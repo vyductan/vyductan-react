@@ -1,25 +1,24 @@
-import { cloneElement, HTMLAttributes, ReactElement, ReactNode } from "react"
+import { cloneElement, HTMLAttributes, ReactElement, ReactNode } from "react";
 
-import { clsm } from "@vyductan/utils"
+import { clsm } from "@vyductan/utils";
 
 export type IconWrapperProps = Omit<
-  HTMLAttributes<HTMLSpanElement>,
+  HTMLAttributes<SVGSVGElement>,
   "children"
 > & {
-  children: ReactElement
-}
+  children: ReactElement;
+};
 const IconWrapper = ({
   children,
   className = "",
   ...props
 }: IconWrapperProps) => {
-  return (
-    <span role="img" className={clsm("h-6 w-6", className)} {...props}>
-      {cloneElement(children, {
-        "aria-hidden": "true",
-      })}
-    </span>
-  )
-}
+  return cloneElement(children, {
+    className: clsm("w-6 h-6", className),
+    "aria-hidden": "true",
+    role: "img",
+    ...props,
+  });
+};
 
-export default IconWrapper
+export default IconWrapper;
