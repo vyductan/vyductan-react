@@ -1,10 +1,10 @@
-import * as React from "react"
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 
-import { clsm } from "@vyductan/utils"
+import { clsm } from "@vyductan/utils";
 
-import Spin from "../spin"
+import Spin from "../spin";
 
 const buttonVariants = cva(
   [
@@ -59,45 +59,44 @@ const buttonVariants = cva(
       size: "default",
     },
   },
-)
+);
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"]
-  loading?: boolean
+  asChild?: boolean;
+  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  loading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      className,
-      type,
-      size,
       asChild = false,
-      children,
+      className,
       disabled,
       htmlType,
       loading,
+      size,
+      type,
       ...props
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button"
+    const Comp = asChild ? Slot : "button";
     return (
       <Comp
         ref={ref}
-        type={htmlType}
         className={clsm(buttonVariants({ type, size, className }))}
         disabled={loading || disabled}
+        type={htmlType}
         {...props}
-      >
-        {loading ? <Spin /> : null}
-      </Comp>
-    )
+      />
+      // {/* {loading ? <Spin /> : null} */}
+      // {/* </Comp> */}
+    );
   },
-)
-Button.displayName = "Button"
+);
+Button.displayName = "Button";
 
-export { Button, buttonVariants }
+export { Button, buttonVariants };
