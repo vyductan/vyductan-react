@@ -1,5 +1,5 @@
-import { theme } from "antd";
-import type { GlobalToken } from "antd";
+// import { theme } from "antd";
+// import type { GlobalToken } from "antd";
 
 // import defaultColors from "tailwindcss/colors";
 
@@ -9,7 +9,7 @@ import type { GlobalToken } from "antd";
  *
  */
 export const THEME_TOKEN = {
-  ...theme.getDesignToken(),
+  // ...theme.getDesignToken(),
   // colorPrimary: defaultColors.blue[600],
   // colorPrimaryBorder: defaultColors.blue[300],
   // colorPrimaryHover: defaultColors.blue[500],
@@ -23,4 +23,5 @@ export const THEME_TOKEN = {
   controlHeight: 40,
   controlHeightLG: 48,
   // colorError: defaultColors.red[500],
-} satisfies GlobalToken;
+}
+// } satisfies GlobalToken;
