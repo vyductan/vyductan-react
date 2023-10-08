@@ -1,5 +1,6 @@
 {
-  "name": "@acme/prettier-config",
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@vyductan/prettier-config",
   "private": true,
   "version": "0.1.0",
   "main": "index.mjs",
@@ -15,8 +16,8 @@
     "prettier-plugin-packagejson": "2"
   },
   "devDependencies": {
-    "@acme/tsconfig": "workspace:*",
+    "@vyductan/typescript-config": "*",
     "typescript": "^5.2.2"
   },
-  "prettier": "@acme/prettier-config"
+  "prettier": "@vyductan/prettier-config"
 }

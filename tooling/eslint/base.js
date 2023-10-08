@@ -6,6 +6,7 @@ const config = {
     project: true,
   },
   extends: [
+    "turbo",
     "@tim-w-james",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",

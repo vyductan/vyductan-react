@@ -1,5 +1,6 @@
 {
-  "name": "@acme/eslint-config",
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@vyductan/eslint-config",
   "version": "0.2.0",
   "private": true,
   "license": "MIT",
@@ -11,9 +12,16 @@
   ],
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "lint": "eslint .",
     "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@vyductan/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "./base.js"
+    ],
+    "root": true
   },
   "dependencies": {
     "@next/eslint-plugin-next": "^13.5.3",
@@ -23,6 +31,7 @@
     "eslint-config-airbnb": "19",
     "eslint-config-airbnb-typescript": "17",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-config-turbo": "^1.10.15",
     "eslint-plugin-filename-rules": "1",
     "eslint-plugin-import": "2",
     "eslint-plugin-jsdoc": "46",
@@ -38,16 +47,9 @@
     "eslint-plugin-tsdoc": "0.2"
   },
   "devDependencies": {
-    "@acme/prettier-config": "workspace:*",
-    "@acme/tsconfig": "workspace:*",
+    "@vyductan/prettier-config": "*",
+    "@vyductan/typescript-config": "*",
     "eslint": "^8.50.0",
     "typescript": "^5.2.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "./base.js"
-    ]
-  },
-  "prettier": "@acme/prettier-config"
+  }
 }

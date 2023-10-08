@@ -1,5 +1,6 @@
 {
-  "extends": "@acme/tsconfig/base.json",
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@vyductan/tsconfig/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

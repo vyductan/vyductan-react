@@ -1,7 +1,8 @@
 {
-  "name": "@acme/tsconfig",
-  "private": true,
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@vyductan/typescript-config",
   "version": "0.1.0",
+  "private": true,
   "files": [
     "base.json"
   ]
