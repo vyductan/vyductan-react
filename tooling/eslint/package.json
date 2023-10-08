@@ -24,10 +24,10 @@
     "root": true
   },
   "dependencies": {
-    "@next/eslint-plugin-next": "^13.5.3",
+    "@next/eslint-plugin-next": "^13.5.4",
     "@types/eslint": "^8.44.3",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
     "eslint-config-airbnb": "19",
     "eslint-config-airbnb-typescript": "17",
     "eslint-config-prettier": "^9.0.0",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@vyductan/prettier-config": "*",
     "@vyductan/typescript-config": "*",
-    "eslint": "^8.50.0",
+    "eslint": "^8.51.0",
     "typescript": "^5.2.2"
   }
 }
