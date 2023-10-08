@@ -1,5 +1,4 @@
 import { cloneElement, Fragment, ReactElement, ReactNode } from "react";
-import Link from "next/link";
 
 import {
   DropdownMenuContent,
@@ -47,7 +46,7 @@ export const Dropdown = ({
         ) : (
           <DropdownMenuItem onSelect={x.onSelect} asChild={!!x.href}>
             {x.href ? (
-              <Link href={x.href}>
+              <a href={x.href}>
                 {x.icon &&
                   cloneElement(x.icon, {
                     className: "mr-2 h-4 w-4",
@@ -56,7 +55,7 @@ export const Dropdown = ({
                 {x.shortcut && (
                   <DropdownMenuShortcut>{x.shortcut}</DropdownMenuShortcut>
                 )}
-              </Link>
+              </a>
             ) : (
               <>
                 {x.icon &&

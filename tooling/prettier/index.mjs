@@ -1,3 +1,4 @@
+// const { fileURLToPath } = require("url");
 import { fileURLToPath } from "url";
 
 /** @typedef  {import("prettier").Config} PrettierConfig */
@@ -6,11 +7,17 @@ import { fileURLToPath } from "url";
 
 /** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
 const config = {
+  // plugins: [
+  //   require.resolve("@ianvs/prettier-plugin-sort-imports"),
+  //   require.resolve("prettier-plugin-tailwindcss"),
+  // ],
   plugins: [
-    require.resolve("@ianvs/prettier-plugin-sort-imports"),
-    require.resolve("prettier-plugin-tailwindcss"),
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-packagejson",
+    "prettier-plugin-tailwindcss",
   ],
   tailwindConfig: fileURLToPath(
+    // new URL("../tailwind/index.ts", require('url').pathToFileURL(__filename).toString()),
     new URL("../tailwind/index.ts", import.meta.url),
   ),
   importOrder: [
@@ -26,6 +33,6 @@ const config = {
     "^[../]",
     "^[./]",
   ],
-}
+};
 
-module.exports = config
+export default config;

@@ -4,10 +4,17 @@ bun i -D eslint eslint-config-airbnb eslint-config-airbnb-typescript eslint-conf
     eslint-plugin-tsdoc
 
 
+--- shadcn/ui
+bun i @radix-ui/react-dropdown-menu @radix-ui/react-avatar @radix-ui/react-slo
+bunx shadcn-ui@latest add
+-- 
+bun i clsx tailwind-merge class-variance-authority
+--- DEV
     "@typescript-eslint/eslint-plugin": "6.7.2",
     "@typescript-eslint/parser": "6.7.2",
 
     "@tim-w-james/eslint-config": "2.2.0",
+    "@types/eslint": "^8.44.3",
 
     "eslint": "^8.50.0",
     "eslint-config-airbnb": "19",
