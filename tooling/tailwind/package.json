@@ -3,17 +3,24 @@
   "name": "@vyductan/tailwind-config",
   "version": "0.1.0",
   "private": true,
-  "main": "index.ts",
   "license": "MIT",
+  "main": "index.ts",
   "files": [
     "index.ts",
     "postcss.js"
   ],
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "lint": "eslint .",
     "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@vyductan/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@vyductan/eslint-config/base"
+    ],
+    "root": true
   },
   "dependencies": {
     "autoprefixer": "^10.4.16",
@@ -27,12 +34,5 @@
     "eslint": "^8.51.0",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@vyductan/eslint-config/base"
-    ]
-  },
-  "prettier": "@vyductan/prettier-config"
+  }
 }
