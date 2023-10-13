@@ -1,3 +1,8 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
 # Logs
 logs
 *.log
@@ -6,11 +11,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*
@@ -22,7 +22,36 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.pem
 
-# PNPM
-pnpm-lock.yaml
-pnpm-workspace.yaml
+# Local files
+*.local
+
+# next.js
+.next/
+out/
+next-env.d.ts
+# expo
+.expo/
+dist/
+expo-env.d.ts
+apps/expo/.gitignore
+# tauri
+dist
+dist-ssr
+
+# production
+build
+
+# testing
+coverage
+
+# typescript
+*.tsbuildinfo
+
+# turbo
+.turbo
+
+# vercel
+.vercel
+
