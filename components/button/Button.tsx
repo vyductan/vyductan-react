@@ -52,6 +52,7 @@ const buttonVariants = cva(
         xs: "h-xs rounded-xs px-2 py-0 text-sm",
         sm: "h-sm rounded-sm px-3 py-1 text-sm",
         default: "h-md rounded-md px-4 py-2 text-md",
+        lg: "h-lg rounded-sm px-3 py-1 text-sm",
       },
     },
     defaultVariants: {
@@ -62,23 +63,29 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type">,
+  extends Omit<
+      React.ButtonHTMLAttributes<HTMLButtonElement>,
+      "type" | "prefix"
+    >,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
   loading?: boolean;
+  prefix?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
+      children,
       className,
       disabled,
       htmlType,
       loading,
       size,
       type,
+      prefix,
       ...props
     },
     ref,
@@ -91,7 +98,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={loading || disabled}
         type={htmlType}
         {...props}
-      />
+      >
+        {prefix && <span className="mr-2">{prefix}</span>}
+        {children}
+      </Comp>
       // {/* {loading ? <Spin /> : null} */}
       // {/* </Comp> */}
     );
