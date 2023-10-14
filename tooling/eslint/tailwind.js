@@ -1,10 +1,14 @@
+const { fileURLToPath } = require("url");
+
 /** @type {import("eslint").Linter.Config} */
 const config = {
   extends: ["plugin:tailwindcss/recommended"],
   settings: {
     tailwindcss: {
       callees: ["clsm", "cva", "cx"],
-      config: "../tailwind/index.ts",
+      config: fileURLToPath(
+        new URL("../tailwind/index.ts", "file://" + __filename),
+      ),
     },
   },
 };
