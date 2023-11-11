@@ -1,4 +1,5 @@
-import { cloneElement, HTMLAttributes, ReactElement, ReactNode } from "react";
+import { cloneElement } from "react";
+import type { HTMLAttributes, ReactElement } from "react";
 
 import { clsm } from "@vyductan/utils";
 
@@ -14,7 +15,7 @@ const IconWrapper = ({
   ...props
 }: IconWrapperProps) => {
   return cloneElement(children, {
-    className: clsm("w-6 h-6", className),
+    className: clsm("h-6 w-6", className),
     "aria-hidden": "true",
     role: "img",
     ...props,

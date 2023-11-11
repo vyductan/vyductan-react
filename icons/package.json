@@ -8,6 +8,7 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "devDependencies": {
-    "@iconify/react": "^4.1.1"
+    "@iconify/react": "^4.1.1",
+    "@vyductan/typescript-config": "*"
   }
 }

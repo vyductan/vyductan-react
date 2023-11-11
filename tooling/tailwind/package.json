@@ -15,24 +15,14 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
-  "prettier": "@vyductan/prettier-config",
-  "eslintConfig": {
-    "extends": [
-      "@vyductan/eslint-config/base"
-    ],
-    "root": true
-  },
   "dependencies": {
     "autoprefixer": "^10.4.16",
     "postcss": "8.4.31",
-    "tailwindcss": "3.3.3"
+    "tailwindcss": "3.3.5",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@vyductan/eslint-config": "*",
-    "@vyductan/prettier-config": "*",
     "@vyductan/typescript-config": "*",
-    "eslint": "^8.51.0",
-    "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   }
 }

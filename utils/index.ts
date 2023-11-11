@@ -1,2 +1,3 @@
-export { default as clsm } from "./clsm"
-export { formatCurrencyVND } from "./formatCurrency"
+export { default as clsm } from "./clsm";
+export * from "./color";
+export { formatCurrencyVND } from "./formatCurrency";

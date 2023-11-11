@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
@@ -15,17 +16,8 @@ const buttonVariants = cva(
   ],
   {
     variants: {
-      type: {
-        default: [
-          "bg-gray-900 text-gray-50",
-          "hover:bg-gray-900/90",
-          "dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90",
-        ],
-        primary: [
-          "bg-primary",
-          "hover:bg-primary/90",
-          "active:ring-primary-border",
-        ],
+      color: {
+        default: ["hover:text-primary-hover"],
         danger: [
           "bg-red-500",
           "hover:bg-red-500/90",
@@ -33,10 +25,26 @@ const buttonVariants = cva(
           "dark:bg-red-900",
           "dark:hover:bg-red-900/90",
         ],
-        // outline:
-        //   "border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50",
+      },
+      type: {
+        primary: [
+          "text-white bg-primary",
+          "hover:bg-primary-hover",
+          "active:ring-primary-border",
+        ],
+        default: [
+          // "text-primary",
+          "border border-border",
+          "hover:border-primary-hover",
+        ],
+        // default: [
+        //   "bg-gray-900 text-gray-50",
+        //   "hover:bg-gray-900/90",
+        //   "dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90",
+        // ],
+
         // secondary:
-        //   "bg-gray-100 text-gray-900 hover:bg-gray-100/80 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-800/80",
+        // "bg-gray-100 text-gray-900 hover:bg-gray-100/80 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-800/80",
         ghost:
           "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-50",
         "ghost-action": ["text-blue-500"],
@@ -53,25 +61,24 @@ const buttonVariants = cva(
         sm: "h-sm rounded-sm px-3 py-1 text-sm",
         default: "h-md rounded-md px-4 py-2 text-md",
         lg: "h-lg rounded-sm px-3 py-1 text-sm",
+        xl: "h-xl px-4 text-xl",
       },
     },
     defaultVariants: {
       type: "default",
+      color: "default",
       size: "default",
     },
   },
 );
 
 export interface ButtonProps
-  extends Omit<
-      React.ButtonHTMLAttributes<HTMLButtonElement>,
-      "type" | "prefix"
-    >,
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color" | "type">,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
   loading?: boolean;
-  prefix?: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -80,12 +87,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       asChild = false,
       children,
       className,
+      color,
       disabled,
       htmlType,
       loading,
       size,
       type,
-      prefix,
+      icon,
       ...props
     },
     ref,
@@ -94,12 +102,30 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
-        className={clsm(buttonVariants({ type, size, className }))}
-        disabled={loading || disabled}
+        className={clsm(
+          buttonVariants({ color, type, size, className }),
+          icon && !children
+            ? !size || size === "default"
+              ? "w-10"
+              : size === "sm"
+              ? "w-8"
+              : ""
+            : "",
+        )}
+        disabled={loading ?? disabled}
         type={htmlType}
         {...props}
       >
-        {prefix && <span className="mr-2">{prefix}</span>}
+        {icon && (
+          <span
+            className={clsm(children && "mr-2")}
+            onClick={() => {
+              console.log(icon, children, size);
+            }}
+          >
+            {icon}
+          </span>
+        )}
         {children}
       </Comp>
       // {/* {loading ? <Spin /> : null} */}
