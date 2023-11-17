@@ -26,7 +26,16 @@ export default {
           DEFAULT: "hsl(var(--primary-600))",
           hover: "hsl(var(--primary-500))",
           foreground: "hsl(var(--primary-foreground))",
+          100: "hsl(var(--primary-100))",
+          200: "hsl(var(--primary-200))",
           300: "hsl(var(--primary-300))",
+          400: "hsl(var(--primary-400))",
+          500: "hsl(var(--primary-500))",
+          600: "hsl(var(--primary-600))",
+          700: "hsl(var(--primary-700))",
+          800: "hsl(var(--primary-800))",
+          900: "hsl(var(--primary-900))",
+          950: "hsl(var(--primary-950))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -60,11 +69,6 @@ export default {
       // }),
       backgroundColor: {
         // warning: THEME_TOKEN.colorWarningBg,
-      },
-      borderColor: {
-        // color: THEME_TOKEN.colorBorder,
-        // "color-secondary": THEME_TOKEN.colorBorderSecondary,
-        // warning: THEME_TOKEN.colorWarningBorder,
       },
       borderRadius: {
         xs: borderRadius.DEFAULT,
@@ -101,6 +105,13 @@ export default {
       },
       padding: {
         // lg: THEME_TOKEN.paddingLG + "px",
+      },
+      // Colors
+      textColor: {
+        placeholder: "hsl(var(--placeholder))",
+      },
+      borderColor: {
+        "      error-hover": "hsl(var(--border-error-hover))",
       },
     },
   },

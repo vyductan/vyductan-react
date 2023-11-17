@@ -4,11 +4,11 @@
 
 @layer base {
   :root {
-    --primary-100: 41 10% 95%;
-    --primary-200: 39 36% 82%;
-    --primary-300: 37 52% 74%;
-    --primary-400: 35 68% 66%;
-    --primary-500: 33 84% 58%;
+    --primary-100: 41 100% 95%;
+    --primary-200: 39 100% 82%;
+    --primary-300: 37 100% 74%;
+    --primary-400: 35 100% 66%;
+    --primary-500: 33 100% 58%;
     --primary-600: 31 100% 50%;
     --primary-700: 29 100% 43%;
     --primary-800: 27 100% 35%;
@@ -47,11 +47,11 @@
   }
 
   [data-theme="dark"] {
-    /* --primary-100: 27 100% 5%; */
-    --primary-200: 39 36% 80%;
-    --primary-300: 37 52% 72%;
-    --primary-400: 35 68% 63%;
-    --primary-500: 33 84% 52%;
+    --primary-100: 27 100% 5%;
+    --primary-200: 39 90% 80%;
+    --primary-300: 37 89% 72%;
+    --primary-400: 35 86% 63%;
+    --primary-500: 33 79% 52%;
     --primary-600: 31 100% 43%;
     --primary-700: 31 100% 33%;
     --primary-800: 31 100% 23%;
@@ -84,6 +84,10 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+
+    --placeholder: 0 0% 0% / 0.25;
+
+    --border-error-hover: theme(colors.red.500);
   }
 }
 

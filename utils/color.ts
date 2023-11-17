@@ -17,10 +17,7 @@ export const hexToHsl = (hex: string) => {
   hex = hex.replace(/^#/, "");
 
   // Chuyển đổi hex sang RGB
-  const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
+  const { r, g, b } = hexToRgb(hex);
 
   // Chia các giá trị RGB cho 255 để có giá trị từ 0 đến 1
   const rNormalized = r / 255;
@@ -28,37 +25,31 @@ export const hexToHsl = (hex: string) => {
   const bNormalized = b / 255;
 
   // Tìm giá trị tối đa và tối thiểu trong RGB
-  const max = Math.max(rNormalized, gNormalized, bNormalized);
-  const min = Math.min(rNormalized, gNormalized, bNormalized);
-
-  let h: number, s: number, l: number;
+  const cMax = Math.max(rNormalized, gNormalized, bNormalized);
+  const cMin = Math.min(rNormalized, gNormalized, bNormalized);
+  const delta = cMax - cMin;
 
   // Tính giá trị Hue (màu sắc)
-  if (max === min) {
-    h = 0; // Màu xám
-  } else if (max === rNormalized) {
-    h = (60 * ((gNormalized - bNormalized) / (max - min)) + 360) % 360;
-  } else if (max === gNormalized) {
-    h = 60 * ((bNormalized - rNormalized) / (max - min)) + 120;
+  let h = 0;
+  if (delta === 0) {
+    h = 0;
+  } else if (cMax === rNormalized) {
+    h = ((gNormalized - bNormalized) / delta) % 6;
+  } else if (cMax === gNormalized) {
+    h = (bNormalized - rNormalized) / delta + 2;
   } else {
-    h = 60 * ((rNormalized - gNormalized) / (max - min)) + 240;
+    h = (rNormalized - gNormalized) / delta + 4;
   }
+
+  h = Math.round(h * 60);
+  if (h < 0) h += 360;
 
   // Tính giá trị Lightness (độ sáng)
-  l = ((max + min) / 2) * 100;
+  const l = (cMax + cMin) / 2;
 
   // Tính giá trị Saturation (độ bão hòa)
-  if (max === 0 || max === min) {
-    s = 0;
-  } else if (max === rNormalized) {
-    s = ((max - min) / max) * 100;
-  } else {
-    s = ((max - min) / (1 - Math.abs(2 * l - 1))) * 100;
-  }
+  const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
 
-  h = Math.round(h);
-  s = Math.round(s);
-  l = Math.round(l);
-
-  return { h, s, l };
+  // to %
+  return { h, s: Math.round(s * 100), l: Math.round(l * 100) };
 };
