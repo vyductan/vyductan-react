@@ -20,3 +20,4 @@ export * from "./toast";
 export * from "./tooltip";
 
 export * from "./extends/ButtonScrollToBottom";
+export * from "./extends/TailwindIndicator";

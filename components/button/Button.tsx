@@ -17,7 +17,7 @@ const buttonVariants = cva(
   {
     variants: {
       color: {
-        default: ["hover:text-primary-hover"],
+        default: [],
         danger: [
           "bg-red-500",
           "hover:bg-red-500/90",
@@ -34,7 +34,7 @@ const buttonVariants = cva(
         ],
         default: [
           // "text-primary",
-          "border border-border",
+          "border border-border hover:text-primary-hover",
           "hover:border-primary-hover",
         ],
         // default: [

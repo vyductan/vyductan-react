@@ -6,29 +6,29 @@ import type { TextareaAutosizeProps } from "react-textarea-autosize";
 
 import { clsm } from "@vyductan/utils";
 
+import { inputStatusVariants } from "../input";
+
 const textareaVariants = cva(
   [
-    "min-h-[80px] w-full bg-transparent px-3 py-2 text-sm",
-    "placeholder:text-muted-foreground",
+    "w-full",
+    "bg-transparent",
+    "text-sm",
+    "placeholder:text-placeholder",
     "focus-visible:outline-none",
     "disabled:cursor-not-allowed disabled:opacity-50",
   ],
   {
     variants: {
-      borderless: {
-        true: [
-          "border-0",
-          "focus-within:outline-none",
-          // "focus-visible:outline-0",
-        ],
-        false: [
-          "rounded-md border border-input ring-offset-background",
-          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        ],
+      size: {
+        xs: "",
+        sm: "",
+        default: "px-3 py-[9px]",
+        lg: "",
+        xl: "px-4 py-4 text-md",
       },
     },
     defaultVariants: {
-      borderless: false,
+      size: "default",
     },
   },
 );
@@ -36,21 +36,24 @@ export type TextareaProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   "style"
 > &
-  VariantProps<typeof textareaVariants> & {
-    autoSize?:
-      | boolean
-      | Pick<
-          TextareaAutosizeProps,
-          "maxRows" | "minRows" | "onHeightChange" | "cacheMeasurements"
-        >;
+  VariantProps<typeof inputStatusVariants> &
+  VariantProps<typeof textareaVariants> &
+  Pick<
+    TextareaAutosizeProps,
+    "maxRows" | "minRows" | "onHeightChange" | "cacheMeasurements"
+  > & {
+    autoSize?: boolean;
   };
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ autoSize, borderless, className, ...props }, ref) => {
+  ({ autoSize, borderless, className, size, status, ...props }, ref) => {
     const Comp = autoSize ? TextareaAutosize : "textarea";
     return (
       <Comp
-        className={clsm(textareaVariants({ borderless, className }))}
+        className={clsm(
+          inputStatusVariants({ borderless, status }),
+          textareaVariants({ className, size }),
+        )}
         ref={ref}
         {...(typeof autoSize === "object" ? autoSize : {})}
         {...props}
