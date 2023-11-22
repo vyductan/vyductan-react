@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
@@ -76,6 +78,7 @@ export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color" | "type">,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  href?: string;
   htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
   loading?: boolean;
   icon?: React.ReactNode;
@@ -108,8 +111,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             ? !size || size === "default"
               ? "w-10"
               : size === "sm"
-              ? "w-8"
-              : ""
+                ? "w-8"
+                : ""
             : "",
         )}
         disabled={loading ?? disabled}
@@ -126,10 +129,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {icon}
           </span>
         )}
-        {children}
+        {loading ? <Spin>{children}</Spin> : children}
       </Comp>
-      // {/* {loading ? <Spin /> : null} */}
-      // {/* </Comp> */}
     );
   },
 );

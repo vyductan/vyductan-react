@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vyductan/tailwind-config",
+  "name": "@vyductan/theme-config",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -15,6 +15,13 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "prettier": "@vyductan/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@vyductan/eslint-config/base"
+    ],
+    "root": true
+  },
   "dependencies": {
     "autoprefixer": "^10.4.16",
     "postcss": "8.4.31",
@@ -22,7 +29,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@vyductan/typescript-config": "*",
-    "typescript": "^5.2.2"
+    "@vyductan/eslint-config": "*",
+    "@vyductan/prettier-config": "*",
+    "@vyductan/typescript-config": "*"
   }
 }

@@ -27,11 +27,14 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tanstack/react-table": "^8.10.7",
     "@vyductan/hooks": "*",
+    "@vyductan/icons": "workspace:*",
     "@vyductan/utils": "*",
     "class-variance-authority": "^0.7.0",
+    "react": "18.2.0",
     "react-textarea-autosize": "^8.5.3"
   },
   "devDependencies": {
+    "@types/react": "^18.2.37",
     "@vyductan/eslint-config": "*",
     "@vyductan/typescript-config": "*",
     "typescript": "^5.2.2"

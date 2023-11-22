@@ -1,4 +1,9 @@
-import { cloneElement, Fragment, ReactElement, ReactNode } from "react";
+"use client";
+
+import { cloneElement, Fragment } from "react";
+import type { MouseEventHandler, ReactElement, ReactNode } from "react";
+import type { Placement } from "@popperjs/core";
+import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
 
 import {
   DropdownMenuContent,
@@ -11,7 +16,7 @@ import {
 } from "./_components";
 
 type MenuItem = {
-  key: string;
+  key?: string;
   label?: ReactNode;
   icon?: ReactElement;
   shortcut?: ReactNode;
@@ -19,67 +24,92 @@ type MenuItem = {
   as?: "title" | "separator";
   href?: string;
   onSelect?: (event: Event) => void;
+  onClick?: MouseEventHandler<HTMLDivElement>;
 };
-type Menu = MenuItem[];
-export type DropdownProps = {
+type Menu = {
+  className?: string;
+  items: MenuItem[];
+};
+export type DropdownProps = DropdownMenuTriggerProps & {
   className?: string;
   children: ReactNode;
   menu: Menu;
-  overlayClassName?: string;
+  placement?: Placement;
 };
 
 export const Dropdown = ({
   className,
   children,
   menu,
-  overlayClassName,
+  placement,
+  ...rest
 }: DropdownProps) => {
-  const renderMenu = (menu: Menu): ReactNode => {
-    return menu.map((x) => (
-      <Fragment key={x.key}>
-        {x.as === "title" ? (
-          <DropdownMenuLabel>{x.label}</DropdownMenuLabel>
-        ) : x.as === "separator" ? (
-          <DropdownMenuSeparator />
-        ) : x.group ? (
-          renderMenu(x.group)
-        ) : (
-          <DropdownMenuItem onSelect={x.onSelect} asChild={!!x.href}>
-            {x.href ? (
-              <a href={x.href}>
-                {x.icon &&
-                  cloneElement(x.icon, {
-                    className: "mr-2 h-4 w-4",
-                  })}
-                <span>{x.label}</span>
-                {x.shortcut && (
-                  <DropdownMenuShortcut>{x.shortcut}</DropdownMenuShortcut>
-                )}
-              </a>
-            ) : (
-              <>
-                {x.icon &&
-                  cloneElement(x.icon, {
-                    className: "mr-2 h-4 w-4",
-                  })}
-                <span>{x.label}</span>
-                {x.shortcut && (
-                  <DropdownMenuShortcut>{x.shortcut}</DropdownMenuShortcut>
-                )}
-              </>
-            )}
-          </DropdownMenuItem>
-        )}
-      </Fragment>
-    ));
+  const side = placement?.includes("top")
+    ? "top"
+    : placement?.includes("right")
+      ? "right"
+      : !placement || placement.includes("bottom")
+        ? "bottom"
+        : "left";
+  const align =
+    !placement || placement.includes("auto")
+      ? "center"
+      : placement?.includes("start")
+        ? "start"
+        : "end";
+  const renderMenu = (menu: MenuItem[]): ReactNode => {
+    return menu.map(
+      ({ as, group, href, key, label, icon, shortcut, onSelect }, index) => (
+        <Fragment key={key ?? index}>
+          {as === "title" ? (
+            <DropdownMenuLabel>{label}</DropdownMenuLabel>
+          ) : as === "separator" ? (
+            <DropdownMenuSeparator />
+          ) : group ? (
+            renderMenu(group)
+          ) : (
+            <DropdownMenuItem onSelect={onSelect} asChild={!!href}>
+              {href ? (
+                <a href={href}>
+                  {icon &&
+                    cloneElement(icon, {
+                      className: "mr-2 h-4 w-4",
+                    })}
+                  <span>{label}</span>
+                  {shortcut && (
+                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                  )}
+                </a>
+              ) : (
+                <>
+                  {icon &&
+                    cloneElement(icon, {
+                      className: "mr-2 h-4 w-4",
+                    })}
+                  <span>{label}</span>
+                  {shortcut && (
+                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                  )}
+                </>
+              )}
+            </DropdownMenuItem>
+          )}
+        </Fragment>
+      ),
+    );
   };
   return (
     <DropdownMenuRoot>
-      <DropdownMenuTrigger className={className}>
+      <DropdownMenuTrigger className={className} {...rest}>
         {children}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className={overlayClassName}>
-        {renderMenu(menu)}
+      <DropdownMenuContent
+        className={menu.className}
+        side={side}
+        align={align}
+        forceMount
+      >
+        {renderMenu(menu.items)}
       </DropdownMenuContent>
     </DropdownMenuRoot>
   );

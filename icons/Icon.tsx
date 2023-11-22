@@ -1,3 +1,5 @@
+"use client";
+
 import { Icon as Iconify } from "@iconify/react";
 import type { IconProps as IconifyProps } from "@iconify/react";
 

@@ -7,7 +7,7 @@ const config = {
     "prettier-plugin-tailwindcss",
   ],
   tailwindConfig: fileURLToPath(
-    new URL("../tailwind/index.ts", import.meta.url),
+    new URL("../../theme/index.ts", import.meta.url),
   ),
   importOrder: [
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",

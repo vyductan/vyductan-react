@@ -7,7 +7,7 @@ const config = {
     tailwindcss: {
       callees: ["clsm", "cva", "cx"],
       config: fileURLToPath(
-        new URL("../tailwind/index.ts", "file://" + __filename),
+        new URL("../../theme/index.ts", "file://" + __filename),
       ),
     },
   },

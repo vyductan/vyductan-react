@@ -146,7 +146,7 @@ const Modal = ({
 
         <DialogFooter>
           <Button onClick={onCancel}>Cancel</Button>
-          <Button color="primary" onClick={onOk}>
+          <Button type="primary" onClick={onOk}>
             {okText ?? "Ok"}
           </Button>
         </DialogFooter>

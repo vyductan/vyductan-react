@@ -1,14 +1,14 @@
-import defaultTailwindConfig from "tailwindcss/defaultConfig"
+import {theme} from "tailwindcss/defaultConfig"
 
 export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
 
-const defaultTailwindScreensConfig = defaultTailwindConfig.theme
+const defaultTailwindScreensConfig =theme
   ?.screens as Record<string, string>
 
 export const defaultScreensConfig = (() => {
   const c: Record<string, number> = {}
   Object.keys(defaultTailwindScreensConfig).map((x) => {
-    c[x] = Number((defaultTailwindScreensConfig[x] as string).replace("px", ""))
+    c[x] = Number((defaultTailwindScreensConfig[x]!).replace("px", ""))
   })
   return {
     xs: 0,

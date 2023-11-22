@@ -1,7 +1,6 @@
 import type { Config } from "tailwindcss";
 import { borderRadius, fontSize, spacing } from "tailwindcss/defaultTheme";
-
-// import { THEME_TOKEN } from "../../theme/token";
+import tailwindcssAnimatePlugin from "tailwindcss-animate"
 
 export default {
   darkMode: ["class", '[data-theme="dark"]'],
@@ -115,5 +114,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimatePlugin],
 } satisfies Config;

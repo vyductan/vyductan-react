@@ -1,15 +1,17 @@
-import { ReactNode } from "react";
+"use client";
+
+import type { ReactNode } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import type { AvatarImageProps } from "@radix-ui/react-avatar";
 
 import { clsm } from "@vyductan/utils";
 
-export type AvatarProps = {
+export type AvatarProps = AvatarImageProps & {
   children?: ReactNode;
   className?: string;
-  src?: string;
   asChild?: AvatarPrimitive.AvatarProps["asChild"];
 };
-export const Avatar = ({ children, className, src }: AvatarProps) => {
+export const Avatar = ({ children, className, ...rest }: AvatarProps) => {
   return (
     <AvatarPrimitive.Root
       className={clsm(
@@ -19,7 +21,7 @@ export const Avatar = ({ children, className, src }: AvatarProps) => {
     >
       <AvatarPrimitive.Image
         className={clsm("aspect-square h-full w-full")}
-        src={src}
+        {...rest}
       />
       <AvatarPrimitive.Fallback
         className={clsm(
