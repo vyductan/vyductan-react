@@ -7,11 +7,11 @@ import type { AvatarImageProps } from "@radix-ui/react-avatar";
 import { clsm } from "@vyductan/utils";
 
 export type AvatarProps = AvatarImageProps & {
-  children?: ReactNode;
+  fallback?: ReactNode;
   className?: string;
   asChild?: AvatarPrimitive.AvatarProps["asChild"];
 };
-export const Avatar = ({ children, className, ...rest }: AvatarProps) => {
+export const Avatar = ({ fallback, className, ...rest }: AvatarProps) => {
   return (
     <AvatarPrimitive.Root
       className={clsm(
@@ -28,7 +28,7 @@ export const Avatar = ({ children, className, ...rest }: AvatarProps) => {
           "flex h-full w-full items-center justify-center rounded-full bg-primary text-white dark:bg-primary",
         )}
       >
-        {children}
+        {fallback}
       </AvatarPrimitive.Fallback>
     </AvatarPrimitive.Root>
   );
