@@ -34,9 +34,7 @@
     "react-textarea-autosize": "^8.5.3"
   },
   "devDependencies": {
-    "@types/react": "^18.2.37",
     "@vyductan/eslint-config": "*",
-    "@vyductan/typescript-config": "*",
-    "typescript": "^5.2.2"
+    "@vyductan/typescript-config": "*"
   }
 }
