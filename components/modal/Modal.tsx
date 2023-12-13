@@ -73,7 +73,7 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={clsm(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
       className,
     )}
     {...props}
@@ -134,7 +134,7 @@ const Modal = ({
       }}
       {...rest}
     >
-      {trigger ? <DialogTrigger>{trigger}</DialogTrigger> : null}
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
 
       <DialogContent>
         <DialogHeader>
@@ -142,7 +142,7 @@ const Modal = ({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
-        {children}
+        <div className="max-h-[75vh] overflow-auto">{children}</div>
 
         <DialogFooter>
           <Button onClick={onCancel}>Cancel</Button>
