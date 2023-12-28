@@ -1,9 +1,8 @@
 import * as React from "react";
-import { cva, VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
-// TODO: rename
 export const inputStatusVariants = cva(
   [
     "w-full",
@@ -44,9 +43,14 @@ export const inputStatusVariants = cva(
   },
 );
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
-  VariantProps<typeof inputStatusVariants>;
+  VariantProps<typeof inputStatusVariants> & {
+    onValueChange?: (value: string) => void;
+  };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ borderless, className, status, type, ...props }, ref) => {
+  (
+    { borderless, className, status, type, onChange, onValueChange, ...props },
+    ref,
+  ) => {
     return (
       <input
         type={type}
@@ -61,6 +65,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className,
         )}
         ref={ref}
+        onChange={(e) => {
+          onChange?.(e);
+          onValueChange?.(e.target.value);
+        }}
         {...props}
       />
     );
