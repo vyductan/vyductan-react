@@ -7,6 +7,7 @@ import { Icon } from "@vyductan/icons";
 import { clsm } from "@vyductan/utils";
 
 import { Button } from "../button";
+import { ScrollArea } from "../scroll-area";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -38,7 +39,11 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={clsm(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-gray-200 bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] dark:border-gray-800 dark:bg-gray-950 sm:rounded-lg md:w-full",
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-[calc(100vw-16px)] translate-x-[-50%] translate-y-[-50%] gap-4 border border-gray-200 bg-white py-6 shadow-lg duration-200",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
+        "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        "dark:border-gray-800 dark:bg-gray-950",
+        "sm:rounded-lg",
         className,
       )}
       {...props}
@@ -59,7 +64,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={clsm(
-      "flex flex-col space-y-1.5 text-center sm:text-left",
+      "flex flex-col space-y-1.5 px-6 text-center sm:text-left",
       className,
     )}
     {...props}
@@ -109,6 +114,7 @@ const DialogDescription = React.forwardRef<
 DialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 type ModalProps = Omit<DialogPrimitive.DialogProps, "onOpenChange"> & {
+  className?: string;
   children?: React.ReactNode;
   description?: React.ReactNode;
   okText?: string;
@@ -118,6 +124,7 @@ type ModalProps = Omit<DialogPrimitive.DialogProps, "onOpenChange"> & {
   onCancel?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
+  className,
   children,
   description,
   okText,
@@ -129,20 +136,24 @@ const Modal = ({
 }: ModalProps) => {
   return (
     <Dialog
-      onOpenChange={() => {
-        onCancel?.();
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onCancel?.();
+        }
       }}
       {...rest}
     >
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
 
-      <DialogContent>
+      <DialogContent className={className}>
         <DialogHeader>
           {title && <DialogTitle>{title}</DialogTitle>}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
 
-        <div className="max-h-[75vh] overflow-auto">{children}</div>
+        <ScrollArea className="max-h-[80vh] px-5 [&>[data-radix-scroll-area-viewport]]:px-1">
+          {children}
+        </ScrollArea>
 
         <DialogFooter>
           <Button onClick={onCancel}>Cancel</Button>
