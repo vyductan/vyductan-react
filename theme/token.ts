@@ -23,5 +23,5 @@ export const THEME_TOKEN = {
   controlHeight: 40,
   controlHeightLG: 48,
   // colorError: defaultColors.red[500],
-}
+};
 // } satisfies GlobalToken;

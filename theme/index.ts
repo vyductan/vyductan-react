@@ -1,6 +1,6 @@
-import type { Config } from "tailwindcss";
+import { type Config } from "tailwindcss";
+import tailwindcssAnimatePlugin from "tailwindcss-animate";
 import { borderRadius, fontSize, spacing } from "tailwindcss/defaultTheme";
-import tailwindcssAnimatePlugin from "tailwindcss-animate"
 
 export default {
   darkMode: ["class", '[data-theme="dark"]'],
@@ -80,6 +80,9 @@ export default {
       fontSize: {
         md: fontSize.base,
         base: fontSize.sm,
+      },
+      width: {
+        "screen-md": "1024px",
       },
       height: {
         xs: spacing[6],
