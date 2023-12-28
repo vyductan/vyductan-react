@@ -1,5 +1,6 @@
 // https://github.com/t3-oss/create-t3-app/blob/main/cli/template/base/_eslintrc.cjs
-const { fileURLToPath } = require("url");
+// https://github.com/t3-oss/create-t3-turbo/blob/main/tooling/eslint/base.js
+// const { fileURLToPath } = require("url");
 
 /** @type {import("eslint").Linter.Config} */
 const config = {
@@ -9,33 +10,33 @@ const config = {
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "prettier",
-    "canonical",
   ],
+  env: {
+    es2022: true,
+    node: true,
+  },
   parser: "@typescript-eslint/parser",
   parserOptions: {
     project: true,
   },
   plugins: ["@typescript-eslint", "import", "canonical"],
   rules: {
-    "prettier/prettier": "off",
-    // canonical
-    // "canonical/sort-keys": "off",
-    // "canonical/import-specifier-newline": "off",
-    // "canonical/export-specifier-newline": "off",
-    "canonical/no-barrel-import": "error",
-
-    // ------
-    // t3
+    /*
+     * t3
+     */
     "@typescript-eslint/array-type": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
+      { prefer: "type-imports", fixStyle: "separate-type-imports" },
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
       {
-        prefer: "type-imports",
-        fixStyle: "inline-type-imports",
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
       },
     ],
-    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
     "@typescript-eslint/no-misused-promises": [
       "error",
       {
@@ -43,8 +44,11 @@ const config = {
       },
     ],
 
-    // t3-turbo
+    /*
+     * t3-turbo
+     */
     "turbo/no-undeclared-env-vars": "off",
+    //t3 had
     // "@typescript-eslint/no-unused-vars": [
     //   "error",
     //   { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
@@ -53,7 +57,12 @@ const config = {
     //   "warn",
     //   { prefer: "type-imports", fixStyle: "separate-type-imports" },
     // ],
-    "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"], // no need use
+
+    /*
+     * t3
+     */
+    "canonical/no-barrel-import": "error",
 
     /**
      * @tim-w-james (override)
@@ -110,18 +119,18 @@ const config = {
     "pnpm-lock.yaml",
   ],
   reportUnusedDisableDirectives: true,
-  settings: {
-    "import/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
-    },
-    "import/resolver": {
-      typescript: {
-        project: fileURLToPath(
-          new URL("../typescript/base.json", "file://" + __filename),
-        ),
-      },
-    },
-  },
+  // settings: {
+  //   "import/parsers": {
+  //     "@typescript-eslint/parser": [".ts", ".tsx"],
+  //   },
+  //   "import/resolver": {
+  //     typescript: {
+  //       project: fileURLToPath(
+  //         new URL("../typescript/base.json", "file://" + __filename),
+  //       ),
+  //     },
+  //   },
+  // },
 };
 
 module.exports = config;
