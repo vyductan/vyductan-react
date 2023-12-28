@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@vyductan/components-pro",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.ts",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@vyductan/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@vyductan/eslint-config/base"
+    ],
+    "root": true
+  },
+  "dependencies": {
+    "@vyductan/components": "*",
+    "@vyductan/hooks": "*",
+    "@vyductan/icons": "workspace:*",
+    "@vyductan/utils": "*",
+    "react": "18.2.0"
+  },
+  "devDependencies": {
+    "@vyductan/eslint-config": "*",
+    "@vyductan/theme-config": "*",
+    "@vyductan/typescript-config": "*"
+  }
+}
