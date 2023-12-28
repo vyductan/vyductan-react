@@ -1,8 +1,8 @@
-import InternalList from "./List"
-import ListItem from "./ListItem"
+import InternalList from "./List";
+import ListItem from "./ListItem";
 
-export type { ListProps } from "./List"
+export type { ListProps } from "./List";
 
 export const List = Object.assign(InternalList, {
   Item: ListItem,
-})
+});
