@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { cva } from "class-variance-authority";
-import type { VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
@@ -36,8 +35,12 @@ const buttonVariants = cva(
         ],
         default: [
           // "text-primary",
-          "border border-border hover:text-primary-hover",
-          "hover:border-primary-hover",
+          "border border-border",
+          "hover:text-primary-hover hover:border-primary-hover",
+        ],
+        dashed: [
+          "border border-border border-dashed",
+          "hover:text-primary-hover hover:border-primary-hover",
         ],
         // default: [
         //   "bg-gray-900 text-gray-50",
