@@ -10,17 +10,22 @@ const config = {
     new URL("../../theme/index.ts", import.meta.url),
   ),
   importOrder: [
+    "<TYPES>",
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
     "^(next/(.*)$)|^(next$)",
     "^(expo(.*)$)|^(expo$)",
     "<THIRD_PARTY_MODULES>",
     "",
+    "<TYPES>^@vyductan",
     "^@vyductan/(.*)$",
     "",
+    "<TYPES>^[.|..|~]",
     "^~/",
     "^[../]",
     "^[./]",
   ],
+  importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
+  importOrderTypeScriptVersion: "4.4.0",
 };
 
 export default config;

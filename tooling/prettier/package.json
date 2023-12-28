@@ -3,7 +3,10 @@
   "name": "@vyductan/prettier-config",
   "version": "0.1.0",
   "private": true,
-  "main": "index.mjs",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
@@ -12,12 +15,12 @@
   "prettier": "@vyductan/prettier-config",
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
-    "prettier": "^3.1.0",
+    "prettier": "^3.1.1",
     "prettier-plugin-packagejson": "^2.4.6",
-    "prettier-plugin-tailwindcss": "^0.5.7"
+    "prettier-plugin-tailwindcss": "^0.5.9"
   },
   "devDependencies": {
     "@vyductan/typescript-config": "*",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
