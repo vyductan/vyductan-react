@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { TooltipContentProps } from "@radix-ui/react-tooltip";
+import type { TooltipContentProps } from "@radix-ui/react-tooltip";
 
 import { clsm } from "@vyductan/utils";
 

@@ -1,16 +1,14 @@
-import { type ReactNode } from "react"
-
-import { clsm } from "@vyductan/utils"
+import type { ReactNode } from "react";
 
 type CardProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 const Card = ({ children }: CardProps) => {
   return (
     <div>
       <div className="lg:p-lg">{children}</div>
     </div>
-  )
-}
+  );
+};
 
-export default Card
+export default Card;

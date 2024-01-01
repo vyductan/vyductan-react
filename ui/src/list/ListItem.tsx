@@ -1,9 +1,9 @@
-import { ReactNode } from "react"
+import type { ReactNode } from "react";
 
 interface ListItemProps {
-  children: ReactNode
+  children: ReactNode;
 }
 const ListItem = ({ children }: ListItemProps) => {
-  return <li className="flex py-6">{children}</li>
-}
-export default ListItem
+  return <li className="flex py-6">{children}</li>;
+};
+export default ListItem;
