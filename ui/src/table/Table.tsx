@@ -65,7 +65,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         columnDefMerged.cell = ({ row }) =>
           typeof dataIndex === "string"
             ? render(row.getValue(dataIndex), row.original, row.index)
-            : undefined;
+            : render(undefined as never, row.original, row.index);
       }
       return columnDefMerged;
       // return {
