@@ -1,10 +1,10 @@
-import { type Config } from "tailwindcss";
-import tailwindcssAnimatePlugin from "tailwindcss-animate";
+import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 import { borderRadius, fontSize, spacing } from "tailwindcss/defaultTheme";
 
 export default {
-  darkMode: ["class", '[data-theme="dark"]'],
-  content: [""],
+  darkMode: ["class"],
+  content: ["src/**/*.{ts,tsx}"],
   theme: {
     container: {
       center: true,
@@ -117,5 +117,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindcssAnimatePlugin],
+  plugins: [animate],
 } satisfies Config;
