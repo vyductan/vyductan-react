@@ -1,9 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vyductan/components-pro",
+  "name": "@vyductan/ui-pro",
   "version": "0.1.0",
   "private": true,
-  "main": "index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "format": "prettier --check \"**/*.{mjs,ts,md,json}\"",
@@ -17,15 +20,15 @@
     "root": true
   },
   "dependencies": {
-    "@vyductan/components": "*",
-    "@vyductan/hooks": "*",
+    "@vyductan/hooks": "workspace:*",
     "@vyductan/icons": "workspace:*",
-    "@vyductan/utils": "*",
+    "@vyductan/ui": "workspace*",
+    "@vyductan/utils": "workspace*",
     "react": "18.2.0"
   },
   "devDependencies": {
-    "@vyductan/eslint-config": "*",
-    "@vyductan/theme-config": "*",
-    "@vyductan/typescript-config": "*"
+    "@vyductan/eslint-config": "workspace*",
+    "@vyductan/theme-config": "workspace*",
+    "@vyductan/typescript-config": "workspace*"
   }
 }

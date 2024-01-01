@@ -1,11 +1,6 @@
-import type {
-  AvatarProps,
-  DirectionType,
-  TagProps,
-} from "@vyductan/components";
-
-import { Avatar } from "@vyductan/components";
+import type { AvatarProps, DirectionType, TagProps } from "@vyductan/ui";
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@vyductan/icons";
+import { Avatar } from "@vyductan/ui";
 import { clsm } from "@vyductan/utils";
 
 type PageHeaderProps = {
