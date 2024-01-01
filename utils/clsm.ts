@@ -1,4 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
+import type { ClassValue } from "clsx";
+import { clsx } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
 const customTwMerge = extendTailwindMerge({
@@ -12,5 +13,3 @@ const customTwMerge = extendTailwindMerge({
 export const clsm = (...inputs: ClassValue[]) => {
   return customTwMerge(clsx(inputs));
 };
-
-export default clsm;
