@@ -8,7 +8,7 @@
     "clean": "rm -rf .turbo node_modules"
   },
   "dependencies": {
-    "@vyductan/utils": "*"
+    "@vyductan/utils": "workspace:*"
   },
   "devDependencies": {
     "@iconify/react": "^4.1.1",
