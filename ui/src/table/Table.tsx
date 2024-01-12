@@ -1,11 +1,17 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
+/*
+ *
+ * https://ant.design/components/table#components-table-demo-expand
+ *
+ */
+import type { ColumnDef, ExpandedState } from "@tanstack/react-table";
 import type { ForwardedRef, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -50,6 +56,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
 ) => {
   const [selectedRows, setSelectedRows] = useState<TRecord[]>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const columnsDef: ColumnDef<TRecord>[] = columns.map(
     ({ dataIndex, title, render }, index) => {
@@ -61,12 +68,36 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       // if (dataIndex) {
       //   columnDefMerged.accessorKey = dataIndex
       // }
-      if (render) {
-        columnDefMerged.cell = ({ row }) =>
-          typeof dataIndex === "string"
-            ? render(row.getValue(dataIndex), row.original, row.index)
-            : render(undefined as never, row.original, row.index);
-      }
+      columnDefMerged.cell = ({ row, getValue }) => (
+        <>
+          {row.getCanExpand() ? (
+            <button
+              {...{
+                onClick: row.getToggleExpandedHandler(),
+                style: {
+                  cursor: "pointer",
+                  paddingLeft: `${row.depth * 2}rem`,
+                },
+              }}
+            >
+              {row.getIsExpanded() ? "👇" : "👉"}
+            </button>
+          ) : (
+            <span
+              style={{
+                paddingLeft: `${row.depth * 2}rem`,
+              }}
+            />
+          )}
+
+          {/* render value*/}
+          {render
+            ? typeof dataIndex === "string"
+              ? render(getValue() as never, row.original, row.index)
+              : render(undefined as never, row.original, row.index)
+            : getValue()}
+        </>
+      );
       return columnDefMerged;
       // return {
       //   ...(dataIndex && { accessorKey: dataIndex }),
@@ -86,130 +117,18 @@ const TableInner = <TRecord extends Record<string, unknown>>(
   const table = useReactTable({
     data: dataSource,
     columns: columnsDef,
+    state: {
+      expanded,
+    },
     getCoreRowModel: getCoreRowModel(),
-    onRowSelectionChange: setRowSelection,
-  });
+    debugTable: true,
 
-  // const mergedColumns = [
-  //   // show arrow
-  //   ...(expandable
-  //     ? ([
-  //         {
-  //           width: 30,
-  //           render: (record, index) => (
-  //             <Disclosure.Button
-  //               className="tw-text-sm tw-font-medium tw-text-purple-500 tw-cursor-pointer tw-bg-white"
-  //               onClick={() => {
-  //                 expandable.onExpand?.(record);
-  //               }}
-  //             >
-  //               <ChevronUpIcon
-  //                 className={`tw-h-5 tw-w-5 tw-transition-transform ${
-  //                   (
-  //                     rowKey
-  //                       ? expandable.expandedRowKeys?.includes(
-  //                           String(record[rowKey]),
-  //                         )
-  //                       : expandable.expandedRowKeys?.includes(index.toString())
-  //                   )
-  //                     ? "tw-transform tw-rotate-0"
-  //                     : "tw-rotate-180"
-  //                 }`}
-  //                 aria-hidden="true"
-  //               />
-  //             </Disclosure.Button>
-  //           ),
-  //         },
-  //       ] as ColumnsType<RecordType>)
-  //     : []),
-  //   // Checkbox column
-  //   ...(rowSelection
-  //     ? ([
-  //         {
-  //           title: (
-  //             <Checkbox
-  //               checked={
-  //                 _.isEqual(
-  //                   dataSource?.map((data) => {
-  //                     return data.id;
-  //                   }),
-  //                   rowSelection.selectedRowKeys,
-  //                 ) &&
-  //                 dataSource &&
-  //                 dataSource.length > 0
-  //               }
-  //               className="cursor-pointer"
-  //               onChange={(e) => {
-  //                 if (e.currentTarget.checked) {
-  //                   if (rowSelection.selectedRowKeys) {
-  //                     const newSelectedRows = [
-  //                       ...selectedRows,
-  //                       ...(dataSource ?? []),
-  //                     ];
-  //                     const newSelectedRowKeys = newSelectedRows.map(
-  //                       (data) => data[rowKey],
-  //                     ) as Key[];
-  //                     setSelectedRows(newSelectedRows);
-  //                     rowSelection.onChange(
-  //                       newSelectedRowKeys,
-  //                       newSelectedRows,
-  //                     );
-  //                   }
-  //                 } else {
-  //                   if (rowSelection.selectedRowKeys) {
-  //                     setSelectedRows([]);
-  //                     rowSelection.onChange([], []);
-  //                   }
-  //                 }
-  //               }}
-  //             />
-  //           ),
-  //           width: 30,
-  //           render: (record) => {
-  //             return (
-  //               <Checkbox
-  //                 checked={rowSelection?.selectedRowKeys?.includes(
-  //                   record[rowKey] as Key,
-  //                 )}
-  //                 className="cursor-pointer"
-  //                 onChange={(e) => {
-  //                   if (e.currentTarget.checked) {
-  //                     if (rowSelection.selectedRowKeys && record[rowKey]) {
-  //                       const newSelectedRows = [...selectedRows, record];
-  //                       const newSelectedRowKeys = newSelectedRows.map(
-  //                         (data) => data[rowKey],
-  //                       ) as Key[];
-  //                       setSelectedRows(newSelectedRows);
-  //                       rowSelection.onChange(
-  //                         newSelectedRowKeys,
-  //                         newSelectedRows,
-  //                       );
-  //                     }
-  //                   } else {
-  //                     if (rowSelection.selectedRowKeys && record[rowKey]) {
-  //                       const newSelectedRows = selectedRows.filter(
-  //                         (data) => data[rowKey] !== record[rowKey],
-  //                       );
-  //                       const newSelectedRowKeys = newSelectedRows.map(
-  //                         (data) => data[rowKey],
-  //                       ) as Key[];
-  //                       setSelectedRows(newSelectedRows);
-  //                       rowSelection.onChange(
-  //                         newSelectedRowKeys,
-  //                         newSelectedRows,
-  //                       );
-  //                     }
-  //                   }
-  //                 }}
-  //               />
-  //             );
-  //           },
-  //         },
-  //       ] as ColumnsType<RecordType>)
-  //     : []),
-  //   // Filter hidden column
-  //   ...columns.filter((x) => !x.hidden),
-  // ];
+    onRowSelectionChange: setRowSelection,
+
+    getSubRows: (record) => record.children as TRecord[],
+    onExpandedChange: setExpanded,
+    getExpandedRowModel: getExpandedRowModel(),
+  });
 
   return (
     <div className="relative w-full overflow-x-auto">
@@ -232,7 +151,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         {/*     ))} */}
         {/*   </colgroup> */}
         {/* )} */}
-        <TableHeader className={clsm("", sticky ? "tw-sticky tw-top-0" : "")}>
+        <TableHeader className={clsm("", sticky ? "sticky top-0" : "")}>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
