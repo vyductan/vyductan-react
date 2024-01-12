@@ -1,4 +1,4 @@
-import type {HTMLAttributes, ReactNode} from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
 import { WarningFilled } from "@vyductan/icons";
 import { clsm } from "@vyductan/utils";

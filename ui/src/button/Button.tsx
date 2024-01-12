@@ -7,11 +7,11 @@ import { cva } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
-import Spin from "../spin";
+import { Loader } from "../loader";
 
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center font-medium ring-offset-white transition-colors",
+    "inline-flex items-center justify-center text-sm font-medium ring-offset-white transition-colors",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "disabled:pointer-events-none disabled:opacity-50",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
@@ -28,20 +28,20 @@ const buttonVariants = cva(
           "dark:hover:bg-red-900/90",
         ],
       },
-      type: {
+      variant: {
         primary: [
-          "text-white bg-primary",
+          "bg-primary text-white",
           "hover:bg-primary-hover",
-          "active:ring-primary-border",
+          "active:ring-primary",
         ],
         default: [
           // "text-primary",
           "border border-border",
-          "hover:text-primary-hover hover:border-primary-hover",
+          "hover:border-primary-hover hover:text-primary-hover",
         ],
         dashed: [
-          "border border-border border-dashed",
-          "hover:text-primary-hover hover:border-primary-hover",
+          "border border-dashed border-border",
+          "hover:border-primary-hover hover:text-primary-hover",
         ],
         // default: [
         //   "bg-gray-900 text-gray-50",
@@ -63,15 +63,15 @@ const buttonVariants = cva(
         link: "text-gray-900 underline-offset-4 hover:underline dark:text-gray-50",
       },
       size: {
-        xs: "h-xs rounded-xs px-2 py-0 text-sm",
-        sm: "h-sm rounded-sm px-3 py-1 text-sm",
-        default: "h-md rounded-md px-4 py-2 text-md",
-        lg: "h-lg rounded-sm px-3 py-1 text-sm",
+        xs: "h-xs rounded-xs px-2 py-0",
+        sm: "h-sm rounded-sm px-3 py-1",
+        default: "h-md rounded-md px-4 py-2",
+        lg: "h-lg rounded-sm px-3 py-1 text-md",
         xl: "h-xl px-4 text-xl",
       },
     },
     defaultVariants: {
-      type: "default",
+      variant: "default",
       color: "default",
       size: "default",
     },
@@ -79,11 +79,10 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color" | "type">,
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   href?: string;
-  htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
   loading?: boolean;
   icon?: React.ReactNode;
 }
@@ -96,10 +95,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       color,
       disabled,
-      htmlType,
       loading,
       size,
-      type,
+      variant,
       icon,
       ...props
     },
@@ -110,7 +108,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={clsm(
-          buttonVariants({ color, type, size, className }),
+          buttonVariants({ color, variant, size, className }),
           icon && !children
             ? !size || size === "default"
               ? "w-10"
@@ -120,20 +118,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             : "",
         )}
         disabled={loading ?? disabled}
-        type={htmlType}
         {...props}
       >
-        {icon && (
-          <span
-            className={clsm(children && "mr-2")}
-            onClick={() => {
-              console.log(icon, children, size);
-            }}
-          >
-            {icon}
-          </span>
-        )}
-        {loading ? <Spin>{children}</Spin> : children}
+        {icon && <span className={clsm(children && "mr-2")}>{icon}</span>}
+        {loading ? <Loader>{children}</Loader> : children}
       </Comp>
     );
   },

@@ -52,12 +52,12 @@ export const CodeBlock = memo(
       copyToClipboard(children);
     };
     return (
-      <div className="codeblock relative w-full bg-zinc-950 font-sans">
+      <div className="relative w-full bg-zinc-950 font-sans">
         <div className="flex w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             <Button
-              type="ghost"
+              variant="ghost"
               className="text-xs hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
               onClick={onCopy}
             >
@@ -94,3 +94,4 @@ export const CodeBlock = memo(
     );
   },
 );
+CodeBlock.displayName = "CodeBlock";
