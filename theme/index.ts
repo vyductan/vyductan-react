@@ -21,6 +21,7 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        link: "hsl(var(--link))",
         primary: {
           DEFAULT: "hsl(var(--primary-600))",
           hover: "hsl(var(--primary-500))",
