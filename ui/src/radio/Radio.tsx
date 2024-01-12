@@ -15,19 +15,21 @@ type RadioOption<TValue extends string = string> = {
 };
 type RadioGroupProps = Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
-  "defaultValue"
+  "defaultValue" | "onChange"
 > & {
   defaultValue?: HTMLInputElement["defaultValue"];
   options: RadioOption[];
+  onChange?: RadioGroupPrimitive.RadioGroupProps["onValueChange"];
 };
 const RadioGroup = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,
   RadioGroupProps
->(({ className, options, ...props }, ref) => {
+>(({ className, options, onChange, ...props }, ref) => {
   return (
     <>
       <RadioGroupPrimitive.Root
         className={clsm("flex gap-2", className)}
+        onValueChange={onChange}
         {...props}
         ref={ref}
       >
