@@ -1,19 +1,25 @@
 "use client";
 
-import type { FieldValues, UseFormRegister } from "react-hook-form";
+import type {
+  Control,
+  FieldValues,
+  Path,
+  UseFormRegister,
+} from "react-hook-form";
 
 import { DeleteOutlined } from "@vyductan/icons";
 
-import type { FieldsSchema, FieldType } from "./types";
+import type { FieldsSchema, FieldType, InputUnion } from "./types";
 import type { FormInstance } from "./useForm";
 import { Button } from "../button";
+import { DatePicker } from "../date-picker";
+import Editor from "../editor";
 import { Input } from "../input";
 import { RadioGroup } from "../radio";
 import { Tag } from "../tag";
 import { Field } from "./Field";
 import { FieldArray } from "./FieldArray";
 import { Form } from "./Form";
-import { fieldInputTypes } from "./types";
 
 /*
  * Docs: https://procomponents.ant.design/en-US/components/schema-form
@@ -45,6 +51,7 @@ const AutoForm = <
               <AutoFormField
                 field={field}
                 register={form.register}
+                control={form.control}
                 key={index}
               />
             ))}
@@ -55,11 +62,16 @@ const AutoForm = <
   );
 };
 
-const AutoFormField = <TFieldValues extends FieldValues = FieldValues>({
+const AutoFormField = <
+  TFieldValues extends FieldValues = FieldValues,
+  TContext = unknown,
+>({
   field,
+  control,
   register,
 }: {
   field: FieldsSchema<TFieldValues>;
+  control: Control<TFieldValues, TContext>;
   register: UseFormRegister<TFieldValues>;
 }) => {
   if (field.type === "list") {
@@ -87,6 +99,8 @@ const AutoFormField = <TFieldValues extends FieldValues = FieldValues>({
                   />
                 </div>
                 {schemaFields.map((field) => {
+                  if (!field.type) return;
+
                   const key = field.name ? `${item.id}.${field.name}` : item.id;
                   const itemName = field.name
                     ? `${name}.${index}.${field.name}`
@@ -102,6 +116,12 @@ const AutoFormField = <TFieldValues extends FieldValues = FieldValues>({
                           TFieldValues[keyof TFieldValues]
                         >
                       }
+                      control={
+                        control as unknown as Control<
+                          TFieldValues[keyof TFieldValues],
+                          TContext
+                        >
+                      }
                       register={
                         register as unknown as UseFormRegister<
                           TFieldValues[keyof TFieldValues]
@@ -113,8 +133,8 @@ const AutoFormField = <TFieldValues extends FieldValues = FieldValues>({
               </div>
             ))}
             <Button
-              type="dashed"
-              htmlType="button"
+              variant="dashed"
+              type="button"
               className="w-full"
               onClick={() => append(appendProps?.defaultValue)}
             >
@@ -125,34 +145,44 @@ const AutoFormField = <TFieldValues extends FieldValues = FieldValues>({
       </FieldArray>
     );
   }
-  if (fieldInputTypes.includes(field.type)) {
-    const { name, label, description, className, ...rest } = field;
+  const { name, label, description, className, ...rest } = field;
 
-    return (
-      <Field
-        name={name}
-        label={label}
-        description={description}
-        className={className}
-      >
-        {({ field: fieldRenderProps }) => {
-          return renderFieldInput({
-            props: {
-              ...rest,
-              ...fieldRenderProps,
-            } as FieldsSchema<TFieldValues>,
-          });
-        }}
-      </Field>
-    );
-  }
+  return (
+    <Field
+      name={name as Path<TFieldValues>}
+      label={label}
+      description={description}
+      className={className}
+      control={control}
+    >
+      {({ field: fieldRenderProps }) => {
+        return renderInput({
+          ...rest,
+          ...fieldRenderProps,
+        } as InputUnion);
+      }}
+    </Field>
+  );
 };
 
-const renderFieldInput = <TFieldValues extends FieldValues = FieldValues>({
-  props,
-}: {
-  props: FieldsSchema<TFieldValues>;
-}) => {
+const renderInput = (props: InputUnion) => {
+  if (props.type === "date") {
+    return <DatePicker mode="single" {...props} />;
+  }
+  if (props.type === "date-range") {
+    return <DatePicker mode="range" {...props} />;
+  }
+  if (props.type === "editor") {
+    const { onChange, ...rest } = props;
+    return (
+      <Editor
+        onChange={(editorState) => {
+          onChange?.(editorState.toJSON());
+        }}
+        {...rest}
+      />
+    );
+  }
   if (props.type === "radio-group") {
     return <RadioGroup {...props} />;
   }

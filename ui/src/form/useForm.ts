@@ -6,14 +6,20 @@
  */
 import type { BaseSyntheticEvent } from "react";
 import type {
+  DefaultValues,
   FieldValues,
+  KeepStateOptions,
   SubmitHandler,
+  UseFormReset,
   UseFormReturn,
   UseFormProps as UseRHFormProps,
 } from "react-hook-form";
 import type { z } from "zod";
+import { useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm as useRHForm } from "react-hook-form";
+
+import type { ResetAction } from "./types";
 
 type FormInstance<
   TFieldValues extends FieldValues = FieldValues,
@@ -23,7 +29,8 @@ type FormInstance<
   submit: (
     e?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
   ) => Promise<void>;
-  defaultValues?: UseRHFormProps<TFieldValues>["defaultValues"];
+  setFieldsValue: UseFormReset<TFieldValues>;
+  resetFields: (keepStateOptions?: KeepStateOptions) => void;
 };
 
 type UseFormProps<
@@ -54,14 +61,47 @@ const useForm = <
   const methods = useRHForm<TFieldValues, TContext, TTransformedValues>({
     defaultValues,
     resolver: schema ? zodResolver(schema) : undefined,
+    // fix form values is not cleared after unmounting
+    // shouldUnregister: true,
   });
 
-  const formInstance = {
-    ...methods,
-    defaultValues: defaultValues,
+  const { reset } = methods;
 
-    submit: methods.handleSubmit(onSubmit),
-  };
+  const setFieldsValue = useCallback(
+    (
+      values?:
+        | DefaultValues<TFieldValues>
+        | TFieldValues
+        | ResetAction<TFieldValues>,
+      keepStateOptions?: KeepStateOptions,
+    ) => {
+      reset(values, {
+        keepDefaultValues: true,
+        ...keepStateOptions,
+      });
+    },
+    [reset],
+  );
+
+  const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
+    if (typeof defaultValues === "function") {
+      defaultValues()
+        .then((values) => {
+          return methods.reset(values, keepStateOptions);
+        })
+        .catch(() => void 0);
+    } else {
+      methods.reset(defaultValues, keepStateOptions);
+    }
+  }, []);
+
+  const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
+    {
+      ...methods,
+      submit: methods.handleSubmit(onSubmit),
+      resetFields,
+      setFieldsValue,
+    };
 
   return formInstance;
 };

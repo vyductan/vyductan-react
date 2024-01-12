@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type {
   ControllerFieldState,
+  ControllerProps,
   ControllerRenderProps,
   FieldPath,
   FieldValues,
@@ -23,50 +24,50 @@ import { FieldMessage } from "./FieldMessage";
 export type FieldControllerRenderProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = Omit<ControllerRenderProps<TFieldValues, TName>, "onChange"> & {
-  onValueChange: ControllerRenderProps<TFieldValues, TName>["onChange"];
-};
+> = ControllerRenderProps<TFieldValues, TName>;
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  children?:
-    | ReactElement
-    | (({
-        field,
-        fieldState,
-        formState,
-      }: {
-        field: FieldControllerRenderProps<TFieldValues, TName>;
-        fieldState: ControllerFieldState;
-        formState: UseFormStateReturn<TFieldValues>;
-      }) => React.ReactElement);
-  name: TName;
-  label?: string;
-  description?: string;
-  className?: string;
-};
+> = Omit<ControllerProps<TFieldValues, TName>, "render"> &
+  Required<Pick<ControllerProps<TFieldValues, TName>, "control">> & {
+    children?:
+      | ReactElement
+      | (({
+          field,
+          fieldState,
+          formState,
+        }: {
+          field: FieldControllerRenderProps<TFieldValues, TName>;
+          fieldState: ControllerFieldState;
+          formState: UseFormStateReturn<TFieldValues>;
+        }) => React.ReactElement);
+    label?: string;
+    description?: string;
+    className?: string;
+  };
 const Field = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-  children,
+  name,
   label,
+  children,
   description,
   className,
   ...props
 }: FieldProps<TFieldValues, TName>) => {
   const id = useId();
   const { getFieldState, formState } = useFormContext();
-  const { error } = getFieldState(props.name, formState);
+  const { error } = getFieldState(name, formState);
 
   const fieldId = `${id}-form-item`;
   const fieldDescriptionId = `${id}-form-item-description`;
   const fieldMessageId = `${id}-form-item-message`;
+
   return (
     <FormFieldContext.Provider
       value={{
-        name: props.name,
+        name,
         id,
         fieldId,
         fieldDescriptionId,
@@ -74,8 +75,10 @@ const Field = <
       }}
     >
       <Controller
+        name={name}
         defaultValue={"" as PathValue<TFieldValues, TName>}
-        render={({ field: { onChange, ...field }, fieldState, formState }) => (
+        {...props}
+        render={({ field, fieldState, formState }) => (
           <div className={clsm("space-y-2", "mb-6", className)}>
             {/* Label */}
             {label && <FormLabel>{label}:</FormLabel>}
@@ -93,14 +96,11 @@ const Field = <
               {children
                 ? typeof children === "function"
                   ? children({
-                      field: { ...field, onValueChange: onChange },
+                      field,
                       fieldState,
                       formState,
                     })
-                  : cloneElement(children, {
-                      ...field,
-                      onValueChange: onChange,
-                    })
+                  : cloneElement(children, field)
                 : null}
             </Slot>
 
@@ -115,7 +115,6 @@ const Field = <
             <FieldMessage />
           </div>
         )}
-        {...props}
       />
     </FormFieldContext.Provider>
   );

@@ -1,5 +1,11 @@
 import type { FieldValues } from "react-hook-form";
 
+import type {
+  DatePickerProps,
+  DatePickerRangeProps,
+  DatePickerSingleProps,
+} from "../date-picker";
+import type { EditorProps } from "../editor/Editor";
 import type { InputProps } from "../input";
 import type { RadioGroupProps } from "../radio";
 import type { TextareaProps } from "../textarea";
@@ -38,12 +44,23 @@ type AutoFormFieldBaseProps = {
 
   // render?: (values: TFormValues) => React.ReactNode;
 };
-export type FieldWithType<TType extends FieldType, TFieldProps> = Omit<
+export type FieldWithType<TType, TFieldProps> = Omit<
   TFieldProps,
-  "title" | "children"
+  "title" | "children" | "onChange"
 > & {
   type: TType;
+  // value: string;
+  onChange?: (...event: unknown[]) => void;
 };
+export type InputUnion =
+  | FieldWithType<"date", Omit<DatePickerSingleProps, "mode">>
+  | FieldWithType<"date-range", Omit<DatePickerRangeProps, "mode">>
+  | FieldWithType<"editor", EditorProps>
+  | FieldWithType<"radio-group", RadioGroupProps>
+  | FieldWithType<"text", InputProps>
+  // | FieldWithType<"number", FieldInputProps>
+  // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
+  | FieldWithType<"textarea", TextareaProps>;
 
 type AutoFormFieldUnion<
   // TFieldValues,
@@ -67,12 +84,15 @@ type AutoFormFieldUnion<
   //     //           >;
   //     //         }
   //   >
-  (| FieldWithType<"radio-group", FieldProps<TFieldValues> & RadioGroupProps>
-    | FieldWithType<"text", FieldProps<TFieldValues> & InputProps>
-    // | FieldWithType<"number", FieldInputProps>
-    // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
-    | FieldWithType<"textarea", FieldProps<TFieldValues> & TextareaProps>
-  );
+
+  // (| FieldWithType<"radio-group", FieldProps<TFieldValues> & RadioGroupProps>
+  //   | FieldWithType<"text", FieldProps<TFieldValues> & InputProps>
+  //   // | FieldWithType<"number", FieldInputProps>
+  //   // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
+  //   | FieldWithType<"textarea", FieldProps<TFieldValues> & TextareaProps>
+  // )
+  Omit<FieldProps<TFieldValues>, "control"> &
+  InputUnion;
 // | FieldWithType<"time", FieldInputProps>
 // | FieldWithType<"group", { gridCols?: number; columns: Array<FieldsSchema<TRecord>> }>
 // | FieldWithType<"custom", unknown>
@@ -106,8 +126,13 @@ type AutoFormFieldUnion<
 //
 type FieldListType = "list";
 type FieldObjectType = "object";
-export const fieldInputTypes = ["radio-group", "text", "textarea"] as const;
-export type FieldInputType = (typeof fieldInputTypes)[number];
+type FieldInputType =
+  | "date"
+  | "date-range"
+  | "editor"
+  | "radio-group"
+  | "text"
+  | "textarea";
 export type FieldType = FieldInputType | FieldListType | FieldObjectType;
 export type FieldsSchema<
   TFieldValues,
@@ -145,6 +170,17 @@ export type FieldsSchema<
         //   ? FieldsSchema<I>
         //   : keyof TFieldValues[key];
       };
+  // : TFieldType extends FieldInputType
+  //   ? AutoFormFieldUnion & {
+  //       // type: TFieldType;
+  //       name: key;
+  //       // columns?: TFieldValues[key] extends (infer I)[]
+  //       //   ? FieldsSchema<I>
+  //       //   : keyof TFieldValues[key];
+  //     }
+  //   : {
+  //       type: never;
+  // };
 }[keyof TFieldValues];
 // type TestUser = {
 //   name: string;
@@ -185,3 +221,9 @@ export type FieldsSchema<
 //     },
 //   ],
 // };
+//
+//
+
+export type ResetAction<TFieldValues> = (
+  formValues: TFieldValues,
+) => TFieldValues;
