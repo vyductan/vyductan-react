@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import type { ResizablePanelProps } from "./ResizablePanel";
 import { ResizableHandler } from "./ResizableHandler";
 import { ResizablePanel } from "./ResizablePanel";
@@ -13,10 +15,10 @@ export const Resizable = ({ direction, items }: ResizableProps) => {
     <ResizablePanelGroup direction={direction}>
       {items.map((x, idx) => {
         return (
-          <>
+          <Fragment key={idx}>
             {idx > 0 && <ResizableHandler withHandle />}
             <ResizablePanel {...x} />
-          </>
+          </Fragment>
         );
       })}
     </ResizablePanelGroup>
