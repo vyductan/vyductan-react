@@ -14,7 +14,7 @@ import type { FormInstance } from "./useForm";
 import { Button } from "../button";
 import { DatePicker } from "../date-picker";
 import Editor from "../editor";
-import { Input } from "../input";
+import { Input, InputPassword } from "../input";
 import { RadioGroup } from "../radio";
 import { Tag } from "../tag";
 import { Field } from "./Field";
@@ -182,6 +182,10 @@ const renderInput = (props: InputUnion) => {
         {...rest}
       />
     );
+  }
+  if (props.type === "password") {
+    const { type: _, ...rest } = props;
+    return <InputPassword {...rest} />;
   }
   if (props.type === "radio-group") {
     return <RadioGroup {...props} />;

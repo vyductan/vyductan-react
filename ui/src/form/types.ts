@@ -1,12 +1,12 @@
 import type { FieldValues } from "react-hook-form";
 
 import type {
-  DatePickerProps,
   DatePickerRangeProps,
   DatePickerSingleProps,
 } from "../date-picker";
 import type { EditorProps } from "../editor/Editor";
 import type { InputProps } from "../input";
+import type { InputPasswordProps } from "../input/Password";
 import type { RadioGroupProps } from "../radio";
 import type { TextareaProps } from "../textarea";
 import type { FieldProps } from "./Field";
@@ -57,6 +57,7 @@ export type InputUnion =
   | FieldWithType<"date-range", Omit<DatePickerRangeProps, "mode">>
   | FieldWithType<"editor", EditorProps>
   | FieldWithType<"radio-group", RadioGroupProps>
+  | FieldWithType<"password", InputPasswordProps>
   | FieldWithType<"text", InputProps>
   // | FieldWithType<"number", FieldInputProps>
   // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
@@ -126,13 +127,7 @@ type AutoFormFieldUnion<
 //
 type FieldListType = "list";
 type FieldObjectType = "object";
-type FieldInputType =
-  | "date"
-  | "date-range"
-  | "editor"
-  | "radio-group"
-  | "text"
-  | "textarea";
+type FieldInputType = InputUnion["type"];
 export type FieldType = FieldInputType | FieldListType | FieldObjectType;
 export type FieldsSchema<
   TFieldValues,

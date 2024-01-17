@@ -10,30 +10,20 @@ export const inputStatusVariants = cva(
     "bg-transparent",
     "text-sm",
     "placeholder:text-placeholder",
-    "focus-visible:outline-none",
+    "focus-within:outline-none",
     "disabled:cursor-not-allowed disabled:opacity-50",
   ],
   {
     variants: {
       borderless: {
-        true: [
-          "border-0",
-          "focus-within:outline-none",
-          // "focus-visible:outline-0",
-        ],
-        false: [
-          "border",
-          "rounded-md",
-          "focus-visible:ring-2",
-          // "rounded-md border border-input ring-offset-background",
-          // "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        ],
+        true: ["border-0", "focus-within:outline-none"],
+        false: ["border", "rounded-md", "focus-within:ring-2"],
       },
       status: {
         default: [
           "border-primary-600",
           "hover:border-primary-400",
-          "focus-visible:border-primary-600 focus-visible:ring-primary-200",
+          "focus-within:border-primary-600 focus-visible:ring-primary-200",
         ],
       },
     },
@@ -45,35 +35,47 @@ export const inputStatusVariants = cva(
 );
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> &
   VariantProps<typeof inputStatusVariants> & {
-    onValueChange?: (value: string) => void;
+    suffix?: React.ReactNode;
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    { borderless, className, status, type, onChange, onValueChange, ...props },
-    ref,
-  ) => {
+  ({ borderless, className, id, status, suffix, onChange, ...props }, ref) => {
+    const useId = React.useId();
+    const _id = id ?? useId;
+
     return (
-      <input
-        type={type}
+      <span
         className={clsm(
           inputStatusVariants({ borderless, status }),
           "w-full px-3 py-[9px]",
           "bg-transparent",
           "text-sm",
           "flex rounded-md border border-input ring-offset-background",
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          // "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+          "focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
           "disabled:cursor-not-allowed disabled:opacity-50",
-          "placeholder:text-muted-foreground",
+          "cursor-text",
           className,
         )}
-        ref={ref}
-        onChange={(e) => {
-          onChange?.(e);
-          onValueChange?.(e.target.value);
+        aria-hidden="true"
+        onClick={() => {
+          document.getElementById(_id)?.focus();
         }}
-        {...props}
-      />
+      >
+        <input
+          id={_id}
+          className={clsm(
+            "w-full",
+            "border-none outline-none",
+            "placeholder:text-muted-foreground",
+          )}
+          ref={ref}
+          onChange={(e) => {
+            onChange?.(e);
+          }}
+          {...props}
+        />
+        {suffix && <span>{suffix}</span>}
+      </span>
     );
   },
 );
