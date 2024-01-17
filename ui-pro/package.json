@@ -23,8 +23,7 @@
     "@vyductan/hooks": "workspace:*",
     "@vyductan/icons": "workspace:*",
     "@vyductan/ui": "workspace*",
-    "@vyductan/utils": "workspace*",
-    "react": "18.2.0"
+    "@vyductan/utils": "workspace*"
   },
   "devDependencies": {
     "@vyductan/eslint-config": "workspace*",
