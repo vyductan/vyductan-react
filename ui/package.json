@@ -56,7 +56,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/react-dom": "18.2.18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "@vyductan/eslint-config": "*",
     "@vyductan/theme-config": "*",
