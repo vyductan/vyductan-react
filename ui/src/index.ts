@@ -15,7 +15,7 @@ export * from "./input";
 export * from "./label";
 export * from "./link";
 export * from "./list";
-export * from "./loader";
+export * from "./spin";
 export * from "./markdown";
 export * from "./modal";
 export * from "./radio";

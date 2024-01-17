@@ -14,7 +14,7 @@ export interface SpinProps extends VariantProps<typeof spinVariants> {
   spinning?: boolean;
   children?: React.ReactNode;
 }
-export const Loader = ({ spinning, size, children }: SpinProps) => {
+export const Spin = ({ spinning, size, children }: SpinProps) => {
   return (
     <div>
       {spinning === undefined ||

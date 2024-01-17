@@ -9,6 +9,13 @@ const config = {
       config: fileURLToPath(
         new URL("../../theme/index.ts", "file://" + __filename),
       ),
+      cssFiles: [
+        "**/*.{css,scss}",
+        "!**/node_modules",
+        "!**/.*",
+        "!**/dist",
+        "!**/build",
+      ],
     },
   },
 };

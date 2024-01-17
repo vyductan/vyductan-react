@@ -3,6 +3,9 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { clsm } from "@vyductan/utils";
 
+type ScrollBarProps = React.ComponentPropsWithoutRef<
+  typeof ScrollAreaPrimitive.ScrollAreaScrollbar
+>;
 const ScrollBar = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>
@@ -25,4 +28,5 @@ const ScrollBar = React.forwardRef<
 ));
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;
 
+export type { ScrollBarProps };
 export { ScrollBar };

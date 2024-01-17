@@ -6,7 +6,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 import { clsm } from "@vyductan/utils";
 
 import { buttonVariants } from "../button";
-import { Loader } from "../loader";
+import { Spin } from "../spin";
 
 const AlertDialog = AlertDialogPrimitive.Root;
 
@@ -112,7 +112,7 @@ const AlertDialogAction = React.forwardRef<
     disabled={disabled ?? loading}
     {...props}
   >
-    {loading ? <Loader>{children}</Loader> : children}
+    {loading ? <Spin>{children}</Spin> : children}
   </AlertDialogPrimitive.Action>
 ));
 AlertDialogAction.displayName = AlertDialogPrimitive.Action.displayName;

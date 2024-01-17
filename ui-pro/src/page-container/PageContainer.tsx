@@ -11,7 +11,7 @@ export const PageContainer = ({ children, header }: PageContainerProps) => {
   return (
     <main>
       <PageHeader {...header} />
-      <div>{children}</div>
+      <div className="relative">{children}</div>
     </main>
   );
 };

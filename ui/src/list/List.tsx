@@ -2,7 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import React, { Fragment } from "react";
 import { cva } from "class-variance-authority";
 
-import { Loader } from "../loader";
+import { Spin } from "../spin";
 
 const listVariants = cva([""], {
   variants: {
@@ -56,7 +56,7 @@ function List<T>({
   return (
     <>
       {header && <div>{header}</div>}
-      <Loader>
+      <Spin>
         {/* {childrenContent} */}
         <ul role="list">
           {dataSource.map((item, index) => (
@@ -73,7 +73,7 @@ function List<T>({
             </Fragment>
           ))}
         </ul>
-      </Loader>
+      </Spin>
       {footer && <div>{footer}</div>}
     </>
   );

@@ -7,7 +7,7 @@ import { cva } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
-import { Loader } from "../loader";
+import { Spin } from "../spin";
 
 const buttonVariants = cva(
   [
@@ -121,7 +121,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {icon && <span className={clsm(children && "mr-2")}>{icon}</span>}
-        {loading ? <Loader>{children}</Loader> : children}
+        {loading ? <Spin>{children}</Spin> : children}
       </Comp>
     );
   },
