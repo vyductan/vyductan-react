@@ -26,6 +26,7 @@
     "root": true
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@lexical/react": "^0.12.6",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-avatar": "^1.0.4",
