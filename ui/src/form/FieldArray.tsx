@@ -26,7 +26,12 @@ const FieldArray = ({
     name,
   });
   return (
-    <Field name={name} label={label} description={description}>
+    <Field
+      control={control}
+      name={name}
+      label={label}
+      description={description}
+    >
       {() => (
         <div className="mt-2 rounded-md bg-gray-200 p-6 dark:bg-gray-900/80">
           {children?.(fieldArray)}
