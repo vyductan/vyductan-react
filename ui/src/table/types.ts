@@ -8,11 +8,10 @@ type BaseTableColumnDef = {
   align?: "left" | "right" | "center";
   className?: string;
   hidden?: boolean;
-  width?: number | string;
+  width?: number;
 };
 type DefWithOutDataIndex<TRecord> = BaseTableColumnDef & {
   dataIndex?: never;
-  // x: (x: TRecord) => ReactNode;
   render?: (value: never, record: TRecord, index: number) => ReactNode;
 };
 export type TableColumnDef<TRecord> =
