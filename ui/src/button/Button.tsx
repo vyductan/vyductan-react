@@ -114,7 +114,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               ? "w-10"
               : size === "sm"
                 ? "w-8"
-                : ""
+                : size === "xs"
+                  ? "w-6"
+                  : ""
             : "",
         )}
         disabled={loading ?? disabled}
