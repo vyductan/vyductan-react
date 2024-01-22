@@ -1,18 +1,18 @@
 import { Fragment } from "react";
 
 import type { ResizablePanelProps } from "./ResizablePanel";
+import type { ResizablePanelGroupProps } from "./ResizablePanelGroup";
 import { ResizableHandler } from "./ResizableHandler";
 import { ResizablePanel } from "./ResizablePanel";
 import { ResizablePanelGroup } from "./ResizablePanelGroup";
 
 export type ResizableItems = ResizablePanelProps[];
-export type ResizableProps = {
-  direction: "horizontal" | "vertical";
+export type ResizableProps = ResizablePanelGroupProps & {
   items: ResizableItems;
 };
-export const Resizable = ({ direction, items }: ResizableProps) => {
+export const Resizable = ({ direction, items, ...props }: ResizableProps) => {
   return (
-    <ResizablePanelGroup direction={direction}>
+    <ResizablePanelGroup direction={direction} {...props}>
       {items.map((x, idx) => {
         return (
           <Fragment key={idx}>

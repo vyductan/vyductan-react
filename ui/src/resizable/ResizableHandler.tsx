@@ -26,12 +26,12 @@ export const ResizableHandler = ({
     {withHandle && (
       <div
         className={clsm(
-          "absolute bottom-0 top-0 z-10 m-auto flex h-4 w-4 items-center justify-center rounded border border-border bg-gray-200",
+          "absolute inset-y-0 z-10 m-auto flex size-4 items-center justify-center rounded border border-border bg-gray-200",
           "group-hover:border-blue-500 group-hover:text-blue-500",
           " group-focus:border-blue-500 group-focus:text-blue-500",
         )}
       >
-        <Icon icon="lucide:grip-vertical" className="h-2.5 w-2.5" />
+        <Icon icon="lucide:grip-vertical" className="size-2.5" />
       </div>
     )}
   </ResizablePrimitive.PanelResizeHandle>
