@@ -9,7 +9,9 @@ export const TableRow = forwardRef<
   <tr
     ref={ref}
     className={clsm(
-      "border-b transition-colors hover:bg-gray-100/50 data-[state=selected]:bg-gray-100 dark:hover:bg-gray-800/50 dark:data-[state=selected]:bg-gray-800",
+      "border-b transition-colors",
+      "hover:bg-gray-100/50 dark:hover:bg-gray-800/50",
+      "data-[state=selected]:bg-gray-100 dark:data-[state=selected]:bg-gray-800",
       className,
     )}
     {...props}

@@ -1,3 +1,4 @@
+import type { Column, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 /**
@@ -9,21 +10,34 @@ type BaseTableColumnDef = {
   className?: string;
   hidden?: boolean;
   width?: number;
+
+  enableResizing?: boolean;
+  minSize?: number;
 };
 type DefWithOutDataIndex<TRecord> = BaseTableColumnDef & {
   dataIndex?: never;
-  render?: (value: never, record: TRecord, index: number) => ReactNode;
+  render?: (ctx: RenderContext<TRecord>) => ReactNode;
 };
-export type TableColumnDef<TRecord> =
+export type TableColumnDef<TRecord> = {
+  children?: TableColumnDef<TRecord>[];
+} & (
   | DefWithOutDataIndex<TRecord>
   | (BaseTableColumnDef &
       {
         [K in keyof TRecord]-?: {
           dataIndex: K;
           render?: (
-            value: TRecord[K],
-            record: TRecord,
-            index: number,
+            ctx: RenderContext<TRecord> & {
+              value: TRecord[K];
+            },
           ) => ReactNode;
         };
-      }[keyof TRecord]);
+      }[keyof TRecord])
+);
+
+type RenderContext<TRecord> = {
+  record: TRecord;
+  index: number;
+  row: Row<TRecord>;
+  column: Column<TRecord>;
+};

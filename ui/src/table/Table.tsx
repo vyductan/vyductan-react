@@ -5,7 +5,7 @@
  * https://ant.design/components/table#components-table-demo-expand
  *
  */
-import type { ColumnDef, ExpandedState } from "@tanstack/react-table";
+import type { ExpandedState } from "@tanstack/react-table";
 import type { ForwardedRef, HTMLAttributes, ReactNode } from "react";
 import { forwardRef, useState } from "react";
 import {
@@ -23,6 +23,7 @@ import { TableCell } from "./TableCell";
 import { TableHead } from "./TableHead";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
+import { transformToTanstack } from "./utils";
 
 export type Payment = {
   id: string;
@@ -48,58 +49,29 @@ type TableProps<TRecord extends Record<string, unknown>> =
     // pagination?: BPPaginationWithStateProps;
     sticky?: boolean;
     size?: "smal" | "default";
+
+    scroll?: {
+      x: boolean;
+    };
   };
 
 const TableInner = <TRecord extends Record<string, unknown>>(
-  { className, columns, dataSource, sticky, ...props }: TableProps<TRecord>,
+  {
+    className,
+    columns,
+    dataSource,
+    sticky,
+    scroll,
+    ...props
+  }: TableProps<TRecord>,
   ref: ForwardedRef<HTMLTableElement>,
 ) => {
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
-  const columnsDef: ColumnDef<TRecord>[] = columns.map(
-    ({ dataIndex, title, render, width }, index) => {
-      const columnDefMerged: ColumnDef<TRecord> = {
-        id: dataIndex?.toString() ?? index.toString(),
-        accessorKey: dataIndex,
-        header: () => title,
-        size: width,
-      };
-      columnDefMerged.cell = ({ row, getValue }) => (
-        <>
-          {row.getCanExpand() ? (
-            <button
-              {...{
-                onClick: row.getToggleExpandedHandler(),
-                style: {
-                  cursor: "pointer",
-                  paddingLeft: `${row.depth * 2}rem`,
-                },
-              }}
-            >
-              {row.getIsExpanded() ? "👇" : "👉"}
-            </button>
-          ) : (
-            <span
-              style={{
-                paddingLeft: `${row.depth * 2}rem`,
-              }}
-            />
-          )}
-
-          {/* render value*/}
-          {render
-            ? typeof dataIndex === "string"
-              ? render(getValue() as never, row.original, row.index)
-              : render(undefined as never, row.original, row.index)
-            : getValue()}
-        </>
-      );
-      return columnDefMerged;
-    },
-  );
   const table = useReactTable({
     data: dataSource,
-    columns: columnsDef,
+    columns: transformToTanstack(columns),
+    columnResizeMode: "onChange",
     state: {
       expanded,
     },
@@ -123,11 +95,13 @@ const TableInner = <TRecord extends Record<string, unknown>>(
           //   "tw-border tw-rounded-xl tw-border-solid tw-border-neutral-40",
           className,
         )}
-        // style={
-        //   {
-        //     width: table.getCenterTotalSize(),
-        //   }
-        // }
+        style={{
+          ...(scroll?.x
+            ? {
+                width: table.getCenterTotalSize(),
+              }
+            : {}),
+        }}
         {...props}
       >
         <TableHeader className={clsm("", sticky ? "sticky top-0" : "")}>
