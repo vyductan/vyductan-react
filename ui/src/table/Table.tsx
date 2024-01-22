@@ -23,7 +23,7 @@ import { TableCell } from "./TableCell";
 import { TableHead } from "./TableHead";
 import { TableHeader } from "./TableHeader";
 import { TableRow } from "./TableRow";
-import { transformToTanstack } from "./utils";
+import { transformColumnDefs } from "./utils";
 
 export type Payment = {
   id: string;
@@ -70,7 +70,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
 
   const table = useReactTable({
     data: dataSource,
-    columns: transformToTanstack(columns),
+    columns: transformColumnDefs(columns),
     columnResizeMode: "onChange",
     state: {
       expanded,

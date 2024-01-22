@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import type { TableColumnDef } from "./types";
 
-export const transformToTanstack = <TRecord extends Record<string, unknown>>(
+export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
 ) => {
   const columnsDef: ColumnDef<TRecord>[] = columns.map(
@@ -15,7 +15,7 @@ export const transformToTanstack = <TRecord extends Record<string, unknown>>(
           ? { id: dataIndex, accessorKey: dataIndex }
           : { id: index.toString(), accessorFn: () => index.toString() }),
         header: () => title,
-        ...(children ? { columns: transformToTanstack(children) } : {}),
+        ...(children ? { columns: transformColumnDefs(children) } : {}),
         enableResizing,
         minSize,
       };
