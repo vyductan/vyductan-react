@@ -84,21 +84,26 @@ const DatePickerInternal = (
   })();
 
   return (
-    <Popover className="w-auto p-0" content={picker}>
-      <Button
-        className={clsm(
-          "flex w-full",
-          "justify-start text-left font-normal",
-          !props.value && "text-muted-foreground",
-        )}
-        ref={ref}
-      >
-        {valueToDisplay}
-        <Icon
-          icon="mingcute:calendar-2-line"
-          className="ml-auto h-4 w-4 opacity-50"
-        />
-      </Button>
+    <Popover
+      className="w-auto p-0"
+      trigger={
+        <Button
+          className={clsm(
+            "flex w-full",
+            "justify-start text-left font-normal",
+            !props.value && "text-muted-foreground",
+          )}
+          ref={ref}
+        >
+          {valueToDisplay}
+          <Icon
+            icon="mingcute:calendar-2-line"
+            className="ml-auto size-4 opacity-50"
+          />
+        </Button>
+      }
+    >
+      {picker}
     </Popover>
   );
 };
