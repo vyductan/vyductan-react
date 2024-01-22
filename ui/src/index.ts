@@ -1,5 +1,6 @@
 export { default as Alert } from "./alert";
 export * from "./alert-modal";
+export * from "./autocomplete";
 export * from "./avatar";
 export * from "./button";
 export * from "./calendar";
