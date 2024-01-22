@@ -1,5 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
+import type { AutocompleteProps } from "../autocomplete";
 import type {
   DatePickerRangeProps,
   DatePickerSingleProps,
@@ -11,28 +12,6 @@ import type { RadioGroupProps } from "../radio";
 import type { TextareaProps } from "../textarea";
 import type { FieldProps } from "./Field";
 import type { FieldArrayProps } from "./FieldArray";
-
-// https://procomponents.ant.design/en-US/components/schema#valuetype-lists
-// type FieldType =
-//   | "autocomplete"
-//   | "checkbox"
-//   | "date"
-//   | "file"
-//   | "list"
-//   | "number"
-//   | "radio-group"
-//   | "select"
-//   | "text"
-//   | "textarea"
-//   | "time"
-//   | "custom"
-//   | "group"
-//   | "title"
-//   | "divider"
-//   | "address"
-//   | "identification"
-//   | "person"
-//   | "phone";
 
 type AutoFormFieldBaseProps = {
   // title?: ReactNode;
@@ -52,7 +31,10 @@ export type FieldWithType<TType, TFieldProps> = Omit<
   // value: string;
   onChange?: (...event: unknown[]) => void;
 };
+
+// https://procomponents.ant.design/en-US/components/schema#valuetype-lists
 export type InputUnion =
+  | FieldWithType<"autocomplete", AutocompleteProps>
   | FieldWithType<"date", Omit<DatePickerSingleProps, "mode">>
   | FieldWithType<"date-range", Omit<DatePickerRangeProps, "mode">>
   | FieldWithType<"editor", EditorProps>
@@ -128,43 +110,60 @@ type AutoFormFieldUnion<
 type FieldListType = "list";
 type FieldObjectType = "object";
 type FieldInputType = InputUnion["type"];
-export type FieldType = FieldInputType | FieldListType | FieldObjectType;
+type FieldGroupType = "group";
+export type FieldType =
+  | FieldInputType
+  | FieldListType
+  | FieldObjectType
+  | FieldGroupType;
 export type FieldsSchema<
   TFieldValues,
   // TFieldValues extends FieldValues = FieldValues,
   // TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TFieldType extends FieldType = FieldType,
 > = {
-  [key in keyof TFieldValues]: TFieldType extends FieldListType
-    ? FieldArrayProps & {
+  [key in keyof TFieldValues]: TFieldType extends FieldGroupType
+    ? {
         type: TFieldType;
-        // name: string;
-        // label?: ReactNode;
-        itemTitle?: string;
-        appendProps?: {
-          title?: string;
-          defaultValue?: TFieldValues[key] extends (infer I)[]
-            ? I
-            : // : keyof TFieldValues[key];
-              TFieldValues;
-        };
-        fields: TFieldValues[key] extends (infer I)[]
-          ? I extends FieldValues
-            ? FieldsSchema<I>[]
-            : [FieldsSchema<FieldValues>]
-          : // : keyof TFieldValues[key];
-            FieldsSchema<TFieldValues[key]>[];
-        // FieldsSchema<TFieldValues[key]>[];
-        // fields: FieldsSchema<TFieldValues[key]>[];
-        // string[];
+        className?: string;
+        columns: FieldsSchema<
+          TFieldValues,
+          Exclude<FieldType, FieldGroupType>
+        >[];
+
+        // to fix(list): Property 'name' does not exist on type 'never'
+        name?: never;
       }
-    : AutoFormFieldUnion & {
-        type: TFieldType;
-        name: key;
-        // columns?: TFieldValues[key] extends (infer I)[]
-        //   ? FieldsSchema<I>
-        //   : keyof TFieldValues[key];
-      };
+    : TFieldType extends FieldListType
+      ? FieldArrayProps & {
+          type: TFieldType;
+          // name: string;
+          // label?: ReactNode;
+          itemTitle?: string;
+          appendProps?: {
+            title?: string;
+            defaultValue?: TFieldValues[key] extends (infer I)[]
+              ? I
+              : // : keyof TFieldValues[key];
+                TFieldValues;
+          };
+          fields: TFieldValues[key] extends (infer I)[]
+            ? I extends FieldValues
+              ? FieldsSchema<I>[]
+              : [FieldsSchema<FieldValues>]
+            : // : keyof TFieldValues[key];
+              FieldsSchema<TFieldValues[key]>[];
+          // FieldsSchema<TFieldValues[key]>[];
+          // fields: FieldsSchema<TFieldValues[key]>[];
+          // string[];
+        }
+      : AutoFormFieldUnion & {
+          type: TFieldType;
+          name: key;
+          // columns?: TFieldValues[key] extends (infer I)[]
+          //   ? FieldsSchema<I>
+          //   : keyof TFieldValues[key];
+        };
   // : TFieldType extends FieldInputType
   //   ? AutoFormFieldUnion & {
   //       // type: TFieldType;

@@ -93,6 +93,7 @@ const useForm = <
     } else {
       methods.reset(defaultValues, keepStateOptions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =

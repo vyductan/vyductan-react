@@ -1,16 +1,14 @@
 "use client";
 
-import type {
-  Control,
-  FieldValues,
-  Path,
-  UseFormRegister,
-} from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
+import React from "react";
 
 import { DeleteOutlined } from "@vyductan/icons";
+import { clsm } from "@vyductan/utils";
 
 import type { FieldsSchema, FieldType, InputUnion } from "./types";
 import type { FormInstance } from "./useForm";
+import { AutoComplete } from "../autocomplete";
 import { Button } from "../button";
 import { DatePicker } from "../date-picker";
 import Editor from "../editor";
@@ -39,133 +37,116 @@ const AutoForm = <
   TTransformedValues extends FieldValues | undefined = undefined,
   TFieldType extends FieldType = FieldType,
 >({
+  form,
   fields,
-  ...rest
 }: AutoFormProps<TFieldValues, TContext, TTransformedValues, TFieldType>) => {
-  return (
-    <Form {...rest}>
-      {(form) => {
-        return (
-          <>
-            {fields.map((field, index) => (
-              <AutoFormField
-                field={field}
-                register={form.register}
-                control={form.control}
-                key={index}
-              />
-            ))}
-          </>
-        );
-      }}
-    </Form>
-  );
-};
+  const { control } = form;
 
-const AutoFormField = <
-  TFieldValues extends FieldValues = FieldValues,
-  TContext = unknown,
->({
-  field,
-  control,
-  register,
-}: {
-  field: FieldsSchema<TFieldValues>;
-  control: Control<TFieldValues, TContext>;
-  register: UseFormRegister<TFieldValues>;
-}) => {
-  if (field.type === "list") {
-    const {
-      type: _,
-      name,
-      itemTitle,
-      appendProps,
-      fields: schemaFields,
-      ...rest
-    } = field;
-    return (
-      <FieldArray name={name} {...rest}>
-        {({ fields, append, remove }) => (
-          <div>
-            {fields.map((item, index) => (
-              <div key={item.id}>
-                <div className="mb-2 flex justify-between">
-                  <Tag className="rounded-md">
-                    {itemTitle ?? "Item"} #{index}
-                  </Tag>
-                  <DeleteOutlined
-                    className="cursor-pointer"
-                    onClick={() => remove(index)}
-                  />
-                </div>
-                {schemaFields.map((field) => {
-                  if (!field.type) return;
-
-                  const key = field.name ? `${item.id}.${field.name}` : item.id;
-                  const itemName = field.name
-                    ? `${name}.${index}.${field.name}`
-                    : `${name}.${index}`;
-                  return (
-                    <AutoFormField
-                      key={key}
-                      field={
-                        {
-                          ...field,
-                          name: itemName,
-                        } as unknown as FieldsSchema<
-                          TFieldValues[keyof TFieldValues]
-                        >
-                      }
-                      control={
-                        control as unknown as Control<
-                          TFieldValues[keyof TFieldValues],
-                          TContext
-                        >
-                      }
-                      register={
-                        register as unknown as UseFormRegister<
-                          TFieldValues[keyof TFieldValues]
-                        >
-                      }
-                    />
-                  );
-                })}
-              </div>
-            ))}
-            <Button
-              variant="dashed"
-              type="button"
-              className="w-full"
-              onClick={() => append(appendProps?.defaultValue)}
+  const render = <TFieldValues extends FieldValues = FieldValues>(
+    fields: Array<FieldsSchema<TFieldValues>>,
+  ) =>
+    fields.map((field, index) => {
+      const component = (() => {
+        if (field.type === "group") {
+          const { columns, className } = field;
+          return (
+            <div
+              className={clsm(
+                "relative",
+                "grid gap-x-4",
+                "auto-cols-fr grid-flow-col",
+                className,
+              )}
             >
-              {appendProps?.title ?? "Add new Item"}
-            </Button>
-          </div>
-        )}
-      </FieldArray>
-    );
-  }
-  const { name, label, description, className, ...rest } = field;
+              {render(columns)}
+            </div>
+          );
+        }
 
-  return (
-    <Field
-      name={name as Path<TFieldValues>}
-      label={label}
-      description={description}
-      className={className}
-      control={control}
-    >
-      {({ field: fieldRenderProps }) => {
-        return renderInput({
-          ...rest,
-          ...fieldRenderProps,
-        } as InputUnion);
-      }}
-    </Field>
-  );
+        if (field.type === "list") {
+          const {
+            type: _,
+            name,
+            itemTitle,
+            appendProps,
+            fields: schemaFields,
+            ...rest
+          } = field;
+          return (
+            <FieldArray name={name} {...rest}>
+              {({ fields, append, remove }) => (
+                <div>
+                  {fields.map((item, index) => (
+                    <div key={item.id}>
+                      <div className="mb-2 flex justify-between">
+                        <Tag className="rounded-md">
+                          {itemTitle ?? "Item"} #{index}
+                        </Tag>
+                        <DeleteOutlined
+                          className="cursor-pointer"
+                          onClick={() => remove(index)}
+                        />
+                      </div>
+                      {render(
+                        schemaFields.map(
+                          (field) =>
+                            ({
+                              ...field,
+                              ...(field.type === "group"
+                                ? {}
+                                : field.name
+                                  ? { name: `${name}.${index}.${field.name}` }
+                                  : { name: `${name}.${index}` }),
+                            }) as unknown as FieldsSchema<
+                              TFieldValues[keyof TFieldValues]
+                            >,
+                        ),
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    variant="dashed"
+                    type="button"
+                    className="w-full"
+                    onClick={() => append(appendProps?.defaultValue)}
+                  >
+                    {appendProps?.title ?? "Add new Item"}
+                  </Button>
+                </div>
+              )}
+            </FieldArray>
+          );
+        }
+        const { name, label, description, className, ...rest } = field;
+
+        return (
+          <Field
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            name={name as any}
+            label={label}
+            description={description}
+            className={className}
+            control={control}
+          >
+            {({ field: fieldRenderProps }) => {
+              return renderInput({
+                ...rest,
+                ...fieldRenderProps,
+              } as InputUnion);
+            }}
+          </Field>
+        );
+      })();
+      return <React.Fragment key={index}>{component}</React.Fragment>;
+    });
+  return <Form form={form}>{render(fields)}</Form>;
 };
 
 const renderInput = (props: InputUnion) => {
+  if (props.type === "autocomplete") {
+    const { type: _, ...restProps } = props;
+    return <AutoComplete {...restProps} />;
+  }
   if (props.type === "date") {
     return <DatePicker mode="single" {...props} />;
   }
