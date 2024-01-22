@@ -2,36 +2,36 @@
 
 import type { DialogProps } from "@radix-ui/react-dialog";
 import * as React from "react";
-import { Command as CommandPrimitive } from "cmdk";
+import { Command as CommandPrimitive, useCommandState } from "cmdk";
 
 import { Icon } from "@vyductan/icons";
 import { clsm } from "@vyductan/utils";
 
 import { Dialog, DialogContent } from "../modal/components";
 
-const CommandBase = React.forwardRef<
+const CommandRoot = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive>
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
     className={clsm(
-      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
+      "flex size-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
       className,
     )}
     {...props}
   />
 ));
-CommandBase.displayName = CommandPrimitive.displayName;
+CommandRoot.displayName = CommandPrimitive.displayName;
 
 type CommandDialogProps = DialogProps;
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <CommandBase className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+        <CommandRoot className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
           {children}
-        </CommandBase>
+        </CommandRoot>
       </DialogContent>
     </Dialog>
   );
@@ -43,7 +43,7 @@ const CommandInput = React.forwardRef<
 >(({ className, ...props }, ref) => (
   // eslint-disable-next-line react/no-unknown-property
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Icon icon="lucide:search" className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+    <Icon icon="lucide:search" className="mr-2 size-4 shrink-0 opacity-50" />
     <CommandPrimitive.Input
       ref={ref}
       className={clsm(
@@ -73,16 +73,36 @@ const CommandList = React.forwardRef<
 
 CommandList.displayName = CommandPrimitive.List.displayName;
 
+// fix: https://github.com/pacocoursey/cmdk/issues/149#issuecomment-1606206982
+// Command.tsx: add line {options.length > 0 && (
 const CommandEmpty = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Empty>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => (
-  <CommandPrimitive.Empty
-    ref={ref}
-    className="py-6 text-center text-sm"
-    {...props}
-  />
-));
+>((props, ref) => {
+  const render = useCommandState((state) => state.filtered.count === 0);
+  if (!render) return null;
+
+  return (
+    <div
+      ref={ref}
+      className="py-6 text-center text-sm"
+      // eslint-disable-next-line react/no-unknown-property
+      cmdk-empty=""
+      role="presentation"
+      {...props}
+    />
+  );
+});
+// const CommandEmpty = React.forwardRef<
+//   React.ElementRef<typeof CommandPrimitive.Empty>,
+//   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+// >((props, ref) => (
+//   <CommandPrimitive.Empty
+//     ref={ref}
+//     className="py-6 text-center text-sm"
+//     {...props}
+//   />
+// ));
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
@@ -147,7 +167,7 @@ const CommandShortcut = ({
 CommandShortcut.displayName = "CommandShortcut";
 
 export {
-  CommandBase,
+  CommandRoot,
   CommandDialog,
   CommandInput,
   CommandList,
