@@ -5,10 +5,12 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { clsm } from "@vyductan/utils";
 
+type PopoverRootProps = PopoverPrimitive.PopoverProps;
 const PopoverRoot = PopoverPrimitive.Root;
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
+type PopoverContentProps = PopoverPrimitive.PopoverContentProps;
 const PopoverContent = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Content>
@@ -28,4 +30,5 @@ const PopoverContent = React.forwardRef<
 ));
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
+export type { PopoverRootProps, PopoverContentProps };
 export { PopoverRoot, PopoverTrigger, PopoverContent };

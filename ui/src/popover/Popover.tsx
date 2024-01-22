@@ -1,17 +1,23 @@
 import React from "react";
 
+import type { PopoverContentProps, PopoverRootProps } from "./components";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "./components";
 
-type PopoverProps = {
-  className?: string;
-  content: React.ReactNode;
-  children?: React.ReactNode;
-};
-export const Popover = ({ className, content, children }: PopoverProps) => {
+export type PopoverProps = PopoverRootProps &
+  PopoverContentProps & {
+    trigger?: React.ReactNode;
+  };
+export const Popover = ({
+  children,
+  trigger,
+  open,
+  onOpenChange,
+  ...props
+}: PopoverProps) => {
   return (
-    <PopoverRoot>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent className={className}>{content}</PopoverContent>
+    <PopoverRoot open={open} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+      <PopoverContent {...props}>{children}</PopoverContent>
     </PopoverRoot>
   );
 };
