@@ -47,6 +47,9 @@ const AutoForm = <
   ) =>
     fields.map((field, index) => {
       const component = (() => {
+        if (field.type === "custom") {
+          return <>{field.render()}</>;
+        }
         if (field.type === "group") {
           const { columns, className } = field;
           return (

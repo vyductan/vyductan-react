@@ -115,55 +115,62 @@ export type FieldType =
   | FieldInputType
   | FieldListType
   | FieldObjectType
-  | FieldGroupType;
+  | FieldGroupType
+  | "custom";
 export type FieldsSchema<
   TFieldValues,
   // TFieldValues extends FieldValues = FieldValues,
   // TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TFieldType extends FieldType = FieldType,
 > = {
-  [key in keyof TFieldValues]: TFieldType extends FieldGroupType
+  [key in keyof TFieldValues]: TFieldType extends "custom"
     ? {
-        type: TFieldType;
-        className?: string;
-        columns: FieldsSchema<
-          TFieldValues,
-          Exclude<FieldType, FieldGroupType>
-        >[];
-
-        // to fix(list): Property 'name' does not exist on type 'never'
+        type: "custom";
         name?: never;
+        render: () => void;
       }
-    : TFieldType extends FieldListType
-      ? FieldArrayProps & {
+    : TFieldType extends FieldGroupType
+      ? {
           type: TFieldType;
-          // name: string;
-          // label?: ReactNode;
-          itemTitle?: string;
-          appendProps?: {
-            title?: string;
-            defaultValue?: TFieldValues[key] extends (infer I)[]
-              ? I
-              : // : keyof TFieldValues[key];
-                TFieldValues;
-          };
-          fields: TFieldValues[key] extends (infer I)[]
-            ? I extends FieldValues
-              ? FieldsSchema<I>[]
-              : [FieldsSchema<FieldValues>]
-            : // : keyof TFieldValues[key];
-              FieldsSchema<TFieldValues[key]>[];
-          // FieldsSchema<TFieldValues[key]>[];
-          // fields: FieldsSchema<TFieldValues[key]>[];
-          // string[];
+          className?: string;
+          columns: FieldsSchema<
+            TFieldValues,
+            Exclude<FieldType, FieldGroupType>
+          >[];
+
+          // to fix(list): Property 'name' does not exist on type 'never'
+          name?: never;
         }
-      : AutoFormFieldUnion & {
-          type: TFieldType;
-          name: key;
-          // columns?: TFieldValues[key] extends (infer I)[]
-          //   ? FieldsSchema<I>
-          //   : keyof TFieldValues[key];
-        };
+      : TFieldType extends FieldListType
+        ? FieldArrayProps & {
+            type: TFieldType;
+            // name: string;
+            // label?: ReactNode;
+            itemTitle?: string;
+            appendProps?: {
+              title?: string;
+              defaultValue?: TFieldValues[key] extends (infer I)[]
+                ? I
+                : // : keyof TFieldValues[key];
+                  TFieldValues;
+            };
+            fields: TFieldValues[key] extends (infer I)[]
+              ? I extends FieldValues
+                ? FieldsSchema<I>[]
+                : [FieldsSchema<FieldValues>]
+              : // : keyof TFieldValues[key];
+                FieldsSchema<TFieldValues[key]>[];
+            // FieldsSchema<TFieldValues[key]>[];
+            // fields: FieldsSchema<TFieldValues[key]>[];
+            // string[];
+          }
+        : AutoFormFieldUnion & {
+            type: TFieldType;
+            name: key;
+            // columns?: TFieldValues[key] extends (infer I)[]
+            //   ? FieldsSchema<I>
+            //   : keyof TFieldValues[key];
+          };
   // : TFieldType extends FieldInputType
   //   ? AutoFormFieldUnion & {
   //       // type: TFieldType;
