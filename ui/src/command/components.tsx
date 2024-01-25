@@ -9,9 +9,10 @@ import { clsm } from "@vyductan/utils";
 
 import { Dialog, DialogContent } from "../modal/components";
 
+type CommandRootProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
 const CommandRoot = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+  CommandRootProps
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
@@ -166,6 +167,7 @@ const CommandShortcut = ({
 };
 CommandShortcut.displayName = "CommandShortcut";
 
+export type { CommandRootProps };
 export {
   CommandRoot,
   CommandDialog,
