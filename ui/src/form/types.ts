@@ -1,6 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
-import type { AutocompleteProps } from "../autocomplete";
+import type { AutoCompleteProps } from "../autocomplete";
 import type {
   DatePickerRangeProps,
   DatePickerSingleProps,
@@ -34,7 +34,7 @@ export type FieldWithType<TType, TFieldProps> = Omit<
 
 // https://procomponents.ant.design/en-US/components/schema#valuetype-lists
 export type InputUnion =
-  | FieldWithType<"autocomplete", AutocompleteProps>
+  | FieldWithType<"autocomplete", AutoCompleteProps>
   | FieldWithType<"date", Omit<DatePickerSingleProps, "mode">>
   | FieldWithType<"date-range", Omit<DatePickerRangeProps, "mode">>
   | FieldWithType<"editor", EditorProps>
@@ -125,7 +125,7 @@ export type FieldsSchema<
 > = {
   [key in keyof TFieldValues]: TFieldType extends "custom"
     ? {
-        type: "custom";
+        type: TFieldType;
         name?: never;
         render: () => void;
       }
