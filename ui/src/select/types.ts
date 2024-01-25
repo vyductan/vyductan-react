@@ -1,4 +1,5 @@
-export type SelectOption = {
+export type SelectOption<T> = {
   label: React.ReactNode;
-  value: string;
+  value: T;
+  icon?: string;
 };
