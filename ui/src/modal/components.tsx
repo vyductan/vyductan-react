@@ -26,6 +26,8 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+const DialogClose = DialogPrimitive.Close;
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -112,6 +114,7 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName;
 export type { DialogProps };
 export {
   Dialog,
+  DialogClose,
   DialogTrigger,
   DialogContent,
   DialogHeader,

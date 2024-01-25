@@ -7,6 +7,7 @@ import { Button } from "../button";
 import { ScrollArea } from "../scroll-area";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -62,7 +63,9 @@ const Modal = ({
         </ScrollArea>
 
         <DialogFooter>
-          <Button onClick={onCancel}>Cancel</Button>
+          <DialogClose asChild onClick={onCancel}>
+            <Button>Cancel</Button>
+          </DialogClose>
           <Button variant="primary" loading={okLoading} onClick={onOk}>
             {okText ?? "Ok"}
           </Button>
