@@ -70,9 +70,11 @@ export const Command = <T extends string>({
                         )}
                       />
                     ))}
-                  {optionRender?.icon
-                    ? optionRender.icon(item)
-                    : item.icon && <Icon icon={item.icon} />}
+                  {optionRender?.icon ? (
+                    <span className="mr-2">{optionRender.icon(item)}</span>
+                  ) : (
+                    item.icon && <Icon icon={item.icon} />
+                  )}
                   {optionRender?.label ? optionRender.label(item) : item.label}
                 </CommandItem>
               ))}
