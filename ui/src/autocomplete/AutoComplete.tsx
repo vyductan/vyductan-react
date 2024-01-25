@@ -21,6 +21,7 @@ export type AutoCompleteProps<T extends string = string> = Pick<
 > & {
   options: SelectOption<T>[];
   trigger?: (value?: T) => React.ReactNode;
+
   onChange?: (value: T) => void;
   onSearchChange?: (search: string) => void;
 };
@@ -30,10 +31,10 @@ const AutoCompleteInner = <T extends string>(
     value,
     options,
     trigger,
-    onChange,
 
     placeholder,
 
+    onChange,
     onSearchChange,
     ...props
   }: AutoCompleteProps<T>,
@@ -42,6 +43,26 @@ const AutoCompleteInner = <T extends string>(
   const [open, setOpen] = React.useState(false);
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  const buttonText = (() => {
+    if (!value) {
+      return placeholder ?? defaultPlaceholder;
+    }
+    const o = options.find((o) => o.value === value);
+    if (o) {
+      return (
+        <>
+          {props.optionRender?.icon ? (
+            <span className="mr-2">{props.optionRender.icon(o)}</span>
+          ) : (
+            o.icon && <Icon icon={o.icon} />
+          )}
+          {props.optionRender?.label ? props.optionRender.label(o) : o.label}
+        </>
+      );
+    }
+    return "";
+  })();
 
   return (
     <Popover
@@ -53,11 +74,9 @@ const AutoCompleteInner = <T extends string>(
             ref={buttonRef}
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className="w-full justify-between text-sm"
           >
-            {value
-              ? options.find((o) => o.value === value)?.label
-              : placeholder ?? defaultPlaceholder}
+            <span>{buttonText}</span>
             <Icon
               icon="lucide:chevrons-up-down"
               className="ml-2 size-4 shrink-0 opacity-50"
