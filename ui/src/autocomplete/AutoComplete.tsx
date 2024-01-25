@@ -5,42 +5,50 @@ import * as React from "react";
 import { Icon } from "@vyductan/icons";
 
 import type { CommandProps } from "../command";
-import type { InputBaseProps } from "../input/types";
 import type { SelectOption } from "../select/types";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Popover } from "../popover";
 
-export type AutocompleteProps = Pick<
-  CommandProps,
-  "value" | "placeholder" | "empty"
-> &
-  InputBaseProps & {
-    options: SelectOption[];
-    onChange?: (value: InputBaseProps["value"]) => void;
-  };
-export const AutoComplete = React.forwardRef<
-  HTMLInputElement,
-  AutocompleteProps
->(
-  (
-    {
-      value,
-      options,
-      onChange,
+export type AutoCompleteProps<T extends string = string> = Pick<
+  CommandProps<T>,
+  | "value"
+  | "placeholder"
+  | "empty"
+  | "groupClassName"
+  | "optionRender"
+  | "optionsRender"
+> & {
+  options: SelectOption<T>[];
+  trigger?: (value?: T) => React.ReactNode;
+  onChange?: (value: T) => void;
+  onSearchChange?: (search: string) => void;
+};
 
-      placeholder,
-      ...props
-    },
-    _,
-  ) => {
-    const [open, setOpen] = React.useState(false);
+const AutoCompleteInner = <T extends string>(
+  {
+    value,
+    options,
+    trigger,
+    onChange,
 
-    const buttonRef = React.useRef<HTMLButtonElement>(null);
+    placeholder,
 
-    return (
-      <Popover
-        trigger={
+    onSearchChange,
+    ...props
+  }: AutoCompleteProps<T>,
+  _: React.ForwardedRef<HTMLInputElement>,
+) => {
+  const [open, setOpen] = React.useState(false);
+
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  return (
+    <Popover
+      trigger={
+        trigger ? (
+          trigger(value)
+        ) : (
           <Button
             ref={buttonRef}
             role="combobox"
@@ -55,26 +63,34 @@ export const AutoComplete = React.forwardRef<
               className="ml-2 size-4 shrink-0 opacity-50"
             />
           </Button>
-        }
-        open={open}
-        onOpenChange={setOpen}
-        className="p-0"
-        style={{ width: buttonRef.current?.offsetWidth }}
-      >
-        <Command
-          options={options.map((o) => ({
-            ...o,
-            onSelect: () => {
-              onChange?.(o.value);
-              setOpen(false);
-            },
-          }))}
-          {...props}
-        />
-      </Popover>
-    );
+        )
+      }
+      open={open}
+      onOpenChange={setOpen}
+      className="p-0"
+      style={{ width: buttonRef.current?.offsetWidth }}
+    >
+      <Command<T>
+        options={options.map((o) => ({
+          ...o,
+          onSelect: () => {
+            onChange?.(o.value);
+            setOpen(false);
+          },
+        }))}
+        onSearchChange={onSearchChange}
+        {...props}
+      />
+    </Popover>
+  );
+};
+
+export const AutoComplete = React.forwardRef(AutoCompleteInner) as <
+  T extends string,
+>(
+  props: AutoCompleteProps<T> & {
+    ref?: React.ForwardedRef<HTMLUListElement>;
   },
-);
-AutoComplete.displayName = "AutoComplete";
+) => ReturnType<typeof AutoCompleteInner>;
 
 const defaultPlaceholder = "Select an option";
