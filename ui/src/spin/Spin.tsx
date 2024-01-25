@@ -6,7 +6,7 @@ import { clsm } from "@vyductan/utils";
 const spinVariants = cva("", {
   variants: {
     size: {
-      default: "h-8 w-8",
+      default: "size-8",
     },
   },
 });
@@ -25,8 +25,8 @@ export const Spin = ({ spinning, size, children }: SpinProps) => {
               className="relative inline-flex flex-col items-center justify-center gap-2"
             >
               <div className={clsm("relative flex", spinVariants({ size }))}>
-                <i className="animate-spinner-ease-spin absolute h-full w-full rounded-full border-[3px] border-solid border-x-transparent border-b-primary border-t-transparent"></i>
-                <i className="animate-spinner-linear-spin absolute h-full w-full rounded-full border-[3px] border-dotted border-x-transparent border-b-primary border-t-transparent opacity-75"></i>
+                <i className="animate-spinner-ease-spin absolute size-full rounded-full border-[3px] border-solid border-x-transparent border-b-primary border-t-transparent"></i>
+                <i className="animate-spinner-linear-spin absolute size-full rounded-full border-[3px] border-dotted border-x-transparent border-b-primary border-t-transparent opacity-75"></i>
               </div>
             </div>
           </div>
