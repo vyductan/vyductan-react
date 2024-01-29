@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vyductan/theme-config",
+  "name": "@vyductan/tailwind-config",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./index.ts",
+    "./web": "./web.ts",
     "./globals.css": "./globals.css",
     "./postcss.cjs": "./postcss.cjs"
   },

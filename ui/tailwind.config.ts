@@ -4,7 +4,7 @@
  */
 import type { Config } from "tailwindcss";
 
-import baseConfig from "@vyductan/theme-config";
+import baseConfig from "@vyductan/tailwind-config/web";
 
 export default {
   content: ["./src/**/*.tsx"],

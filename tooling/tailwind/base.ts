@@ -1,18 +1,10 @@
 import type { Config } from "tailwindcss";
-import animate from "tailwindcss-animate";
-import { borderRadius, fontSize, spacing } from "tailwindcss/defaultTheme";
+import { fontSize, spacing } from "tailwindcss/defaultTheme";
 
 export default {
   darkMode: ["class"],
   content: ["src/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       colors: ({ colors }) => ({
         error: colors.red[300],
@@ -70,14 +62,6 @@ export default {
       backgroundColor: {
         // warning: THEME_TOKEN.colorWarningBg,
       },
-      borderRadius: {
-        xs: borderRadius.DEFAULT,
-        sm: borderRadius.md,
-        md: borderRadius.lg,
-        lg: borderRadius.xl,
-        xl: borderRadius["2xl"],
-        "2xl": borderRadius["3xl"],
-      },
       fontSize: {
         md: fontSize.base,
         base: fontSize.sm,
@@ -92,31 +76,15 @@ export default {
         lg: spacing[12],
         xl: spacing[14],
       },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-      padding: {
-        // lg: THEME_TOKEN.paddingLG + "px",
-      },
-      // Colors
+      /**
+       * Colors
+       */
       textColor: {
         placeholder: "hsl(var(--placeholder))",
       },
       borderColor: {
-        "      error-hover": "hsl(var(--border-error-hover))",
+        "error-hover": "hsl(var(--border-error-hover))",
       },
     },
   },
-  plugins: [animate],
 } satisfies Config;

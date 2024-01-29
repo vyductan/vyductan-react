@@ -4,7 +4,7 @@ import {
   defaultScreensConfig,
   ResponsiveConfig,
   Screens,
-} from "../../theme/defaultConfig"
+} from "../../tooling/tailwind/defaultConfigltConfig"
 import isBrowser from "../utils/isBrowser"
 
 type Subscriber = () => void

@@ -27,7 +27,10 @@
   },
   "devDependencies": {
     "@vyductan/eslint-config": "workspace*",
-    "@vyductan/theme-config": "workspace*",
+    "@vyductan/tailwind-config": "workspace*",
     "@vyductan/typescript-config": "workspace*"
+  },
+  "peerDependencies": {
+    "react": "18.2.0"
   }
 }
