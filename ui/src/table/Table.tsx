@@ -17,7 +17,9 @@ import {
 
 import { clsm } from "@vyductan/utils";
 
+import type { PaginationProps } from "../pagination";
 import type { TableColumnDef } from "./types";
+import { Pagination } from "../pagination";
 import { TableBody } from "./TableBody";
 import { TableCell } from "./TableCell";
 import { TableHead } from "./TableHead";
@@ -36,7 +38,6 @@ type TableProps<TRecord extends Record<string, unknown>> =
   HTMLAttributes<HTMLTableElement> & {
     columns: TableColumnDef<TRecord>[];
     dataSource: TRecord[];
-    bordered?: boolean;
     // emptyRender?: EmptyProps;
     expandable?: {
       expandedRowKeys: string[];
@@ -45,8 +46,10 @@ type TableProps<TRecord extends Record<string, unknown>> =
       onExpand?: (record: TRecord) => void;
     };
     rowKey?: keyof TRecord;
+    pagination?: PaginationProps;
+
+    bordered?: boolean;
     loading?: boolean;
-    // pagination?: BPPaginationWithStateProps;
     sticky?: boolean;
     size?: "smal" | "default";
 
@@ -60,6 +63,8 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     className,
     columns,
     dataSource,
+    pagination,
+
     sticky,
     scroll,
     ...props
@@ -76,7 +81,6 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       expanded,
     },
     getCoreRowModel: getCoreRowModel(),
-    debugTable: true,
 
     getSubRows: (record) => record.children as TRecord[],
     onExpandedChange: setExpanded,
@@ -165,7 +169,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
           )}
         </TableBody>
       </table>
-      {/* {pagination && <BPPaginationWithState {...pagination} />} */}
+      {pagination && <Pagination {...pagination} />}
     </div>
   );
 };

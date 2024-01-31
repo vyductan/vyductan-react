@@ -19,6 +19,7 @@ export * from "./list";
 export * from "./spin";
 export * from "./markdown";
 export * from "./modal";
+export * from "./pagination";
 export * from "./radio";
 export * from "./resizable";
 export * from "./scroll-area";

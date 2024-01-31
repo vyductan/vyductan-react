@@ -12,28 +12,32 @@ type BaseTableColumnDef = {
   width?: number;
 
   enableResizing?: boolean;
-  minSize?: number;
+  minWidth?: number;
 };
+export type ExtraTableColumnDef<TRecord> = {
+  fixed?: "left" | "right";
+  children?: TableColumnDef<TRecord>[];
+};
+
 type DefWithOutDataIndex<TRecord> = BaseTableColumnDef & {
   dataIndex?: never;
   render?: (ctx: RenderContext<TRecord>) => ReactNode;
 };
-export type TableColumnDef<TRecord> = {
-  children?: TableColumnDef<TRecord>[];
-} & (
-  | DefWithOutDataIndex<TRecord>
-  | (BaseTableColumnDef &
-      {
-        [K in keyof TRecord]-?: {
-          dataIndex: K;
-          render?: (
-            ctx: RenderContext<TRecord> & {
-              value: TRecord[K];
-            },
-          ) => ReactNode;
-        };
-      }[keyof TRecord])
-);
+export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
+  (
+    | DefWithOutDataIndex<TRecord>
+    | (BaseTableColumnDef &
+        {
+          [K in keyof TRecord]-?: {
+            dataIndex: K;
+            render?: (
+              ctx: RenderContext<TRecord> & {
+                value: TRecord[K];
+              },
+            ) => ReactNode;
+          };
+        }[keyof TRecord])
+  );
 
 type RenderContext<TRecord> = {
   record: TRecord;
