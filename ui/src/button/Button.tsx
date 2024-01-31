@@ -12,6 +12,7 @@ import { Spin } from "../spin";
 const buttonVariants = cva(
   [
     "inline-flex items-center justify-center text-sm font-medium ring-offset-white transition-colors",
+    "border",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "disabled:pointer-events-none disabled:opacity-50",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
@@ -36,7 +37,7 @@ const buttonVariants = cva(
         ],
         default: [
           // "text-primary",
-          "border border-border",
+          "border-border",
           "hover:border-primary-hover hover:text-primary-hover",
         ],
         dashed: [
@@ -51,8 +52,10 @@ const buttonVariants = cva(
 
         // secondary:
         // "bg-gray-100 text-gray-900 hover:bg-gray-100/80 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-800/80",
-        ghost:
+        ghost: [
+          "border-transparent",
           "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-50",
+        ],
         "ghost-action": ["text-blue-500"],
         "ghost-danger": [
           "text-red-500",
@@ -69,7 +72,37 @@ const buttonVariants = cva(
         lg: "h-lg rounded-sm px-3 py-1 text-md",
         xl: "h-xl px-4 text-xl",
       },
+      shape: {
+        icon: "p-0",
+      },
     },
+    compoundVariants: [
+      {
+        size: "xs",
+        shape: "icon",
+        className: "w-6",
+      },
+      {
+        size: "sm",
+        shape: "icon",
+        className: "w-8",
+      },
+      {
+        size: "default",
+        shape: "icon",
+        className: "w-10",
+      },
+      {
+        size: "lg",
+        shape: "icon",
+        className: "w-12",
+      },
+      {
+        size: "xl",
+        shape: "icon",
+        className: "w-14",
+      },
+    ],
     defaultVariants: {
       variant: "default",
       color: "default",
@@ -97,6 +130,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       loading,
       size,
+      shape,
       variant,
       icon,
       ...props
@@ -108,16 +142,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={clsm(
-          buttonVariants({ color, variant, size, className }),
-          icon && !children
-            ? !size || size === "default"
-              ? "w-10"
-              : size === "sm"
-                ? "w-8"
-                : size === "xs"
-                  ? "w-6"
-                  : ""
-            : "",
+          buttonVariants({
+            color,
+            variant,
+            size,
+            shape:
+              shape !== "icon" ? shape : icon && !children ? "icon" : undefined,
+            className,
+          }),
         )}
         disabled={loading ?? disabled}
         {...props}
