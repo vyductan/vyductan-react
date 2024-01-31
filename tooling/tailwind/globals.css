@@ -99,7 +99,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  a {
-    @apply cursor-pointer text-link hover:text-primary-500 hover:underline;
-  }
 }
