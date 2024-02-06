@@ -46,6 +46,8 @@
 
     --link: 14 79% 62%;
     --input: 0 0% 89.8%;
+
+    --text-description: 0 0% 0% / 45%;
   }
 
   .dark {
@@ -89,6 +91,8 @@
     --ring: 0 0% 83.1%;
 
     --border-error-hover: theme(colors.red.500);
+
+    --text-description: 0 0% 100% / 45%;
   }
 }
 

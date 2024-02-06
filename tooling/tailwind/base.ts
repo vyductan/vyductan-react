@@ -81,6 +81,7 @@ export default {
        */
       textColor: {
         placeholder: "hsl(var(--placeholder))",
+        description: "hsl(var(--text-description))",
       },
       borderColor: {
         "error-hover": "hsl(var(--border-error-hover))",
