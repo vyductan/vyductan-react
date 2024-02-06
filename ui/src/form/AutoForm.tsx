@@ -161,7 +161,7 @@ const renderInput = (props: InputUnion) => {
     return (
       <Editor
         onChange={(editorState) => {
-          onChange?.(editorState.toJSON());
+          onChange?.(JSON.stringify(editorState));
         }}
         {...rest}
       />
