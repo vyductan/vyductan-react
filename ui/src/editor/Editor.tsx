@@ -1,12 +1,7 @@
 "use client";
 
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
-import type {
-  EditorState,
-  LexicalEditor,
-  SerializedEditorState,
-  SerializedLexicalNode,
-} from "lexical";
+import type { EditorState, LexicalEditor } from "lexical";
 import type { Ref } from "react";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
@@ -16,7 +11,6 @@ import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode } from "@lexical/rich-text";
-import { $getRoot } from "lexical";
 
 import { clsm } from "@vyductan/utils";
 
@@ -32,7 +26,7 @@ import { LinkPlugin } from "./plugins/LinkPlugin";
 import { OnChangePlugin } from "./plugins/OnChangePlugin";
 
 export type EditorProps = EditorContextValue & {
-  value?: SerializedEditorState<SerializedLexicalNode>;
+  value?: string;
   onChange?: (
     editorState: EditorState,
     editor: LexicalEditor,
@@ -59,8 +53,7 @@ const EditorInternal = (
         }
         if (
           value &&
-          JSON.stringify(value) !==
-            JSON.stringify(editorRef.current?.getEditorState())
+          value !== JSON.stringify(editorRef.current?.getEditorState())
         ) {
           editorRef.current.setEditorState(
             editorRef.current.parseEditorState(value),
