@@ -4,12 +4,6 @@
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "include": [
-    ".",
-    "../../theme/postcss.js",
-    "../../theme/package.json",
-    "../../theme/index.ts",
-    "../../theme/globals.css"
-  ],
+  "include": ["."],
   "exclude": ["node_modules"]
 }
