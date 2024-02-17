@@ -15,6 +15,7 @@ import Editor from "../editor";
 import { Input, InputPassword } from "../input";
 import { RadioGroup } from "../radio";
 import { Tag } from "../tag";
+import { Textarea } from "../textarea";
 import { Field } from "./Field";
 import { FieldArray } from "./FieldArray";
 import { Form } from "./Form";
@@ -177,6 +178,9 @@ const renderInput = (props: InputUnion) => {
   }
   if (props.type === "text") {
     return <Input {...props} />;
+  }
+  if (props.type === "textarea") {
+    return <Textarea {...props} />;
   }
   return <></>;
 };
