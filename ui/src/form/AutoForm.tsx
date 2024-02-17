@@ -1,6 +1,6 @@
 "use client";
 
-import type { FieldValues } from "react-hook-form";
+import type { Control, FieldValues, Path } from "react-hook-form";
 import React from "react";
 
 import { DeleteOutlined } from "@vyductan/icons";
@@ -24,8 +24,8 @@ import { Form } from "./Form";
  */
 type AutoFormProps<
   TFieldValues extends FieldValues,
-  TContext,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TContext = unknown,
+  TTransformedValues extends FieldValues = TFieldValues,
   TFieldType extends FieldType = FieldType,
 > = {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
@@ -34,7 +34,7 @@ type AutoFormProps<
 const AutoForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
   TFieldType extends FieldType = FieldType,
 >({
   form,
@@ -98,7 +98,9 @@ const AutoForm = <
                               ...(field.type === "group"
                                 ? {}
                                 : field.name
-                                  ? { name: `${name}.${index}.${field.name}` }
+                                  ? {
+                                      name: `${name}.${index}.${String(field.name)}`,
+                                    }
                                   : { name: `${name}.${index}` }),
                             }) as unknown as FieldsSchema<
                               TFieldValues[keyof TFieldValues]
@@ -124,12 +126,11 @@ const AutoForm = <
 
         return (
           <Field
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            name={name as any}
+            name={name as Path<TFieldValues>}
+            control={control as unknown as Control<TFieldValues>}
             label={label}
             description={description}
             className={className}
-            control={control}
           >
             {({ field: fieldRenderProps }) => {
               return renderInput({

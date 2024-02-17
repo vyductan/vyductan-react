@@ -25,7 +25,7 @@ type AutoFormFieldBaseProps = {
 };
 export type FieldWithType<TType, TFieldProps> = Omit<
   TFieldProps,
-  "title" | "children" | "onChange"
+  "name" | "title" | "children" | "onChange"
 > & {
   type: TType;
   // value: string;
@@ -74,8 +74,9 @@ type AutoFormFieldUnion<
   //   // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
   //   | FieldWithType<"textarea", FieldProps<TFieldValues> & TextareaProps>
   // )
-  Omit<FieldProps<TFieldValues>, "control"> &
+  Omit<FieldProps<TFieldValues>, "control" | "name"> &
   InputUnion;
+
 // | FieldWithType<"time", FieldInputProps>
 // | FieldWithType<"group", { gridCols?: number; columns: Array<FieldsSchema<TRecord>> }>
 // | FieldWithType<"custom", unknown>
