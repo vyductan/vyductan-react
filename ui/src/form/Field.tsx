@@ -49,7 +49,6 @@ const Field = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-  name,
   label,
   children,
   description,
@@ -58,7 +57,7 @@ const Field = <
 }: FieldProps<TFieldValues, TName>) => {
   const id = useId();
   const { getFieldState, formState } = useFormContext();
-  const { error } = getFieldState(name, formState);
+  const { error } = getFieldState(props.name, formState);
 
   const fieldId = `${id}-form-item`;
   const fieldDescriptionId = `${id}-form-item-description`;
@@ -67,7 +66,7 @@ const Field = <
   return (
     <FormFieldContext.Provider
       value={{
-        name,
+        name: props.name,
         id,
         fieldId,
         fieldDescriptionId,
@@ -75,7 +74,6 @@ const Field = <
       }}
     >
       <Controller
-        name={name}
         defaultValue={"" as PathValue<TFieldValues, TName>}
         {...props}
         render={({ field, fieldState, formState }) => (

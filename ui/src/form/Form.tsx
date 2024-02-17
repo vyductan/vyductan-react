@@ -52,7 +52,7 @@ import type { FormInstance } from "./useForm";
 type FormProps<
   TFieldValues extends FieldValues,
   TContext,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
 > = {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
   children:
@@ -62,13 +62,13 @@ type FormProps<
       ) => ReactNode);
 };
 const Form = <
-  TValues extends FieldValues,
+  TFieldValues extends FieldValues,
   TContext,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
 >({
   form,
   children,
-}: FormProps<TValues, TContext, TTransformedValues>) => {
+}: FormProps<TFieldValues, TContext, TTransformedValues>) => {
   //   {
   //   form: formInstanceExternal,
   //   defaultValues,

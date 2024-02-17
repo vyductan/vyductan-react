@@ -24,7 +24,7 @@ import type { ResetAction } from "./types";
 type FormInstance<
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
   submit: (
     e?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
@@ -36,7 +36,7 @@ type FormInstance<
 type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
 > = UseRHFormProps<TFieldValues, TContext> & {
   schema?: z.ZodType<TFieldValues>;
   onSubmit: TTransformedValues extends undefined
@@ -48,7 +48,7 @@ type UseFormProps<
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues extends FieldValues = TFieldValues,
 >({
   defaultValues,
   schema,
@@ -61,8 +61,6 @@ const useForm = <
   const methods = useRHForm<TFieldValues, TContext, TTransformedValues>({
     defaultValues,
     resolver: schema ? zodResolver(schema) : undefined,
-    // fix form values is not cleared after unmounting
-    // shouldUnregister: true,
   });
 
   const { reset } = methods;
