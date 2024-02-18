@@ -3,34 +3,45 @@ import { cva } from "class-variance-authority";
 
 import { clsm } from "@vyductan/utils";
 
+import "./style.css";
+
 const spinVariants = cva("", {
   variants: {
     size: {
-      default: "size-8",
+      default: [
+        "size-5",
+        "before:!bg-[length:4px_4px] after:!bg-[length:6px_6px]",
+        "before:m-0.5",
+      ],
+      lg: [
+        "size-8",
+        "before:!bg-[length:6px_6px] after:!bg-[length:12px_12px]",
+      ],
+      xl: [
+        "size-12",
+        "before:!bg-[length:8px_8px] after:!bg-[length:12px_12px]",
+      ],
     },
+  },
+  defaultVariants: {
+    size: "default",
   },
 });
 export interface SpinProps extends VariantProps<typeof spinVariants> {
   spinning?: boolean;
   children?: React.ReactNode;
 }
-export const Spin = ({ spinning, size, children }: SpinProps) => {
+export const Spin = ({ spinning = true, size, children }: SpinProps) => {
   return (
     <div>
-      {spinning === undefined ||
-        (spinning && (
-          <div key="loading">
-            <div
-              aria-label="Loading"
-              className="relative inline-flex flex-col items-center justify-center gap-2"
-            >
-              <div className={clsm("relative flex", spinVariants({ size }))}>
-                <i className="animate-spinner-ease-spin absolute size-full rounded-full border-[3px] border-solid border-x-transparent border-b-primary border-t-transparent"></i>
-                <i className="animate-spinner-linear-spin absolute size-full rounded-full border-[3px] border-dotted border-x-transparent border-b-primary border-t-transparent opacity-75"></i>
-              </div>
-            </div>
-          </div>
-        ))}
+      {spinning && (
+        <div key="loading">
+          <div
+            aria-label="Loading"
+            className={clsm("spin", spinVariants({ size }))}
+          />
+        </div>
+      )}
       {children}
     </div>
   );
