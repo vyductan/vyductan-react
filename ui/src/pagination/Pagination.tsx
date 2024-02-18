@@ -8,11 +8,11 @@ import type { PaginationItemProps } from "./components";
 import type { PaginationLocale } from "./types";
 import {
   PaginationContent,
-  PaginationEllipsis,
+  // PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+  // PaginationLink,
+  // PaginationNext,
+  // PaginationPrevious,
   PaginationRoot,
   PaginationTotal,
 } from "./components";
@@ -65,15 +65,15 @@ export const Pagination = (props: PaginationProps) => {
     showLessItems,
     showPrevNextJumpers = true,
     showQuickJumper,
-    showSizeChanger: showSizeChangerProp,
+    // showSizeChanger: showSizeChangerProp,
     showTitle,
     showTotal,
-    totalBoundaryShowSizeChanger = 50,
+    // totalBoundaryShowSizeChanger = 50,
 
     itemRender = defaultItemRender,
   } = props;
 
-  const [pageSize, setPageSize] = useMergedState<number>(10, {
+  const [pageSize, _setPageSize] = useMergedState<number>(10, {
     value: pageSizeProp,
     defaultValue: defaultPageSize,
   });
@@ -137,8 +137,8 @@ export const Pagination = (props: PaginationProps) => {
 
   const hasPrev = current > 1;
   const hasNext = current < calculatePage(undefined, pageSize, total);
-  const showSizeChanger =
-    showSizeChangerProp ?? total > totalBoundaryShowSizeChanger;
+  // const showSizeChanger =
+  //   showSizeChangerProp ?? total > totalBoundaryShowSizeChanger;
 
   function prevHandle() {
     if (hasPrev) handleChange(current - 1);
@@ -165,8 +165,8 @@ export const Pagination = (props: PaginationProps) => {
   ) {
     if (
       event.key === "Enter" ||
-      event.charCode === KeyCode.ENTER ||
-      event.keyCode === KeyCode.ENTER
+      event.code === KeyCode.ENTER.toString()
+      // event..keyCode === KeyCode.ENTER
     ) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       callback(...restParams);
@@ -237,8 +237,7 @@ export const Pagination = (props: PaginationProps) => {
       : showQuickJumper?.goButton;
 
   // ================== Simple ==================
-  // FIXME: ts type
-  let gotoButton = goButton;
+  let _gotoButton = goButton;
   let simplePager: React.ReactNode = null;
 
   function getValidValue(
@@ -303,7 +302,7 @@ export const Pagination = (props: PaginationProps) => {
     // ====== Simple quick jump ======
     if (goButton) {
       if (typeof goButton === "boolean") {
-        gotoButton = (
+        _gotoButton = (
           <button
             type="button"
             onClick={() => {
@@ -319,7 +318,7 @@ export const Pagination = (props: PaginationProps) => {
           </button>
         );
       } else {
-        gotoButton = (
+        _gotoButton = (
           <span
             onClick={() => {
               handleChange(internalInputVal);
@@ -337,9 +336,9 @@ export const Pagination = (props: PaginationProps) => {
         );
       }
 
-      gotoButton = (
+      _gotoButton = (
         <li title={showTitle ? `Jump to ${current}/${allPages}` : undefined}>
-          {gotoButton}
+          {_gotoButton}
         </li>
       );
     }
@@ -616,8 +615,8 @@ function noop() {
 }
 
 const defaultItemRender: PaginationProps["itemRender"] = (
-  page,
-  type,
+  _page,
+  _type,
   element,
 ) => element;
 

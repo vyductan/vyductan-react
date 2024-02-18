@@ -416,7 +416,7 @@ function useDraggableBlockMenu(
         {isEditable && (
           <Icon
             icon="uil:draggabledots"
-            className="pointer-events-none h-4 w-4 opacity-80"
+            className="pointer-events-none size-4 opacity-80"
           />
         )}
       </div>

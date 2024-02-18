@@ -94,5 +94,8 @@ const Tabs = React.forwardRef<
     </>
   );
 });
+
+Tabs.displayName = "Tabs";
+
 export { Tabs };
 export type { TabsProps };

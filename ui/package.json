@@ -60,6 +60,7 @@
     "zustand": "^4.5.1"
   },
   "devDependencies": {
+    "@types/react-dom": "^18.2.19",
     "@types/react-syntax-highlighter": "^15.5.11",
     "@vyductan/eslint-config": "*",
     "@vyductan/tailwind-config": "*",

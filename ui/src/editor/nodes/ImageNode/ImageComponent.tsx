@@ -7,8 +7,6 @@ import type {
 import * as React from "react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { useCollaborationContext } from "@lexical/react/LexicalCollaborationContext";
-import { CollaborationPlugin } from "@lexical/react/LexicalCollaborationPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin";
@@ -74,8 +72,8 @@ function LazyImage({
   imageRef,
   src,
   width,
-  height,
-  maxWidth,
+  height: _,
+  maxWidth: __,
 }: {
   altText: string;
   className: string | null;
@@ -363,9 +361,10 @@ export default function ImageComponent({
           <div className="relative self-center">
             <LazyImage
               className={
-                isFocused
-                  ? `focused ${$isNodeSelection(selection) ? "draggable" : ""}`
-                  : null
+                ""
+                // isFocused
+                //   ? `focused ${$isNodeSelection(selection) ? "draggable" : ""}`
+                //   : null
               }
               src={src}
               altText={altText}
@@ -388,7 +387,7 @@ export default function ImageComponent({
           </div>
         </div>
         {showCaption && (
-          <div className="image-caption-container">
+          <div className="">
             <LexicalNestedComposer initialEditor={caption}>
               <AutoFocusPlugin />
               {/* <MentionsPlugin /> */}
@@ -407,12 +406,8 @@ export default function ImageComponent({
               {/* )} */}
               <HistoryPlugin externalHistoryState={historyState} />
               <RichTextPlugin
-                contentEditable={<div className="ImageNode__contentEditable" />}
-                placeholder={
-                  <div className="ImageNode__placeholder">
-                    Enter a caption...
-                  </div>
-                }
+                contentEditable={<div className="" />}
+                placeholder={<div className="">Enter a caption...</div>}
                 ErrorBoundary={LexicalErrorBoundary}
               />
               {/* {showNestedEditorTreeView === true ? <TreeViewPlugin /> : null} */}

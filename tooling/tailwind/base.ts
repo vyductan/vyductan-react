@@ -45,6 +45,9 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -59,9 +62,7 @@ export default {
       //   // foreground: theme("colors.gray.800"),
       //   // warning: THEME_TOKEN.colorWarningText,
       // }),
-      backgroundColor: {
-        // warning: THEME_TOKEN.colorWarningBg,
-      },
+
       fontSize: {
         md: fontSize.base,
         base: fontSize.sm,
@@ -83,8 +84,12 @@ export default {
         placeholder: "hsl(var(--placeholder))",
         description: "hsl(var(--text-description))",
       },
+      backgroundColor: {
+        warning: "hsl(var(--warning-bg))",
+      },
       borderColor: {
         "error-hover": "hsl(var(--border-error-hover))",
+        warning: "hsl(var(--warning-border))",
       },
     },
   },

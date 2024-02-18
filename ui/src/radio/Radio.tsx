@@ -58,14 +58,14 @@ const Radio = React.forwardRef<
         id={id}
         ref={ref}
         className={clsm(
-          "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          "aspect-square size-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           "data-[state=checked]:border-2",
           className,
         )}
         {...props}
       >
         <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-          <CircleFilled className="h-2 w-2 fill-current text-current" />
+          <CircleFilled className="size-2 fill-current text-current" />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
       <Label htmlFor={id} className="cursor-pointer px-2">
