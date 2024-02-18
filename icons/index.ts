@@ -7,7 +7,7 @@ export * from "./CheckOutlined";
 export * from "./ChevronRightOutlined";
 export * from "./CircleFilled";
 export * from "./CircleOutlined";
-export { default as CloseOutlined } from "./CloseOutlined";
+export * from "./CloseOutlined";
 export * from "./DeleteOutlined";
 export * from "./LogoutOutlined";
 export * from "./MailOutlined";
