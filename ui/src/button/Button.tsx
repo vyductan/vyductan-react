@@ -74,6 +74,7 @@ const buttonVariants = cva(
       },
       shape: {
         icon: "p-0",
+        circle: "rounded-full",
       },
     },
     compoundVariants: [
