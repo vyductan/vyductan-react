@@ -1,3 +1,5 @@
+"use client";
+
 export { default as Alert } from "./alert";
 export * from "./alert-modal";
 export * from "./autocomplete";
@@ -10,6 +12,7 @@ export * from "./divider";
 export * from "./dropdown";
 export { default as Card } from "./card";
 export * from "./editor";
+export * from "./float-button";
 export * from "./form";
 // export { default as Drawer } from "./drawer/index.ts_";
 export * from "./input";
