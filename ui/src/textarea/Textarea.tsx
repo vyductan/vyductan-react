@@ -24,7 +24,7 @@ const textareaVariants = cva(
         sm: "",
         default: "px-3 py-[9px]",
         lg: "",
-        xl: "px-4 py-4 text-md",
+        xl: "p-4 text-md",
       },
     },
     defaultVariants: {

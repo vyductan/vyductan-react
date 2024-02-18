@@ -15,17 +15,17 @@ export const Avatar = ({ fallback, className, ...rest }: AvatarProps) => {
   return (
     <AvatarPrimitive.Root
       className={clsm(
-        "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
+        "relative flex size-10 shrink-0 overflow-hidden rounded-full",
         className,
       )}
     >
       <AvatarPrimitive.Image
-        className={clsm("aspect-square h-full w-full")}
+        className={clsm("aspect-square size-full")}
         {...rest}
       />
       <AvatarPrimitive.Fallback
         className={clsm(
-          "flex h-full w-full items-center justify-center rounded-full bg-primary text-white dark:bg-primary",
+          "flex size-full items-center justify-center rounded-full bg-primary text-white dark:bg-primary",
         )}
       >
         {fallback}

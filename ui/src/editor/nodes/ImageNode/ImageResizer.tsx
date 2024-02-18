@@ -80,14 +80,14 @@ export default function ImageResizer({
   const minWidth = 100;
   const minHeight = 100;
 
-  const setStartCursor = (direction: number) => {
-    const ew = direction === Direction.east || direction === Direction.west;
-    const ns = direction === Direction.north || direction === Direction.south;
-    const nwse =
-      (direction & Direction.north && direction & Direction.west) ||
-      (direction & Direction.south && direction & Direction.east);
-
-    const cursorDir = ew ? "ew" : ns ? "ns" : nwse ? "nwse" : "nesw";
+  const setStartCursor = (_direction: number) => {
+    // const ew = direction === Direction.east || direction === Direction.west;
+    // const ns = direction === Direction.north || direction === Direction.south;
+    // const nwse =
+    //   (direction & Direction.north && direction & Direction.west) ||
+    //   (direction & Direction.south && direction & Direction.east);
+    //
+    // const cursorDir = ew ? "ew" : ns ? "ns" : nwse ? "nwse" : "nesw";
 
     if (editorRootElement !== null) {
       editorRootElement.style.setProperty(
@@ -269,12 +269,12 @@ export default function ImageResizer({
         )}
       >
         <Tooltip title="Caption">
-          <div className="flex h-6 w-6 cursor-pointer items-center justify-center bg-gray-900/50 first:rounded-l hover:bg-gray-700/50">
+          <div className="flex size-6 cursor-pointer items-center justify-center bg-gray-900/50 first:rounded-l hover:bg-gray-700/50">
             <Icon icon="material-symbols:closed-caption-outline" />
           </div>
         </Tooltip>
         <Tooltip title="Download">
-          <div className="flex h-6 w-6 cursor-pointer items-center justify-center bg-gray-900/50 last:rounded-r hover:bg-gray-700/50">
+          <div className="flex size-6 cursor-pointer items-center justify-center bg-gray-900/50 last:rounded-r hover:bg-gray-700/50">
             <Icon icon="humbleicons:download" />
           </div>
         </Tooltip>

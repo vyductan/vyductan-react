@@ -5,9 +5,9 @@ import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
   isNotFirstDeepColumn?: boolean,
-  expandable?: {
-    expandedRowKeys: string[];
-  },
+  // expandable?: {
+  //   expandedRowKeys: string[];
+  // },
 ) => {
   const columnsDef: (ColumnDef<TRecord> & ExtraTableColumnDef<TRecord>)[] =
     columns.map(

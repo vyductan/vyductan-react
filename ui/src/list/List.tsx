@@ -33,40 +33,40 @@ export interface ListProps<T> extends VariantProps<typeof listVariants> {
   renderItem: (item: T, index: number) => React.ReactNode;
 }
 
-function List<T>({
+function List<TRecord extends Record<string, unknown>>({
   // pagination = false as ListProps<any>['pagination'],
   // prefixCls: customizePrefixCls,
-  bordered = false,
-  split = true,
-  className,
+  // bordered = false,
+  // split = true,
+  // className,
   // rootClassName,
-  style,
+  // style,
   // itemLayout,
-  loadMore,
+  // loadMore,
   // grid,
   dataSource = [],
-  size,
+  // size,
   header,
   footer,
-  loading = false,
+  // loading = false,
   rowKey,
   renderItem,
-  ...rest
-}: ListProps<T>) {
+  // ...rest
+}: ListProps<TRecord>) {
   return (
     <>
       {header && <div>{header}</div>}
       <Spin>
         {/* {childrenContent} */}
-        <ul role="list">
+        <ul>
           {dataSource.map((item, index) => (
             <Fragment
               key={
                 typeof rowKey === "function"
                   ? rowKey(item)
                   : rowKey
-                    ? item[rowKey]
-                    : (item as any).key || `list-item-${index}`
+                    ? (item[rowKey] as string)
+                    : `list-item-${index}`
               }
             >
               {renderItem(item, index)}

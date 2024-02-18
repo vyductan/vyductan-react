@@ -16,6 +16,7 @@ const config = {
         "!**/dist",
         "!**/build",
       ],
+      whitelist: ["_.+"],
     },
   },
 };

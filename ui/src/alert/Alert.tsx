@@ -16,7 +16,7 @@ const Alert = ({ children, className, showIcon, type }: AlertProps) => {
         "flex items-center px-3 py-2",
         "break-words text-sm",
         type === "warning" &&
-          "border-warning bg-warning text-warning rounded-lg border",
+          "rounded-lg border border-warning bg-warning text-warning",
         className,
       )}
     >

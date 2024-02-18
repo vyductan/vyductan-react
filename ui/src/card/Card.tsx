@@ -6,7 +6,7 @@ type CardProps = {
 const Card = ({ children }: CardProps) => {
   return (
     <div>
-      <div className="lg:p-lg">{children}</div>
+      <div className="lg:p-6">{children}</div>
     </div>
   );
 };

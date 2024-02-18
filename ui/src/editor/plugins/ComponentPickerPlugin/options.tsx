@@ -7,7 +7,7 @@ import {
 } from "@lexical/list";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
-import { INSERT_TABLE_COMMAND } from "@lexical/table";
+// import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
   $createParagraphNode,
   $getSelection,
@@ -20,38 +20,38 @@ import type { useModal } from "../../../modal";
 import { InsertImage } from "../ImagesPlugin/InsertImage";
 import { ComponentPickerOption } from "./types";
 
-function getDynamicOptions(editor: LexicalEditor, queryString: string) {
-  const options: Array<ComponentPickerOption> = [];
-
-  if (queryString == null) {
-    return options;
-  }
-
-  const tableMatch = queryString.match(/^([1-9]\d?)(?:x([1-9]\d?)?)?$/);
-
-  if (tableMatch !== null) {
-    const rows = tableMatch[1];
-    const colOptions = tableMatch[2]
-      ? [tableMatch[2]]
-      : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(String);
-
-    options.push(
-      ...colOptions.map(
-        (columns) =>
-          new ComponentPickerOption(`${rows}x${columns} Table`, {
-            icon: <Icon icon="radix-icons:table" />,
-            keywords: ["table"],
-            onSelect: () => {
-              rows &&
-                editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns, rows });
-            },
-          }),
-      ),
-    );
-  }
-
-  return options;
-}
+// function getDynamicOptions(editor: LexicalEditor, queryString: string) {
+//   const options: Array<ComponentPickerOption> = [];
+//
+//   if (queryString == null) {
+//     return options;
+//   }
+//
+//   const tableMatch = queryString.match(/^([1-9]\d?)(?:x([1-9]\d?)?)?$/);
+//
+//   if (tableMatch !== null) {
+//     const rows = tableMatch[1];
+//     const colOptions = tableMatch[2]
+//       ? [tableMatch[2]]
+//       : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(String);
+//
+//     options.push(
+//       ...colOptions.map(
+//         (columns) =>
+//           new ComponentPickerOption(`${rows}x${columns} Table`, {
+//             icon: <Icon icon="radix-icons:table" />,
+//             keywords: ["table"],
+//             onSelect: () => {
+//               rows &&
+//                 editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns, rows });
+//             },
+//           }),
+//       ),
+//     );
+//   }
+//
+//   return options;
+// }
 
 type ShowModal = ReturnType<typeof useModal>[1];
 
