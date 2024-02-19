@@ -80,27 +80,27 @@ const buttonVariants = cva(
     compoundVariants: [
       {
         size: "xs",
-        shape: "icon",
+        shape: ["icon", "circle"],
         className: "w-6",
       },
       {
         size: "sm",
-        shape: "icon",
+        shape: ["icon", "circle"],
         className: "w-8",
       },
       {
         size: "default",
-        shape: "icon",
+        shape: ["icon", "circle"],
         className: "w-10",
       },
       {
         size: "lg",
-        shape: "icon",
+        shape: ["icon", "circle"],
         className: "w-12",
       },
       {
         size: "xl",
-        shape: "icon",
+        shape: ["icon", "circle"],
         className: "w-14",
       },
     ],
