@@ -2,7 +2,7 @@
 
 import type { Placement } from "@popperjs/core";
 import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
-import type { MouseEventHandler, ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment } from "react";
 
 import {
@@ -24,7 +24,6 @@ type MenuItem = {
   as?: "title" | "separator";
   href?: string;
   onSelect?: (event: Event) => void;
-  onClick?: MouseEventHandler<HTMLDivElement>;
 };
 type Menu = {
   className?: string;
