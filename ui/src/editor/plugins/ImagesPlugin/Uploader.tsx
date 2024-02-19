@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { clsm } from "@vyductan/utils";
 
 import type { InsertImagePayload } from "./types";
-import { toast } from "../../../toast";
+import { message } from "../../../toast";
 import { EditorContext } from "../../context";
 
 type UploadProps = {
@@ -15,7 +15,7 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
 
   const upload = async (file: File) => {
     if (file.size / 1024 / 1024 > 50) {
-      toast.error("File size too big (max 50MB)");
+      message.error("File size too big (max 50MB)");
     } else {
       const blob = await apiUpload({
         file: file,
