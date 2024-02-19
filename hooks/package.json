@@ -3,8 +3,24 @@
   "name": "@vyductan/hooks",
   "version": "0.1.0",
   "private": true,
-  "main": "index.ts",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules"
+  },
+  "prettier": "@vyductan/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@vyductan/eslint-config/base",
+      "@vyductan/eslint-config/react",
+      "@vyductan/eslint-config/tailwind"
+    ],
+    "root": true
+  },
+  "devDependencies": {
+    "@vyductan/eslint-config": "*",
+    "@vyductan/typescript-config": "*"
   }
 }
