@@ -10,48 +10,51 @@ function ThemeToggle() {
   const { setTheme } = useTheme();
 
   return (
-    <Dropdown
-      asChild
-      placement="top"
-      menu={{
-        items: [
-          {
-            label: "Light",
-            onClick: () => {
-              setTheme("light");
+    <>
+      <Dropdown
+        asChild
+        placement="top"
+        menu={{
+          items: [
+            {
+              label: "Light",
+              onSelect: () => {
+                setTheme("light");
+              },
             },
-          },
-          {
-            label: "Dark",
-            onClick: () => {
-              setTheme("dark");
+            {
+              label: "Dark",
+              onSelect: () => {
+                setTheme("dark");
+              },
             },
-          },
-          {
-            label: "System",
-            onClick: () => {
-              setTheme("system");
+            {
+              label: "System",
+              onSelect: () => {
+                setTheme("system");
+              },
             },
-          },
-        ],
-      }}
-    >
-      <Button
-        icon={
-          <>
-            <Icon
-              icon="radix-icons:sun"
-              className="size-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
-            />
-            <Icon
-              icon="radix-icons:moon"
-              className="absolute size-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
-            />
-            <span className="sr-only">Toggle theme</span>
-          </>
-        }
-      />
-    </Dropdown>
+          ],
+        }}
+      >
+        <Button
+          shape="circle"
+          icon={
+            <>
+              <Icon
+                icon="radix-icons:sun"
+                className="block size-4 rotate-0 transition-all dark:hidden dark:-rotate-90"
+              />
+              <Icon
+                icon="radix-icons:moon"
+                className="hidden size-4 rotate-90 transition-all dark:block dark:rotate-0"
+              />
+              <span className="sr-only">Toggle theme</span>
+            </>
+          }
+        />
+      </Dropdown>
+    </>
   );
 }
 
