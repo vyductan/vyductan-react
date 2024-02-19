@@ -5,7 +5,7 @@ import * as React from "react";
 import { Icon } from "@vyductan/icons";
 
 import type { CommandProps } from "../command";
-import type { SelectOption } from "../select/types";
+import type { Option } from "../select/types";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Popover } from "../popover";
@@ -19,7 +19,7 @@ export type AutoCompleteProps<T extends string = string> = Pick<
   | "optionRender"
   | "optionsRender"
 > & {
-  options: SelectOption<T>[];
+  options: Option<T>[];
   trigger?: (value?: T) => React.ReactNode;
 
   onChange?: (value: T) => void;

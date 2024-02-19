@@ -1,7 +1,7 @@
 import { Icon } from "@vyductan/icons";
 import { clsm } from "@vyductan/utils";
 
-import type { SelectOption } from "../select/types";
+import type { Option } from "../select/types";
 import type { CommandRootProps } from "./components";
 import {
   CommandEmpty,
@@ -14,7 +14,7 @@ import { defaultEmpty, defaultPlaceholder } from "./config";
 
 export type CommandProps<T> = CommandRootProps & {
   value?: T;
-  options: (SelectOption<T> & {
+  options: (Option<T> & {
     onSelect: (currentValue: string) => void;
   })[];
 
@@ -26,10 +26,10 @@ export type CommandProps<T> = CommandRootProps & {
   groupClassName?: string;
   optionRender?: {
     checked?: boolean;
-    icon?: (option: SelectOption<T>) => React.ReactNode;
-    label?: (option: SelectOption<T>) => React.ReactNode;
+    icon?: (option: Option<T>) => React.ReactNode;
+    label?: (option: Option<T>) => React.ReactNode;
   };
-  optionsRender?: (options: SelectOption<T>[]) => React.ReactNode;
+  optionsRender?: (options: Option<T>[]) => React.ReactNode;
 };
 
 export const Command = <T extends string>({
