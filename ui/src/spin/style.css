@@ -1,0 +1,27 @@
+.spin {
+  aspect-ratio: 1;
+  display: grid;
+}
+.spin::before,
+.spin::after {
+  content: "";
+  grid-area: 1/1;
+  --c: no-repeat
+    radial-gradient(farthest-side, hsl(var(--primary-600)) 92%, #0000);
+  background:
+    var(--c) 50% 0,
+    var(--c) 50% 100%,
+    var(--c) 100% 50%,
+    var(--c) 0 50%;
+  animation: l12 1s infinite;
+}
+.spin::before {
+  filter: hue-rotate(45deg);
+  animation-timing-function: linear;
+}
+
+@keyframes l12 {
+  100% {
+    transform: rotate(0.5turn);
+  }
+}

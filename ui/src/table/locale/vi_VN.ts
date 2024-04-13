@@ -1,0 +1,21 @@
+export const tableLocale_vi = {
+  Table: {
+    filterTitle: "Bộ lọc",
+    filterConfirm: "Đồng ý",
+    filterReset: "Bỏ lọc",
+    filterEmptyText: "Không có bộ lọc",
+    filterCheckall: "Chọn tất cả",
+    filterSearchPlaceholder: "Tìm kiếm bộ lọc",
+    emptyText: "Trống",
+    selectAll: "Chọn tất cả",
+    selectInvert: "Chọn ngược lại",
+    selectNone: "Bỏ chọn tất cả",
+    selectionAll: "Chọn tất cả",
+    sortTitle: "Sắp xếp",
+    expand: "Mở rộng dòng",
+    collapse: "Thu gọn dòng",
+    triggerDesc: "Nhấp để sắp xếp giảm dần",
+    triggerAsc: "Nhấp để sắp xếp tăng dần",
+    cancelSort: "Nhấp để hủy sắp xếp",
+  },
+};

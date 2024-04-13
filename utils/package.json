@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@acme/utils",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "prettier": "@acme/prettier-config",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@acme/prettier-config": "*",
+    "@acme/eslint-config": "*",
+    "@acme/typescript-config": "*",
+    "slugify": "^1.6.6"
+  }
+}
