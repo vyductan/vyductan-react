@@ -36,7 +36,7 @@ const renderBack = (
       <div
         role="button"
         onClick={(e) => {
-          onBack?.(e);
+          onBack(e);
         }}
         className=""
         aria-label="back"

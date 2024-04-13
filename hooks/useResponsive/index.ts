@@ -17,7 +17,7 @@ const tailwindScreensConfig = theme?.screens as Record<string, string>;
 let responsiveConfig = (() => {
   const c: Record<string, number> = {};
   Object.keys(tailwindScreensConfig).map((x) => {
-    c[x] = Number(tailwindScreensConfig[x]!.replace("px", ""));
+    c[x] = Number(tailwindScreensConfig[x]?.replace("px", ""));
   });
   return {
     xs: 0,

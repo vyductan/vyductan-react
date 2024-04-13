@@ -25,6 +25,6 @@
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
-    "@acme/typescript-config": "workspace:*"
+    "@acme/tsconfig": "workspace:*"
   }
 }

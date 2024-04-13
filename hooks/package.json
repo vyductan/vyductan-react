@@ -14,7 +14,11 @@
   "prettier": "@acme/prettier-config",
   "devDependencies": {
     "@acme/eslint-config": "*",
-    "@acme/typescript-config": "*",
-    "@acme/prettier-config": "*"
+    "@acme/prettier-config": "*",
+    "@acme/tsconfig": "*",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "react": "18.2.0"
   }
 }

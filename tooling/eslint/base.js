@@ -23,51 +23,51 @@ export default tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
     ],
     rules: {
-    /*
-     * t3-turbo
-     */
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        argsIgnorePattern: "^_",
-        varsIgnorePattern: "^_",
-      },
-    ],
-    "@typescript-eslint/consistent-type-imports": [
-      "warn",
-      { prefer: "type-imports", fixStyle: "separate-type-imports" },
-    ],
-    "@typescript-eslint/no-misused-promises": [
-      "error",
-      {
-        checksVoidReturn: { attributes: false },
-      },
-    ],
-    "@typescript-eslint/no-unnecessary-condition": [
-      "error",
-      {
-        allowConstantLoopConditions: true,
-      },
-    ],
-    "@typescript-eslint/no-non-null-assertion": "error",
-    "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
+      /*
+       * t3-turbo
+       */
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/consistent-type-imports": [
+        "warn",
+        { prefer: "type-imports", fixStyle: "separate-type-imports" },
+      ],
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        {
+          checksVoidReturn: { attributes: false },
+        },
+      ],
+      "@typescript-eslint/no-unnecessary-condition": [
+        "error",
+        {
+          allowConstantLoopConditions: true,
+        },
+      ],
+      "@typescript-eslint/no-non-null-assertion": "error",
+      "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
 
-    /*
-     * t3
-     */
-    "@typescript-eslint/array-type": "off",
-    "@typescript-eslint/consistent-type-definitions": "off",
-    "@typescript-eslint/require-await": "off",
+      /*
+       * t3
+       */
+      "@typescript-eslint/array-type": "off",
+      "@typescript-eslint/consistent-type-definitions": "off",
+      "@typescript-eslint/require-await": "off",
 
-    /*
-     * Nextjs
-     * that rules allowed by Nextjs
-     */
-    // "@typescript-eslint/unbound-method": "off",
-  },
+      /*
+       * Nextjs
+       * that rules allowed by Nextjs
+       */
+      // "@typescript-eslint/unbound-method": "off",
+    },
   },
   {
     linterOptions: { reportUnusedDisableDirectives: true },
     languageOptions: { parserOptions: { project: true } },
   },
-)
+);
