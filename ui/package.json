@@ -89,7 +89,6 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "lexical": "^0.14.3",
-    "rc-util": "^5.38.2",
     "react-day-picker": "^8.10.0",
     "react-hook-form": "^7.51.3",
     "react-markdown": "^9.0.1",
