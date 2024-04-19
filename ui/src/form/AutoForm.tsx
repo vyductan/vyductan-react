@@ -145,7 +145,7 @@ const AutoForm = <
               const onChange = (...event: any) => {
                 if ("onChange" in rest && typeof rest.onChange === "function") {
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                  rest.onChange?.(...event);
+                  rest.onChange(...event);
                 }
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                 fieldRenderProps.onChange(...event);

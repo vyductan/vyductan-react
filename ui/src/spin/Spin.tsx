@@ -42,7 +42,7 @@ export const Spin = ({ spinning = true, size, children }: SpinProps) => {
           />
         </div>
       )}
-      {children}
+      {children && children}
     </div>
   );
 };

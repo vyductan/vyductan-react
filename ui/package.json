@@ -92,6 +92,7 @@
     "lexical": "^0.14.3",
     "react-day-picker": "^8.10.0",
     "react-hook-form": "^7.51.3",
+    "react-hook-form-antd": "^1.1.0",
     "react-markdown": "^9.0.1",
     "react-resizable-panels": "^2.0.16",
     "react-syntax-highlighter": "^15.5.0",
