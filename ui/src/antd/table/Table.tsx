@@ -5,7 +5,8 @@ import type { ForwardedRef } from "react";
 import { forwardRef } from "react";
 import { Table as AntdTable } from "antd";
 import { useTranslation } from "react-i18next";
-import { useLocation, useSearchParams } from "react-router-dom";
+
+import { useLocation, useSearchParams } from "@acme/hooks";
 
 import type { PaginationProps } from "../pagination";
 import { Link } from "~/components/link";

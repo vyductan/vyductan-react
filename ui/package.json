@@ -62,8 +62,8 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@acme/hooks": "*",
-    "@acme/utils": "*",
+    "@acme/hooks": "workspace:*",
+    "@acme/utils": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
     "@lexical/react": "^0.14.3",
     "@radix-ui/react-accordion": "^1.1.2",
@@ -103,9 +103,9 @@
     "zustand": "^4.5.1"
   },
   "devDependencies": {
-    "@acme/eslint-config": "*",
-    "@acme/tailwind-config": "*",
-    "@acme/tsconfig": "*",
+    "@acme/eslint-config": "workspace:*",
+    "@acme/tailwind-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
     "@iconify/react": "^4.1.1",
     "@types/react-dom": "^18.2.25",
     "@types/react-syntax-highlighter": "^15.5.11"

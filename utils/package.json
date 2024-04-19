@@ -13,9 +13,9 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@acme/eslint-config": "*",
-    "@acme/prettier-config": "*",
-    "@acme/tsconfig": "*",
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
     "slugify": "^1.6.6"
   }
 }

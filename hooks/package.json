@@ -12,10 +12,13 @@
     "lint": "eslint"
   },
   "prettier": "@acme/prettier-config",
+  "dependencies": {
+    "@tanstack/react-router": "^1.28.6"
+  },
   "devDependencies": {
-    "@acme/eslint-config": "*",
-    "@acme/prettier-config": "*",
-    "@acme/tsconfig": "*",
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
