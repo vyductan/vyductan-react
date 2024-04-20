@@ -6,10 +6,11 @@ import { forwardRef } from "react";
 import { Table as AntdTable } from "antd";
 import { useTranslation } from "react-i18next";
 
-import { useLocation, useSearchParams } from "@acme/hooks";
-
+import type { TranslationFn } from "../../_util/translation";
 import type { PaginationProps } from "../pagination";
-import { Link } from "~/components/link";
+import { t as defaultT } from "../../_util/translation";
+import { Link } from "../../link";
+import { tableLocale_en } from "../../table/locale/en_US";
 import { createPageURL, usePagination } from "../pagination";
 
 type TableProps<TRecord = AnyObject> = Omit<
@@ -17,16 +18,19 @@ type TableProps<TRecord = AnyObject> = Omit<
   "pagination"
 > & {
   pagination?: PaginationProps;
+  t?: TranslationFn;
 };
 const TableInner = <TRecord extends AnyObject = AnyObject>(
-  { pagination, ...props }: TableProps<TRecord>,
+  {
+    pagination,
+    locale = tableLocale_en,
+    t = defaultT,
+    ...props
+  }: TableProps<TRecord>,
   ref: React.Ref<Reference>,
 ) => {
-  const { t } = useTranslation();
-  const { pathname } = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { page: current, pageSize } = usePagination();
-  const { showTotal, ...restPagination } = pagination ?? {};
+  // const { page: current, pageSize } = usePagination();
+  const { current, pageSize, showTotal, ...restPagination } = pagination ?? {};
 
   return (
     <AntdTable
@@ -35,7 +39,7 @@ const TableInner = <TRecord extends AnyObject = AnyObject>(
         pagination
           ? {
               defaultPageSize: pageSize,
-              defaultCurrent: current,
+              current: current,
               itemRender: (page, type, element) =>
                 type === "page" ? (
                   <Link href={createPageURL(page, pathname, searchParams)}>
@@ -46,7 +50,7 @@ const TableInner = <TRecord extends AnyObject = AnyObject>(
                 ),
               showTotal: (total, range) =>
                 typeof showTotal === "boolean"
-                  ? t("Pagination.total", { total })
+                  ? t("components.Pagination.total", { total })
                   : showTotal?.(total, range),
               showSizeChanger: true,
               onShowSizeChange: (_, size) => {

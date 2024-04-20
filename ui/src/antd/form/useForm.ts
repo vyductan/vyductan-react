@@ -1,7 +1,10 @@
+"use client";
+
 /**
  * Docs
  * https://github.com/react-component/field-form/blob/master/src/useForm.ts
  */
+import type { BaseSyntheticEvent } from "react";
 import type {
   DefaultValues,
   FieldValues,
@@ -23,7 +26,9 @@ type FormInstance<
   TContext = unknown,
   TTransformedValues extends FieldValues = TFieldValues,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
-  submit: (values: TFieldValues) => void;
+  submit: (
+    e?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
+  ) => Promise<void>;
   setFieldsValue: UseFormReset<TFieldValues>;
   resetFields: (keepStateOptions?: KeepStateOptions) => void;
 };
@@ -56,8 +61,6 @@ const useForm = <
   const methods = useRHForm<TFieldValues, TContext, TTransformedValues>({
     defaultValues,
     resolver: schema ? zodResolver(schema) : undefined,
-    // fix form values is not cleared after unmounting
-    // shouldUnregister: true,
   });
 
   const { reset } = methods;
@@ -80,21 +83,10 @@ const useForm = <
 
   const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
     if (typeof defaultValues === "function") {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       defaultValues()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        .then(
-          (
-            values:
-              | TFieldValues
-              | DefaultValues<TFieldValues>
-              | ((formValues: TFieldValues) => TFieldValues)
-              | undefined,
-          ) => {
-            return methods.reset(values, keepStateOptions);
-          },
-        )
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        .then((values) => {
+          return methods.reset(values, keepStateOptions);
+        })
         .catch(() => void 0);
     } else {
       methods.reset(defaultValues, keepStateOptions);
@@ -105,9 +97,7 @@ const useForm = <
   const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
     {
       ...methods,
-      submit: methods.handleSubmit(onSubmit) as unknown as (
-        values: TFieldValues,
-      ) => void,
+      submit: methods.handleSubmit(onSubmit),
       resetFields,
       setFieldsValue,
     };
