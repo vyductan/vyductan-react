@@ -4,4 +4,3 @@ export * from "./useDebounce";
 export { useEnterSubmit } from "./useEnterSubmit";
 export { useLocalStorage } from "./use-local-storage";
 export { useResizeObserver } from "./use-resize-observer";
-export { default as useResponsive } from "./useResponsive";

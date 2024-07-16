@@ -1,6 +1,6 @@
 "use client";
 
-import type { Control, FieldValues, Path, PathValue } from "react-hook-form";
+import type { Control, FieldValues, Path } from "react-hook-form";
 import React from "react";
 import { Select } from "antd";
 
@@ -25,8 +25,9 @@ import { FormList } from "./FormList";
  */
 type AutoFormProps<
   TFieldValues extends FieldValues,
-  TContext = unknown,
-  TTransformedValues extends FieldValues = TFieldValues,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TContext = any,
+  TTransformedValues extends FieldValues | undefined = undefined,
   TFieldType extends FieldType = FieldType,
 > = Omit<FormProps<TFieldValues, TContext, TTransformedValues>, "children"> & {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
@@ -34,8 +35,9 @@ type AutoFormProps<
 };
 const AutoForm = <
   TFieldValues extends FieldValues = FieldValues,
-  TContext = unknown,
-  TTransformedValues extends FieldValues = TFieldValues,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TContext = any,
+  TTransformedValues extends FieldValues | undefined = undefined,
   TFieldType extends FieldType = FieldType,
 >({
   form,
@@ -72,59 +74,64 @@ const AutoForm = <
           const {
             type: _,
             name,
+            label,
             itemTitle,
             appendProps,
             fields: schemaFields,
-            ...rest
+            // ...rest
           } = field;
           return (
-            <FormList name={name}>
+            <FormList name={name} label={label}>
               {(fields, oparation, _meta) => {
                 return (
-                  <div>
+                  <>
                     {fields.map(({ key, name }) => {
                       return (
                         <FormItem key={key}>
-                          <div className="mb-2 flex justify-between">
-                            <Tag className="rounded-md">
-                              {itemTitle ?? "Item"} #{index}
-                            </Tag>
-                            <DeleteIcon
-                              className="cursor-pointer"
-                              onClick={() => oparation.remove(index)}
-                            />
-                          </div>
-                          {render(
-                            schemaFields.map(
-                              (field) =>
-                                ({
-                                  ...field,
-                                  ...(field.type === "group"
-                                    ? {}
-                                    : field.name
-                                      ? {
-                                          name: `${name}.${index}.${String(field.name)}`,
-                                        }
-                                      : { name: `${name}.${index}` }),
-                                }) as unknown as FieldsSchema<
-                                  TFieldValues[keyof TFieldValues]
-                                >,
-                            ),
-                          )}
-                          <Button
-                            variant="dashed"
-                            type="button"
-                            className="w-full"
-                            onClick={() =>
-                              oparation.add(appendProps?.defaultValue)
-                            }
-                          >
-                            {appendProps?.title ?? "Add new Item"}
-                          </Button>
+                          <>
+                            <div className="mb-2 flex justify-between">
+                              <Tag className="rounded-md">
+                                {itemTitle ?? "Item"} #{index}
+                              </Tag>
+                              <Button
+                                icon={
+                                  <DeleteIcon
+                                    className="cursor-pointer"
+                                    onClick={() => oparation.remove(index)}
+                                  />
+                                }
+                              />
+                            </div>
+                            {render(
+                              schemaFields.map(
+                                (field) =>
+                                  ({
+                                    ...field,
+                                    ...(field.type === "group"
+                                      ? {}
+                                      : field.name
+                                        ? {
+                                            name: `${name}.${index}.${String(field.name)}`,
+                                          }
+                                        : { name: `${name}.${index}` }),
+                                  }) as unknown as FieldsSchema<
+                                    TFieldValues[keyof TFieldValues]
+                                  >,
+                              ),
+                            )}
+                          </>
                         </FormItem>
                       );
                     })}
-                  </div>
+                    <Button
+                      variant="dashed"
+                      type="button"
+                      className="w-full"
+                      onClick={() => oparation.add(appendProps?.defaultValue)}
+                    >
+                      {appendProps?.title ?? "Add new Item"}
+                    </Button>
+                  </>
                 );
               }}
             </FormList>

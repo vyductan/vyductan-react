@@ -1,4 +1,4 @@
-import type { FieldValues } from "react-hook-form";
+import type { FieldPath, FieldValues } from "react-hook-form";
 
 import type { CheckboxProps } from "../checkbox";
 import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
@@ -24,7 +24,7 @@ type AutoFormFieldBaseProps = {
 };
 export type FieldWithType<TType, TFieldProps> = Omit<
   TFieldProps,
-  "title" | "children" | "onChange"
+  "name" | "title" | "children" | "onChange"
 > & {
   type: TType;
   // value: string;
@@ -108,7 +108,6 @@ type AutoFormFieldUnion<
 //
 type FieldObjectType = "object";
 type FieldInputType = InputUnion["type"];
-type FieldGroupType = "group";
 export type FieldType =
   | FieldInputType
   | FieldObjectType
@@ -131,10 +130,7 @@ export type FieldsSchema<
       ? {
           type: TFieldType;
           className?: string;
-          columns: FieldsSchema<
-            TFieldValues,
-            Exclude<FieldType, FieldGroupType>
-          >[];
+          columns: FieldsSchema<TFieldValues, Exclude<FieldType, "group">>[];
 
           // to fix(list): Property 'name' does not exist on type 'never'
           name?: never;
@@ -165,7 +161,8 @@ export type FieldsSchema<
           }
         : AutoFormFieldUnion<TFieldValues, TFieldValues[key]> & {
             type: TFieldType;
-            name?: key;
+            // name?: key;
+            name?: FieldPath<TFieldValues>;
             // columns?: TFieldValues[key] extends (infer I)[]
             //   ? FieldsSchema<I>
             //   : keyof TFieldValues[key];

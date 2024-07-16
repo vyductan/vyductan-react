@@ -5,7 +5,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./next/*": "./src/next/*/index.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -13,7 +14,7 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@tanstack/react-router": "^1.28.6"
+    "@tanstack/react-router": "^1.33.1"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
