@@ -23,8 +23,8 @@ import type { ResetAction } from "./types";
 
 type FormInstance<
   TFieldValues extends FieldValues = FieldValues,
-  TContext = unknown,
-  TTransformedValues extends FieldValues = TFieldValues,
+  TContext = any,
+  TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
   submit: (
     e?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
@@ -35,8 +35,8 @@ type FormInstance<
 
 type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
-  TContext = unknown,
-  TTransformedValues extends FieldValues = TFieldValues,
+  TContext = any,
+  TTransformedValues extends FieldValues | undefined = undefined,
 > = UseRHFormProps<TFieldValues, TContext> & {
   schema?: z.ZodType<TFieldValues>;
   onSubmit: TTransformedValues extends undefined
@@ -47,8 +47,8 @@ type UseFormProps<
 };
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
-  TContext = unknown,
-  TTransformedValues extends FieldValues = TFieldValues,
+  TContext = any,
+  TTransformedValues extends FieldValues | undefined = undefined,
 >({
   defaultValues,
   schema,

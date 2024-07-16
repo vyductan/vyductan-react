@@ -48,7 +48,7 @@ type RecordWithCustomRow<
 type TableProps<TRecord extends RecordWithCustomRow> =
   HTMLAttributes<HTMLTableElement> & {
     columns: TableColumnDef<TRecord>[];
-    dataSource: TRecord[];
+    dataSource: TRecord[] | undefined;
     bordered?: boolean;
     // emptyRender?: EmptyProps;
     expandable?: {
@@ -328,7 +328,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             </TableHeader>
 
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row, index) =>
                   row.original._customRow ? (
                     <TableRow key={row.id}>
@@ -355,7 +355,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             className={clsm(
                               typeof cell.column.columnDef.meta?.className ===
                                 "string"
-                                ? cell.column.columnDef.meta?.className
+                                ? cell.column.columnDef.meta.className
                                 : cell.column.columnDef.meta?.className?.(
                                     row.original,
                                     index,
