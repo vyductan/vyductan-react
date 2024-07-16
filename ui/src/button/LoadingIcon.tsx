@@ -1,4 +1,4 @@
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
 export const LoadingIcon = ({
   className,

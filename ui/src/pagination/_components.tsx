@@ -1,13 +1,15 @@
 import * as React from "react";
 import Link from "next/link";
 
-import { clsm } from "@acme/ui";
-
 import type { ButtonProps } from "../button";
+import { clsm } from "..";
 import { buttonVariants } from "../button";
 import { Icon } from "../icons";
 
-const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
+const PaginationRoot = ({
+  className,
+  ...props
+}: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
     aria-label="pagination"
@@ -15,7 +17,7 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
     {...props}
   />
 );
-Pagination.displayName = "Pagination";
+PaginationRoot.displayName = "PaginationRoot";
 
 const PaginationContent = React.forwardRef<
   HTMLUListElement,
@@ -95,7 +97,7 @@ const PaginationNext = ({
     className={clsm(className)}
     {...props}
   >
-    <Icon icon="mingcute:right-fill" className="size-4" />
+    <Icon icon="icon-[mingcute:right-fill]" className="size-4" />
   </PaginationLink>
 );
 PaginationNext.displayName = "PaginationNext";
@@ -109,7 +111,7 @@ const PaginationEllipsis = ({
     className={clsm("flex size-9 items-center justify-center", className)}
     {...props}
   >
-    <Icon icon="mingcute:more-1-fill" className="size-4" />
+    <Icon icon="icon-[mingcute--more-1-fill] size-4" className="size-4" />
     <span className="sr-only">More pages</span>
   </span>
 );
@@ -125,7 +127,7 @@ PaginationTotal.displayName = "PaginationTotal";
 
 export type { PaginationItemProps };
 export {
-  Pagination as PaginationRoot,
+  PaginationRoot,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,

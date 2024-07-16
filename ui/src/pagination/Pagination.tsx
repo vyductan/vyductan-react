@@ -2,7 +2,7 @@ import React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import KeyCode from "rc-util/lib/KeyCode";
 
-import type { PaginationItemProps } from "./components";
+import type { PaginationItemProps } from "./_components";
 import type { PaginationLocale } from "./types";
 import { clsm } from "..";
 import { Icon } from "../icons";
@@ -15,7 +15,7 @@ import {
   PaginationPrevious,
   PaginationRoot,
   PaginationTotal,
-} from "./components";
+} from "./_components";
 import enUS from "./locale/en_US";
 import { usePagination } from "./usePagination";
 
@@ -123,9 +123,9 @@ export const Pagination = (props: PaginationProps) => {
 
   function runIfEnter(
     event: React.KeyboardEvent<HTMLLIElement>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     callback: (...params: any[]) => void,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ...restParams: any[]
   ) {
     if (
@@ -133,7 +133,6 @@ export const Pagination = (props: PaginationProps) => {
       event.code === KeyCode.ENTER.toString()
       // event..keyCode === KeyCode.ENTER
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       callback(...restParams);
     }
   }
@@ -206,12 +205,18 @@ export const Pagination = (props: PaginationProps) => {
     const jumpPrevContent = itemRender?.(
       jumpPrevPage,
       "jump-prev",
-      <Icon icon="icon-park-outline:double-left" aria-label="prev page" />,
+      <Icon
+        className="icon-[park-outline--double-left]"
+        aria-label="prev page"
+      />,
     );
     const jumpNextContent = itemRender?.(
       jumpNextPage,
       "jump-next",
-      <Icon icon="icon-park-outline:double-right" aria-label="next page" />,
+      <Icon
+        className="icon-[park-outline--double-right]"
+        aria-label="next page"
+      />,
     );
 
     if (showPrevNextJumpers) {

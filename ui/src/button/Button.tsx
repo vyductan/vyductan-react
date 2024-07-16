@@ -21,11 +21,16 @@ const buttonVariants = cva(
       primary: {
         true: ["border-primary", "hover:border-primary-hover "],
       },
+      action: {
+        true: [],
+      },
       danger: {
         true: ["text-error", "active:ring-error-active"],
       },
       color: {
         default: [],
+        action: [],
+        danger: [],
       },
       variant: {
         default: [
@@ -42,6 +47,7 @@ const buttonVariants = cva(
           "hover:border-primary-hover hover:text-primary-hover",
         ],
         ghost: ["border-transparent", "hover:bg-gray-100 hover:text-gray-900"],
+        light: ["border-transparent", "hover:bg-gray-100 hover:text-gray-900"],
         link: "text-gray-900 underline-offset-4 hover:underline dark:text-gray-50",
       },
       size: {
@@ -66,6 +72,19 @@ const buttonVariants = cva(
         className: [
           "border-error bg-error",
           "hover:border-error-hover hover:bg-error-hover",
+        ],
+      },
+      {
+        variant: "light",
+        color: "action",
+        className: ["text-info bg-info/10", "hover:text-white hover:bg-info"],
+      },
+      {
+        variant: "light",
+        color: "danger",
+        className: [
+          "text-danger bg-danger/10",
+          "hover:text-white hover:bg-danger",
         ],
       },
       {
@@ -94,7 +113,7 @@ const buttonVariants = cva(
       {
         size: "default",
         shape: ["icon", "circle"],
-        className: "w-8",
+        className: "min-w-8 w-8",
       },
       {
         size: "lg",
@@ -174,7 +193,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           ) : (
             <>
               {(!!loading || icon) && (
-                <span className={clsm(children && "mr-2")}>
+                <span className={clsm(children ? "mr-2" : "")}>
                   <Slot className="size-5">
                     {loading ? <LoadingIcon /> : icon}
                   </Slot>
