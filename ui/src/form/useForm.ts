@@ -15,9 +15,10 @@ import type {
   UseFormProps as UseRHFormProps,
 } from "react-hook-form";
 import type { z } from "zod";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm as useRHForm } from "react-hook-form";
+import { isEqual, transform } from "lodash";
+import { useForm as useRHForm, useWatch } from "react-hook-form";
 
 import type { ResetAction } from "./types";
 
@@ -49,19 +50,22 @@ const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = unknown,
   TTransformedValues extends FieldValues = TFieldValues,
->({
-  defaultValues,
-  schema,
-  onSubmit,
-}: UseFormProps<TFieldValues, TContext, TTransformedValues>): FormInstance<
-  TFieldValues,
-  TContext,
-  TTransformedValues
-> => {
-  const methods = useRHForm<TFieldValues, TContext, TTransformedValues>({
-    defaultValues,
-    resolver: schema ? zodResolver(schema) : undefined,
-  });
+>(
+  props?: UseFormProps<TFieldValues, TContext, TTransformedValues> & {
+    onValuesChange?: (
+      changedValues: TFieldValues,
+      allValues: TFieldValues,
+    ) => void;
+  },
+): FormInstance<TFieldValues, TContext, TTransformedValues> => {
+  const methods = useRHForm<TFieldValues, TContext, TTransformedValues>(
+    props
+      ? {
+          defaultValues: props.defaultValues,
+          resolver: props.schema ? zodResolver(props.schema) : undefined,
+        }
+      : undefined,
+  );
 
   const { reset } = methods;
 
@@ -82,14 +86,17 @@ const useForm = <
   );
 
   const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
-    if (typeof defaultValues === "function") {
-      defaultValues()
-        .then((values) => {
-          return methods.reset(values, keepStateOptions);
-        })
-        .catch(() => void 0);
-    } else {
-      methods.reset(defaultValues, keepStateOptions);
+    if (props) {
+      if (typeof props.defaultValues === "function") {
+        props
+          .defaultValues()
+          .then((values) => {
+            return methods.reset(values, keepStateOptions);
+          })
+          .catch(() => void 0);
+      } else {
+        methods.reset(props.defaultValues, keepStateOptions);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -97,13 +104,53 @@ const useForm = <
   const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
     {
       ...methods,
-      submit: methods.handleSubmit(onSubmit),
+      submit: props
+        ? methods.handleSubmit(props.onSubmit)
+        : () => Promise.resolve(),
       resetFields,
       setFieldsValue,
     };
+
+  // onValuesChange
+  // has onValuesChange
+  // form has values
+  // values not same defaultValues
+  const w = useWatch<TFieldValues>({ control: formInstance.control });
+  useEffect(() => {
+    if (
+      props?.onValuesChange &&
+      w &&
+      !isEqual(formInstance.formState.defaultValues, w) &&
+      Object.keys(w).length > 0
+    ) {
+      props.onValuesChange(
+        getChangedValues(
+          formInstance.formState.defaultValues,
+          w,
+        ) as TFieldValues,
+        w as TFieldValues,
+      );
+    }
+  }, [w]);
 
   return formInstance;
 };
 
 export { useForm };
 export type { UseFormProps, FormInstance };
+
+const getChangedValues = (
+  obj1: Record<string, any> | undefined,
+  obj2: Record<string, any>,
+) => {
+  if (!obj1) return obj2;
+  return transform(
+    obj1,
+    (result, value, key) => {
+      if (!isEqual(value, obj2[key])) {
+        result[key] = obj2[key];
+      }
+    },
+    {} as Record<string, any>,
+  );
+};

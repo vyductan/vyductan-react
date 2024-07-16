@@ -8,11 +8,13 @@ import { FormProvider } from "react-hook-form";
 
 import type { FormInstance } from "./useForm";
 
+// const x: AntdFormProps;
+// x.fields
 type FormProps<
   TFieldValues extends FieldValues,
   TContext,
-  TTransformedValues extends FieldValues = TFieldValues,
-> = Omit<AntdFormProps, "form" | "children"> & {
+  TTransformedValues extends FieldValues | undefined = undefined,
+> = Omit<AntdFormProps, "form" | "children" | "fields"> & {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
   children:
     | ReactNode

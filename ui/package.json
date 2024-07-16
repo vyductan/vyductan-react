@@ -86,7 +86,6 @@
     "@tanstack/react-table": "^8.17.3",
     "ahooks": "^3.7.11",
     "antd": "^5.17.2",
-    "antd": "^5.16.1",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",

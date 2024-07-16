@@ -1,29 +1,26 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { clsm } from "@acme/ui";
+import type { AlertRootProps } from "./_components";
+import { clsm } from "..";
+import { Icon } from "../icons";
+import { AlertDescription, AlertRoot, AlertTitle } from "./_components";
 
-import { WarningFilled } from "../icons";
-
-type AlertProps = HTMLAttributes<HTMLDivElement> & {
-  children: ReactNode;
-  type: "success" | "warning";
+type AlertProps = AlertRootProps & {
+  title?: ReactNode;
+  message?: ReactNode;
   showIcon?: boolean;
 };
-const Alert = ({ children, className, showIcon, type }: AlertProps) => {
-  const icon = type === "warning" ? <WarningFilled /> : null;
+const Alert = ({ title, message, className, showIcon, type }: AlertProps) => {
+  const icon =
+    type === "warning" ? (
+      <Icon className="icon-[mingcute--warning-line]" />
+    ) : null;
   return (
-    <div
-      className={clsm(
-        "flex items-center px-3 py-2",
-        "break-words text-sm",
-        type === "warning" &&
-          "rounded-lg border border-warning bg-warning text-warning",
-        className,
-      )}
-    >
+    <AlertRoot type={type} className={clsm(className)}>
       {showIcon && <span className="me-2">{icon}</span>}
-      <div className="flex-1">{children}</div>
-    </div>
+      {title && <AlertTitle>{title}</AlertTitle>}
+      {message && <AlertDescription>{message}</AlertDescription>}
+    </AlertRoot>
   );
 };
 
