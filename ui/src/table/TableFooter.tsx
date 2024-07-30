@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
 const TableFooter = forwardRef<
   HTMLTableSectionElement,

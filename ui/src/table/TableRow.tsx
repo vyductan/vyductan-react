@@ -12,6 +12,7 @@ export const TableRow = forwardRef<
       "group",
       "transition-colors",
       "data-[state=selected]:bg-gray-100 dark:data-[state=selected]:bg-gray-800",
+      "hover:bg-gray-100",
       className,
     )}
     {...props}

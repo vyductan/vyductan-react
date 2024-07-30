@@ -1,23 +1,23 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 
 import { clsm } from "@acme/ui";
 
 import type { InsertImagePayload } from "./types";
 import { message } from "../../../toast";
-import { EditorContext } from "../../context";
+import { useEditor } from "../../store";
 
 type UploadProps = {
   onUploadSuccess: (payload: InsertImagePayload) => void;
 };
 export const Uploader = ({ onUploadSuccess }: UploadProps) => {
-  const { apiUpload } = useContext(EditorContext);
+  const { uploadService } = useEditor();
   const [dragActive, setDragActive] = useState(false);
 
   const upload = async (file: File) => {
     if (file.size / 1024 / 1024 > 50) {
       message.error("File size too big (max 50MB)");
     } else {
-      const blob = await apiUpload({
+      const blob = await uploadService({
         file: file,
         fileName: file.name,
       });
@@ -90,7 +90,7 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
               e.stopPropagation();
               setDragActive(false);
 
-              const file = e.dataTransfer.files?.[0];
+              const file = e.dataTransfer.files[0];
               if (file) {
                 await upload(file);
               }

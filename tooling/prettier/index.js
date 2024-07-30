@@ -11,9 +11,7 @@ const config = {
     "prettier-plugin-packagejson",
     "prettier-plugin-tailwindcss",
   ],
-  tailwindConfig: fileURLToPath(
-    new URL("../tailwind/web.ts", import.meta.url),
-  ),
+  tailwindConfig: fileURLToPath(new URL("../tailwind/web.ts", import.meta.url)),
   importOrder: [
     "<TYPES>",
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
@@ -31,6 +29,20 @@ const config = {
   ],
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrderTypeScriptVersion: "4.4.0",
+  overrides: [
+    {
+      files: "*.json.hbs",
+      options: {
+        parser: "json",
+      },
+    },
+    {
+      files: "*.js.hbs",
+      options: {
+        parser: "babel",
+      },
+    },
+  ],
 };
 
 export default config;

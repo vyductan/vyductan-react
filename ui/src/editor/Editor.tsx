@@ -14,8 +14,6 @@ import { HeadingNode } from "@lexical/rich-text";
 
 import { clsm } from "@acme/ui";
 
-import type { EditorContextValue } from "./context";
-import { EditorContextProvider } from "./context";
 import { ImageNode } from "./nodes/ImageNode";
 import { AutoLinkPlugin } from "./plugins/AutoLinkPlugin";
 import ComponentPickerMenuPlugin from "./plugins/ComponentPickerPlugin/ComponentPicker";
@@ -25,7 +23,7 @@ import { ImagesPlugin } from "./plugins/ImagesPlugin";
 import { LinkPlugin } from "./plugins/LinkPlugin";
 import { OnChangePlugin } from "./plugins/OnChangePlugin";
 
-export type EditorProps = EditorContextValue & {
+export type EditorProps = {
   value?: string;
   onChange?: (
     editorState: EditorState,
@@ -34,7 +32,7 @@ export type EditorProps = EditorContextValue & {
   ) => void;
 };
 const EditorInternal = (
-  { value, onChange, ...rest }: EditorProps,
+  { value, onChange }: EditorProps,
   ref: Ref<HTMLDivElement>,
 ) => {
   const editorRef = useRef<LexicalEditor | null>(null);
@@ -53,7 +51,7 @@ const EditorInternal = (
         }
         if (
           value &&
-          value !== JSON.stringify(editorRef.current?.getEditorState())
+          value !== JSON.stringify(editorRef.current.getEditorState())
         ) {
           editorRef.current.setEditorState(
             editorRef.current.parseEditorState(value),
@@ -64,9 +62,7 @@ const EditorInternal = (
   }, [value]);
 
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
-    if (_floatingAnchorElem !== null) {
-      setFloatingAnchorElem(_floatingAnchorElem);
-    }
+    setFloatingAnchorElem(_floatingAnchorElem);
   };
   const CustomContentEditable = useMemo(() => {
     return (
@@ -136,37 +132,35 @@ const EditorInternal = (
   };
 
   return (
-    <EditorContextProvider value={rest}>
-      <LexicalComposer initialConfig={initialConfig}>
-        <div
-          className="relative p-6 [&:has(br):not(:has(span))::before]:absolute"
-          ref={ref}
-        >
-          <RichTextPlugin
-            contentEditable={CustomContentEditable}
-            placeholder={CustomPlaceholder}
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <EditorRefPlugin editorRef={editorRef} />
-          <OnChangePlugin onChange={onChange} />
-          <HistoryPlugin />
-          <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+    <LexicalComposer initialConfig={initialConfig}>
+      <div
+        className="relative p-6 [&:has(br):not(:has(span))::before]:absolute"
+        ref={ref}
+      >
+        <RichTextPlugin
+          contentEditable={CustomContentEditable}
+          placeholder={CustomPlaceholder}
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <EditorRefPlugin editorRef={editorRef} />
+        <OnChangePlugin onChange={onChange} />
+        <HistoryPlugin />
+        <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
 
-          <AutoLinkPlugin />
-          <ComponentPickerMenuPlugin />
-          <ImagesPlugin />
-          <LinkPlugin />
+        <AutoLinkPlugin />
+        <ComponentPickerMenuPlugin />
+        <ImagesPlugin />
+        <LinkPlugin />
 
-          {/* {floatingAnchorElem ? ( */}
-          {/*   <> */}
-          {/*     <DraggableBlockPlugin anchorElem={floatingAnchorElem} /> */}
-          {/*   </> */}
-          {/* ) : ( */}
-          {/*   "" */}
-          {/* )} */}
-        </div>
-      </LexicalComposer>
-    </EditorContextProvider>
+        {/* {floatingAnchorElem ? ( */}
+        {/*   <> */}
+        {/*     <DraggableBlockPlugin anchorElem={floatingAnchorElem} /> */}
+        {/*   </> */}
+        {/* ) : ( */}
+        {/*   "" */}
+        {/* )} */}
+      </div>
+    </LexicalComposer>
   );
 };
 

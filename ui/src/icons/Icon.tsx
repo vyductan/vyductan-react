@@ -1,18 +1,19 @@
-"use client";
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
-import type { IconProps as IconifyProps } from "@iconify/react";
-import { Icon as Iconify } from "@iconify/react";
-
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
 // https://icon-sets.iconify.design/
-export type IconProps = IconifyProps & {
+export type IconProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLSpanElement>,
+  HTMLSpanElement
+> & {
+  icon: string;
   srOnly?: string;
 };
-export const Icon = ({ className, srOnly, ...props }: IconProps) => {
+export const Icon = ({ icon, className, srOnly, ...props }: IconProps) => {
   return (
     <>
-      <Iconify className={clsm("size-5", className)} {...props} />
+      <span className={clsm(icon, className)} {...props}></span>
       {srOnly && <span className="sr-only">{srOnly}</span>}
     </>
   );

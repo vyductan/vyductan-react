@@ -2,8 +2,11 @@
 // https://github.com/t3-oss/create-t3-turbo/blob/main/tooling/eslint/base.js
 
 /// <reference types="./types.d.ts" />
+import * as path from "node:path";
+import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
+import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 
 /**
@@ -34,14 +37,14 @@ export const restrictEnvAccess = tseslint.config({
 });
 
 export default tseslint.config(
-  {
-    // Globally ignored files
-    ignores: ["**/*.config.*"],
-  },
+  // Ignore files not tracked by VCS and any config files
+  includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
+  { ignores: ["**/*.config.*"] },
   {
     files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     plugins: {
       import: importPlugin,
+      turbo: turboPlugin,
     },
     extends: [
       eslint.configs.recommended,
@@ -50,6 +53,7 @@ export default tseslint.config(
       ...tseslint.configs.stylisticTypeChecked,
     ],
     rules: {
+      ...turboPlugin.configs.recommended.rules,
       /*
        * t3-turbo
        */
@@ -76,7 +80,7 @@ export default tseslint.config(
           allowConstantLoopConditions: true,
         },
       ],
-      "@typescript-eslint/no-non-null-assertion": "error",
+      // "@typescript-eslint/no-non-null-assertion": "error",
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
 
       /*
@@ -91,10 +95,15 @@ export default tseslint.config(
        * that rules allowed by Nextjs
        */
       // "@typescript-eslint/unbound-method": "off",
+      // "@typescript-eslint/no-non-null-assertion": "error",
+      // "@typescript-eslint/prefer-nullish-coalescing": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {
     linterOptions: { reportUnusedDisableDirectives: true },
-    languageOptions: { parserOptions: { project: true } },
+    languageOptions: { parserOptions: { projectService: true } },
   },
 );

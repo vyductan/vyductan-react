@@ -3,10 +3,11 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { TableProps } from "./Table";
 import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
+import { Icon } from "../icons";
 
 export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
-  props?: Pick<TableProps<TRecord>, "rowKey" | "rowSelection">,
+  props?: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
   isNotFirstDeepColumn?: boolean,
 ) => {
   const columnsDef: (ColumnDef<TRecord> & ExtraTableColumnDef<TRecord>)[] =
@@ -121,6 +122,36 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
     columnsDef.unshift(selectionColumn);
   }
 
+  if (props?.expandable) {
+    const expandColumn: ColumnDef<TRecord> = {
+      id: "expander",
+      header: () => null,
+      size: 50,
+      meta: {
+        align: "center",
+      },
+      cell: ({ row }) => {
+        return row.getCanExpand() ? (
+          <button
+            {...{
+              onClick: () => {
+                row.getToggleExpandedHandler()();
+              },
+            }}
+            className="flex w-full cursor-pointer items-center justify-center"
+          >
+            {row.getIsExpanded() ? (
+              <Icon icon="icon-[lucide--chevron-down]" className="text-base" />
+            ) : (
+              <Icon icon="icon-[lucide--chevron-right]" className="text-base" />
+            )}
+          </button>
+        ) : null;
+      },
+    };
+    columnsDef.unshift(expandColumn);
+  }
+
   return columnsDef;
 };
 
@@ -131,7 +162,8 @@ function createSelectColumn<T>(): ColumnDef<T> {
     id: "selection",
     header: ({ table }) => (
       <Checkbox
-        id="select-all"
+        // id="select-all"
+        aria-label="Select all"
         checked={table.getIsAllRowsSelected()}
         indeterminate={table.getIsSomeRowsSelected()}
         onChange={table.toggleAllRowsSelected}
@@ -140,7 +172,8 @@ function createSelectColumn<T>(): ColumnDef<T> {
     ),
     cell: ({ row, table }) => (
       <Checkbox
-        id={`select-row-${row.id}`}
+        // id={`select-row-${row.id}`}
+        aria-label="Select row"
         checked={row.getIsSelected()}
         indeterminate={row.getIsSomeSelected()}
         className="flex items-center justify-center"
@@ -157,7 +190,7 @@ function createSelectColumn<T>(): ColumnDef<T> {
         }}
       />
     ),
-    size: 32,
+    size: 40,
     meta: {
       align: "center",
     },

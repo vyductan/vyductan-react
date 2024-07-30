@@ -1,9 +1,8 @@
-import type { AvatarProps } from "@acme/ui/avatar";
-import type { TagProps } from "@acme/ui/tag";
-import type { Direction } from "@acme/ui/types";
-import { clsm } from "@acme/ui";
-import { Avatar } from "@acme/ui/avatar";
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@acme/ui/icons";
+// import { ArrowLeftOutlined, ArrowRightOutlined } from "@acme/ui/icons";
+
+import { clsm } from "../..";
+import { Avatar, AvatarProps } from "../../avatar";
+import { TagProps } from "../../tag";
 
 type PageHeaderProps = {
   title?: React.ReactNode;
@@ -17,54 +16,27 @@ type PageHeaderProps = {
   onBack?: (e?: React.MouseEvent<HTMLElement>) => void;
 };
 
-const getBackIcon = (props: PageHeaderProps, direction: Direction = "ltr") => {
-  if (props.backIcon !== undefined) {
-    return props.backIcon;
-  }
-  return direction === "rtl" ? <ArrowRightOutlined /> : <ArrowLeftOutlined />;
-};
-
-const renderBack = (
-  backIcon?: React.ReactNode,
-  onBack?: (e?: React.MouseEvent<HTMLElement>) => void,
-) => {
-  if (!backIcon || !onBack) {
-    return null;
-  }
-  return (
-    <div>
-      <div
-        role="button"
-        onClick={(e) => {
-          onBack(e);
-        }}
-        className=""
-        aria-label="back"
-      >
-        {backIcon}
-      </div>
-    </div>
-  );
-};
-
-const renderTitle = (props: PageHeaderProps, direction: Direction = "ltr") => {
-  const { title, avatar, subTitle, tags, extra, onBack } = props;
+const Title = (props: PageHeaderProps) => {
+  const { title, avatar, subTitle, tags, extra } = props;
   const hasHeading = title ?? subTitle ?? tags ?? extra;
   // If there is nothing, return a null
   if (!hasHeading) {
     return null;
   }
-  const backIcon = getBackIcon(props, direction);
-  const backIconDom = renderBack(backIcon, onBack);
+  // const backIcon = getBackIcon(props, direction);
+  // const backIconDom = renderBack(backIcon, onBack);
   return (
     <div className={clsm("flex justify-between")}>
       <div className="">
-        {backIconDom}
+        {/* {backIconDom} */}
         {avatar && <Avatar className={clsm(avatar.className)} {...avatar} />}
         {title && (
-          <span title={typeof title === "string" ? title : undefined}>
+          <h3
+            title={typeof title === "string" ? title : undefined}
+            className="!text-defaulttextcolor dark:!text-defaulttextcolor/70 text-xl font-semibold dark:text-white dark:hover:text-white"
+          >
             {title}
-          </span>
+          </h3>
         )}
         {subTitle && (
           <span title={typeof subTitle === "string" ? subTitle : undefined}>
@@ -101,12 +73,11 @@ const PageHeader = (props: PageHeaderProps) => {
     // layout,
   } = props;
 
-  const title = renderTitle(props);
   const children = renderChildren(props);
 
   return (
-    <div className={className}>
-      {title}
+    <div className={clsm("py-5", className)}>
+      <Title {...props} />
       {children}
     </div>
   );

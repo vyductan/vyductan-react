@@ -1,3 +1,5 @@
+"use client";
+
 import type { LexicalEditor } from "lexical";
 import type { DragEvent as ReactDragEvent } from "react";
 import * as React from "react";
