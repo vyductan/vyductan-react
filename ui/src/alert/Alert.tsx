@@ -12,9 +12,7 @@ type AlertProps = AlertRootProps & {
 };
 const Alert = ({ title, message, className, showIcon, type }: AlertProps) => {
   const icon =
-    type === "warning" ? (
-      <Icon className="icon-[mingcute--warning-line]" />
-    ) : null;
+    type === "warning" ? <Icon icon="icon-[mingcute--warning-line]" /> : null;
   return (
     <AlertRoot type={type} className={clsm(className)}>
       {showIcon && <span className="me-2">{icon}</span>}

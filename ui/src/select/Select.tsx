@@ -3,8 +3,8 @@
 import type { VariantProps } from "class-variance-authority";
 import React from "react";
 
-import type { ValueType } from "../form/types";
-import type { inputStatusVariants } from "../input";
+import type { ValueType } from "../form";
+import type { inputSizeVariants, inputVariants } from "../input";
 import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
 import {
@@ -21,7 +21,8 @@ export type SelectProps<T extends ValueType = string> = Omit<
   SelectRootProps,
   "value" | "onValueChange"
 > &
-  VariantProps<typeof inputStatusVariants> & {
+  VariantProps<typeof inputVariants> &
+  VariantProps<typeof inputSizeVariants> & {
     value?: T;
     options: Option<T>[];
 
@@ -77,7 +78,7 @@ const SelectInner = <T extends ValueType = string>(
         size={size}
         status={status}
       >
-        <SelectValue placeholder={placeholder} />
+        <SelectValue placeholder={placeholder} className="h-5" />
       </SelectTrigger>
       <SelectContent>
         {options.map((o) => (

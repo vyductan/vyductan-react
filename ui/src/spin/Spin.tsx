@@ -1,9 +1,11 @@
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
 import "./style.css";
+
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 const spinVariants = cva("", {
   variants: {
@@ -27,22 +29,39 @@ const spinVariants = cva("", {
     size: "default",
   },
 });
-export interface SpinProps extends VariantProps<typeof spinVariants> {
-  spinning?: boolean;
-  children?: React.ReactNode;
-}
-export const Spin = ({ spinning = true, size, children }: SpinProps) => {
+export type SpinProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+> &
+  VariantProps<typeof spinVariants> & {
+    spinning?: boolean;
+  };
+export const Spin = ({
+  spinning = true,
+  size,
+  children,
+  ...props
+}: SpinProps) => {
   return (
-    <div>
+    <div {...props}>
       {spinning && (
-        <div key="loading">
+        <div
+          key="loading"
+          className="absolute inset-0 z-10 flex max-h-[400px] items-center justify-center"
+        >
           <div
             aria-label="Loading"
             className={clsm("spin", spinVariants({ size }))}
           />
         </div>
       )}
-      {children && children}
+      <div
+        className={clsm(
+          spinning && "user-select-none pointer-events-none opacity-50",
+        )}
+      >
+        {children && children}
+      </div>
     </div>
   );
 };

@@ -3,8 +3,7 @@
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
 
-import { clsm } from "@acme/ui";
-
+import { clsm } from "..";
 import { buttonVariants } from "../button";
 import { Icon } from "../icons";
 
@@ -21,42 +20,63 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={clsm("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+        disabled: "text-muted-foreground opacity-50",
+        months: "relative flex flex-col sm:flex-row",
+        // months: "relative flex flex-col sm:flex-row ",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
+        month_caption: "flex justify-center pt-1 relative items-center mx-10",
+        month_grid: "w-full border-collapse space-y-1",
         caption_label: "text-sm font-medium",
         nav: "space-x-1 flex items-center",
-        nav_button: clsm(
-          buttonVariants(),
+        button_next: clsm(
+          buttonVariants({ variant: "outline" }),
           "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          "absolute right-1 top-0",
         ),
-        nav_button_previous: "absolute left-1",
-        nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell:
+        button_previous: clsm(
+          buttonVariants({ variant: "outline" }),
+          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          "absolute left-1 top-0",
+        ),
+        weekdays: "flex",
+        weekday:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
-        cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        day: clsm(
+        week: "flex w-full mt-2",
+        day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+        day_button: clsm(
           buttonVariants({ variant: "ghost" }),
           "size-9 p-0 font-normal aria-selected:opacity-100",
         ),
-        day_range_end: "day-range-end",
-        day_selected:
+        range_end: "day-range-end",
+        selected:
           "bg-primary text-white hover:bg-primary hover:text-white focus:bg-primary focus:text-white",
-        day_today: "bg-accent text-accent-foreground",
-        day_outside:
+        today: "bg-background-hover text-accent-foreground rounded-md",
+        outside:
           "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
+        range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+        hidden: "invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: () => <Icon icon="mingcute:left-fill" className="size-4" />,
-        IconRight: () => <Icon icon="mingcute:right-fill" className="size-4" />,
+        Chevron: (props) => {
+          if (props.orientation === "left") {
+            return (
+              <Icon
+                icon="icon-[mingcute--left-fill]"
+                className="size-4"
+                {...props}
+              />
+            );
+          }
+          return (
+            <Icon
+              icon="icon-[mingcute--right-fill]"
+              className="size-4"
+              {...props}
+            />
+          );
+        },
       }}
       {...props}
     />

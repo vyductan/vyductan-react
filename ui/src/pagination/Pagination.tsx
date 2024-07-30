@@ -206,7 +206,7 @@ export const Pagination = (props: PaginationProps) => {
       jumpPrevPage,
       "jump-prev",
       <Icon
-        className="icon-[park-outline--double-left]"
+        icon="icon-[heroicons-solid--chevron-double-left]"
         aria-label="prev page"
       />,
     );
@@ -214,7 +214,7 @@ export const Pagination = (props: PaginationProps) => {
       jumpNextPage,
       "jump-next",
       <Icon
-        className="icon-[park-outline--double-right]"
+        icon="icon-[heroicons-solid--chevron-double-right]"
         aria-label="next page"
       />,
     );

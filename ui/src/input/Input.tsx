@@ -1,18 +1,19 @@
+"use client";
+
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { useHover } from "ahooks";
 import { cva } from "class-variance-authority";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "@acme/ui";
-
+import { clsm } from "..";
 import { triggerNativeEventFor } from "../_util/event";
 import { Icon } from "../icons";
 
-export const inputStatusVariants = cva(
+export const inputVariants = cva(
   [
     "w-full",
-    "flex rounded-md border border-input ring-offset-background",
+    "flex border border-input ring-offset-background",
     "text-sm",
     "focus-within:outline-none",
     "disabled:cursor-not-allowed disabled:opacity-50",
@@ -24,30 +25,45 @@ export const inputStatusVariants = cva(
         true: ["border-0", "focus-within:outline-none"],
         false: ["border", "rounded-md", "focus-within:ring-2"],
       },
-      size: {
-        sm: "",
-        default: "px-[11px] py-[5px]",
-        lg: "px-[11px] py-[9px]",
-      },
       status: {
         default: [
           "hover:border-primary-500",
           "focus-within:!border-primary-600 focus-within:ring-primary-100",
         ],
+        error: [
+          "border-danger text-danger",
+          "hover:border-danger-hover",
+          "focus-within:border-danger focus-within:ring-danger-muted",
+        ],
+        warning: [],
       },
     },
     defaultVariants: {
       borderless: false,
-      size: "default",
       status: "default",
     },
   },
 );
+export const inputSizeVariants = cva([], {
+  variants: {
+    size: {
+      sm: "",
+      default: "px-[11px] py-[5px]",
+      lg: "px-[11px] py-[9px]",
+    },
+  },
+  defaultVariants: {
+    size: "default",
+  },
+});
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> &
-  VariantProps<typeof inputStatusVariants> & {
+  VariantProps<typeof inputVariants> &
+  VariantProps<typeof inputSizeVariants> & {
     /** If allow to remove input content with clear icon */
     allowClear?: boolean | { clearIcon: React.ReactNode };
     suffix?: React.ReactNode;
+    addonBefore?: React.ReactNode;
+    addonAfter?: React.ReactNode;
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
@@ -55,10 +71,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       allowClear,
       borderless,
       className,
-      id: idProp,
+      hidden,
       size,
       status,
+
+      addonBefore,
+      addonAfter,
       suffix,
+
+      id: idProp,
       onChange,
       ...props
     },
@@ -86,7 +107,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       allowClear && isHovering && value ? (
         <button
           type="button"
-          className="opacity-30 hover:opacity-50"
+          className={clsm(
+            "flex opacity-30 hover:opacity-50",
+            inputSizeVariants({ size }),
+          )}
           onClick={() => {
             triggerNativeEventFor(document.getElementById(id), {
               event: "input",
@@ -95,45 +119,71 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           }}
         >
           <Icon
-            icon="ant-design:close-circle-filled"
-            type="button"
+            icon="icon-[ant-design--close-circle-filled]"
             className="pointer-events-none size-4"
           />
         </button>
       ) : (
-        suffix
+        <span
+          className={clsm("flex items-center", inputSizeVariants({ size }))}
+        >
+          {suffix}
+        </span>
       )
     ) : null;
 
     return (
       <span
         ref={wrapperRef}
+        aria-hidden={hidden ? "true" : undefined}
         className={clsm(
-          inputStatusVariants({ borderless, size, status }),
+          inputVariants({ borderless, status }),
           "cursor-text",
           className,
         )}
-        aria-hidden="true"
         onClick={() => {
           document.getElementById(id)?.focus();
         }}
       >
+        {addonBefore && (
+          <span
+            className={clsm(
+              !borderless && "rounded-s-md",
+              "border-e bg-background",
+              inputSizeVariants({ size }),
+            )}
+          >
+            {addonBefore}
+          </span>
+        )}
         <input
           id={id}
+          ref={inputRef}
           className={clsm(
             "w-full",
             "bg-transparent",
             "placeholder:text-muted-foreground",
             "border-none outline-none",
+            inputSizeVariants({ size }),
           )}
-          ref={inputRef}
           onChange={(e) => {
             setValue(e.currentTarget.value);
             onChange?.(e);
           }}
           {...props}
         />
-        {suffixComp && <span className="flex items-center">{suffixComp}</span>}
+        {suffixComp && suffixComp}
+        {addonAfter && (
+          <span
+            className={clsm(
+              !borderless && "rounded-e-md",
+              "border-s bg-background",
+              inputSizeVariants({ size }),
+            )}
+          >
+            {addonAfter}
+          </span>
+        )}
       </span>
     );
   },

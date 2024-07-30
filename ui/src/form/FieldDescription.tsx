@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 
-import { clsm } from "@acme/ui";
-
+import { clsm } from "..";
 import { useField } from "./useField";
 
 const FieldDescription = forwardRef<
@@ -11,10 +10,10 @@ const FieldDescription = forwardRef<
   const { fieldDescriptionId } = useField();
 
   return (
-    <p
+    <div
       ref={ref}
       id={fieldDescriptionId}
-      className={clsm("text-sm text-muted-foreground", className)}
+      className={clsm("text-sm text-foreground-muted", className)}
       {...props}
     />
   );

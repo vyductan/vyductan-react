@@ -5,13 +5,15 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
+import type { IconProps } from "../icons";
 import { clsm } from "..";
 import Wave from "../_util/wave";
+import { GenericSlot } from "../slot";
 import { LoadingIcon } from "./LoadingIcon";
 
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-white transition-colors",
+    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-white transition-colors gap-2",
     "border",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
@@ -24,13 +26,11 @@ const buttonVariants = cva(
       action: {
         true: [],
       },
-      danger: {
-        true: ["text-error", "active:ring-error-active"],
-      },
       color: {
         default: [],
-        action: [],
+        accent: [],
         danger: [],
+        success: [],
       },
       variant: {
         default: [
@@ -42,23 +42,39 @@ const buttonVariants = cva(
           "border-border bg-background",
           "hover:border-border-hover hover:bg-background-hover",
         ],
-        dashed: [
-          "border border-dashed border-border",
-          "hover:border-primary-hover hover:text-primary-hover",
-        ],
-        ghost: ["border-transparent", "hover:bg-gray-100 hover:text-gray-900"],
-        light: ["border-transparent", "hover:bg-gray-100 hover:text-gray-900"],
-        link: "text-gray-900 underline-offset-4 hover:underline dark:text-gray-50",
+        ghost: ["border-transparent", "hover:bg-background-hover"],
+        light: ["border-transparent", "hover:bg-background-hover"],
+        link: "underline-offset-4 hover:underline",
       },
       size: {
-        sm: "h-6 rounded-sm px-2 py-0",
+        sm: "h-6 rounded-sm px-2 py-0 font-normal",
         default: "h-8 rounded-md px-3 py-1",
         lg: "h-10 rounded-lg px-4 py-2",
       },
       shape: {
         default: "",
-        icon: "p-0",
+        icon: [
+          // "p-0 ",
+          // "sm:[&:has(span.sm:not-sr-only)]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
+          // '[&:has(span[class*="sm:not-sr-only"])]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
+          // "sm:[&:has(span.size-4)]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
+          // "sm:has-[span.size-4]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
+          // "has-[span.sm\\:not-sr-only]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
+          // "has-[span.sm\\:not-sr-only]:w-auto",
+          // 'has-[span[class*="sm:not-sr-only"]]:sm:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
+          // '[&:has(span[class*="sm:not-sr-only"])]:sm:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
+          // "!p-[unset]",
+          // 'has-[span[class*="sm:not-sr-only"]]:sm:w-auto has-[span[class*="sm:not-sr-only"]]:p-0 has-[span[class*="sm:not-sr-only"]]:sm:p-[auto]',
+          'has-[span[class*="sm:not-sr-only"]]:sm:w-auto',
+          'has-[span[class*="sm:not-sr-only"]]:max-sm:p-0',
+          '[&:not(:has(span[class*="sm:not-sr-only"]))]:p-0',
+        ],
         circle: "rounded-full",
+      },
+      /* Whenever to hidden text at mobile view */
+      srOnly: {
+        true: "",
+        false: "",
       },
       disabled: {
         true: "pointer-events-none opacity-50",
@@ -66,25 +82,48 @@ const buttonVariants = cva(
       },
     },
     compoundVariants: [
+      // primary
       {
         primary: true,
-        danger: true,
+        // danger: true,
+        color: "danger",
         className: [
-          "border-error bg-error",
-          "hover:border-error-hover hover:bg-error-hover",
+          "border-danger bg-danger",
+          "hover:border-danger-hover hover:bg-danger-hover",
+        ],
+      },
+
+      // light
+      {
+        variant: "light",
+        className: [
+          "bg-primary-300 text-primary-600",
+          "hover:bg-primary-700 hover:text-white",
         ],
       },
       {
         variant: "light",
-        color: "action",
-        className: ["text-info bg-info/10", "hover:text-white hover:bg-info"],
+        color: "accent",
+        className: [
+          "text-accent bg-accent-muted",
+          // "hover:text-white hover:bg-info",
+          "hover:text-white hover:bg-accent-hover",
+        ],
       },
       {
         variant: "light",
         color: "danger",
         className: [
-          "text-danger bg-danger/10",
-          "hover:text-white hover:bg-danger",
+          "text-danger bg-danger-muted",
+          "hover:text-white hover:bg-danger-hover",
+        ],
+      },
+      {
+        variant: "light",
+        color: "success",
+        className: [
+          "text-success bg-success/10",
+          "hover:text-white hover:bg-success",
         ],
       },
       {
@@ -96,9 +135,10 @@ const buttonVariants = cva(
           "hover:bg-blue-100 dark:hover:bg-blue-300",
         ],
       },
+      // outline
       {
-        danger: true,
         variant: "outline",
+        color: "danger",
         className: [
           "border-error",
           "hover:border-error-hover  hover:text-error-hover",
@@ -113,7 +153,7 @@ const buttonVariants = cva(
       {
         size: "default",
         shape: ["icon", "circle"],
-        className: "min-w-8 w-8",
+        className: "w-8",
       },
       {
         size: "lg",
@@ -143,7 +183,8 @@ export interface ButtonProps
   asChild?: boolean;
   href?: string;
   loading?: boolean;
-  icon?: React.ReactNode;
+  // icon?: React.ReactNode;
+  icon?: React.ReactElement<IconProps>;
   color?: NonNullable<ButtonVariants["color"]>;
   variant?: Exclude<ButtonVariants["variant"], "primary">;
 }
@@ -155,12 +196,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       className,
       color,
-      danger,
       disabled,
       loading,
       primary,
       size,
       shape,
+      srOnly,
       variant,
       icon,
       ...props
@@ -176,16 +217,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             "relative",
             buttonVariants({
               color,
-              danger,
               disabled,
               primary: !primary && !!variant ? null : !primary ? true : primary,
               size,
-              shape: icon && !children ? shape ?? "icon" : shape,
+              shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
+              // shape:
+              //   (icon && !children) || icon?.props.srOnly
+              //     ? (shape ?? "icon")
+              //     : shape,
               variant,
               className,
             }),
           )}
           disabled={loading ?? disabled}
+          type="button"
           {...props}
         >
           {asChild ? (
@@ -193,13 +238,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           ) : (
             <>
               {(!!loading || icon) && (
-                <span className={clsm(children ? "mr-2" : "")}>
-                  <Slot className="size-5">
-                    {loading ? <LoadingIcon /> : icon}
-                  </Slot>
-                </span>
+                <GenericSlot<Partial<IconProps>>
+                  className={clsm(
+                    size === "sm" ? "" : "size-4",
+                    // children ? "mr-2" : "",
+                  )}
+                  // srOnly={
+                  //   srOnly && typeof children === "string"
+                  //     ? children
+                  //     : undefined
+                  // }
+                >
+                  {loading ? <LoadingIcon /> : icon}
+                </GenericSlot>
               )}
-              {children}
+              {srOnly && typeof children === "string" ? (
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  {children}
+                </span>
+              ) : (
+                children
+              )}
             </>
           )}
         </Comp>

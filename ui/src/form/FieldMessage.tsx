@@ -1,8 +1,9 @@
+"use client";
+
 import type { HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
-import { clsm } from "@acme/ui";
-
+import { clsm } from "..";
 import { useField } from "./useField";
 
 const FieldMessage = forwardRef<
@@ -10,7 +11,7 @@ const FieldMessage = forwardRef<
   HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, fieldMessageId } = useField();
-  const body = error ? String(error?.message) : children;
+  const body = error ? String(error.message) : children;
 
   if (!body) {
     return null;
@@ -20,13 +21,13 @@ const FieldMessage = forwardRef<
     <p
       ref={ref}
       id={fieldMessageId}
-      className={clsm("text-sm font-medium text-destructive", className)}
+      className={clsm("mb-1 text-sm text-danger", className)}
       {...props}
     >
       {body}
     </p>
   );
 });
-FieldMessage.displayName = "FormMessage";
+FieldMessage.displayName = "FieldMessage";
 
 export { FieldMessage };

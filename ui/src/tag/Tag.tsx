@@ -2,15 +2,17 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { cva } from "class-variance-authority";
 
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex justify-center items-center rounded border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        default: [
+          "border-transparent text-primary-foreground",
+          "whitespace-nowrap",
+        ],
         secondary:
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
@@ -18,16 +20,24 @@ const badgeVariants = cva(
         outline: "text-foreground",
       },
       color: {
-        default: "",
-        success: "",
+        default: "bg-gray-200 text-gray-950",
+        success: "bg-success-bg text-success",
         processing: "",
         error: "",
         warning: "",
+        blue: "bg-blue-200 text-blue-900",
+        green: "bg-green-200 text-green-900",
+        teal: "bg-teal-300 text-teal-900",
+      },
+      bordered: {
+        true: "border",
+        false: "",
       },
     },
     defaultVariants: {
       variant: "default",
       color: "default",
+      bordered: true,
     },
   },
 );

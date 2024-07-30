@@ -9,7 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./components";
+} from "./_components";
 
 type AlertModalProps = Omit<ModalProps, "onOk"> & {
   onConfirm?: () => void;
@@ -41,9 +41,7 @@ export const AlertModal = ({
       <AlertDialogContent className={className}>
         <AlertDialogHeader>
           {title && <AlertDialogTitle>{title}</AlertDialogTitle>}
-          {description && (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
-          )}
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>

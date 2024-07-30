@@ -6,20 +6,22 @@ import { useClickAway, useFocusWithin } from "ahooks";
 import { format as formatDate, isValid, parse } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import type { inputStatusVariants } from "../input";
+import type { inputSizeVariants, inputVariants } from "../input";
 import { clsm } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { Input } from "../input";
 import { Popover } from "../popover";
 
-export type DatePickerProps = VariantProps<typeof inputStatusVariants> & {
-  format?: string;
-  defaultValue?: Date;
-  value?: Date;
-  /** Callback function, can be executed when the selected time is changing */
-  onChange?: (date: Date | undefined, dateString: string) => void;
-};
+export type DatePickerProps = VariantProps<typeof inputVariants> &
+  VariantProps<typeof inputSizeVariants> & {
+    format?: string;
+    defaultValue?: Date;
+    value?: Date;
+    placeholder?: string;
+    /** Callback function, can be executed when the selected time is changing */
+    onChange?: (date: Date | undefined, dateString: string) => void;
+  };
 const DatePickerInternal = (
   {
     borderless,
@@ -28,6 +30,7 @@ const DatePickerInternal = (
     status,
     defaultValue,
     value,
+    placeholder,
     ...props
   }: DatePickerProps,
   ref: React.Ref<HTMLInputElement>,
@@ -139,10 +142,10 @@ const DatePickerInternal = (
           status={status}
           className={clsm("items-center", "justify-start text-left")}
           ref={ref}
-          placeholder="Pick a date"
+          placeholder={placeholder}
           suffix={
             <Icon
-              icon="mingcute:calendar-2-line"
+              icon="icon-[mingcute--calendar-2-line]"
               className="ml-auto size-4 opacity-50"
             />
           }

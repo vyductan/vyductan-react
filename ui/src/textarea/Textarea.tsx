@@ -4,9 +4,8 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 
-import { clsm } from "@acme/ui";
-
-import { inputStatusVariants } from "../input";
+import { clsm } from "..";
+import { inputVariants } from "../input";
 
 const textareaVariants = cva(
   [
@@ -36,7 +35,7 @@ export type TextareaProps = Omit<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
   "style"
 > &
-  VariantProps<typeof inputStatusVariants> &
+  VariantProps<typeof inputVariants> &
   VariantProps<typeof textareaVariants> &
   Pick<
     TextareaAutosizeProps,
@@ -51,7 +50,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <Comp
         className={clsm(
-          inputStatusVariants({ borderless, status }),
+          inputVariants({ borderless, status }),
           textareaVariants({ className, size }),
         )}
         ref={ref}

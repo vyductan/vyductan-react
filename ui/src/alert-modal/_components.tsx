@@ -3,9 +3,8 @@
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
-import { clsm } from "@acme/ui";
-
 import type { ButtonProps } from "../button";
+import { clsm } from "..";
 import { Button, buttonVariants } from "../button";
 
 const AlertDialog = AlertDialogPrimitive.Root;
@@ -20,7 +19,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={clsm(
-      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -107,8 +106,8 @@ const AlertDialogAction = React.forwardRef<
     isControlled?: boolean;
   }
 >(({ asChild, isControlled, ...props }, ref) => {
-  return !asChild ?? isControlled ? (
-    <Button danger {...props} />
+  return (!asChild ?? isControlled) ? (
+    <Button color="danger" {...props} />
   ) : (
     <AlertDialogPrimitive.Action ref={ref} asChild {...props} />
   );

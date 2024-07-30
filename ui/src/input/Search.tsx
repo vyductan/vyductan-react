@@ -9,7 +9,7 @@ import { Icon } from "../icons";
 type SearchProps = {
   placeholder?: string;
 };
-export const Search = ({ placeholder }: SearchProps) => {
+export const InputSearch = ({ placeholder }: SearchProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -32,9 +32,10 @@ export const Search = ({ placeholder }: SearchProps) => {
 
   return (
     <Input
+      allowClear
       defaultValue={searchParams.get("query")?.toString()}
       placeholder={placeholder ?? "Search..."}
-      suffix={<Icon icon="mingcute:search-2-line" />}
+      suffix={<Icon icon="icon-[lucide--search]" />}
       onChange={(e) => {
         handleSearch(e.target.value);
       }}

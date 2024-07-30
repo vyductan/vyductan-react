@@ -7,7 +7,7 @@ import { Command as CommandPrimitive, useCommandState } from "cmdk";
 import { clsm } from "@acme/ui";
 
 import { Icon } from "../icons";
-import { Dialog, DialogContent } from "../modal/components";
+import { Dialog, DialogContent } from "../modal/_components";
 
 type CommandRootProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
 const CommandRoot = React.forwardRef<
