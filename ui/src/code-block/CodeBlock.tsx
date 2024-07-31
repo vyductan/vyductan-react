@@ -5,7 +5,7 @@ import { memo } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { useCopyToClipboard } from "@acme/hooks";
+import { useCopyToClipboard } from "@acme/hooks/use-copy-to-clipboard";
 
 import { Button } from "../button";
 import { Icon } from "../icons";

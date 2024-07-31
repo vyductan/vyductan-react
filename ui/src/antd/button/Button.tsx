@@ -12,7 +12,7 @@ type ButtonProps = Omit<AntdButtonProps, "type" | "htmlType"> & {
 const Button = forwardRef(
   (
     { primary = true, variant: variantProp, type, ...props }: ButtonProps,
-    ref: Ref<HTMLElement>,
+    ref: Ref<HTMLButtonElement | HTMLAnchorElement>,
   ) => {
     let variant = variantProp ? variantProp : primary ? "primary" : "default";
     if (variantProp === "outline") {

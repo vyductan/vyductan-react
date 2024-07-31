@@ -10,12 +10,12 @@ export default function useCursor(
   focused: boolean,
 ): [() => void, () => void] {
   const selectionRef = useRef<{
-    start?: number;
-    end?: number;
+    start: number | null;
+    end: number | null;
     value?: string;
     beforeTxt?: string;
     afterTxt?: string;
-  }>(null);
+  } | null>(null);
 
   function recordCursor() {
     // Record position
@@ -56,15 +56,17 @@ export default function useCursor(
 
         let startPos = value.length;
 
-        if (value.startsWith(beforeTxt)) {
+        if (beforeTxt && value.startsWith(beforeTxt)) {
           startPos = beforeTxt.length;
-        } else if (value.endsWith(afterTxt)) {
-          startPos = value.length - selectionRef.current.afterTxt.length;
-        } else {
+        } else if (afterTxt && value.endsWith(afterTxt)) {
+          startPos = value.length - afterTxt.length;
+        } else if (beforeTxt && start) {
           const beforeLastChar = beforeTxt[start - 1];
-          const newIndex = value.indexOf(beforeLastChar, start - 1);
-          if (newIndex !== -1) {
-            startPos = newIndex + 1;
+          if (beforeLastChar) {
+            const newIndex = value.indexOf(beforeLastChar, start - 1);
+            if (newIndex !== -1) {
+              startPos = newIndex + 1;
+            }
           }
         }
 
@@ -72,7 +74,7 @@ export default function useCursor(
       } catch (e) {
         warning(
           false,
-          `Something warning of cursor restore. Please fire issue about this: ${e.message}`,
+          `Something warning of cursor restore. Please fire issue about this: ${(e as Error).message}`,
         );
       }
     }

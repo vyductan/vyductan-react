@@ -1,14 +1,16 @@
 import type { ReactNode } from "react";
 
+import { CardContent, CardRoot } from "./_components";
+
 type CardProps = {
   children: ReactNode;
 };
 const Card = ({ children }: CardProps) => {
   return (
-    <div>
-      <div className="lg:p-6">{children}</div>
-    </div>
+    <CardRoot>
+      <CardContent>{children}</CardContent>
+    </CardRoot>
   );
 };
 
-export default Card;
+export { Card };

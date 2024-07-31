@@ -41,6 +41,4 @@ const message = Object.assign(
   },
 );
 
-const notification = toast;
-
-export { notification, message };
+export { toast as notification, message };

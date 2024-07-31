@@ -1,10 +1,11 @@
 "use client";
 
-import type { Placement } from "@popperjs/core";
+// import type { Placement } from "@popperjs/core";
 import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
 import type { ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment } from "react";
 
+import type { Placement } from "../types";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -54,7 +55,7 @@ export const Dropdown = ({
   const align =
     !placement || placement.includes("auto")
       ? "center"
-      : placement?.includes("start")
+      : placement.includes("start")
         ? "start"
         : "end";
   const renderMenu = (items: MenuItem[]): ReactNode => {

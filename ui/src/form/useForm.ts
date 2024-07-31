@@ -90,7 +90,7 @@ const useForm = <
       if (typeof props.defaultValues === "function") {
         props
           .defaultValues()
-          .then((values) => {
+          .then((values: TFieldValues) => {
             return methods.reset(values, keepStateOptions);
           })
           .catch(() => void 0);

@@ -13,6 +13,7 @@ import type { InputProps } from "./Input";
 import useCursor from "./hooks/useCursor";
 import useFrame from "./hooks/useFrame";
 import { Input } from "./Input";
+import { getDecupleSteps } from "./utils/numberUtil";
 
 /**
  * We support `stringMode` which need handle correct type when user call in onChange
@@ -47,12 +48,14 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
 
   defaultValue?: T;
   value?: T | null;
-  onChange?: (value: number) => void;
+  onChange?: (value: T | null) => void;
   onInput?: (text: string) => void;
+  onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
 
   min?: T;
   max?: T;
   step?: ValueType;
+  onStep?: (value: T, info: { offset: ValueType; type: "up" | "down" }) => void;
 
   /** Parse display value to validate number */
   parser?: (displayValue: string | undefined) => T;
@@ -81,12 +84,13 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
 const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
   (
     {
-      stringMode,
+      stringMode = false,
 
       defaultValue,
       value,
       onChange,
       onInput,
+      onPressEnter,
 
       readOnly,
       disabled,
@@ -94,6 +98,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       min,
       max,
       step = 1,
+      onStep,
 
       formatter,
       parser,
@@ -121,7 +126,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     // ============================ Value =============================
     // Real value control
     const [decimalValue, setDecimalValue] = React.useState<DecimalClass>(() =>
-      getMiniDecimal(value ?? defaultValue),
+      getMiniDecimal(value ?? defaultValue ?? ""),
     );
 
     function setUncontrolledDecimalValue(newDecimal: DecimalClass) {
@@ -220,7 +225,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
      */
     const [inputValue, setInternalInputValue] = useState<string | number>(
       () => {
-        const initValue = defaultValue ?? value;
+        const initValue = defaultValue ?? value ?? "";
         if (
           decimalValue.isInvalidate() &&
           ["string", "number"].includes(typeof initValue)
@@ -249,11 +254,11 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
 
     // >>> Max & Min limit
     const maxDecimal = React.useMemo(
-      () => getDecimalIfValidate(max),
+      () => getDecimalIfValidate(max ?? ""),
       [max, precision],
     );
     const minDecimal = React.useMemo(
-      () => getDecimalIfValidate(min),
+      () => getDecimalIfValidate(min ?? ""),
       [min, precision],
     );
 
@@ -336,7 +341,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       if (!readOnly && !disabled && isRangeValidate) {
         const numStr = updateValue.toString();
         const mergedPrecision = getPrecision(numStr, userTyping);
-        if (mergedPrecision >= 0) {
+        if (mergedPrecision && mergedPrecision >= 0) {
           updateValue = getMiniDecimal(toFixed(numStr, ".", mergedPrecision));
 
           // When to fixed. The value may out of min & max range.
@@ -415,7 +420,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     const onCompositionEnd = () => {
       compositionRef.current = false;
 
-      collectInputValue(inputRef.current.value);
+      collectInputValue(inputRef.current!.value);
     };
 
     // >>> Input
@@ -522,7 +527,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
 
     React.useEffect(() => {
       if (changeOnWheel && focus) {
-        const onWheel = (event) => {
+        const onWheel = (event: WheelEvent) => {
           // moving mouse wheel rises wheel event with deltaY < 0
           // scroll value grows from top to bottom, as screen Y coordinate
           onInternalStep(event.deltaY < 0);
@@ -560,7 +565,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
 
     // Input by value
     useLayoutUpdateEffect(() => {
-      const newValue = getMiniDecimal(value);
+      const newValue = getMiniDecimal(value ?? "");
       setDecimalValue(newValue);
 
       const currentParsedValue = getMiniDecimal(mergedParser(inputValue));
