@@ -2,19 +2,19 @@ import * as React from "react";
 
 import { clsm } from "..";
 
-const CardRoot = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={clsm(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className,
-    )}
-    {...props}
-  />
-));
+type CardRootProps = React.HTMLAttributes<HTMLDivElement>;
+const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={clsm(
+        "rounded-lg border bg-card text-card-foreground shadow-sm",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
 CardRoot.displayName = "CardRoot";
 
 const CardHeader = React.forwardRef<
@@ -75,6 +75,8 @@ const CardFooter = React.forwardRef<
   />
 ));
 CardFooter.displayName = "CardFooter";
+
+export type { CardRootProps };
 
 export {
   CardRoot,
