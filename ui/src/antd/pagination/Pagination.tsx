@@ -1,10 +1,9 @@
 import type { PaginationProps as AntdPaginationProps } from "antd";
 import { Pagination as AntdPagination } from "antd";
-import { useTranslation } from "react-i18next";
 import { useLocation, useSearchParams } from "react-router-dom";
 
-import { usePagination } from "~/components/pagination";
-import { Link } from "../../components/link";
+import { Link } from "../link";
+import { usePagination } from "./usePagination";
 
 const createPageURL = (
   pageNumber: number | string,
@@ -18,9 +17,11 @@ const createPageURL = (
 
 type PaginationProps = Omit<AntdPaginationProps, "showTotal"> & {
   showTotal?: boolean | AntdPaginationProps["showTotal"];
+  locale?: {
+    "Pagination.total": string;
+  };
 };
-const Pagination = ({ showTotal, ...props }: PaginationProps) => {
-  const { t } = useTranslation();
+const Pagination = ({ showTotal, locale, ...props }: PaginationProps) => {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const { page: current, pageSize } = usePagination();
@@ -39,7 +40,7 @@ const Pagination = ({ showTotal, ...props }: PaginationProps) => {
       }
       showTotal={(total, range) =>
         typeof showTotal === "boolean"
-          ? t("Pagination.total", { total })
+          ? locale?.["Pagination.total"]
           : showTotal?.(total, range)
       }
       showSizeChanger

@@ -14,7 +14,8 @@ export const DateRangePicker = (_props: DateRangePickerProps) => {
     <div>
       <Calendar
         mode="range"
-        initialFocus
+        // initialFocus
+        autoFocus
         // selected={{
         //   from: value?.start,
         //   to: value?.end,

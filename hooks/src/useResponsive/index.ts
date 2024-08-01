@@ -57,7 +57,7 @@ export function configResponsive(config: ResponsiveConfig) {
   if (info) calculate();
 }
 
-export default function useResponsive() {
+export const useResponsive = () => {
   if (isBrowser && !listening) {
     info = {
       xs: false,
@@ -97,4 +97,4 @@ export default function useResponsive() {
   }, []);
 
   return state;
-}
+};

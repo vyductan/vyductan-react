@@ -11,7 +11,7 @@ import type { FormInstance } from "./useForm";
 import { AutoComplete } from "../autocomplete";
 import { Button } from "../button";
 import { DatePicker, DateRangePicker } from "../date-picker";
-import Editor from "../editor";
+import { Editor } from "../editor";
 import { DeleteIcon } from "../icons/DeleteIcon";
 import { Input, InputPassword } from "../input";
 import { RadioGroup } from "../radio";
@@ -141,13 +141,11 @@ const AutoForm = <
             }
           >
             {({ field: fieldRenderProps }) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const onChange = (...event: any) => {
                 if ("onChange" in rest && typeof rest.onChange === "function") {
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                   rest.onChange(...event);
                 }
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
                 fieldRenderProps.onChange(...event);
               };
               return renderInput({

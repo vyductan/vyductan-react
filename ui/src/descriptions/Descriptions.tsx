@@ -1,4 +1,4 @@
-import { useResponsive } from "@acme/hooks";
+import { useResponsive } from "@acme/hooks/useResponsive";
 
 import type { Screens } from "../theme";
 import { clsm } from "..";

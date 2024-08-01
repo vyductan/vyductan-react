@@ -5,17 +5,18 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./index.ts"
+    "./*": {
+      "types": "./dist/src/*/index.d.ts",
+      "default": "./src/*/index.ts"
     },
     "./next/*": {
       "types": "./dist/src/next/*/index.d.ts",
-      "default": "./dist/src/next/*/index.ts"
+      "default": "./src/next/*/index.ts"
     }
   },
   "scripts": {
-    "clean": "rm -rf .turbo node_modules",
+    "clean": "rm -rf .turbo dist node_modules",
+    "dev": "tsc",
     "lint": "eslint"
   },
   "prettier": "@acme/prettier-config",

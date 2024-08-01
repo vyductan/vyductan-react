@@ -42,6 +42,10 @@ const buttonVariants = cva(
           "border-border bg-background",
           "hover:border-border-hover hover:bg-background-hover",
         ],
+        dashed: [
+          "border border-dashed border-border",
+          "hover:border-primary-hover hover:text-primary-hover",
+        ],
         ghost: ["border-transparent", "hover:bg-background-hover"],
         light: ["border-transparent", "hover:bg-background-hover"],
         link: "underline-offset-4 hover:underline",
@@ -183,8 +187,8 @@ export interface ButtonProps
   asChild?: boolean;
   href?: string;
   loading?: boolean;
-  // icon?: React.ReactNode;
-  icon?: React.ReactElement<IconProps>;
+  icon?: React.ReactNode;
+  // icon?: React.ReactElement<IconProps>;
   color?: NonNullable<ButtonVariants["color"]>;
   variant?: Exclude<ButtonVariants["variant"], "primary">;
 }

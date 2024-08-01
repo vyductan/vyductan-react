@@ -6,8 +6,10 @@ import type {
   FieldPath,
   FieldValues,
 } from "react-hook-form";
+import React from "react";
 import { Form as AntdForm } from "antd";
-import { FormItem as RhfAntdFormItem } from "react-hook-form-antd";
+
+import { FormItem as RhfAntdFormItem } from "./RhfAntdFormItem";
 
 const { Item: AntdFormItem } = AntdForm;
 
@@ -21,7 +23,7 @@ type FormItemProps<
 > = Omit<ControllerProps<TFieldValues, TName>, "control" | "name" | "render"> &
   Omit<AntdFormItemProps, "name"> & {
     children: ReactElement;
-    label?: string;
+    label?: React.ReactNode;
     description?: string;
     className?: string;
   } & (

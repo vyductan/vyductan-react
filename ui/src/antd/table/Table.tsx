@@ -4,13 +4,9 @@ import type { Reference } from "rc-table";
 import type { ForwardedRef } from "react";
 import { forwardRef } from "react";
 import { Table as AntdTable } from "antd";
-import { useTranslation } from "react-i18next";
+import { useLocation, useSearchParams } from "react-router-dom";
 
-import type { TranslationFn } from "../../_util/translation";
 import type { PaginationProps } from "../pagination";
-import { t as defaultT } from "../../_util/translation";
-import { Link } from "../../link";
-import { tableLocale_en } from "../../table/locale/en_US";
 import { createPageURL, usePagination } from "../pagination";
 
 type TableProps<TRecord = AnyObject> = Omit<
@@ -18,19 +14,15 @@ type TableProps<TRecord = AnyObject> = Omit<
   "pagination"
 > & {
   pagination?: PaginationProps;
-  t?: TranslationFn;
 };
 const TableInner = <TRecord extends AnyObject = AnyObject>(
-  {
-    pagination,
-    locale = tableLocale_en,
-    t = defaultT,
-    ...props
-  }: TableProps<TRecord>,
+  { pagination, ...props }: TableProps<TRecord>,
   ref: React.Ref<Reference>,
 ) => {
-  // const { page: current, pageSize } = usePagination();
-  const { current, pageSize, showTotal, ...restPagination } = pagination ?? {};
+  const { pathname } = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { page: current, pageSize } = usePagination();
+  const { showTotal, ...restPagination } = pagination ?? {};
 
   return (
     <AntdTable
@@ -40,18 +32,22 @@ const TableInner = <TRecord extends AnyObject = AnyObject>(
           ? {
               defaultPageSize: pageSize,
               current: current,
-              itemRender: (page, type, element) =>
-                type === "page" ? (
-                  <Link href={createPageURL(page, pathname, searchParams)}>
+              itemRender: (page, type, element) => {
+                if (page < 1) page = 1;
+                return type === "page" ? (
+                  <a href={createPageURL(page, pathname, searchParams)}>
                     {page}
-                  </Link>
+                  </a>
                 ) : (
-                  element
-                ),
-              showTotal: (total, range) =>
-                typeof showTotal === "boolean"
-                  ? t("components.Pagination.total", { total })
-                  : showTotal?.(total, range),
+                  <a href={createPageURL(page, pathname, searchParams)}>
+                    {element}
+                  </a>
+                );
+              },
+              // showTotal: (total, range) =>
+              //   typeof showTotal === "boolean"
+              //     ? t("Pagination.total", { total })
+              //     : showTotal?.(total, range),
               showSizeChanger: true,
               onShowSizeChange: (_, size) => {
                 searchParams.set("pageSize", size.toString());
