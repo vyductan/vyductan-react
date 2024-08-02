@@ -118,8 +118,7 @@ const FieldInner = <
                           field.value !== undefined || field.value !== null
                             ? field.value
                             : "",
-                        onChange: (e) => {
-                          console.log("ffff", fieldState, formState);
+                        onChange: (e: any) => {
                           children.props.onChange?.(e);
                           field.onChange(onChange ? onChange(e) : e);
                         },

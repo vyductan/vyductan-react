@@ -28,7 +28,7 @@ type TabsProps = Omit<
   /**
    * Extras content (left|right)
    */
-  tabBarExtraContent:
+  tabBarExtraContent?:
     | React.ReactNode
     | { left: React.ReactNode; right: React.ReactNode };
 
