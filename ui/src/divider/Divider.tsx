@@ -3,14 +3,20 @@
 import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
-import { clsm } from "@acme/ui";
+import { clsm } from "..";
 
+type SeparatorProps = React.ComponentPropsWithoutRef<
+  typeof SeparatorPrimitive.Root
+> & {
+  as?: "li";
+};
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+  SeparatorProps
 >(
   (
     {
+      as,
       className,
       orientation = "horizontal",
       decorative = true,
@@ -21,6 +27,7 @@ const Separator = React.forwardRef<
   ) => {
     const separator = (
       <SeparatorPrimitive.Root
+        asChild
         ref={ref}
         decorative={decorative}
         orientation={orientation}
@@ -33,7 +40,9 @@ const Separator = React.forwardRef<
           className,
         )}
         {...props}
-      />
+      >
+        {as === "li" ? <li /> : <div />}
+      </SeparatorPrimitive.Root>
     );
     const Comp = children ? "div" : React.Fragment;
     return (
