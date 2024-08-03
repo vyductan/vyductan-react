@@ -1,8 +1,9 @@
 // import { ArrowLeftOutlined, ArrowRightOutlined } from "@acme/ui/icons";
 
+import type { AvatarProps } from "../../avatar";
+import type { TagProps } from "../../tag";
 import { clsm } from "../..";
-import { Avatar, AvatarProps } from "../../avatar";
-import { TagProps } from "../../tag";
+import { Avatar } from "../../avatar";
 
 type PageHeaderProps = {
   title?: React.ReactNode;
