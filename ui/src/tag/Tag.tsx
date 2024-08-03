@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority";
 
 import { clsm } from "..";
 
-const badgeVariants = cva(
+const tagVariants = cva(
   "inline-flex justify-center items-center rounded border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
@@ -22,11 +22,15 @@ const badgeVariants = cva(
       color: {
         default: "bg-gray-200 text-gray-950",
         success: "bg-success-bg text-success",
-        processing: "",
-        error: "",
-        warning: "",
+        processing: "bg-blue-200 text-blue-900",
+        error: "bg-red-200 text-red-900",
+        warning: "bg-amber-200 text-amber-900",
+        amber: "bg-amber-200 text-amber-900",
         blue: "bg-blue-200 text-blue-900",
         green: "bg-green-200 text-green-900",
+        red: "bg-red-200 text-red-900",
+        pink: "bg-pink-300 text-pink-900",
+        purple: "bg-purple-200 text-purple-900",
         teal: "bg-teal-300 text-teal-900",
       },
       bordered: {
@@ -44,16 +48,16 @@ const badgeVariants = cva(
 
 interface TagProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "color">,
-    VariantProps<typeof badgeVariants> {}
+    VariantProps<typeof tagVariants> {}
 
 const Tag = ({ className, variant, color, ...props }: TagProps) => {
   return (
     <div
-      className={clsm(badgeVariants({ variant, color }), className, "text-xs")}
+      className={clsm(tagVariants({ variant, color }), className, "text-xs")}
       {...props}
     />
   );
 };
 
-export { Tag, badgeVariants };
+export { Tag, tagVariants };
 export type { TagProps };
