@@ -20,21 +20,24 @@ export const NavMenu = ({
   ...props
 }: NavMenuProps) => {
   const transform = (items: MenuItemDef[]) => {
-    const components = items.map((item, index) => {
-      const key = item.key ?? index;
-      return (
-        <NavigationMenuItem key={key}>
-          <NavigationMenuLink
-            asChild
-            className={navigationMenuTriggerStyle({
-              mode,
-              selected: !!selectedKeys?.includes(key),
-            })}
-          >
-            {item.label}
-          </NavigationMenuLink>
-        </NavigationMenuItem>
-      );
+    const components = items.map((item) => {
+      if (item.type === "item") {
+        const key = item.key;
+        return (
+          <NavigationMenuItem key={key}>
+            <NavigationMenuLink
+              asChild
+              className={navigationMenuTriggerStyle({
+                mode,
+                selected: !!selectedKeys?.includes(key),
+              })}
+            >
+              {item.label}
+            </NavigationMenuLink>
+          </NavigationMenuItem>
+        );
+      }
+      return null;
     });
     return components;
   };

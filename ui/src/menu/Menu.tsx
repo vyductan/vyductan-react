@@ -1,10 +1,13 @@
+"use client";
+
 import type { KeyboardEvent, MouseEvent } from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "rc-util";
 
 import type { MenuItemDef } from "./types";
 import { clsm } from "..";
 import { Collapse } from "../collapse";
+import { Divider } from "../divider";
+import { MenuItem } from "./_components";
 
 type MenuProps = {
   className?: string;
@@ -45,82 +48,119 @@ export const Menu = ({
 
   const renderItem = (menu: MenuItemDef[]) => {
     return menu.map((item, index) => {
-      const key = item.key ?? String(index);
-      if (!item.children) {
-        const active = mergedSelectKeys.some((x) => x.endsWith(key));
+      if (item.type === "divider") {
         return (
-          <li
-            role="menuitem"
-            key={key}
-            onClick={(event) => {
-              onSelect?.({ item, key, event });
-            }}
-            onKeyUp={(event) => {
-              onSelect?.({ item, key, event });
-            }}
-            className={clsm(
-              "text-secondary",
-              "border-l border-transparent",
-              "hover:text-primary",
-              active
-                ? "border-primary bg-primary-100 text-primary-500"
-                : "hover:border-foreground hover:text-foreground",
-            )}
-          >
-            <Slot
-              className={clsm("block cursor-pointer rounded-md px-4 py-2.5")}
+          <Divider key={index} as="li" role="separator" className="border-t" />
+        );
+      }
+
+      if (item.type === "group") {
+        return (
+          <li key={index} role="presentation" className="my-1">
+            <div
+              role="presentation"
+              title={item.label?.toString()}
+              className="py-2"
             >
-              {typeof item.label === "string" ? (
-                <span>{item.label}</span>
-              ) : (
-                item.label
-              )}
-            </Slot>
+              {item.label}
+            </div>
+            {item.children && (
+              <ul role="group">
+                {item.children.map(({ key, ...x }) => {
+                  const isActive = mergedSelectKeys.some((x) =>
+                    x.endsWith(key.toString()),
+                  );
+                  return (
+                    <MenuItem
+                      key={key}
+                      keyProp={key}
+                      isActive={isActive}
+                      onSelect={onSelect}
+                      {...x}
+                    />
+                  );
+                })}
+              </ul>
+            )}
           </li>
         );
       }
 
-      return (
-        <Collapse
-          key={key}
-          type="single"
-          defaultActiveKey={mergedOpenKeys}
-          items={[
-            {
-              key: key,
-              label: item.label,
-              children: renderItem(item.children),
-            },
-          ]}
-          contentProps={{
-            as: "ul",
-            className: clsm("border-l border-border"),
-          }}
-          triggerProps={{
-            className: clsm(
-              "text-secondary",
-              "hover:text-foreground",
-              mergedSelectKeys.some((x) => x.includes(key)) &&
-                "text-foreground",
-            ),
-          }}
-        />
-      );
+      const { key, ...rest } = item;
+      return <MenuItem key={key} keyProp={key} onSelect={onSelect} {...rest} />;
+
+      // if (!item.children) {
+      //   const isActive = mergedSelectKeys.some((x) => x.endsWith(key));
+      //   return (
+      //     <li
+      //       role="menuitem"
+      //       key={key}
+      //       onClick={(event) => {
+      //         onSelect?.({ item, key, event });
+      //       }}
+      //       onKeyUp={(event) => {
+      //         onSelect?.({ item, key, event });
+      //       }}
+      //       className={clsm(
+      //         "text-secondary",
+      //         "border-l border-transparent",
+      //         "hover:text-primary",
+      //         isActive
+      //           ? "border-primary bg-primary-100 text-primary-500"
+      //           : "hover:border-foreground hover:text-foreground",
+      //       )}
+      //     >
+      //       <Slot
+      //         className={clsm("block cursor-pointer rounded-md px-4 py-2.5")}
+      //       >
+      //         {typeof item.label === "string" ? (
+      //           <span>{item.label}</span>
+      //         ) : (
+      //           item.label
+      //         )}
+      //       </Slot>
+      //     </li>
+      //   );
+      // }
+
+      // return (
+      //   <Collapse
+      //     key={key}
+      //     type="single"
+      //     defaultActiveKey={mergedOpenKeys}
+      //     items={[
+      //       {
+      //         key: key,
+      //         label: item.label,
+      //         children: renderItem(item.children),
+      //       },
+      //     ]}
+      //     contentProps={{
+      //       as: "ul",
+      //       className: clsm("border-l border-border"),
+      //     }}
+      //     triggerProps={{
+      //       className: clsm(
+      //         "text-secondary",
+      //         "hover:text-foreground",
+      //         mergedSelectKeys.some((x) => x.includes(key)) &&
+      //           "text-foreground",
+      //       ),
+      //     }}
+      //   />
+      // );
     });
   };
 
-  const Comp = "aside";
-
   return (
-    <Comp className={className}>
-      <ul
-        className={clsm(
-          mode === "inline" &&
-            "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
-        )}
-      >
-        {renderItem(items)}
-      </ul>
-    </Comp>
+    <ul
+      className={clsm(
+        mode === "inline" &&
+          "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
+        className,
+      )}
+    >
+      {renderItem(items)}
+    </ul>
   );
 };
