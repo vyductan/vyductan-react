@@ -1,5 +1,5 @@
 import type { IconWrapperProps } from "./Wrapper";
-import IconWrapper from "./Wrapper";
+import { IconWrapper } from "./Wrapper";
 
 // lucide
 export const CircleOutlined = (props: Omit<IconWrapperProps, "children">) => {

@@ -3,23 +3,30 @@ import { cloneElement } from "react";
 
 import { clsm } from "@acme/ui";
 
-export type IconWrapperProps = Omit<
-  HTMLAttributes<SVGSVGElement>,
-  "children"
-> & {
+type IconWrapperProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: ReactElement;
+  srOnly?: string;
 };
 const IconWrapper = ({
   children,
-  className = "",
+  className,
+  srOnly,
   ...props
 }: IconWrapperProps) => {
-  return cloneElement(children, {
-    className: clsm("size-6", className),
-    "aria-hidden": "true",
-    role: "img",
-    ...props,
-  });
+  return (
+    <>
+      <span className={clsm(className)} {...props}>
+        {cloneElement(children, {
+          className: clsm("size-6", className),
+          "aria-hidden": "true",
+          role: "img",
+          ...props,
+        })}
+      </span>
+      {srOnly && <span className="sr-only">{srOnly}</span>}
+    </>
+  );
 };
 
-export default IconWrapper;
+export type { IconWrapperProps };
+export { IconWrapper };

@@ -1,5 +1,5 @@
 import type { IconWrapperProps } from "./Wrapper";
-import IconWrapper from "./Wrapper";
+import { IconWrapper } from "./Wrapper";
 
 // lucide
 export const UserOutlined = (props: Omit<IconWrapperProps, "children">) => {
@@ -11,7 +11,6 @@ export const UserOutlined = (props: Omit<IconWrapperProps, "children">) => {
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
         stroke="currentColor"
-        {...props}
       >
         <g
           fill="none"

@@ -1,4 +1,5 @@
 export * from "./Icon";
+export * from "./Wrapper";
 
 export * from "./ArrowDownFilled";
 export * from "./ArrowLeftOutlined";
