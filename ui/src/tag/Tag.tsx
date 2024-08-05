@@ -19,7 +19,7 @@ const tagVariants = cva(
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
       },
-      color: {
+      color_variant: {
         default: "bg-gray-200 text-gray-950",
         success: "bg-success-bg text-success",
         processing: "bg-blue-200 text-blue-900",
@@ -40,7 +40,7 @@ const tagVariants = cva(
     },
     defaultVariants: {
       variant: "default",
-      color: "default",
+      color_variant: "default",
       bordered: true,
     },
   },
@@ -48,12 +48,23 @@ const tagVariants = cva(
 
 interface TagProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "color">,
-    VariantProps<typeof tagVariants> {}
+    Omit<VariantProps<typeof tagVariants>, "color_variant"> {
+  color?: string | null;
+}
 
 const Tag = ({ className, variant, color, ...props }: TagProps) => {
   return (
     <div
-      className={clsm(tagVariants({ variant, color }), className, "text-xs")}
+      className={clsm(
+        tagVariants({
+          variant,
+          color_variant: color as VariantProps<
+            typeof tagVariants
+          >["color_variant"],
+        }),
+        className,
+        "text-xs",
+      )}
       {...props}
     />
   );
