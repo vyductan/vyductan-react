@@ -88,12 +88,12 @@ const useForm = <
   const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
     if (props) {
       if (typeof props.defaultValues === "function") {
-        props
-          .defaultValues()
-          .then((values: TFieldValues) => {
-            return methods.reset(values, keepStateOptions);
-          })
-          .catch(() => void 0);
+        // props
+        //   .defaultValues()
+        //   .then((values: TFieldValues) => {
+        //     return methods.reset(values, keepStateOptions);
+        //   })
+        //   .catch(() => void 0);
       } else {
         methods.reset(props.defaultValues, keepStateOptions);
       }
@@ -119,7 +119,6 @@ const useForm = <
   useEffect(() => {
     if (
       props?.onValuesChange &&
-      w &&
       !isEqual(formInstance.formState.defaultValues, w) &&
       Object.keys(w).length > 0
     ) {

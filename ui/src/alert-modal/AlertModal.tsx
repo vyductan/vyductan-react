@@ -11,7 +11,7 @@ import {
   AlertDialogTrigger,
 } from "./_components";
 
-type AlertModalProps = Omit<ModalProps, "onOk"> & {
+export type AlertModalProps = Omit<ModalProps, "onOk"> & {
   onConfirm?: () => void;
 };
 
