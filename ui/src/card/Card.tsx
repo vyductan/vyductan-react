@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { CardRootProps } from "./_components";
+import { clsm } from "..";
 import {
   CardContent,
   CardDescription,
@@ -17,20 +18,30 @@ type CardProps = CardRootProps & {
     title?: string;
     description?: string;
   };
+  extra?: ReactNode;
 };
 const Card = ({
   title,
   description,
   children,
   classNames,
+  extra,
   ...props
 }: CardProps) => {
   return (
     <CardRoot {...props}>
       {(!!title || !!description) && (
         <CardHeader>
-          <CardTitle className={classNames?.title}>{title}</CardTitle>
-          <CardDescription className={classNames?.description}>
+          <div className="flex items-center">
+            <CardTitle className={classNames?.title}>{title}</CardTitle>
+            <div className="ml-auto">{extra}</div>
+          </div>
+          <CardDescription
+            className={clsm(
+              description ? "" : "hidden",
+              classNames?.description,
+            )}
+          >
             {description}
           </CardDescription>
         </CardHeader>
