@@ -80,22 +80,22 @@ const useForm = <
 
   const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
     if (typeof defaultValues === "function") {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      defaultValues()
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        .then(
-          (
-            values:
-              | TFieldValues
-              | DefaultValues<TFieldValues>
-              | ((formValues: TFieldValues) => TFieldValues)
-              | undefined,
-          ) => {
-            return methods.reset(values, keepStateOptions);
-          },
-        )
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        .catch(() => void 0);
+      // // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      // defaultValues()
+      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      //   .then(
+      //     (
+      //       values:
+      //         | TFieldValues
+      //         | DefaultValues<TFieldValues>
+      //         | ((formValues: TFieldValues) => TFieldValues)
+      //         | undefined,
+      //     ) => {
+      //       return methods.reset(values, keepStateOptions);
+      //     },
+      //   )
+      //   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      //   .catch(() => void 0);
     } else {
       methods.reset(defaultValues, keepStateOptions);
     }

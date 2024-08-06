@@ -15,8 +15,8 @@
       "default": "./src/*/index.ts"
     },
     "./antd/*": {
-      "types": "./dist/src/*/index.d.ts",
-      "default": "./src/*/index.ts"
+      "types": "./dist/src/antd/*/index.d.ts",
+      "default": "./src/antd/*/index.ts"
     },
     "./pro/*": {
       "types": "./dist/src/pro/*/index.d.ts",
