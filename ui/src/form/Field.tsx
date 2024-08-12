@@ -6,14 +6,12 @@ import type {
   ControllerFieldState,
   ControllerProps,
   ControllerRenderProps,
-  FieldError,
   FieldPath,
   FieldValues,
   UseFormReturn,
   UseFormStateReturn,
 } from "react-hook-form";
 import { cloneElement, forwardRef, useId } from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { Controller, useFormContext } from "react-hook-form";
 
 import type { inputVariants } from "../input";
@@ -23,7 +21,6 @@ import { FormFieldContext } from "./context";
 import { FieldDescription } from "./FieldDescription";
 import { FieldLabel } from "./FieldLabel";
 import { FieldMessage } from "./FieldMessage";
-import { useField } from "./useField";
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -119,7 +116,11 @@ const FieldInner = <
                             ? field.value
                             : "",
                         onChange: (e: any) => {
-                          children.props.onChange?.(e);
+                          (
+                            children.props as {
+                              onChange?: (...event: any[]) => any;
+                            }
+                          ).onChange?.(e);
                           field.onChange(onChange ? onChange(e) : e);
                         },
                       })
@@ -157,7 +158,7 @@ const FieldInner = <
   }
 
   if (typeof children !== "function") {
-    return <FieldRender children={children} />;
+    return <FieldRender fieldId={fieldId} children={children} {...props} />;
   }
   return null;
 };
