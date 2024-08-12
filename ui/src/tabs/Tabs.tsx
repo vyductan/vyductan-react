@@ -10,6 +10,7 @@ import type {
 } from "./_components";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "./_components";
 
+type TabBarExtraMap = { left?: React.ReactNode; right?: React.ReactNode };
 type TabsProps = Omit<
   TabsRootProps,
   "defaultValue" | "onValueChange" | "onChange"
@@ -28,9 +29,7 @@ type TabsProps = Omit<
   /**
    * Extras content (left|right)
    */
-  tabBarExtraContent?:
-    | React.ReactNode
-    | { left: React.ReactNode; right: React.ReactNode };
+  tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
 
   // styles
   // list
@@ -50,6 +49,17 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
     },
     ref,
   ) => {
+    // Parse extra
+    let assertExtra: TabBarExtraMap = {};
+    if (
+      typeof tabBarExtraContent === "object" &&
+      !React.isValidElement(tabBarExtraContent)
+    ) {
+      assertExtra = tabBarExtraContent as TabBarExtraMap;
+    } else {
+      assertExtra.right = tabBarExtraContent;
+    }
+
     return (
       <>
         <TabsRoot
@@ -59,6 +69,8 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
           {...props}
         >
           <div className="flex items-center">
+            <div className="mr-4">{assertExtra.left}</div>
+
             <TabsList {...listProps}>
               {items.map((x) => (
                 <TabsTrigger key={x.key} value={x.key} {...triggerProps}>
@@ -67,16 +79,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
               ))}
             </TabsList>
 
-            {/* tabBarExtraContent render */}
-            <div className="ml-auto">
-              {tabBarExtraContent &&
-              typeof tabBarExtraContent === "object" &&
-              "right" in tabBarExtraContent ? (
-                <>{tabBarExtraContent.right}</>
-              ) : tabBarExtraContent ? (
-                tabBarExtraContent
-              ) : null}
-            </div>
+            <div className="ml-auto">{assertExtra.right}</div>
           </div>
 
           {items.map((x) => (
