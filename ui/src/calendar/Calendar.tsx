@@ -1,5 +1,14 @@
 "use client";
 
+import type {
+  PropsBase,
+  PropsMulti,
+  PropsMultiRequired,
+  PropsRange,
+  PropsRangeRequired,
+  PropsSingle,
+  PropsSingleRequired,
+} from "react-day-picker";
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
 
@@ -7,16 +16,34 @@ import { clsm } from "..";
 import { buttonVariants } from "../button";
 import { Icon } from "../icons";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = Omit<PropsBase, "disabled"> &
+  (
+    | PropsSingle
+    | PropsSingleRequired
+    | PropsMulti
+    | PropsMultiRequired
+    | PropsRange
+    | PropsRangeRequired
+    | {
+        mode?: undefined;
+        required?: undefined;
+      }
+  ) & {
+    disabled?: boolean;
+    disabledDays?: PropsBase["disabled"];
+  };
 
 function Calendar({
   className,
   classNames,
+  disabled: _,
   showOutsideDays = true,
+  disabledDays,
   ...props
 }: CalendarProps) {
   return (
     <DayPicker
+      disabled={disabledDays}
       showOutsideDays={showOutsideDays}
       className={clsm("p-3", className)}
       classNames={{
