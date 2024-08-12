@@ -5,7 +5,7 @@ import { useMergedState } from "rc-util";
 
 import type { MenuItemDef } from "./types";
 import { clsm } from "..";
-import { Collapse } from "../collapse";
+// import { Collapse } from "../collapse";
 import { Divider } from "../divider";
 import { MenuItem } from "./_components";
 
@@ -25,20 +25,20 @@ type MenuProps = {
 };
 export const Menu = ({
   className,
-  defaultOpenKeys,
+  // defaultOpenKeys,
   defaultSelectedKeys,
   items,
-  openKeys,
+  // openKeys,
   mode = "inline",
   selectedKeys,
   onSelect,
 }: MenuProps) => {
-  const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
-    defaultOpenKeys ?? [],
-    {
-      value: openKeys,
-    },
-  );
+  // const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
+  //   defaultOpenKeys ?? [],
+  //   {
+  //     value: openKeys,
+  //   },
+  // );
   const [mergedSelectKeys, _setMergedSelectKeys] = useMergedState(
     defaultSelectedKeys ?? [],
     {

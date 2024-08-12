@@ -31,7 +31,7 @@ const SelectTrigger = React.forwardRef<
       "placeholder:text-placeholder",
       "focus:outline-none",
       // "focus:ring-2 focus:ring-ring focus:ring-offset-2",
-      "disabled:text-placeholder disabled:cursor-not-allowed",
+      // "disabled:text-placeholder disabled:cursor-not-allowed disabled:pointer-events-none",
       // "[&>span]:line-clamp-1", ???  disabled for middle arrow
       className,
     )}
