@@ -16,7 +16,7 @@ export const inputVariants = cva(
     "flex border border-input ring-offset-background",
     "text-sm",
     "focus-within:outline-none",
-    "disabled:cursor-not-allowed disabled:opacity-50",
+    // "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-background-active disabled:hover:border-input",
     // "file:border-0 file:bg-transparent file:text-sm file:font-medium",
   ],
   {
@@ -24,6 +24,11 @@ export const inputVariants = cva(
       borderless: {
         true: ["border-0", "focus-within:outline-none"],
         false: ["border", "rounded-md", "focus-within:ring-2"],
+      },
+      disabled: {
+        true: [
+          "cursor-not-allowed opacity-50 bg-background-active hover:!border-input",
+        ],
       },
       status: {
         default: [
@@ -41,6 +46,7 @@ export const inputVariants = cva(
     defaultVariants: {
       borderless: false,
       status: "default",
+      disabled: false,
     },
   },
 );
@@ -56,10 +62,13 @@ export const inputSizeVariants = cva([], {
     size: "default",
   },
 });
+type InputVariants = Omit<VariantProps<typeof inputVariants>, "disabled"> & {
+  disabled?: boolean;
+};
 type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> &
-  VariantProps<typeof inputVariants> &
+  InputVariants &
+  /** If allow to remove input content with clear icon */
   VariantProps<typeof inputSizeVariants> & {
-    /** If allow to remove input content with clear icon */
     allowClear?: boolean | { clearIcon: React.ReactNode };
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
@@ -68,13 +77,14 @@ type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> &
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      allowClear,
       borderless,
       className,
+      disabled,
       hidden,
       size,
       status,
 
+      allowClear,
       addonBefore,
       addonAfter,
       suffix,
@@ -137,7 +147,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ref={wrapperRef}
         aria-hidden={hidden ? "true" : undefined}
         className={clsm(
-          inputVariants({ borderless, status }),
+          inputVariants({ borderless, disabled, status }),
           "cursor-text",
           className,
         )}
@@ -166,6 +176,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "border-none outline-none",
             inputSizeVariants({ size }),
           )}
+          disabled={disabled}
           onChange={(e) => {
             setValue(e.currentTarget.value);
             onChange?.(e);
@@ -191,4 +202,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export { Input };
-export type { InputProps };
+export type { InputProps, InputVariants };
