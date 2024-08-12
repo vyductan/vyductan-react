@@ -106,7 +106,7 @@ const AlertDialogAction = React.forwardRef<
     isControlled?: boolean;
   }
 >(({ asChild, isControlled, ...props }, ref) => {
-  return (!asChild ?? isControlled) ? (
+  return !asChild || isControlled ? (
     <Button color="danger" {...props} />
   ) : (
     <AlertDialogPrimitive.Action ref={ref} asChild {...props} />

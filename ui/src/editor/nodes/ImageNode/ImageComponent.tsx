@@ -8,7 +8,7 @@ import * as React from "react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
@@ -54,6 +54,7 @@ export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
 
 function useSuspenseImage(src: string) {
   if (!imageCache.has(src)) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw new Promise((resolve) => {
       const img = new Image();
       img.src = src;
@@ -61,6 +62,9 @@ function useSuspenseImage(src: string) {
       img.onload = () => {
         imageCache.add(src);
         resolve(null);
+      };
+      img.onerror = () => {
+        imageCache.add(src);
       };
     });
   }

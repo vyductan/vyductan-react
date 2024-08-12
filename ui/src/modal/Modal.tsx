@@ -44,7 +44,7 @@ const Modal = ({
   trigger,
   onOk,
   onCancel,
-  onOpenChange,
+  // onOpenChange,
   ...rest
 }: ModalProps) => {
   // const CancelBtn = () => (
@@ -91,13 +91,13 @@ const Modal = ({
   );
   return (
     <Dialog
+      {...rest}
       onOpenChange={(isOpen) => {
-        onOpenChange?.(isOpen);
+        rest.onOpenChange?.(isOpen);
         if (!isOpen) {
           onCancel?.();
         }
       }}
-      {...rest}
     >
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
 

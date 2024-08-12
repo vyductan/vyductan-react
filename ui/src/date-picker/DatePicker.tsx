@@ -6,14 +6,14 @@ import { useClickAway, useFocusWithin } from "ahooks";
 import { format as formatDate, isValid, parse } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import type { inputSizeVariants, inputVariants } from "../input";
+import type { inputSizeVariants, InputVariants } from "../input";
 import { clsm } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { Input } from "../input";
 import { Popover } from "../popover";
 
-export type DatePickerProps = VariantProps<typeof inputVariants> &
+export type DatePickerProps = InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     format?: string;
     defaultValue?: Date;

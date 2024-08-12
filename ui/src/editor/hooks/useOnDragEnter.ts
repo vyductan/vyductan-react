@@ -38,17 +38,15 @@ export const useOnDragEnter = () => {
 
       const coordinates = element.getBoundingClientRect();
 
-      if (coordinates) {
-        draggableStore.getState().setLine({
-          htmlElement: element,
-          data: {
-            top: coordinates.top,
-            left: coordinates.left,
-            height: coordinates.height,
-            width: coordinates.width,
-          },
-        });
-      }
+      draggableStore.getState().setLine({
+        htmlElement: element,
+        data: {
+          top: coordinates.top,
+          left: coordinates.left,
+          height: coordinates.height,
+          width: coordinates.width,
+        },
+      });
 
       return true;
     },

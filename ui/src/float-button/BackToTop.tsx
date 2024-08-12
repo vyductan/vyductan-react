@@ -50,11 +50,7 @@ export const FloatButtonBackToTop = React.forwardRef<
       : window;
 
   const handleScroll = useCallback(
-    (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      e: React.UIEvent<HTMLElement, UIEvent> | { target: any },
-    ) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    (e: React.UIEvent<HTMLElement, UIEvent> | { target: any }) => {
       const scrollTop = getScrollTarget(e.target, true);
       setVisible(scrollTop >= visibilityHeight);
     },
@@ -65,10 +61,10 @@ export const FloatButtonBackToTop = React.forwardRef<
     const getTarget = target ?? getDefaultTarget;
     const container = getTarget();
     handleScroll({ target: container });
-    container?.addEventListener("scroll", handleScroll);
+    container.addEventListener("scroll", handleScroll);
     return () => {
       // handleScroll.cancel();
-      container?.removeEventListener("scroll", handleScroll);
+      container.removeEventListener("scroll", handleScroll);
     };
   }, [target, handleScroll]);
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import * as React from "react";
 import { useEvent } from "rc-util";
 import raf from "rc-util/lib/raf";

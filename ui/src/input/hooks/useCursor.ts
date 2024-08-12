@@ -36,6 +36,7 @@ export default function useCursor(
           afterTxt,
         };
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       // Fix error in Chrome:
       // Failed to read the 'selectionStart' property from 'HTMLInputElement'

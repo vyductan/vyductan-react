@@ -107,8 +107,8 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
 
       changeOnBlur,
 
-      upHandler,
-      downHandler,
+      // upHandler,
+      // downHandler,
       keyboard,
       changeOnWheel,
       ...inputProps
@@ -202,7 +202,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
             (decimalSeparator || (mergedPrecision && mergedPrecision >= 0))
           ) {
             // Separator
-            const separatorStr = decimalSeparator || ".";
+            const separatorStr = decimalSeparator ?? ".";
 
             str = toFixed(str, separatorStr, mergedPrecision);
           }
@@ -255,15 +255,17 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     // >>> Max & Min limit
     const maxDecimal = React.useMemo(
       () => getDecimalIfValidate(max ?? ""),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [max, precision],
     );
     const minDecimal = React.useMemo(
       () => getDecimalIfValidate(min ?? ""),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [min, precision],
     );
 
     const upDisabled = React.useMemo(() => {
-      if (!maxDecimal || !decimalValue || decimalValue.isInvalidate()) {
+      if (!maxDecimal || decimalValue.isInvalidate()) {
         return false;
       }
 
@@ -271,7 +273,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     }, [maxDecimal, decimalValue]);
 
     const downDisabled = React.useMemo(() => {
-      if (!minDecimal || !decimalValue || decimalValue.isInvalidate()) {
+      if (!minDecimal || decimalValue.isInvalidate()) {
         return false;
       }
 
@@ -334,7 +336,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       // This should not block user typing
       if (!updateValue.isEmpty() && !userTyping) {
         // Revert value in range if needed
-        updateValue = getRangeValue(updateValue) || updateValue;
+        updateValue = getRangeValue(updateValue) ?? updateValue;
         isRangeValidate = true;
       }
 
@@ -446,9 +448,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         stepDecimal = stepDecimal.negate();
       }
 
-      const target = (decimalValue || getMiniDecimal(0)).add(
-        stepDecimal.toString(),
-      );
+      const target = getMiniDecimal(0).add(stepDecimal.toString());
 
       const updatedValue = triggerValueUpdate(target, false);
 

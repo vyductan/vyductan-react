@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import React, { cloneElement, useRef } from "react";
 import isVisible from "rc-util/lib/Dom/isVisible";
 import { composeRef, supportRef } from "rc-util/lib/ref";
@@ -35,7 +35,6 @@ const Wave: React.FC<WaveProps> = (props) => {
         !isVisible(e.target as HTMLElement) ||
         // No need wave
         !node.getAttribute ||
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         node.getAttribute("disabled") ||
         (node as HTMLInputElement).disabled ||
         // node.className.includes("disabled") ||

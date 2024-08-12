@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
 import { Children, cloneElement, isValidElement, useEffect } from "react";
 import { Form as AntdForm } from "antd";
@@ -33,6 +32,7 @@ export const FormItem = <TFieldValues extends FieldValues = FieldValues>({
 
   useEffect(() => {
     form.setFieldValue(name, field.value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field.value]);
 
   return (
@@ -54,6 +54,7 @@ export const FormItem = <TFieldValues extends FieldValues = FieldValues>({
             //@ts-expect-error onChange type safe is not necessary here
             onChange: (...params) => {
               child.props.onChange?.(...params);
+              // eslint-disable-next-line @typescript-eslint/no-unused-expressions
               overrideFieldOnChange
                 ? overrideFieldOnChange(...params)
                 : field.onChange(...params);

@@ -51,9 +51,9 @@ export const draggableStore = createWithEqualityFn<
 
         if (
           prevLine?.top === newLine.data.top &&
-          prevLine?.left === newLine.data.left &&
-          prevLine?.height === newLine.data.height &&
-          prevLine?.width === newLine.data.width
+          prevLine.left === newLine.data.left &&
+          prevLine.height === newLine.data.height &&
+          prevLine.width === newLine.data.width
         ) {
           return;
         }

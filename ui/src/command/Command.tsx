@@ -62,7 +62,7 @@ export const Command = <T extends ValueType = string>({
                   onSelect={item.onSelect}
                 >
                   {!optionRender ||
-                    (optionRender?.checked && (
+                    (optionRender.checked && (
                       <Icon
                         icon="mingcute:check-fill"
                         className={clsm(

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import * as React from "react";
 import { cubicBezier, motion } from "framer-motion";
 import raf from "rc-util/lib/raf";

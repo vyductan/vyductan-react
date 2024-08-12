@@ -381,7 +381,7 @@ function useDraggableBlockMenu(
 
   function onDragStart(event: ReactDragEvent<HTMLDivElement>): void {
     const dataTransfer = event.dataTransfer;
-    if (!dataTransfer || !draggableBlockElem) {
+    if (!draggableBlockElem) {
       return;
     }
     setDragImage(dataTransfer, draggableBlockElem);

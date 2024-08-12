@@ -22,7 +22,7 @@ const TableInner = <TRecord extends AnyObject = AnyObject>(
   const { pathname } = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { page: current, pageSize } = usePagination();
-  const { showTotal, ...restPagination } = pagination ?? {};
+  const { showTotal: _, ...restPagination } = pagination ?? {};
 
   return (
     <AntdTable

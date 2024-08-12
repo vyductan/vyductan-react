@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useState } from "react";
 import { theme } from "tailwindcss/defaultConfig";
 

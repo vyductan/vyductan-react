@@ -2,8 +2,8 @@
 // https://github.com/t3-oss/create-t3-turbo/blob/main/tooling/eslint/base.js
 
 /// <reference types="./types.d.ts" />
-import * as path from "node:path";
-import { includeIgnoreFile } from "@eslint/compat";
+// import * as path from "node:path";
+// import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 import turboPlugin from "eslint-plugin-turbo";
@@ -38,8 +38,8 @@ export const restrictEnvAccess = tseslint.config({
 
 export default tseslint.config(
   // Ignore files not tracked by VCS and any config files
-  includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
-  { ignores: ["**/*.config.*"] },
+  // includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
+  { ignores: ["**/*.config.*", "**/*.d.ts"] },
   {
     files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     plugins: {

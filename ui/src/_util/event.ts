@@ -16,7 +16,7 @@ export function triggerNativeEventFor<T>(
   }
 
   const [prop, value] = Object.entries(valueObj)[0] ?? [];
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+   
   const prototype = Object.getPrototypeOf(element);
   const desc = Object.getOwnPropertyDescriptor(prototype, prop!);
 

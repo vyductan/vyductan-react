@@ -12,7 +12,7 @@ type SearchProps = {
 export const InputSearch = ({ placeholder }: SearchProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { replace } = useRouter();
+  const router = useRouter();
 
   const { run: handleSearch } = useDebounceFn(
     (term: string) => {
@@ -23,7 +23,7 @@ export const InputSearch = ({ placeholder }: SearchProps) => {
       } else {
         params.delete("query");
       }
-      replace(`${pathname}?${params.toString()}`);
+      router.replace(`${pathname}?${params.toString()}`);
     },
     {
       wait: 300,
