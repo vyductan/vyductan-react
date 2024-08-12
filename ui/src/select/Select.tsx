@@ -7,6 +7,7 @@ import type { ValueType } from "../form";
 import type { inputSizeVariants, inputVariants } from "../input";
 import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
+import { Empty } from "../empty";
 import {
   SelectContent,
   SelectItem,
@@ -81,11 +82,15 @@ const SelectInner = <T extends ValueType = string>(
         <SelectValue placeholder={placeholder} className="h-5" />
       </SelectTrigger>
       <SelectContent>
-        {options.map((o) => (
-          <SelectItem key={String(o.value)} value={o.value as string}>
-            {o.label}
-          </SelectItem>
-        ))}
+        {options.length > 0 ? (
+          options.map((o) => (
+            <SelectItem key={String(o.value)} value={o.value as string}>
+              {o.label}
+            </SelectItem>
+          ))
+        ) : (
+          <Empty />
+        )}
       </SelectContent>
     </SelectRoot>
   );
