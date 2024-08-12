@@ -17,6 +17,7 @@ type CardProps = CardRootProps & {
   classNames?: {
     title?: string;
     description?: string;
+    content?: string;
   };
   extra?: ReactNode;
 };
@@ -46,7 +47,7 @@ const Card = ({
           </CardDescription>
         </CardHeader>
       )}
-      <CardContent>{children}</CardContent>
+      <CardContent className={classNames?.content}>{children}</CardContent>
     </CardRoot>
   );
 };
