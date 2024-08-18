@@ -11,31 +11,37 @@ import {
 } from "./_components";
 
 type CardProps = CardRootProps & {
-  title?: ReactNode;
-  description?: ReactNode;
-  children: ReactNode;
   classNames?: {
     title?: string;
     description?: string;
     content?: string;
   };
+  bordered?: boolean;
+  title?: ReactNode;
+  description?: ReactNode;
+  children: ReactNode;
   extra?: ReactNode;
 };
 const Card = ({
+  classNames,
+  bordered,
+  className,
   title,
   description,
   children,
-  classNames,
   extra,
   ...props
 }: CardProps) => {
   return (
-    <CardRoot {...props}>
+    <CardRoot
+      className={clsm(!bordered ? "border-none" : "", className)}
+      {...props}
+    >
       {(!!title || !!description) && (
         <CardHeader>
           <div className="flex items-center">
             <CardTitle className={classNames?.title}>{title}</CardTitle>
-            <div className="ml-auto">{extra}</div>
+            {extra && <div className="ml-auto">{extra}</div>}
           </div>
           <CardDescription
             className={clsm(
