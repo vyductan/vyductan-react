@@ -22,4 +22,4 @@ const Alert = ({ title, message, className, showIcon, type }: AlertProps) => {
   );
 };
 
-export default Alert;
+export { Alert };
