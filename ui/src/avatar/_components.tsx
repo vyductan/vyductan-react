@@ -17,8 +17,8 @@ const AvatarRoot = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={clsm(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full",
-      size === "xl" && "h-[4rem] w-[4rem] text-[1.25rem] leading-[4rem]",
+      "relative flex size-10 shrink-0 overflow-hidden rounded-full",
+      size === "xl" && "size-16 text-[1.25rem] leading-[4rem]",
       className,
     )}
     {...props}
@@ -35,7 +35,7 @@ const AvatarImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
-    className={clsm("aspect-square h-full w-full", className)}
+    className={clsm("aspect-square size-full", className)}
     {...props}
   />
 ));
@@ -48,7 +48,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={clsm(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
+      "flex size-full items-center justify-center rounded-full bg-muted",
       className,
     )}
     {...props}
