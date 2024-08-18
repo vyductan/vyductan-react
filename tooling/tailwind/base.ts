@@ -125,11 +125,12 @@ export default {
             DEFAULT: baseColors.blue[100],
           },
         },
-        danger: {
+        error: {
           DEFAULT: baseColors.red[800],
           hover: baseColors.red[900],
           muted: {
             DEFAULT: baseColors.red[100],
+            hover: baseColors.red[200],
           },
         },
         success: {
@@ -158,6 +159,7 @@ export default {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
         },
+        placeholder: baseColors.gray[700],
         ring: "hsl(var(--ring))",
       },
       /* End Colors */
@@ -165,9 +167,32 @@ export default {
       fontSize: {
         md: fontSize.base,
       },
-      width: {
-        "screen-md": "1024px",
-      },
+      // width: {
+      //   "screen-sm": "640px",
+      //   "screen-md": "1024px",
+      // },
+      width: (pluginUtils) => ({
+        ...pluginUtils.breakpoints(pluginUtils.theme("screens")),
+        // ...theme('spacing'),
+        // none: 'none',
+        // xs: '20rem',
+        // sm: '24rem',
+        // md: '28rem',
+        // lg: '32rem',
+        // xl: '36rem',
+        // '2xl': '42rem',
+        // '3xl': '48rem',
+        // '4xl': '56rem',
+        // '5xl': '64rem',
+        // '6xl': '72rem',
+        // '7xl': '80rem',
+        // full: '100%',
+        // min: 'min-content',
+        // max: 'max-content',
+        // fit: 'fit-content',
+        // prose: '65ch',
+        // ...breakpoints(theme('screens')),
+      }),
       /**
        * Colors
        */
