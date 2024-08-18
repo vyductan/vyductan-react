@@ -56,7 +56,7 @@ const Checkbox = React.forwardRef<
             "transition-colors",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-white",
-            "data-[state=indeterminate]:text-ds-gray-900",
+            "data-[state=indeterminate]:text-gray-900",
             "hover:bg-background-hover",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           )}
@@ -65,7 +65,7 @@ const Checkbox = React.forwardRef<
         >
           <CheckboxPrimitive.Indicator
             className={clsm(
-              "flex h-full w-full items-center justify-center text-current",
+              "flex size-full items-center justify-center text-current",
             )}
           >
             {indeterminate ? (

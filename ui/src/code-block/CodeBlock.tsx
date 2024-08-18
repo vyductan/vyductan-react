@@ -4,8 +4,7 @@ import type { ComponentProps } from "react";
 import { memo } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-import { useCopyToClipboard } from "@acme/hooks/use-copy-to-clipboard";
+import { useCopyToClipboard } from "usehooks-ts";
 
 import { Button } from "../button";
 import { Icon } from "../icons";
@@ -46,10 +45,10 @@ export type CodeBlockProps = Omit<
 };
 export const CodeBlock = memo(
   ({ language, children, ...props }: CodeBlockProps) => {
-    const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
-    const onCopy = () => {
+    const [isCopied, copyToClipboard] = useCopyToClipboard();
+    const onCopy = async () => {
       if (isCopied) return;
-      copyToClipboard(children);
+      await copyToClipboard(children);
     };
     return (
       <div className="relative w-full bg-zinc-950 font-sans">

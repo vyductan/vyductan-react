@@ -34,9 +34,7 @@ const Separator = React.forwardRef<
         className={clsm(
           "my-6",
           "bg-border",
-          orientation === "horizontal"
-            ? "h-[1px] grow basis-0"
-            : "h-full w-[1px]",
+          orientation === "horizontal" ? "h-px grow basis-0" : "h-full w-px",
           className,
         )}
         {...props}
