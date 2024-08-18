@@ -369,7 +369,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           data-state={row.getIsSelected() && "selected"}
                           className={clsm(
                             rowClassName?.(row.original, index),
-                            row.getIsExpanded() ? "border-l border-r" : "",
+                            row.getIsExpanded() ? "border-x" : "",
                           )}
                         >
                           {row.getVisibleCells().map((cell) => {
@@ -420,7 +420,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             <TableCell
                               colSpan={row.getVisibleCells().length}
                               size={size}
-                              className="border-b border-l border-r px-2 text-[13px]"
+                              className="border-x border-b px-2 text-[13px]"
                             >
                               {expandable.expandedRowRender(row.original)}
                             </TableCell>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { TabsListProps } from "@radix-ui/react-tabs";
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
@@ -9,7 +10,7 @@ type TabsRootProps = React.ComponentProps<typeof TabsPrimitive.Root>;
 type TabsRootRef = React.ElementRef<typeof TabsPrimitive.Root>;
 const TabsRoot = TabsPrimitive.Root;
 
-type TabsListProps = React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>;
+// type TabsListProps = React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>;
 const TabsList = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.List>,
   TabsListProps

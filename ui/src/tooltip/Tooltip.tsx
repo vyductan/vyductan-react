@@ -18,7 +18,7 @@ const TooltipContent = React.forwardRef<
     ref={ref}
     sideOffset={sideOffset}
     className={clsm(
-      "z-50 overflow-hidden rounded-md bg-ds-gray-1000 px-3 py-1 text-sm text-ds-gray-100 shadow-md",
+      "z-50 overflow-hidden rounded-md bg-gray-950 px-3 py-1 text-sm text-gray-100 shadow-md",
       "data-[side=top]:slide-in-from-bottom-2",
       "data-[side=right]:slide-in-from-left-2",
       "data-[side=bottom]:slide-in-from-top-2",

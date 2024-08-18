@@ -18,7 +18,7 @@ export const PageContainer = ({
 }: PageContainerProps) => {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-3 lg:p-6">
-      <PageHeader {...header} />
+      {header && <PageHeader {...header} />}
       <div className={clsm("relative", content?.className)}>{children}</div>
     </main>
   );

@@ -69,7 +69,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
           {...props}
         >
           <div className="flex items-center">
-            <div className="mr-4">{assertExtra.left}</div>
+            {assertExtra.left && <div className="mr-4">{assertExtra.left}</div>}
 
             <TabsList {...listProps}>
               {items.map((x) => (

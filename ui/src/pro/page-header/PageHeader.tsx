@@ -34,7 +34,7 @@ const Title = (props: PageHeaderProps) => {
         {title && (
           <h3
             title={typeof title === "string" ? title : undefined}
-            className="!text-defaulttextcolor dark:!text-defaulttextcolor/70 text-xl font-semibold dark:text-white dark:hover:text-white"
+            className="text-xl font-semibold dark:text-white dark:hover:text-white"
           >
             {title}
           </h3>

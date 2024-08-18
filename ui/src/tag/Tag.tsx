@@ -5,7 +5,10 @@ import { cva } from "class-variance-authority";
 import { clsm } from "..";
 
 const tagVariants = cva(
-  "inline-flex justify-center items-center rounded border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  [
+    "text-xs",
+    "inline-flex items-center justify-center rounded border px-2.5 py-0.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  ],
   {
     variants: {
       variant: {
@@ -21,7 +24,7 @@ const tagVariants = cva(
       },
       color_variant: {
         default: "bg-gray-200 text-gray-950",
-        success: "bg-success-bg text-success",
+        success: "bg-success-muted text-success",
         processing: "bg-blue-200 text-blue-900",
         error: "bg-red-200 text-red-900",
         warning: "bg-amber-200 text-amber-900",
@@ -63,7 +66,6 @@ const Tag = ({ className, variant, color, ...props }: TagProps) => {
           >["color_variant"],
         }),
         className,
-        "text-xs",
       )}
       {...props}
     />

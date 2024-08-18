@@ -27,7 +27,7 @@ export const inputVariants = cva(
       },
       disabled: {
         true: [
-          "cursor-not-allowed opacity-50 bg-background-active hover:!border-input",
+          "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
         ],
       },
       status: {
@@ -36,9 +36,9 @@ export const inputVariants = cva(
           "focus-within:!border-primary-600 focus-within:ring-primary-100",
         ],
         error: [
-          "border-danger text-danger",
-          "hover:border-danger-hover",
-          "focus-within:border-danger focus-within:ring-danger-muted",
+          "border-error text-error",
+          "hover:border-error-hover",
+          "focus-within:border-error focus-within:ring-error-muted",
         ],
         warning: [],
       },

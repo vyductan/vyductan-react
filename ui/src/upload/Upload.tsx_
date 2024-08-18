@@ -1,0 +1,33 @@
+import { useCallback } from "react";
+
+import { UploadService } from "./types";
+
+type UploadProps = {
+  uploadService: UploadService;
+  //
+} & (
+  | {
+      multiple: false;
+      value?: string;
+      onChange?: (value: string | undefined) => void;
+    }
+  | {
+      multiple: true;
+      value?: string[];
+      onChange?: (value: (string | undefined)[] | undefined) => void;
+    }
+);
+const Upload = ({ value }: UploadProps) => {
+  // const onDrop = useCallback((acceptedFiles: File[]) => {
+  //   // onUpload(acceptedFiles);
+  // }, [onUpload]);
+
+  return (
+    <>
+      <input type="file" />
+    </>
+  );
+};
+
+export type { UploadProps };
+export { Upload };

@@ -55,11 +55,7 @@ export const Spin = ({
           />
         </div>
       )}
-      <div
-        className={clsm(
-          spinning && "user-select-none pointer-events-none opacity-50",
-        )}
-      >
+      <div className={clsm(spinning && "pointer-events-none opacity-50")}>
         {children && children}
       </div>
     </div>

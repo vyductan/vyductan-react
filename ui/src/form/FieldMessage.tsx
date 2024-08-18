@@ -21,7 +21,7 @@ const FieldMessage = forwardRef<
     <p
       ref={ref}
       id={fieldMessageId}
-      className={clsm("mb-1 text-sm text-danger", className)}
+      className={clsm("mb-1 text-sm text-error", className)}
       {...props}
     >
       {body}
