@@ -1,9 +1,13 @@
+import type { ReactNode } from "react";
+import { Fragment } from "react";
+
 import { useResponsive } from "@acme/hooks/useResponsive";
 
 import type { Screens } from "../theme";
 import { clsm } from "..";
 
 export type DescriptionsItem = {
+  key: React.Key;
   label?: React.ReactNode;
   children?: React.ReactNode;
 };
@@ -14,16 +18,22 @@ type DescriptionProps = {
   bordered?: boolean;
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
-  labelClassName?: string;
-  contentClassName?: string;
+  classNames?: {
+    label: string;
+    content: string;
+  };
+  extra?: ReactNode;
 };
 export const Descriptions = ({
   title,
   items,
+  extra,
+
+  classNames,
   bordered,
   column,
   layout = "horizontal",
-  ...props
+  // ...props
 }: DescriptionProps) => {
   const x = useResponsive();
   const currentScreen = Object.entries(x)
@@ -62,27 +72,31 @@ export const Descriptions = ({
       ? chunkArray(items, mergedColumn)
       : createRows(items, mergedColumn);
 
-  const labelClassName = clsm("text-secondary", props.labelClassName);
-  const contentClassName = clsm(props.contentClassName);
+  const labelClassName = clsm("text-secondary", classNames?.label);
+  const contentClassName = clsm(classNames?.content);
   const thClassName = clsm(
     "text-start text-sm font-normal",
-    "px-6",
     labelClassName,
-    bordered && "border-e bg-background-200",
+    bordered && "border-e bg-surface-secondary",
     layout === "horizontal" && "py-4",
     layout === "vertical" && "pb-1",
+    layout === "vertical" && bordered && "px-6",
   );
   const tdClassName = clsm(
     "break-all",
-    "px-6",
     bordered && "border-e",
     layout === "horizontal" && "py-4",
     layout === "vertical" && "pb-4",
+    layout === "vertical" && bordered && "px-6",
     contentClassName,
   );
   return (
     <div>
-      <div className="text-lg font-semibold">{title}</div>
+      <div className="mb-4 flex items-center">
+        <div className="text-lg font-semibold">{title}</div>
+        {extra && <div className="ml-auto">{extra}</div>}
+      </div>
+
       <div className={clsm(bordered && "border")}>
         <table
           className={clsm("w-full", bordered ? "table-auto" : "table-fixed")}
@@ -91,36 +105,34 @@ export const Descriptions = ({
             {rows.map((cols, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={clsm(
-                  bordered && "mb-[1px] border-b last:border-none",
-                )}
+                className={clsm(bordered && "mb-px border-b last:border-none")}
               >
-                {cols.map((col) =>
+                {cols.map((col, idx) =>
                   // horizontal
                   typeof col === "object" && "label" in col! ? (
                     !bordered ? (
-                      <>
-                        <td className="flex gap-1">
-                          <span className={labelClassName}>{col.label}:</span>
-                          <span className={contentClassName}>
-                            {col.children}
-                          </span>
-                        </td>
-                      </>
+                      <td key={col.key} className="flex gap-1">
+                        <span className={labelClassName}>{col.label}:</span>
+                        <span className={contentClassName}>{col.children}</span>
+                      </td>
                     ) : (
-                      <>
+                      <Fragment key={col.key}>
                         <th className={thClassName}>
                           <span>{col.label}</span>
                         </th>
                         <td className={clsm(tdClassName, "last:border-none")}>
                           <span>{col.children ? col.children : "-"}</span>
                         </td>
-                      </>
+                      </Fragment>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
-                    <th className={thClassName}>{col as React.ReactNode}</th>
+                    <th key={idx} className={thClassName}>
+                      {col as React.ReactNode}
+                    </th>
                   ) : (
-                    <td className={tdClassName}>{col as React.ReactNode}</td>
+                    <td key={idx} className={tdClassName}>
+                      {col as React.ReactNode}
+                    </td>
                   ),
                 )}
               </tr>
