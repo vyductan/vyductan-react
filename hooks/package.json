@@ -6,25 +6,23 @@
   "type": "module",
   "exports": {
     "./*": {
-      "types": "./dist/src/*/index.d.ts",
+      "//types": "./dist/src/*/index.d.ts",
       "default": "./src/*/index.ts"
     },
     "./next/*": {
-      "types": "./dist/src/next/*/index.d.ts",
+      "//types": "./dist/src/next/*/index.d.ts",
       "default": "./src/next/*/index.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@tanstack/react-router": "^1.45.2"
+    "@tanstack/react-router": "^1.48.1"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
