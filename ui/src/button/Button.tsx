@@ -13,7 +13,7 @@ import { LoadingIcon } from "./LoadingIcon";
 
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-white transition-colors gap-2",
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-white transition-colors",
     "border",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
@@ -39,14 +39,18 @@ const buttonVariants = cva(
           "active:ring-primary",
         ],
         outline: [
-          "border-border bg-background",
+          "border-border",
           "hover:border-border-hover hover:bg-background-hover",
         ],
         dashed: [
           "border border-dashed border-border",
           "hover:border-primary-hover hover:text-primary-hover",
         ],
-        ghost: ["border-transparent", "hover:bg-background-hover"],
+        ghost: [
+          "border-transparent",
+          "hover:bg-background-hover",
+          "data-[state=open]:bg-background-hover",
+        ],
         light: ["border-transparent", "hover:bg-background-hover"],
         link: "underline-offset-4 hover:underline",
       },
@@ -92,8 +96,8 @@ const buttonVariants = cva(
         // danger: true,
         color: "danger",
         className: [
-          "border-danger bg-danger",
-          "hover:border-danger-hover hover:bg-danger-hover",
+          "border-error bg-error",
+          "hover:border-error-hover hover:bg-error-hover",
         ],
       },
 
@@ -109,25 +113,25 @@ const buttonVariants = cva(
         variant: "light",
         color: "accent",
         className: [
-          "text-accent bg-accent-muted",
+          "bg-accent-muted text-accent",
           // "hover:text-white hover:bg-info",
-          "hover:text-white hover:bg-accent-hover",
+          "hover:bg-accent-hover hover:text-white",
         ],
       },
       {
         variant: "light",
         color: "danger",
         className: [
-          "text-danger bg-danger-muted",
-          "hover:text-white hover:bg-danger-hover",
+          "bg-error-muted text-error",
+          "hover:bg-error-hover hover:text-white",
         ],
       },
       {
         variant: "light",
         color: "success",
         className: [
-          "text-success bg-success/10",
-          "hover:text-white hover:bg-success",
+          "bg-success/10 text-success",
+          "hover:bg-success hover:text-white",
         ],
       },
       {
@@ -145,10 +149,21 @@ const buttonVariants = cva(
         color: "danger",
         className: [
           "border-error",
-          "hover:border-error-hover  hover:text-error-hover",
+          "hover:border-error-hover hover:text-error-hover",
           "hover:bg-red-100 dark:hover:bg-red-300",
         ],
       },
+      // Ghost
+      {
+        variant: "ghost",
+        color: "danger",
+        className: [
+          "text-error",
+          "hover:text-error-hover",
+          "hover:bg-red-100 dark:hover:bg-red-300",
+        ],
+      },
+      // Size
       {
         size: "sm",
         shape: ["icon", "circle"],
