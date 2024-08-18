@@ -6,6 +6,7 @@ import type { ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment } from "react";
 
 import type { Placement } from "../types";
+import { clsm } from "..";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -19,6 +20,7 @@ import {
 type MenuItem = {
   key?: string;
   label?: ReactNode;
+  className?: string;
   icon?: ReactElement;
   shortcut?: ReactNode;
   group?: MenuItem[];
@@ -60,7 +62,10 @@ export const Dropdown = ({
         : "end";
   const renderMenu = (items: MenuItem[]): ReactNode => {
     return items.map(
-      ({ as, group, href, key, label, icon, shortcut, onSelect }, index) => (
+      (
+        { as, group, href, key, label, className, icon, shortcut, onSelect },
+        index,
+      ) => (
         <Fragment key={key ?? index}>
           {as === "title" ? (
             <DropdownMenuLabel>{label}</DropdownMenuLabel>
@@ -72,7 +77,7 @@ export const Dropdown = ({
             <DropdownMenuItem
               onSelect={onSelect}
               asChild={!!href}
-              className={menu.itemsClassName}
+              className={clsm(menu.itemsClassName, className)}
             >
               {href ? (
                 <a href={href}>
