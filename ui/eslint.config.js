@@ -5,7 +5,7 @@ import tailwindConfig from "@acme/eslint-config/tailwind";
 /** @type {import('typescript-eslint').Config} */
 export default [
   {
-    ignores: [".next/**"],
+    ignores: ["dist/**"],
   },
   ...baseConfig,
   ...reactConfig,

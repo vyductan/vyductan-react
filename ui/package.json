@@ -7,27 +7,24 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
+      "//types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
     },
     "./*": {
-      "types": "./dist/src/*/index.d.ts",
+      "//types": "./dist/src/*/index.d.ts",
       "default": "./src/*/index.ts"
     },
     "./antd/*": {
-      "types": "./dist/src/antd/*/index.d.ts",
+      "//types": "./dist/src/antd/*/index.d.ts",
       "default": "./src/antd/*/index.ts"
     },
     "./pro/*": {
-      "types": "./dist/src/pro/*/index.d.ts",
+      "//types": "./dist/src/pro/*/index.d.ts",
       "default": "./src/pro/*/index.ts"
     }
   },
   "scripts": {
-    "add": "pnpm dlx shadcn-ui add",
-    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
@@ -37,7 +34,7 @@
     "@acme/hooks": "workspace:*",
     "@acme/utils": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
-    "@iconify/json": "^2.2.234",
+    "@iconify/json": "^2.2.237",
     "@lexical/react": "^0.17.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -56,35 +53,36 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@rc-component/mini-decimal": "^1.1.0",
     "@tanstack/react-table": "^8.20.1",
-    "ahooks": "^3.8.0",
-    "antd": "^5.20.0",
+    "ahooks": "^3.8.1",
     "class-variance-authority": "^0.7.0",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.1.8",
+    "framer-motion": "^11.3.28",
     "lexical": "^0.17.0",
+    "next-themes": "^0.3.0",
+    "rc-util": "^5.43.0",
     "react-day-picker": "^9.0.7",
+    "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.52.2",
-    "react-hook-form-antd": "^1.1.0",
     "react-markdown": "^9.0.1",
-    "react-resizable-panels": "^2.0.20",
-    "react-router-dom": "^6.25.1",
+    "react-resizable-panels": "^2.1.0",
+    "react-router-dom": "^6.26.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-textarea-autosize": "^8.5.3",
     "sonner": "^1.5.0",
-    "tailwind-merge": "^2.4.0",
-    "zod": "^3.23.8",
+    "tailwind-merge": "^2.5.2",
+    "usehooks-ts": "^3.1.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
-    "@acme/tailwind-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@iconify/react": "^4.1.1",
     "@types/lodash": "^4.17.7",
     "@types/react": "catalog:react18",
-    "@types/react-dom": "^18.3.0",
+    "@types/react-dom": "catalog:react18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "eslint": "catalog:",
     "prettier": "catalog:",
