@@ -27,13 +27,16 @@ import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
 import { Spin } from "../spin";
 import { Tooltip } from "../tooltip";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRoot,
+  TableRow,
+} from "./_components";
 import { tableLocale_en } from "./locale/en_US";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import { TableBody } from "./TableBody";
-import { TableCell } from "./TableCell";
-import { TableHead } from "./TableHead";
-import { TableHeader } from "./TableHeader";
-import { TableRow } from "./TableRow";
 import { transformColumnDefs } from "./utils";
 
 type RecordWithCustomRow<
@@ -223,7 +226,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
           ref={wrapperRef}
           className={clsm(scroll?.x && "overflow-x-auto overflow-y-hidden")}
         >
-          <table
+          <TableRoot
             ref={ref}
             className={clsm(
               !scroll?.x && "w-full",
@@ -347,6 +350,8 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               ))}
             </TableHeader>
 
+            <tbody aria-hidden="true" className="h-3"></tbody>
+
             {!skeleton ? (
               <TableBody>
                 {table.getRowModel().rows.length ? (
@@ -462,7 +467,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                   })}
               </TableBody>
             )}
-          </table>
+          </TableRoot>
         </div>
         {pagination && <Pagination className="my-4" {...pagination} />}
       </Spin>

@@ -3,13 +3,13 @@ import type { CSSProperties } from "react";
 
 import { clsm } from "..";
 
-export const tableStyles = {
-  row: {
-    classNames: clsm("bg-background"),
-    hoverClassNames: clsm("bg-gray-100 dark:bg-gray-800"),
-    hoverByCssClassNames: "hover:bg-gray-100 dark:hover:bg-gray-800",
-  },
-};
+// export const tableStyles = {
+//   row: {
+//     classNames: clsm("bg-background"),
+//     hoverClassNames: clsm("bg-gray-100 dark:bg-gray-800"),
+//     hoverByCssClassNames: "hover:bg-gray-100 dark:hover:bg-gray-800",
+//   },
+// };
 
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
