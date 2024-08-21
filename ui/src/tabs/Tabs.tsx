@@ -8,6 +8,8 @@ import type {
   TabsRootRef,
   TabsTriggerProps,
 } from "./_components";
+import type { TabsType } from "./types";
+import { clsm } from "..";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "./_components";
 
 type TabBarExtraMap = { left?: React.ReactNode; right?: React.ReactNode };
@@ -15,6 +17,7 @@ type TabsProps = Omit<
   TabsRootProps,
   "defaultValue" | "onValueChange" | "onChange"
 > & {
+  type?: TabsType;
   /**
    * Initial active TabPane's key, if activeKey is not set
    */
@@ -39,6 +42,9 @@ type TabsProps = Omit<
 const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
   (
     {
+      type,
+      className,
+
       defaultActiveKey,
       items,
       onChange,
@@ -66,21 +72,25 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
           ref={ref}
           defaultValue={defaultActiveKey}
           onValueChange={onChange}
+          className={clsm("w-full", className)}
           {...props}
         >
-          <div className="flex items-center">
+          <TabsList type={type} {...listProps}>
             {assertExtra.left && <div className="mr-4">{assertExtra.left}</div>}
-
-            <TabsList {...listProps}>
-              {items.map((x) => (
-                <TabsTrigger key={x.key} value={x.key} {...triggerProps}>
-                  {x.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            <div className="ml-auto">{assertExtra.right}</div>
-          </div>
+            {items.map((x) => (
+              <TabsTrigger
+                key={x.key}
+                value={x.key}
+                tabsType={type}
+                {...triggerProps}
+              >
+                {x.label}
+              </TabsTrigger>
+            ))}
+            {assertExtra.right && (
+              <div className="ml-auto">{assertExtra.right}</div>
+            )}
+          </TabsList>
 
           {items.map((x) => (
             <TabsContent key={x.key} value={x.key}>
