@@ -2,6 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
+import Link from "next/link";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
@@ -105,6 +106,14 @@ const buttonVariants = cva(
       {
         variant: "light",
         className: [
+          "bg-gray-200 text-gray-950",
+          "hover:bg-gray-700 hover:text-white",
+        ],
+      },
+      {
+        variant: "light",
+        primary: true,
+        className: [
           "bg-primary-300 text-primary-600",
           "hover:bg-primary-700 hover:text-white",
         ],
@@ -163,6 +172,15 @@ const buttonVariants = cva(
           "hover:bg-red-100 dark:hover:bg-red-300",
         ],
       },
+      {
+        variant: "ghost",
+        color: "success",
+        className: [
+          "text-success",
+          "hover:text-success-hover",
+          "hover:bg-green-100",
+        ],
+      },
       // Size
       {
         size: "sm",
@@ -212,6 +230,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
+      href,
       children,
       className,
       color,
@@ -227,7 +246,35 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
+    const Comp = asChild || href ? Slot : "button";
+
+    const ChildrenToRender = (
+      <>
+        {(!!loading || icon) && (
+          <GenericSlot<Partial<IconProps>>
+            className={clsm(
+              size === "sm" ? "" : "size-4",
+              // children ? "mr-2" : "",
+            )}
+            // srOnly={
+            //   srOnly && typeof children === "string"
+            //     ? children
+            //     : undefined
+            // }
+          >
+            {loading ? <LoadingIcon /> : icon}
+          </GenericSlot>
+        )}
+        {srOnly && typeof children === "string" ? (
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+            {children}
+          </span>
+        ) : (
+          children
+        )}
+      </>
+    );
+
     return (
       <Wave>
         <Comp
@@ -254,31 +301,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         >
           {asChild ? (
             children
+          ) : href ? (
+            <Link href={href}>{ChildrenToRender}</Link>
           ) : (
-            <>
-              {(!!loading || icon) && (
-                <GenericSlot<Partial<IconProps>>
-                  className={clsm(
-                    size === "sm" ? "" : "size-4",
-                    // children ? "mr-2" : "",
-                  )}
-                  // srOnly={
-                  //   srOnly && typeof children === "string"
-                  //     ? children
-                  //     : undefined
-                  // }
-                >
-                  {loading ? <LoadingIcon /> : icon}
-                </GenericSlot>
-              )}
-              {srOnly && typeof children === "string" ? (
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  {children}
-                </span>
-              ) : (
-                children
-              )}
-            </>
+            ChildrenToRender
           )}
         </Comp>
       </Wave>
