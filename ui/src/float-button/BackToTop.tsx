@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import VerticalAlignTopOutlined from "@ant-design/icons/VerticalAlignTopOutlined";
 import { motion } from "framer-motion";
 
 import type { FloatButtonProps } from "./FloatButton";
 import type { FloatButtonRef } from "./types";
+import { Icon } from "../icons";
 import FloatButtonGroupContext from "./context";
 import { FloatButton } from "./FloatButton";
 import { getScrollTarget, scrollTo } from "./utils";
@@ -29,7 +29,7 @@ export const FloatButtonBackToTop = React.forwardRef<
   const {
     shape = "circle",
     visibilityHeight = 400,
-    icon = <VerticalAlignTopOutlined />,
+    icon = <Icon icon="icon-[ant-design--vertical-align-top-outlined]" />,
     target,
     duration = 450,
     onClick,
