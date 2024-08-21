@@ -36,15 +36,20 @@ export const Descriptions = ({
   // ...props
 }: DescriptionProps) => {
   const x = useResponsive();
-  const currentScreen = Object.entries(x)
-    .filter(([, v]) => v)
-    .slice(-1)[0]![0] as Screens;
-  const mergedColumn =
-    typeof column === "number"
-      ? column
-      : typeof column === "object"
-        ? column[currentScreen]!
-        : 3;
+  let mergedColumn = 3;
+  if (typeof column === "number") {
+    mergedColumn = column;
+  } else if (typeof column === "object") {
+    const mergedColumnWithScreen: Partial<Record<Screens, number | null>> = {};
+    Object.entries(x).forEach(([k]) => {
+      mergedColumnWithScreen[k as Screens] = column[k as Screens] ?? null;
+    });
+    const matched = Object.entries(mergedColumnWithScreen)
+      .filter(([, v]) => v)
+      .slice(-1)[0]![0] as Screens;
+    mergedColumn = column[matched]!;
+  }
+
   function chunkArray<T>(array: T[], size: number): T[][] {
     const chunkedArray: T[][] = [];
     for (let i = 0; i < array.length; i += size) {
@@ -72,7 +77,7 @@ export const Descriptions = ({
       ? chunkArray(items, mergedColumn)
       : createRows(items, mergedColumn);
 
-  const labelClassName = clsm("text-secondary", classNames?.label);
+  const labelClassName = clsm("text-foreground-muted", classNames?.label);
   const contentClassName = clsm(classNames?.content);
   const thClassName = clsm(
     "text-start text-sm font-normal",
@@ -92,10 +97,12 @@ export const Descriptions = ({
   );
   return (
     <div>
-      <div className="mb-4 flex items-center">
-        <div className="text-lg font-semibold">{title}</div>
-        {extra && <div className="ml-auto">{extra}</div>}
-      </div>
+      {(!!title || !!extra) && (
+        <div className="mb-4 flex items-center">
+          <div className="text-lg font-semibold">{title}</div>
+          {extra && <div className="ml-auto">{extra}</div>}
+        </div>
+      )}
 
       <div className={clsm(bordered && "border")}>
         <table
