@@ -6,11 +6,11 @@
   "type": "module",
   "exports": {
     "./*": {
-      "//types": "./dist/src/*/index.d.ts",
+      "types": "./dist/src/*/index.d.ts",
       "default": "./src/*/index.ts"
     },
     "./next/*": {
-      "//types": "./dist/src/next/*/index.d.ts",
+      "types": "./dist/src/next/*/index.d.ts",
       "default": "./src/next/*/index.ts"
     }
   },
@@ -30,6 +30,11 @@
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
+    "@types/react": "catalog:react18",
+    "@types/react-dom": "catalog:react18",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "react": "catalog:react18",
     "typescript": "catalog:"
   }
 }
