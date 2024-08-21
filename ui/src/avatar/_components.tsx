@@ -8,7 +8,7 @@ import { clsm } from "..";
 export type AvatarRootProps = React.ComponentPropsWithoutRef<
   typeof AvatarPrimitive.Root
 > & {
-  size?: "default" | "xl";
+  size?: "default" | "lg" | "xl";
 };
 const AvatarRoot = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -17,7 +17,9 @@ const AvatarRoot = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={clsm(
-      "relative flex size-10 shrink-0 overflow-hidden rounded-full",
+      "relative flex shrink-0 overflow-hidden rounded-full",
+      "size-8",
+      size === "lg" && "size-10 text-lg",
       size === "xl" && "size-16 text-[1.25rem] leading-[4rem]",
       className,
     )}
@@ -48,7 +50,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={clsm(
-      "flex size-full items-center justify-center rounded-full bg-muted",
+      "flex size-full items-center justify-center rounded-full bg-amber-300 text-white",
       className,
     )}
     {...props}
