@@ -81,7 +81,7 @@ const Modal = ({
         ),
         CancelBtn: () => (
           <DialogClose asChild onClick={onCancel}>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Huỷ</Button>
           </DialogClose>
         ),
       },

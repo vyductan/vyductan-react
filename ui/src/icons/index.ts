@@ -10,6 +10,7 @@ export * from "./CircleFilled";
 export * from "./CircleOutlined";
 export * from "./CloseOutlined";
 export * from "./DeleteIcon";
+export * from "./DownloadIcon";
 export * from "./EditIcon";
 export * from "./LogoutOutlined";
 export * from "./MailOutlined";
