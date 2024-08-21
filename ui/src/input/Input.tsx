@@ -65,11 +65,15 @@ export const inputSizeVariants = cva([], {
 type InputVariants = Omit<VariantProps<typeof inputVariants>, "disabled"> & {
   disabled?: boolean;
 };
-type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> &
+type InputProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "size" | "prefix"
+> &
   InputVariants &
   /** If allow to remove input content with clear icon */
   VariantProps<typeof inputSizeVariants> & {
     allowClear?: boolean | { clearIcon: React.ReactNode };
+    prefix?: React.ReactNode;
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
     addonAfter?: React.ReactNode;
@@ -87,6 +91,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       allowClear,
       addonBefore,
       addonAfter,
+      prefix,
       suffix,
 
       id: idProp,
@@ -113,6 +118,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     // ================== Prefix & Suffix ================== //
     const isHovering = useHover(wrapperRef);
+    const prefixComp = prefix ? (
+      <span
+        className={clsm(
+          "flex items-center",
+          inputSizeVariants({ size }),
+          "pr-0",
+        )}
+      >
+        {prefix}
+      </span>
+    ) : null;
     const suffixComp = suffix ? (
       allowClear && isHovering && value ? (
         <button
@@ -135,7 +151,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </button>
       ) : (
         <span
-          className={clsm("flex items-center", inputSizeVariants({ size }))}
+          className={clsm(
+            "flex items-center",
+            inputSizeVariants({ size }),
+            "pl-0",
+          )}
         >
           {suffix}
         </span>
@@ -166,6 +186,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {addonBefore}
           </span>
         )}
+        {prefixComp && prefixComp}
         <input
           id={id}
           ref={inputRef}
