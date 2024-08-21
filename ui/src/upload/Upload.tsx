@@ -5,14 +5,15 @@ import type { ForwardedRef } from "react";
 import { forwardRef } from "react";
 import { useMergedState } from "rc-util";
 
-import type { FileItem, UploadService } from "./types";
+import type { DownloadService, FileItem, UploadService } from "./types";
 import { Button } from "../button";
 import { Card } from "../card";
-import { DeleteIcon, Icon } from "../icons";
+import { DeleteIcon, DownloadIcon, Icon } from "../icons";
 import { UploadZone } from "./UploadZone";
 
 type UploadProps = {
   uploadService?: UploadService;
+  downloadService?: DownloadService;
 } & (
   | {
       multiple?: false;
@@ -34,6 +35,7 @@ const Upload = forwardRef(
       value,
       defaultValue,
       uploadService,
+      downloadService,
       onChange: __,
       ...rest
     } = props;
@@ -82,19 +84,31 @@ const Upload = forwardRef(
                   />
                 )}
                 <span className="px-2">{item.name}</span>
-                <Button
-                  className="ml-auto"
-                  variant="ghost"
-                  color="danger"
-                  icon={<DeleteIcon />}
-                  onClick={() => {
-                    if (!props.multiple && !Array.isArray(files)) {
-                      setFiles(undefined);
-                    } else if (props.multiple && Array.isArray(files)) {
-                      setFiles(files.filter((_, fi) => fi !== idx));
-                    }
-                  }}
-                />
+                <div className="ml-auto flex gap-2">
+                  <Button
+                    variant="ghost"
+                    color="success"
+                    icon={<DownloadIcon />}
+                    onClick={async () => {
+                      await downloadService?.({
+                        file: item,
+                        fileName: item.name,
+                      });
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    color="danger"
+                    icon={<DeleteIcon />}
+                    onClick={() => {
+                      if (!props.multiple && !Array.isArray(files)) {
+                        setFiles(undefined);
+                      } else if (props.multiple && Array.isArray(files)) {
+                        setFiles(files.filter((_, fi) => fi !== idx));
+                      }
+                    }}
+                  />
+                </div>
               </Card>
             ))}
           </div>

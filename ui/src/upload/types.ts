@@ -16,6 +16,10 @@ export type UploadService = (input: {
       success: false;
     }
 >;
+export type DownloadService = (input: {
+  file: FileItem;
+  fileName: string;
+}) => Promise<void>;
 
 export type FileItem = {
   url: string;
