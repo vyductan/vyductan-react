@@ -7,19 +7,15 @@
   "type": "module",
   "exports": {
     ".": {
-      "//types": "./dist/src/index.d.ts",
+      "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
     },
     "./*": {
-      "//types": "./dist/src/*/index.d.ts",
+      "types": "./dist/src/*/index.d.ts",
       "default": "./src/*/index.ts"
     },
-    "./antd/*": {
-      "//types": "./dist/src/antd/*/index.d.ts",
-      "default": "./src/antd/*/index.ts"
-    },
     "./pro/*": {
-      "//types": "./dist/src/pro/*/index.d.ts",
+      "types": "./dist/src/pro/*/index.d.ts",
       "default": "./src/pro/*/index.ts"
     }
   },
@@ -36,7 +32,7 @@
     "@acme/hooks": "workspace:*",
     "@acme/utils": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
-    "@iconify/json": "^2.2.237",
+    "@iconify/json": "^2.2.238",
     "@lexical/react": "^0.17.0",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -81,10 +77,10 @@
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
     "@types/lodash": "^4.17.7",
     "@types/react": "catalog:react18",
-    "@types/react-dom": "catalog:react18",
     "@types/react-syntax-highlighter": "^15.5.11",
     "eslint": "catalog:",
     "prettier": "catalog:",
