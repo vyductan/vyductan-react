@@ -1,5 +1,5 @@
 export function isNotGrey(color: string) {
-  const match = /rgba?\((\d*), (\d*), (\d*)(, [\d.]*)?\)/.exec((color || ""));
+  const match = /rgba?\((\d*), (\d*), (\d*)(, [\d.]*)?\)/.exec(color || "");
   if (match?.[1] && match[2] && match[3]) {
     return !(match[1] === match[2] && match[2] === match[3]);
   }

@@ -29,7 +29,7 @@ export const ResizableHandler = ({
         className={clsm(
           "absolute inset-y-0 z-10 m-auto flex size-4 items-center justify-center rounded border border-border bg-gray-200",
           "group-hover:border-blue-500 group-hover:text-blue-500",
-          " group-focus:border-blue-500 group-focus:text-blue-500",
+          "group-focus:border-blue-500 group-focus:text-blue-500",
         )}
       >
         <Icon icon="lucide:grip-vertical" className="size-2.5" />
