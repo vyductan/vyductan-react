@@ -31,7 +31,7 @@ type ModalProps = DialogProps & {
   title: React.ReactNode;
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
-  onCancel?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
   className,
@@ -60,7 +60,27 @@ const Modal = ({
   //   ),
   //   [okLoading, okText, onOk],
   // );
-  const footerToRender = !footer ? (
+  const footerToRender = footer ? (
+    typeof footer === "function" ? (
+      footer({
+        originNode: undefined,
+        extra: {
+          OkBtn: () => (
+            <Button loading={okLoading} onClick={onOk}>
+              {okText ?? "Ok"}
+            </Button>
+          ),
+          CancelBtn: () => (
+            <DialogClose asChild onClick={onCancel}>
+              <Button variant="outline">Huỷ</Button>
+            </DialogClose>
+          ),
+        },
+      })
+    ) : (
+      footer
+    )
+  ) : (
     <>
       {/* <CancelBtn /> */}
       <DialogClose asChild onClick={onCancel}>
@@ -70,24 +90,6 @@ const Modal = ({
         {okText ?? "Ok"}
       </Button>
     </>
-  ) : typeof footer === "function" ? (
-    footer({
-      originNode: null,
-      extra: {
-        OkBtn: () => (
-          <Button loading={okLoading} onClick={onOk}>
-            {okText ?? "Ok"}
-          </Button>
-        ),
-        CancelBtn: () => (
-          <DialogClose asChild onClick={onCancel}>
-            <Button variant="outline">Huỷ</Button>
-          </DialogClose>
-        ),
-      },
-    })
-  ) : (
-    footer
   );
   return (
     <Dialog
@@ -99,7 +101,7 @@ const Modal = ({
         }
       }}
     >
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent className={className}>
         <DialogHeader>

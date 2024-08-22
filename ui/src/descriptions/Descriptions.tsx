@@ -40,36 +40,15 @@ export const Descriptions = ({
   if (typeof column === "number") {
     mergedColumn = column;
   } else if (typeof column === "object") {
-    const mergedColumnWithScreen: Partial<Record<Screens, number | null>> = {};
-    Object.entries(x).forEach(([k]) => {
-      mergedColumnWithScreen[k as Screens] = column[k as Screens] ?? null;
-    });
-    const matched = Object.entries(mergedColumnWithScreen)
-      .filter(([, v]) => v)
-      .slice(-1)[0]![0] as Screens;
+    const mergedColumnWithScreen: Partial<Record<Screens, number | undefined>> =
+      {};
+    for (const [k] of Object.entries(x)) {
+      mergedColumnWithScreen[k as Screens] = column[k as Screens] ?? undefined;
+    }
+    const matched = Object.entries(mergedColumnWithScreen).findLast(
+      ([, v]) => v,
+    )![0] as Screens;
     mergedColumn = column[matched]!;
-  }
-
-  function chunkArray<T>(array: T[], size: number): T[][] {
-    const chunkedArray: T[][] = [];
-    for (let i = 0; i < array.length; i += size) {
-      const chunk = array.slice(i, i + size);
-      chunkedArray.push(chunk);
-    }
-    return chunkedArray;
-  }
-  function createRows(
-    data: DescriptionsItem[],
-    columns: number,
-  ): React.ReactNode[][] {
-    const rows: React.ReactNode[][] = [];
-    for (let i = 0; i < data.length; i += columns) {
-      const labels = data.slice(i, i + columns).map((item) => item.label);
-      const childrens = data.slice(i, i + columns).map((item) => item.children);
-      rows.push(labels);
-      rows.push(childrens);
-    }
-    return rows;
   }
 
   const rows =
@@ -114,33 +93,33 @@ export const Descriptions = ({
                 key={rowIndex}
                 className={clsm(bordered && "mb-px border-b last:border-none")}
               >
-                {cols.map((col, idx) =>
+                {cols.map((col, index) =>
                   // horizontal
                   typeof col === "object" && "label" in col! ? (
-                    !bordered ? (
-                      <td key={col.key} className="flex gap-1">
-                        <span className={labelClassName}>{col.label}:</span>
-                        <span className={contentClassName}>{col.children}</span>
-                      </td>
-                    ) : (
+                    bordered ? (
                       <Fragment key={col.key}>
                         <th className={thClassName}>
                           <span>{col.label}</span>
                         </th>
                         <td className={clsm(tdClassName, "last:border-none")}>
-                          <span>{col.children ? col.children : "-"}</span>
+                          <span>{col.children ?? "-"}</span>
                         </td>
                       </Fragment>
+                    ) : (
+                      <td key={col.key} className="flex gap-1">
+                        <span className={labelClassName}>{col.label}:</span>
+                        <span className={contentClassName}>{col.children}</span>
+                      </td>
                     ) //vertical
-                  ) : rowIndex % 2 === 0 ? (
-                    <th key={idx} className={thClassName}>
+                  ) : (rowIndex % 2 === 0 ? (
+                    <th key={index} className={thClassName}>
                       {col as React.ReactNode}
                     </th>
                   ) : (
-                    <td key={idx} className={tdClassName}>
+                    <td key={index} className={tdClassName}>
                       {col as React.ReactNode}
                     </td>
-                  ),
+                  )),
                 )}
               </tr>
             ))}
@@ -150,3 +129,26 @@ export const Descriptions = ({
     </div>
   );
 };
+
+function chunkArray<T>(array: T[], size: number): T[][] {
+  const chunkedArray: T[][] = [];
+  for (let index = 0; index < array.length; index += size) {
+    const chunk = array.slice(index, index + size);
+    chunkedArray.push(chunk);
+  }
+  return chunkedArray;
+}
+function createRows(
+  data: DescriptionsItem[],
+  columns: number,
+): React.ReactNode[][] {
+  const rows: React.ReactNode[][] = [];
+  for (let index = 0; index < data.length; index += columns) {
+    const labels = data.slice(index, index + columns).map((item) => item.label);
+    const childrens = data
+      .slice(index, index + columns)
+      .map((item) => item.children);
+    rows.push(labels, childrens);
+  }
+  return rows;
+}

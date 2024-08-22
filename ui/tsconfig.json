@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "@acme/tsconfig/internal-package.json",
   "compilerOptions": {
-    "lib": ["ES2022", "dom", "dom.iterable"],
+    "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
     "rootDir": "."
   },

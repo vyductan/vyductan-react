@@ -36,7 +36,7 @@ const getDecimalValue = (stringMode: boolean, decimalValue: DecimalClass) => {
 
 const getDecimalIfValidate = (value: ValueType) => {
   const decimal = getMiniDecimal(value);
-  return decimal.isInvalidate() ? null : decimal;
+  return decimal.isInvalidate() ? undefined : decimal;
 };
 
 type InputNumberProps<T extends ValueType = ValueType> = Omit<
@@ -48,7 +48,7 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
 
   defaultValue?: T;
   value?: T | null;
-  onChange?: (value: T | null) => void;
+  onChange?: (value: T | undefined) => void;
   onInput?: (text: string) => void;
   onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
 
@@ -148,35 +148,38 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
      * @param userTyping  Change by user typing
      */
     const getPrecision = useCallback(
-      (numStr: string, userTyping: boolean) => {
+      (numberString: string, userTyping: boolean) => {
         if (userTyping) {
-          return undefined;
+          return;
         }
 
         if (precision && precision >= 0) {
           return precision;
         }
 
-        return Math.max(getNumberPrecision(numStr), getNumberPrecision(step));
+        return Math.max(
+          getNumberPrecision(numberString),
+          getNumberPrecision(step),
+        );
       },
       [precision, step],
     );
     // >>> Parser
     const mergedParser = React.useCallback(
-      (num: string | number) => {
-        const numStr = String(num);
+      (number_: string | number) => {
+        const numberString = String(number_);
 
         if (parser) {
-          return parser(numStr);
+          return parser(numberString);
         }
 
-        let parsedStr = numStr;
+        let parsedString = numberString;
         if (decimalSeparator) {
-          parsedStr = parsedStr.replace(decimalSeparator, ".");
+          parsedString = parsedString.replace(decimalSeparator, ".");
         }
 
         // [Legacy] We still support auto convert `$ 123,456` to `123456`
-        return parsedStr.replace(/[^\w.-]+/g, "");
+        return parsedString.replaceAll(/[^\w.-]+/g, "");
       },
       [parser, decimalSeparator],
     );
@@ -191,24 +194,24 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
           });
         }
 
-        let str = typeof number === "number" ? num2str(number) : number;
+        let string_ = typeof number === "number" ? num2str(number) : number;
 
         // User typing will not auto format with precision directly
         if (!userTyping) {
-          const mergedPrecision = getPrecision(str, userTyping);
+          const mergedPrecision = getPrecision(string_, userTyping);
 
           if (
-            validateNumber(str) &&
+            validateNumber(string_) &&
             (decimalSeparator || (mergedPrecision && mergedPrecision >= 0))
           ) {
             // Separator
-            const separatorStr = decimalSeparator ?? ".";
+            const separatorString = decimalSeparator ?? ".";
 
-            str = toFixed(str, separatorStr, mergedPrecision);
+            string_ = toFixed(string_, separatorString, mergedPrecision);
           }
         }
 
-        return str;
+        return string_;
       },
       [formatter, getPrecision, decimalSeparator],
     );
@@ -311,7 +314,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         return minDecimal;
       }
 
-      return null;
+      return;
     };
 
     /**
@@ -341,16 +344,18 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       }
 
       if (!readOnly && !disabled && isRangeValidate) {
-        const numStr = updateValue.toString();
-        const mergedPrecision = getPrecision(numStr, userTyping);
+        const numberString = updateValue.toString();
+        const mergedPrecision = getPrecision(numberString, userTyping);
         if (mergedPrecision && mergedPrecision >= 0) {
-          updateValue = getMiniDecimal(toFixed(numStr, ".", mergedPrecision));
+          updateValue = getMiniDecimal(
+            toFixed(numberString, ".", mergedPrecision),
+          );
 
           // When to fixed. The value may out of min & max range.
           // 4 in [0, 3.8] => 3.8 => 4 (toFixed)
           if (!isInRange(updateValue)) {
             updateValue = getMiniDecimal(
-              toFixed(numStr, ".", mergedPrecision, true),
+              toFixed(numberString, ".", mergedPrecision, true),
             );
           }
         }
@@ -360,7 +365,7 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
           setUncontrolledDecimalValue(updateValue);
           onChange?.(
             updateValue.isEmpty()
-              ? null
+              ? undefined
               : getDecimalValue(stringMode, updateValue),
           );
 
@@ -380,17 +385,17 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     const onNextPromise = useFrame();
 
     // >>> Collect input value
-    const collectInputValue = (inputStr: string) => {
+    const collectInputValue = (inputString: string) => {
       recordCursor();
 
       // Update inputValue in case input can not parse as number
       // Refresh ref value immediately since it may used by formatter
-      inputValueRef.current = inputStr;
-      setInternalInputValue(inputStr);
+      inputValueRef.current = inputString;
+      setInternalInputValue(inputString);
 
       // Parse number
       if (!compositionRef.current) {
-        const finalValue = mergedParser(inputStr);
+        const finalValue = mergedParser(inputString);
         const finalDecimal = getMiniDecimal(finalValue);
         if (!finalDecimal.isNaN()) {
           triggerValueUpdate(finalDecimal, true);
@@ -398,18 +403,18 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
       }
 
       // Trigger onInput later to let user customize value if they want to handle something after onChange
-      onInput?.(inputStr);
+      onInput?.(inputString);
 
       // optimize for chinese input experience
       // https://github.com/ant-design/ant-design/issues/8196
       onNextPromise(() => {
-        let nextInputStr = inputStr;
+        let nextInputString = inputString;
         if (!parser) {
-          nextInputStr = inputStr.replace(/。/g, ".");
+          nextInputString = inputString.replaceAll("。", ".");
         }
 
-        if (nextInputStr !== inputStr) {
-          collectInputValue(nextInputStr);
+        if (nextInputString !== inputString) {
+          collectInputValue(nextInputString);
         }
       });
     };
@@ -426,8 +431,10 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
     };
 
     // >>> Input
-    const onInternalInput: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-      collectInputValue(e.target.value);
+    const onInternalInput: React.ChangeEventHandler<HTMLInputElement> = (
+      event,
+    ) => {
+      collectInputValue(event.target.value);
     };
 
     // ============================= Step =============================
@@ -468,15 +475,11 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
      */
     const flushInputValue = (userTyping: boolean) => {
       const parsedValue = getMiniDecimal(mergedParser(inputValue));
-      let formatValue: DecimalClass;
-
-      if (!parsedValue.isNaN()) {
-        // Only validate value or empty value can be re-fill to inputValue
-        // Reassign the formatValue within ranged of trigger control
-        formatValue = triggerValueUpdate(parsedValue, userTyping);
-      } else {
-        formatValue = triggerValueUpdate(decimalValue, userTyping);
-      }
+      const formatValue: DecimalClass = parsedValue.isNaN()
+        ? triggerValueUpdate(decimalValue, userTyping)
+        : // Only validate value or empty value can be re-fill to inputValue
+          // Reassign the formatValue within ranged of trigger control
+          triggerValueUpdate(parsedValue, userTyping);
 
       if (value !== undefined) {
         // Reset back with controlled value first
@@ -625,7 +628,9 @@ const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
         aria-valuemin={min as any}
         aria-valuemax={max as any}
         aria-valuenow={
-          decimalValue.isInvalidate() ? null : (decimalValue.toString() as any)
+          decimalValue.isInvalidate()
+            ? undefined
+            : (decimalValue.toString() as any)
         }
         {...inputProps}
         ref={composeRef(inputRef, ref)}

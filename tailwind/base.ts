@@ -150,10 +150,6 @@ export default {
           hover: baseColors.gray[500],
           active: baseColors.gray[600],
         },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
         input: "hsl(var(--input))",
         popover: {
           DEFAULT: "hsl(var(--popover))",

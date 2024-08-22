@@ -24,7 +24,7 @@ type CardProps = CardRootProps & {
 };
 const Card = ({
   classNames,
-  bordered,
+  bordered = true,
   className,
   title,
   description,
@@ -34,7 +34,7 @@ const Card = ({
 }: CardProps) => {
   return (
     <CardRoot
-      className={clsm(!bordered ? "border-none" : "", className)}
+      className={clsm(bordered ? "" : "border-none", className)}
       {...props}
     >
       {(!!title || !!description) && (

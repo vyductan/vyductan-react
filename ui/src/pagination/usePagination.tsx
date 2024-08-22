@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export const usePagination = (opts?: { page?: number; pageSize?: number }) => {
+export const usePagination = (options?: { page?: number; pageSize?: number }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -10,24 +10,24 @@ export const usePagination = (opts?: { page?: number; pageSize?: number }) => {
 
   useEffect(() => {
     if (
-      opts?.page &&
+      options?.page &&
       !searchParams.has("page") &&
-      searchParams.get("page") !== String(opts.page)
+      searchParams.get("page") !== String(options.page)
     ) {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("page", String(opts.page));
+      params.set("page", String(options.page));
       router.push(pathname + "?" + params.toString());
     }
     if (
-      opts?.pageSize &&
+      options?.pageSize &&
       !searchParams.has("pageSize") &&
-      searchParams.get("pageSize") !== String(opts.pageSize)
+      searchParams.get("pageSize") !== String(options.pageSize)
     ) {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("pageSize", String(opts.pageSize));
+      params.set("pageSize", String(options.pageSize));
       router.push(pathname + "?" + params.toString());
     }
-  }, [opts, pathname, router, searchParams]);
+  }, [options, pathname, router, searchParams]);
 
   return {
     page: page ? Number(page) : 1,

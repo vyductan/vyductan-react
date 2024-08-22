@@ -23,7 +23,9 @@ export const Popover = ({
 }: PopoverProps) => {
   return (
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
-      {open !== undefined ? (
+      {open === undefined ? (
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+      ) : (
         <PopoverAnchor
           asChild
           {...(trigger === "hover"
@@ -41,8 +43,6 @@ export const Popover = ({
         >
           {children}
         </PopoverAnchor>
-      ) : (
-        <PopoverTrigger asChild>{children}</PopoverTrigger>
       )}
       <PopoverContent {...props}>{content}</PopoverContent>
     </PopoverRoot>

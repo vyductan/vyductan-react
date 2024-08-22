@@ -95,13 +95,13 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     loading = false,
     skeleton = false,
 
-    columns: columnsProp = [],
+    columns: propColumns = [],
     dataSource = [],
     pagination,
     expandable,
     rowKey = "id",
     rowClassName,
-    rowSelection: rowSelectionProp,
+    rowSelection: propRowSelection,
 
     sticky,
     scroll,
@@ -113,25 +113,25 @@ const TableInner = <TRecord extends Record<string, unknown>>(
   const data = React.useMemo(() => dataSource, [dataSource]);
   const columns = React.useMemo(
     () =>
-      transformColumnDefs(columnsProp, {
+      transformColumnDefs(propColumns, {
         rowKey,
-        rowSelection: rowSelectionProp,
+        rowSelection: propRowSelection,
         expandable,
       }),
-    [columnsProp, rowKey, rowSelectionProp, expandable],
+    [propColumns, rowKey, propRowSelection, expandable],
   );
 
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const defaultPinnings = {
-    left: columnsProp
+    left: propColumns
       .map((x, index) => ({
         key: x.dataIndex?.toString() ?? index.toString(),
         fixed: x.fixed,
       }))
       .filter((x) => x.fixed === "left")
       .map((x) => x.key),
-    right: columnsProp
+    right: propColumns
       .map((x, index) => ({
         key: x.dataIndex?.toString() ?? index.toString(),
         fixed: x.fixed,
@@ -145,22 +145,23 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     {
       value: (() => {
         const rowSelectionTst: Record<string, boolean> = {};
-        rowSelectionProp?.selectedRowKeys?.forEach((x) => {
-          const index = dataSource.findIndex((d) => d[rowKey] === x);
-          if (index > -1) rowSelectionTst[index] = true;
-        });
+        if (propRowSelection?.selectedRowKeys)
+          for (const x of propRowSelection.selectedRowKeys) {
+            const index = dataSource.findIndex((d) => d[rowKey] === x);
+            if (index > -1) rowSelectionTst[index] = true;
+          }
         return rowSelectionTst;
       })(),
       onChange: (value) => {
-        if (rowSelectionProp) {
+        if (propRowSelection) {
           const selectedRowKeys = Object.keys(value).map(
-            (k) => dataSource[parseInt(k)]![rowKey],
+            (k) => dataSource[Number.parseInt(k)]![rowKey],
           );
-          rowSelectionProp.onChange?.(
+          propRowSelection.onChange?.(
             _.union(
               // ignore already selected in other pages
               _.filter(
-                rowSelectionProp.selectedRowKeys ?? [],
+                propRowSelection.selectedRowKeys ?? [],
                 (n) => !dataSource.map((x) => x[rowKey]).includes(n),
               ),
               selectedRowKeys,
@@ -245,7 +246,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                 {columns.map((col, index) => (
                   <col
                     key={index}
-                    {...(col.size ? { style: { width: col.size } } : {})}
+                    {...(col.size === undefined
+                      ? {}
+                      : { style: { width: col.size } })}
                   />
                 ))}
               </colgroup>
@@ -255,9 +258,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               style={{
                 position: sticky ? "sticky" : undefined,
                 top: sticky
-                  ? typeof sticky === "boolean"
+                  ? (typeof sticky === "boolean"
                     ? 0
-                    : sticky.offsetHeader
+                    : sticky.offsetHeader)
                   : undefined,
                 zIndex: sticky ? 11 : undefined,
               }}
@@ -302,9 +305,10 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             header.column.getCanSort()
                               ? header.column.getNextSortingOrder() === "asc"
                                 ? locale.triggerAsc
-                                : header.column.getNextSortingOrder() === "desc"
+                                // eslint-disable-next-line unicorn/no-nested-ternary
+                                : (header.column.getNextSortingOrder() === "desc"
                                   ? locale.triggerDesc
-                                  : locale.cancelSort
+                                  : locale.cancelSort)
                               : undefined
                           }
                         >
@@ -316,7 +320,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             )}
                           >
                             {header.isPlaceholder
-                              ? null
+                              ? undefined
                               : flexRender(
                                   header.column.columnDef.header,
                                   header.getContext(),
@@ -340,7 +344,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   )}
                                 />
                               </div>
-                            ) : null}
+                            ) : undefined}
                           </span>
                         </Tooltip>
                       </TableHead>
@@ -352,9 +356,27 @@ const TableInner = <TRecord extends Record<string, unknown>>(
 
             <tbody aria-hidden="true" className="h-3"></tbody>
 
-            {!skeleton ? (
+            {skeleton ? (
               <TableBody>
-                {table.getRowModel().rows.length ? (
+                {Array.from({ length: 5 })
+                  .fill(0)
+                  .map((_, index) => {
+                    return (
+                      <TableRow key={index} className="hover:bg-transparent">
+                        {table.getVisibleFlatColumns().map((x) => {
+                          return (
+                            <TableCell key={x.id}>
+                              <Skeleton className="h-4 w-full" />
+                            </TableCell>
+                          );
+                        })}
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            ) : (
+              <TableBody>
+                {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row, index) =>
                     row.original._customRow ? (
                       <TableRow key={row.id}>
@@ -447,24 +469,6 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                     </TableCell>
                   </TableRow>
                 )}
-              </TableBody>
-            ) : (
-              <TableBody>
-                {Array(5)
-                  .fill(0)
-                  .map((_, index) => {
-                    return (
-                      <TableRow key={index} className="hover:bg-transparent">
-                        {table.getVisibleFlatColumns().map((x) => {
-                          return (
-                            <TableCell key={x.id}>
-                              <Skeleton className="h-4 w-full" />
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
               </TableBody>
             )}
           </TableRoot>

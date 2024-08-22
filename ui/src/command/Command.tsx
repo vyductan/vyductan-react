@@ -1,6 +1,6 @@
 import { clsm } from "@acme/ui";
 
-import type { ValueType } from "../form";
+import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { Icon } from "../icons";

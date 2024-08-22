@@ -7,6 +7,7 @@ import type { ValueType } from "../form";
 import type { inputSizeVariants, inputVariants } from "../input";
 import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
+import { clsm } from "..";
 import { Empty } from "../empty";
 import {
   SelectContent,
@@ -26,6 +27,8 @@ export type SelectProps<T extends ValueType = string> = Omit<
   VariantProps<typeof inputSizeVariants> & {
     value?: T;
     options: Option<T>[];
+
+    className?: string;
 
     loading?: boolean;
     empty?: React.ReactNode;
@@ -52,6 +55,7 @@ const SelectInner = <T extends ValueType = string>(
 
     onChange,
 
+    className,
     borderless,
     size,
     status,
@@ -74,7 +78,7 @@ const SelectInner = <T extends ValueType = string>(
       {...props}
     >
       <SelectTrigger
-        className="w-full"
+        className={clsm("w-full", className)}
         borderless={borderless}
         size={size}
         status={status}

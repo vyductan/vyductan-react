@@ -100,11 +100,11 @@ const AutoForm = <
                               ...field,
                               ...(field.type === "group"
                                 ? {}
-                                : field.name
+                                : (field.name
                                   ? {
                                       name: `${name}.${index}.${String(field.name)}`,
                                     }
-                                  : { name: `${name}.${index}` }),
+                                  : { name: `${name}.${index}` })),
                             }) as unknown as FieldsSchema<
                               TFieldValues[keyof TFieldValues]
                             >,

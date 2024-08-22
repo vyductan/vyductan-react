@@ -7,7 +7,7 @@ import { render, unmount } from "rc-util/lib/React/render";
 import type { ShowWaveEffect, WaveAllowedComponent } from "./interface";
 import { getTargetWaveColor, isNotGrey } from "./util";
 
-function validateNum(value: number) {
+function validateNumber(value: number) {
   return Number.isNaN(value) ? 0 : value;
 }
 
@@ -52,10 +52,10 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
     // Rect
     const { borderLeftWidth, borderTopWidth } = nodeStyle;
     setLeft(
-      isStatic ? target.offsetLeft : validateNum(-parseFloat(borderLeftWidth)),
+      isStatic ? target.offsetLeft : validateNumber(-Number.parseFloat(borderLeftWidth)),
     );
     setTop(
-      isStatic ? target.offsetTop : validateNum(-parseFloat(borderTopWidth)),
+      isStatic ? target.offsetTop : validateNumber(-Number.parseFloat(borderTopWidth)),
     );
     setWidth(target.offsetWidth);
     setHeight(target.offsetHeight);
@@ -74,7 +74,7 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
         borderTopRightRadius,
         borderBottomRightRadius,
         borderBottomLeftRadius,
-      ].map((radius) => validateNum(parseFloat(radius))),
+      ].map((radius) => validateNumber(Number.parseFloat(radius))),
     );
   }
 
@@ -128,18 +128,8 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
         position: "absolute",
         boxShadow: "0 0 0 6px " + color,
         opacity: 0,
-        transition: !isSmallComponent
+        transition: isSmallComponent
           ? {
-              boxShadow: {
-                ease: easeOutCirc,
-                duration: 0.4,
-              },
-              opacity: {
-                ease: easeOutCirc,
-                duration: 2,
-              },
-            }
-          : {
               boxShadow: {
                 ease: easeInOut,
                 duration: 0.3,
@@ -147,6 +137,16 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
               opacity: {
                 ease: easeInOut,
                 duration: 0.35,
+              },
+            }
+          : {
+              boxShadow: {
+                ease: easeOutCirc,
+                duration: 0.4,
+              },
+              opacity: {
+                ease: easeOutCirc,
+                duration: 2,
               },
             },
       }}

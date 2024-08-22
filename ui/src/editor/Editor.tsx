@@ -36,7 +36,7 @@ const EditorInternal = (
   ref: Ref<HTMLDivElement>,
 ) => {
   const editorRef = useRef<LexicalEditor | null>(null);
-  const [floatingAnchorElem, setFloatingAnchorElem] =
+  const [floatingAnchorElement, setFloatingAnchorElement] =
     useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -61,8 +61,8 @@ const EditorInternal = (
     });
   }, [value]);
 
-  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
-    setFloatingAnchorElem(_floatingAnchorElem);
+  const onRef = (_floatingAnchorElement: HTMLDivElement) => {
+    setFloatingAnchorElement(_floatingAnchorElement);
   };
   const CustomContentEditable = useMemo(() => {
     return (
@@ -145,7 +145,7 @@ const EditorInternal = (
         <EditorRefPlugin editorRef={editorRef} />
         <OnChangePlugin onChange={onChange} />
         <HistoryPlugin />
-        <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+        <DraggableBlockPlugin anchorElem={floatingAnchorElement} />
 
         <AutoLinkPlugin />
         <ComponentPickerMenuPlugin />

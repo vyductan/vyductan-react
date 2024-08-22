@@ -70,10 +70,10 @@ export const Pagination = (props: PaginationProps) => {
     return `${pathname}?${params.toString()}`;
   };
 
-  const [internalInputVal, setInternalInputVal] = React.useState(current);
+  const [internalInputValue, setInternalInputValue] = React.useState(current);
 
   React.useEffect(() => {
-    setInternalInputVal(current);
+    setInternalInputValue(current);
   }, [current]);
 
   const jumpPrevPage = Math.max(1, current - (showLessItems ? 3 : 5));
@@ -96,8 +96,8 @@ export const Pagination = (props: PaginationProps) => {
         newPage = 1;
       }
 
-      if (newPage !== internalInputVal) {
-        setInternalInputVal(newPage);
+      if (newPage !== internalInputValue) {
+        setInternalInputValue(newPage);
       }
 
       router.push(createPageURL(newPage));
@@ -168,7 +168,7 @@ export const Pagination = (props: PaginationProps) => {
   // ================== Render ==================
   // When hideOnSinglePage is true and there is only 1 page, hide the pager
   if (hideOnSinglePage && total <= pageSize) {
-    return null;
+    return;
   }
   // ====================== Normal ======================
   const pagerList: React.ReactElement<PaginationItemProps>[] = [];
@@ -180,7 +180,7 @@ export const Pagination = (props: PaginationProps) => {
     if (!allPages) {
       pagerList.push(
         <PaginationItem
-          ref={null}
+          ref={undefined}
           key="noPager"
           // className={`${prefixCls}-item-disabled`}
         >
@@ -189,11 +189,14 @@ export const Pagination = (props: PaginationProps) => {
       );
     }
 
-    for (let i = 1; i <= allPages; i += 1) {
+    for (let index = 1; index <= allPages; index += 1) {
       pagerList.push(
-        <PaginationItem ref={null} key={i}>
-          <PaginationLink href={createPageURL(i)} isActive={current === i}>
-            {i}
+        <PaginationItem ref={undefined} key={index}>
+          <PaginationLink
+            href={createPageURL(index)}
+            isActive={current === index}
+          >
+            {index}
           </PaginationLink>
         </PaginationItem>,
       );
@@ -269,11 +272,14 @@ export const Pagination = (props: PaginationProps) => {
       left = allPages - pageBufferSize * 2;
     }
 
-    for (let i = left; i <= right; i += 1) {
+    for (let index = left; index <= right; index += 1) {
       pagerList.push(
-        <PaginationItem ref={null} key={i}>
-          <PaginationLink href={createPageURL(i)} isActive={current === i}>
-            {i}
+        <PaginationItem ref={undefined} key={index}>
+          <PaginationLink
+            href={createPageURL(index)}
+            isActive={current === index}
+          >
+            {index}
           </PaginationLink>
         </PaginationItem>,
       );
@@ -291,7 +297,7 @@ export const Pagination = (props: PaginationProps) => {
     }
 
     if (allPages - current >= pageBufferSize * 2 && current !== allPages - 2) {
-      const lastOne = pagerList[pagerList.length - 1]!;
+      const lastOne = pagerList.at(-1)!;
       pagerList[pagerList.length - 1] = React.cloneElement(lastOne, {
         // className: classNames(
         //   `${prefixCls}-item-before-jump-next`,
@@ -337,12 +343,7 @@ export const Pagination = (props: PaginationProps) => {
   /*
    * Next Button
    */
-  let nextDisabled: boolean;
-  if (simple) {
-    nextDisabled = !hasNext;
-  } else {
-    nextDisabled = !hasNext || !allPages;
-  }
+  const nextDisabled = simple ? !hasNext : !hasNext || !allPages;
   const next = (
     <PaginationItem aria-disabled={nextDisabled}>
       <PaginationNext
@@ -376,12 +377,12 @@ function isInteger(v: number) {
   return (
     typeof value === "number" &&
     !Number.isNaN(value) &&
-    isFinite(value) &&
+    Number.isFinite(value) &&
     Math.floor(value) === value
   );
 }
 
 function calculatePage(p: number | undefined, pageSize: number, total: number) {
-  const _pageSize = typeof p === "undefined" ? pageSize : p;
+  const _pageSize = p ?? pageSize;
   return Math.floor((total - 1) / _pageSize) + 1;
 }

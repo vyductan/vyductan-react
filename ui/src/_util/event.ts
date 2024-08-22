@@ -7,15 +7,15 @@ export function triggerNativeEventFor<T>(
   element: T,
   {
     event,
-    ...valueObj
+    ...valueObject
   }: { event: keyof HTMLElementEventMap; [key: string]: string },
 ) {
   if (!(element instanceof Element)) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    throw new Error(`Expected an Element but received ${element} instead!`);
+    throw new TypeError(`Expected an Element but received ${element} instead!`);
   }
 
-  const [prop, value] = Object.entries(valueObj)[0] ?? [];
+  const [prop, value] = Object.entries(valueObject)[0] ?? [];
 
   const prototype = Object.getPrototypeOf(element);
   const desc = Object.getOwnPropertyDescriptor(prototype, prop!);

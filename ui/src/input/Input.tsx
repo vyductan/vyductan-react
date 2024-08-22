@@ -128,7 +128,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       >
         {prefix}
       </span>
-    ) : null;
+    ) : undefined;
     const suffixComp = suffix ? (
       allowClear && isHovering && value ? (
         <button
@@ -138,7 +138,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             inputSizeVariants({ size }),
           )}
           onClick={() => {
-            triggerNativeEventFor(document.getElementById(id), {
+            triggerNativeEventFor(document.querySelector("#" + id), {
               event: "input",
               value: "",
             });
@@ -160,7 +160,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {suffix}
         </span>
       )
-    ) : null;
+    ) : undefined;
 
     return (
       <span
@@ -172,7 +172,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className,
         )}
         onClick={() => {
-          document.getElementById(id)?.focus();
+          document.querySelector<HTMLInputElement>("#" + id)?.focus();
         }}
       >
         {addonBefore && (
@@ -198,9 +198,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             inputSizeVariants({ size }),
           )}
           disabled={disabled}
-          onChange={(e) => {
-            setValue(e.currentTarget.value);
-            onChange?.(e);
+          onChange={(event) => {
+            setValue(event.currentTarget.value);
+            onChange?.(event);
           }}
           {...props}
         />

@@ -22,11 +22,12 @@ export default function useCursor(
     try {
       if (input) {
         const { selectionStart: start, selectionEnd: end, value } = input;
-        const beforeTxt = value.substring(
+        const beforeTxt = value.slice(
           0,
-          typeof start === "number" ? start : undefined,
+          Math.max(0, typeof start === "number" ? start : 0),
         );
-        const afterTxt = typeof end === "number" ? value.substring(end) : "";
+        const afterTxt =
+          typeof end === "number" ? value.slice(Math.max(0, end)) : "";
 
         selectionRef.current = {
           start,
@@ -36,8 +37,7 @@ export default function useCursor(
           afterTxt,
         };
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
+    } catch {
       // Fix error in Chrome:
       // Failed to read the 'selectionStart' property from 'HTMLInputElement'
       // http://stackoverflow.com/q/21177489/3040605
@@ -72,10 +72,10 @@ export default function useCursor(
         }
 
         input.setSelectionRange(startPos, startPos);
-      } catch (e) {
+      } catch (error) {
         warning(
           false,
-          `Something warning of cursor restore. Please fire issue about this: ${(e as Error).message}`,
+          `Something warning of cursor restore. Please fire issue about this: ${(error as Error).message}`,
         );
       }
     }

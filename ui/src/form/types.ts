@@ -1,4 +1,4 @@
-import type { FieldValues, SubmitHandler } from "react-hook-form";
+import type { FieldValues,  } from "react-hook-form";
 
 import type { AutoCompleteProps } from "../autocomplete";
 import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
@@ -231,4 +231,6 @@ export type ResetAction<TFieldValues> = (
   formValues: TFieldValues,
 ) => TFieldValues;
 
-export type { FieldsSchema, FieldType, SubmitHandler };
+export type { FieldsSchema, FieldType,  };
+
+export {type SubmitHandler} from "react-hook-form";

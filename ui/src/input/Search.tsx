@@ -36,8 +36,8 @@ export const InputSearch = ({ placeholder }: SearchProps) => {
       defaultValue={searchParams.get("query")?.toString()}
       placeholder={placeholder ?? "Search..."}
       prefix={<Icon icon="icon-[lucide--search]" />}
-      onChange={(e) => {
-        handleSearch(e.target.value);
+      onChange={(event) => {
+        handleSearch(event.target.value);
       }}
     />
   );

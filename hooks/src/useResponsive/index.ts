@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { theme } from "tailwindcss/defaultConfig";
 
-import isBrowser from "../utils/isBrowser";
+import isBrowser from "../utils/is-browser";
 
 type Subscriber = () => void;
 

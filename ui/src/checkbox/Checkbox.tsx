@@ -45,9 +45,9 @@ const Checkbox = React.forwardRef<
           checked={
             indeterminate
               ? "indeterminate"
-              : typeof props.value === "boolean"
+              : (typeof props.value === "boolean"
                 ? props.value
-                : checked
+                : checked)
           }
           defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
           className={clsm(

@@ -62,9 +62,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                 sortingFn:
                   typeof sorter === "boolean"
                     ? "auto"
-                    : typeof sorter === "string"
+                    : (typeof sorter === "string"
                       ? sorter
-                      : (rowA, rowB) => sorter(rowA.original, rowB.original),
+                      : (rowA, rowB) => sorter(rowA.original, rowB.original)),
               }
             : { enableSorting: false }),
           ...restProps,
@@ -95,7 +95,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
 
             {/* render value*/}
             {render
-              ? typeof dataIndex === "string"
+              ? (typeof dataIndex === "string"
                 ? render({
                     value: getValue() as never,
                     record: row.original,
@@ -109,7 +109,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                     index: row.index,
                     column,
                     row,
-                  })
+                  }))
               : getValue()}
           </>
         );
@@ -183,7 +183,7 @@ function createSelectColumn<T>(): ColumnDef<T> {
             const { rows, rowsById } = table.getRowModel();
             const rowsToToggle = getRowRange(rows, row.id, lastSelectedId);
             const isLastSelected = rowsById[lastSelectedId]?.getIsSelected();
-            rowsToToggle.forEach((row) => row.toggleSelected(isLastSelected));
+            for (const row of rowsToToggle) row.toggleSelected(isLastSelected);
           }
 
           lastSelectedId = row.id;

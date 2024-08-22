@@ -65,9 +65,9 @@ function List<TRecord extends Record<string, unknown>>({
               key={
                 typeof rowKey === "function"
                   ? rowKey(item)
-                  : rowKey
+                  : (rowKey
                     ? (item[rowKey] as string)
-                    : `list-item-${index}`
+                    : `list-item-${index}`)
               }
             >
               {renderItem(item, index)}

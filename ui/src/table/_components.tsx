@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { clsm } from "..";
-import { TableSize } from "./types";
+import type { TableSize } from "./types";
 
 const TableRoot = React.forwardRef<
   HTMLTableElement,

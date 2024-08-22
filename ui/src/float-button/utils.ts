@@ -2,8 +2,8 @@ import raf from "rc-util/lib/raf";
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-export function isWindow(obj: any): obj is Window {
-  return obj !== null && obj !== undefined && obj === obj.window;
+export function isWindow(object: any): object is Window {
+  return object !== null && object !== undefined && object === object.window;
 }
 
 export function getScrollTarget(
@@ -52,7 +52,7 @@ export function scrollTo(y: number, options: ScrollToOptions = {}) {
   const scrollTop = getScrollTarget(container, true);
   const startTime = Date.now();
 
-  const frameFunc = () => {
+  const frameFunction = () => {
     const timestamp = Date.now();
     const time = timestamp - startTime;
     const nextScrollTop = easeInOutCubic(
@@ -72,12 +72,12 @@ export function scrollTo(y: number, options: ScrollToOptions = {}) {
       container.scrollTop = nextScrollTop;
     }
     if (time < duration) {
-      raf(frameFunc);
+      raf(frameFunction);
     } else if (typeof callback === "function") {
       callback();
     }
   };
-  raf(frameFunc);
+  raf(frameFunction);
 }
 
 export function easeInOutCubic(t: number, b: number, c: number, d: number) {

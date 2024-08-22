@@ -68,9 +68,9 @@ const Upload = forwardRef(
         )}
         {Array.isArray(files) && (
           <div className="mt-2 flex w-full flex-col gap-2">
-            {files.map((item, idx) => (
+            {files.map((item, index) => (
               <Card
-                key={idx}
+                key={index}
                 classNames={{
                   content: "lg:p-4 flex items-center text-sm",
                 }}
@@ -104,7 +104,7 @@ const Upload = forwardRef(
                       if (!props.multiple && !Array.isArray(files)) {
                         setFiles(undefined);
                       } else if (props.multiple && Array.isArray(files)) {
-                        setFiles(files.filter((_, fi) => fi !== idx));
+                        setFiles(files.filter((_, fi) => fi !== index));
                       }
                     }}
                   />

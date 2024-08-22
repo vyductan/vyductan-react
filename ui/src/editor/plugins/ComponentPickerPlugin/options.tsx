@@ -78,9 +78,9 @@ export function getBaseOptions(
               icon={
                 n === 1
                   ? "gravity-ui:heading-1"
-                  : n === 2
+                  : (n === 2
                     ? "gravity-ui:heading-2"
-                    : "gravity-ui:heading-3"
+                    : "gravity-ui:heading-3")
               }
             />
           ),
@@ -106,19 +106,18 @@ export function getBaseOptions(
       icon: <Icon icon="mynaui:list-number" />,
       keywords: ["numbered list", "ordered list", "ol"],
       onSelect: () =>
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
+        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0),
     }),
     new ComponentPickerOption("Bulleted List", {
       icon: <Icon icon="mynaui:list" />,
       keywords: ["bulleted list", "unordered list", "ul"],
       onSelect: () =>
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
+        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0),
     }),
     new ComponentPickerOption("Check List", {
       icon: <Icon icon="mynaui:list-check" />,
       keywords: ["check list", "todo list"],
-      onSelect: () =>
-        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
+      onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0),
     }),
     new ComponentPickerOption("Quote", {
       icon: <Icon icon="pajamas:quote" />,

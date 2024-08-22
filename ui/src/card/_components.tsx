@@ -8,7 +8,7 @@ const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(
     <div
       ref={ref}
       className={clsm(
-        "rounded-lg border bg-card text-card-foreground shadow-sm",
+        "text-card-foreground rounded-lg border bg-surface shadow-sm",
         className,
       )}
       {...props}

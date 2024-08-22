@@ -3,32 +3,32 @@ import { toast } from "sonner";
 
 import type { PromiseData, PromiseT } from "./types";
 
-const baseFn = (
-  fn: (
+const baseFunction = (
+  function_: (
     message: string | React.ReactNode,
     data?: ExternalToast,
   ) => string | number,
   message: React.ReactNode,
   options?: ExternalToast | undefined,
 ) => {
-  return fn(message, { position: "top-center", ...options });
+  return function_(message, { position: "top-center", ...options });
 };
 const message = Object.assign(
   (message: React.ReactNode, options?: ExternalToast | undefined) =>
-    baseFn(toast, message, options),
+    baseFunction(toast, message, options),
   {
     success: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.success, message, options),
+      baseFunction(toast.success, message, options),
     info: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.info, message, options),
+      baseFunction(toast.info, message, options),
     warning: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.warning, message, options),
+      baseFunction(toast.warning, message, options),
     error: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.error, message, options),
+      baseFunction(toast.error, message, options),
     loading: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.loading, message, options),
+      baseFunction(toast.loading, message, options),
     message: (message: React.ReactNode, options?: ExternalToast | undefined) =>
-      baseFn(toast.message, message, options),
+      baseFunction(toast.message, message, options),
     custom: (
       jsx: (id: number | string) => React.ReactElement,
       options?: ExternalToast,
@@ -41,4 +41,6 @@ const message = Object.assign(
   },
 );
 
-export { toast as notification, message };
+export { message };
+
+export { toast as notification } from "sonner";

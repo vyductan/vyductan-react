@@ -57,9 +57,9 @@ export const Dropdown = ({
   const align =
     !placement || placement.includes("auto")
       ? "center"
-      : placement.includes("start")
+      : (placement.includes("start")
         ? "start"
-        : "end";
+        : "end");
   const renderMenu = (items: MenuItem[]): ReactNode => {
     return items.map(
       (

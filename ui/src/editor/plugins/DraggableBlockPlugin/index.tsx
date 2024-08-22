@@ -52,7 +52,7 @@ function getTopLevelNodeKeys(editor: LexicalEditor): string[] {
   return editor.getEditorState().read(() => $getRoot().getChildrenKeys());
 }
 
-function getCollapsedMargins(elem: HTMLElement): {
+function getCollapsedMargins(element: HTMLElement): {
   marginTop: number;
   marginBottom: number;
 } {
@@ -60,44 +60,44 @@ function getCollapsedMargins(elem: HTMLElement): {
     element: Element | null,
     margin: "marginTop" | "marginBottom",
   ): number =>
-    element ? parseFloat(window.getComputedStyle(element)[margin]) : 0;
+    element ? Number.parseFloat(window.getComputedStyle(element)[margin]) : 0;
 
-  const { marginTop, marginBottom } = window.getComputedStyle(elem);
-  const prevElemSiblingMarginBottom = getMargin(
-    elem.previousElementSibling,
+  const { marginTop, marginBottom } = window.getComputedStyle(element);
+  const prevElementSiblingMarginBottom = getMargin(
+    element.previousElementSibling,
     "marginBottom",
   );
-  const nextElemSiblingMarginTop = getMargin(
-    elem.nextElementSibling,
+  const nextElementSiblingMarginTop = getMargin(
+    element.nextElementSibling,
     "marginTop",
   );
   const collapsedTopMargin = Math.max(
-    parseFloat(marginTop),
-    prevElemSiblingMarginBottom,
+    Number.parseFloat(marginTop),
+    prevElementSiblingMarginBottom,
   );
   const collapsedBottomMargin = Math.max(
-    parseFloat(marginBottom),
-    nextElemSiblingMarginTop,
+    Number.parseFloat(marginBottom),
+    nextElementSiblingMarginTop,
   );
 
   return { marginBottom: collapsedBottomMargin, marginTop: collapsedTopMargin };
 }
 
 function getBlockElement(
-  anchorElem: HTMLElement,
+  anchorElement: HTMLElement,
   editor: LexicalEditor,
   event: MouseEvent,
   useEdgeAsDefault = false,
 ): HTMLElement | null {
-  const anchorElementRect = anchorElem.getBoundingClientRect();
+  const anchorElementRect = anchorElement.getBoundingClientRect();
   const topLevelNodeKeys = getTopLevelNodeKeys(editor);
 
-  let blockElem: HTMLElement | null = null;
+  let blockElement: HTMLElement | null = null;
   editor.getEditorState().read(() => {
     if (useEdgeAsDefault) {
       const [firstNode, lastNode] = [
         editor.getElementByKey(topLevelNodeKeys[0]!),
-        editor.getElementByKey(topLevelNodeKeys[topLevelNodeKeys.length - 1]!),
+        editor.getElementByKey(topLevelNodeKeys.at(-1)!),
       ];
 
       const [firstNodeRect, lastNodeRect] = [
@@ -107,12 +107,12 @@ function getBlockElement(
 
       if (firstNodeRect && lastNodeRect) {
         if (event.y < firstNodeRect.top) {
-          blockElem = firstNode;
+          blockElement = firstNode;
         } else if (event.y > lastNodeRect.bottom) {
-          blockElem = lastNode;
+          blockElement = lastNode;
         }
 
-        if (blockElem) {
+        if (blockElement) {
           return;
         }
       }
@@ -123,13 +123,13 @@ function getBlockElement(
 
     while (index >= 0 && index < topLevelNodeKeys.length) {
       const key = topLevelNodeKeys[index];
-      const elem = editor.getElementByKey(key!);
-      if (elem === null) {
+      const element = editor.getElementByKey(key!);
+      if (element === null) {
         break;
       }
       const point = new Point(event.x, event.y);
-      const domRect = Rect.fromDOM(elem);
-      const { marginTop, marginBottom } = getCollapsedMargins(elem);
+      const domRect = Rect.fromDOM(element);
+      const { marginTop, marginBottom } = getCollapsedMargins(element);
 
       const rect = domRect.generateNewRect({
         bottom: domRect.bottom + marginBottom,
@@ -144,7 +144,7 @@ function getBlockElement(
       } = rect.contains(point);
 
       if (result) {
-        blockElem = elem;
+        blockElement = element;
         prevIndex = index;
         break;
       }
@@ -164,7 +164,7 @@ function getBlockElement(
     }
   });
 
-  return blockElem;
+  return blockElement;
 }
 
 function isOnMenu(element: HTMLElement): boolean {
@@ -172,62 +172,62 @@ function isOnMenu(element: HTMLElement): boolean {
 }
 
 function setMenuPosition(
-  targetElem: HTMLElement | null,
-  floatingElem: HTMLElement,
-  anchorElem: HTMLElement,
+  targetElement: HTMLElement | null,
+  floatingElement: HTMLElement,
+  anchorElement: HTMLElement,
 ) {
-  if (!targetElem) {
-    floatingElem.style.opacity = "0";
-    floatingElem.style.transform = "translate(-10000px, -10000px)";
+  if (!targetElement) {
+    floatingElement.style.opacity = "0";
+    floatingElement.style.transform = "translate(-10000px, -10000px)";
     return;
   }
 
-  const targetRect = targetElem.getBoundingClientRect();
-  const targetStyle = window.getComputedStyle(targetElem);
-  const floatingElemRect = floatingElem.getBoundingClientRect();
-  const anchorElementRect = anchorElem.getBoundingClientRect();
+  const targetRect = targetElement.getBoundingClientRect();
+  const targetStyle = window.getComputedStyle(targetElement);
+  const floatingElementRect = floatingElement.getBoundingClientRect();
+  const anchorElementRect = anchorElement.getBoundingClientRect();
 
   const top =
     targetRect.top +
-    (parseInt(targetStyle.lineHeight, 10) - floatingElemRect.height) / 2 -
+    (Number.parseInt(targetStyle.lineHeight, 10) - floatingElementRect.height) / 2 -
     anchorElementRect.top;
 
   const left = SPACE;
 
-  floatingElem.style.opacity = "1";
-  floatingElem.style.transform = `translate(${left}px, ${top}px)`;
+  floatingElement.style.opacity = "1";
+  floatingElement.style.transform = `translate(${left}px, ${top}px)`;
 }
 
 function setDragImage(
   dataTransfer: DataTransfer,
-  draggableBlockElem: HTMLElement,
+  draggableBlockElement: HTMLElement,
 ) {
-  const { transform } = draggableBlockElem.style;
+  const { transform } = draggableBlockElement.style;
 
   // Remove dragImage borders
-  draggableBlockElem.style.transform = "translateZ(0)";
-  dataTransfer.setDragImage(draggableBlockElem, 0, 0);
+  draggableBlockElement.style.transform = "translateZ(0)";
+  dataTransfer.setDragImage(draggableBlockElement, 0, 0);
 
   setTimeout(() => {
-    draggableBlockElem.style.transform = transform;
+    draggableBlockElement.style.transform = transform;
   });
 }
 
 function setTargetLine(
-  targetLineElem: HTMLElement,
-  targetBlockElem: HTMLElement,
+  targetLineElement: HTMLElement,
+  targetBlockElement: HTMLElement,
   mouseY: number,
-  anchorElem: HTMLElement,
+  anchorElement: HTMLElement,
 ) {
-  const { top: targetBlockElemTop, height: targetBlockElemHeight } =
-    targetBlockElem.getBoundingClientRect();
+  const { top: targetBlockElementTop, height: targetBlockElementHeight } =
+    targetBlockElement.getBoundingClientRect();
   const { top: anchorTop, width: anchorWidth } =
-    anchorElem.getBoundingClientRect();
+    anchorElement.getBoundingClientRect();
 
-  const { marginTop, marginBottom } = getCollapsedMargins(targetBlockElem);
-  let lineTop = targetBlockElemTop;
-  if (mouseY >= targetBlockElemTop) {
-    lineTop += targetBlockElemHeight + marginBottom / 2;
+  const { marginTop, marginBottom } = getCollapsedMargins(targetBlockElement);
+  let lineTop = targetBlockElementTop;
+  if (mouseY >= targetBlockElementTop) {
+    lineTop += targetBlockElementHeight + marginBottom / 2;
   } else {
     lineTop -= marginTop / 2;
   }
@@ -235,38 +235,38 @@ function setTargetLine(
   const top = lineTop - anchorTop - TARGET_LINE_HALF_HEIGHT;
   const left = TEXT_BOX_HORIZONTAL_PADDING - SPACE;
 
-  targetLineElem.style.transform = `translate(${left}px, ${top}px)`;
-  targetLineElem.style.width = `${
+  targetLineElement.style.transform = `translate(${left}px, ${top}px)`;
+  targetLineElement.style.width = `${
     anchorWidth - (TEXT_BOX_HORIZONTAL_PADDING - SPACE) * 2
   }px`;
-  targetLineElem.style.opacity = ".4";
+  targetLineElement.style.opacity = ".4";
 }
 
-function hideTargetLine(targetLineElem: HTMLElement | null) {
-  if (targetLineElem) {
-    targetLineElem.style.opacity = "0";
-    targetLineElem.style.transform = "translate(-10000px, -10000px)";
+function hideTargetLine(targetLineElement: HTMLElement | null) {
+  if (targetLineElement) {
+    targetLineElement.style.opacity = "0";
+    targetLineElement.style.transform = "translate(-10000px, -10000px)";
   }
 }
 
 function useDraggableBlockMenu(
   editor: LexicalEditor,
-  anchorElem: HTMLElement,
+  anchorElement: HTMLElement,
   isEditable: boolean,
 ): JSX.Element {
-  const scrollerElem = anchorElem.parentElement;
+  const scrollerElement = anchorElement.parentElement;
 
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
   const isDraggingBlockRef = useRef<boolean>(false);
-  const [draggableBlockElem, setDraggableBlockElem] =
+  const [draggableBlockElement, setDraggableBlockElement] =
     useState<HTMLElement | null>(null);
 
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
       const target = event.target;
       if (!isHTMLElement(target)) {
-        setDraggableBlockElem(null);
+        setDraggableBlockElement(null);
         return;
       }
 
@@ -274,29 +274,29 @@ function useDraggableBlockMenu(
         return;
       }
 
-      const _draggableBlockElem = getBlockElement(anchorElem, editor, event);
+      const _draggableBlockElement = getBlockElement(anchorElement, editor, event);
 
-      setDraggableBlockElem(_draggableBlockElem);
+      setDraggableBlockElement(_draggableBlockElement);
     }
 
     function onMouseLeave() {
-      setDraggableBlockElem(null);
+      setDraggableBlockElement(null);
     }
 
-    scrollerElem?.addEventListener("mousemove", onMouseMove);
-    scrollerElem?.addEventListener("mouseleave", onMouseLeave);
+    scrollerElement?.addEventListener("mousemove", onMouseMove);
+    scrollerElement?.addEventListener("mouseleave", onMouseLeave);
 
     return () => {
-      scrollerElem?.removeEventListener("mousemove", onMouseMove);
-      scrollerElem?.removeEventListener("mouseleave", onMouseLeave);
+      scrollerElement?.removeEventListener("mousemove", onMouseMove);
+      scrollerElement?.removeEventListener("mouseleave", onMouseLeave);
     };
-  }, [scrollerElem, anchorElem, editor]);
+  }, [scrollerElement, anchorElement, editor]);
 
   useEffect(() => {
     if (menuRef.current) {
-      setMenuPosition(draggableBlockElem, menuRef.current, anchorElem);
+      setMenuPosition(draggableBlockElement, menuRef.current, anchorElement);
     }
-  }, [anchorElem, draggableBlockElem]);
+  }, [anchorElement, draggableBlockElement]);
 
   useEffect(() => {
     function onDragover(event: DragEvent): boolean {
@@ -311,12 +311,12 @@ function useDraggableBlockMenu(
       if (!isHTMLElement(target)) {
         return false;
       }
-      const targetBlockElem = getBlockElement(anchorElem, editor, event, true);
-      const targetLineElem = targetLineRef.current;
-      if (targetBlockElem === null || targetLineElem === null) {
+      const targetBlockElement = getBlockElement(anchorElement, editor, event, true);
+      const targetLineElement = targetLineRef.current;
+      if (targetBlockElement === null || targetLineElement === null) {
         return false;
       }
-      setTargetLine(targetLineElem, targetBlockElem, pageY, anchorElem);
+      setTargetLine(targetLineElement, targetBlockElement, pageY, anchorElement);
       // Prevent default event to be able to trigger onDrop events
       event.preventDefault();
       return true;
@@ -339,24 +339,24 @@ function useDraggableBlockMenu(
       if (!isHTMLElement(target)) {
         return false;
       }
-      const targetBlockElem = getBlockElement(anchorElem, editor, event, true);
-      if (!targetBlockElem) {
+      const targetBlockElement = getBlockElement(anchorElement, editor, event, true);
+      if (!targetBlockElement) {
         return false;
       }
-      const targetNode = $getNearestNodeFromDOMNode(targetBlockElem);
+      const targetNode = $getNearestNodeFromDOMNode(targetBlockElement);
       if (!targetNode) {
         return false;
       }
       if (targetNode === draggedNode) {
         return true;
       }
-      const targetBlockElemTop = targetBlockElem.getBoundingClientRect().top;
-      if (pageY >= targetBlockElemTop) {
+      const targetBlockElementTop = targetBlockElement.getBoundingClientRect().top;
+      if (pageY >= targetBlockElementTop) {
         targetNode.insertAfter(draggedNode);
       } else {
         targetNode.insertBefore(draggedNode);
       }
-      setDraggableBlockElem(null);
+      setDraggableBlockElement(null);
 
       return true;
     }
@@ -377,17 +377,17 @@ function useDraggableBlockMenu(
         COMMAND_PRIORITY_HIGH,
       ),
     );
-  }, [anchorElem, editor]);
+  }, [anchorElement, editor]);
 
   function onDragStart(event: ReactDragEvent<HTMLDivElement>): void {
     const dataTransfer = event.dataTransfer;
-    if (!draggableBlockElem) {
+    if (!draggableBlockElement) {
       return;
     }
-    setDragImage(dataTransfer, draggableBlockElem);
+    setDragImage(dataTransfer, draggableBlockElement);
     let nodeKey = "";
     editor.update(() => {
-      const node = $getNearestNodeFromDOMNode(draggableBlockElem);
+      const node = $getNearestNodeFromDOMNode(draggableBlockElement);
       if (node) {
         nodeKey = node.getKey();
       }
@@ -427,7 +427,7 @@ function useDraggableBlockMenu(
         ref={targetLineRef}
       />
     </>,
-    anchorElem,
+    anchorElement,
   );
 }
 

@@ -1,5 +1,3 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
-
-export { ThemeProvider };
+export { ThemeProvider } from "next-themes";

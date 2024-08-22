@@ -9,6 +9,8 @@ import importPlugin from "eslint-plugin-import";
 import turboPlugin from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 
+import unicornPlugin from "./unicorn.js";
+
 /**
  * All packages that leverage t3-env should use this rule
  */
@@ -39,8 +41,10 @@ export const restrictEnvAccess = tseslint.config(
 );
 
 export default tseslint.config(
+  ...unicornPlugin,
   // Ignore files not tracked by VCS and any config files
   includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
+  { ignores: ["**/*.config.*"] },
   {
     files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     plugins: {

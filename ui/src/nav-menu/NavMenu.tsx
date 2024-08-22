@@ -37,7 +37,7 @@ export const NavMenu = ({
           </NavigationMenuItem>
         );
       }
-      return null;
+      return;
     });
     return components;
   };

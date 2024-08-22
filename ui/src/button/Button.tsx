@@ -10,7 +10,7 @@ import type { IconProps } from "../icons";
 import { clsm } from "..";
 import Wave from "../_util/wave";
 import { GenericSlot } from "../slot";
-import { LoadingIcon } from "./LoadingIcon";
+import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = cva(
   [
@@ -284,7 +284,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             buttonVariants({
               color,
               disabled,
-              primary: !primary && !!variant ? null : !primary ? true : primary,
+              primary: !primary && !!variant ? undefined : (primary ?? true),
               size,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
               // shape:
@@ -314,3 +314,5 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+
+export { LoadingIcon } from "./loading-icon";

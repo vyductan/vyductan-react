@@ -6,26 +6,26 @@ import * as React from "react";
 import { Modal } from "./Modal";
 
 export const useModal = (): [
-  JSX.Element | null,
+  JSX.Element | undefined,
   (options: {
     title: string;
     content: (onCancel: () => void) => React.ReactNode;
     onCancel?: () => void;
   }) => void,
 ] => {
-  const [modalState, setModalState] = useState<null | {
+  const [modalState, setModalState] = useState<{
     title: string;
     content: React.ReactNode;
     onCancel?: () => void;
-  }>(null);
+  }>();
 
   const onCancel = useCallback(() => {
-    setModalState(null);
+    setModalState(undefined);
   }, []);
 
   const modal = useMemo(() => {
-    if (modalState === null) {
-      return null;
+    if (modalState === undefined) {
+      return;
     }
     const { title, content, onCancel } = modalState;
     return (

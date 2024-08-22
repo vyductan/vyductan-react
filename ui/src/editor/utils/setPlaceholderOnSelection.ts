@@ -9,8 +9,8 @@ const PLACEHOLDER_CLASS_NAME = clsm(
   "[&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]",
 ).split(" ");
 
-const isHtmlHeadingElement = (el: HTMLElement): el is HTMLHeadingElement => {
-  return el instanceof HTMLHeadingElement;
+const isHtmlHeadingElement = (element: HTMLElement): element is HTMLHeadingElement => {
+  return element instanceof HTMLHeadingElement;
 };
 
 export const setPlaceholderOnSelection = ({
@@ -28,24 +28,24 @@ export const setPlaceholderOnSelection = ({
   /**
    * 2. Remove "placeholder" class if it was added before
    */
-  children.forEach(({ htmlElement }) => {
+  for (const { htmlElement } of children) {
     if (!htmlElement) {
-      return;
+      continue;
     }
 
     if (isHtmlHeadingElement(htmlElement)) {
-      return;
+      continue;
     }
 
     const classList = htmlElement.classList;
 
     if (
-      classList.length &&
+      classList.length > 0 &&
       classList.value.includes(PLACEHOLDER_CLASS_NAME.join(" "))
     ) {
       classList.remove(...PLACEHOLDER_CLASS_NAME);
     }
-  });
+  }
 
   /**
    * 3. Do nothing if there is only one lexical child,

@@ -14,7 +14,7 @@ type PageHeaderProps = {
   extra?: React.ReactNode;
   avatar?: AvatarProps;
   tags?: React.ReactElement<TagProps> | React.ReactElement<TagProps>[];
-  onBack?: (e?: React.MouseEvent<HTMLElement>) => void;
+  onBack?: (event?: React.MouseEvent<HTMLElement>) => void;
 };
 
 const Title = (props: PageHeaderProps) => {
@@ -22,7 +22,7 @@ const Title = (props: PageHeaderProps) => {
   const hasHeading = title ?? subTitle ?? tags ?? extra;
   // If there is nothing, return a null
   if (!hasHeading) {
-    return null;
+    return;
   }
   // const backIcon = getBackIcon(props, direction);
   // const backIconDom = renderBack(backIcon, onBack);
@@ -57,7 +57,7 @@ const Title = (props: PageHeaderProps) => {
 const renderChildren = (props: PageHeaderProps) => {
   const { children } = props;
   if (!children) {
-    return null;
+    return;
   }
   return <div>{children}</div>;
 };

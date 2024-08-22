@@ -28,7 +28,7 @@ type FormInstance<
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
   submit: (
-    e?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
+    event?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
   ) => Promise<void>;
   setFieldsValue: UseFormReset<TFieldValues>;
   resetFields: (keepStateOptions?: KeepStateOptions) => void;
@@ -139,15 +139,15 @@ export { useForm };
 export type { UseFormProps, FormInstance };
 
 const getChangedValues = (
-  obj1: Record<string, any> | undefined,
-  obj2: Record<string, any>,
+  object1: Record<string, any> | undefined,
+  object2: Record<string, any>,
 ) => {
-  if (!obj1) return obj2;
+  if (!object1) return object2;
   return transform(
-    obj1,
+    object1,
     (result, value, key) => {
-      if (!isEqual(value, obj2[key])) {
-        result[key] = obj2[key];
+      if (!isEqual(value, object2[key])) {
+        result[key] = object2[key];
       }
     },
     {} as Record<string, any>,

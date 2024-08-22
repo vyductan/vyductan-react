@@ -103,7 +103,7 @@ const FieldInner = <
               // error={formState.errors[name]}
               children={
                 children
-                  ? typeof children === "function"
+                  ? (typeof children === "function"
                     ? children({
                         field,
                         fieldState,
@@ -123,7 +123,7 @@ const FieldInner = <
                           ).onChange?.(e);
                           field.onChange(onChange ? onChange(e) : e);
                         },
-                      })
+                      }))
                   : null
               }
               ref={ref}
@@ -203,7 +203,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       <div
         className={clsm(
           "flex flex-col",
-          !fieldState?.error ? "mb-6" : "",
+          fieldState?.error ? "" : "mb-6",
           className,
         )}
         ref={ref}
@@ -226,9 +226,9 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
             <GenericSlot<VariantProps<typeof inputVariants>>
               id={fieldId}
               aria-describedby={
-                !fieldState?.error
-                  ? `${fieldDescriptionId}`
-                  : `${fieldDescriptionId} ${fieldMessageId}`
+                fieldState?.error
+                  ? `${fieldDescriptionId} ${fieldMessageId}`
+                  : `${fieldDescriptionId}`
               }
               aria-invalid={!!fieldState?.error}
               status={fieldState?.error ? "error" : "default"}

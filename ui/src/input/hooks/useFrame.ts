@@ -4,7 +4,7 @@ import raf from "rc-util/lib/raf";
 /**
  * Always trigger latest once when call multiple time
  */
-export default () => {
+const useFrame = () => {
   const idRef = useRef(0);
 
   const cleanUp = () => {
@@ -21,3 +21,4 @@ export default () => {
     });
   };
 };
+export default useFrame;

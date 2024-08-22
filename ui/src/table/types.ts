@@ -39,7 +39,7 @@ export type ExtraTableColumnDef<TRecord> = {
 
 type DefWithOutDataIndex<TRecord> = BaseTableColumnDef<TRecord> & {
   dataIndex?: never;
-  render?: (ctx: RenderContext<TRecord>) => ReactNode;
+  render?: (context: RenderContext<TRecord>) => ReactNode;
 };
 export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
   (
@@ -49,7 +49,7 @@ export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
           [K in keyof TRecord]-?: {
             dataIndex: K;
             render?: (
-              ctx: RenderContext<TRecord, K> & {
+              context: RenderContext<TRecord, K> & {
                 value: TRecord[K];
               },
             ) => ReactNode;
@@ -57,7 +57,7 @@ export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
         }[keyof TRecord])
   );
 
-type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
+export type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
   record: TRecord;
   index: number;
   row: Row<TRecord>;

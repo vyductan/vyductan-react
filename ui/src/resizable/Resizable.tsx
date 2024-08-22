@@ -15,10 +15,10 @@ export type ResizableProps = ResizablePanelGroupProps & {
 export const Resizable = ({ direction, items, ...props }: ResizableProps) => {
   return (
     <ResizablePanelGroup direction={direction} {...props}>
-      {items.map((x, idx) => {
+      {items.map((x, index) => {
         return (
-          <Fragment key={idx}>
-            {idx > 0 && <ResizableHandler withHandle />}
+          <Fragment key={index}>
+            {index > 0 && <ResizableHandler withHandle />}
             <ResizablePanel {...x} />
           </Fragment>
         );

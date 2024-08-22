@@ -37,26 +37,26 @@ const DatePickerInternal = (
 ) => {
   const [open, setOpen] = React.useState(false);
   const [month, setMonth] = React.useState<Date | undefined>(
-    defaultValue !== undefined
-      ? isValid(defaultValue)
-        ? defaultValue
-        : new Date()
-      : isValid(value)
+    defaultValue === undefined
+      ? (isValid(value)
         ? value
-        : new Date(),
+        : new Date())
+      : (isValid(defaultValue)
+        ? defaultValue
+        : new Date()),
   );
 
   const inputId = React.useId();
 
   // ====================== Value =======================
   const preValue =
-    defaultValue !== undefined
-      ? isValid(defaultValue)
-        ? formatDate(defaultValue, format)
-        : ""
-      : isValid(value)
+    defaultValue === undefined
+      ? (isValid(value)
         ? formatDate(value!, format)
-        : "";
+        : "")
+      : (isValid(defaultValue)
+        ? formatDate(defaultValue, format)
+        : "");
   const [inputValue, setInputValue] = useMergedState(preValue);
 
   // set input value if date value change
@@ -103,16 +103,14 @@ const DatePickerInternal = (
 
   useClickAway(
     (e) => {
-      if (isFocused) {
-        // check if choose a day in panel or not
-        if (!(e.target && "name" in e.target && e.target.name === "day")) {
+      if (isFocused && // check if choose a day in panel or not
+        !(e.target && "name" in e.target && e.target.name === "day")) {
           if (inputValue.length === 10) {
             handleChange(inputValue);
           } else {
             setInputValue(preValue);
           }
         }
-      }
     },
     () => document.getElementById(inputId),
   );

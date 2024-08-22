@@ -21,8 +21,9 @@ export function useResizeObserver<T extends HTMLElement = HTMLElement>() {
 
   const observer = useMemo(
     () =>
-      typeof window !== "undefined"
-        ? new ResizeObserver((entries) => {
+      typeof window === "undefined"
+        ? null
+        : new ResizeObserver((entries) => {
             const entry = entries[0];
 
             if (entry) {
@@ -34,8 +35,7 @@ export function useResizeObserver<T extends HTMLElement = HTMLElement>() {
                 }
               });
             }
-          })
-        : null,
+          }),
     [],
   );
 
