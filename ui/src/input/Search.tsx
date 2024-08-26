@@ -3,13 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounceFn } from "ahooks";
 
-import { Input } from ".";
+import type { InputProps } from "./input";
 import { Icon } from "../icons";
+import { Input } from "./input";
 
-type SearchProps = {
-  placeholder?: string;
-};
-export const InputSearch = ({ placeholder }: SearchProps) => {
+type SearchProps = InputProps;
+export const InputSearch = ({ placeholder, ...props }: SearchProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -39,6 +38,7 @@ export const InputSearch = ({ placeholder }: SearchProps) => {
       onChange={(event) => {
         handleSearch(event.target.value);
       }}
+      {...props}
     />
   );
 };

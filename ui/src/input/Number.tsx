@@ -9,10 +9,10 @@ import getMiniDecimal, {
 import { useLayoutUpdateEffect } from "rc-util/lib/hooks/useLayoutEffect";
 import { composeRef } from "rc-util/lib/ref";
 
-import type { InputProps } from "./Input";
+import type { InputProps } from "./input";
 import useCursor from "./hooks/useCursor";
 import useFrame from "./hooks/useFrame";
-import { Input } from "./Input";
+import { Input } from "./input";
 import { getDecupleSteps } from "./utils/numberUtil";
 
 /**

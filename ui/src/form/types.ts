@@ -1,10 +1,10 @@
-import type { FieldValues,  } from "react-hook-form";
+import type { FieldValues } from "react-hook-form";
 
 import type { AutoCompleteProps } from "../autocomplete";
 import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
 import type { EditorProps } from "../editor/Editor";
 import type { InputProps } from "../input";
-import type { InputPasswordProps } from "../input/Password";
+import type { InputPasswordProps } from "../input/password";
 import type { RadioGroupProps } from "../radio";
 import type { SelectProps } from "../select";
 import type { TextareaProps } from "../textarea";
@@ -231,6 +231,7 @@ export type ResetAction<TFieldValues> = (
   formValues: TFieldValues,
 ) => TFieldValues;
 
-export type { FieldsSchema, FieldType,  };
+export type { FieldsSchema, FieldType };
 
-export {type SubmitHandler} from "react-hook-form";
+export { type SubmitHandler } from "react-hook-form";
+

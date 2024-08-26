@@ -1,8 +1,8 @@
 import React from "react";
 
-import type { InputProps } from "./Input";
+import type { InputProps } from "./input";
 import { Icon } from "../icons";
-import { Input } from "./Input";
+import { Input } from "./input";
 
 export type InputPasswordProps = Omit<InputProps, "type">;
 export const InputPassword = React.forwardRef<

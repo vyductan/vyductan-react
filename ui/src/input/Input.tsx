@@ -138,7 +138,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             inputSizeVariants({ size }),
           )}
           onClick={() => {
-            triggerNativeEventFor(document.querySelector("#" + id), {
+            triggerNativeEventFor(document.querySelector(`[id='${id}]`), {
               event: "input",
               value: "",
             });
@@ -172,7 +172,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className,
         )}
         onClick={() => {
-          document.querySelector<HTMLInputElement>("#" + id)?.focus();
+          document.querySelector<HTMLInputElement>(`[id='${id}]`)?.focus();
         }}
       >
         {addonBefore && (
