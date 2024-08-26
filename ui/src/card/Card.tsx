@@ -19,8 +19,9 @@ type CardProps = CardRootProps & {
   bordered?: boolean;
   title?: ReactNode;
   description?: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
   extra?: ReactNode;
+  size?: "default" | "sm";
 };
 const Card = ({
   classNames,
@@ -30,6 +31,7 @@ const Card = ({
   description,
   children,
   extra,
+  size = "default",
   ...props
 }: CardProps) => {
   return (
@@ -53,9 +55,12 @@ const Card = ({
           </CardDescription>
         </CardHeader>
       )}
-      <CardContent className={classNames?.content}>{children}</CardContent>
+      <CardContent className={classNames?.content} size={size}>
+        {children}
+      </CardContent>
     </CardRoot>
   );
 };
 
+export type { CardProps };
 export { Card };
