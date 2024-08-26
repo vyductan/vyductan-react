@@ -1,6 +1,6 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
-import type { TableProps } from "./Table";
+import type { TableProps } from "./table";
 import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
 import { Icon } from "../icons";
@@ -62,9 +62,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                 sortingFn:
                   typeof sorter === "boolean"
                     ? "auto"
-                    : (typeof sorter === "string"
+                    : typeof sorter === "string"
                       ? sorter
-                      : (rowA, rowB) => sorter(rowA.original, rowB.original)),
+                      : (rowA, rowB) => sorter(rowA.original, rowB.original),
               }
             : { enableSorting: false }),
           ...restProps,
@@ -95,7 +95,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
 
             {/* render value*/}
             {render
-              ? (typeof dataIndex === "string"
+              ? typeof dataIndex === "string"
                 ? render({
                     value: getValue() as never,
                     record: row.original,
@@ -109,7 +109,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                     index: row.index,
                     column,
                     row,
-                  }))
+                  })
               : getValue()}
           </>
         );
@@ -125,7 +125,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   if (props?.expandable) {
     const expandColumn: ColumnDef<TRecord> = {
       id: "expander",
-      header: () => null,
+      // header: () => undefined,
       size: 50,
       meta: {
         align: "center",
@@ -146,7 +146,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
               <Icon icon="icon-[lucide--chevron-right]" className="text-base" />
             )}
           </button>
-        ) : null;
+        ) : undefined;
       },
     };
     columnsDef.unshift(expandColumn);
@@ -178,8 +178,8 @@ function createSelectColumn<T>(): ColumnDef<T> {
         indeterminate={row.getIsSomeSelected()}
         className="flex items-center justify-center"
         onChange={row.getToggleSelectedHandler()}
-        onClick={(e) => {
-          if (e.shiftKey) {
+        onClick={(event) => {
+          if (event.shiftKey) {
             const { rows, rowsById } = table.getRowModel();
             const rowsToToggle = getRowRange(rows, row.id, lastSelectedId);
             const isLastSelected = rowsById[lastSelectedId]?.getIsSelected();

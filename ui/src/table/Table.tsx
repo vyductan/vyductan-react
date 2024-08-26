@@ -35,7 +35,7 @@ import {
   TableRoot,
   TableRow,
 } from "./_components";
-import { tableLocale_en } from "./locale/en_US";
+import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformColumnDefs } from "./utils";
 
@@ -224,7 +224,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     <>
       <Spin spinning={loading} className="relative">
         <div
-          ref={wrapperRef}
+          // ref={wrapperRef}
           className={clsm(scroll?.x && "overflow-x-auto overflow-y-hidden")}
         >
           <TableRoot
@@ -258,9 +258,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               style={{
                 position: sticky ? "sticky" : undefined,
                 top: sticky
-                  ? (typeof sticky === "boolean"
+                  ? typeof sticky === "boolean"
                     ? 0
-                    : sticky.offsetHeader)
+                    : sticky.offsetHeader
                   : undefined,
                 zIndex: sticky ? 11 : undefined,
               }}
@@ -305,10 +305,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             header.column.getCanSort()
                               ? header.column.getNextSortingOrder() === "asc"
                                 ? locale.triggerAsc
-                                // eslint-disable-next-line unicorn/no-nested-ternary
-                                : (header.column.getNextSortingOrder() === "desc"
+                                : header.column.getNextSortingOrder() === "desc"
                                   ? locale.triggerDesc
-                                  : locale.cancelSort)
+                                  : locale.cancelSort
                               : undefined
                           }
                         >
