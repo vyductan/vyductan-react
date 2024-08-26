@@ -15,6 +15,8 @@ type DescriptionProps = {
   title?: React.ReactNode;
   items: DescriptionsItem[];
 
+  className?: string;
+
   bordered?: boolean;
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
@@ -28,6 +30,8 @@ export const Descriptions = ({
   title,
   items,
   extra,
+
+  className,
 
   classNames,
   bordered,
@@ -75,7 +79,7 @@ export const Descriptions = ({
     contentClassName,
   );
   return (
-    <div>
+    <div className={className}>
       {(!!title || !!extra) && (
         <div className="mb-4 flex items-center">
           <div className="text-lg font-semibold">{title}</div>
@@ -95,7 +99,7 @@ export const Descriptions = ({
               >
                 {cols.map((col, index) =>
                   // horizontal
-                  typeof col === "object" && "label" in col! ? (
+                  col && typeof col === "object" && "label" in col ? (
                     bordered ? (
                       <Fragment key={col.key}>
                         <th className={thClassName}>
@@ -111,7 +115,7 @@ export const Descriptions = ({
                         <span className={contentClassName}>{col.children}</span>
                       </td>
                     ) //vertical
-                  ) : (rowIndex % 2 === 0 ? (
+                  ) : rowIndex % 2 === 0 ? (
                     <th key={index} className={thClassName}>
                       {col as React.ReactNode}
                     </th>
@@ -119,7 +123,7 @@ export const Descriptions = ({
                     <td key={index} className={tdClassName}>
                       {col as React.ReactNode}
                     </td>
-                  )),
+                  ),
                 )}
               </tr>
             ))}
