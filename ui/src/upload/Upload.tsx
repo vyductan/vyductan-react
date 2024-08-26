@@ -9,7 +9,7 @@ import type { DownloadService, FileItem, UploadService } from "./types";
 import { Button } from "../button";
 import { Card } from "../card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
-import { UploadZone } from "./UploadZone";
+import { UploadZone } from "./upload-zone";
 
 type UploadProps = {
   uploadService?: UploadService;
