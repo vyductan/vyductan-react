@@ -12,6 +12,8 @@ export default [
             Args: true,
             def: true,
             Def: true,
+            env: true,
+            Env: true,
             ref: true,
             Ref: true,
             params: true,
