@@ -77,7 +77,7 @@ const PageHeader = (props: PageHeaderProps) => {
   const children = renderChildren(props);
 
   return (
-    <div className={clsm("py-5", className)}>
+    <div className={clsm("pb-5", className)}>
       <Title {...props} />
       {children}
     </div>
