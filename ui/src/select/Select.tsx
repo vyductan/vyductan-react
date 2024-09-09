@@ -25,6 +25,7 @@ export type SelectProps<T extends ValueType = string> = Omit<
 > &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> & {
+    id?: string;
     value?: T;
     options: Option<T>[];
 
@@ -48,6 +49,7 @@ export type SelectProps<T extends ValueType = string> = Omit<
 
 const SelectInner = <T extends ValueType = string>(
   {
+    id,
     value,
     options,
 
@@ -78,6 +80,7 @@ const SelectInner = <T extends ValueType = string>(
       {...props}
     >
       <SelectTrigger
+        id={id}
         className={clsm("w-full", className)}
         borderless={borderless}
         size={size}
