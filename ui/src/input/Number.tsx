@@ -81,566 +81,571 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   keyboard?: boolean;
   changeOnWheel?: boolean;
 };
-const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
-  (
-    {
-      stringMode = false,
+const InternalInputNumber = (
+  {
+    stringMode = false,
 
-      defaultValue,
-      value,
-      onChange,
-      onInput,
-      onPressEnter,
+    defaultValue,
+    value,
+    onChange,
+    onInput,
+    onPressEnter,
 
-      readOnly,
-      disabled,
+    readOnly,
+    disabled,
 
-      min,
-      max,
-      step = 1,
-      onStep,
+    min,
+    max,
+    step = 1,
+    onStep,
 
-      formatter,
-      parser,
-      precision,
-      decimalSeparator,
+    formatter,
+    parser,
+    precision,
+    decimalSeparator,
 
-      changeOnBlur,
+    changeOnBlur = true,
 
-      // upHandler,
-      // downHandler,
-      keyboard,
-      changeOnWheel,
-      ...inputProps
+    // upHandler,
+    // downHandler,
+    keyboard,
+    changeOnWheel,
+    ...inputProps
+  }: InputNumberProps,
+  ref: React.ForwardedRef<HTMLInputElement>,
+) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const [focus, setFocus] = React.useState(false);
+
+  const userTypingRef = React.useRef(false);
+  const compositionRef = React.useRef(false);
+  const shiftKeyRef = React.useRef(false);
+
+  // ============================ Value =============================
+  // Real value control
+  const [decimalValue, setDecimalValue] = React.useState<DecimalClass>(() =>
+    getMiniDecimal(value ?? defaultValue ?? ""),
+  );
+
+  function setUncontrolledDecimalValue(newDecimal: DecimalClass) {
+    if (value === undefined) {
+      setDecimalValue(newDecimal);
+    }
+  }
+
+  // ====================== Parser & Formatter ======================
+  /**
+   * `precision` is used for formatter & onChange.
+   * It will auto generate by `value` & `step`.
+   * But it will not block user typing.
+   *
+   * Note: Auto generate `precision` is used for legacy logic.
+   * We should remove this since we already support high precision with BigInt.
+   *
+   * @param number  Provide which number should calculate precision
+   * @param userTyping  Change by user typing
+   */
+  const getPrecision = useCallback(
+    (numberString: string, userTyping: boolean) => {
+      if (userTyping) {
+        return;
+      }
+
+      if (precision && precision >= 0) {
+        return precision;
+      }
+
+      return Math.max(
+        getNumberPrecision(numberString),
+        getNumberPrecision(step),
+      );
     },
-    ref,
-  ) => {
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    [precision, step],
+  );
+  // >>> Parser
+  const mergedParser = React.useCallback(
+    (number_: string | number) => {
+      const numberString = String(number_);
 
-    const [focus, setFocus] = React.useState(false);
-
-    const userTypingRef = React.useRef(false);
-    const compositionRef = React.useRef(false);
-    const shiftKeyRef = React.useRef(false);
-
-    // ============================ Value =============================
-    // Real value control
-    const [decimalValue, setDecimalValue] = React.useState<DecimalClass>(() =>
-      getMiniDecimal(value ?? defaultValue ?? ""),
-    );
-
-    function setUncontrolledDecimalValue(newDecimal: DecimalClass) {
-      if (value === undefined) {
-        setDecimalValue(newDecimal);
+      if (parser) {
+        return parser(numberString);
       }
-    }
 
-    // ====================== Parser & Formatter ======================
-    /**
-     * `precision` is used for formatter & onChange.
-     * It will auto generate by `value` & `step`.
-     * But it will not block user typing.
-     *
-     * Note: Auto generate `precision` is used for legacy logic.
-     * We should remove this since we already support high precision with BigInt.
-     *
-     * @param number  Provide which number should calculate precision
-     * @param userTyping  Change by user typing
-     */
-    const getPrecision = useCallback(
-      (numberString: string, userTyping: boolean) => {
-        if (userTyping) {
-          return;
-        }
+      let parsedString = numberString;
+      if (decimalSeparator) {
+        parsedString = parsedString.replace(decimalSeparator, ".");
+      }
 
-        if (precision && precision >= 0) {
-          return precision;
-        }
-
-        return Math.max(
-          getNumberPrecision(numberString),
-          getNumberPrecision(step),
-        );
-      },
-      [precision, step],
-    );
-    // >>> Parser
-    const mergedParser = React.useCallback(
-      (number_: string | number) => {
-        const numberString = String(number_);
-
-        if (parser) {
-          return parser(numberString);
-        }
-
-        let parsedString = numberString;
-        if (decimalSeparator) {
-          parsedString = parsedString.replace(decimalSeparator, ".");
-        }
-
-        // [Legacy] We still support auto convert `$ 123,456` to `123456`
-        return parsedString.replaceAll(/[^\w.-]+/g, "");
-      },
-      [parser, decimalSeparator],
-    );
-    // >>> Formatter
-    const inputValueRef = React.useRef<string | number>("");
-    const mergedFormatter = React.useCallback(
-      (number: string, userTyping: boolean) => {
-        if (formatter) {
-          return formatter(number, {
-            userTyping,
-            input: String(inputValueRef.current),
-          });
-        }
-
-        let string_ = typeof number === "number" ? num2str(number) : number;
-
-        // User typing will not auto format with precision directly
-        if (!userTyping) {
-          const mergedPrecision = getPrecision(string_, userTyping);
-
-          if (
-            validateNumber(string_) &&
-            (decimalSeparator || (mergedPrecision && mergedPrecision >= 0))
-          ) {
-            // Separator
-            const separatorString = decimalSeparator ?? ".";
-
-            string_ = toFixed(string_, separatorString, mergedPrecision);
-          }
-        }
-
-        return string_;
-      },
-      [formatter, getPrecision, decimalSeparator],
-    );
-
-    // ========================== InputValue ==========================
-    /**
-     * Input text value control
-     *
-     * User can not update input content directly. It updates with follow rules by priority:
-     *  1. controlled `value` changed
-     *    * [SPECIAL] Typing like `1.` should not immediately convert to `1`
-     *  2. User typing with format (not precision)
-     *  3. Blur or Enter trigger revalidate
-     */
-    const [inputValue, setInternalInputValue] = useState<string | number>(
-      () => {
-        const initValue = defaultValue ?? value ?? "";
-        if (
-          decimalValue.isInvalidate() &&
-          ["string", "number"].includes(typeof initValue)
-        ) {
-          return Number.isNaN(initValue) ? "" : initValue;
-        }
-        return mergedFormatter(decimalValue.toString(), false);
-      },
-    );
-    inputValueRef.current = inputValue;
-
-    // Should always be string
-    function setInputValue(newValue: DecimalClass, userTyping: boolean) {
-      setInternalInputValue(
-        mergedFormatter(
-          // Invalidate number is sometime passed by external control, we should let it go
-          // Otherwise is controlled by internal interactive logic which check by userTyping
-          // You can ref 'show limited value when input is not focused' test for more info.
-          newValue.isInvalidate()
-            ? newValue.toString(false)
-            : newValue.toString(!userTyping),
+      // [Legacy] We still support auto convert `$ 123,456` to `123456`
+      return parsedString.replaceAll(/[^\w.-]+/g, "");
+    },
+    [parser, decimalSeparator],
+  );
+  // >>> Formatter
+  const inputValueRef = React.useRef<string | number>("");
+  const mergedFormatter = React.useCallback(
+    (number: string, userTyping: boolean) => {
+      if (formatter) {
+        return formatter(number, {
           userTyping,
-        ),
-      );
+          input: String(inputValueRef.current),
+        });
+      }
+
+      let string_ = typeof number === "number" ? num2str(number) : number;
+
+      // User typing will not auto format with precision directly
+      if (!userTyping) {
+        const mergedPrecision = getPrecision(string_, userTyping);
+
+        if (
+          validateNumber(string_) &&
+          (decimalSeparator || (mergedPrecision && mergedPrecision >= 0))
+        ) {
+          // Separator
+          const separatorString = decimalSeparator ?? ".";
+
+          string_ = toFixed(string_, separatorString, mergedPrecision);
+        }
+      }
+
+      return string_;
+    },
+    [formatter, getPrecision, decimalSeparator],
+  );
+
+  // ========================== InputValue ==========================
+  /**
+   * Input text value control
+   *
+   * User can not update input content directly. It updates with follow rules by priority:
+   *  1. controlled `value` changed
+   *    * [SPECIAL] Typing like `1.` should not immediately convert to `1`
+   *  2. User typing with format (not precision)
+   *  3. Blur or Enter trigger revalidate
+   */
+  const [inputValue, setInternalInputValue] = useState<string | number>(() => {
+    const initValue = defaultValue ?? value ?? "";
+    if (
+      decimalValue.isInvalidate() &&
+      ["string", "number"].includes(typeof initValue)
+    ) {
+      return Number.isNaN(initValue) ? "" : initValue;
+    }
+    return mergedFormatter(decimalValue.toString(), false);
+  });
+  inputValueRef.current = inputValue;
+
+  // Should always be string
+  function setInputValue(newValue: DecimalClass, userTyping: boolean) {
+    setInternalInputValue(
+      mergedFormatter(
+        // Invalidate number is sometime passed by external control, we should let it go
+        // Otherwise is controlled by internal interactive logic which check by userTyping
+        // You can ref 'show limited value when input is not focused' test for more info.
+        newValue.isInvalidate()
+          ? newValue.toString(false)
+          : newValue.toString(!userTyping),
+        userTyping,
+      ),
+    );
+  }
+
+  // >>> Max & Min limit
+  const maxDecimal = React.useMemo(
+    () => getDecimalIfValidate(max ?? ""),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [max, precision],
+  );
+  const minDecimal = React.useMemo(
+    () => getDecimalIfValidate(min ?? ""),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [min, precision],
+  );
+
+  const upDisabled = React.useMemo(() => {
+    if (!maxDecimal || decimalValue.isInvalidate()) {
+      return false;
     }
 
-    // >>> Max & Min limit
-    const maxDecimal = React.useMemo(
-      () => getDecimalIfValidate(max ?? ""),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [max, precision],
-    );
-    const minDecimal = React.useMemo(
-      () => getDecimalIfValidate(min ?? ""),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [min, precision],
-    );
+    return maxDecimal.lessEquals(decimalValue);
+  }, [maxDecimal, decimalValue]);
 
-    const upDisabled = React.useMemo(() => {
-      if (!maxDecimal || decimalValue.isInvalidate()) {
-        return false;
-      }
+  const downDisabled = React.useMemo(() => {
+    if (!minDecimal || decimalValue.isInvalidate()) {
+      return false;
+    }
 
-      return maxDecimal.lessEquals(decimalValue);
-    }, [maxDecimal, decimalValue]);
+    return decimalValue.lessEquals(minDecimal);
+  }, [minDecimal, decimalValue]);
 
-    const downDisabled = React.useMemo(() => {
-      if (!minDecimal || decimalValue.isInvalidate()) {
-        return false;
-      }
+  // >>> Cursor controller
+  // Cursor controller
+  const [recordCursor, restoreCursor] = useCursor(inputRef.current, focus);
+  // const [recordCursor, restoreCursor] = useCursor(
+  //   // ref.
+  //   inputRef.current,
+  //   document.activeElement === inputRef.current,
+  // );
+  // useEffect(() => {
+  //   restoreCursor();
+  // }, [props.value, restoreCursor]);
 
-      return decimalValue.lessEquals(minDecimal);
-    }, [minDecimal, decimalValue]);
+  // ============================= Data =============================
+  /**
+   * Find target value closet within range.
+   * e.g. [11, 28]:
+   *    3  => 11
+   *    23 => 23
+   *    99 => 28
+   */
+  const getRangeValue = (target: DecimalClass) => {
+    // target > max
+    if (maxDecimal && !target.lessEquals(maxDecimal)) {
+      return maxDecimal;
+    }
 
-    // >>> Cursor controller
-    // Cursor controller
-    const [recordCursor, restoreCursor] = useCursor(inputRef.current, focus);
-    // const [recordCursor, restoreCursor] = useCursor(
-    //   // ref.
-    //   inputRef.current,
-    //   document.activeElement === inputRef.current,
-    // );
-    // useEffect(() => {
-    //   restoreCursor();
-    // }, [props.value, restoreCursor]);
+    // target < min
+    if (minDecimal && !minDecimal.lessEquals(target)) {
+      return minDecimal;
+    }
 
-    // ============================= Data =============================
-    /**
-     * Find target value closet within range.
-     * e.g. [11, 28]:
-     *    3  => 11
-     *    23 => 23
-     *    99 => 28
-     */
-    const getRangeValue = (target: DecimalClass) => {
-      // target > max
-      if (maxDecimal && !target.lessEquals(maxDecimal)) {
-        return maxDecimal;
-      }
+    return;
+  };
 
-      // target < min
-      if (minDecimal && !minDecimal.lessEquals(target)) {
-        return minDecimal;
-      }
+  /**
+   * Check value is in [min, max] range
+   */
+  const isInRange = (target: DecimalClass) => !getRangeValue(target);
 
-      return;
-    };
+  /**
+   * Trigger `onChange` if value validated and not equals of origin.
+   * Return the value that re-align in range.
+   */
+  const triggerValueUpdate = (
+    newValue: DecimalClass,
+    userTyping: boolean,
+  ): DecimalClass => {
+    let updateValue = newValue;
 
-    /**
-     * Check value is in [min, max] range
-     */
-    const isInRange = (target: DecimalClass) => !getRangeValue(target);
+    let isRangeValidate = isInRange(updateValue) || updateValue.isEmpty();
 
-    /**
-     * Trigger `onChange` if value validated and not equals of origin.
-     * Return the value that re-align in range.
-     */
-    const triggerValueUpdate = (
-      newValue: DecimalClass,
-      userTyping: boolean,
-    ): DecimalClass => {
-      let updateValue = newValue;
+    // Skip align value when trigger value is empty.
+    // We just trigger onChange(null)
+    // This should not block user typing
+    if (!updateValue.isEmpty() && !userTyping) {
+      // Revert value in range if needed
+      updateValue = getRangeValue(updateValue) ?? updateValue;
+      isRangeValidate = true;
+    }
 
-      let isRangeValidate = isInRange(updateValue) || updateValue.isEmpty();
+    if (!readOnly && !disabled && isRangeValidate) {
+      const numberString = updateValue.toString();
+      const mergedPrecision = getPrecision(numberString, userTyping);
+      if (mergedPrecision && mergedPrecision >= 0) {
+        updateValue = getMiniDecimal(
+          toFixed(numberString, ".", mergedPrecision),
+        );
 
-      // Skip align value when trigger value is empty.
-      // We just trigger onChange(null)
-      // This should not block user typing
-      if (!updateValue.isEmpty() && !userTyping) {
-        // Revert value in range if needed
-        updateValue = getRangeValue(updateValue) ?? updateValue;
-        isRangeValidate = true;
-      }
-
-      if (!readOnly && !disabled && isRangeValidate) {
-        const numberString = updateValue.toString();
-        const mergedPrecision = getPrecision(numberString, userTyping);
-        if (mergedPrecision && mergedPrecision >= 0) {
+        // When to fixed. The value may out of min & max range.
+        // 4 in [0, 3.8] => 3.8 => 4 (toFixed)
+        if (!isInRange(updateValue)) {
           updateValue = getMiniDecimal(
-            toFixed(numberString, ".", mergedPrecision),
+            toFixed(numberString, ".", mergedPrecision, true),
           );
-
-          // When to fixed. The value may out of min & max range.
-          // 4 in [0, 3.8] => 3.8 => 4 (toFixed)
-          if (!isInRange(updateValue)) {
-            updateValue = getMiniDecimal(
-              toFixed(numberString, ".", mergedPrecision, true),
-            );
-          }
-        }
-
-        // Trigger event
-        if (!updateValue.equals(decimalValue)) {
-          setUncontrolledDecimalValue(updateValue);
-          onChange?.(
-            updateValue.isEmpty()
-              ? undefined
-              : getDecimalValue(stringMode, updateValue),
-          );
-
-          // Reformat input if value is not controlled
-          if (value === undefined) {
-            setInputValue(updateValue, userTyping);
-          }
-        }
-
-        return updateValue;
-      }
-
-      return decimalValue;
-    };
-
-    // ========================== User Input ==========================
-    const onNextPromise = useFrame();
-
-    // >>> Collect input value
-    const collectInputValue = (inputString: string) => {
-      recordCursor();
-
-      // Update inputValue in case input can not parse as number
-      // Refresh ref value immediately since it may used by formatter
-      inputValueRef.current = inputString;
-      setInternalInputValue(inputString);
-
-      // Parse number
-      if (!compositionRef.current) {
-        const finalValue = mergedParser(inputString);
-        const finalDecimal = getMiniDecimal(finalValue);
-        if (!finalDecimal.isNaN()) {
-          triggerValueUpdate(finalDecimal, true);
         }
       }
 
-      // Trigger onInput later to let user customize value if they want to handle something after onChange
-      onInput?.(inputString);
+      // Trigger event
+      if (!updateValue.equals(decimalValue)) {
+        setUncontrolledDecimalValue(updateValue);
+        onChange?.(
+          updateValue.isEmpty()
+            ? undefined
+            : getDecimalValue(stringMode, updateValue),
+        );
 
-      // optimize for chinese input experience
-      // https://github.com/ant-design/ant-design/issues/8196
-      onNextPromise(() => {
-        let nextInputString = inputString;
-        if (!parser) {
-          nextInputString = inputString.replaceAll("。", ".");
+        // Reformat input if value is not controlled
+        if (value === undefined) {
+          setInputValue(updateValue, userTyping);
         }
-
-        if (nextInputString !== inputString) {
-          collectInputValue(nextInputString);
-        }
-      });
-    };
-
-    // >>> Composition
-    const onCompositionStart = () => {
-      compositionRef.current = true;
-    };
-
-    const onCompositionEnd = () => {
-      compositionRef.current = false;
-
-      collectInputValue(inputRef.current!.value);
-    };
-
-    // >>> Input
-    const onInternalInput: React.ChangeEventHandler<HTMLInputElement> = (
-      event,
-    ) => {
-      collectInputValue(event.target.value);
-    };
-
-    // ============================= Step =============================
-    const onInternalStep = (up: boolean) => {
-      // Ignore step since out of range
-      if ((up && upDisabled) || (!up && downDisabled)) {
-        return;
       }
 
-      // Clear typing status since it may be caused by up & down key.
-      // We should sync with input value.
-      userTypingRef.current = false;
+      return updateValue;
+    }
 
-      let stepDecimal = getMiniDecimal(
-        shiftKeyRef.current ? getDecupleSteps(step) : step,
-      );
-      if (!up) {
-        stepDecimal = stepDecimal.negate();
+    return decimalValue;
+  };
+
+  // ========================== User Input ==========================
+  const onNextPromise = useFrame();
+
+  // >>> Collect input value
+  const collectInputValue = (inputString: string) => {
+    recordCursor();
+
+    // Update inputValue in case input can not parse as number
+    // Refresh ref value immediately since it may used by formatter
+    inputValueRef.current = inputString;
+    setInternalInputValue(inputString);
+
+    // Parse number
+    if (!compositionRef.current) {
+      const finalValue = mergedParser(inputString);
+      const finalDecimal = getMiniDecimal(finalValue);
+      if (!finalDecimal.isNaN()) {
+        triggerValueUpdate(finalDecimal, true);
+      }
+    }
+
+    // Trigger onInput later to let user customize value if they want to handle something after onChange
+    onInput?.(inputString);
+
+    // optimize for chinese input experience
+    // https://github.com/ant-design/ant-design/issues/8196
+    onNextPromise(() => {
+      let nextInputString = inputString;
+      if (!parser) {
+        nextInputString = inputString.replaceAll("。", ".");
       }
 
-      const target = getMiniDecimal(0).add(stepDecimal.toString());
-
-      const updatedValue = triggerValueUpdate(target, false);
-
-      onStep?.(getDecimalValue(stringMode, updatedValue), {
-        offset: shiftKeyRef.current ? getDecupleSteps(step) : step,
-        type: up ? "up" : "down",
-      });
-
-      inputRef.current?.focus();
-    };
-
-    // ============================ Flush =============================
-    /**
-     * Flush current input content to trigger value change & re-formatter input if needed.
-     * This will always flush input value for update.
-     * If it's invalidate, will fallback to last validate value.
-     */
-    const flushInputValue = (userTyping: boolean) => {
-      const parsedValue = getMiniDecimal(mergedParser(inputValue));
-      const formatValue: DecimalClass = parsedValue.isNaN()
-        ? triggerValueUpdate(decimalValue, userTyping)
-        : // Only validate value or empty value can be re-fill to inputValue
-          // Reassign the formatValue within ranged of trigger control
-          triggerValueUpdate(parsedValue, userTyping);
-
-      if (value !== undefined) {
-        // Reset back with controlled value first
-        setInputValue(decimalValue, false);
-      } else if (!formatValue.isNaN()) {
-        // Reset input back since no validate value
-        setInputValue(formatValue, false);
-      }
-    };
-
-    // Solve the issue of the event triggering sequence when entering numbers in chinese input (Safari)
-    const onBeforeInput = () => {
-      userTypingRef.current = true;
-    };
-
-    const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
-      const { key, shiftKey } = event;
-      userTypingRef.current = true;
-
-      shiftKeyRef.current = shiftKey;
-
-      if (key === "Enter") {
-        if (!compositionRef.current) {
-          userTypingRef.current = false;
-        }
-        flushInputValue(false);
-        onPressEnter?.(event);
-      }
-
-      if (keyboard === false) {
-        return;
-      }
-
-      // Do step
-      if (
-        !compositionRef.current &&
-        ["Up", "ArrowUp", "Down", "ArrowDown"].includes(key)
-      ) {
-        onInternalStep(key === "Up" || key === "ArrowUp");
-        event.preventDefault();
-      }
-    };
-
-    const onKeyUp = () => {
-      userTypingRef.current = false;
-      shiftKeyRef.current = false;
-    };
-
-    React.useEffect(() => {
-      if (changeOnWheel && focus) {
-        const onWheel = (event: WheelEvent) => {
-          // moving mouse wheel rises wheel event with deltaY < 0
-          // scroll value grows from top to bottom, as screen Y coordinate
-          onInternalStep(event.deltaY < 0);
-          event.preventDefault();
-        };
-        const input = inputRef.current;
-        if (input) {
-          // React onWheel is passive and we can't preventDefault() in it.
-          // That's why we should subscribe with DOM listener
-          // https://stackoverflow.com/questions/63663025/react-onwheel-handler-cant-preventdefault-because-its-a-passive-event-listenev
-          input.addEventListener("wheel", onWheel, { passive: false });
-          return () => input.removeEventListener("wheel", onWheel);
-        }
+      if (nextInputString !== inputString) {
+        collectInputValue(nextInputString);
       }
     });
+  };
 
-    // >>> Focus & Blur
-    const onBlur = () => {
-      if (changeOnBlur) {
-        flushInputValue(false);
-      }
+  // >>> Composition
+  const onCompositionStart = () => {
+    compositionRef.current = true;
+  };
 
-      setFocus(false);
+  const onCompositionEnd = () => {
+    compositionRef.current = false;
 
-      userTypingRef.current = false;
-    };
+    collectInputValue(inputRef.current!.value);
+  };
 
-    // ========================== Controlled ==========================
-    // Input by precision & formatter
-    useLayoutUpdateEffect(() => {
-      if (!decimalValue.isInvalidate()) {
-        setInputValue(decimalValue, false);
-      }
-    }, [precision, formatter]);
+  // >>> Input
+  const onInternalInput: React.ChangeEventHandler<HTMLInputElement> = (
+    event,
+  ) => {
+    collectInputValue(event.target.value);
+  };
 
-    // Input by value
-    useLayoutUpdateEffect(() => {
-      const newValue = getMiniDecimal(value ?? "");
-      setDecimalValue(newValue);
+  // ============================= Step =============================
+  const onInternalStep = (up: boolean) => {
+    // Ignore step since out of range
+    if ((up && upDisabled) || (!up && downDisabled)) {
+      return;
+    }
 
-      const currentParsedValue = getMiniDecimal(mergedParser(inputValue));
+    // Clear typing status since it may be caused by up & down key.
+    // We should sync with input value.
+    userTypingRef.current = false;
 
-      // When user typing from `1.2` to `1.`, we should not convert to `1` immediately.
-      // But let it go if user set `formatter`
-      if (
-        !newValue.equals(currentParsedValue) ||
-        !userTypingRef.current ||
-        formatter
-      ) {
-        // Update value as effect
-        setInputValue(newValue, userTypingRef.current);
-      }
-    }, [value]);
-
-    // ============================ Cursor ============================
-    useLayoutUpdateEffect(() => {
-      if (formatter) {
-        restoreCursor();
-      }
-    }, [inputValue]);
-
-    // const propToPass: ComponentProps<typeof NativeHtml.TextInput> =
-    //   formatter && parser
-    //     ? {
-    //         value: mergedFormatter(field.value) + (isHasLastDot ? "." : ""),
-    //         onChange: (e) => {
-    //           if (/^[^.]*\.$/.test(e.currentTarget.value)) {
-    //             setIsHasLastDot(true);
-    //           } else {
-    //             setIsHasLastDot(false);
-    //           }
-    //
-    //           recordCursor();
-    //           // helper.setValue(mergedParser(e.currentTarget.value));
-    //           onChange?.(mergedParser(e.currentTarget.value));
-    //         },
-    //       }
-    //     : {
-    //         ...field,
-    //       };
-
-    return (
-      <Input
-        // ref={ref}
-        // type="number"
-        // onChange={(e) => {
-        //   return onChange?.(Number(e.target.value));
-        // }}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-        onKeyUp={onKeyUp}
-        onCompositionStart={onCompositionStart}
-        onCompositionEnd={onCompositionEnd}
-        onBeforeInput={onBeforeInput}
-        aria-valuemin={min as any}
-        aria-valuemax={max as any}
-        aria-valuenow={
-          decimalValue.isInvalidate()
-            ? undefined
-            : (decimalValue.toString() as any)
-        }
-        {...inputProps}
-        ref={composeRef(inputRef, ref)}
-        onChange={onInternalInput}
-        value={inputValue}
-      />
+    let stepDecimal = getMiniDecimal(
+      shiftKeyRef.current ? getDecupleSteps(step) : step,
     );
+    if (!up) {
+      stepDecimal = stepDecimal.negate();
+    }
+
+    const target = getMiniDecimal(0).add(stepDecimal.toString());
+
+    const updatedValue = triggerValueUpdate(target, false);
+
+    onStep?.(getDecimalValue(stringMode, updatedValue), {
+      offset: shiftKeyRef.current ? getDecupleSteps(step) : step,
+      type: up ? "up" : "down",
+    });
+
+    inputRef.current?.focus();
+  };
+
+  // ============================ Flush =============================
+  /**
+   * Flush current input content to trigger value change & re-formatter input if needed.
+   * This will always flush input value for update.
+   * If it's invalidate, will fallback to last validate value.
+   */
+  const flushInputValue = (userTyping: boolean) => {
+    const parsedValue = getMiniDecimal(mergedParser(inputValue));
+    const formatValue: DecimalClass = parsedValue.isNaN()
+      ? triggerValueUpdate(decimalValue, userTyping)
+      : // Only validate value or empty value can be re-fill to inputValue
+        // Reassign the formatValue within ranged of trigger control
+        triggerValueUpdate(parsedValue, userTyping);
+
+    if (value !== undefined) {
+      // Reset back with controlled value first
+      setInputValue(decimalValue, false);
+    } else if (!formatValue.isNaN()) {
+      // Reset input back since no validate value
+      setInputValue(formatValue, false);
+    }
+  };
+
+  // Solve the issue of the event triggering sequence when entering numbers in chinese input (Safari)
+  const onBeforeInput = () => {
+    userTypingRef.current = true;
+  };
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
+    const { key, shiftKey } = event;
+    userTypingRef.current = true;
+
+    shiftKeyRef.current = shiftKey;
+
+    if (key === "Enter") {
+      if (!compositionRef.current) {
+        userTypingRef.current = false;
+      }
+      flushInputValue(false);
+      onPressEnter?.(event);
+    }
+
+    if (keyboard === false) {
+      return;
+    }
+
+    // Do step
+    if (
+      !compositionRef.current &&
+      ["Up", "ArrowUp", "Down", "ArrowDown"].includes(key)
+    ) {
+      onInternalStep(key === "Up" || key === "ArrowUp");
+      event.preventDefault();
+    }
+  };
+
+  const onKeyUp = () => {
+    userTypingRef.current = false;
+    shiftKeyRef.current = false;
+  };
+
+  React.useEffect(() => {
+    if (changeOnWheel && focus) {
+      const onWheel = (event: WheelEvent) => {
+        // moving mouse wheel rises wheel event with deltaY < 0
+        // scroll value grows from top to bottom, as screen Y coordinate
+        onInternalStep(event.deltaY < 0);
+        event.preventDefault();
+      };
+      const input = inputRef.current;
+      if (input) {
+        // React onWheel is passive and we can't preventDefault() in it.
+        // That's why we should subscribe with DOM listener
+        // https://stackoverflow.com/questions/63663025/react-onwheel-handler-cant-preventdefault-because-its-a-passive-event-listenev
+        input.addEventListener("wheel", onWheel, { passive: false });
+        return () => input.removeEventListener("wheel", onWheel);
+      }
+    }
+  });
+
+  // >>> Focus & Blur
+  const onBlur = () => {
+    console.log("blur", changeOnBlur, "x");
+    if (changeOnBlur) {
+      flushInputValue(false);
+    }
+
+    setFocus(false);
+
+    userTypingRef.current = false;
+  };
+
+  // ========================== Controlled ==========================
+  // Input by precision & formatter
+  useLayoutUpdateEffect(() => {
+    if (!decimalValue.isInvalidate()) {
+      setInputValue(decimalValue, false);
+    }
+  }, [precision, formatter]);
+
+  // Input by value
+  useLayoutUpdateEffect(() => {
+    const newValue = getMiniDecimal(value ?? "");
+    setDecimalValue(newValue);
+
+    const currentParsedValue = getMiniDecimal(mergedParser(inputValue));
+
+    // When user typing from `1.2` to `1.`, we should not convert to `1` immediately.
+    // But let it go if user set `formatter`
+    if (
+      !newValue.equals(currentParsedValue) ||
+      !userTypingRef.current ||
+      formatter
+    ) {
+      // Update value as effect
+      setInputValue(newValue, userTypingRef.current);
+    }
+  }, [value]);
+
+  // ============================ Cursor ============================
+  useLayoutUpdateEffect(() => {
+    if (formatter) {
+      restoreCursor();
+    }
+  }, [inputValue]);
+
+  // const propToPass: ComponentProps<typeof NativeHtml.TextInput> =
+  //   formatter && parser
+  //     ? {
+  //         value: mergedFormatter(field.value) + (isHasLastDot ? "." : ""),
+  //         onChange: (e) => {
+  //           if (/^[^.]*\.$/.test(e.currentTarget.value)) {
+  //             setIsHasLastDot(true);
+  //           } else {
+  //             setIsHasLastDot(false);
+  //           }
+  //
+  //           recordCursor();
+  //           // helper.setValue(mergedParser(e.currentTarget.value));
+  //           onChange?.(mergedParser(e.currentTarget.value));
+  //         },
+  //       }
+  //     : {
+  //         ...field,
+  //       };
+
+  return (
+    <Input
+      // ref={ref}
+      // type="number"
+      // onChange={(e) => {
+      //   return onChange?.(Number(e.target.value));
+      // }}
+      onBlur={onBlur}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      onCompositionStart={onCompositionStart}
+      onCompositionEnd={onCompositionEnd}
+      onBeforeInput={onBeforeInput}
+      aria-valuemin={min as any}
+      aria-valuemax={max as any}
+      aria-valuenow={
+        decimalValue.isInvalidate()
+          ? undefined
+          : (decimalValue.toString() as any)
+      }
+      {...inputProps}
+      ref={composeRef(inputRef, ref)}
+      onChange={onInternalInput}
+      value={inputValue}
+    />
+  );
+};
+// InputNumber.displayName = "Input";
+
+const InputNumber = React.forwardRef(InternalInputNumber) as <
+  T extends ValueType,
+>(
+  props: InputNumberProps<T> & {
+    ref?: React.ForwardedRef<HTMLInputElement>;
   },
-);
-InputNumber.displayName = "Input";
+) => ReturnType<typeof InternalInputNumber>;
 
 export { InputNumber };
 export type { InputNumberProps };
