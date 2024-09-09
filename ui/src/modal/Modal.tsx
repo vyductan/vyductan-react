@@ -23,7 +23,7 @@ type ModalProps = DialogProps & {
   footer?:
     | ((params: {
         originNode: React.ReactNode;
-        extra: { OkBtn: React.FC; CancelBtn: React.FC };
+        extra: { OkBtn: React.ReactElement; CancelBtn: React.ReactElement };
       }) => React.ReactNode)
     | React.ReactNode;
   okText?: string;
@@ -65,12 +65,12 @@ const Modal = ({
       footer({
         originNode: undefined,
         extra: {
-          OkBtn: () => (
+          OkBtn: (
             <Button loading={okLoading} onClick={onOk}>
               {okText ?? "Ok"}
             </Button>
           ),
-          CancelBtn: () => (
+          CancelBtn: (
             <DialogClose asChild onClick={onCancel}>
               <Button variant="outline">Huỷ</Button>
             </DialogClose>
