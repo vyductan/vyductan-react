@@ -1,5 +1,6 @@
 import React from "react";
 
+import type { Placement } from "../types";
 import type { PopoverContentProps, PopoverRootProps } from "./_components";
 import {
   PopoverAnchor,
@@ -12,15 +13,37 @@ export type PopoverProps = PopoverRootProps &
   Omit<PopoverContentProps, "content"> & {
     trigger?: "click" | "hover" | "focus";
     content?: React.ReactNode;
+    placement?: Placement;
   };
 export const Popover = ({
   children,
   trigger = "hover",
   content,
   open,
+  placement,
   onOpenChange,
   ...props
 }: PopoverProps) => {
+  const side = placement?.includes("top")
+    ? "top"
+    : placement?.includes("right")
+      ? "right"
+      : !placement || placement.includes("bottom")
+        ? "bottom"
+        : "left";
+  const align =
+    !placement || placement.includes("auto")
+      ? "center"
+      : placement.includes("Left")
+        ? "start"
+        : "end";
+  // const align =
+  //   !placement || placement.includes("auto")
+  //     ? "center"
+  //     : placement.includes("start")
+  //       ? "start"
+  //       : "end";
+
   return (
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
       {open === undefined ? (
@@ -31,11 +54,9 @@ export const Popover = ({
           {...(trigger === "hover"
             ? {
                 onMouseOver: () => {
-                  console.log("over");
                   if (!open) onOpenChange?.(true);
                 },
                 onMouseLeave: () => {
-                  console.log("leave");
                   if (open) onOpenChange?.(false);
                 },
               }
@@ -44,7 +65,9 @@ export const Popover = ({
           {children}
         </PopoverAnchor>
       )}
-      <PopoverContent {...props}>{content}</PopoverContent>
+      <PopoverContent side={side} align={align} {...props}>
+        {content}
+      </PopoverContent>
     </PopoverRoot>
   );
 };
