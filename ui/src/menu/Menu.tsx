@@ -56,7 +56,7 @@ export const Menu = ({
 
       if (item.type === "group") {
         return (
-          <li key={index} role="presentation" className="my-1">
+          <li key={index} role="presentation" className="my-1 text-left">
             <div
               role="presentation"
               title={item.label?.toString()}
@@ -155,8 +155,7 @@ export const Menu = ({
   return (
     <ul
       className={clsm(
-        mode === "inline" &&
-          "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
+        mode === "inline" && "space-x-2 space-y-1 overflow-y-auto",
         className,
       )}
     >

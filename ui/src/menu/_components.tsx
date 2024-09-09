@@ -35,17 +35,18 @@ export const MenuItem = ({
         onSelect?.({ item: { key: keyProp, label }, key: keyProp, event });
       }}
       className={clsm(
-        "text-secondary",
-        "border-l border-transparent",
-        "hover:text-primary",
+        "my-1",
+        "transition-all",
+        "border-l-2 border-transparent",
+        "text-foreground-muted hover:text-foreground",
         isActive
-          ? "border-primary bg-primary-100 text-primary-500"
-          : "hover:border-foreground hover:text-foreground",
+          ? "border-primary bg-primary-100 text-primary-600 hover:text-primary-700"
+          : "hover:border-foreground-muted",
       )}
     >
       <Slot
         className={clsm(
-          "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 transition-all hover:text-primary",
+          "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2",
         )}
       >
         {href ? (
@@ -57,12 +58,6 @@ export const MenuItem = ({
           labelToRender
         )}
       </Slot>
-      {/* <Slot className={clsm("block cursor-pointer rounded-md px-4 py-2.5")}> */}
-      {/*   <> */}
-      {/*     {typeof icon === "string" ? <Icon className={icon} /> : icon} */}
-      {/*     {typeof label === "string" ? <span>{label}</span> : label} */}
-      {/*   </> */}
-      {/* </Slot> */}
     </li>
   );
 };
