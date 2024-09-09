@@ -39,15 +39,18 @@ export const Descriptions = ({
   layout = "horizontal",
   // ...props
 }: DescriptionProps) => {
-  const x = useResponsive();
+  const responsiveInfo = useResponsive();
   let mergedColumn = 3;
   if (typeof column === "number") {
     mergedColumn = column;
   } else if (typeof column === "object") {
     const mergedColumnWithScreen: Partial<Record<Screens, number | undefined>> =
       {};
-    for (const [k] of Object.entries(x)) {
-      mergedColumnWithScreen[k as Screens] = column[k as Screens] ?? undefined;
+    for (const [k] of Object.entries(responsiveInfo)) {
+      mergedColumnWithScreen[k as Screens] =
+        responsiveInfo[k as Screens] && column[k as Screens]
+          ? column[k as Screens]
+          : undefined;
     }
     const matched = Object.entries(mergedColumnWithScreen).findLast(
       ([, v]) => v,
