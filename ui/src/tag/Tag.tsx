@@ -25,10 +25,7 @@ const tagVariants = tv({
   ],
   variants: {
     variant: {
-      default: [
-        "border-transparent text-primary-foreground",
-        "whitespace-nowrap",
-      ],
+      default: ["border-transparent", "whitespace-nowrap"],
       secondary:
         "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
       destructive:
@@ -43,7 +40,7 @@ const tagVariants = tv({
   },
   defaultVariants: {
     variant: "default",
-    color_variant: "default",
+    color: "default",
     bordered: true,
   },
 });
