@@ -1,7 +1,7 @@
 import type { LexicalEditor } from "lexical";
 import { $getSelection, $isRangeSelection } from "lexical";
 
-import { setPlaceholderOnSelection } from "./setPlaceholderOnSelection";
+import { setPlaceholderOnSelection } from "./set-placeholder-on-selection";
 
 export const setNodePlaceholderFromSelection = (
   editor: LexicalEditor,

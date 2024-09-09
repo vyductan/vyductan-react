@@ -1,7 +1,7 @@
 import type { EditorState, LexicalEditor } from "lexical";
 import { OnChangePlugin as LexicalOnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-import { setNodePlaceholderFromSelection } from "../utils/setNodePlaceholderFromSelection";
+import { setNodePlaceholderFromSelection } from "../utils/set-node-placeholder-from-selection";
 
 type Props = {
   onChange?: (

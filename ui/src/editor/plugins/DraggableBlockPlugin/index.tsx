@@ -88,16 +88,16 @@ function getBlockElement(
   editor: LexicalEditor,
   event: MouseEvent,
   useEdgeAsDefault = false,
-): HTMLElement | null {
+): HTMLElement | undefined {
   const anchorElementRect = anchorElement.getBoundingClientRect();
   const topLevelNodeKeys = getTopLevelNodeKeys(editor);
 
-  let blockElement: HTMLElement | null = null;
+  let blockElement: HTMLElement | undefined = undefined;
   editor.getEditorState().read(() => {
     if (useEdgeAsDefault) {
       const [firstNode, lastNode] = [
-        editor.getElementByKey(topLevelNodeKeys[0]!),
-        editor.getElementByKey(topLevelNodeKeys.at(-1)!),
+        editor.getElementByKey(topLevelNodeKeys[0]!) ?? undefined,
+        editor.getElementByKey(topLevelNodeKeys.at(-1)!) ?? undefined,
       ];
 
       const [firstNodeRect, lastNodeRect] = [
@@ -172,7 +172,7 @@ function isOnMenu(element: HTMLElement): boolean {
 }
 
 function setMenuPosition(
-  targetElement: HTMLElement | null,
+  targetElement: HTMLElement | undefined,
   floatingElement: HTMLElement,
   anchorElement: HTMLElement,
 ) {
@@ -189,7 +189,8 @@ function setMenuPosition(
 
   const top =
     targetRect.top +
-    (Number.parseInt(targetStyle.lineHeight, 10) - floatingElementRect.height) / 2 -
+    (Number.parseInt(targetStyle.lineHeight, 10) - floatingElementRect.height) /
+      2 -
     anchorElementRect.top;
 
   const left = SPACE;
@@ -259,14 +260,15 @@ function useDraggableBlockMenu(
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
   const isDraggingBlockRef = useRef<boolean>(false);
-  const [draggableBlockElement, setDraggableBlockElement] =
-    useState<HTMLElement | null>(null);
+  const [draggableBlockElement, setDraggableBlockElement] = useState<
+    HTMLElement | undefined
+  >();
 
   useEffect(() => {
     function onMouseMove(event: MouseEvent) {
       const target = event.target;
       if (!isHTMLElement(target)) {
-        setDraggableBlockElement(null);
+        setDraggableBlockElement(undefined);
         return;
       }
 
@@ -274,13 +276,17 @@ function useDraggableBlockMenu(
         return;
       }
 
-      const _draggableBlockElement = getBlockElement(anchorElement, editor, event);
+      const _draggableBlockElement = getBlockElement(
+        anchorElement,
+        editor,
+        event,
+      );
 
       setDraggableBlockElement(_draggableBlockElement);
     }
 
     function onMouseLeave() {
-      setDraggableBlockElement(null);
+      setDraggableBlockElement(undefined);
     }
 
     scrollerElement?.addEventListener("mousemove", onMouseMove);
@@ -311,12 +317,22 @@ function useDraggableBlockMenu(
       if (!isHTMLElement(target)) {
         return false;
       }
-      const targetBlockElement = getBlockElement(anchorElement, editor, event, true);
+      const targetBlockElement = getBlockElement(
+        anchorElement,
+        editor,
+        event,
+        true,
+      );
       const targetLineElement = targetLineRef.current;
-      if (targetBlockElement === null || targetLineElement === null) {
+      if (targetBlockElement === undefined || targetLineElement === null) {
         return false;
       }
-      setTargetLine(targetLineElement, targetBlockElement, pageY, anchorElement);
+      setTargetLine(
+        targetLineElement,
+        targetBlockElement,
+        pageY,
+        anchorElement,
+      );
       // Prevent default event to be able to trigger onDrop events
       event.preventDefault();
       return true;
@@ -339,7 +355,12 @@ function useDraggableBlockMenu(
       if (!isHTMLElement(target)) {
         return false;
       }
-      const targetBlockElement = getBlockElement(anchorElement, editor, event, true);
+      const targetBlockElement = getBlockElement(
+        anchorElement,
+        editor,
+        event,
+        true,
+      );
       if (!targetBlockElement) {
         return false;
       }
@@ -350,13 +371,14 @@ function useDraggableBlockMenu(
       if (targetNode === draggedNode) {
         return true;
       }
-      const targetBlockElementTop = targetBlockElement.getBoundingClientRect().top;
+      const targetBlockElementTop =
+        targetBlockElement.getBoundingClientRect().top;
       if (pageY >= targetBlockElementTop) {
         targetNode.insertAfter(draggedNode);
       } else {
         targetNode.insertBefore(draggedNode);
       }
-      setDraggableBlockElement(null);
+      setDraggableBlockElement(undefined);
 
       return true;
     }
@@ -434,7 +456,7 @@ function useDraggableBlockMenu(
 export const DraggableBlockPlugin = ({
   anchorElem,
 }: {
-  anchorElem: HTMLElement | null;
+  anchorElem: HTMLElement | undefined;
 }): JSX.Element => {
   const [editor] = useLexicalComposerContext();
   return useDraggableBlockMenu(

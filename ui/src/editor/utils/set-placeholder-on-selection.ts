@@ -3,13 +3,15 @@ import type { LexicalEditor, LexicalNode, RangeSelection } from "lexical";
 import { clsm } from "@acme/ui";
 
 import { getAllLexicalChildren } from "./getAllLexicalChildren";
-import { getNodePlaceholder } from "./getNodePlaceholder";
+import { getNodePlaceholder } from "./get-node-placeholder";
 
 const PLACEHOLDER_CLASS_NAME = clsm(
   "[&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]",
 ).split(" ");
 
-const isHtmlHeadingElement = (element: HTMLElement): element is HTMLHeadingElement => {
+const isHtmlHeadingElement = (
+  element: HTMLElement,
+): element is HTMLHeadingElement => {
   return element instanceof HTMLHeadingElement;
 };
 

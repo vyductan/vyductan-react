@@ -36,7 +36,8 @@ export const getNodePlaceholder = (lexicalNode: LexicalNode) => {
   }
   if ($isParagraphNode(lexicalNode)) {
     // Like in https://www.notion.so/
-    placeholder += "Press '/' for commands...";
+    // placeholder += "Press '/' for commands...";
+    placeholder = "Write something or press '/' for commands...";
   }
   return placeholder;
 };

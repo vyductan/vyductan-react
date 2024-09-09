@@ -3,14 +3,15 @@
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState, LexicalEditor } from "lexical";
 import type { Ref } from "react";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { EditorRefPlugin } from "@lexical/react/LexicalEditorRefPlugin";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode } from "@lexical/rich-text";
+import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 
 import { clsm } from "@acme/ui";
 
@@ -21,7 +22,7 @@ import { DraggableBlockPlugin } from "./plugins/DraggableBlockPlugin";
 import { HistoryPlugin } from "./plugins/history";
 import { ImagesPlugin } from "./plugins/ImagesPlugin";
 import { LinkPlugin } from "./plugins/LinkPlugin";
-import { OnChangePlugin } from "./plugins/OnChangePlugin";
+import { OnChangePlugin } from "./plugins/on-change-plugin";
 
 export type EditorProps = {
   value?: string;
@@ -36,8 +37,9 @@ const EditorInternal = (
   ref: Ref<HTMLDivElement>,
 ) => {
   const editorRef = useRef<LexicalEditor | null>(null);
-  const [floatingAnchorElement, setFloatingAnchorElement] =
-    useState<HTMLDivElement | null>(null);
+  const [floatingAnchorElement, setFloatingAnchorElement] = useState<
+    HTMLDivElement | undefined
+  >();
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -64,41 +66,51 @@ const EditorInternal = (
   const onRef = (_floatingAnchorElement: HTMLDivElement) => {
     setFloatingAnchorElement(_floatingAnchorElement);
   };
-  const CustomContentEditable = useMemo(() => {
-    return (
-      <div>
-        <div className="relative" ref={onRef}>
-          <ContentEditable
-            className={clsm(
-              "relative border-0 px-7 py-2 outline-0",
-              "flex flex-col",
-              "text-base",
-              // "[&>*]:py-[3px]",
-            )}
-          />
-        </div>
-      </div>
-    );
-  }, []);
-  const CustomPlaceholder = useMemo(() => {
-    return (
-      <div
-        style={{
-          position: "absolute",
-          top: 30,
-          left: 30,
-        }}
-        className="text-placeholder"
-      >
-        Enter some text...
-      </div>
-    );
-  }, []);
+  // const CustomContentEditable = useMemo(() => {
+  //   return (
+  //     <div>
+  //       <div className="relative" ref={onRef}>
+  //         <ContentEditable
+  //           placeholder={placeholder}
+  //           // placeholder="Type / for commands..."
+  //           className={clsm(
+  //             "my-px flex px-0.5 py-0.5",
+  //             "outline-0",
+  //             // "relative border-0 px-7 py-2 outline-0",
+  //             // "flex flex-col",
+  //             // "text-base",
+  //             // "[&>*]:py-[3px]",
+  //           )}
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // }, []);
+  // const CustomPlaceholder = useMemo(() => {
+  //   return (
+  //     <div
+  //       style={{
+  //         position: "absolute",
+  //         top: 30,
+  //         left: 30,
+  //       }}
+  //       className="text-placeholder"
+  //     >
+  //       Press '/' for commands...
+  //     </div>
+  //   );
+  // }, []);
 
   const initialConfig: InitialConfigType = {
     namespace: "Editor",
     nodes: [AutoLinkNode, HeadingNode, ImageNode, LinkNode],
     editable: true,
+    editorState: () => {
+      const root = $getRoot();
+      const paragraph = $createParagraphNode();
+      paragraph.append($createTextNode(""));
+      root.append(paragraph);
+    },
     // editorState: value
     //   ? (editor) => {
     //       console.log("editor", editor);
@@ -138,8 +150,35 @@ const EditorInternal = (
         ref={ref}
       >
         <RichTextPlugin
-          contentEditable={CustomContentEditable}
-          placeholder={CustomPlaceholder}
+          contentEditable={
+            <div>
+              <div className="relative" ref={onRef}>
+                <ContentEditable
+                  aria-placeholder="Write something or press '/' for commands..."
+                  placeholder={
+                    <div
+                      className="absolute left-0.5 top-0.5 text-base text-placeholder"
+                      onClick={() => editorRef.current?.focus()}
+                    >
+                      Write something or press '/' for commands...
+                    </div>
+                  }
+                  // class="text-base [&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]"
+                  className={clsm(
+                    "relative flex flex-col",
+                    "my-px p-0.5 outline-0",
+                    // "text-base [&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]",
+                    // "outline-0",
+                    // "relative border-0 px-7 py-2 outline-0",
+                    // "flex flex-col",
+                    // "text-base",
+                    // "[&>*]:py-[3px]",
+                  )}
+                />
+              </div>
+            </div>
+          }
+          // placeholder={CustomPlaceholder}
           ErrorBoundary={LexicalErrorBoundary}
         />
         <EditorRefPlugin editorRef={editorRef} />
