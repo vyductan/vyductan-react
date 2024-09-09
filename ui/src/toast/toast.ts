@@ -1,3 +1,5 @@
+"use client";
+
 import type { ExternalToast } from "sonner";
 import { toast } from "sonner";
 
