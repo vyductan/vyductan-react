@@ -211,6 +211,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               !borderless && "rounded-e-md",
               "border-s bg-background",
               inputSizeVariants({ size }),
+              "whitespace-nowrap",
             )}
           >
             {addonAfter}
