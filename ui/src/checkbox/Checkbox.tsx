@@ -45,13 +45,13 @@ const Checkbox = React.forwardRef<
           checked={
             indeterminate
               ? "indeterminate"
-              : (typeof props.value === "boolean"
+              : typeof props.value === "boolean"
                 ? props.value
-                : checked)
+                : checked
           }
           defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
           className={clsm(
-            "peer size-4 shrink-0 self-center rounded-[4px]",
+            "peer size-4 self-center rounded-[4px]",
             "border border-gray-700 ring-offset-background",
             "transition-colors",
             "disabled:cursor-not-allowed disabled:opacity-50",
@@ -82,7 +82,7 @@ const Checkbox = React.forwardRef<
             )}
           </CheckboxPrimitive.Indicator>
         </CheckboxPrimitive.Root>
-        <span className="cursor-pointer px-2">{children}</span>
+        {children && <span className="cursor-pointer px-2">{children}</span>}
       </label>
     );
   },

@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
 import type { ValueType } from "../form";
-import { Checkbox } from "./Checkbox";
+import { Checkbox } from "./checkbox";
 
 type CheckboxGroupProps<T extends ValueType> = {
   name?: string;
