@@ -286,21 +286,22 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           header.column.columnDef.meta?.align === "right" &&
                             "text-right",
                           // pinning
-                          scroll?.x &&
-                            getCommonPinningClassName(
-                              header.column,
-                              {
-                                scrollLeft: wrapperScrollLeft,
-                                scrollRight: wrapperScrollRight,
-                              },
-                              true,
-                            ),
+                          // scroll?.x &&
+                          getCommonPinningClassName(
+                            header.column,
+                            {
+                              scrollLeft: wrapperScrollLeft,
+                              scrollRight: wrapperScrollRight,
+                            },
+                            true,
+                          ),
                           // selection column
                           header.id === "selection" && "px-0",
                         )}
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <Tooltip
+                          open={header.column.getCanSort()}
                           title={
                             header.column.getCanSort()
                               ? header.column.getNextSortingOrder() === "asc"
@@ -423,11 +424,11 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   cell.column.columnDef.meta?.align ===
                                     "right" && "text-right",
                                   // pinning
-                                  scroll?.x &&
-                                    getCommonPinningClassName(cell.column, {
-                                      scrollLeft: wrapperScrollLeft,
-                                      scrollRight: wrapperScrollRight,
-                                    }),
+                                  // scroll?.x &&
+                                  getCommonPinningClassName(cell.column, {
+                                    scrollLeft: wrapperScrollLeft,
+                                    scrollRight: wrapperScrollRight,
+                                  }),
                                   // selection column
                                   cell.id.endsWith("selection") && "px-0",
                                 )}

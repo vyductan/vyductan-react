@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { clsm } from "..";
 import type { TableSize } from "./types";
+import { clsm } from "..";
 
 const TableRoot = React.forwardRef<
   HTMLTableElement,
@@ -111,7 +111,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
     <td
       ref={ref}
       className={clsm(
-        "px-3",
+        "px-2",
         size === "sm" ? "py-2" : "py-3",
         "border-b",
         "break-words",
