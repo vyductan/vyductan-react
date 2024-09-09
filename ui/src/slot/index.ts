@@ -1,1 +1,1 @@
-export * from "./GenericSlot";
+export * from "./generic-slot";
