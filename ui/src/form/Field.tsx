@@ -18,9 +18,9 @@ import type { inputVariants } from "../input";
 import { clsm } from "..";
 import { GenericSlot } from "../slot";
 import { FormFieldContext } from "./context";
-import { FieldDescription } from "./FieldDescription";
-import { FieldLabel } from "./FieldLabel";
-import { FieldMessage } from "./FieldMessage";
+import { FieldDescription } from "./field-description";
+import { FieldLabel } from "./field-label";
+import { FieldMessage } from "./field-message";
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -103,7 +103,7 @@ const FieldInner = <
               // error={formState.errors[name]}
               children={
                 children
-                  ? (typeof children === "function"
+                  ? typeof children === "function"
                     ? children({
                         field,
                         fieldState,
@@ -111,20 +111,17 @@ const FieldInner = <
                       })
                     : cloneElement(children, {
                         ...field,
-                        value:
-                          field.value !== undefined || field.value !== null
-                            ? field.value
-                            : "",
-                        onChange: (e: any) => {
+                        value: field.value ?? "",
+                        onChange: (event: any) => {
                           (
                             children.props as {
                               onChange?: (...event: any[]) => any;
                             }
-                          ).onChange?.(e);
-                          field.onChange(onChange ? onChange(e) : e);
+                          ).onChange?.(event);
+                          field.onChange(onChange ? onChange(event) : event);
                         },
-                      }))
-                  : null
+                      })
+                  : undefined
               }
               ref={ref}
               {...props}
@@ -160,7 +157,7 @@ const FieldInner = <
   if (typeof children !== "function") {
     return <FieldRender fieldId={fieldId} children={children} {...props} />;
   }
-  return null;
+  return;
 };
 
 type FieldRenderProps = {
@@ -220,7 +217,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
               ) : (
                 label
               )
-            ) : null}
+            ) : undefined}
 
             {/* Input */}
             <GenericSlot<VariantProps<typeof inputVariants>>

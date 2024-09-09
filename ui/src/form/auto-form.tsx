@@ -5,7 +5,7 @@ import React from "react";
 
 import { clsm } from "@acme/ui";
 
-import type { FormProps } from "./Form";
+import type { FormProps } from "./form";
 import type { FieldsSchema, FieldType, InputUnion } from "./types";
 import type { FormInstance } from "./useForm";
 import { AutoComplete } from "../autocomplete";
@@ -17,9 +17,9 @@ import { Input, InputPassword } from "../input";
 import { RadioGroup } from "../radio";
 import { Tag } from "../tag";
 import { Textarea } from "../textarea";
-import { Field } from "./Field";
-import { FieldArray } from "./FieldArray";
-import { Form } from "./Form";
+import { Field } from "./field";
+import { FieldList } from "./field-list";
+import { Form } from "./form";
 
 /*
  * Docs: https://procomponents.ant.design/en-US/components/schema-form
@@ -79,11 +79,11 @@ const AutoForm = <
             ...rest
           } = field;
           return (
-            <FieldArray name={name} {...rest}>
+            <FieldList name={name} {...rest}>
               {({ fields, append, remove }) => (
                 <div>
                   {fields.map((item, index) => (
-                    <div key={item.id}>
+                    <div key={item.name}>
                       <div className="mb-2 flex justify-between">
                         <Tag className="rounded-md">
                           {itemTitle ?? "Item"} #{index}
@@ -100,11 +100,11 @@ const AutoForm = <
                               ...field,
                               ...(field.type === "group"
                                 ? {}
-                                : (field.name
+                                : field.name
                                   ? {
                                       name: `${name}.${index}.${String(field.name)}`,
                                     }
-                                  : { name: `${name}.${index}` })),
+                                  : { name: `${name}.${index}` }),
                             }) as unknown as FieldsSchema<
                               TFieldValues[keyof TFieldValues]
                             >,
@@ -122,7 +122,7 @@ const AutoForm = <
                   </Button>
                 </div>
               )}
-            </FieldArray>
+            </FieldList>
           );
         }
         const { name, label, description, className, ...rest } = field;
