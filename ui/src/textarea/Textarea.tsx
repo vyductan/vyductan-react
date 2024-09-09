@@ -21,7 +21,7 @@ const textareaVariants = cva(
       size: {
         xs: "",
         sm: "",
-        default: "px-3 py-[9px]",
+        default: "px-[11px] py-[5px]",
         lg: "",
         xl: "p-4 text-md",
       },
