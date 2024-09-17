@@ -9,10 +9,11 @@ export interface Props {
   columns?: number;
   style?: React.CSSProperties;
   horizontal?: boolean;
+  className?: string;
 }
 
 export const List = forwardRef<HTMLUListElement, Props>(
-  ({ children, columns = 1, horizontal, style }: Props, ref) => {
+  ({ children, columns = 1, horizontal, style, className }: Props, ref) => {
     return (
       <ul
         ref={ref}
@@ -29,6 +30,7 @@ export const List = forwardRef<HTMLUListElement, Props>(
         className={clsm(
           "grid w-full auto-rows-max gap-2 rounded-md",
           horizontal && "grid-flow-col",
+          className,
         )}
       >
         {children}
