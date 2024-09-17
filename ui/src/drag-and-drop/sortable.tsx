@@ -255,7 +255,7 @@ export const Sortable = ({
     >
       <Wrapper style={style} center>
         <SortableContext items={items} strategy={strategy}>
-          <Container>
+          <Container className={classNames?.list}>
             {items.map((item, index) => (
               <SortableItem
                 key={item.id}

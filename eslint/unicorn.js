@@ -31,6 +31,8 @@ export default [
             Prop: true,
             props: true,
             Props: true,
+            src: true,
+            Src: true,
           },
         },
       ],

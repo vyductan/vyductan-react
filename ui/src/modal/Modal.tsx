@@ -32,6 +32,8 @@ type ModalProps = DialogProps & {
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+
+  scrollAreaViewportRef?: React.RefObject<HTMLDivElement>;
 };
 const Modal = ({
   className,
@@ -45,6 +47,8 @@ const Modal = ({
   onOk,
   onCancel,
   // onOpenChange,
+  //
+  scrollAreaViewportRef,
   ...rest
 }: ModalProps) => {
   // const CancelBtn = () => (
@@ -91,6 +95,9 @@ const Modal = ({
       </Button>
     </>
   );
+
+  const ref = React.useRef<HTMLDivElement>(null);
+  ref.current?.scrollTo(0, ref.current.scrollHeight);
   return (
     <Dialog
       {...rest}
@@ -109,7 +116,10 @@ const Modal = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] px-5 [&>[data-radix-scroll-area-viewport]]:px-1">
+        <ScrollArea
+          className="max-h-[80vh] px-5 [&>[data-radix-scroll-area-viewport]]:px-1"
+          viewportRef={scrollAreaViewportRef}
+        >
           {children}
         </ScrollArea>
 

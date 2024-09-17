@@ -28,22 +28,20 @@ export type SelectProps<T extends ValueType = string> = Omit<
     id?: string;
     value?: T;
     options: Option<T>[];
-
-    className?: string;
-
-    loading?: boolean;
-    empty?: React.ReactNode;
     placeholder?: string;
 
-    onSearchChange?: (search: string) => void;
-
+    className?: string;
     groupClassName?: string;
+    loading?: boolean;
+    empty?: React.ReactNode;
+    dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     optionRender?: (option: Option<T>) => {
       checked?: boolean;
       icon?: React.ReactNode;
       label?: React.ReactNode;
     };
     optionsRender?: (options: Option<T>[]) => React.ReactNode;
+    onSearchChange?: (search: string) => void;
     onChange?: (value: T, option: Option | Array<Option>) => void;
   };
 
@@ -52,22 +50,35 @@ const SelectInner = <T extends ValueType = string>(
     id,
     value,
     options,
-
     placeholder,
-
-    onChange,
 
     className,
     borderless,
     size,
     status,
+    dropdownRender,
 
+    onChange,
     ...props
   }: SelectProps<T>,
   _: React.ForwardedRef<HTMLInputElement>,
 ) => {
   const [open, setOpen] = React.useState(false);
 
+  const content = (
+    <>
+      {options.length > 0 ? (
+        options.map((o) => (
+          <SelectItem key={String(o.value)} value={o.value as string}>
+            {o.label}
+          </SelectItem>
+        ))
+      ) : (
+        <Empty />
+      )}
+    </>
+  );
+  const ContentComp = dropdownRender ? dropdownRender(content) : content;
   return (
     <SelectRoot
       value={value as string}
@@ -88,17 +99,7 @@ const SelectInner = <T extends ValueType = string>(
       >
         <SelectValue placeholder={placeholder} className="h-5" />
       </SelectTrigger>
-      <SelectContent>
-        {options.length > 0 ? (
-          options.map((o) => (
-            <SelectItem key={String(o.value)} value={o.value as string}>
-              {o.label}
-            </SelectItem>
-          ))
-        ) : (
-          <Empty />
-        )}
-      </SelectContent>
+      <SelectContent>{ContentComp}</SelectContent>
     </SelectRoot>
   );
 };

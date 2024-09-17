@@ -4,13 +4,17 @@ import type { FileItem, UploadService } from "./types";
 import { clsm } from "..";
 
 type UploadZoneProps = {
-  uploadService?: UploadService;
   accept?: string;
+  uploadService?: UploadService;
   onUploadSuccess?: (data: FileItem) => void;
+
+  render?: () => void;
 };
 export const UploadZone = ({
   uploadService,
   onUploadSuccess,
+
+  // render
 }: UploadZoneProps) => {
   const [dragActive, setDragActive] = useState(false);
 
@@ -70,7 +74,7 @@ export const UploadZone = ({
     <div>
       <label
         htmlFor="image-upload"
-        className="group relative mt-2 flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
+        className="group relative flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
       >
         <div
           className="absolute z-[5] size-full rounded-md"
