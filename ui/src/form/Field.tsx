@@ -3,6 +3,7 @@
 import type { VariantProps } from "class-variance-authority";
 import type { ForwardedRef, ReactElement, ReactNode } from "react";
 import type {
+  Control,
   ControllerFieldState,
   ControllerProps,
   ControllerRenderProps,
@@ -12,7 +13,7 @@ import type {
   UseFormStateReturn,
 } from "react-hook-form";
 import { cloneElement, forwardRef, useId } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
 
 import type { inputVariants } from "../input";
 import { clsm } from "..";
@@ -43,7 +44,7 @@ type FieldProps<
   description?: ReactNode;
   className?: string;
   /*
-   * Custome output for input component (like DatePicker)
+   * Custome output for input component (like DatePicker, Upload)
    * */
   onChange?: (...event: any[]) => any;
 };
@@ -52,7 +53,7 @@ const FieldInner = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   {
-    control,
+    // control,
     name,
     children,
     // label,
@@ -74,61 +75,17 @@ const FieldInner = <
 
   if (form && name) {
     return (
-      <FormFieldContext.Provider
-        value={{
-          name,
-          id,
-          fieldId,
-          fieldDescriptionId,
-          fieldMessageId,
-        }}
-      >
-        <Controller
-          control={control}
-          name={name}
-          // defaultValue=""
-          // render={(x) => {
-          //   console.log("rrrrrrr", x.fieldState.error);
-          //   return <>rrrr{x.fieldState.error?.message}</>;
-          // }}
-          //{...props}
-          render={({ field, fieldState, formState }) => (
-            <FieldRender
-              fieldId={fieldId}
-              fieldMessageId={fieldMessageId}
-              fieldDescriptionId={fieldDescriptionId}
-              fieldState={fieldState}
-              // formState={formState}
-              // error={fieldState.errors[name]}
-              // error={formState.errors[name]}
-              children={
-                children
-                  ? typeof children === "function"
-                    ? children({
-                        field,
-                        fieldState,
-                        formState,
-                      })
-                    : cloneElement(children, {
-                        ...field,
-                        value: field.value ?? "",
-                        onChange: (event: any) => {
-                          (
-                            children.props as {
-                              onChange?: (...event: any[]) => any;
-                            }
-                          ).onChange?.(event);
-                          field.onChange(onChange ? onChange(event) : event);
-                        },
-                      })
-                  : undefined
-              }
-              ref={ref}
-              {...props}
-            />
-          )}
-        />
-      </FormFieldContext.Provider>
+      <FieldController
+        id={id}
+        fieldId={fieldId}
+        fieldMessageId={fieldMessageId}
+        fieldDescriptionId={fieldDescriptionId}
+        control={form.control}
+        name={name}
+        children={children}
+        onChange={onChange}
+        {...props}
+      />
     );
   }
   if (name && typeof children !== "function") {
@@ -160,13 +117,112 @@ const FieldInner = <
   return;
 };
 
+type FieldControllerProps<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
+  control: Control<TFieldValues>;
+  name: TName;
+  children?:
+    | ReactElement
+    | (({
+        field,
+        fieldState,
+        formState,
+      }: {
+        field: FieldControllerRenderProps<TFieldValues, TName>;
+        fieldState: ControllerFieldState;
+        formState: UseFormStateReturn<TFieldValues>;
+      }) => React.ReactElement);
+  onChange?: (...event: any[]) => any;
+
+  id: string;
+  fieldId: string;
+  fieldMessageId: string;
+  fieldDescriptionId: string;
+};
+const InternalFieldController = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>(
+  {
+    control,
+    name,
+    onChange,
+    children,
+    id,
+    fieldId,
+    fieldMessageId,
+    fieldDescriptionId,
+    ...props
+  }: FieldControllerProps<TFieldValues, TName>,
+  ref: ForwardedRef<HTMLDivElement>,
+) => {
+  const watchedValue = useWatch({
+    control,
+    name,
+  });
+  return (
+    <FormFieldContext.Provider
+      value={{
+        name,
+        id,
+        fieldId,
+        fieldDescriptionId,
+        fieldMessageId,
+      }}
+    >
+      <Controller
+        control={control}
+        name={name}
+        render={({ field, fieldState, formState }) => (
+          <FieldRender
+            fieldId={fieldId}
+            fieldMessageId={fieldMessageId}
+            fieldDescriptionId={fieldDescriptionId}
+            fieldState={fieldState}
+            children={
+              children
+                ? typeof children === "function"
+                  ? children({
+                      field,
+                      fieldState,
+                      formState,
+                    })
+                  : cloneElement(children, {
+                      ...field,
+                      value: watchedValue ?? "",
+                      onChange: (event: any) => {
+                        (
+                          children.props as {
+                            onChange?: (...event: any[]) => any;
+                          }
+                        ).onChange?.(event);
+                        field.onChange(onChange ? onChange(event) : event);
+                      },
+                    })
+                : undefined
+            }
+            ref={ref}
+            {...props}
+          />
+        )}
+      />
+    </FormFieldContext.Provider>
+  );
+};
+const FieldController = forwardRef(InternalFieldController) as <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>(
+  props: FieldControllerProps<TFieldValues, TName>,
+) => ReturnType<typeof InternalFieldController>;
+
 type FieldRenderProps = {
   className?: string;
 
   label?: string | JSX.Element;
   description?: ReactNode;
-  // error?: string FieldError;
-  // error?: FieldError;
   children?: ReactElement | null;
 
   fieldId?: string;
@@ -174,7 +230,6 @@ type FieldRenderProps = {
   fieldMessageId?: string;
 
   fieldState?: ControllerFieldState;
-  // formState?: UseFormStateReturn<any>;
 };
 const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
   (
@@ -182,7 +237,6 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       className,
       label,
       description,
-      // error,
       children,
 
       fieldId,
@@ -190,7 +244,6 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       fieldMessageId,
 
       fieldState,
-      // formState,
 
       ...props
     },
