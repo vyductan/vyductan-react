@@ -1,6 +1,6 @@
 import type { FieldValues } from "react-hook-form";
 
-import type { AutoCompleteProps } from "../autocomplete";
+import type { AutoCompleteProps } from "../auto-complete";
 import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
 import type { EditorProps } from "../editor";
 import type { InputProps } from "../input";
