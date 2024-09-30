@@ -212,6 +212,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               "border-s bg-background",
               inputSizeVariants({ size }),
               "whitespace-nowrap",
+              // p-0 for use Select component
+              typeof addonAfter === "object" && "p-0",
             )}
           >
             {addonAfter}
