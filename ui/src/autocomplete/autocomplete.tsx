@@ -5,6 +5,7 @@ import * as React from "react";
 import type { CommandProps } from "../command";
 import type { ValueType } from "../form";
 import type { Option } from "../select/types";
+import { clsm } from "..";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
@@ -14,6 +15,7 @@ import { selectDefaultPlaceholder } from "../select";
 export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
   | "value"
+  | "filter"
   | "placeholder"
   | "empty"
   | "groupClassName"
@@ -49,6 +51,9 @@ const AutoCompleteInner = <T extends ValueType = string>(
     }
     const o = options.find((o) => o.value === value);
     if (o) {
+      const label = props.optionRender?.label
+        ? props.optionRender.label(o)
+        : o.label;
       return (
         <>
           {props.optionRender?.icon ? (
@@ -56,7 +61,11 @@ const AutoCompleteInner = <T extends ValueType = string>(
           ) : (
             o.icon && <Icon icon={o.icon} />
           )}
-          {props.optionRender?.label ? props.optionRender.label(o) : o.label}
+          {typeof label === "string" ? (
+            <span className="truncate">{label}</span>
+          ) : (
+            label
+          )}
         </>
       );
     }
@@ -72,6 +81,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
       style={{ width: buttonRef.current?.offsetWidth }}
       content={
         <Command
+          value={value}
           options={options.map((o) => ({
             ...o,
             onSelect: () => {
@@ -86,13 +96,17 @@ const AutoCompleteInner = <T extends ValueType = string>(
     >
       <Button
         ref={buttonRef}
+        variant="outline"
         role="combobox"
         aria-expanded={open}
-        className="w-full justify-between text-sm"
+        className={clsm(
+          "w-full justify-between text-sm font-normal",
+          !value && "text-muted-foreground",
+        )}
       >
-        <span>{buttonText}</span>
+        {buttonText}
         <Icon
-          icon="lucide:chevrons-up-down"
+          icon="icon-[lucide--chevrons-up-down]"
           className="ml-2 size-4 shrink-0 opacity-50"
         />
       </Button>
