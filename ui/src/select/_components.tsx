@@ -2,8 +2,10 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 
+import type { ValueType } from "../form";
 import { clsm } from "..";
 import { Icon } from "../icons";
+import { CheckFilled } from "../icons/check-filled";
 import { inputSizeVariants, inputVariants } from "../input";
 
 type SelectRootProps = SelectPrimitive.SelectProps;
@@ -13,36 +15,89 @@ const SelectGroup = SelectPrimitive.Group;
 
 const SelectValue = SelectPrimitive.Value;
 
-type SelectTriggerProps = React.ComponentPropsWithoutRef<
-  typeof SelectPrimitive.Trigger
+type SelectTriggerProps = Omit<
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>,
+  "value"
 > &
   VariantProps<typeof inputVariants> &
-  VariantProps<typeof inputSizeVariants>;
+  VariantProps<typeof inputSizeVariants> & {
+    allowClear: boolean | undefined;
+    onClear: () => void;
+    /* For clear */
+    value: ValueType | undefined;
+  };
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   SelectTriggerProps
->(({ className, children, borderless, size, status, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={clsm(
-      inputVariants({ borderless, status }),
-      inputSizeVariants({ size }),
-      "items-center justify-between",
-      "placeholder:text-placeholder",
-      "focus:outline-none",
-      // "focus:ring-2 focus:ring-ring focus:ring-offset-2",
-      // "disabled:text-placeholder disabled:cursor-not-allowed disabled:pointer-events-none",
-      // "[&>span]:line-clamp-1", ???  disabled for middle arrow
+>(
+  (
+    {
       className,
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon className="flex size-5 items-center justify-center">
-      <Icon icon="icon-[mingcute--down-fill]" className="size-4 opacity-50" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-));
+      children,
+      borderless,
+      size,
+      status,
+
+      allowClear,
+      onClear,
+      value,
+
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <SelectPrimitive.Trigger
+        ref={ref}
+        className={clsm(
+          "group relative",
+          inputVariants({ borderless, status }),
+          inputSizeVariants({ size }),
+          "items-center justify-between",
+          "data-[placeholder]:text-muted-foreground",
+          "focus:outline-none",
+          // "focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          // "disabled:text-placeholder disabled:cursor-not-allowed disabled:pointer-events-none",
+          // "[&>span]:line-clamp-1", ???  disabled for middle arrow
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        {allowClear && (
+          <button
+            className={clsm(
+              "z-10",
+              "absolute right-[11px]",
+              "flex size-5 items-center justify-center transition-opacity",
+              "opacity-0",
+              "hover:!opacity-50",
+              value && "group-hover:opacity-30",
+            )}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClear();
+            }}
+          >
+            <Icon
+              icon="icon-[ant-design--close-circle-filled]"
+              className="pointer-events-none size-3.5"
+            />
+          </button>
+        )}
+        <SelectPrimitive.Icon
+          className={clsm(
+            "flex size-5 items-center justify-center opacity-50 transition-opacity",
+            allowClear && value && "group-hover:opacity-0",
+          )}
+        >
+          <Icon icon="icon-[mingcute--down-fill]" className="size-4" />
+        </SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+    );
+  },
+);
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 const SelectScrollUpButton = React.forwardRef<
@@ -140,7 +195,7 @@ const SelectItem = React.forwardRef<
   >
     <span className="absolute left-2 flex h-full items-center justify-center">
       <SelectPrimitive.ItemIndicator asChild>
-        <Icon icon="icon-[mingcute--check-fill]" className="size-4" />
+        <CheckFilled className="size-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
 
