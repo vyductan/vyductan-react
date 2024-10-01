@@ -1,2 +1,2 @@
 export * from "./radio";
-export * from "./RadioGroup";
+export * from "./radio-group";

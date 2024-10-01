@@ -5,8 +5,8 @@ import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { clsm } from "@acme/ui";
 
-import type { ScrollBarProps } from "./ScrollBar";
-import { ScrollBar } from "./ScrollBar";
+import type { ScrollBarProps } from "./scroll-bar";
+import { ScrollBar } from "./scroll-bar";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,

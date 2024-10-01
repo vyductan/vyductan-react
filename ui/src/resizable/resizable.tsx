@@ -2,11 +2,11 @@
 
 import { Fragment } from "react";
 
-import type { ResizablePanelProps } from "./ResizablePanel";
-import type { ResizablePanelGroupProps } from "./ResizablePanelGroup";
-import { ResizableHandler } from "./ResizableHandler";
-import { ResizablePanel } from "./ResizablePanel";
-import { ResizablePanelGroup } from "./ResizablePanelGroup";
+import type { ResizablePanelProps } from "./resizable-panel";
+import type { ResizablePanelGroupProps } from "./resizable-panel-group";
+import { ResizableHandler } from "./resizable-handler";
+import { ResizablePanel } from "./resizable-panel";
+import { ResizablePanelGroup } from "./resizable-panel-group";
 
 export type ResizableItems = ResizablePanelProps[];
 export type ResizableProps = ResizablePanelGroupProps & {

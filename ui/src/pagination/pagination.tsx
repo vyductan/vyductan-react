@@ -17,7 +17,7 @@ import {
   PaginationTotal,
 } from "./_components";
 import enUS from "./locale/en_US";
-import { usePagination } from "./usePagination";
+import { usePagination } from "./use-pagination";
 
 export type PaginationProps = {
   className?: string;

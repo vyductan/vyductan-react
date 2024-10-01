@@ -1,1 +1,1 @@
-export * from "./TailwindIndicator";
+export * from "./tailwind-indicator";

@@ -8,7 +8,7 @@ import { clsm } from "@acme/ui";
 import type { FormProps } from "./form";
 import type { FieldsSchema, FieldType, InputUnion } from "./types";
 import type { FormInstance } from "./useForm";
-import { AutoComplete } from "../auto-complete";
+import { AutoComplete } from "../autocomplete";
 import { Button } from "../button";
 import { DatePicker, DateRangePicker } from "../date-picker";
 import { Editor } from "../editor";
