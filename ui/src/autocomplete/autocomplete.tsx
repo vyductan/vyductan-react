@@ -114,7 +114,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
   );
 };
 
-export const AutoComplete = React.forwardRef(AutoCompleteInner) as <
+export const Autocomplete = React.forwardRef(AutoCompleteInner) as <
   T extends ValueType,
 >(
   props: AutoCompleteProps<T> & {

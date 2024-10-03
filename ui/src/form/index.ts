@@ -3,5 +3,5 @@ export * from "./field";
 export * from "./field-label";
 export * from "./form";
 export * from "./field-list";
-export * from "./useForm";
+export * from "./use-form";
 export * from "./types";

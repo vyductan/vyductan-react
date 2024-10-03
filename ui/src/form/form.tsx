@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 import { FormProvider } from "react-hook-form";
 
-import type { FormInstance } from "./useForm";
+import type { FormInstance } from "./use-form";
 
 type FormProps<
   TFieldValues extends FieldValues,

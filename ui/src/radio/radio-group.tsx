@@ -3,7 +3,7 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import type { ValueType } from "../form";
 import { clsm } from "..";
-import { Radio } from "./Radio";
+import { Radio } from "./radio";
 
 type RadioOption<TValue extends string | number | boolean = string> = {
   label: React.ReactNode;

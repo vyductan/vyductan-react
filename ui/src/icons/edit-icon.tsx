@@ -1,5 +1,5 @@
-import type { IconProps } from "./Icon";
-import { Icon } from "./Icon";
+import type { IconProps } from "./icon";
+import { Icon } from "./icon";
 
 type EditIconProps = Omit<IconProps, "icon">;
 export const EditIcon = (props: EditIconProps) => {

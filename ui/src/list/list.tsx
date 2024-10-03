@@ -12,7 +12,7 @@ const listVariants = cva([""], {
     },
   },
 });
-export interface ListProps<T> extends VariantProps<typeof listVariants> {
+interface ListProps<T> extends VariantProps<typeof listVariants> {
   bordered?: boolean;
   className?: string;
   // rootClassName?: string;
@@ -34,7 +34,7 @@ export interface ListProps<T> extends VariantProps<typeof listVariants> {
   renderItem: (item: T, index: number) => React.ReactNode;
 }
 
-function List<TRecord extends Record<string, unknown>>({
+const List = <TRecord extends Record<string, unknown>>({
   // pagination = false as ListProps<any>['pagination'],
   // prefixCls: customizePrefixCls,
   // bordered = false,
@@ -53,7 +53,7 @@ function List<TRecord extends Record<string, unknown>>({
   rowKey,
   renderItem,
   // ...rest
-}: ListProps<TRecord>) {
+}: ListProps<TRecord>) => {
   return (
     <>
       {header && <div>{header}</div>}
@@ -65,9 +65,9 @@ function List<TRecord extends Record<string, unknown>>({
               key={
                 typeof rowKey === "function"
                   ? rowKey(item)
-                  : (rowKey
+                  : rowKey
                     ? (item[rowKey] as string)
-                    : `list-item-${index}`)
+                    : `list-item-${index}`
               }
             >
               {renderItem(item, index)}
@@ -78,6 +78,7 @@ function List<TRecord extends Record<string, unknown>>({
       {footer && <div>{footer}</div>}
     </>
   );
-}
+};
 
-export default List;
+export type { ListProps };
+export { List };
