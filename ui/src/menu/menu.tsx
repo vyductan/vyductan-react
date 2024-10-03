@@ -64,22 +64,27 @@ export const Menu = ({
             >
               {item.label}
             </div>
-            {item.children && (
+            {item.children.some((c) => !c.hidenInNav) && (
               <ul role="group">
-                {item.children.map(({ key, ...x }) => {
-                  const isActive = mergedSelectKeys.some((x) =>
-                    x.endsWith(key.toString()),
-                  );
-                  return (
-                    <MenuItem
-                      key={key}
-                      keyProp={key}
-                      isActive={isActive}
-                      onSelect={onSelect}
-                      {...x}
-                    />
-                  );
-                })}
+                {item.children
+                  .filter((c) => !c.hidenInNav)
+                  .map(({ key, ...x }) => {
+                    // const isActive = mergedSelectKeys.some((x) =>
+                    //   x.endsWith(key.toString()),
+                    // );
+                    const isActive = mergedSelectKeys.some((x) =>
+                      key.toString().startsWith(x),
+                    );
+                    return (
+                      <MenuItem
+                        key={key}
+                        keyProp={key}
+                        isActive={isActive}
+                        onSelect={onSelect}
+                        {...x}
+                      />
+                    );
+                  })}
               </ul>
             )}
           </li>

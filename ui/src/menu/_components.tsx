@@ -1,5 +1,4 @@
 import type { KeyboardEvent, MouseEvent } from "react";
-import Link from "next/link";
 import { Slot } from "@radix-ui/react-slot";
 
 import type { MenuItemType } from "./types";
@@ -19,12 +18,15 @@ export const MenuItem = ({
   keyProp,
   label,
   icon,
-  href,
   onSelect,
   isActive,
 }: MenuItemProps) => {
-  const labelToRender =
-    typeof label === "string" ? <span>{label}</span> : label;
+  const labelToRender = (
+    <div>
+      {typeof icon === "string" ? <Icon icon={icon} /> : icon}
+      {typeof label === "string" ? <span>{label}</span> : label}
+    </div>
+  );
   return (
     <li
       role="menuitem"
@@ -49,14 +51,15 @@ export const MenuItem = ({
           "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2",
         )}
       >
-        {href ? (
-          <Link href={href}>
-            {typeof icon === "string" ? <Icon icon={icon} /> : icon}
-            {labelToRender}
-          </Link>
-        ) : (
-          labelToRender
-        )}
+        {/* {href ? ( */}
+        {/*   <Link href={href}> */}
+        {/*     {typeof icon === "string" ? <Icon icon={icon} /> : icon} */}
+        {/*     {labelToRender} */}
+        {/*   </Link> */}
+        {/* ) : ( */}
+        {/*   labelToRender */}
+        {/* )} */}
+        {labelToRender}
       </Slot>
     </li>
   );

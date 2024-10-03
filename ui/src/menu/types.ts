@@ -17,6 +17,8 @@ export type MenuItemType = {
 
   children?: MenuItemType[];
 
+  hidenInNav?: boolean;
+
   // // >>>>> Active
   // onMouseEnter?: MenuHoverEventHandler;
   // onMouseLeave?: MenuHoverEventHandler;
