@@ -13,6 +13,11 @@ import type { FieldArrayProps } from "./field-list";
 
 export type ValueType = string | number | boolean;
 
+export type FieldError = {
+  path: string[];
+  message: string;
+};
+
 type AutoFormFieldBaseProps = {
   // title?: ReactNode;
 

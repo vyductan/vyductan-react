@@ -4,7 +4,7 @@ import type { HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
 import { clsm } from "..";
-import { useField } from "./useField";
+import { useField } from "./use-field";
 
 const FieldMessage = forwardRef<
   HTMLParagraphElement,

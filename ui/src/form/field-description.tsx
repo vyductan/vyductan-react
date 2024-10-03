@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
 import { clsm } from "..";
-import { useField } from "./useField";
+import { useField } from "./use-field";
 
 const FieldDescription = forwardRef<
   HTMLParagraphElement,

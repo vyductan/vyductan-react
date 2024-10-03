@@ -9,19 +9,19 @@ import type {
   ControllerRenderProps,
   FieldPath,
   FieldValues,
-  UseFormReturn,
   UseFormStateReturn,
 } from "react-hook-form";
 import { cloneElement, forwardRef, useId } from "react";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { Controller, useWatch } from "react-hook-form";
 
 import type { inputVariants } from "../input";
 import { clsm } from "..";
 import { GenericSlot } from "../slot";
-import { FormFieldContext } from "./context";
+import { FormFieldContext, useFormContext } from "./context";
 import { FieldDescription } from "./field-description";
 import { FieldLabel } from "./field-label";
 import { FieldMessage } from "./field-message";
+import { useFieldOptionalityCheck } from "./use-field-optionality-check";
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -70,8 +70,14 @@ const FieldInner = <
   const fieldDescriptionId = `${id}-form-item-description`;
   const fieldMessageId = `${id}-form-item-message`;
 
-  const form =
-    useFormContext<TFieldValues>() as UseFormReturn<TFieldValues> | null;
+  // const form =
+  //   useFormContext<TFieldValues>() as UseFormReturn<TFieldValues> | null;
+  const form = useFormContext<TFieldValues>();
+
+  // console.log(form.control._options.resolver({[field.name]: field.value}, context, {}))
+  //
+
+  const isOptional = useFieldOptionalityCheck(name, form?.schema);
 
   if (form && name) {
     return (
@@ -84,6 +90,7 @@ const FieldInner = <
         name={name}
         children={children}
         onChange={onChange}
+        required={!isOptional}
         {...props}
       />
     );
@@ -140,6 +147,8 @@ type FieldControllerProps<
   fieldId: string;
   fieldMessageId: string;
   fieldDescriptionId: string;
+  disabled?: boolean;
+  required?: boolean;
 };
 const InternalFieldController = <
   TFieldValues extends FieldValues = FieldValues,
@@ -154,6 +163,8 @@ const InternalFieldController = <
     fieldId,
     fieldMessageId,
     fieldDescriptionId,
+    disabled,
+    required,
     ...props
   }: FieldControllerProps<TFieldValues, TName>,
   ref: ForwardedRef<HTMLDivElement>,
@@ -181,6 +192,7 @@ const InternalFieldController = <
             fieldMessageId={fieldMessageId}
             fieldDescriptionId={fieldDescriptionId}
             fieldState={fieldState}
+            required={required}
             children={
               children
                 ? typeof children === "function"
@@ -191,6 +203,7 @@ const InternalFieldController = <
                     })
                   : cloneElement(children, {
                       ...field,
+                      disabled,
                       value: watchedValue ?? "",
                       onChange: (event: any) => {
                         (
@@ -230,6 +243,8 @@ type FieldRenderProps = {
   fieldMessageId?: string;
 
   fieldState?: ControllerFieldState;
+
+  required?: boolean;
 };
 const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
   (
@@ -244,6 +259,8 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       fieldMessageId,
 
       fieldState,
+
+      required,
 
       ...props
     },
@@ -266,7 +283,9 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
             {/* Label */}
             {label ? (
               typeof label === "string" ? (
-                <FieldLabel className="pb-2">{label}</FieldLabel>
+                <FieldLabel className="pb-2" required={required}>
+                  {label}
+                </FieldLabel>
               ) : (
                 label
               )

@@ -14,7 +14,7 @@ import type {
   UseFormReturn,
   UseFormProps as UseRHFormProps,
 } from "react-hook-form";
-import type { z } from "zod";
+import type { z, ZodSchema } from "zod";
 import { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEqual, transform } from "lodash";
@@ -27,8 +27,9 @@ type FormInstance<
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
+  schema: ZodSchema | undefined;
   submit: (
-    event?: BaseSyntheticEvent<object, unknown, unknown> | undefined,
+    event?: BaseSyntheticEvent<object, unknown, unknown>,
   ) => Promise<void>;
   setFieldsValue: UseFormReset<TFieldValues>;
   resetFields: (keepStateOptions?: KeepStateOptions) => void;
@@ -45,23 +46,23 @@ type UseFormProps<
     : TTransformedValues extends FieldValues
       ? SubmitHandler<TTransformedValues>
       : never;
+  onValuesChange?: (
+    changedValues: TFieldValues,
+    allValues: TFieldValues,
+  ) => void;
 };
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 >(
-  props?: UseFormProps<TFieldValues, TContext, TTransformedValues> & {
-    onValuesChange?: (
-      changedValues: TFieldValues,
-      allValues: TFieldValues,
-    ) => void;
-  },
+  props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
   const methods = useRHForm<TFieldValues, TContext, TTransformedValues>(
     props
       ? {
           defaultValues: props.defaultValues,
+          values: props.values,
           resolver: props.schema ? zodResolver(props.schema) : undefined,
         }
       : undefined,
@@ -104,6 +105,7 @@ const useForm = <
   const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
     {
       ...methods,
+      schema: props?.schema,
       submit: props
         ? methods.handleSubmit(props.onSubmit)
         : () => Promise.resolve(),
