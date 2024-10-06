@@ -90,7 +90,7 @@ const FieldInner = <
         name={name}
         children={children}
         onChange={onChange}
-        required={!isOptional}
+        required={isOptional === undefined ? false : !isOptional}
         {...props}
       />
     );

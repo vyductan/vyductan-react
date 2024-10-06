@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 import type {
   Control,
   FieldArrayPath,
@@ -13,7 +13,6 @@ import { Field } from "./field";
 
 type FieldListProps<
   TFieldValues extends FieldValues = FieldValues,
-  // TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TFieldArrayName extends
     FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
 > = {
@@ -22,7 +21,6 @@ type FieldListProps<
   label?: string;
   description?: string;
   children?: (
-    // ctx: UseFieldArrayReturn<TFieldValues, TFieldArrayName, "id">,
     ctx: Omit<
       UseFieldArrayReturn<TFieldValues, TFieldArrayName, "id">,
       "fields"
@@ -31,9 +29,8 @@ type FieldListProps<
         id: string;
         name: string;
       }[];
-      // values: FieldArrayWithId<TFieldValues, TFieldArrayName, "id">[];
     },
-  ) => ReactNode;
+  ) => ReactElement;
 };
 const FieldList = <
   TFieldValues extends FieldValues = FieldValues,
@@ -64,8 +61,8 @@ const FieldList = <
     ...helper,
   };
   return (
-    <Field label={label} description={description}>
-      <div className="mt-2 rounded-md">{children?.(ctx)}</div>
+    <Field label={label} name={name} description={description}>
+      {children?.(ctx)}
     </Field>
   );
 };
