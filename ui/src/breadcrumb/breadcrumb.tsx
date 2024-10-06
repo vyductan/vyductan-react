@@ -5,21 +5,21 @@ import { Slot } from "@radix-ui/react-slot";
 import { clsm } from "..";
 import { Skeleton } from "../skeleton";
 
-type BreadcrumbsItem = { key?: Key; title: React.ReactNode; href?: string };
-type BreadcrumbsProps<
+type BreadcrumbItem = { key?: Key; title: React.ReactNode; href?: string };
+type BreadcrumbProps<
   T extends Record<string, string> = Record<string, string>,
 > = {
-  items: BreadcrumbsItem[];
+  items: BreadcrumbItem[];
   className?: string;
   itemRender?: (
-    route: BreadcrumbsItem,
+    route: BreadcrumbItem,
     params: T,
-    routes: BreadcrumbsItem[],
+    routes: BreadcrumbItem[],
     paths: string[],
   ) => React.ReactNode;
   skeleton?: boolean;
 };
-const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbsProps) => {
+const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbProps) => {
   return (
     <nav aria-label="Breadcrumb" className={className}>
       <ol className="flex gap-2">
@@ -52,5 +52,5 @@ const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbsProps) => {
   );
 };
 
-export type { BreadcrumbsItem, BreadcrumbsProps };
-export { Breadcrumb as Breadcrumbs };
+export type { BreadcrumbItem, BreadcrumbProps };
+export { Breadcrumb };
