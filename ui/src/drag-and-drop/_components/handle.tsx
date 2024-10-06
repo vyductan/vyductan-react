@@ -1,21 +1,19 @@
-import React, { forwardRef } from "react";
+import { useSortable } from "@dnd-kit/sortable";
 
-import type { ActionProps } from "./action";
-import { Action } from "./action";
+import { Button } from "../../button";
+import { Icon } from "../../icons";
 
-export const Handle = forwardRef<HTMLButtonElement, ActionProps>(
-  (props, ref) => {
-    return (
-      <Action
-        ref={ref}
-        cursor="grab"
-        data-cypress="draggable-handle"
-        {...props}
-      >
-        <svg viewBox="0 0 20 20" width="1em" height="1em">
-          <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
-        </svg>
-      </Action>
-    );
-  },
-);
+export const HandleButton = ({ id }: { id: string }) => {
+  const { setActivatorNodeRef, listeners } = useSortable({
+    id,
+  });
+
+  return (
+    <Button
+      variant="ghost"
+      icon={<Icon icon="icon-[octicon--grabber-16]" />}
+      {...listeners}
+      ref={setActivatorNodeRef}
+    />
+  );
+};

@@ -40,10 +40,6 @@ import { createPortal } from "react-dom";
 import type { ItemProps } from "./_components/item";
 import { Item } from "./_components/item";
 import { List } from "./_components/list";
-import { Wrapper } from "./_components/wrapper";
-
-// import {createRange} from '../../utilities';
-// import {Item, List, Wrapper} from '../../components';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -90,7 +86,6 @@ export interface SortableProps {
   removable?: boolean;
   reorderItems?: typeof arrayMove;
   strategy?: SortingStrategy;
-  style?: React.CSSProperties;
   useDragOverlay?: boolean;
   getItemStyles?(args: {
     id: UniqueIdentifier;
@@ -133,7 +128,6 @@ export const Sortable = ({
   renderItem,
   reorderItems = arrayMove,
   strategy = rectSortingStrategy,
-  style,
   useDragOverlay = true,
   // eslint-disable-next-line @typescript-eslint/unbound-method
   wrapperStyle = () => ({}),
@@ -253,31 +247,30 @@ export const Sortable = ({
       measuring={measuring}
       modifiers={modifiers}
     >
-      <Wrapper style={style} center>
-        <SortableContext items={items} strategy={strategy}>
-          <Container className={classNames?.list}>
-            {items.map((item, index) => (
-              <SortableItem
-                key={item.id}
-                id={item.id}
-                handle={handle}
-                index={index}
-                style={getItemStyles}
-                className={classNames?.item}
-                wrapperStyle={wrapperStyle}
-                disabled={isDisabled(item.id)}
-                renderItem={renderItem}
-                onRemove={handleRemove}
-                animateLayoutChanges={animateLayoutChanges}
-                useDragOverlay={useDragOverlay}
-                getNewIndex={getNewIndex}
-              >
-                {item.children}
-              </SortableItem>
-            ))}
-          </Container>
-        </SortableContext>
-      </Wrapper>
+      <SortableContext items={items} strategy={strategy}>
+        <Container className={classNames?.list}>
+          {items.map((item, index) => (
+            <SortableItem
+              key={item.id}
+              id={item.id}
+              handle={handle}
+              index={index}
+              style={getItemStyles}
+              className={classNames?.item}
+              wrapperStyle={wrapperStyle}
+              disabled={isDisabled(item.id)}
+              renderItem={renderItem}
+              onRemove={handleRemove}
+              animateLayoutChanges={animateLayoutChanges}
+              useDragOverlay={useDragOverlay}
+              getNewIndex={getNewIndex}
+            >
+              {item.children}
+            </SortableItem>
+          ))}
+        </Container>
+      </SortableContext>
+
       {useDragOverlay
         ? createPortal(
             <DragOverlay
@@ -287,6 +280,7 @@ export const Sortable = ({
               {activeItem ? (
                 <Item
                   id={activeItem.id}
+                  index={0}
                   className={classNames?.item}
                   // value={items[activeIndex]?.id}
                   handle={handle}

@@ -30,7 +30,7 @@ export interface ItemProps {
   handle?: boolean;
   handleProps?: any;
   // height?: number;
-  index?: number;
+  index: number;
   fadeIn?: boolean;
   transform?: Transform | null;
   sorting?: boolean;
@@ -48,7 +48,7 @@ export interface ItemProps {
     dragOverlay: boolean;
     dragging: boolean;
     sorting: boolean;
-    index: number | undefined;
+    index: number;
     fadeIn: boolean;
     listeners: DraggableSyntheticListeners;
     transform: ItemProps["transform"];
