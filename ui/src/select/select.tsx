@@ -77,6 +77,10 @@ const SelectInner = <T extends ValueType = string>(
 
   const content = (
     <>
+      {/* to allow user set value that not in options */}
+      {!options.some((o) => o.value === value) && value !== "" && (
+        <SelectItem value={value as string}>{value}</SelectItem>
+      )}
       {options.length > 0 ? (
         options.map((o) => (
           <SelectItem
@@ -96,15 +100,18 @@ const SelectInner = <T extends ValueType = string>(
     </>
   );
   const ContentComp = dropdownRender ? dropdownRender(content) : content;
+
   return (
     <SelectRoot
       key={key}
       value={value as string}
       open={open}
       onOpenChange={setOpen}
-      onValueChange={(value) => {
-        const x = options.find((x) => String(x.value) === String(value))?.value;
-        onChange?.(x, options.find((x) => x.value === value) as Option);
+      onValueChange={(changedValue) => {
+        const o = options.find((x) => String(x.value) === String(changedValue));
+        // to allow user set value that not in options
+        if (!changedValue || !o) return;
+        onChange?.(o.value, o as Option);
       }}
       {...props}
     >
@@ -137,6 +144,4 @@ const Select = React.forwardRef(SelectInner) as <T extends ValueType>(
     ref?: React.ForwardedRef<HTMLUListElement>;
   },
 ) => ReturnType<typeof SelectInner>;
-Select.displayName = "Select";
-
 export { Select };
