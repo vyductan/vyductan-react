@@ -33,7 +33,7 @@ export const inputVariants = cva(
       status: {
         default: [
           "hover:border-primary-500",
-          "focus-within:!border-primary-600 focus-within:ring-primary-100",
+          "focus-within:border-primary-600 focus-within:ring-primary-100",
         ],
         error: [
           "border-error text-error",
@@ -77,12 +77,17 @@ type InputProps = Omit<
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
     addonAfter?: React.ReactNode;
+  } & {
+    classNames?: {
+      wrapper?: string;
+    };
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     {
       borderless,
       className,
+      classNames,
       disabled,
       hidden,
       size,
@@ -169,7 +174,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className={clsm(
           inputVariants({ borderless, disabled, status }),
           "cursor-text",
-          className,
+          classNames?.wrapper,
         )}
         onClick={() => {
           document.querySelector<HTMLInputElement>(`[id='${id}]`)?.focus();
@@ -192,10 +197,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={inputRef}
           className={clsm(
             "w-full",
+            "text-left",
             "bg-transparent",
             "placeholder:text-muted-foreground",
             "border-none outline-none",
             inputSizeVariants({ size }),
+            className,
           )}
           disabled={disabled}
           onChange={(event) => {
@@ -213,7 +220,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               inputSizeVariants({ size }),
               "whitespace-nowrap",
               // p-0 for use Select component
-              typeof addonAfter === "object" && "p-0",
+              React.isValidElement(addonAfter) &&
+                (addonAfter.type as unknown as { displayName: string })
+                  .displayName === "Select"
+                ? "p-0"
+                : "",
             )}
           >
             {addonAfter}
