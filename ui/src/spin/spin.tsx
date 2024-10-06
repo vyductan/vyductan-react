@@ -5,7 +5,7 @@ import { clsm } from "..";
 
 import "./style.css";
 
-import type { DetailedHTMLProps, HTMLAttributes } from "react";
+import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
 
 const spinVariants = cva("", {
   variants: {
@@ -35,28 +35,34 @@ export type SpinProps = DetailedHTMLProps<
 > &
   VariantProps<typeof spinVariants> & {
     spinning?: boolean;
+    tip?: ReactNode;
   };
 export const Spin = ({
   spinning = true,
+  tip,
+  className,
   size,
   children,
   ...props
 }: SpinProps) => {
   return (
-    <div {...props}>
+    <div className={clsm("relative", className)} {...props}>
       {spinning && (
         <div
           key="loading"
-          className="absolute inset-0 z-10 flex max-h-[400px] items-center justify-center"
+          className="absolute inset-0 z-10 flex max-h-[400px] flex-col items-center justify-center"
         >
           <div
             aria-label="Loading"
             className={clsm("spin", spinVariants({ size }))}
           />
+          {tip && <div className="mt-2">{tip}</div>}
         </div>
       )}
-      <div className={clsm(spinning && "pointer-events-none opacity-50")}>
-        {children && children}
+      <div
+        className={clsm("h-full", spinning && "pointer-events-none opacity-50")}
+      >
+        {children}
       </div>
     </div>
   );
