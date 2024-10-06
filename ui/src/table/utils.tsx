@@ -3,11 +3,15 @@ import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { TableProps } from "./table";
 import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
+import { HandleButton } from "../drag-and-drop/_components/handle";
 import { Icon } from "../icons";
 
 export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
-  props?: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
+  props?: Pick<
+    TableProps<TRecord>,
+    "rowKey" | "rowSelection" | "expandable" | "sortable"
+  >,
   isNotFirstDeepColumn?: boolean,
 ) => {
   const columnsDef: (ColumnDef<TRecord> & ExtraTableColumnDef<TRecord>)[] =
@@ -117,6 +121,22 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
       },
     );
 
+  if (props?.sortable) {
+    const dragHandleColumn: ColumnDef<TRecord> = {
+      id: "drag-handle",
+      // header: () => undefined,
+      size: 50,
+      meta: {
+        align: "center",
+      },
+      cell: ({ row }) => (
+        <>
+          <HandleButton id={row.id} /> {row.id}
+        </>
+      ),
+    };
+    columnsDef.unshift(dragHandleColumn);
+  }
   if (props?.rowSelection) {
     const selectionColumn = createSelectColumn<TRecord>();
     columnsDef.unshift(selectionColumn);

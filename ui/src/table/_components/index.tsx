@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import type { TableSize } from "./types";
-import { clsm } from "..";
+import type { TableSize } from "../types";
+import { clsm } from "../..";
 
 const TableRoot = React.forwardRef<
   HTMLTableElement,
@@ -63,22 +63,22 @@ const TableFooter = React.forwardRef<
 ));
 TableFooter.displayName = "TableFooter";
 
-const TableRow = React.forwardRef<
-  HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={clsm(
-      "group",
-      "transition-colors",
-      "data-[state=selected]:bg-gray-100 dark:data-[state=selected]:bg-gray-800",
-      "hover:bg-gray-100",
-      className,
-    )}
-    {...props}
-  />
-));
+type TableRowProps = React.HTMLAttributes<HTMLTableRowElement>;
+const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
+  ({ className, ...props }, ref) => (
+    <tr
+      ref={ref}
+      className={clsm(
+        "group",
+        "transition-colors",
+        "data-[state=selected]:bg-gray-100 dark:data-[state=selected]:bg-gray-800",
+        "hover:bg-gray-100",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
 TableRow.displayName = "TableRow";
 
 type TableHeadProps = React.ThHTMLAttributes<HTMLTableCellElement> & {
@@ -135,6 +135,8 @@ const TableCaption = React.forwardRef<
   />
 ));
 TableCaption.displayName = "TableCaption";
+
+export type { TableRowProps };
 
 export {
   TableRoot,

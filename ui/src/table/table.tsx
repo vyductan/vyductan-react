@@ -19,9 +19,11 @@ import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
 import { useMergedState } from "rc-util";
 
+import type { SortableProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
 import type { RowSelection, TableColumnDef } from "./types";
 import { clsm } from "..";
+import { Sortable } from "../drag-and-drop";
 import { Icon } from "../icons";
 import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
@@ -85,6 +87,8 @@ type TableProps<TRecord extends RecordWithCustomRow> =
     };
     /** Translation */
     locale?: typeof tableLocale_en.Table;
+    /** Sortable */
+    sortable?: SortableProps;
   };
 
 const TableInner = <TRecord extends Record<string, unknown>>(
@@ -106,6 +110,8 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     sticky,
     scroll,
     locale = tableLocale_en.Table,
+
+    sortable,
     ...props
   }: TableProps<TRecord>,
   ref: ForwardedRef<HTMLTableElement>,
@@ -117,8 +123,15 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         rowKey,
         rowSelection: propRowSelection,
         expandable,
+        // sortable,
       }),
-    [propColumns, rowKey, propRowSelection, expandable],
+    [
+      propColumns,
+      rowKey,
+      propRowSelection,
+      expandable,
+      // sortable
+    ],
   );
 
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -186,6 +199,8 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       sorting,
     },
     getCoreRowModel: getCoreRowModel(),
+    // rowKey
+    getRowId: (originalRow) => originalRow[rowKey] as string,
     // expandable
     enableExpanding: !!expandable,
     getExpandedRowModel: getExpandedRowModel(),
@@ -220,6 +235,93 @@ const TableInner = <TRecord extends Record<string, unknown>>(
   const wrapperScrollRight =
     (scroll?.x ?? 0) - (wrapperWidth + wrapperScrollLeft);
 
+  const TableBodyContent =
+    table.getRowModel().rows.length > 0 ? (
+      table.getRowModel().rows.map((row, index) =>
+        row.original._customRow ? (
+          <TableRow key={row.id}>
+            <TableCell
+              colSpan={columns.length}
+              size={size}
+              className={clsm(row.original._customRowClassName as string)}
+            >
+              {row.original._customRow as React.ReactNode}
+            </TableCell>
+          </TableRow>
+        ) : (
+          <Fragment key={row.id}>
+            <TableRow
+              data-state={row.getIsSelected() && "selected"}
+              className={clsm(
+                rowClassName?.(row.original, index),
+                row.getIsExpanded() ? "border-x" : "",
+              )}
+            >
+              {row.getVisibleCells().map((cell) => {
+                return (
+                  <TableCell
+                    key={cell.id}
+                    size={size}
+                    style={getCommonPinningStyles(cell.column)}
+                    className={clsm(
+                      // row className
+                      // typeof cell.column.columnDef.meta?.className ===
+                      //   "string"
+                      //   ? cell.column.columnDef.meta.className
+                      //   : cell.column.columnDef.meta?.className?.(
+                      //       row.original,
+                      //       index,
+                      //     ),
+                      // bordered
+                      bordered && "border-e",
+                      // align
+                      cell.column.columnDef.meta?.align === "center" &&
+                        "text-center",
+                      cell.column.columnDef.meta?.align === "right" &&
+                        "text-right",
+                      // pinning
+                      // scroll?.x &&
+                      getCommonPinningClassName(cell.column, {
+                        scrollLeft: wrapperScrollLeft,
+                        scrollRight: wrapperScrollRight,
+                      }),
+                      // selection column
+                      cell.id.endsWith("selection") && "px-0",
+                      // column className
+                      cell.column.columnDef.meta?.className,
+                    )}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+            {row.getIsExpanded() && expandable && (
+              <TableRow className="bg-gray-50">
+                {/* 2nd row is a custom 1 cell row */}
+                <TableCell
+                  colSpan={row.getVisibleCells().length}
+                  size={size}
+                  className="border-x border-b px-2 text-[13px]"
+                >
+                  {expandable.expandedRowRender(row.original)}
+                </TableCell>
+              </TableRow>
+            )}
+          </Fragment>
+        ),
+      )
+    ) : (
+      <TableRow>
+        <TableCell
+          colSpan={columns.length}
+          className={clsm("h-48 text-center", bordered && "border-e")}
+        >
+          {!loading && "No data"}
+        </TableCell>
+      </TableRow>
+    );
+
   return (
     <>
       <Spin spinning={loading} className="relative">
@@ -241,8 +343,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             style={tableStyles}
             {...props}
           >
-            {columns.some((column) => column.size) && (
+            {(columns.some((column) => column.size) || sortable) && (
               <colgroup>
+                {sortable && <col style={{ width: 50 }} />}
                 {columns.map((col, index) => (
                   <col
                     key={index}
@@ -267,6 +370,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             >
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
+                  {sortable && <TableHead />}
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead
@@ -374,31 +478,30 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                     );
                   })}
               </TableBody>
-            ) : (
-              <TableBody>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row, index) =>
-                    row.original._customRow ? (
-                      <TableRow key={row.id}>
-                        <TableCell
-                          colSpan={columns.length}
-                          size={size}
-                          className={clsm(
-                            row.original._customRowClassName as string,
-                          )}
-                        >
-                          {row.original._customRow as React.ReactNode}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
+            ) : sortable ? (
+              <Sortable
+                {...sortable}
+                handle
+                Container={TableBody}
+                items={table.getRowModel().rows}
+                renderItem={({ props, id, index, nodes }) => {
+                  const row = table.getRowModel().rows.find((x) => x.id === id);
+                  if (!row) return <></>;
+                  return (
+                    <>
                       <Fragment key={row.id}>
                         <TableRow
+                          {...(props as any)}
                           data-state={row.getIsSelected() && "selected"}
                           className={clsm(
                             rowClassName?.(row.original, index),
                             row.getIsExpanded() ? "border-x" : "",
+                            "hover:bg-transparent",
                           )}
                         >
+                          <TableCell className="flex border-b-0 py-0">
+                            {nodes?.Handle}
+                          </TableCell>
                           {row.getVisibleCells().map((cell) => {
                             return (
                               <TableCell
@@ -406,31 +509,32 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                 size={size}
                                 style={getCommonPinningStyles(cell.column)}
                                 className={clsm(
-                                  // column className
+                                  // // row className
+                                  // // typeof cell.column.columnDef.meta?.className ===
+                                  // //   "string"
+                                  // //   ? cell.column.columnDef.meta.className
+                                  // //   : cell.column.columnDef.meta?.className?.(
+                                  // //       row.original,
+                                  // //       index,
+                                  // //     ),
+                                  // // bordered
+                                  // bordered && "border-e",
+                                  // // align
+                                  // cell.column.columnDef.meta?.align ===
+                                  //   "center" && "text-center",
+                                  // cell.column.columnDef.meta?.align ===
+                                  //   "right" && "text-right",
+                                  // // pinning
+                                  // // scroll?.x &&
+                                  // getCommonPinningClassName(cell.column, {
+                                  //   scrollLeft: wrapperScrollLeft,
+                                  //   scrollRight: wrapperScrollRight,
+                                  // }),
+                                  // // selection column
+                                  // cell.id.endsWith("selection") && "px-0",
+                                  "border-b-0 py-0",
+                                  // // column className
                                   cell.column.columnDef.meta?.className,
-                                  // row className
-                                  // typeof cell.column.columnDef.meta?.className ===
-                                  //   "string"
-                                  //   ? cell.column.columnDef.meta.className
-                                  //   : cell.column.columnDef.meta?.className?.(
-                                  //       row.original,
-                                  //       index,
-                                  //     ),
-                                  // bordered
-                                  bordered && "border-e",
-                                  // align
-                                  cell.column.columnDef.meta?.align ===
-                                    "center" && "text-center",
-                                  cell.column.columnDef.meta?.align ===
-                                    "right" && "text-right",
-                                  // pinning
-                                  // scroll?.x &&
-                                  getCommonPinningClassName(cell.column, {
-                                    scrollLeft: wrapperScrollLeft,
-                                    scrollRight: wrapperScrollRight,
-                                  }),
-                                  // selection column
-                                  cell.id.endsWith("selection") && "px-0",
                                 )}
                               >
                                 {flexRender(
@@ -454,22 +558,12 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           </TableRow>
                         )}
                       </Fragment>
-                    ),
-                  )
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className={clsm(
-                        "h-48 text-center",
-                        bordered && "border-e",
-                      )}
-                    >
-                      {!loading && "No data"}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
+                    </>
+                  );
+                }}
+              />
+            ) : (
+              <TableBody>{TableBodyContent}</TableBody>
             )}
           </TableRoot>
         </div>
