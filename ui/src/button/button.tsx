@@ -61,6 +61,7 @@ const buttonVariants = cva(
         sm: "h-6 rounded-sm px-2 py-0 font-normal",
         default: "h-8 rounded-md px-3 py-1",
         lg: "h-10 rounded-lg px-4 py-2",
+        xl: "h-12 rounded-lg px-4 py-2",
       },
       shape: {
         default: "",
@@ -216,7 +217,7 @@ const buttonVariants = cva(
         className: "w-10",
       },
       {
-        size: "lg",
+        size: "xl",
         shape: ["icon", "circle"],
         className: "w-12",
       },
