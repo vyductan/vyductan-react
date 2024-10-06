@@ -2,12 +2,7 @@ import React from "react";
 
 import type { Placement } from "../types";
 import type { PopoverContentProps, PopoverRootProps } from "./_components";
-import {
-  PopoverAnchor,
-  PopoverContent,
-  PopoverRoot,
-  PopoverTrigger,
-} from "./_components";
+import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_components";
 
 export type PopoverProps = PopoverRootProps &
   Omit<PopoverContentProps, "content"> & {
@@ -37,19 +32,13 @@ export const Popover = ({
       : placement.includes("Left")
         ? "start"
         : "end";
-  // const align =
-  //   !placement || placement.includes("auto")
-  //     ? "center"
-  //     : placement.includes("start")
-  //       ? "start"
-  //       : "end";
 
   return (
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
       {open === undefined ? (
         <PopoverTrigger asChild>{children}</PopoverTrigger>
       ) : (
-        <PopoverAnchor
+        <PopoverTrigger
           asChild
           {...(trigger === "hover"
             ? {
@@ -63,8 +52,27 @@ export const Popover = ({
             : {})}
         >
           {children}
-        </PopoverAnchor>
+        </PopoverTrigger>
       )}
+      {/* {open === undefined ? ( */}
+      {/*   <PopoverTrigger asChild>{children}</PopoverTrigger> */}
+      {/* ) : ( */}
+      {/*   <PopoverAnchor */}
+      {/*     asChild */}
+      {/*     {...(trigger === "hover" */}
+      {/*       ? { */}
+      {/*           onMouseOver: () => { */}
+      {/*             if (!open) onOpenChange?.(true); */}
+      {/*           }, */}
+      {/*           onMouseLeave: () => { */}
+      {/*             if (open) onOpenChange?.(false); */}
+      {/*           }, */}
+      {/*         } */}
+      {/*       : {})} */}
+      {/*   > */}
+      {/*     {children} */}
+      {/*   </PopoverAnchor> */}
+      {/* )} */}
       <PopoverContent side={side} align={align} {...props}>
         {content}
       </PopoverContent>
