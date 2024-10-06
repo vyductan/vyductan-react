@@ -6,19 +6,20 @@ import { clsm } from "..";
 
 const color: Record<string, string> = {
   default: "bg-gray-200 text-gray-950",
-  gray: "bg-gray-200 text-gray-950 hover:border-gray-500 focus-within:border-gray-600 focus-within:ring-gray-100",
   success: "bg-success-muted text-success",
-  processing:
-    "bg-blue-200 text-blue-900 hover:border-blue-500 focus-within:border-blue-600 focus-within:ring-blue-100",
+  processing: "bg-blue-200 text-blue-900",
   error: "bg-red-200 text-red-900",
-  warning: "bg-amber-200 text-amber-900",
-  amber: "bg-amber-200 text-amber-900",
-  blue: "bg-blue-200 text-blue-900",
+  warning: "bg-amber-200 text-amber-9000",
+  gray: "bg-gray-200 text-gray-950 hover:border-gray-500 focus-within:border-gray-600 focus-within:ring-gray-100",
+  amber:
+    "bg-amber-200 text-amber-900 hover:border-amber-500 focus-within:border-amber-600 focus-within:ring-amber-100",
+  blue: "bg-blue-200 text-blue-900 hover:border-blue-500 focus-within:border-blue-600 focus-within:ring-blue-100",
   green:
     "bg-green-200 text-green-900 hover:border-green-500 focus-within:border-green-600 focus-within:ring-green-100",
-  red: "bg-red-200 text-red-900",
+  red: "bg-red-200 text-red-900 hover:border-red-500 focus-within:border-red-600 focus-within:ring-red-100",
   pink: "bg-pink-300 text-pink-900 hover:border-pink-500 focus-within:border-pink-600 focus-within:ring-pink-100",
-  purple: "bg-purple-200 text-purple-900",
+  purple:
+    "bg-purple-200 text-purple-900 hover:border-purple-500 focus-within:border-purple-600 focus-within:ring-purple-100",
   teal: "bg-teal-300 text-teal-900 hover:border-teal-500 focus-within:border-teal-600 focus-within:ring-teal-100",
 };
 const tagVariants = tv({

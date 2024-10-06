@@ -22,6 +22,7 @@ type TabsProps = Omit<
    * Initial active TabPane's key, if activeKey is not set
    */
   defaultActiveKey?: TabsRootProps["defaultValue"];
+  activeKey?: TabsRootProps["value"];
   items: {
     key: string;
     label: React.ReactNode;
@@ -46,6 +47,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
       className,
 
       defaultActiveKey,
+      activeKey,
       items,
       onChange,
       tabBarExtraContent,
@@ -71,6 +73,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
         <TabsRoot
           ref={ref}
           defaultValue={defaultActiveKey}
+          value={activeKey}
           onValueChange={onChange}
           className={clsm("w-full", className)}
           {...props}
