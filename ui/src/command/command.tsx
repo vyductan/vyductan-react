@@ -4,11 +4,13 @@ import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { Icon } from "../icons";
+import { CheckFilled } from "../icons/check-filled";
 import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
   CommandRoot,
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
@@ -43,44 +45,48 @@ export const Command = <T extends ValueType = string>({
   groupClassName,
   optionRender,
   optionsRender,
+
+  filter,
 }: CommandProps<T>) => {
   return (
-    <CommandRoot>
+    <CommandRoot filter={filter}>
       <CommandInput
         placeholder={placeholder ?? defaultPlaceholder}
         onValueChange={onSearchChange}
       />
-      <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
-      {options.length > 0 && (
-        <CommandGroup className={groupClassName}>
-          {optionsRender
-            ? optionsRender(options)
-            : options.map((item) => (
-                <CommandItem
-                  key={item.value.toString()}
-                  value={item.value as string}
-                  onSelect={item.onSelect}
-                >
-                  {!optionRender ||
-                    (optionRender.checked && (
-                      <Icon
-                        icon="mingcute:check-fill"
+      <CommandList>
+        <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
+        {options.length > 0 && (
+          <CommandGroup className={groupClassName}>
+            {optionsRender
+              ? optionsRender(options)
+              : options.map((item) => (
+                  <CommandItem
+                    key={item.value.toString()}
+                    value={item.value as string}
+                    onSelect={item.onSelect}
+                  >
+                    {(!optionRender || optionRender.checked) && (
+                      <CheckFilled
                         className={clsm(
-                          "mr-2 size-4",
+                          "mr-2 size-4 shrink-0",
                           value === item.value ? "opacity-100" : "opacity-0",
                         )}
                       />
-                    ))}
-                  {optionRender?.icon ? (
-                    <span className="mr-2">{optionRender.icon(item)}</span>
-                  ) : (
-                    item.icon && <Icon icon={item.icon} />
-                  )}
-                  {optionRender?.label ? optionRender.label(item) : item.label}
-                </CommandItem>
-              ))}
-        </CommandGroup>
-      )}
+                    )}
+                    {optionRender?.icon ? (
+                      <span className="mr-2">{optionRender.icon(item)}</span>
+                    ) : (
+                      item.icon && <Icon icon={item.icon} />
+                    )}
+                    {optionRender?.label
+                      ? optionRender.label(item)
+                      : item.label}
+                  </CommandItem>
+                ))}
+          </CommandGroup>
+        )}
+      </CommandList>
     </CommandRoot>
   );
 };

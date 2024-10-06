@@ -2,7 +2,7 @@
 
 import type { DialogProps } from "@radix-ui/react-dialog";
 import * as React from "react";
-import { Command as CommandPrimitive, useCommandState } from "cmdk";
+import { Command as CommandPrimitive } from "cmdk";
 
 import { clsm } from "@acme/ui";
 
@@ -43,7 +43,10 @@ const CommandInput = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
   <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Icon icon="lucide:search" className="mr-2 size-4 shrink-0 opacity-50" />
+    <Icon
+      icon="icon-[lucide--search]"
+      className="mr-2 size-4 shrink-0 opacity-50"
+    />
     <CommandPrimitive.Input
       ref={ref}
       className={clsm(
@@ -75,33 +78,33 @@ CommandList.displayName = CommandPrimitive.List.displayName;
 
 // fix: https://github.com/pacocoursey/cmdk/issues/149#issuecomment-1606206982
 // Command.tsx: add line {options.length > 0 && (
-const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => {
-  const render = useCommandState((state) => state.filtered.count === 0);
-  if (!render) return null;
-
-  return (
-    <div
-      ref={ref}
-      className="py-6 text-center text-sm"
-      cmdk-empty=""
-      role="presentation"
-      {...props}
-    />
-  );
-});
 // const CommandEmpty = React.forwardRef<
 //   React.ElementRef<typeof CommandPrimitive.Empty>,
 //   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
-// >((props, ref) => (
-//   <CommandPrimitive.Empty
-//     ref={ref}
-//     className="py-6 text-center text-sm"
-//     {...props}
-//   />
-// ));
+// >((props, ref) => {
+//   const render = useCommandState((state) => state.filtered.count === 0);
+//   if (!render) return <></>;
+//
+//   return (
+//     <div
+//       ref={ref}
+//       className="py-6 text-center text-sm"
+//       cmdk-empty=""
+//       role="presentation"
+//       {...props}
+//     />
+//   );
+// });
+const CommandEmpty = React.forwardRef<
+  React.ElementRef<typeof CommandPrimitive.Empty>,
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+>((props, ref) => (
+  <CommandPrimitive.Empty
+    ref={ref}
+    className="py-6 text-center text-sm"
+    {...props}
+  />
+));
 
 CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
 
@@ -140,7 +143,12 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={clsm(
-      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+      // "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+      // "aria-selected:bg-accent aria-selected:text-accent-foreground",
+      "hover:bg-background-hover",
+      // "data-[selected='true']:bg-background-hover",
+      "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
       className,
     )}
     {...props}
