@@ -32,6 +32,8 @@ const buttonVariants = cva(
         accent: [],
         danger: [],
         success: [],
+        teal: [],
+        pink: [],
       },
       variant: {
         default: [
@@ -99,6 +101,22 @@ const buttonVariants = cva(
         className: [
           "border-error bg-error",
           "hover:border-error-hover hover:bg-error-hover",
+        ],
+      },
+      {
+        primary: true,
+        color: "teal",
+        className: [
+          "border-teal-600 bg-teal-600",
+          "hover:border-teal-700 hover:bg-teal-700",
+        ],
+      },
+      {
+        primary: true,
+        color: "pink",
+        className: [
+          "border-pink-600 bg-pink-600",
+          "hover:border-pink-700 hover:bg-pink-700",
         ],
       },
 
