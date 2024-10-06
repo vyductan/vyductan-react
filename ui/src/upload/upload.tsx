@@ -6,12 +6,13 @@ import { forwardRef } from "react";
 import { useMergedState } from "rc-util";
 
 import type { DownloadService, FileItem, UploadService } from "./types";
+import type { UploadZoneProps } from "./upload-zone";
 import { Button } from "../button";
 import { Card } from "../card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
 import { UploadZone } from "./upload-zone";
 
-type UploadProps = {
+type UploadProps = Pick<UploadZoneProps, "listType" | "placeholder"> & {
   render?: {
     image: (file: FileItem) => React.ReactNode;
   };
@@ -22,28 +23,26 @@ type UploadProps = {
   width?: number;
   height?: number;
 } & (
-  | {
-      multiple?: false;
-      value?: string;
-      defaultValue?: string;
-      onChange?: (value: string | undefined) => void;
+    | {
+        multiple?: false;
+        value?: string;
+        defaultValue?: string;
+        onChange?: (value: string | undefined) => void;
 
-      // value?: FileItem;
-      // defaultValue?: FileItem;
-      // onChange?: (value: FileItem | undefined) => void;
-    }
-  | {
-      multiple: true;
-      value?: FileItem[];
-      defaultValue?: FileItem[];
-      onChange?: (value: FileItem[] | undefined) => void;
-    }
-);
+        // value?: FileItem;
+        // defaultValue?: FileItem;
+        // onChange?: (value: FileItem | undefined) => void;
+      }
+    | {
+        multiple: true;
+        value?: FileItem[];
+        defaultValue?: FileItem[];
+        onChange?: (value: FileItem[] | undefined) => void;
+      }
+  );
 const Upload = forwardRef(
   (
     {
-      render,
-      // value,
       // defaultValue,
       uploadService,
       downloadService,
@@ -51,20 +50,15 @@ const Upload = forwardRef(
       width,
       height,
 
+      render,
+      listType,
+      placeholder,
+
+      // value,
       ...props
     }: UploadProps,
     ref: ForwardedRef<HTMLDivElement>,
   ) => {
-    // const {
-    //   multiple: _,
-    //   value,
-    //   defaultValue,
-    //   uploadService,
-    //   downloadService,
-    //   onChange: __,
-    //   ...rest
-    // } = props;
-
     const [files, setFiles] = useMergedState<FileItem[]>(
       props.defaultValue
         ? Array.isArray(props.defaultValue)
@@ -78,7 +72,6 @@ const Upload = forwardRef(
             : [{ url: props.value, name: props.value }]
           : [],
         onChange: (value) => {
-          console.log("xx", value);
           if (props.multiple) {
             props.onChange?.(value);
           } else {
@@ -87,8 +80,6 @@ const Upload = forwardRef(
         },
       },
     );
-
-    console.log("fffff", props.value, files, width, height);
 
     return (
       <div ref={ref}>
@@ -109,7 +100,6 @@ const Upload = forwardRef(
                     className="p-1 text-white hover:bg-black/10"
                     title="Remove file"
                     onClick={() => {
-                      console.log("/");
                       setFiles([]);
                     }}
                   />
@@ -117,6 +107,9 @@ const Upload = forwardRef(
               </div>
             ) : (
               <UploadZone
+                listType={listType}
+                placeholder={placeholder}
+                style={{ width, height }}
                 uploadService={uploadService}
                 onUploadSuccess={(file) => {
                   setFiles([file]);
@@ -129,6 +122,7 @@ const Upload = forwardRef(
         {props.multiple && (
           <>
             <UploadZone
+              style={{ width, height }}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
                 setFiles([...files, file]);

@@ -1,21 +1,33 @@
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import { useState } from "react";
 
 import type { FileItem, UploadService } from "./types";
 import { clsm } from "..";
+import { Icon } from "../icons";
+import { Spin } from "../spin";
 
-type UploadZoneProps = {
+type UploadZoneProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+> & {
   accept?: string;
   uploadService?: UploadService;
   onUploadSuccess?: (data: FileItem) => void;
 
+  listType?: "picture-card";
+  placeholder?: string;
   render?: () => void;
 };
-export const UploadZone = ({
+const UploadZone = ({
   uploadService,
   onUploadSuccess,
 
   // render
+  listType,
+  placeholder,
+  ...props
 }: UploadZoneProps) => {
+  const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
   const upload = async (file: File) => {
@@ -23,10 +35,12 @@ export const UploadZone = ({
     //   message.error("File size too big (max 50MB)");
     //   return
     // }
+    setUploading(true);
     const blob = await uploadService?.({
       file: file,
       fileName: file.name,
     });
+    setUploading(false);
     if (blob?.success) {
       onUploadSuccess?.({
         url: blob.url,
@@ -71,11 +85,8 @@ export const UploadZone = ({
   };
 
   return (
-    <div>
-      <label
-        htmlFor="image-upload"
-        className="group relative flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
-      >
+    <Spin spinning={uploading} tip="Đang tải lên" className="h-32" {...props}>
+      <div className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50">
         <div
           className="absolute z-[5] size-full rounded-md"
           onDragOver={(e) => {
@@ -104,46 +115,53 @@ export const UploadZone = ({
             }
           }}
         />
-        <div
-          className={clsm(
-            "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
-            dragActive && "border-2 border-black",
-            "bg-white opacity-100 hover:bg-gray-50",
-          )}
-          // className={`${
-          //   dragActive ? "border-2 border-black" : ""
-          // }  ${
-          //   data.image
-          //     ? "bg-white/80 opacity-0 hover:opacity-100 hover:backdrop-blur-md"
-          //     :
-          // }`}
-        >
-          <svg
-            className={`${
-              dragActive ? "scale-110" : "scale-100"
-            } size-7 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {listType === "picture-card" ? (
+          <div className="flex flex-col items-center gap-2">
+            <Icon icon="icon-[mingcute--add-fill]" />
+            <span>{placeholder ?? "Upload"}</span>
+          </div>
+        ) : (
+          <div
+            className={clsm(
+              "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
+              dragActive && "border-2 border-black",
+              "bg-white opacity-100 hover:bg-gray-50",
+            )}
+            // className={`${
+            //   dragActive ? "border-2 border-black" : ""
+            // }  ${
+            //   data.image
+            //     ? "bg-white/80 opacity-0 hover:opacity-100 hover:backdrop-blur-md"
+            //     :
+            // }`}
           >
-            <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
-            <path d="M12 12v9"></path>
-            <path d="m16 16-4-4-4 4"></path>
-          </svg>
-          <p className="mt-2 text-center text-sm text-gray-500">
-            Drag and drop or click to upload.
-          </p>
-          <p className="mt-2 text-center text-sm text-gray-500">
-            Max file size: 50MB
-          </p>
-          <span className="sr-only">Photo upload</span>
-        </div>
+            <svg
+              className={`${
+                dragActive ? "scale-110" : "scale-100"
+              } size-7 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path>
+              <path d="M12 12v9"></path>
+              <path d="m16 16-4-4-4 4"></path>
+            </svg>
+            <p className="mt-2 text-center text-sm text-gray-500">
+              Drag and drop or click to upload.
+            </p>
+            <p className="mt-2 text-center text-sm text-gray-500">
+              Max file size: 50MB
+            </p>
+            <span className="sr-only">Photo upload</span>
+          </div>
+        )}
         {/* {data.image && ( */}
         {/*   // eslint-disable-next-line @next/next/no-img-element */}
         {/*   <img */}
@@ -152,7 +170,7 @@ export const UploadZone = ({
         {/*     className="h-full w-full rounded-md object-cover" */}
         {/*   /> */}
         {/* )} */}
-      </label>
+      </div>
 
       <div className="mt-1 flex rounded-md shadow-sm">
         <input
@@ -166,6 +184,9 @@ export const UploadZone = ({
           }}
         />
       </div>
-    </div>
+    </Spin>
   );
 };
+
+export type { UploadZoneProps };
+export { UploadZone };
