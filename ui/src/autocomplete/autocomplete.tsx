@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
+
 import type { CommandProps } from "../command";
 import type { ValueType } from "../form";
 import type { Option } from "../select/types";
@@ -23,6 +25,7 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   | "optionsRender"
 > & {
   options: Option<T>[];
+  optionsToSearch?: { value: string; label: string }[];
 
   onChange?: (value: T) => void;
   onSearchChange?: (search: string) => void;
@@ -32,6 +35,22 @@ const AutoCompleteInner = <T extends ValueType = string>(
   {
     value,
     options,
+    optionsToSearch,
+
+    filter = (value, search, _) => {
+      const label = (optionsToSearch ?? options)
+        .find((item) => item.value === value)
+        ?.label?.toString();
+      if (
+        label &&
+        removeVietnameseTones(label.toLowerCase()).includes(
+          removeVietnameseTones(search.toLowerCase()),
+        )
+      ) {
+        return 1;
+      }
+      return 0;
+    },
 
     placeholder,
 
@@ -90,6 +109,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
             },
           }))}
           onSearchChange={onSearchChange}
+          filter={filter}
           {...props}
         />
       }
