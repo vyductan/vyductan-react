@@ -1,4 +1,5 @@
-import type { DetailedHTMLProps, HTMLAttributes } from "react";
+import type { DetailedHTMLProps, ForwardedRef, HTMLAttributes } from "react";
+import { forwardRef } from "react";
 
 import { clsm } from "..";
 
@@ -10,11 +11,16 @@ export type IconProps = DetailedHTMLProps<
   icon: string;
   srOnly?: string;
 };
-export const Icon = ({ icon, className, srOnly, ...props }: IconProps) => {
-  return (
-    <>
-      <span className={clsm(icon, className)} {...props}></span>
-      {srOnly && <span className="sr-only">{srOnly}</span>}
-    </>
-  );
-};
+export const Icon = forwardRef(
+  (
+    { icon, className, srOnly, ...props }: IconProps,
+    ref: ForwardedRef<HTMLSpanElement>,
+  ) => {
+    return (
+      <>
+        <span ref={ref} className={clsm(icon, className)} {...props}></span>
+        {srOnly && <span className="sr-only">{srOnly}</span>}
+      </>
+    );
+  },
+);
