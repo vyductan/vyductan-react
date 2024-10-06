@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
 
+import type { ButtonProps } from "../button";
 import type { CommandProps } from "../command";
 import type { ValueType } from "../form";
 import type { Option } from "../select/types";
@@ -27,6 +28,9 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   options: Option<T>[];
   optionsToSearch?: { value: string; label: string }[];
 
+  className?: string;
+  size?: ButtonProps["size"];
+
   onChange?: (value: T) => void;
   onSearchChange?: (search: string) => void;
 };
@@ -36,6 +40,9 @@ const AutoCompleteInner = <T extends ValueType = string>(
     value,
     options,
     optionsToSearch,
+
+    className,
+    size,
 
     filter = (value, search, _) => {
       const label = (optionsToSearch ?? options)
@@ -115,6 +122,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
       }
     >
       <Button
+        size={size}
         ref={buttonRef}
         variant="outline"
         role="combobox"
@@ -122,6 +130,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
         className={clsm(
           "w-full justify-between text-sm font-normal",
           !value && "text-muted-foreground",
+          className,
         )}
       >
         {buttonText}
