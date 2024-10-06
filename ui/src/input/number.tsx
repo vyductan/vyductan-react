@@ -546,7 +546,6 @@ const InternalInputNumber = (
 
   // >>> Focus & Blur
   const onBlur = () => {
-    console.log("blur", changeOnBlur, "x");
     if (changeOnBlur) {
       flushInputValue(false);
     }
@@ -617,6 +616,7 @@ const InternalInputNumber = (
       // onChange={(e) => {
       //   return onChange?.(Number(e.target.value));
       // }}
+      disabled={disabled}
       onBlur={onBlur}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
