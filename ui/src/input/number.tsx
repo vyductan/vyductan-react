@@ -1,3 +1,6 @@
+// https://github.com/react-component/input-number/commit/de38d1a328f47db3df52f69f579e4c78d868961a
+// May 18, 2024
+
 import type { DecimalClass, ValueType } from "@rc-component/mini-decimal";
 import React, { useCallback, useState } from "react";
 import getMiniDecimal, {
@@ -88,6 +91,7 @@ const InternalInputNumber = (
     defaultValue,
     value,
     onChange,
+    onBlur,
     onInput,
     onPressEnter,
 
@@ -110,6 +114,7 @@ const InternalInputNumber = (
     // downHandler,
     keyboard,
     changeOnWheel,
+
     ...inputProps
   }: InputNumberProps,
   ref: React.ForwardedRef<HTMLInputElement>,
@@ -545,9 +550,12 @@ const InternalInputNumber = (
   });
 
   // >>> Focus & Blur
-  const onBlur = () => {
+  const onInternalBlur = (
+    event: React.FocusEvent<HTMLInputElement, Element>,
+  ) => {
     if (changeOnBlur) {
       flushInputValue(false);
+      onBlur?.(event);
     }
 
     setFocus(false);
@@ -617,7 +625,7 @@ const InternalInputNumber = (
       //   return onChange?.(Number(e.target.value));
       // }}
       disabled={disabled}
-      onBlur={onBlur}
+      onBlur={onInternalBlur}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       onCompositionStart={onCompositionStart}

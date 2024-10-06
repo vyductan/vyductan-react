@@ -186,6 +186,7 @@ const InternalFieldController = <
       <Controller
         control={control}
         name={name}
+        disabled={disabled}
         render={({ field, fieldState, formState }) => (
           <FieldRender
             fieldId={fieldId}
@@ -203,8 +204,16 @@ const InternalFieldController = <
                     })
                   : cloneElement(children, {
                       ...field,
-                      disabled,
                       value: watchedValue ?? "",
+                      onBlur: (event: any) => {
+                        (
+                          children.props as {
+                            onBlur?: (...event: any[]) => any;
+                          }
+                        ).onBlur?.(event);
+                        // field.onBlur(onChange ? onChange(event) : event);
+                        field.onBlur();
+                      },
                       onChange: (event: any) => {
                         (
                           children.props as {

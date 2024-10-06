@@ -55,11 +55,9 @@ const useFormContext = <
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 >() => {
-  return useContext(FormContext) as unknown as FormContextValue<
-    TFieldValues,
-    TContext,
-    TTransformedValues
-  >;
+  return useContext(FormContext) as unknown as
+    | FormContextValue<TFieldValues, TContext, TTransformedValues>
+    | undefined;
 };
 
 export { FormFieldContext, FormProvider, useFormContext };
