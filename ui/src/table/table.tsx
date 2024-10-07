@@ -499,8 +499,10 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             "hover:bg-transparent",
                           )}
                         >
-                          <TableCell className="flex border-b-0 py-0">
-                            {nodes?.Handle}
+                          <TableCell className={clsm("flex border-b-0 py-0")}>
+                            <div className={sortable.classNames?.handleWrapper}>
+                              {nodes?.Handle}
+                            </div>
                           </TableCell>
                           {row.getVisibleCells().map((cell) => {
                             return (
