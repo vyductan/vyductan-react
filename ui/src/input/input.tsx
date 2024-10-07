@@ -56,6 +56,7 @@ export const inputSizeVariants = cva([], {
       sm: "",
       default: "px-[11px] py-[5px]",
       lg: "px-[11px] py-[9px]",
+      xl: "px-[11px] py-[13px]",
     },
   },
   defaultVariants: {
