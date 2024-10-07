@@ -31,8 +31,12 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   className?: string;
   size?: ButtonProps["size"];
 
-  onChange?: (value: T) => void;
+  allowClear?: boolean;
+
+  onChange?: (value?: T) => void;
   onSearchChange?: (search: string) => void;
+
+  dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
 };
 
 const AutoCompleteInner = <T extends ValueType = string>(
@@ -61,8 +65,13 @@ const AutoCompleteInner = <T extends ValueType = string>(
 
     placeholder,
 
+    allowClear,
+
     onChange,
     onSearchChange,
+
+    dropdownRender,
+
     ...props
   }: AutoCompleteProps<T>,
   _: React.ForwardedRef<HTMLInputElement>,
@@ -117,6 +126,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
           }))}
           onSearchChange={onSearchChange}
           filter={filter}
+          dropdownRender={dropdownRender}
           {...props}
         />
       }
@@ -138,6 +148,30 @@ const AutoCompleteInner = <T extends ValueType = string>(
           icon="icon-[lucide--chevrons-up-down]"
           className="ml-2 size-4 shrink-0 opacity-50"
         />
+        {allowClear && (
+          <button
+            className={clsm(
+              "z-10",
+              "absolute right-[11px]",
+              "flex size-5 items-center justify-center transition-opacity",
+              "opacity-0",
+              "hover:!opacity-50",
+              value && "group-hover:opacity-30",
+            )}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // onClear();
+              onChange?.();
+              // setOpen(false);
+            }}
+          >
+            <Icon
+              icon="icon-[ant-design--close-circle-filled]"
+              className="pointer-events-none size-3.5"
+            />
+          </button>
+        )}
       </Button>
     </Popover>
   );

@@ -6,7 +6,10 @@ import { Command as CommandPrimitive } from "cmdk";
 
 import { clsm } from "@acme/ui";
 
+import type { ValueType } from "../form";
+import type { Option } from "../select/types";
 import { Icon } from "../icons";
+import { CheckFilled } from "../icons/check-filled";
 import { Dialog, DialogContent } from "../modal/_components";
 
 type CommandRootProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
@@ -136,10 +139,19 @@ const CommandSeparator = React.forwardRef<
 ));
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
+type CommandItemProps<T extends ValueType = ValueType> =
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & {
+    checked: boolean;
+    optionRender?: {
+      checked?: boolean;
+      icon?: (option: Option<T>) => React.ReactNode;
+      label?: (option: Option<T>) => React.ReactNode;
+    };
+  };
 const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, ...props }, ref) => (
+  CommandItemProps
+>(({ className, children, optionRender, checked, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
     className={clsm(
@@ -152,7 +164,18 @@ const CommandItem = React.forwardRef<
       className,
     )}
     {...props}
-  />
+  >
+    {(!optionRender || optionRender.checked) && (
+      <CheckFilled
+        className={clsm(
+          "mr-2 size-4 shrink-0",
+          checked ? "opacity-100" : "opacity-0",
+        )}
+      />
+    )}
+
+    {children}
+  </CommandPrimitive.Item>
 ));
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
