@@ -58,6 +58,8 @@ export interface ItemProps {
       Handle?: React.ReactNode;
     };
   }): React.ReactElement;
+
+  adjustScale?: boolean;
 }
 
 export const Item = React.memo(
@@ -91,6 +93,8 @@ export const Item = React.memo(
         // value,
         wrapperStyle,
         // ...props
+
+        adjustScale,
       },
       ref,
     ) => {
@@ -133,7 +137,7 @@ export const Item = React.memo(
 
         ...(dragOverlay
           ? {
-              "--scale": 1.05,
+              "--scale": adjustScale ? 1.05 : 1,
               zIndex: 999,
             }
           : {}),

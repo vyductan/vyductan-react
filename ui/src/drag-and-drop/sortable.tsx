@@ -66,6 +66,8 @@ export interface SortableProps {
     item?: string;
     list?: string;
     wrapper?: string;
+    handle?: string;
+    handleWrapper?: string;
   };
   activationConstraint?: PointerActivationConstraint;
   animateLayoutChanges?: AnimateLayoutChanges;
@@ -299,6 +301,7 @@ export const Sortable = ({
                     overIndex: -1,
                     isDragOverlay: true,
                   })}
+                  adjustScale={adjustScale}
                   dragOverlay
                 >
                   {activeItem.children}
