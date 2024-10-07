@@ -43,6 +43,7 @@ type FieldProps<
   label?: string | JSX.Element;
   description?: ReactNode;
   className?: string;
+  required?: boolean;
   /*
    * Custome output for input component (like DatePicker, Upload)
    * */
@@ -56,6 +57,7 @@ const FieldInner = <
     // control,
     name,
     children,
+    required,
     // label,
     // description,
     // children,
@@ -90,7 +92,7 @@ const FieldInner = <
         name={name}
         children={children}
         onChange={onChange}
-        required={isOptional === undefined ? false : !isOptional}
+        required={required ?? (isOptional === undefined ? false : !isOptional)}
         {...props}
       />
     );
@@ -112,6 +114,7 @@ const FieldInner = <
           fieldDescriptionId={fieldDescriptionId}
           children={children}
           ref={ref}
+          required={required}
           {...props}
         />
       </FormFieldContext.Provider>
@@ -119,7 +122,14 @@ const FieldInner = <
   }
 
   if (typeof children !== "function") {
-    return <FieldRender fieldId={fieldId} children={children} {...props} />;
+    return (
+      <FieldRender
+        fieldId={fieldId}
+        children={children}
+        required={required}
+        {...props}
+      />
+    );
   }
   return;
 };

@@ -9,7 +9,9 @@ import type {
 } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
 
+import { useFormContext } from "./context";
 import { Field } from "./field";
+import { useFieldOptionalityCheck } from "./use-field-optionality-check";
 
 type FieldListProps<
   TFieldValues extends FieldValues = FieldValues,
@@ -20,6 +22,7 @@ type FieldListProps<
   name: TFieldArrayName;
   label?: string;
   description?: string;
+  required?: boolean;
   children?: (
     ctx: Omit<
       UseFieldArrayReturn<TFieldValues, TFieldArrayName, "id">,
@@ -41,6 +44,7 @@ const FieldList = <
   name,
   label,
   description,
+  required,
   children,
 }: FieldListProps<TFieldValues, TFieldArrayName>) => {
   const { fields: defaultValues, ...helper } = useFieldArray<
@@ -60,8 +64,16 @@ const FieldList = <
     fields,
     ...helper,
   };
+
+  const form = useFormContext<TFieldValues>();
+  const isOptional = useFieldOptionalityCheck(name, form?.schema);
+
   return (
-    <Field label={label} name={name} description={description}>
+    <Field
+      label={label}
+      description={description}
+      required={required ?? (isOptional === undefined ? false : !isOptional)}
+    >
       {children?.(ctx)}
     </Field>
   );
