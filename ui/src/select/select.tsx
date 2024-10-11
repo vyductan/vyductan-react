@@ -18,8 +18,6 @@ import {
   SelectValue,
 } from "./_components";
 
-export const selectDefaultPlaceholder = "Select an option";
-
 export type SelectProps<T extends ValueType = string> = Omit<
   SelectRootProps,
   "value" | "onValueChange"
@@ -78,7 +76,7 @@ const SelectInner = <T extends ValueType = string>(
   const content = (
     <>
       {/* to allow user set value that not in options */}
-      {!options.some((o) => o.value === value) && value !== "" && (
+      {!!value && !options.some((o) => o.value === value) && value !== "" && (
         <SelectItem value={value as string}>{value}</SelectItem>
       )}
       {options.length > 0 ? (
