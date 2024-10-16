@@ -89,6 +89,7 @@ const SelectTrigger = React.forwardRef<
         <SelectPrimitive.Icon
           className={clsm(
             "flex size-5 items-center justify-center opacity-50 transition-opacity",
+            "pl-1",
             allowClear && value && "group-hover:opacity-0",
           )}
         >
@@ -154,9 +155,10 @@ const SelectContent = React.forwardRef<
       <SelectScrollUpButton />
       <SelectPrimitive.Viewport
         className={clsm(
-          "p-1",
+          "px-[3px] py-1",
+          // deduction border left and right: calc(var(--radix-select-trigger-width)-2px)
           position === "popper" &&
-            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[calc(var(--radix-select-trigger-width)-2px)]",
         )}
       >
         {children}
@@ -186,20 +188,28 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={clsm(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none",
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 text-sm outline-none",
+      // "pr-2 pl-8",
+      "px-2",
       "focus:bg-background-hover",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-full items-center justify-center">
+    {/* <span className="absolute left-2 flex h-full items-center justify-center"> */}
+    {/*   <SelectPrimitive.ItemIndicator asChild> */}
+    {/*     <CheckFilled className="size-4" /> */}
+    {/*   </SelectPrimitive.ItemIndicator> */}
+    {/* </span> */}
+
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+
+    <span className="absolute right-2 flex h-full items-center justify-center">
       <SelectPrimitive.ItemIndicator asChild>
         <CheckFilled className="size-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
-
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ));
 SelectItem.displayName = SelectPrimitive.Item.displayName;
