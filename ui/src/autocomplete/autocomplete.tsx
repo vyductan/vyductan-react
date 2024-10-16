@@ -13,7 +13,6 @@ import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
 import { Popover } from "../popover";
-import { selectDefaultPlaceholder } from "../select";
 
 export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
@@ -30,6 +29,7 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
 
   className?: string;
   size?: ButtonProps["size"];
+  disabled?: boolean;
 
   allowClear?: boolean;
 
@@ -47,6 +47,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
 
     className,
     size,
+    disabled,
 
     filter = (value, search, _) => {
       const label = (optionsToSearch ?? options)
@@ -82,7 +83,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
 
   const buttonText = (() => {
     if (!value) {
-      return placeholder ?? selectDefaultPlaceholder;
+      return placeholder ?? <span className="opacity-0"></span>;
     }
     const o = options.find((o) => o.value === value);
     if (o) {
@@ -136,6 +137,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
         ref={buttonRef}
         variant="outline"
         role="combobox"
+        disabled={disabled}
         aria-expanded={open}
         className={clsm(
           "w-full justify-between text-sm font-normal",
