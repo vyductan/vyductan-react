@@ -39,7 +39,7 @@ const Card = ({
       className={clsm(bordered ? "" : "border-none", className)}
       {...props}
     >
-      {(!!title || !!description) && (
+      {(!!title || !!description || !!extra) && (
         <CardHeader>
           <div className="flex items-center">
             <CardTitle className={classNames?.title}>{title}</CardTitle>
@@ -55,7 +55,13 @@ const Card = ({
           </CardDescription>
         </CardHeader>
       )}
-      <CardContent className={classNames?.content} size={size}>
+      <CardContent
+        className={clsm(
+          classNames?.content,
+          (!!title || !!description || !!extra) && "pt-0 lg:pt-0",
+        )}
+        size={size}
+      >
         {children}
       </CardContent>
     </CardRoot>
