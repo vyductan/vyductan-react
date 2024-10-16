@@ -8,8 +8,8 @@ export type PageContainerProps = {
   children: ReactNode;
   header?: PageHeaderProps;
   className?: string;
-  content?: {
-    className?: string;
+  classNames?: {
+    content?: string;
   };
   loading?: boolean;
 };
@@ -17,7 +17,7 @@ export const PageContainer = ({
   children,
   header,
   className,
-  content,
+  classNames,
   loading = false,
 }: PageContainerProps) => {
   return (
@@ -33,7 +33,9 @@ export const PageContainer = ({
       ) : (
         <>
           {header && <PageHeader {...header} />}
-          <div className={clsm("relative", content?.className)}>{children}</div>
+          <div className={clsm("relative", classNames?.content)}>
+            {children}
+          </div>
         </>
       )}
     </main>
