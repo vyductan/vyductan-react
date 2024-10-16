@@ -165,16 +165,25 @@ const CommandItem = React.forwardRef<
     )}
     {...props}
   >
+    {/* {(!optionRender || optionRender.checked) && ( */}
+    {/*   <CheckFilled */}
+    {/*     className={clsm( */}
+    {/*       "mr-2 size-4 shrink-0", */}
+    {/*       checked ? "opacity-100" : "opacity-0", */}
+    {/*     )} */}
+    {/*   /> */}
+    {/* )} */}
+
+    {children}
+
     {(!optionRender || optionRender.checked) && (
       <CheckFilled
         className={clsm(
-          "mr-2 size-4 shrink-0",
+          "ml-auto size-4 shrink-0",
           checked ? "opacity-100" : "opacity-0",
         )}
       />
     )}
-
-    {children}
   </CommandPrimitive.Item>
 ));
 
