@@ -34,7 +34,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={clsm(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-xl font-semibold leading-none tracking-tight",
       className,
     )}
     {...props}
@@ -55,7 +55,7 @@ const CardDescription = React.forwardRef<
 CardDescription.displayName = "CardDescription";
 
 type CardContentProps = React.HTMLAttributes<HTMLDivElement> & {
-  size: CardProps["size"];
+  size?: CardProps["size"];
 };
 const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, size, ...props }, ref) => (
