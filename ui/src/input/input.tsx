@@ -13,7 +13,7 @@ import { Icon } from "../icons";
 export const inputVariants = cva(
   [
     "w-full",
-    "flex border border-input ring-offset-background",
+    "flex items-center border border-input ring-offset-background",
     "text-sm",
     "focus-within:outline-none",
     // "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-background-active disabled:hover:border-input",
