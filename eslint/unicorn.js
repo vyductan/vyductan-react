@@ -1,5 +1,6 @@
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 
+/** @type {Awaited<import('typescript-eslint').Config>} */
 export default [
   eslintPluginUnicorn.configs["flat/recommended"],
   {

@@ -24,7 +24,7 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@tanstack/react-router": "^1.57.9"
+    "@tanstack/react-router": "^1.64.0"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
