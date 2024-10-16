@@ -21,8 +21,8 @@ type DescriptionProps = {
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
   classNames?: {
-    label: string;
-    content: string;
+    label?: string;
+    content?: string;
   };
   extra?: ReactNode;
 };
@@ -98,7 +98,10 @@ export const Descriptions = ({
             {rows.map((cols, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={clsm(bordered && "mb-px border-b last:border-none")}
+                className={clsm(
+                  bordered && "mb-px border-b last:border-none",
+                  "[&:last-child>td]:pb-0",
+                )}
               >
                 {cols.map((col, index) =>
                   // horizontal
@@ -118,15 +121,15 @@ export const Descriptions = ({
                         <span className={contentClassName}>{col.children}</span>
                       </td>
                     ) //vertical
-                  ) : rowIndex % 2 === 0 ? (
+                  ) : (rowIndex % 2 === 0 ? (
                     <th key={index} className={thClassName}>
                       {col as React.ReactNode}
                     </th>
                   ) : (
-                    <td key={index} className={tdClassName}>
+                    <td key={index} className={clsm(tdClassName)}>
                       {col as React.ReactNode}
                     </td>
-                  ),
+                  )),
                 )}
               </tr>
             ))}
