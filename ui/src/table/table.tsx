@@ -86,7 +86,7 @@ type TableProps<TRecord extends RecordWithCustomRow> =
       x: number;
     };
     /** Translation */
-    locale?: typeof tableLocale_en.Table;
+    locale?: Partial<Record<keyof typeof tableLocale_en.Table, ReactNode>>;
     /** Sortable */
     sortable?: SortableProps;
   };
@@ -312,12 +312,12 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         ),
       )
     ) : (
-      <TableRow>
+      <TableRow className="hover:bg-transparent">
         <TableCell
           colSpan={columns.length}
           className={clsm("h-48 text-center", bordered && "border-e")}
         >
-          {!loading && "No data"}
+          {!loading && locale.emptyText}
         </TableCell>
       </TableRow>
     );
