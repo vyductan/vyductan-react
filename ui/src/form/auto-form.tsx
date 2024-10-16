@@ -10,7 +10,6 @@ import type { FieldsSchema, FieldType, InputUnion } from "./types";
 import type { FormInstance } from "./use-form";
 import { Autocomplete } from "../autocomplete";
 import { Button } from "../button";
-import { DatePicker, DateRangePicker } from "../date-picker";
 import { Editor } from "../editor";
 import { DeleteIcon } from "../icons/delete-icon";
 import { Input, InputPassword } from "../input";
@@ -143,6 +142,7 @@ const AutoForm = <
             {({ field: fieldRenderProps }) => {
               const onChange = (...event: any) => {
                 if ("onChange" in rest && typeof rest.onChange === "function") {
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                   rest.onChange(...event);
                 }
 
@@ -171,12 +171,12 @@ const renderInput = (props: InputUnion) => {
     const { type: _, ...restProps } = props;
     return <Autocomplete {...restProps} />;
   }
-  if (props.type === "date") {
-    return <DatePicker {...props} />;
-  }
-  if (props.type === "date-range") {
-    return <DateRangePicker {...props} />;
-  }
+  // if (props.type === "date") {
+  //   return <DatePicker {...props} mode="single" />;
+  // }
+  // if (props.type === "date-range") {
+  //   return <DateRangePicker {...props} />;
+  // }
   if (props.type === "editor") {
     const { onChange, ...rest } = props;
     return (
