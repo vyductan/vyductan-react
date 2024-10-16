@@ -288,7 +288,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
     return (
       <div
         className={clsm(
-          "flex flex-col",
+          "flex h-full flex-col",
           fieldState?.error ? "" : "mb-6",
           className,
         )}
