@@ -5,9 +5,10 @@ type EmptyProps = {
   className?: string;
   image?: React.ReactNode;
   description?: React.ReactNode;
+  children?: React.ReactNode;
 };
 
-const Empty = ({ className, image, description }: EmptyProps) => {
+const Empty = ({ className, image, description, children }: EmptyProps) => {
   const ImageToRender = image ?? <EmptyIcon className="size-16" />;
   const DescriptionToRender = description ?? "No data";
   return (
@@ -19,6 +20,7 @@ const Empty = ({ className, image, description }: EmptyProps) => {
     >
       <div className="mb-2">{ImageToRender}</div>
       <div className="text-foreground-muted">{DescriptionToRender}</div>
+      <div className="mt-4">{children}</div>
     </div>
   );
 };
