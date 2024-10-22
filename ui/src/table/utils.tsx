@@ -5,17 +5,31 @@ import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
 import { HandleButton } from "../drag-and-drop/_components/handle";
 import { Icon } from "../icons";
+import { DragHandle } from "./_components/table-row-sortable";
 
 export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
   props?: Pick<
     TableProps<TRecord>,
-    "rowKey" | "rowSelection" | "expandable" | "sortable"
+    "rowKey" | "rowSelection" | "expandable" | "sortable" | "dnd"
   >,
   isNotFirstDeepColumn?: boolean,
 ) => {
+  const mergedColumns: TableColumnDef<TRecord>[] = [
+    ...(props?.dnd
+      ? [
+          {
+            key: "sort",
+            align: "center",
+            width: 80,
+            render: () => <DragHandle />,
+          } satisfies TableColumnDef<TRecord>,
+        ]
+      : []),
+    ...columns,
+  ];
   const columnsDef: (ColumnDef<TRecord> & ExtraTableColumnDef<TRecord>)[] =
-    columns.map(
+    mergedColumns.map(
       (
         {
           children,
@@ -124,6 +138,22 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   if (props?.sortable) {
     const dragHandleColumn: ColumnDef<TRecord> = {
       id: "drag-handle",
+      // header: () => undefined,
+      size: 50,
+      meta: {
+        align: "center",
+      },
+      cell: ({ row }) => (
+        <>
+          <HandleButton id={row.id} /> {row.id}
+        </>
+      ),
+    };
+    columnsDef.unshift(dragHandleColumn);
+  }
+  if (props?.dnd) {
+    const dragHandleColumn: ColumnDef<TRecord> = {
+      id: "sort",
       // header: () => undefined,
       size: 50,
       meta: {

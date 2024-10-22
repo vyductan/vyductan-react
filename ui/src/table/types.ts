@@ -27,6 +27,7 @@ declare module "@tanstack/react-table" {
  * TRecord[K] inherit from https://stackoverflow.com/a/56837244
  */
 type BaseTableColumnDef<TRecord> = {
+  key?: string;
   hidden?: boolean;
   title?: string | ReactNode;
   width?: number;
@@ -76,3 +77,54 @@ export type RowSelection<TRecord> = {
 };
 
 export type TableSize = "sm" | "default";
+
+export type Key = React.Key;
+
+export type ScrollConfig = {
+  index?: number;
+  key?: Key;
+  top?: number;
+};
+
+// ================= Customized =================
+type Component<P> =
+  | React.ComponentType<P>
+  | React.ForwardRefExoticComponent<P>
+  | React.FC<P>
+  | keyof React.ReactHTML;
+
+export type CustomizeComponent = Component<any>;
+
+export type OnCustomizeScroll = (info: {
+  currentTarget?: HTMLElement;
+  scrollLeft?: number;
+}) => void;
+
+export type CustomizeScrollBody<RecordType> = (
+  data: readonly RecordType[],
+  info: {
+    scrollbarSize: number;
+    ref: React.Ref<{
+      scrollLeft: number;
+      scrollTo?: (scrollConfig: ScrollConfig) => void;
+    }>;
+    onScroll: OnCustomizeScroll;
+  },
+) => React.ReactNode;
+
+export interface TableComponents<RecordType> {
+  table?: CustomizeComponent;
+  header?: {
+    table?: CustomizeComponent;
+    wrapper?: CustomizeComponent;
+    row?: CustomizeComponent;
+    cell?: CustomizeComponent;
+  };
+  body?:
+    | CustomizeScrollBody<RecordType>
+    | {
+        wrapper?: CustomizeComponent;
+        row?: CustomizeComponent;
+        cell?: CustomizeComponent;
+      };
+}

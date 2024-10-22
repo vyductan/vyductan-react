@@ -20,20 +20,38 @@ const TableRoot = React.forwardRef<
 ));
 TableRoot.displayName = "TableRoot";
 
-const TableHeader = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead
-    ref={ref}
-    className={clsm(
-      "[&_tr:hover]:bg-transparent [&_tr]:border-b",
-      "text-foreground-muted",
-      className,
-    )}
-    {...props}
-  />
-));
+type TableHeaderProps = React.HTMLAttributes<HTMLTableSectionElement> & {
+  /** Set sticky header and scroll bar */
+  sticky?:
+    | boolean
+    | {
+        offsetHeader?: number;
+        offsetScroll?: number;
+        getContainer?: () => HTMLElement;
+      };
+};
+const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
+  ({ className, sticky, ...props }, ref) => (
+    <thead
+      ref={ref}
+      className={clsm(
+        "[&_tr:hover]:bg-transparent [&_tr]:border-b",
+        "text-foreground-muted",
+        className,
+      )}
+      style={{
+        position: sticky ? "sticky" : undefined,
+        top: sticky
+          ? typeof sticky === "boolean"
+            ? 0
+            : sticky.offsetHeader
+          : undefined,
+        zIndex: sticky ? 11 : undefined,
+      }}
+      {...props}
+    />
+  ),
+);
 TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
