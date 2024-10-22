@@ -1,7 +1,7 @@
 import React from "react";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
@@ -84,11 +84,11 @@ const YearPickerInternal = ({
                 }}
               >
                 <div
-                  className={clsm(
+                  className={cn(
                     "rounded-md px-4 py-0.5 hover:bg-background-hover",
                     number_ === new Date().getFullYear() && "bg-background",
                     value === index &&
-                      "bg-primary-600 text-white hover:bg-primary-600",
+                      "bg-primary-600 hover:bg-primary-600 text-white",
                   )}
                 >
                   {number_}
@@ -100,7 +100,7 @@ const YearPickerInternal = ({
       }
     >
       <div
-        className={clsm(
+        className={cn(
           inputVariants(),
           inputSizeVariants(),
           "gap-2",

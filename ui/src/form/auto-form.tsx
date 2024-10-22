@@ -3,7 +3,7 @@
 import type { Control, FieldValues, Path, PathValue } from "react-hook-form";
 import React from "react";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import type { FormProps } from "./form";
 import type { FieldsSchema, FieldType, InputUnion } from "./types";
@@ -56,7 +56,7 @@ const AutoForm = <
           const { columns, className } = field;
           return (
             <div
-              className={clsm(
+              className={cn(
                 "relative",
                 "grid gap-x-4",
                 "auto-cols-fr grid-flow-col",

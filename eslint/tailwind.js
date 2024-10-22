@@ -18,7 +18,7 @@ export default [
     // },
     settings: {
       tailwindcss: {
-        callees: ["clsm", "cva", "cx"],
+        callees: ["cn", "cva", "cx"],
         config,
         // config: fileURLToPath(
         //   new URL("../tailwind/web.ts", "file://" + __filename),

@@ -1,4 +1,4 @@
-import { clsm } from "..";
+import { cn } from "..";
 
 type TimeSelectProps = {
   value?: Date;
@@ -26,7 +26,7 @@ export const TimeSelect = ({
           {hourOptions.map((hour) => (
             <li
               key={hour}
-              className={clsm(
+              className={cn(
                 "mx-1 flex cursor-pointer justify-center rounded-sm px-4 py-1",
                 "hover:bg-background-hover",
                 value?.getHours() === hour && "bg-primary-200",
@@ -46,7 +46,7 @@ export const TimeSelect = ({
           {minuteOptions.map((minute) => (
             <li
               key={minute}
-              className={clsm(
+              className={cn(
                 "mx-1 flex cursor-pointer justify-center rounded-sm px-4 py-1",
                 "hover:bg-background-hover",
                 value?.getMinutes() === minute && "bg-primary-200",

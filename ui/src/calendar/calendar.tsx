@@ -18,7 +18,7 @@ import {
   useDayPicker,
 } from "react-day-picker";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Button, buttonVariants } from "../button";
 import { Icon } from "../icons";
 
@@ -84,7 +84,7 @@ function Calendar({
     <DayPicker
       disabled={disabledDays}
       showOutsideDays={showOutsideDays}
-      className={clsm("p-3", className)}
+      className={cn("p-3", className)}
       style={{
         width: 248.8 * (columnsDisplayed ?? 1) + "px",
       }}
@@ -100,7 +100,7 @@ function Calendar({
         weekday: "w-8 text-[0.8rem] font-normal text-muted-foreground",
         weekdays: "flex flex-row",
         day: "flex size-8 flex-1 items-center justify-center rounded-md p-0 text-sm [&:has(button)]:hover:!bg-accent [&:has(button)]:hover:text-accent-foreground [&:has(button)]:hover:aria-selected:!bg-primary [&:has(button)]:hover:aria-selected:text-primary-foreground",
-        day_button: clsm(
+        day_button: cn(
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal transition-none hover:bg-transparent hover:text-inherit aria-selected:opacity-100",
         ),
@@ -112,26 +112,26 @@ function Calendar({
         // caption_label: "text-sm font-medium",
         // nav: "space-x-1 flex items-center",
         nav: "flex items-start",
-        button_next: clsm(
+        button_next: cn(
           buttonVariants({
             variant: "outline",
             className:
               "absolute right-0 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
           }),
         ),
-        button_previous: clsm(
+        button_previous: cn(
           buttonVariants({
             variant: "outline",
             className:
               "absolute left-0 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
           }),
         ),
-        // button_next: clsm(
+        // button_next: cn(
         //   buttonVariants({ variant: "outline" }),
         //   "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         //   "absolute right-1 top-0",
         // ),
-        // button_previous: clsm(
+        // button_previous: cn(
         //   buttonVariants({ variant: "outline" }),
         //   "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         //   "absolute left-1 top-0",
@@ -141,7 +141,7 @@ function Calendar({
         //   "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         // week: "flex w-full mt-2",
         // day: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-        // day_button: clsm(
+        // day_button: cn(
         //   buttonVariants({ variant: "ghost" }),
         //   "size-9 p-0 font-normal aria-selected:opacity-100",
         // ),
@@ -274,7 +274,7 @@ function Calendar({
             onNextClick?.(nextMonth);
           }, [goToMonth, nextMonth]);
           return (
-            <nav className={clsm("flex items-center", className)} {...props}>
+            <nav className={cn("flex items-center", className)} {...props}>
               <Button
                 variant="outline"
                 className="absolute left-0 size-7 bg-transparent p-0 opacity-80 hover:opacity-100"
@@ -346,7 +346,7 @@ function Calendar({
           if (navView === "years") {
             return (
               <div
-                className={clsm("grid grid-cols-4 gap-y-2", className)}
+                className={cn("grid grid-cols-4 gap-y-2", className)}
                 {...props}
               >
                 {Array.from(
@@ -368,7 +368,7 @@ function Calendar({
                     return (
                       <Button
                         key={index}
-                        className={clsm(
+                        className={cn(
                           "h-7 w-full text-sm font-normal text-foreground",
                           displayYears.from + index ===
                             new Date().getFullYear() &&

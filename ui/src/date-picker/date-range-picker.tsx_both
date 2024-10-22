@@ -7,7 +7,7 @@ import { format as formatDate, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 
 import type { DatePickerProps } from "./date-picker";
-import { clsm } from "..";
+import { cn } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { Input } from "../input";
@@ -179,7 +179,7 @@ const DatePickerInternal = <T extends DateType = Date>(
           borderless={borderless}
           size={size}
           status={status}
-          className={clsm("items-center", "justify-start text-left")}
+          className={cn("items-center", "justify-start text-left")}
           ref={ref}
           placeholder={placeholder}
           suffix={

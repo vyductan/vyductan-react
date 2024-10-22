@@ -3,7 +3,7 @@ import type { LexicalEditor } from "lexical";
 import * as React from "react";
 import { useRef } from "react";
 
-import { clsm } from "../../..";
+import { cn } from "../../..";
 import { Icon } from "../../../icons";
 import { Tooltip } from "../../../tooltip";
 
@@ -69,9 +69,9 @@ export default function ImageResizer({
   // Find max width, accounting for editor padding.
   const maxWidthContainer = maxWidth
     ? maxWidth
-    : (editorRootElement === null
+    : editorRootElement === null
       ? 100
-      : editorRootElement.getBoundingClientRect().width - 20);
+      : editorRootElement.getBoundingClientRect().width - 20;
   const maxHeightContainer =
     editorRootElement === null
       ? 100
@@ -161,8 +161,8 @@ export default function ImageResizer({
       setStartCursor(direction);
       onResizeStart();
 
-      controlWrapper.classList.add(...clsm("block touch-none").split(" "));
-      controlWrapper.classList.remove(...clsm("hidden").split(" "));
+      controlWrapper.classList.add(...cn("block touch-none").split(" "));
+      controlWrapper.classList.remove(...cn("hidden").split(" "));
       image.style.height = `${height}px`;
       image.style.width = `${width}px`;
 
@@ -239,8 +239,8 @@ export default function ImageResizer({
       positioning.currentHeight = 0;
       positioning.isResizing = false;
 
-      controlWrapper.classList.remove(...clsm("block touch-none").split(" "));
-      controlWrapper.classList.add(...clsm("hidden").split(" "));
+      controlWrapper.classList.remove(...cn("block touch-none").split(" "));
+      controlWrapper.classList.add(...cn("hidden").split(" "));
 
       setEndCursor();
       onResizeEnd(width, height);
@@ -263,7 +263,7 @@ export default function ImageResizer({
         </button>
       )}
       <div
-        className={clsm(
+        className={cn(
           "absolute right-1 top-1 flex divide-x divide-white/50",
           "text-white",
         )}
@@ -280,7 +280,7 @@ export default function ImageResizer({
         </Tooltip>
       </div>
       <div
-        className={clsm(
+        className={cn(
           "-right-2 bottom-[48%]",
           "absolute h-10 w-2 cursor-col-resize bg-gray-400",
           "hover:bg-gray-500",
@@ -290,7 +290,7 @@ export default function ImageResizer({
         }}
       />
       <div
-        className={clsm(
+        className={cn(
           "-left-2 bottom-[48%]",
           "absolute h-10 w-2 cursor-col-resize bg-gray-400",
           "hover:bg-gray-500",

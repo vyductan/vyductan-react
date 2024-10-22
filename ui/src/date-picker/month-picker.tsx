@@ -2,7 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
@@ -75,11 +75,11 @@ const MonthPickerInternal = ({
                 }}
               >
                 <div
-                  className={clsm(
+                  className={cn(
                     "rounded-md px-4 py-0.5 hover:bg-background-hover",
                     index === new Date().getMonth() && "bg-background",
                     value === index &&
-                      "bg-primary-600 text-white hover:bg-primary-600",
+                      "bg-primary-600 hover:bg-primary-600 text-white",
                   )}
                 >
                   {monthString}
@@ -91,7 +91,7 @@ const MonthPickerInternal = ({
       }
     >
       <div
-        className={clsm(
+        className={cn(
           inputVariants(),
           inputSizeVariants(),
           "gap-2",

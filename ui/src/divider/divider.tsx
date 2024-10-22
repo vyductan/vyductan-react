@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 type SeparatorProps = React.ComponentPropsWithoutRef<
   typeof SeparatorPrimitive.Root
@@ -31,7 +31,7 @@ const Separator = React.forwardRef<
         ref={ref}
         decorative={decorative}
         orientation={orientation}
-        className={clsm(
+        className={cn(
           "my-6",
           "bg-border",
           orientation === "horizontal" ? "h-px grow basis-0" : "h-full w-px",

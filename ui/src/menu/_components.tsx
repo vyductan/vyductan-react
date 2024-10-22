@@ -2,7 +2,7 @@ import type { KeyboardEvent, MouseEvent } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import type { MenuItemType } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 
 type MenuItemProps = Omit<MenuItemType, "key"> & {
@@ -36,18 +36,18 @@ export const MenuItem = ({
       onKeyUp={(event) => {
         onSelect?.({ item: { key: keyProp, label }, key: keyProp, event });
       }}
-      className={clsm(
+      className={cn(
         "my-1",
         "transition-all",
         "border-l-2 border-transparent",
         "text-foreground-muted hover:text-foreground",
         isActive
-          ? "border-primary bg-primary-100 text-primary-600 hover:text-primary-700"
+          ? "bg-primary-100 text-primary-600 hover:text-primary-700 border-primary"
           : "hover:border-foreground-muted",
       )}
     >
       <Slot
-        className={clsm(
+        className={cn(
           "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2",
         )}
       >

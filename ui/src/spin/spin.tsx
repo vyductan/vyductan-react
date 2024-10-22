@@ -1,7 +1,7 @@
 import type { VariantProps } from "class-variance-authority";
 import { cva } from "class-variance-authority";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 import "./style.css";
 
@@ -46,7 +46,7 @@ export const Spin = ({
   ...props
 }: SpinProps) => {
   return (
-    <div className={clsm("relative", className)} {...props}>
+    <div className={cn("relative", className)} {...props}>
       {spinning && (
         <div
           key="loading"
@@ -54,13 +54,13 @@ export const Spin = ({
         >
           <div
             aria-label="Loading"
-            className={clsm("spin", spinVariants({ size }))}
+            className={cn("spin", spinVariants({ size }))}
           />
           {tip && <div className="mt-2">{tip}</div>}
         </div>
       )}
       <div
-        className={clsm("h-full", spinning && "pointer-events-none opacity-50")}
+        className={cn("h-full", spinning && "pointer-events-none opacity-50")}
       >
         {children}
       </div>

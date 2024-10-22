@@ -1,4 +1,4 @@
-import { clsm } from "..";
+import { cn } from "..";
 import { EmptyIcon } from "./EmptyIcon";
 
 type EmptyProps = {
@@ -13,10 +13,7 @@ const Empty = ({ className, image, description, children }: EmptyProps) => {
   const DescriptionToRender = description ?? "No data";
   return (
     <div
-      className={clsm(
-        "flex flex-col items-center px-4 py-2 text-sm",
-        className,
-      )}
+      className={cn("flex flex-col items-center px-4 py-2 text-sm", className)}
     >
       <div className="mb-2">{ImageToRender}</div>
       <div className="text-foreground-muted">{DescriptionToRender}</div>

@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import type { DatePickerProps } from "./date-picker";
-import { clsm } from "..";
+import { cn } from "..";
 import { inputVariants } from "../input";
 import { DatePicker } from "./date-picker";
 
@@ -32,7 +32,7 @@ const DateRangePickerInternal = <T extends DateType = Date>(
   ref: React.Ref<HTMLInputElement>,
 ) => {
   return (
-    <div className={clsm("flex items-center gap-2", inputVariants())}>
+    <div className={cn("flex items-center gap-2", inputVariants())}>
       {/* <DatePicker */}
       {/*   ref={ref} */}
       {/*   defaultValue={defaultValue?.[0]} */}

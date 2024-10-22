@@ -1,27 +1,28 @@
-import { defaultConfig } from "tailwind-variants";
+import { cx } from "class-variance-authority";
+import { extendTailwindMerge } from "tailwind-merge";
 
-defaultConfig.twMergeConfig = {
+const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       w: ["w-screen-sm", "w-screen-md", "w-screen-xl"],
     },
   },
-};
+});
+const cn = (...inputs: Parameters<typeof cx>) => twMerge(cx(inputs));
 
-// import { cx } from "class-variance-authority";
-// import { extendTailwindMerge } from "tailwind-merge";
+export { cn };
+
+// import type { CnOptions } from "tailwind-variants";
+// import { cnBase, defaultConfig } from "tailwind-variants";
 //
-export * from "./types";
-//
-// const twMerge = extendTailwindMerge({
+// defaultConfig.twMergeConfig = {
 //   extend: {
 //     classGroups: {
 //       w: ["w-screen-sm", "w-screen-md", "w-screen-xl"],
 //     },
 //   },
-// });
-// const clsm = (...inputs: Parameters<typeof cx>) => twMerge(cx(inputs));
-//
-// export { clsm };
+// };
 
-export { cnBase as clsm } from "tailwind-variants";
+// export * from "./types";
+//
+// export const cn = cnBase as <T extends CnOptions>(...classes: T) => string;

@@ -7,7 +7,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
 import type { IconProps } from "../icons";
-import { clsm } from "..";
+import { cn } from "..";
 import Wave from "../_util/wave";
 import { GenericSlot } from "../slot";
 import { LoadingIcon } from "./loading-icon";
@@ -271,7 +271,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={clsm(
+            className={cn(
               size === "sm" ? "" : "size-4",
               // children ? "mr-2" : "",
             )}
@@ -298,7 +298,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Wave>
         <Comp
           ref={ref}
-          className={clsm(
+          className={cn(
             "relative",
             buttonVariants({
               color,

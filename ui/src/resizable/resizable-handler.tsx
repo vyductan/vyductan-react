@@ -1,6 +1,6 @@
 import * as ResizablePrimitive from "react-resizable-panels";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import { Icon } from "../icons";
 
@@ -12,7 +12,7 @@ export const ResizableHandler = ({
   withHandle?: boolean;
 }) => (
   <ResizablePrimitive.PanelResizeHandle
-    className={clsm(
+    className={cn(
       "group hover:bg-blue-500 focus:bg-blue-500",
       "relative flex w-px items-center justify-center bg-border",
       "after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2",
@@ -26,7 +26,7 @@ export const ResizableHandler = ({
   >
     {withHandle && (
       <div
-        className={clsm(
+        className={cn(
           "absolute inset-y-0 z-10 m-auto flex size-4 items-center justify-center rounded border border-border bg-gray-200",
           "group-hover:border-blue-500 group-hover:text-blue-500",
           "group-focus:border-blue-500 group-focus:text-blue-500",

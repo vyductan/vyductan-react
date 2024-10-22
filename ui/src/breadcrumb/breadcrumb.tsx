@@ -2,7 +2,7 @@ import type { Key } from "react";
 import { Fragment } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Skeleton } from "../skeleton";
 
 type BreadcrumbItem = { key?: Key; title: React.ReactNode; href?: string };
@@ -28,7 +28,7 @@ const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbProps) => {
           return (
             <Fragment key={key}>
               <Slot
-                className={clsm(
+                className={cn(
                   index !== items.length - 1 && "text-secondary",
                   "-mx-1 rounded px-1",
                   "hover:bg-background-hover",

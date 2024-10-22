@@ -1,6 +1,6 @@
 import * as ResizablePrimitive from "react-resizable-panels";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 export type ResizablePanelGroupProps = React.ComponentProps<
   typeof ResizablePrimitive.PanelGroup
@@ -10,7 +10,7 @@ export const ResizablePanelGroup = ({
   ...props
 }: ResizablePanelGroupProps) => (
   <ResizablePrimitive.PanelGroup
-    className={clsm(
+    className={cn(
       "flex size-full data-[panel-group-direction=vertical]:flex-col",
       className,
     )}

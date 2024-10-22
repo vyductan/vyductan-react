@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 type TimelineProps = {
   items: {
@@ -17,7 +17,7 @@ export const Timeline = ({ items }: TimelineProps) => {
         return (
           <li
             key={index}
-            className={clsm(
+            className={cn(
               "relative",
               "pb-5",
               // "relative grid gap-10 pl-6 after:absolute after:inset-y-0 after:left-0 after:w-px after:bg-muted-foreground/20",
@@ -33,7 +33,7 @@ export const Timeline = ({ items }: TimelineProps) => {
             />
 
             <div
-              className={clsm(
+              className={cn(
                 "absolute",
                 x.dot
                   ? "flex -translate-x-1/2 -translate-y-1/2 bg-white py-1"

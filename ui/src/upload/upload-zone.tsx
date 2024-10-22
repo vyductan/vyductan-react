@@ -2,7 +2,7 @@ import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import { useState } from "react";
 
 import type { FileItem, UploadService } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import { Spin } from "../spin";
 
@@ -122,7 +122,7 @@ const UploadZone = ({
           </div>
         ) : (
           <div
-            className={clsm(
+            className={cn(
               "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
               dragActive && "border-2 border-black",
               "bg-white opacity-100 hover:bg-gray-50",

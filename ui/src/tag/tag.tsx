@@ -2,7 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { tv } from "tailwind-variants";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 const color: Record<string, string> = {
   default: "bg-gray-200 text-gray-950",
@@ -58,7 +58,7 @@ interface TagProps
 const Tag = ({ className, variant, color, ...props }: TagProps) => {
   return (
     <div
-      className={clsm(
+      className={cn(
         tagVariants({
           variant,
           color,

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import type { ValueType } from "../form";
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 
 type RadioProps = Omit<
@@ -17,11 +17,11 @@ const Radio = React.forwardRef<
   RadioProps
 >(({ label, className, value, ...props }, ref) => {
   return (
-    <label className={clsm("flex items-center", "text-sm", className)}>
+    <label className={cn("flex items-center", "text-sm", className)}>
       <RadioGroupPrimitive.Item
         ref={ref}
         value={value as string}
-        className={clsm(
+        className={cn(
           "aspect-square size-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
           "data-[state=checked]:border-2",
         )}

@@ -1,14 +1,14 @@
 import * as React from "react";
 
 import type { CardProps } from "./card";
-import { clsm } from "..";
+import { cn } from "..";
 
 type CardRootProps = React.HTMLAttributes<HTMLDivElement>;
 const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={clsm("rounded-lg border bg-surface shadow-sm", className)}
+      className={cn("rounded-lg border bg-surface shadow-sm", className)}
       {...props}
     />
   ),
@@ -21,7 +21,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={clsm("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
     {...props}
   />
 ));
@@ -33,7 +33,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={clsm(
+    className={cn(
       "text-xl font-semibold leading-none tracking-tight",
       className,
     )}
@@ -48,7 +48,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={clsm("text-sm text-muted-foreground", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
@@ -61,7 +61,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, size, ...props }, ref) => (
     <div
       ref={ref}
-      className={clsm(size === "sm" ? "p-3" : "p-3 lg:p-6", className)}
+      className={cn(size === "sm" ? "p-3" : "p-3 lg:p-6", className)}
       {...props}
     />
   ),
@@ -74,7 +74,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={clsm("flex items-center p-6 pt-0", className)}
+    className={cn("flex items-center p-6 pt-0", className)}
     {...props}
   />
 ));

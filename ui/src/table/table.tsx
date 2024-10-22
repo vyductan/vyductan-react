@@ -23,7 +23,7 @@ import { useMergedState } from "rc-util";
 import type { SortableContextProps, SortableProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
 import type { RowSelection, TableColumnDef, TableComponents } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Sortable, SortableContext } from "../drag-and-drop";
 import { Icon } from "../icons";
 import { Pagination } from "../pagination";
@@ -264,7 +264,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             <TableCell
               colSpan={columns.length}
               size={size}
-              className={clsm(row.original._customRowClassName as string)}
+              className={cn(row.original._customRowClassName as string)}
             >
               {row.original._customRow as React.ReactNode}
             </TableCell>
@@ -281,7 +281,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             {/*           key={cell.id} */}
             {/*           size={size} */}
             {/*           style={getCommonPinningStyles(cell.column)} */}
-            {/*           className={clsm( */}
+            {/*           className={cn( */}
             {/*             // row className */}
             {/*             // typeof cell.column.columnDef.meta?.className === */}
             {/*             //   "string" */}
@@ -323,7 +323,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             <TableRowComp
               data-state={row.getIsSelected() && "selected"}
               data-row-key={row.original[rowKey]}
-              className={clsm(
+              className={cn(
                 rowClassName?.(row.original, index),
                 row.getIsExpanded() ? "border-x" : "",
               )}
@@ -334,7 +334,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                     key={cell.id}
                     size={size}
                     style={getCommonPinningStyles(cell.column)}
-                    className={clsm(
+                    className={cn(
                       // row className
                       // typeof cell.column.columnDef.meta?.className ===
                       //   "string"
@@ -386,7 +386,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       <TableRow className="hover:bg-transparent">
         <TableCell
           colSpan={columns.length}
-          className={clsm("h-48 text-center", bordered && "border-e")}
+          className={cn("h-48 text-center", bordered && "border-e")}
         >
           {!loading && locale.emptyText}
         </TableCell>
@@ -399,11 +399,11 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         <Spin spinning={loading} className="relative">
           <div
             // ref={wrapperRef}
-            className={clsm(scroll?.x && "overflow-x-auto overflow-y-hidden")}
+            className={cn(scroll?.x && "overflow-x-auto overflow-y-hidden")}
           >
             <TableRoot
               ref={ref}
-              className={clsm(
+              className={cn(
                 !scroll?.x && "w-full",
                 "caption-bottom text-sm",
                 // bordered
@@ -451,7 +451,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           colSpan={header.colSpan}
                           size={size}
                           style={getCommonPinningStyles(header.column)}
-                          className={clsm(
+                          className={cn(
                             // column className
                             header.column.columnDef.meta?.className,
                             // bordered
@@ -490,7 +490,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             }
                           >
                             <span
-                              className={clsm(
+                              className={cn(
                                 // sorting
                                 header.column.getCanSort() &&
                                   "flex cursor-pointer items-center justify-between",
@@ -506,7 +506,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                 <div>
                                   <Icon
                                     icon="ant-design:caret-up-filled"
-                                    className={clsm(
+                                    className={cn(
                                       "size-3",
                                       header.column.getIsSorted() !== "asc" &&
                                         "text-gray-400",
@@ -514,7 +514,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   />
                                   <Icon
                                     icon="ant-design:caret-down-filled"
-                                    className={clsm(
+                                    className={cn(
                                       "-mt-1 size-3",
                                       header.column.getIsSorted() !== "desc" &&
                                         "text-gray-400",
@@ -568,13 +568,13 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           <TableRow
                             {...(props as any)}
                             data-state={row.getIsSelected() && "selected"}
-                            className={clsm(
+                            className={cn(
                               rowClassName?.(row.original, index),
                               row.getIsExpanded() ? "border-x" : "",
                               "hover:bg-transparent",
                             )}
                           >
-                            <TableCell className={clsm("flex border-b-0 py-0")}>
+                            <TableCell className={cn("flex border-b-0 py-0")}>
                               <div
                                 className={sortable.classNames?.handleWrapper}
                               >
@@ -587,7 +587,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   key={cell.id}
                                   size={size}
                                   style={getCommonPinningStyles(cell.column)}
-                                  className={clsm(
+                                  className={cn(
                                     // // row className
                                     // // typeof cell.column.columnDef.meta?.className ===
                                     // //   "string"

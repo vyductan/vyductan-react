@@ -1,11 +1,11 @@
 import type { LexicalEditor, LexicalNode, RangeSelection } from "lexical";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
-import { getAllLexicalChildren } from "./getAllLexicalChildren";
 import { getNodePlaceholder } from "./get-node-placeholder";
+import { getAllLexicalChildren } from "./getAllLexicalChildren";
 
-const PLACEHOLDER_CLASS_NAME = clsm(
+const PLACEHOLDER_CLASS_NAME = cn(
   "[&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]",
 ).split(" ");
 

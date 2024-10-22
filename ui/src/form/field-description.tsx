@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { useField } from "./use-field";
 
 const FieldDescription = forwardRef<
@@ -13,7 +13,7 @@ const FieldDescription = forwardRef<
     <div
       ref={ref}
       id={fieldDescriptionId}
-      className={clsm("text-sm text-foreground-muted", className)}
+      className={cn("text-sm text-foreground-muted", className)}
       {...props}
     />
   );

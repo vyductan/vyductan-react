@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import type { InsertImagePayload } from "./types";
 import { message } from "../../../toast";
@@ -97,7 +97,7 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
             }}
           />
           <div
-            className={clsm(
+            className={cn(
               "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
               dragActive && "border-2 border-black",
               "bg-white opacity-100 hover:bg-gray-50",

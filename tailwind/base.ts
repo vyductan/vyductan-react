@@ -131,6 +131,41 @@ export default {
     extend: {
       colors: {
         ...baseColors,
+        /*shadcn*/
+        // border: 'hsl(var(--border))',
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        // background: 'hsl(var(--background))',
+        // foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        // accent: {
+        // 	DEFAULT: 'hsl(var(--accent))',
+        // 	foreground: 'hsl(var(--accent-foreground))'
+        // },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        /* own */
         foreground: {
           DEFAULT: "hsl(var(--foreground))",
           muted: {
@@ -138,25 +173,19 @@ export default {
           },
         },
         background: {
-          DEFAULT: baseColors.gray[100],
+          DEFAULT: "hsl(var(--background))",
+          // DEFAULT: baseColors.gray[100],
           hover: baseColors.gray[200],
           active: baseColors.gray[300],
           muted: {
             DEFAULT: baseColors.gray[100],
           },
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
         accent: {
-          DEFAULT: baseColors.blue[600],
-          hover: baseColors.blue[700],
+          DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          // DEFAULT: baseColors.blue[600],
+          hover: baseColors.blue[700],
           muted: {
             DEFAULT: baseColors.blue[100],
           },
@@ -176,23 +205,14 @@ export default {
             DEFAULT: baseColors.green[100],
           },
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
 
         border: {
-          DEFAULT: baseColors.gray[400],
+          DEFAULT: "hsl(var(--border))",
+          // DEFAULT: baseColors.gray[400],
           hover: baseColors.gray[500],
           active: baseColors.gray[600],
         },
-        input: "hsl(var(--input))",
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
         placeholder: baseColors.gray[700],
-        ring: "hsl(var(--ring))",
       },
       /* End Colors */
 

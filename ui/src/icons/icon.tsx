@@ -1,7 +1,7 @@
 import type { DetailedHTMLProps, ForwardedRef, HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 // https://icon-sets.iconify.design/
 export type IconProps = DetailedHTMLProps<
@@ -18,7 +18,7 @@ export const Icon = forwardRef(
   ) => {
     return (
       <>
-        <span ref={ref} className={clsm(icon, className)} {...props}></span>
+        <span ref={ref} className={cn(icon, className)} {...props}></span>
         {srOnly && <span className="sr-only">{srOnly}</span>}
       </>
     );

@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 export type AvatarRootProps = React.ComponentPropsWithoutRef<
   typeof AvatarPrimitive.Root
@@ -16,7 +16,7 @@ const AvatarRoot = React.forwardRef<
 >(({ className, size, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
-    className={clsm(
+    className={cn(
       "relative flex shrink-0 overflow-hidden rounded-full",
       "size-8",
       size === "sm" && "size-6 text-xs",
@@ -38,7 +38,7 @@ const AvatarImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
-    className={clsm("aspect-square size-full", className)}
+    className={cn("aspect-square size-full", className)}
     {...props}
   />
 ));
@@ -50,7 +50,7 @@ const AvatarFallback = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
-    className={clsm(
+    className={cn(
       "flex size-full items-center justify-center rounded-full bg-amber-500 text-white",
       className,
     )}

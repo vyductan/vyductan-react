@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { PageHeaderProps } from "../page-header";
-import { clsm } from "../..";
+import { cn } from "../..";
 import { PageHeader } from "../page-header";
 
 export type PageContainerProps = {
@@ -22,7 +22,7 @@ export const PageContainer = ({
 }: PageContainerProps) => {
   return (
     <main
-      className={clsm(
+      className={cn(
         "mx-auto w-full max-w-screen-lg",
         "flex flex-1 flex-col gap-4 p-4 lg:gap-3 lg:p-6",
         className,
@@ -33,9 +33,7 @@ export const PageContainer = ({
       ) : (
         <>
           {header && <PageHeader {...header} />}
-          <div className={clsm("relative", classNames?.content)}>
-            {children}
-          </div>
+          <div className={cn("relative", classNames?.content)}>{children}</div>
         </>
       )}
     </main>

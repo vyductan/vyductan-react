@@ -4,7 +4,7 @@ import KeyCode from "rc-util/lib/KeyCode";
 
 import type { PaginationItemProps } from "./_components";
 import type { PaginationLocale } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import {
   PaginationContent,
@@ -355,7 +355,7 @@ export const Pagination = (props: PaginationProps) => {
   );
 
   return (
-    <PaginationRoot className={clsm(className)}>
+    <PaginationRoot className={cn(className)}>
       <PaginationContent>
         {totalText}
         {prev}

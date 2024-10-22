@@ -13,7 +13,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HeadingNode } from "@lexical/rich-text";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import { ImageNode } from "./nodes/ImageNode";
 import { AutoLinkPlugin } from "./plugins/AutoLinkPlugin";
@@ -73,7 +73,7 @@ const EditorInternal = (
   //         <ContentEditable
   //           placeholder={placeholder}
   //           // placeholder="Type / for commands..."
-  //           className={clsm(
+  //           className={cn(
   //             "my-px flex px-0.5 py-0.5",
   //             "outline-0",
   //             // "relative border-0 px-7 py-2 outline-0",
@@ -164,7 +164,7 @@ const EditorInternal = (
                     </div>
                   }
                   // class="text-base [&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]"
-                  className={clsm(
+                  className={cn(
                     "relative flex flex-col",
                     "my-px p-0.5 outline-0",
                     // "text-base [&:has(br):not(:has(span))::before]:absolute [&:has(br):not(:has(span))::before]:text-placeholder [&:has(br):not(:has(span))::before]:content-[attr(data-placeholder)]",

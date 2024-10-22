@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import type { CardRootProps } from "./_components";
-import { clsm } from "..";
+import { cn } from "..";
 import {
   CardContent,
   CardDescription,
@@ -36,7 +36,7 @@ const Card = ({
 }: CardProps) => {
   return (
     <CardRoot
-      className={clsm(bordered ? "" : "border-none", className)}
+      className={cn(bordered ? "" : "border-none", className)}
       {...props}
     >
       {(!!title || !!description || !!extra) && (
@@ -46,17 +46,14 @@ const Card = ({
             {extra && <div className="ml-auto">{extra}</div>}
           </div>
           <CardDescription
-            className={clsm(
-              description ? "" : "hidden",
-              classNames?.description,
-            )}
+            className={cn(description ? "" : "hidden", classNames?.description)}
           >
             {description}
           </CardDescription>
         </CardHeader>
       )}
       <CardContent
-        className={clsm(
+        className={cn(
           classNames?.content,
           (!!title || !!description || !!extra) && "pt-0 lg:pt-0",
         )}

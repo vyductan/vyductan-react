@@ -4,7 +4,7 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { inputVariants } from "../input";
 
 const textareaVariants = cva(
@@ -49,7 +49,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const Comp = autoSize ? TextareaAutosize : "textarea";
     return (
       <Comp
-        className={clsm(
+        className={cn(
           inputVariants({ borderless, status }),
           textareaVariants({ className, size }),
         )}

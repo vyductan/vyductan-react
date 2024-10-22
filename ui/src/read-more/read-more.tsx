@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 type ReadMoreProps = {
   children: string;
@@ -25,7 +25,7 @@ export const ReadMore = ({ children, className }: ReadMoreProps) => {
     <div>
       <p
         ref={ref}
-        className={clsm(
+        className={cn(
           "break-words",
           className,
           isShowingMore && "line-clamp-none",

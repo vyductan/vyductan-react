@@ -1,4 +1,4 @@
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import type { ComponentPickerOption } from "./types";
 
@@ -19,7 +19,7 @@ export const ComponentPickerMenuItem = ({
     <li
       key={option.key}
       tabIndex={-1}
-      className={clsm(
+      className={cn(
         "flex items-center gap-2 rounded-sm p-2",
         isSelected && "bg-gray-200",
       )}

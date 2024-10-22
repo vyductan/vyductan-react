@@ -6,7 +6,7 @@ import { format as formatDate, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 
 import type { InputVariants } from "../input";
-import { clsm } from "..";
+import { cn } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
@@ -146,7 +146,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       const input = x ? formatDate(toDate(x), format) : undefined;
       return (
         <div
-          className={clsm(
+          className={cn(
             inputVariants(),
             inputSizeVariants(),
             "gap-2",
@@ -171,7 +171,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       const input2 = x?.[1] ? formatDate(toDate(x[1]), format) : undefined;
       return (
         <div
-          className={clsm(
+          className={cn(
             inputVariants(),
             inputSizeVariants(),
             "gap-2",
@@ -184,7 +184,7 @@ const DatePickerInternal = <T extends DateType = Date>(
           <div>
             <span>{input1}</span>
             <span
-              className={clsm(
+              className={cn(
                 "px-2 text-center text-foreground-muted",
                 !input1 && !input2 && "opacity-0",
               )}

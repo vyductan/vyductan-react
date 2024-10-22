@@ -7,7 +7,7 @@ import type { ValueType } from "../form";
 import type { inputSizeVariants, inputVariants } from "../input";
 import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Empty } from "../empty";
 import { tagColors } from "../tag";
 import {
@@ -84,10 +84,7 @@ const SelectInner = <T extends ValueType = string>(
           <SelectItem
             key={String(o.value)}
             value={o.value as string}
-            className={clsm(
-              o.color ? tagColors[o.color] : "",
-              "bg-transparent",
-            )}
+            className={cn(o.color ? tagColors[o.color] : "", "bg-transparent")}
           >
             {o.label}
           </SelectItem>
@@ -115,7 +112,7 @@ const SelectInner = <T extends ValueType = string>(
     >
       <SelectTrigger
         id={id}
-        className={clsm(
+        className={cn(
           "w-full",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           className,

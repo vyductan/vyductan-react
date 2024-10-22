@@ -3,7 +3,7 @@
 import type { HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { useField } from "./use-field";
 
 const FieldMessage = forwardRef<
@@ -21,7 +21,7 @@ const FieldMessage = forwardRef<
     <p
       ref={ref}
       id={fieldMessageId}
-      className={clsm("mb-1 text-sm text-error", className)}
+      className={cn("mb-1 text-sm text-error", className)}
       {...props}
     >
       {body}
