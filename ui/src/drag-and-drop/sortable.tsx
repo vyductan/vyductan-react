@@ -158,7 +158,7 @@ export const Sortable = ({
     }),
     useSensor(KeyboardSensor, {
       // Disable smooth scrolling in Cypress automated tests
-      scrollBehavior: "Cypress" in window ? "auto" : undefined,
+      scrollBehavior: "Cypress" in globalThis ? "auto" : undefined,
       coordinateGetter,
     }),
   );
