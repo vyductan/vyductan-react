@@ -23,10 +23,10 @@ export const useOnDragEnter = () => {
       // Use key-value that we set before in the "listeners" hook.
       const key = target.getAttribute(DRAGGABLE_KEY);
 
-      if (!key) {
-        return false;
-      } else {
+      if (key) {
         console.log(`Lexical node key is ${key}`);
+      } else {
+        return false;
       }
 
       const element = editor.getElementByKey(key);
@@ -38,17 +38,15 @@ export const useOnDragEnter = () => {
 
       const coordinates = element.getBoundingClientRect();
 
-      if (coordinates) {
-        draggableStore.getState().setLine({
-          htmlElement: element,
-          data: {
-            top: coordinates.top,
-            left: coordinates.left,
-            height: coordinates.height,
-            width: coordinates.width,
-          },
-        });
-      }
+      draggableStore.getState().setLine({
+        htmlElement: element,
+        data: {
+          top: coordinates.top,
+          left: coordinates.left,
+          height: coordinates.height,
+          width: coordinates.width,
+        },
+      });
 
       return true;
     },

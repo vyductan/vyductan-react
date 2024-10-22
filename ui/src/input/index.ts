@@ -1,2 +1,4 @@
-export * from "./Input";
-export * from "./Password";
+export * from "./input";
+export * from "./number";
+export * from "./password";
+export * from "./search";

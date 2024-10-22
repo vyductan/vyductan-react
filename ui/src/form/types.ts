@@ -1,17 +1,22 @@
 import type { FieldValues } from "react-hook-form";
 
 import type { AutoCompleteProps } from "../autocomplete";
-import type {
-  DatePickerRangeProps,
-  DatePickerSingleProps,
-} from "../date-picker";
-import type { EditorProps } from "../editor/Editor";
+import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
+import type { EditorProps } from "../editor";
 import type { InputProps } from "../input";
-import type { InputPasswordProps } from "../input/Password";
+import type { InputPasswordProps } from "../input/password";
 import type { RadioGroupProps } from "../radio";
+import type { SelectProps } from "../select";
 import type { TextareaProps } from "../textarea";
-import type { FieldProps } from "./Field";
-import type { FieldArrayProps } from "./FieldArray";
+import type { FieldProps } from "./field";
+import type { FieldArrayProps } from "./field-list";
+
+export type ValueType = string | number | boolean;
+
+export type FieldError = {
+  path: string[];
+  message: string;
+};
 
 type AutoFormFieldBaseProps = {
   // title?: ReactNode;
@@ -33,21 +38,23 @@ export type FieldWithType<TType, TFieldProps> = Omit<
 };
 
 // https://procomponents.ant.design/en-US/components/schema#valuetype-lists
-export type InputUnion =
+export type InputUnion<TValue extends ValueType = string> =
   | FieldWithType<"autocomplete", AutoCompleteProps>
-  | FieldWithType<"date", Omit<DatePickerSingleProps, "mode">>
-  | FieldWithType<"date-range", Omit<DatePickerRangeProps, "mode">>
+  | FieldWithType<"date", DatePickerProps>
+  | FieldWithType<"date-range", DateRangePickerProps>
   | FieldWithType<"editor", EditorProps>
   | FieldWithType<"radio-group", RadioGroupProps>
   | FieldWithType<"password", InputPasswordProps>
   | FieldWithType<"text", InputProps>
   // | FieldWithType<"number", FieldInputProps>
   // | FieldWithType<"select", FieldProps<TFieldValues, TName> & SelectProps>
+  | FieldWithType<"select", SelectProps<TValue>>
   | FieldWithType<"textarea", TextareaProps>;
 
 type AutoFormFieldUnion<
   // TFieldValues,
   TFieldValues extends FieldValues = FieldValues,
+  TValue extends ValueType = ValueType,
   // TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   // TFieldValues extends Record<string, any> = Record<string, any>,
   // TName extends keyof TFieldValues = keyof TFieldValues,
@@ -75,7 +82,7 @@ type AutoFormFieldUnion<
   //   | FieldWithType<"textarea", FieldProps<TFieldValues> & TextareaProps>
   // )
   Omit<FieldProps<TFieldValues>, "control" | "name"> &
-  InputUnion;
+  InputUnion<TValue>;
 
 // | FieldWithType<"time", FieldInputProps>
 // | FieldWithType<"group", { gridCols?: number; columns: Array<FieldsSchema<TRecord>> }>
@@ -112,15 +119,14 @@ type FieldListType = "list";
 type FieldObjectType = "object";
 type FieldInputType = InputUnion["type"];
 type FieldGroupType = "group";
-export type FieldType =
+type FieldType =
   | FieldInputType
   | FieldListType
   | FieldObjectType
   | FieldGroupType
   | "custom";
-export type FieldsSchema<
-  TFieldValues,
-  // TFieldValues extends FieldValues = FieldValues,
+type FieldsSchema<
+  TFieldValues extends FieldValues = FieldValues,
   // TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
   TFieldType extends FieldType = FieldType,
 > = {
@@ -165,7 +171,7 @@ export type FieldsSchema<
             // fields: FieldsSchema<TFieldValues[key]>[];
             // string[];
           }
-        : AutoFormFieldUnion & {
+        : AutoFormFieldUnion<TFieldValues, TFieldValues[key]> & {
             type: TFieldType;
             name: key;
             // columns?: TFieldValues[key] extends (infer I)[]
@@ -229,3 +235,7 @@ export type FieldsSchema<
 export type ResetAction<TFieldValues> = (
   formValues: TFieldValues,
 ) => TFieldValues;
+
+export type { FieldsSchema, FieldType };
+
+export { type SubmitHandler } from "react-hook-form";

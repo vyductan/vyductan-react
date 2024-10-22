@@ -8,7 +8,7 @@ import * as React from "react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
@@ -52,15 +52,19 @@ const imageCache = new Set();
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
   createCommand("RIGHT_CLICK_IMAGE_COMMAND");
 
-function useSuspenseImage(src: string) {
-  if (!imageCache.has(src)) {
+function useSuspenseImage(source: string) {
+  if (!imageCache.has(source)) {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw new Promise((resolve) => {
       const img = new Image();
-      img.src = src;
+      img.src = source;
       // img.src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png"
-      img.onload = () => {
-        imageCache.add(src);
+      img.addEventListener('load', () => {
+        imageCache.add(source);
         resolve(null);
+      });
+      img.onerror = () => {
+        imageCache.add(source);
       };
     });
   }
@@ -152,7 +156,7 @@ export default function ImageComponent({
   const onEnter = useCallback(
     (event: KeyboardEvent) => {
       const latestSelection = $getSelection();
-      const buttonElem = buttonRef.current;
+      const buttonElement = buttonRef.current;
       if (
         isSelected &&
         $isNodeSelection(latestSelection) &&
@@ -165,11 +169,11 @@ export default function ImageComponent({
           caption.focus();
           return true;
         } else if (
-          buttonElem !== null &&
-          buttonElem !== document.activeElement
+          buttonElement !== null &&
+          buttonElement !== document.activeElement
         ) {
           event.preventDefault();
-          buttonElem.focus();
+          buttonElement.focus();
           return true;
         }
       }

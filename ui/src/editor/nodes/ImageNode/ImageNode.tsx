@@ -117,7 +117,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(
-    src: string,
+    source: string,
     altText: string,
     maxWidth: number,
     width?: "inherit" | number,
@@ -128,14 +128,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     key?: NodeKey,
   ) {
     super(key);
-    this.__src = src;
+    this.__src = source;
     this.__altText = altText;
     this.__maxWidth = maxWidth;
     this.__width = width ?? "inherit";
     this.__height = height ?? "inherit";
     this.__showCaption = showCaption ?? false;
     this.__caption = caption ?? createEditor();
-    this.__captionsEnabled = captionsEnabled ?? captionsEnabled === undefined;
+    this.__captionsEnabled = !!captionsEnabled || captionsEnabled === undefined;
   }
 
   exportJSON(): SerializedImageNode {

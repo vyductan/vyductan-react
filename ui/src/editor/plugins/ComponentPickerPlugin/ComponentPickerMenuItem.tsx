@@ -1,4 +1,4 @@
-import { clsm } from "@vyductan/utils";
+import { clsm } from "@acme/ui";
 
 import type { ComponentPickerOption } from "./types";
 

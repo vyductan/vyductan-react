@@ -1,7 +1,7 @@
 import type { DragEvent as ReactDragEvent } from "react";
 import { memo, useCallback } from "react";
 
-import { clsm } from "@vyductan/utils";
+import { clsm } from "@acme/ui";
 
 import { useDraggableStore } from "../../stores/useDraggableStore";
 
@@ -10,7 +10,7 @@ const DraggableElement = () => {
 
   const handleOnDragStart = useCallback(
     ({ dataTransfer }: ReactDragEvent<HTMLDivElement>) => {
-      if (!dataTransfer || !draggable?.htmlElement) {
+      if (!draggable?.htmlElement) {
         return;
       }
       // THIS WILL SET THE DRAGGABLE IMAGE
@@ -29,7 +29,7 @@ const DraggableElement = () => {
     <div
       style={{
         top: draggable.data.top - scrollOffset,
-        left: (draggable.data.left ?? 0) - 23,
+        left: draggable.data.left - 23,
         height: draggable.data.height,
       }}
       className={clsm(

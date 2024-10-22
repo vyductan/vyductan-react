@@ -1,18 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
 import { useRef } from "react";
 
-import { Icon } from "@vyductan/icons";
-import { clsm } from "@vyductan/utils";
-
-import { Tooltip } from "../../..";
+import { clsm } from "../../..";
+import { Icon } from "../../../icons";
+import { Tooltip } from "../../../tooltip";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
 const Direction = {
-  east: 1 << 0,
+  east: Math.trunc(1),
   north: 1 << 3,
   south: 1 << 1,
   west: 1 << 2,
@@ -69,13 +69,13 @@ export default function ImageResizer({
   // Find max width, accounting for editor padding.
   const maxWidthContainer = maxWidth
     ? maxWidth
-    : editorRootElement !== null
-      ? editorRootElement.getBoundingClientRect().width - 20
-      : 100;
+    : (editorRootElement === null
+      ? 100
+      : editorRootElement.getBoundingClientRect().width - 20);
   const maxHeightContainer =
-    editorRootElement !== null
-      ? editorRootElement.getBoundingClientRect().height - 20
-      : 100;
+    editorRootElement === null
+      ? 100
+      : editorRootElement.getBoundingClientRect().height - 20;
 
   const minWidth = 100;
   const minHeight = 100;

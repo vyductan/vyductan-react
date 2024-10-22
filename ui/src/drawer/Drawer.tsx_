@@ -2,8 +2,8 @@ import { Fragment, ReactNode, useState } from "react"
 import { Dialog, Transition } from "@headlessui/react"
 import { Button } from "antd"
 
-import { useResponsive } from "@vyductan/hooks"
-import { CloseOutlined } from "@vyductan/icons"
+import { useResponsive } from "@acme/hooks"
+import { CloseOutlined } from @acme/ui/icons
 
 type DrawerProps = {
   open: boolean

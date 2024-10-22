@@ -31,14 +31,14 @@ export default function ComponentPickerMenuPlugin(): JSX.Element {
 
     const regex = new RegExp(queryString, "i");
 
-    return [
+    return ( 
       // ...getDynamicOptions(editor, queryString),
-      ...baseOptions.filter(
+      baseOptions.filter(
         (option) =>
           regex.test(option.title) ||
           option.keywords.some((keyword) => regex.test(keyword)),
-      ),
-    ];
+      )
+    );
   }, [editor, queryString, showModal]);
 
   const onSelectOption = useCallback(
@@ -69,20 +69,20 @@ export default function ComponentPickerMenuPlugin(): JSX.Element {
           anchorElementRef,
           { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) =>
-          anchorElementRef.current && options.length
+          anchorElementRef.current && options.length > 0
             ? ReactDOM.createPortal(
                 <div className="min-w-48 rounded-sm border border-border p-1">
                   <ul>
-                    {options.map((option, i: number) => (
+                    {options.map((option, index: number) => (
                       <ComponentPickerMenuItem
-                        index={i}
-                        isSelected={selectedIndex === i}
+                        index={index}
+                        isSelected={selectedIndex === index}
                         onClick={() => {
-                          setHighlightedIndex(i);
+                          setHighlightedIndex(index);
                           selectOptionAndCleanUp(option);
                         }}
                         onMouseEnter={() => {
-                          setHighlightedIndex(i);
+                          setHighlightedIndex(index);
                         }}
                         key={option.key}
                         option={option}

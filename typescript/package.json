@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@acme/tsconfig",
+  "version": "0.1.0",
+  "private": true,
+  "files": [
+    "*.json"
+  ]
+}

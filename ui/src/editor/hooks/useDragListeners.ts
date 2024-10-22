@@ -17,13 +17,13 @@ export const useDragListeners = () => {
 
   useEffect(() => {
     const addListeners = () => {
-      keys.forEach((key) => {
+      for (const key of keys) {
         // Get HTML element by node "key"
         const htmlElement = editor.getElementByKey(key);
 
         if (!htmlElement) {
           console.warn("[useDragListeners] No html element");
-          return;
+          continue;
         }
 
         htmlElement.setAttribute(DRAGGABLE_KEY, key);
@@ -38,22 +38,22 @@ export const useDragListeners = () => {
         htmlElement.addEventListener("dragenter", handleOnDragEnter);
 
         // event listeners will be added later ...
-      });
+      }
     };
     addListeners();
 
     const removeListeners = () => {
-      keys.forEach((key) => {
+      for (const key of keys) {
         const htmlElement = editor.getElementByKey(key);
 
         if (!htmlElement) {
           console.warn("[useDragListeners] No html element");
-          return;
+          continue;
         }
 
         htmlElement.removeEventListener("mouseenter", setDraggableElement);
         htmlElement.removeEventListener("dragenter", handleOnDragEnter);
-      });
+      }
     };
     return () => {
       removeListeners();

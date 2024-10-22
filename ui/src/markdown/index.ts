@@ -1,1 +1,1 @@
-export * from "./MemorizedReactMarkdown";
+export * from "./memorized-react-markdown";

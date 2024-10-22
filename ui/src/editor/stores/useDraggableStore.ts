@@ -1,5 +1,5 @@
 import { devtools } from "zustand/middleware";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/shallow";
 import { createWithEqualityFn } from "zustand/traditional";
 
 type Draggable = {
@@ -51,9 +51,9 @@ export const draggableStore = createWithEqualityFn<
 
         if (
           prevLine?.top === newLine.data.top &&
-          prevLine?.left === newLine.data.left &&
-          prevLine?.height === newLine.data.height &&
-          prevLine?.width === newLine.data.width
+          prevLine.left === newLine.data.left &&
+          prevLine.height === newLine.data.height &&
+          prevLine.width === newLine.data.width
         ) {
           return;
         }
@@ -83,17 +83,15 @@ export const draggableStore = createWithEqualityFn<
 
 export const useDraggableStore = () =>
   draggableStore(
-    ({ draggable, resetState }) => ({
+    useShallow(({ draggable, resetState }) => ({
       draggable,
       resetState,
-    }),
-    shallow,
+    })),
   );
 
 export const useDraggableLineStore = () =>
   draggableStore(
-    ({ line }) => ({
+    useShallow(({ line }) => ({
       line,
-    }),
-    shallow,
+    })),
   );

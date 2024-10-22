@@ -3,7 +3,7 @@ export const hexToRgb = (hex: string) => {
   hex = hex.replace(/^#/, "");
 
   // Chia chuỗi thành các thành phần màu RGB
-  const bigint = parseInt(hex, 16);
+  const bigint = Number.parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;

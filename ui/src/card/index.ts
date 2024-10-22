@@ -1,3 +1,2 @@
-import Card from "./Card";
-
-export default Card;
+export * from "./card";
+export * from "./_components";

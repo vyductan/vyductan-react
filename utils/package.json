@@ -1,18 +1,28 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vyductan/utils",
+  "name": "@acme/utils",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "default": "./src/*.ts"
+    }
   },
   "scripts": {
-    "clean": "rm -rf .turbo node_modules"
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
+  "prettier": "@acme/prettier-config",
   "dependencies": {
-    "clsx": "^2.1.0",
-    "slugify": "^1.6.6",
-    "tailwind-merge": "^2.2.1"
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "slugify": "^1.6.6"
   }
 }

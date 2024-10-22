@@ -19,7 +19,7 @@ import {
 } from "lexical";
 
 import type { InsertImagePayload } from "./types";
-import { CAN_USE_DOM } from "../../constants";
+// import { CAN_USE_DOM } from "../../constants";
 import { ImageNode } from "../../nodes/ImageNode";
 import {
   $createImageNode,
@@ -27,8 +27,8 @@ import {
 } from "../../nodes/ImageNode/ImageNode";
 import { INSERT_IMAGE_COMMAND } from "./constants";
 
-const getDOMSelection = (targetWindow: Window | null): Selection | null =>
-  CAN_USE_DOM ? (targetWindow ?? window).getSelection() : null;
+// const getDOMSelection = (targetWindow: Window | null): Selection | null =>
+//   CAN_USE_DOM ? (targetWindow ?? window).getSelection() : null;
 
 export const ImagesPlugin = ({
   captionsEnabled,
@@ -87,7 +87,6 @@ const TRANSPARENT_IMAGE =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 function onDragStart(event: DragEvent): boolean {
-  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
   const img = (typeof document !== "undefined" &&
     document.createElement("img")) as unknown as HTMLImageElement;
   img.src = TRANSPARENT_IMAGE;
@@ -170,7 +169,7 @@ function getDragImageData(event: DragEvent): null | InsertImagePayload {
   if (!dragData) {
     return null;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
   const { type, data } = JSON.parse(dragData);
   if (type !== "image") {
     return null;
@@ -198,23 +197,24 @@ function canDropImage(event: DragEvent): boolean {
 }
 
 function getDragSelection(event: DragEvent): Range | null | undefined {
-  let range;
-  const target = event.target as null | Element | Document;
-  const targetWindow =
-    target == null
-      ? null
-      : target.nodeType === 9
-        ? (target as Document).defaultView
-        : (target as Element).ownerDocument.defaultView;
-  const domSelection = getDOMSelection(targetWindow);
-  if (document.caretRangeFromPoint) {
-    range = document.caretRangeFromPoint(event.clientX, event.clientY);
-  } else if (event.rangeParent && domSelection !== null) {
-    domSelection.collapse(event.rangeParent, event.rangeOffset ?? 0);
-    range = domSelection.getRangeAt(0);
-  } else {
-    throw Error(`Cannot get the selection when dragging`);
-  }
+  // let range;
+  // const target = event.target as null | Element | Document;
+  // const targetWindow =
+  //   target == null
+  //     ? null
+  //     : target.nodeType === 9
+  //       ? (target as Document).defaultView
+  //       : (target as Element).ownerDocument.defaultView;
+  // const domSelection = getDOMSelection(targetWindow);
+  // if (document.caretRangeFromPoint) {
+  //   range = document.caretRangeFromPoint(event.clientX, event.clientY);
+  // } else if (event.rangeParent && domSelection !== null) {
+  //   domSelection.collapse(event.rangeParent, event.rangeOffset ?? 0);
+  //   range = domSelection.getRangeAt(0);
+  // } else {
+  //   throw Error(`Cannot get the selection when dragging`);
+  // }
 
+  const range = document.caretRangeFromPoint(event.clientX, event.clientY);
   return range;
 }

@@ -1,36 +1,27 @@
-export { default as Alert } from "./alert";
-export * from "./alert-modal";
-export * from "./autocomplete";
-export * from "./avatar";
-export * from "./button";
-export * from "./calendar";
-export * from "./code-block";
-export * from "./date-picker";
-export * from "./divider";
-export * from "./dropdown";
-export { default as Card } from "./card";
-export * from "./editor";
-export * from "./form";
-// export { default as Drawer } from "./drawer/index.ts_";
-export * from "./input";
-export * from "./label";
-export * from "./link";
-export * from "./list";
-export * from "./spin";
-export * from "./markdown";
-export * from "./modal";
-export * from "./pagination";
-export * from "./radio";
-export * from "./resizable";
-export * from "./scroll-area";
-export * from "./table";
-export * from "./tabs";
-export * from "./tag";
-export * from "./textarea";
-export * from "./toast";
-export * from "./tooltip";
+import { defaultConfig } from "tailwind-variants";
 
-export * from "./extends/ButtonScrollToBottom";
-export * from "./extends/TailwindIndicator";
+defaultConfig.twMergeConfig = {
+  extend: {
+    classGroups: {
+      w: ["w-screen-sm", "w-screen-md", "w-screen-xl"],
+    },
+  },
+};
 
-export type DirectionType = "ltr" | "rtl";
+// import { cx } from "class-variance-authority";
+// import { extendTailwindMerge } from "tailwind-merge";
+//
+export * from "./types";
+//
+// const twMerge = extendTailwindMerge({
+//   extend: {
+//     classGroups: {
+//       w: ["w-screen-sm", "w-screen-md", "w-screen-xl"],
+//     },
+//   },
+// });
+// const clsm = (...inputs: Parameters<typeof cx>) => twMerge(cx(inputs));
+//
+// export { clsm };
+
+export { cnBase as clsm } from "tailwind-variants";
