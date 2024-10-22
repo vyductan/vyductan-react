@@ -156,7 +156,7 @@ export const Pagination = (props: PaginationProps) => {
     <PaginationTotal>
       {showTotal(total, [
         total === 0 ? 0 : (current - 1) * pageSize + 1,
-        current * pageSize > total ? total : current * pageSize,
+        Math.min(current * pageSize, total),
       ])}
     </PaginationTotal>
   );
@@ -173,8 +173,8 @@ export const Pagination = (props: PaginationProps) => {
   // ====================== Normal ======================
   const pagerList: React.ReactElement<PaginationItemProps>[] = [];
 
-  const prevPage = current - 1 > 0 ? current - 1 : 0;
-  const nextPage = current + 1 < allPages ? current + 1 : allPages;
+  const prevPage = Math.max(current - 1, 0);
+  const nextPage = Math.min(current + 1, allPages);
   const pageBufferSize = showLessItems ? 1 : 2;
   if (allPages <= 3 + pageBufferSize * 2) {
     if (!allPages) {
