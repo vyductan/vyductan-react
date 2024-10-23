@@ -30,6 +30,9 @@ export const inputVariants = cva(
           "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
         ],
       },
+      readOnly: {
+        true: ["pointer-events-none cursor-not-allowed"],
+      },
       status: {
         default: [
           "hover:border-primary-500",
@@ -78,10 +81,14 @@ type InputProps = Omit<
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
     addonAfter?: React.ReactNode;
-  } & {
     classNames?: {
       wrapper?: string;
     };
+    wrapperProps?: React.DetailedHTMLProps<
+      React.HTMLAttributes<HTMLDivElement>,
+      HTMLDivElement
+    >;
+    "data-state"?: boolean;
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
@@ -100,8 +107,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       prefix,
       suffix,
 
-      id: idProp,
       onChange,
+
+      id: idProp,
+      type,
+      "aria-haspopup": ariaHasPopup,
+      "aria-expanded": ariaExpanded,
+      "aria-controls": ariaControls,
+      "data-state": dataState,
+
+      wrapperProps,
       ...props
     },
     ref,
@@ -140,7 +155,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             inputSizeVariants({ size }),
           )}
           onClick={() => {
-            triggerNativeEventFor(document.querySelector(`[id='${id}]`), {
+            triggerNativeEventFor(document.querySelector(`[id='${id}']`), {
               event: "input",
               value: "",
             });
@@ -164,8 +179,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       )
     ) : undefined;
 
+    const conditionWrapperProps = ariaHasPopup
+      ? {
+          "aria-haspopup": ariaHasPopup,
+          "aria-expanded": ariaExpanded,
+          "aria-controls": ariaControls,
+          "data-state": dataState,
+          type,
+        }
+      : {};
+    const conditionInputProps = ariaHasPopup ? {} : { type };
     return (
-      <span
+      <div
         ref={wrapperRef}
         aria-hidden={hidden ? "true" : undefined}
         className={cn(
@@ -173,8 +198,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "cursor-text",
           classNames?.wrapper,
         )}
-        onClick={() => {
-          document.querySelector<HTMLInputElement>(`[id='${id}]`)?.focus();
+        {...wrapperProps}
+        {...conditionWrapperProps}
+        onClick={(e) => {
+          wrapperProps?.onClick?.(e);
+          document.querySelector<HTMLInputElement>(`[id='${id}']`)?.focus();
         }}
       >
         {addonBefore && (
@@ -196,7 +224,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             "w-full",
             "text-left",
             "bg-transparent",
-            "placeholder:text-muted-foreground",
+            // "placeholder:text-muted-foreground",
+            "placeholder:text-placeholder",
             "border-none outline-none",
             inputSizeVariants({ size }),
             className,
@@ -207,6 +236,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onChange?.(event);
           }}
           {...props}
+          {...conditionInputProps}
         />
         {suffixComp && suffixComp}
         {addonAfter && (
@@ -227,7 +257,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {addonAfter}
           </span>
         )}
-      </span>
+      </div>
     );
   },
 );

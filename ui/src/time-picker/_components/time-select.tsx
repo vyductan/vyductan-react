@@ -1,4 +1,4 @@
-import { cn } from "..";
+import { cn } from "../..";
 
 type TimeSelectProps = {
   value?: Date;
@@ -19,7 +19,6 @@ export const TimeSelect = ({
   const minuteOptions = Array.from({ length: 60 }, (_, index) => index);
   return (
     <div className="flex flex-col py-3 pr-3">
-      <div className="h-10"></div>
       <div className="flex h-[224px] flex-auto divide-x">
         <ul className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
           {/* <ScrollArea className="h-[227px]"> */}
@@ -65,3 +64,5 @@ export const TimeSelect = ({
     </div>
   );
 };
+
+export type { TimeSelectProps };

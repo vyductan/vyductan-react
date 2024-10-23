@@ -46,6 +46,9 @@ const DatePickerInternal = <T extends DateType = Date>(
   {
     // mode,
     id: inputId,
+
+    disabled,
+    readOnly,
     // borderless,
     format = "dd/MM/yyyy",
     // size,
@@ -147,7 +150,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       return (
         <div
           className={cn(
-            inputVariants(),
+            inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
@@ -172,7 +175,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       return (
         <div
           className={cn(
-            inputVariants(),
+            inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
@@ -211,6 +214,8 @@ const DatePickerInternal = <T extends DateType = Date>(
     // size,
     // status,
     // ref,
+    disabled,
+    readOnly,
   ]);
 
   return (

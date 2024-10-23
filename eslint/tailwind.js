@@ -4,7 +4,6 @@ import * as path from "node:path";
 import tailwindPlugin from "eslint-plugin-tailwindcss";
 
 // const __filename = fileURLToPath(import.meta.url);
-const config = path.join(import.meta.dirname, "../tailwind/web.ts");
 
 /** @type {Awaited<import('typescript-eslint').Config>} */
 export default [
@@ -19,7 +18,8 @@ export default [
     settings: {
       tailwindcss: {
         callees: ["cn", "cva", "cx"],
-        config,
+        config: path.join(import.meta.dirname, "../tailwind/web.ts"),
+        // config: "../tailwind/web.ts",
         // config: fileURLToPath(
         //   new URL("../tailwind/web.ts", "file://" + __filename),
         // ),
