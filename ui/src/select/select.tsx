@@ -9,7 +9,6 @@ import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
 import { cn } from "..";
 import { Empty } from "../empty";
-import { tagColors } from "../tag";
 import {
   SelectContent,
   SelectItem,
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./_components";
+import { selectColors } from "./colors";
 
 export type SelectProps<T extends ValueType = string> = Omit<
   SelectRootProps,
@@ -84,7 +84,10 @@ const SelectInner = <T extends ValueType = string>(
           <SelectItem
             key={String(o.value)}
             value={o.value as string}
-            className={cn(o.color ? tagColors[o.color] : "", "bg-transparent")}
+            className={cn(
+              o.color ? selectColors[o.color] : "",
+              "bg-transparent",
+            )}
           >
             {o.label}
           </SelectItem>
@@ -114,7 +117,7 @@ const SelectInner = <T extends ValueType = string>(
         id={id}
         className={cn(
           "w-full",
-          tagColors[options.find((o) => o.value === value)?.color ?? ""],
+          selectColors[options.find((o) => o.value === value)?.color ?? ""],
           className,
         )}
         borderless={borderless}
