@@ -2,7 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import React, { Fragment } from "react";
 import { cva } from "class-variance-authority";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Spin } from "../spin";
 
 const listVariants = cva([""], {
@@ -59,7 +59,7 @@ const List = <TRecord extends Record<string, unknown>>({
       {header && <div>{header}</div>}
       <Spin spinning={loading}>
         {/* {childrenContent} */}
-        <ul className={clsm(listVariants({}))}>
+        <ul className={cn(listVariants({}))}>
           {dataSource.map((item, index) => (
             <Fragment
               key={

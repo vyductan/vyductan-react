@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import React, { forwardRef } from "react";
 
-import { clsm } from "../..";
+import { cn } from "../..";
 
 export interface ActionProps extends React.HTMLAttributes<HTMLButtonElement> {
   active?: {
@@ -17,7 +17,7 @@ export const Action = forwardRef<HTMLButtonElement, ActionProps>(
       <button
         ref={ref}
         {...props}
-        className={clsm(
+        className={cn(
           "flex w-3 touch-none appearance-none rounded-md bg-transparent",
           className,
         )}

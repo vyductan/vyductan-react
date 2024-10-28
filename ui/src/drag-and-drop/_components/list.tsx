@@ -2,7 +2,7 @@
 // 2020-12-31T18:02:04.000Z
 import React, { forwardRef } from "react";
 
-import { clsm } from "../..";
+import { cn } from "../..";
 
 export interface Props {
   children: React.ReactNode;
@@ -27,7 +27,7 @@ export const List = forwardRef<HTMLUListElement, Props>(
           ...style,
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
         }}
-        className={clsm(
+        className={cn(
           "grid w-full auto-rows-max gap-2 rounded-md",
           horizontal && "grid-flow-col",
           className,

@@ -16,7 +16,7 @@ import {
   Thumbs,
 } from "swiper/modules";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 type SwiperPreviewProps = {
   activeIndex: number;
@@ -62,7 +62,7 @@ export const SwiperPreview = ({
           exit={{
             opacity: 0,
           }}
-          className={clsm("fixed inset-0 z-[99999]", "bg-black")}
+          className={cn("fixed inset-0 z-[99999]", "bg-black")}
         >
           <div className="absolute right-6 top-0 z-10 flex h-12 items-center justify-between text-white">
             <div></div>

@@ -1,7 +1,7 @@
 import type { DragEvent as ReactDragEvent } from "react";
 import { memo, useCallback } from "react";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import { useDraggableStore } from "../../stores/useDraggableStore";
 
@@ -32,7 +32,7 @@ const DraggableElement = () => {
         left: draggable.data.left - 23,
         height: draggable.data.height,
       }}
-      className={clsm(
+      className={cn(
         "absolute h-10 w-4 cursor-grab bg-red-500 transition-[background]",
         "active:cursor-grabbing",
         "hover:bg-blue-600",

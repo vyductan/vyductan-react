@@ -1,4 +1,4 @@
-import { clsm } from "../..";
+import { cn } from "../..";
 
 interface Props {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ interface Props {
 export function Wrapper({ children, center, style }: Props) {
   return (
     <div
-      className={clsm("flex w-full", center && "justify-center")}
+      className={cn("flex w-full", center && "justify-center")}
       style={style}
     >
       {children}

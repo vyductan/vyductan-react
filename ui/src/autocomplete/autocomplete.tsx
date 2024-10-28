@@ -8,7 +8,7 @@ import type { ButtonProps } from "../button";
 import type { CommandProps } from "../command";
 import type { ValueType } from "../form";
 import type { Option } from "../select/types";
-import { clsm } from "..";
+import { cn } from "..";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
@@ -139,7 +139,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
         role="combobox"
         disabled={disabled}
         aria-expanded={open}
-        className={clsm(
+        className={cn(
           "w-full justify-between text-sm font-normal",
           !value && "text-muted-foreground",
           className,
@@ -152,7 +152,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
         />
         {allowClear && (
           <button
-            className={clsm(
+            className={cn(
               "z-10",
               "absolute right-[11px]",
               "flex size-5 items-center justify-center transition-opacity",

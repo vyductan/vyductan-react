@@ -6,7 +6,7 @@ import { format as formatDate, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 
 import type { InputVariants } from "../input";
-import { clsm } from "..";
+import { cn } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
@@ -46,6 +46,9 @@ const DatePickerInternal = <T extends DateType = Date>(
   {
     // mode,
     id: inputId,
+
+    disabled,
+    readOnly,
     // borderless,
     format = "dd/MM/yyyy",
     // size,
@@ -57,7 +60,7 @@ const DatePickerInternal = <T extends DateType = Date>(
     // allowClear = false,
     ...props
   }: DatePickerProps<T>,
-  // ref: React.Ref<HTMLInputElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) => {
   const [open, setOpen] = React.useState(false);
 
@@ -146,8 +149,9 @@ const DatePickerInternal = <T extends DateType = Date>(
       const input = x ? formatDate(toDate(x), format) : undefined;
       return (
         <div
-          className={clsm(
-            inputVariants(),
+          ref={ref}
+          className={cn(
+            inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
@@ -171,8 +175,8 @@ const DatePickerInternal = <T extends DateType = Date>(
       const input2 = x?.[1] ? formatDate(toDate(x[1]), format) : undefined;
       return (
         <div
-          className={clsm(
-            inputVariants(),
+          className={cn(
+            inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
@@ -184,7 +188,7 @@ const DatePickerInternal = <T extends DateType = Date>(
           <div>
             <span>{input1}</span>
             <span
-              className={clsm(
+              className={cn(
                 "px-2 text-center text-foreground-muted",
                 !input1 && !input2 && "opacity-0",
               )}
@@ -211,6 +215,8 @@ const DatePickerInternal = <T extends DateType = Date>(
     // size,
     // status,
     // ref,
+    disabled,
+    readOnly,
   ]);
 
   return (

@@ -1,12 +1,12 @@
 import type { Column } from "@tanstack/react-table";
 import type { CSSProperties } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 // export const tableStyles = {
 //   row: {
-//     classNames: clsm("bg-background"),
-//     hoverClassNames: clsm("bg-gray-100 dark:bg-gray-800"),
+//     classNames: cn("bg-background"),
+//     hoverClassNames: cn("bg-gray-100 dark:bg-gray-800"),
 //     hoverByCssClassNames: "hover:bg-gray-100 dark:hover:bg-gray-800",
 //   },
 // };
@@ -31,7 +31,7 @@ export const getCommonPinningClassName = <T>(
     isPinned === "left" && column.getIsLastColumn("left");
   const isFirstRightPinnedColumn =
     isPinned === "right" && column.getIsFirstColumn("right");
-  return clsm(
+  return cn(
     // isPinned && !isHeader && "bg-surface",
     isPinned ? "sticky z-10" : "relative",
     isLastLeftPinnedColumn && [

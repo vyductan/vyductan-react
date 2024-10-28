@@ -15,7 +15,7 @@ import { cloneElement, forwardRef, useId } from "react";
 import { Controller, useWatch } from "react-hook-form";
 
 import type { inputVariants } from "../input";
-import { clsm } from "..";
+import { cn } from "..";
 import { GenericSlot } from "../slot";
 import { FormFieldContext, useFormContext } from "./context";
 import { FieldDescription } from "./field-description";
@@ -287,7 +287,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
   ) => {
     return (
       <div
-        className={clsm(
+        className={cn(
           "flex h-full flex-col",
           fieldState?.error ? "" : "mb-6",
           className,

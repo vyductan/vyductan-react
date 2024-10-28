@@ -9,7 +9,7 @@ import type {
 import type { Transform } from "@dnd-kit/utilities";
 import React, { useEffect } from "react";
 
-import { clsm } from "../..";
+import { cn } from "../..";
 import { Button } from "../../button";
 import { Icon } from "../../icons";
 import { Remove } from "./remove";
@@ -168,14 +168,14 @@ export const Item = React.memo(
         })
       ) : (
         <li
-          // className={clsm(
+          // className={cn(
           //   "flex",
           //   // styles.Wrapper
           //   // fadeIn && styles.fadeIn,
           //   // sorting && styles.sorting,
           //   // dragOverlay && styles.dragOverlay
           // )}
-          className={clsm(
+          className={cn(
             "relative flex grow items-center justify-between p-4",
             "rounded-md border",
             disabled &&
@@ -221,7 +221,7 @@ export const Item = React.memo(
           ref={ref}
         >
           {/* <div */}
-          {/*   className={clsm( */}
+          {/*   className={cn( */}
           {/*     "relative flex grow items-center justify-between p-4", */}
           {/*     "rounded-md border", */}
           {/*     disabled && */}
@@ -241,7 +241,7 @@ export const Item = React.memo(
           {/*   tabIndex={handle ? undefined : 0} */}
           {/* > */}
           {children}
-          <span className={clsm("flex items-center gap-2")}>
+          <span className={cn("flex items-center gap-2")}>
             {onRemove ? (
               <Remove
                 // className={styles.Remove}

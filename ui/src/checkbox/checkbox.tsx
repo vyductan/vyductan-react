@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 
 type CheckboxProps = Omit<
@@ -38,7 +38,7 @@ const Checkbox = React.forwardRef<
         id={id}
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
-        className={clsm("inline-flex items-baseline", "text-sm", className)}
+        className={cn("inline-flex items-baseline", "text-sm", className)}
       >
         <CheckboxPrimitive.Root
           ref={ref}
@@ -50,7 +50,7 @@ const Checkbox = React.forwardRef<
                 : checked
           }
           defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
-          className={clsm(
+          className={cn(
             "peer size-4 self-center rounded-[4px]",
             "border border-gray-700 ring-offset-background",
             "transition-colors",
@@ -64,7 +64,7 @@ const Checkbox = React.forwardRef<
           {...props}
         >
           <CheckboxPrimitive.Indicator
-            className={clsm(
+            className={cn(
               "flex size-full items-center justify-center text-current",
             )}
           >

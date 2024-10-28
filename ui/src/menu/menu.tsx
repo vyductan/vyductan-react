@@ -4,7 +4,7 @@ import type { KeyboardEvent, MouseEvent } from "react";
 import { useMergedState } from "rc-util";
 
 import type { MenuItemDef } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 // import { Collapse } from "../collapse";
 import { Divider } from "../divider";
 import { MenuItem } from "./_components";
@@ -106,7 +106,7 @@ export const Menu = ({
       //       onKeyUp={(event) => {
       //         onSelect?.({ item, key, event });
       //       }}
-      //       className={clsm(
+      //       className={cn(
       //         "text-secondary",
       //         "border-l border-transparent",
       //         "hover:text-primary",
@@ -116,7 +116,7 @@ export const Menu = ({
       //       )}
       //     >
       //       <Slot
-      //         className={clsm("block cursor-pointer rounded-md px-4 py-2.5")}
+      //         className={cn("block cursor-pointer rounded-md px-4 py-2.5")}
       //       >
       //         {typeof item.label === "string" ? (
       //           <span>{item.label}</span>
@@ -142,10 +142,10 @@ export const Menu = ({
       //     ]}
       //     contentProps={{
       //       as: "ul",
-      //       className: clsm("border-l border-border"),
+      //       className: cn("border-l border-border"),
       //     }}
       //     triggerProps={{
-      //       className: clsm(
+      //       className: cn(
       //         "text-secondary",
       //         "hover:text-foreground",
       //         mergedSelectKeys.some((x) => x.includes(key)) &&
@@ -159,7 +159,7 @@ export const Menu = ({
 
   return (
     <ul
-      className={clsm(
+      className={cn(
         mode === "inline" && "space-x-2 space-y-1 overflow-y-auto",
         className,
       )}

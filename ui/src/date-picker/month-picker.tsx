@@ -1,8 +1,9 @@
+import type { ForwardedRef } from "react";
 import React from "react";
 import { format } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
@@ -15,13 +16,16 @@ type MonthPickerProps = {
   value?: number;
   onChange?: (value?: number) => void;
 };
-const MonthPickerInternal = ({
-  id: inputId,
-  open: openProp,
+const MonthPickerInternal = (
+  {
+    id: inputId,
+    open: openProp,
 
-  value,
-  onChange,
-}: MonthPickerProps) => {
+    value,
+    onChange,
+  }: MonthPickerProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) => {
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
   });
@@ -75,7 +79,7 @@ const MonthPickerInternal = ({
                 }}
               >
                 <div
-                  className={clsm(
+                  className={cn(
                     "rounded-md px-4 py-0.5 hover:bg-background-hover",
                     index === new Date().getMonth() && "bg-background",
                     value === index &&
@@ -91,7 +95,8 @@ const MonthPickerInternal = ({
       }
     >
       <div
-        className={clsm(
+        ref={ref}
+        className={cn(
           inputVariants(),
           inputSizeVariants(),
           "gap-2",

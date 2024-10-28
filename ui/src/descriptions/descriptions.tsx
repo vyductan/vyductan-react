@@ -1,10 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { Fragment } from "react";
 
 import { useResponsive } from "@acme/hooks/useResponsive";
 
 import type { Screens } from "../theme";
-import { clsm } from "..";
+import { cn } from "..";
 
 export type DescriptionsItem = {
   key: React.Key;
@@ -63,9 +65,9 @@ export const Descriptions = ({
       ? chunkArray(items, mergedColumn)
       : createRows(items, mergedColumn);
 
-  const labelClassName = clsm("text-foreground-muted", classNames?.label);
-  const contentClassName = clsm(classNames?.content);
-  const thClassName = clsm(
+  const labelClassName = cn("text-foreground-muted", classNames?.label);
+  const contentClassName = cn(classNames?.content);
+  const thClassName = cn(
     "text-start text-sm font-normal",
     labelClassName,
     bordered && "border-e bg-surface-secondary",
@@ -73,7 +75,7 @@ export const Descriptions = ({
     layout === "vertical" && "pb-1",
     layout === "vertical" && bordered && "px-6",
   );
-  const tdClassName = clsm(
+  const tdClassName = cn(
     "break-all",
     bordered && "border-e",
     layout === "horizontal" && "py-4",
@@ -90,15 +92,15 @@ export const Descriptions = ({
         </div>
       )}
 
-      <div className={clsm(bordered && "border")}>
+      <div className={cn(bordered && "border")}>
         <table
-          className={clsm("w-full", bordered ? "table-auto" : "table-fixed")}
+          className={cn("w-full", bordered ? "table-auto" : "table-fixed")}
         >
           <tbody>
             {rows.map((cols, rowIndex) => (
               <tr
                 key={rowIndex}
-                className={clsm(
+                className={cn(
                   bordered && "mb-px border-b last:border-none",
                   "[&:last-child>td]:pb-0",
                 )}
@@ -111,7 +113,7 @@ export const Descriptions = ({
                         <th className={thClassName}>
                           <span>{col.label}</span>
                         </th>
-                        <td className={clsm(tdClassName, "last:border-none")}>
+                        <td className={cn(tdClassName, "last:border-none")}>
                           <span>{col.children ?? "-"}</span>
                         </td>
                       </Fragment>
@@ -121,15 +123,15 @@ export const Descriptions = ({
                         <span className={contentClassName}>{col.children}</span>
                       </td>
                     ) //vertical
-                  ) : (rowIndex % 2 === 0 ? (
+                  ) : rowIndex % 2 === 0 ? (
                     <th key={index} className={thClassName}>
                       {col as React.ReactNode}
                     </th>
                   ) : (
-                    <td key={index} className={clsm(tdClassName)}>
+                    <td key={index} className={cn(tdClassName)}>
                       {col as React.ReactNode}
                     </td>
-                  )),
+                  ),
                 )}
               </tr>
             ))}

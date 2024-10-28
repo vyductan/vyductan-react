@@ -5,7 +5,7 @@ import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import type { TabsType } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 
 type TabsRootProps = React.ComponentProps<typeof TabsPrimitive.Root>;
 type TabsRootRef = React.ElementRef<typeof TabsPrimitive.Root>;
@@ -20,7 +20,7 @@ const TabsList = React.forwardRef<
 >(({ type, className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
-    className={clsm(
+    className={cn(
       "no-scrollbar flex-nowrap overflow-x-scroll text-foreground-muted",
       "flex items-baseline",
       type === "secondary" &&
@@ -47,7 +47,7 @@ const TabsTrigger = React.forwardRef<
 >(({ tabsType, className, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
-    className={clsm(
+    className={cn(
       "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
       "py-3",
       tabsType === "secondary" && [
@@ -76,7 +76,7 @@ const TabsContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Content
     ref={ref}
-    className={clsm(
+    className={cn(
       "mt-4 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className,
     )}

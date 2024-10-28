@@ -1,7 +1,8 @@
+import type { ForwardedRef } from "react";
 import React from "react";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
@@ -14,13 +15,16 @@ type YearPickerProps = {
   value?: number;
   onChange?: (value?: number) => void;
 };
-const YearPickerInternal = ({
-  id: inputId,
-  open: openProp,
+const YearPickerInternal = (
+  {
+    id: inputId,
+    open: openProp,
 
-  value,
-  onChange,
-}: YearPickerProps) => {
+    value,
+    onChange,
+  }: YearPickerProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) => {
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
   });
@@ -84,7 +88,7 @@ const YearPickerInternal = ({
                 }}
               >
                 <div
-                  className={clsm(
+                  className={cn(
                     "rounded-md px-4 py-0.5 hover:bg-background-hover",
                     number_ === new Date().getFullYear() && "bg-background",
                     value === index &&
@@ -100,7 +104,8 @@ const YearPickerInternal = ({
       }
     >
       <div
-        className={clsm(
+        ref={ref}
+        className={cn(
           inputVariants(),
           inputSizeVariants(),
           "gap-2",

@@ -18,7 +18,7 @@ import {
 } from "lexical";
 import { createPortal } from "react-dom";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import { Icon } from "../../../icons";
 import { isHTMLElement } from "../../utils/guard";
@@ -426,7 +426,7 @@ function useDraggableBlockMenu(
   return createPortal(
     <>
       <div
-        className={clsm(
+        className={cn(
           "absolute left-0 top-0 cursor-grab p-px will-change-transform",
           "active:cursor-grabbing",
           "hover:bg-gray-100",

@@ -2,25 +2,24 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { tv } from "tailwind-variants";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 const color: Record<string, string> = {
-  default: "bg-gray-200 text-gray-950",
-  success: "bg-success-muted text-success",
-  processing: "bg-blue-200 text-blue-900",
-  error: "bg-red-200 text-red-900",
-  warning: "bg-amber-200 text-amber-9000",
-  gray: "bg-gray-200 text-gray-950 hover:border-gray-500 focus-within:border-gray-600 focus-within:ring-gray-100",
-  amber:
-    "bg-amber-200 text-amber-900 hover:border-amber-500 focus-within:border-amber-600 focus-within:ring-amber-100",
-  blue: "bg-blue-200 text-blue-900 hover:border-blue-500 focus-within:border-blue-600 focus-within:ring-blue-100",
-  green:
-    "bg-green-200 text-green-900 hover:border-green-500 focus-within:border-green-600 focus-within:ring-green-100",
-  red: "bg-red-200 text-red-900 hover:border-red-500 focus-within:border-red-600 focus-within:ring-red-100",
-  pink: "bg-pink-300 text-pink-900 hover:border-pink-500 focus-within:border-pink-600 focus-within:ring-pink-100",
-  purple:
-    "bg-purple-200 text-purple-900 hover:border-purple-500 focus-within:border-purple-600 focus-within:ring-purple-100",
-  teal: "bg-teal-300 text-teal-900 hover:border-teal-500 focus-within:border-teal-600 focus-within:ring-teal-100",
+  default: "bg-gray-200 text-gray-950  border-gray-600",
+  primary: "bg-primary-200 text-primary-900  border-primary-600",
+  success: "bg-success-muted text-success  border-green-600",
+  processing: "bg-blue-200 text-blue-900  border-blue-600",
+  error: "bg-red-200 text-red-900 border-red-600",
+  warning: "bg-amber-200 text-amber-900 border-amber-600",
+  gray: "bg-gray-200 text-gray-950 border-gray-600",
+  amber: "bg-amber-200 text-amber-900 border-amber-600",
+  blue: "bg-blue-200 text-blue-900 border-blue-600",
+  fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
+  green: "bg-green-200 text-green-900 border-green-600",
+  red: "bg-red-200 text-red-900 border-red-600",
+  pink: "bg-pink-300 text-pink-900 border-pink-600",
+  purple: "bg-purple-200 text-purple-900 border-purple-600",
+  teal: "bg-teal-300 text-teal-900 border-teal-600",
 };
 const tagVariants = tv({
   base: [
@@ -58,7 +57,7 @@ interface TagProps
 const Tag = ({ className, variant, color, ...props }: TagProps) => {
   return (
     <div
-      className={clsm(
+      className={cn(
         tagVariants({
           variant,
           color,

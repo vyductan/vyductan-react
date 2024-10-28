@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactElement } from "react";
 import { cloneElement } from "react";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 type IconWrapperProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: ReactElement;
@@ -15,9 +15,9 @@ const IconWrapper = ({
 }: IconWrapperProps) => {
   return (
     <>
-      <span className={clsm(className)} {...props}>
+      <span className={cn(className)} {...props}>
         {cloneElement(children, {
-          className: clsm("size-6", className),
+          className: cn("size-6", className),
           "aria-hidden": "true",
           role: "img",
           ...props,

@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 type SwitchProps = Omit<
   React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
@@ -16,7 +16,7 @@ const Switch = React.forwardRef<
   SwitchProps
 >(({ className, onChange, ...props }, ref) => (
   <SwitchPrimitives.Root
-    className={clsm(
+    className={cn(
       "peer inline-flex h-[22px] w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
       className,
     )}
@@ -27,7 +27,7 @@ const Switch = React.forwardRef<
     ref={ref}
   >
     <SwitchPrimitives.Thumb
-      className={clsm(
+      className={cn(
         "pointer-events-none block size-[18px] rounded-full bg-background shadow-lg ring-0 transition-transform",
         "data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-0.5",
       )}

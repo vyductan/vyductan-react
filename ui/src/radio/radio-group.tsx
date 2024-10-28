@@ -2,7 +2,7 @@ import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import type { ValueType } from "../form";
-import { clsm } from "..";
+import { cn } from "..";
 import { Radio } from "./radio";
 
 type RadioOption<TValue extends string | number | boolean = string> = {
@@ -25,7 +25,7 @@ const RadioGroupInner = <T extends ValueType = string>(
   return (
     <>
       <RadioGroupPrimitive.Root
-        className={clsm("flex gap-2", className)}
+        className={cn("flex gap-2", className)}
         onValueChange={onChange}
         {...props}
         ref={ref}

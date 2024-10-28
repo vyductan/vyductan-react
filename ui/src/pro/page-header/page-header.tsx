@@ -2,7 +2,7 @@
 
 import type { AvatarProps } from "../../avatar";
 import type { TagProps } from "../../tag";
-import { clsm } from "../..";
+import { cn } from "../..";
 import { Avatar } from "../../avatar";
 
 type PageHeaderProps = {
@@ -27,10 +27,10 @@ const Title = (props: PageHeaderProps) => {
   // const backIcon = getBackIcon(props, direction);
   // const backIconDom = renderBack(backIcon, onBack);
   return (
-    <div className={clsm("flex justify-between")}>
+    <div className={cn("flex justify-between")}>
       <div className="">
         {/* {backIconDom} */}
-        {avatar && <Avatar className={clsm(avatar.className)} {...avatar} />}
+        {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
         {title && (
           <h3
             title={typeof title === "string" ? title : undefined}
@@ -77,7 +77,7 @@ const PageHeader = (props: PageHeaderProps) => {
   const children = renderChildren(props);
 
   return (
-    <div className={clsm("pb-5", className)}>
+    <div className={cn("pb-5", className)}>
       <Title {...props} />
       {children}
     </div>

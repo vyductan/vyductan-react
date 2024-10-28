@@ -7,7 +7,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
 import type { IconProps } from "../icons";
-import { clsm } from "..";
+import { cn } from "..";
 import Wave from "../_util/wave";
 import { GenericSlot } from "../slot";
 import { LoadingIcon } from "./loading-icon";
@@ -29,7 +29,7 @@ const buttonVariants = cva(
       },
       color: {
         default: [],
-        accent: [],
+        link: [],
         danger: [],
         success: [],
         teal: [],
@@ -139,11 +139,11 @@ const buttonVariants = cva(
       },
       {
         variant: "light",
-        color: "accent",
+        color: "link",
         className: [
-          "bg-accent-muted text-accent",
+          "bg-link-muted text-link",
           // "hover:text-white hover:bg-info",
-          "hover:bg-accent-hover hover:text-white",
+          "hover:bg-link-hover hover:text-white",
         ],
       },
       {
@@ -271,7 +271,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={clsm(
+            className={cn(
               size === "sm" ? "" : "size-4",
               // children ? "mr-2" : "",
             )}
@@ -298,7 +298,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Wave>
         <Comp
           ref={ref}
-          className={clsm(
+          className={cn(
             "relative",
             buttonVariants({
               color,

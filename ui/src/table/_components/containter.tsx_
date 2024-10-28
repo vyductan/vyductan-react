@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 import type { TableProps } from "../table";
 import { TableHeader, TableRoot, TableRow } from ".";
-import { clsm } from "../..";
+import { cn } from "../..";
 import { Spin } from "../../spin";
 
 type ContainerProps = TableProps & {
@@ -13,11 +13,11 @@ export const Container = ({ loading, children }: ContainerProps) => {
     <Spin spinning={loading} className="relative">
       <div
         // ref={wrapperRef}
-        className={clsm(scroll.x && "overflow-x-auto overflow-y-hidden")}
+        className={cn(scroll.x && "overflow-x-auto overflow-y-hidden")}
       >
         <TableRoot
           ref={ref}
-          className={clsm(
+          className={cn(
             !scroll.x && "w-full",
             "caption-bottom text-sm",
             // bordered
@@ -55,7 +55,7 @@ export const Container = ({ loading, children }: ContainerProps) => {
                       colSpan={header.colSpan}
                       size={size}
                       style={getCommonPinningStyles(header.column)}
-                      className={clsm(
+                      className={cn(
                         // column className
                         header.column.columnDef.meta?.className,
                         // bordered
@@ -93,7 +93,7 @@ export const Container = ({ loading, children }: ContainerProps) => {
                         }
                       >
                         <span
-                          className={clsm(
+                          className={cn(
                             // sorting
                             header.column.getCanSort() &&
                               "flex cursor-pointer items-center justify-between",
@@ -109,7 +109,7 @@ export const Container = ({ loading, children }: ContainerProps) => {
                             <div>
                               <Icon
                                 icon="ant-design:caret-up-filled"
-                                className={clsm(
+                                className={cn(
                                   "size-3",
                                   header.column.getIsSorted() !== "asc" &&
                                     "text-gray-400",
@@ -117,7 +117,7 @@ export const Container = ({ loading, children }: ContainerProps) => {
                               />
                               <Icon
                                 icon="ant-design:caret-down-filled"
-                                className={clsm(
+                                className={cn(
                                   "-mt-1 size-3",
                                   header.column.getIsSorted() !== "desc" &&
                                     "text-gray-400",
@@ -169,13 +169,13 @@ export const Container = ({ loading, children }: ContainerProps) => {
                       <TableRow
                         {...props}
                         data-state={row.getIsSelected() && "selected"}
-                        className={clsm(
+                        className={cn(
                           rowClassName?.(row.original, index),
                           row.getIsExpanded() ? "border-x" : "",
                           "hover:bg-transparent",
                         )}
                       >
-                        <TableCell className={clsm("flex border-b-0 py-0")}>
+                        <TableCell className={cn("flex border-b-0 py-0")}>
                           <div className={sortable.classNames?.handleWrapper}>
                             {nodes?.Handle}
                           </div>
@@ -186,7 +186,7 @@ export const Container = ({ loading, children }: ContainerProps) => {
                               key={cell.id}
                               size={size}
                               style={getCommonPinningStyles(cell.column)}
-                              className={clsm(
+                              className={cn(
                                 // // row className
                                 // // typeof cell.column.columnDef.meta?.className ===
                                 // //   "string"

@@ -6,7 +6,7 @@ import { useHover } from "ahooks";
 import { cva } from "class-variance-authority";
 import { useMergedState } from "rc-util";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { triggerNativeEventFor } from "../_util/event";
 import { Icon } from "../icons";
 
@@ -29,6 +29,9 @@ export const inputVariants = cva(
         true: [
           "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
         ],
+      },
+      readOnly: {
+        true: ["pointer-events-none cursor-not-allowed"],
       },
       status: {
         default: [
@@ -78,10 +81,14 @@ type InputProps = Omit<
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
     addonAfter?: React.ReactNode;
-  } & {
     classNames?: {
       wrapper?: string;
     };
+    wrapperProps?: React.DetailedHTMLProps<
+      React.HTMLAttributes<HTMLDivElement>,
+      HTMLDivElement
+    >;
+    "data-state"?: boolean;
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
@@ -100,8 +107,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       prefix,
       suffix,
 
-      id: idProp,
       onChange,
+
+      id: idProp,
+      type,
+      "aria-haspopup": ariaHasPopup,
+      "aria-expanded": ariaExpanded,
+      "aria-controls": ariaControls,
+      "data-state": dataState,
+
+      wrapperProps,
       ...props
     },
     ref,
@@ -126,11 +141,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const isHovering = useHover(wrapperRef);
     const prefixComp = prefix ? (
       <span
-        className={clsm(
-          "flex items-center",
-          inputSizeVariants({ size }),
-          "pr-0",
-        )}
+        className={cn("flex items-center", inputSizeVariants({ size }), "pr-0")}
       >
         {prefix}
       </span>
@@ -139,12 +150,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       allowClear && isHovering && value ? (
         <button
           type="button"
-          className={clsm(
+          className={cn(
             "flex opacity-30 hover:opacity-50",
             inputSizeVariants({ size }),
           )}
           onClick={() => {
-            triggerNativeEventFor(document.querySelector(`[id='${id}]`), {
+            triggerNativeEventFor(document.querySelector(`[id='${id}']`), {
               event: "input",
               value: "",
             });
@@ -157,7 +168,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </button>
       ) : (
         <span
-          className={clsm(
+          className={cn(
             "flex items-center",
             inputSizeVariants({ size }),
             "pl-0",
@@ -168,22 +179,35 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       )
     ) : undefined;
 
+    const conditionWrapperProps = ariaHasPopup
+      ? {
+          "aria-haspopup": ariaHasPopup,
+          "aria-expanded": ariaExpanded,
+          "aria-controls": ariaControls,
+          "data-state": dataState,
+          type,
+        }
+      : {};
+    const conditionInputProps = ariaHasPopup ? {} : { type };
     return (
-      <span
+      <div
         ref={wrapperRef}
         aria-hidden={hidden ? "true" : undefined}
-        className={clsm(
+        className={cn(
           inputVariants({ borderless, disabled, status }),
           "cursor-text",
           classNames?.wrapper,
         )}
-        onClick={() => {
-          document.querySelector<HTMLInputElement>(`[id='${id}]`)?.focus();
+        {...wrapperProps}
+        {...conditionWrapperProps}
+        onClick={(e) => {
+          wrapperProps?.onClick?.(e);
+          document.querySelector<HTMLInputElement>(`[id='${id}']`)?.focus();
         }}
       >
         {addonBefore && (
           <span
-            className={clsm(
+            className={cn(
               !borderless && "rounded-s-md",
               "border-e bg-background",
               inputSizeVariants({ size }),
@@ -196,11 +220,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           id={id}
           ref={inputRef}
-          className={clsm(
+          className={cn(
             "w-full",
             "text-left",
             "bg-transparent",
-            "placeholder:text-muted-foreground",
+            // "placeholder:text-muted-foreground",
+            "placeholder:text-placeholder",
             "border-none outline-none",
             inputSizeVariants({ size }),
             className,
@@ -211,11 +236,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onChange?.(event);
           }}
           {...props}
+          {...conditionInputProps}
         />
         {suffixComp && suffixComp}
         {addonAfter && (
           <span
-            className={clsm(
+            className={cn(
               !borderless && "rounded-e-md",
               "border-s bg-background",
               inputSizeVariants({ size }),
@@ -231,7 +257,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {addonAfter}
           </span>
         )}
-      </span>
+      </div>
     );
   },
 );

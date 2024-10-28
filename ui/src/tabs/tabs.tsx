@@ -9,7 +9,7 @@ import type {
   TabsTriggerProps,
 } from "./_components";
 import type { TabsType } from "./types";
-import { clsm } from "..";
+import { cn } from "..";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "./_components";
 
 type TabBarExtraMap = { left?: React.ReactNode; right?: React.ReactNode };
@@ -75,7 +75,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
           defaultValue={defaultActiveKey}
           value={activeKey}
           onValueChange={onChange}
-          className={clsm("w-full", className)}
+          className={cn("w-full", className)}
           {...props}
         >
           <TabsList type={type} {...listProps}>

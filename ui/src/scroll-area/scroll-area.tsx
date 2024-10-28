@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
-import { clsm } from "@acme/ui";
+import { cn } from "@acme/ui";
 
 import type { ScrollBarProps } from "./scroll-bar";
 import { ScrollBar } from "./scroll-bar";
@@ -17,7 +17,7 @@ const ScrollArea = React.forwardRef<
 >(({ className, children, orientation, viewportRef, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
-    className={clsm("overflow-hidden", className)}
+    className={cn("overflow-hidden", className)}
   >
     <ScrollAreaPrimitive.Viewport
       ref={viewportRef}

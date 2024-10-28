@@ -6,7 +6,7 @@ import type { ReactElement, ReactNode } from "react";
 import { cloneElement, Fragment } from "react";
 
 import type { Placement } from "../types";
-import { clsm } from "..";
+import { cn } from "..";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -57,9 +57,9 @@ export const Dropdown = ({
   const align =
     !placement || placement.includes("auto")
       ? "center"
-      : (placement.includes("start")
+      : placement.includes("start")
         ? "start"
-        : "end");
+        : "end";
   const renderMenu = (items: MenuItem[]): ReactNode => {
     return items.map(
       (
@@ -77,7 +77,7 @@ export const Dropdown = ({
             <DropdownMenuItem
               onSelect={onSelect}
               asChild={!!href}
-              className={clsm(menu.itemsClassName, className)}
+              className={cn(menu.itemsClassName, className)}
             >
               {href ? (
                 <a href={href}>
