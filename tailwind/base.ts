@@ -152,10 +152,10 @@ export default {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
-        // accent: {
-        // 	DEFAULT: 'hsl(var(--accent))',
-        // 	foreground: 'hsl(var(--accent-foreground))'
-        // },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -181,10 +181,9 @@ export default {
             DEFAULT: baseColors.gray[100],
           },
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-          // DEFAULT: baseColors.blue[600],
+        link: {
+          DEFAULT: baseColors.blue[600],
+          // foreground: "hsl(var(--accent-foreground))",
           hover: baseColors.blue[700],
           muted: {
             DEFAULT: baseColors.blue[100],

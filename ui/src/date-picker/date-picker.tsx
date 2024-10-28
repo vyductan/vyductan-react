@@ -60,7 +60,7 @@ const DatePickerInternal = <T extends DateType = Date>(
     // allowClear = false,
     ...props
   }: DatePickerProps<T>,
-  // ref: React.Ref<HTMLInputElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) => {
   const [open, setOpen] = React.useState(false);
 
@@ -149,6 +149,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       const input = x ? formatDate(toDate(x), format) : undefined;
       return (
         <div
+          ref={ref}
           className={cn(
             inputVariants({ disabled, readOnly }),
             inputSizeVariants(),

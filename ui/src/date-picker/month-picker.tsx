@@ -1,3 +1,4 @@
+import type { ForwardedRef } from "react";
 import React from "react";
 import { format } from "date-fns";
 import { useMergedState } from "rc-util";
@@ -15,13 +16,16 @@ type MonthPickerProps = {
   value?: number;
   onChange?: (value?: number) => void;
 };
-const MonthPickerInternal = ({
-  id: inputId,
-  open: openProp,
+const MonthPickerInternal = (
+  {
+    id: inputId,
+    open: openProp,
 
-  value,
-  onChange,
-}: MonthPickerProps) => {
+    value,
+    onChange,
+  }: MonthPickerProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) => {
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
   });
@@ -79,7 +83,7 @@ const MonthPickerInternal = ({
                     "rounded-md px-4 py-0.5 hover:bg-background-hover",
                     index === new Date().getMonth() && "bg-background",
                     value === index &&
-                      "bg-primary-600 hover:bg-primary-600 text-white",
+                      "bg-primary-600 text-white hover:bg-primary-600",
                   )}
                 >
                   {monthString}
@@ -91,6 +95,7 @@ const MonthPickerInternal = ({
       }
     >
       <div
+        ref={ref}
         className={cn(
           inputVariants(),
           inputSizeVariants(),

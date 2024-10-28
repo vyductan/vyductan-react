@@ -29,7 +29,7 @@ const buttonVariants = cva(
       },
       color: {
         default: [],
-        accent: [],
+        link: [],
         danger: [],
         success: [],
         teal: [],
@@ -139,11 +139,11 @@ const buttonVariants = cva(
       },
       {
         variant: "light",
-        color: "accent",
+        color: "link",
         className: [
-          "bg-accent-muted text-accent",
+          "bg-link-muted text-link",
           // "hover:text-white hover:bg-info",
-          "hover:bg-accent-hover hover:text-white",
+          "hover:bg-link-hover hover:text-white",
         ],
       },
       {
