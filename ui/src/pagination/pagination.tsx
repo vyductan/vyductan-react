@@ -184,7 +184,7 @@ export const Pagination = (props: PaginationProps) => {
           key="noPager"
           // className={`${prefixCls}-item-disabled`}
         >
-          <PaginationLink href={createPageURL(1)}>1</PaginationLink>
+          <PaginationLink to={createPageURL(1)}>1</PaginationLink>
         </PaginationItem>,
       );
     }
@@ -193,7 +193,7 @@ export const Pagination = (props: PaginationProps) => {
       pagerList.push(
         <PaginationItem ref={undefined} key={index}>
           <PaginationLink
-            href={createPageURL(index)}
+            to={createPageURL(index)}
             isActive={current === index}
           >
             {index}
@@ -276,7 +276,7 @@ export const Pagination = (props: PaginationProps) => {
       pagerList.push(
         <PaginationItem ref={undefined} key={index}>
           <PaginationLink
-            href={createPageURL(index)}
+            to={createPageURL(index)}
             isActive={current === index}
           >
             {index}
@@ -311,14 +311,14 @@ export const Pagination = (props: PaginationProps) => {
     if (left !== 1) {
       pagerList.unshift(
         <PaginationItem key={1}>
-          <PaginationLink href={createPageURL(1)}>1</PaginationLink>
+          <PaginationLink to={createPageURL(1)}>1</PaginationLink>
         </PaginationItem>,
       );
     }
     if (right !== allPages) {
       pagerList.push(
         <PaginationItem key={allPages}>
-          <PaginationLink href={createPageURL(allPages)}>
+          <PaginationLink to={createPageURL(allPages)}>
             {allPages}
           </PaginationLink>
         </PaginationItem>,
@@ -333,7 +333,7 @@ export const Pagination = (props: PaginationProps) => {
       className={prevDisabled ? "cursor-not-allowed" : ""}
     >
       <PaginationPrevious
-        href={createPageURL(prevPage)}
+        to={createPageURL(prevPage)}
         shape="icon"
         disabled={prevDisabled}
       />
@@ -347,7 +347,7 @@ export const Pagination = (props: PaginationProps) => {
   const next = (
     <PaginationItem aria-disabled={nextDisabled}>
       <PaginationNext
-        href={createPageURL(nextPage)}
+        to={createPageURL(nextPage)}
         shape="icon"
         disabled={nextDisabled}
       />
