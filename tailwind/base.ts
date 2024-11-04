@@ -206,8 +206,7 @@ export default {
         },
 
         border: {
-          DEFAULT: "hsl(var(--border))",
-          // DEFAULT: baseColors.gray[400],
+          DEFAULT: baseColors.gray[400],
           hover: baseColors.gray[500],
           active: baseColors.gray[600],
         },
