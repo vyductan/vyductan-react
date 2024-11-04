@@ -2,13 +2,13 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import Link from "next/link";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
 
 import type { IconProps } from "../icons";
 import { cn } from "..";
 import Wave from "../_util/wave";
+import { Link } from "../link";
 import { GenericSlot } from "../slot";
 import { LoadingIcon } from "./loading-icon";
 

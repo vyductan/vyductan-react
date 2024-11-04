@@ -1,10 +1,10 @@
 import * as React from "react";
-import Link from "next/link";
 
 import type { ButtonProps } from "../button";
 import { cn } from "..";
 import { buttonVariants } from "../button";
 import { Icon } from "../icons";
+import { Link } from "../link";
 
 const PaginationRoot = ({
   className,
