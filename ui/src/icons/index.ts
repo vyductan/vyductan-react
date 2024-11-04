@@ -3,6 +3,7 @@ export * from "./Wrapper";
 
 export * from "./arrow-down-filled";
 export * from "./arrow-left-outlined";
+export * from "./check-filled";
 export * from "./ArrowRightOutlined";
 export * from "./CheckOutlined";
 export * from "./ChevronRightOutlined";
