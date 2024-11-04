@@ -92,6 +92,7 @@ const TimePickerInternal = (
       >
         <Input
           id={inputId}
+          autoComplete="off"
           {...inputProps}
           // allowClear={allowClear}
           // borderless={borderless}
