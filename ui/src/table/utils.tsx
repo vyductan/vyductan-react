@@ -11,7 +11,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
   props?: Pick<
     TableProps<TRecord>,
-    "rowKey" | "rowSelection" | "expandable" | "sortable" | "dnd"
+    "rowKey" | "rowSelection" | "expandable" | "dnd"
   >,
   isNotFirstDeepColumn?: boolean,
 ) => {
@@ -135,22 +135,6 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
       },
     );
 
-  if (props?.sortable) {
-    const dragHandleColumn: ColumnDef<TRecord> = {
-      id: "drag-handle",
-      // header: () => undefined,
-      size: 50,
-      meta: {
-        align: "center",
-      },
-      cell: ({ row }) => (
-        <>
-          <HandleButton id={row.id} /> {row.id}
-        </>
-      ),
-    };
-    columnsDef.unshift(dragHandleColumn);
-  }
   if (props?.dnd) {
     const dragHandleColumn: ColumnDef<TRecord> = {
       id: "sort",
