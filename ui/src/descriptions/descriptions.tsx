@@ -11,6 +11,7 @@ import { cn } from "..";
 export type DescriptionsItem = {
   key: React.Key;
   label?: React.ReactNode;
+  span?: number;
   children?: React.ReactNode;
 };
 type DescriptionProps = {
@@ -63,7 +64,7 @@ export const Descriptions = ({
   const rows =
     layout === "horizontal"
       ? chunkArray(items, mergedColumn)
-      : createRows(items, mergedColumn);
+      : createVerticalRows(items, mergedColumn);
 
   const labelClassName = cn("text-foreground-muted", classNames?.label);
   const contentClassName = cn(classNames?.content);
@@ -72,14 +73,14 @@ export const Descriptions = ({
     labelClassName,
     bordered && "border-e bg-surface-secondary",
     layout === "horizontal" && "py-4",
-    layout === "vertical" && "pb-1",
+    layout === "vertical" && "pb-1 pl-3 first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
   );
   const tdClassName = cn(
     "break-all",
     bordered && "border-e",
     layout === "horizontal" && "py-4",
-    layout === "vertical" && "pb-4",
+    layout === "vertical" && "pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
     contentClassName,
   );
@@ -107,7 +108,7 @@ export const Descriptions = ({
               >
                 {cols.map((col, index) =>
                   // horizontal
-                  col && typeof col === "object" && "label" in col ? (
+                  typeof col === "object" && "label" in col ? (
                     bordered ? (
                       <Fragment key={col.key}>
                         <th className={thClassName}>
@@ -124,12 +125,16 @@ export const Descriptions = ({
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
-                    <th key={index} className={thClassName}>
-                      {col as React.ReactNode}
+                    <th key={index} className={thClassName} colSpan={col.span}>
+                      {(col as VerticalCell).content}
                     </th>
                   ) : (
-                    <td key={index} className={cn(tdClassName)}>
-                      {col as React.ReactNode}
+                    <td
+                      key={index}
+                      className={cn(tdClassName)}
+                      colSpan={col.span}
+                    >
+                      {(col as VerticalCell).content}
                     </td>
                   ),
                 )}
@@ -150,16 +155,25 @@ function chunkArray<T>(array: T[], size: number): T[][] {
   }
   return chunkedArray;
 }
-function createRows(
+type VerticalCell = {
+  content: ReactNode;
+  span?: number;
+};
+type VerticalRow = VerticalCell[];
+function createVerticalRows(
   data: DescriptionsItem[],
   columns: number,
-): React.ReactNode[][] {
-  const rows: React.ReactNode[][] = [];
+): VerticalRow[] {
+  const rows: VerticalRow[] = [];
   for (let index = 0; index < data.length; index += columns) {
-    const labels = data.slice(index, index + columns).map((item) => item.label);
-    const childrens = data
-      .slice(index, index + columns)
-      .map((item) => item.children);
+    const labels = data.slice(index, index + columns).map((item) => ({
+      span: item.span,
+      content: item.label,
+    }));
+    const childrens = data.slice(index, index + columns).map((item) => ({
+      span: item.span,
+      content: item.children,
+    }));
     rows.push(labels, childrens);
   }
   return rows;
