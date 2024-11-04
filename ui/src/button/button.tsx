@@ -2,9 +2,9 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
+import Link from "next/link";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { Link } from "react-router-dom";
 
 import type { IconProps } from "../icons";
 import { cn } from "..";
@@ -321,7 +321,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           {asChild ? (
             children
           ) : href ? (
-            <Link to={href}>{ChildrenToRender}</Link>
+            <Link href={href}>{ChildrenToRender}</Link>
           ) : (
             ChildrenToRender
           )}
