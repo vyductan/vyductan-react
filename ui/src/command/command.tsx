@@ -1,3 +1,5 @@
+import { useMergedState } from "rc-util";
+
 import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
@@ -13,6 +15,7 @@ import {
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
 export type CommandProps<T extends ValueType> = CommandRootProps & {
+  defaultValue?: T;
   value?: T;
   options: (Option<T> & {
     onSelect: (currentValue: string) => void;
@@ -36,7 +39,8 @@ export type CommandProps<T extends ValueType> = CommandRootProps & {
 
 export const Command = <T extends ValueType = string>({
   options,
-  value,
+  defaultValue: defaultValueProp,
+  value: valueProp,
   empty,
   placeholder,
   onSearchChange,
@@ -48,6 +52,9 @@ export const Command = <T extends ValueType = string>({
 
   filter,
 }: CommandProps<T>) => {
+  const [value] = useMergedState(defaultValueProp, {
+    value: valueProp,
+  });
   const content = (
     <>
       {/* to allow user set value that not in options */}
@@ -85,7 +92,7 @@ export const Command = <T extends ValueType = string>({
   const ContentComp = dropdownRender ? dropdownRender(content) : content;
 
   return (
-    <CommandRoot filter={filter}>
+    <CommandRoot value={value} filter={filter}>
       <CommandInput
         placeholder={placeholder ?? defaultPlaceholder}
         onValueChange={onSearchChange}

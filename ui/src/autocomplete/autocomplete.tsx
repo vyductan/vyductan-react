@@ -16,6 +16,7 @@ import { Popover } from "../popover";
 
 export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
+  | "defaultValue"
   | "value"
   | "filter"
   | "placeholder"
@@ -41,6 +42,7 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
 
 const AutoCompleteInner = <T extends ValueType = string>(
   {
+    defaultValue,
     value,
     options,
     optionsToSearch,
@@ -117,6 +119,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
       style={{ width: buttonRef.current?.offsetWidth }}
       content={
         <Command
+          defaultValue={defaultValue}
           value={value}
           options={options.map((o) => ({
             ...o,
