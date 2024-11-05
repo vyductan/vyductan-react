@@ -1,6 +1,10 @@
 "use client";
 
-import type { ExpandedState, SortingState } from "@tanstack/react-table";
+import type {
+  ExpandedState,
+  SortingState,
+  Table as TableDef,
+} from "@tanstack/react-table";
 import type {
   CSSProperties,
   ForwardedRef,
@@ -88,6 +92,8 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     locale?: Partial<Record<keyof typeof tableLocale_en.Table, ReactNode>>;
     /** Override default table elements */
     components?: TableComponents<TRecord>;
+    /** Toolbar */
+    toolbar?: (table: TableDef<TRecord>) => JSX.Element;
 
     dnd?: Pick<SortableContextProps, "onDragEnd">;
   };
@@ -115,6 +121,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     dnd,
 
     components,
+    toolbar,
     ...props
   }: TableProps<TRecord>,
   ref: ForwardedRef<HTMLTableElement>,
@@ -244,6 +251,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
           // ref={wrapperRef}
           className={cn(scroll?.x && "overflow-x-auto overflow-y-hidden")}
         >
+          {toolbar?.(table)}
           <TableRoot
             ref={ref}
             className={cn(
@@ -253,6 +261,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               bordered &&
                 "border-separate border-spacing-0 rounded-md border-s border-t",
               size === "sm" ? "[&_th]:" : "",
+              toolbar && "mt-4",
               className,
             )}
             style={tableStyles}
