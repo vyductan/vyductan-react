@@ -9,15 +9,15 @@ export type MenuItemType = {
 
   type?: "item";
 
-  label?: React.ReactNode;
+  label?: string;
 
-  href?: string;
+  path?: string;
 
   icon?: React.ReactNode;
 
   children?: MenuItemType[];
 
-  hidenInNav?: boolean;
+  hiddenInNav?: boolean;
 
   // // >>>>> Active
   // onMouseEnter?: MenuHoverEventHandler;
@@ -28,7 +28,7 @@ export type MenuItemType = {
 };
 export interface MenuItemGroupType extends ItemSharedProps {
   type: "group";
-  label: React.ReactNode;
+  label?: React.ReactNode;
   children: MenuItemType[];
 }
 export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {

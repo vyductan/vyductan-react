@@ -64,10 +64,10 @@ export const Menu = ({
             >
               {item.label}
             </div>
-            {item.children.some((c) => !c.hidenInNav) && (
+            {item.children.some((c) => !c.hiddenInNav) && (
               <ul role="group">
                 {item.children
-                  .filter((c) => !c.hidenInNav)
+                  .filter((c) => !c.hiddenInNav)
                   .map(({ key, ...x }) => {
                     // const isActive = mergedSelectKeys.some((x) =>
                     //   x.endsWith(key.toString()),
