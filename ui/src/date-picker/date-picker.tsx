@@ -41,6 +41,7 @@ export type DatePickerProps<T extends DateType = Date> = InputVariants &
     showTime?: boolean;
 
     allowClear?: boolean;
+    className?: string;
   };
 const DatePickerInternal = <T extends DateType = Date>(
   {
@@ -58,6 +59,7 @@ const DatePickerInternal = <T extends DateType = Date>(
     showTime,
 
     // allowClear = false,
+    className,
     ...props
   }: DatePickerProps<T>,
   ref: React.Ref<HTMLDivElement>,
@@ -154,6 +156,7 @@ const DatePickerInternal = <T extends DateType = Date>(
             inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
+            className,
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
           )}
           onClick={() => {
@@ -179,6 +182,7 @@ const DatePickerInternal = <T extends DateType = Date>(
             inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
             "gap-2",
+            className,
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
           )}
           onClick={() => {
