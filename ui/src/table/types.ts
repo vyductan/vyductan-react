@@ -73,7 +73,11 @@ export type RowSelection<TRecord> = {
   /** Controlled selected row keys */
   selectedRowKeys?: TRecord[keyof TRecord][];
   /** Callback executed when selected rows change */
-  onChange?: (selectedRowKeys: TRecord[keyof TRecord][]) => void;
+  onChange?: (
+    selectedRowKeys: TRecord[keyof TRecord][],
+    // selectedRowKeys: TRecord[keyof TRecord][],
+    selectedRows: TRecord[],
+  ) => void;
 };
 
 export type TableSize = "sm" | "default";

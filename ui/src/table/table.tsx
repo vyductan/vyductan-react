@@ -163,16 +163,25 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       value: (() => {
         const rowSelectionTst: Record<string, boolean> = {};
         if (propRowSelection?.selectedRowKeys)
-          for (const x of propRowSelection.selectedRowKeys) {
-            const index = dataSource.findIndex((d) => d[rowKey] === x);
-            if (index !== -1) rowSelectionTst[index] = true;
+          if (rowKey) {
+            for (const x of propRowSelection.selectedRowKeys) {
+              rowSelectionTst[x as string] = true;
+              // const index = dataSource.findIndex((d) => d[rowKey] === x);
+              // if (index !== -1) rowSelectionTst[index] = true;
+            }
+          } else {
+            for (const x of propRowSelection.selectedRowKeys) {
+              const index = dataSource.findIndex((d) => d[rowKey] === x);
+              if (index !== -1) rowSelectionTst[index] = true;
+            }
           }
         return rowSelectionTst;
       })(),
       onChange: (value) => {
         if (propRowSelection) {
           const selectedRowKeys = Object.keys(value).map(
-            (k) => dataSource[Number.parseInt(k)]![rowKey],
+            // (k) => dataSource[Number.parseInt(k)]![rowKey],
+            (k) => k as TRecord[keyof TRecord],
           );
           propRowSelection.onChange?.(
             _.union(
@@ -183,6 +192,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               ),
               selectedRowKeys,
             ),
+            dataSource.filter((row) => selectedRowKeys.includes(row[rowKey])),
           );
         }
       },
@@ -380,7 +390,8 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               ))}
             </TableHeader>
 
-            <tbody aria-hidden="true" className="h-3"></tbody>
+            {/* padding with header [disable if bordered]*/}
+            {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>}
 
             {skeleton ? (
               <TableBody>

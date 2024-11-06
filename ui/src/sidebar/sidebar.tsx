@@ -40,9 +40,6 @@ export const Sidebar = ({
 
   const renderItems = (items: MenuItemDef[]) => {
     return items.map((item, index) => {
-      // if (item.key === "jobs") {
-      // }
-      console.log("kkk", item, items);
       if (item.type === "divider") {
         return (
           <Divider key={index} as="li" role="separator" className="border-t" />
