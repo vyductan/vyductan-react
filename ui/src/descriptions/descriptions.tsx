@@ -9,7 +9,7 @@ import type { Screens } from "../theme";
 import { cn } from "..";
 
 export type DescriptionsItem = {
-  key: React.Key;
+  key?: React.Key;
   label?: React.ReactNode;
   span?: number;
   children?: React.ReactNode;
@@ -38,12 +38,13 @@ export const Descriptions = ({
 
   classNames,
   bordered,
-  column,
+  column = 3,
   layout = "horizontal",
   // ...props
 }: DescriptionProps) => {
   const responsiveInfo = useResponsive();
-  let mergedColumn = 3;
+
+  let mergedColumn = 0;
   if (typeof column === "number") {
     mergedColumn = column;
   } else if (typeof column === "object") {
@@ -79,11 +80,12 @@ export const Descriptions = ({
   const tdClassName = cn(
     "break-all",
     bordered && "border-e",
-    layout === "horizontal" && "py-4",
+    layout === "horizontal" && "pb-4 pr-4 last:pr-0",
     layout === "vertical" && "pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
     contentClassName,
   );
+
   return (
     <div className={className}>
       {(!!title || !!extra) && (
@@ -110,7 +112,7 @@ export const Descriptions = ({
                   // horizontal
                   typeof col === "object" && "label" in col ? (
                     bordered ? (
-                      <Fragment key={col.key}>
+                      <Fragment key={col.key ?? index}>
                         <th className={thClassName}>
                           <span>{col.label}</span>
                         </th>
@@ -119,7 +121,10 @@ export const Descriptions = ({
                         </td>
                       </Fragment>
                     ) : (
-                      <td key={col.key} className="flex gap-1">
+                      <td
+                        key={col.key ?? index}
+                        className={cn("flex gap-1", tdClassName)}
+                      >
                         <span className={labelClassName}>{col.label}:</span>
                         <span className={contentClassName}>{col.children}</span>
                       </td>
