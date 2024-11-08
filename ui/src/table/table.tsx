@@ -69,7 +69,9 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       onExpand?: (record: TRecord) => void;
     };
     rowKey?: keyof TRecord;
-    rowClassName?: (record: TRecord, index: number) => string;
+    classNames?: {
+      row?: string | ((record: TRecord, index: number) => string);
+    };
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
     pagination?: PaginationProps;
@@ -111,7 +113,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     pagination,
     expandable,
     rowKey = "id",
-    rowClassName,
+    classNames,
     rowSelection: propRowSelection,
 
     sticky,
@@ -391,7 +393,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             </TableHeader>
 
             {/* padding with header [disable if bordered]*/}
-            {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>}
+            {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
 
             {skeleton ? (
               <TableBody>
@@ -482,7 +484,13 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           data-state={row.getIsSelected() && "selected"}
                           data-row-key={row.original[rowKey]}
                           className={cn(
-                            rowClassName?.(row.original, index),
+                            classNames?.row
+                              ? typeof classNames.row === "string"
+                                ? classNames.row
+                                : classNames.row(row.original, index)
+                              : "",
+                            // classNames.row?.className,
+                            // rowClassName?.(row.original, index),
                             row.getIsExpanded() ? "border-x" : "",
                           )}
                         >

@@ -10,8 +10,9 @@ import { cn } from "..";
 
 export type DescriptionsItem = {
   key?: React.Key;
-  label?: React.ReactNode;
   span?: number;
+  className?: string;
+  label?: React.ReactNode;
   children?: React.ReactNode;
 };
 type DescriptionProps = {
@@ -26,7 +27,9 @@ type DescriptionProps = {
   classNames?: {
     label?: string;
     content?: string;
+    td?: string;
   };
+  colon?: boolean;
   extra?: ReactNode;
 };
 export const Descriptions = ({
@@ -40,6 +43,7 @@ export const Descriptions = ({
   bordered,
   column = 3,
   layout = "horizontal",
+  colon = true,
   // ...props
 }: DescriptionProps) => {
   const responsiveInfo = useResponsive();
@@ -83,6 +87,7 @@ export const Descriptions = ({
     layout === "horizontal" && "pb-4 pr-4 last:pr-0",
     layout === "vertical" && "pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
+    classNames?.td,
     contentClassName,
   );
 
@@ -123,9 +128,12 @@ export const Descriptions = ({
                     ) : (
                       <td
                         key={col.key ?? index}
-                        className={cn("flex gap-1", tdClassName)}
+                        className={cn("flex gap-1", tdClassName, col.className)}
                       >
-                        <span className={labelClassName}>{col.label}:</span>
+                        <span className={labelClassName}>
+                          {col.label}
+                          {colon ? ":" : ""}
+                        </span>
                         <span className={contentClassName}>{col.children}</span>
                       </td>
                     ) //vertical
