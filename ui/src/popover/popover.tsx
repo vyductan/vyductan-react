@@ -3,6 +3,7 @@ import { PopoverArrow } from "@radix-ui/react-popover";
 
 import type { Placement } from "../types";
 import type { PopoverContentProps, PopoverRootProps } from "./_components";
+import { cn } from "..";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_components";
 
 export type PopoverProps = PopoverRootProps &
@@ -17,6 +18,8 @@ export const Popover = ({
   trigger = "hover",
   content,
   open,
+
+  className,
   placement,
   arrow,
   onOpenChange,
@@ -79,8 +82,8 @@ export const Popover = ({
       <PopoverContent
         side={side}
         align={align}
+        className={cn(arrow ? "border-none" : "", className)}
         {...props}
-        className={arrow ? "border-none" : ""}
       >
         {arrow && <PopoverArrow className="fill-white" />}
         {content}

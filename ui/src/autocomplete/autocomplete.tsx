@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useMergedState } from "rc-util";
 
 import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
 
@@ -18,6 +19,7 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
   | "defaultValue"
   | "value"
+  | "onChange"
   | "filter"
   | "placeholder"
   | "empty"
@@ -34,7 +36,6 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
 
   allowClear?: boolean;
 
-  onChange?: (value?: T) => void;
   onSearchChange?: (search: string) => void;
 
   dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
@@ -42,8 +43,8 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
 
 const AutoCompleteInner = <T extends ValueType = string>(
   {
-    defaultValue,
-    value,
+    defaultValue: defaultValueProp,
+    value: valueProp,
     options,
     optionsToSearch,
 
@@ -80,6 +81,16 @@ const AutoCompleteInner = <T extends ValueType = string>(
   _: React.ForwardedRef<HTMLInputElement>,
 ) => {
   const [open, setOpen] = React.useState(false);
+  const [value, setValue] = useMergedState(defaultValueProp, {
+    value: valueProp,
+    onChange: (value) => {
+      onChange?.(
+        value,
+        options.find((o) => o.value === value),
+      );
+      setOpen(false);
+    },
+  });
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -119,17 +130,13 @@ const AutoCompleteInner = <T extends ValueType = string>(
       style={{ width: buttonRef.current?.offsetWidth }}
       content={
         <Command
-          defaultValue={defaultValue}
+          options={options}
           value={value}
-          options={options.map((o) => ({
-            ...o,
-            onSelect: () => {
-              onChange?.(o.value);
-              setOpen(false);
-            },
-          }))}
-          onSearchChange={onSearchChange}
+          onChange={(value) => {
+            setValue(value);
+          }}
           filter={filter}
+          onSearchChange={onSearchChange}
           dropdownRender={dropdownRender}
           {...props}
         />

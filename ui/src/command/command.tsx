@@ -14,12 +14,14 @@ import {
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
-export type CommandProps<T extends ValueType> = CommandRootProps & {
+export type CommandProps<T extends ValueType> = Omit<
+  CommandRootProps,
+  "defaultValue" | "value" | "onChange"
+> & {
   defaultValue?: T;
   value?: T;
-  options: (Option<T> & {
-    onSelect: (currentValue: string) => void;
-  })[];
+  options: Option<T>[];
+  onChange?: (value?: T, option?: Option<T>) => void;
 
   empty?: React.ReactNode;
   placeholder?: string;
@@ -49,17 +51,24 @@ export const Command = <T extends ValueType = string>({
   optionRender,
   optionsRender,
   dropdownRender,
+  onChange,
 
   filter,
 }: CommandProps<T>) => {
-  const [value] = useMergedState(defaultValueProp, {
+  const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
+    onChange: (value) => {
+      onChange?.(
+        value,
+        options.find((o) => o.value === value),
+      );
+    },
   });
-  const content = (
+  const panel = (
     <>
       {/* to allow user set value that not in options */}
-      {!options.some((o) => o.value === value) && value !== "" && (
-        <CommandItem value={value} checked={true}>
+      {!!value && !options.some((o) => o.value === value) && value !== "" && (
+        <CommandItem checked={true} value={value as string}>
           {value}
         </CommandItem>
       )}
@@ -71,7 +80,9 @@ export const Command = <T extends ValueType = string>({
             <CommandItem
               key={item.value.toString()}
               value={item.value as string}
-              onSelect={item.onSelect}
+              onSelect={(value) => {
+                setValue(value as T);
+              }}
               checked={value === item.value}
             >
               {optionRender?.icon ? (
@@ -89,17 +100,17 @@ export const Command = <T extends ValueType = string>({
     </>
   );
 
-  const ContentComp = dropdownRender ? dropdownRender(content) : content;
+  const PanelComp = dropdownRender ? dropdownRender(panel) : panel;
 
   return (
-    <CommandRoot value={value} filter={filter}>
+    <CommandRoot filter={filter}>
       <CommandInput
         placeholder={placeholder ?? defaultPlaceholder}
         onValueChange={onSearchChange}
       />
       <CommandList>
         <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
-        <CommandGroup className={groupClassName}>{ContentComp}</CommandGroup>
+        <CommandGroup className={groupClassName}>{PanelComp}</CommandGroup>
       </CommandList>
     </CommandRoot>
   );
