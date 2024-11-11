@@ -121,7 +121,7 @@ const DatePickerInternal = <T extends DateType = Date>(
       return (
         <Calendar
           mode="range"
-          showYearSwitcher
+          // showYearSwitcher
           numberOfMonths={2}
           defaultMonth={x?.[0] && toDate(x[0])}
           selected={
