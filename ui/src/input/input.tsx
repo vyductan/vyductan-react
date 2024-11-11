@@ -12,12 +12,18 @@ import { Icon } from "../icons";
 
 export const inputVariants = cva(
   [
-    "w-full",
-    "flex items-center border border-input ring-offset-background",
-    "text-sm",
+    // "h-9",
+    "rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors",
+    // "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
+    // "placeholder:text-muted-foreground",
+    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+    // "disabled:cursor-not-allowed disabled:opacity-50",
+    "md:text-sm",
+
+    "flex w-full text-base",
+
+    "items-center border border-input ring-offset-background",
     "focus-within:outline-none",
-    // "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-background-active disabled:hover:border-input",
-    // "file:border-0 file:bg-transparent file:text-sm file:font-medium",
   ],
   {
     variants: {
@@ -69,13 +75,10 @@ export const inputSizeVariants = cva([], {
 type InputVariants = Omit<VariantProps<typeof inputVariants>, "disabled"> & {
   disabled?: boolean;
 };
-type InputProps = Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "size" | "prefix"
-> &
+type InputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
   InputVariants &
-  /** If allow to remove input content with clear icon */
   VariantProps<typeof inputSizeVariants> & {
+    /** If allow to remove input content with clear icon */
     allowClear?: boolean | { clearIcon: React.ReactNode };
     prefix?: React.ReactNode;
     suffix?: React.ReactNode;

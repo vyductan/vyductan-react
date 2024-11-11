@@ -55,7 +55,7 @@ const buttonVariants = cva(
           "data-[state=open]:bg-background-hover",
         ],
         light: ["border-transparent", "hover:bg-background-hover"],
-        link: "underline-offset-4 hover:underline",
+        link: "border-transparent !px-0 underline-offset-4 hover:underline",
       },
       size: {
         sm: "h-6 rounded-sm px-2 py-0 font-normal",
