@@ -53,7 +53,9 @@ type RecordWithCustomRow<
     })
   | (Partial<TRecord> & {
       _customRow: ReactNode;
-      _customRowClassName: string;
+      _customRowClassName?: string;
+      _customCellClassName?: string;
+      _customRowStyle?: CSSProperties;
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
   HTMLAttributes<HTMLTableElement> & {
@@ -70,6 +72,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     };
     rowKey?: keyof TRecord;
     classNames?: {
+      header?: string;
       row?: string | ((record: TRecord, index: number) => string);
     };
     /** Row selection config */
@@ -302,6 +305,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                   : undefined,
                 zIndex: sticky ? 11 : undefined,
               }}
+              className={classNames?.header}
             >
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -417,13 +421,19 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               <TableBody>
                 {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row, index) =>
-                    row.original._customRow ? (
-                      <TableRow key={row.id}>
+                    "_customRow" in row.original ? (
+                      <TableRow
+                        key={row.id}
+                        className={cn(
+                          row.original._customRowClassName as string,
+                        )}
+                        style={row.original._customRowStyle as CSSProperties}
+                      >
                         <TableCell
                           colSpan={columns.length}
                           size={size}
                           className={cn(
-                            row.original._customRowClassName as string,
+                            row.original._customCellClassName as string,
                           )}
                         >
                           {row.original._customRow as React.ReactNode}
