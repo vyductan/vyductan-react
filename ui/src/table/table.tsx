@@ -61,7 +61,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
   HTMLAttributes<HTMLTableElement> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
-    bordered?: boolean;
+    bordered?: boolean | "wrapper";
     // emptyRender?: EmptyProps;
     /** Expandable config */
     expandable?: {
@@ -74,6 +74,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     classNames?: {
       header?: string;
       row?: string | ((record: TRecord, index: number) => string);
+      th?: string;
     };
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
@@ -261,23 +262,24 @@ const TableInner = <TRecord extends Record<string, unknown>>(
 
   return (
     <>
-      <Spin spinning={loading} className="relative">
+      <Spin spinning={loading} className={cn("relative space-y-4", className)}>
+        {toolbar?.(table)}
         <div
           // ref={wrapperRef}
-          className={cn(scroll?.x && "overflow-x-auto overflow-y-hidden")}
+          className={cn(
+            scroll?.x && "overflow-x-auto overflow-y-hidden",
+            toolbar && "mt-4",
+            "rounded-md border",
+          )}
         >
-          {toolbar?.(table)}
           <TableRoot
             ref={ref}
             className={cn(
               !scroll?.x && "w-full",
-              "caption-bottom text-sm",
               // bordered
-              bordered &&
-                "border-separate border-spacing-0 rounded-md border-s border-t",
+              // bordered &&
+              //   "border-separate border-spacing-0 rounded-md border-s border-t",
               size === "sm" ? "[&_th]:" : "",
-              toolbar && "mt-4",
-              className,
             )}
             style={tableStyles}
             {...props}
@@ -339,6 +341,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           ),
                           // selection column
                           header.id === "selection" && "px-0",
+                          classNames?.th,
                         )}
                         onClick={header.column.getToggleSortingHandler()}
                       >
