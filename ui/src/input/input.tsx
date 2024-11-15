@@ -63,7 +63,7 @@ export const inputSizeVariants = cva([], {
   variants: {
     size: {
       sm: "",
-      default: "px-[11px] py-[5px]",
+      default: "h-8 px-[11px] py-[5px]",
       lg: "px-[11px] py-[9px]",
       xl: "px-[11px] py-[13px]",
     },
@@ -198,6 +198,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         aria-hidden={hidden ? "true" : undefined}
         className={cn(
           inputVariants({ borderless, disabled, status }),
+          inputSizeVariants({ size }),
           "cursor-text",
           classNames?.wrapper,
         )}
@@ -213,7 +214,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               !borderless && "rounded-s-md",
               "border-e bg-background",
-              inputSizeVariants({ size }),
             )}
           >
             {addonBefore}
@@ -230,7 +230,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             // "placeholder:text-muted-foreground",
             "placeholder:text-placeholder",
             "border-none outline-none",
-            inputSizeVariants({ size }),
             className,
           )}
           disabled={disabled}
@@ -247,7 +246,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className={cn(
               !borderless && "rounded-e-md",
               "border-s bg-background",
-              inputSizeVariants({ size }),
               "whitespace-nowrap",
               // p-0 for use Select component
               React.isValidElement(addonAfter) &&
