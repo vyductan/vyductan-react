@@ -7,6 +7,7 @@ import type {
 import type { ReactNode } from "react";
 
 type Meta<TRecord> = {
+  title?: ReactNode;
   align?: "left" | "right" | "center";
   className?: string;
   // rowName?: string | ((record: TRecord, index: number) => string);
@@ -29,10 +30,10 @@ declare module "@tanstack/react-table" {
 type BaseTableColumnDef<TRecord> = {
   key?: string;
   hidden?: boolean;
-  title?: string | ReactNode;
   width?: number;
 
   enableResizing?: boolean;
+  enableHiding?: boolean;
 } & Meta<TRecord>;
 export type ExtraTableColumnDef<TRecord> = {
   children?: TableColumnDef<TRecord>[];

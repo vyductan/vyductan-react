@@ -35,6 +35,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           children,
           dataIndex,
           enableResizing,
+          enableHiding,
           title,
           width,
           render,
@@ -51,8 +52,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
       ) => {
         const columnDefMerged: ColumnDef<TRecord> &
           ExtraTableColumnDef<TRecord> = {
+          // accessorKey: dataIndex,
           ...(typeof dataIndex === "string"
-            ? { id: dataIndex, accessorKey: dataIndex }
+            ? { accessorKey: dataIndex }
             : { id: index.toString(), accessorFn: () => index.toString() }),
           header: () => title,
           ...(children
@@ -71,8 +73,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
               }
             : {}),
           enableResizing,
+          enableHiding,
           size: width,
-          meta: { align, className, fixed },
+          meta: { title, align, className, fixed },
           // sorting
           ...(sorter
             ? {
@@ -196,22 +199,20 @@ function createSelectColumn<T>(): ColumnDef<T> {
     id: "selection",
     header: ({ table }) => (
       <Checkbox
-        // id="select-all"
         aria-label="Select all"
-        checked={table.getIsAllRowsSelected()}
-        indeterminate={table.getIsSomeRowsSelected()}
-        onChange={table.toggleAllRowsSelected}
         className="flex items-center justify-center"
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        onChange={table.toggleAllPageRowsSelected}
       />
     ),
     cell: ({ row, table }) => (
       <Checkbox
-        // id={`select-row-${row.id}`}
         aria-label="Select row"
+        className="flex items-center justify-center"
         checked={row.getIsSelected()}
         indeterminate={row.getIsSomeSelected()}
-        className="flex items-center justify-center"
-        onChange={row.getToggleSelectedHandler()}
+        onChange={row.toggleSelected}
         onClick={(event) => {
           if (event.shiftKey) {
             const { rows, rowsById } = table.getRowModel();
@@ -228,6 +229,8 @@ function createSelectColumn<T>(): ColumnDef<T> {
     meta: {
       align: "center",
     },
+    enableSorting: false,
+    enableHiding: false,
   };
 }
 
