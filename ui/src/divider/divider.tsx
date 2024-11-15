@@ -35,7 +35,6 @@ const Separator = React.forwardRef<
           "my-6",
           "bg-border",
           orientation === "horizontal" ? "h-px grow basis-0" : "h-full w-px",
-          className,
         )}
         {...props}
       >
@@ -46,7 +45,12 @@ const Separator = React.forwardRef<
     return (
       <Comp
         {...(children
-          ? { className: "flex items-center justify-between gap-2" }
+          ? {
+              className: cn(
+                "flex items-center justify-between gap-2",
+                className,
+              ),
+            }
           : {})}
       >
         {separator}
