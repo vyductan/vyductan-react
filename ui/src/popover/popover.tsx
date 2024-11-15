@@ -33,7 +33,7 @@ export const Popover = ({
         ? "bottom"
         : "left";
   const align =
-    !placement || (!placement.includes("left") && !placement.includes("right"))
+    !placement || (!placement.includes("Left") && !placement.includes("Right"))
       ? "center"
       : placement.includes("Left")
         ? "start"
