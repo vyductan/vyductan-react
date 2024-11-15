@@ -1,3 +1,5 @@
+// https://github.com/shadcn-ui/ui/blob/805ed4120a6a8ae6f6e9714cbd776e18eeba92c7/apps/www/registry/new-york/example/date-picker-form.tsx
+// Nov 6, 2024
 "use client";
 
 import type { VariantProps } from "class-variance-authority";
@@ -14,26 +16,8 @@ import { Popover } from "../popover";
 
 type DateType = Date | string | number | undefined | null;
 
-type PropsSingle<T extends DateType = Date> = {
-  mode?: "single";
-  defaultValue?: T;
-  value?: T;
-  placeholder?: string;
-  onChange?: (date: T | undefined) => void;
-};
-
-type PropsRange<T extends DateType = Date> = {
-  mode: "range";
-  defaultValue?: [T, T];
-  value?: [T, T];
-  /** Callback function, can be executed when the selected time is changing */
-  onChange?: (dates: [T, T | undefined] | undefined) => void;
-
-  placeholder?: [string, string];
-};
-export type DatePickerProps<T extends DateType = Date> = InputVariants &
-  VariantProps<typeof inputSizeVariants> &
-  (PropsSingle<T> | PropsRange<T>) & {
+type DatePickerBaseProps = InputVariants &
+  VariantProps<typeof inputSizeVariants> & {
     valueType?: "date" | "string" | "number" | "format";
     id?: string;
     format?: string;
@@ -43,10 +27,18 @@ export type DatePickerProps<T extends DateType = Date> = InputVariants &
     allowClear?: boolean;
     className?: string;
   };
+type DatePickerProps<T extends DateType = Date> = DatePickerBaseProps & {
+  defaultValue?: T;
+  value?: T;
+  placeholder?: string;
+  onChange?: (date: T | undefined) => void;
+};
 const DatePickerInternal = <T extends DateType = Date>(
   {
     // mode,
-    id: inputId,
+    // id: inputId,
+
+    placeholder,
 
     disabled,
     readOnly,
@@ -86,170 +78,76 @@ const DatePickerInternal = <T extends DateType = Date>(
     [format, valueType],
   );
 
-  const [value, setValue] = useMergedState<T | [T, T | undefined] | undefined>(
-    props.defaultValue,
-    {
-      value: props.value,
-      onChange: (value) => {
-        if (!props.mode || props.mode === "single") {
-          props.onChange?.(value as T);
-        }
-        if (props.mode === "range") {
-          props.onChange?.(value as [T, T | undefined] | undefined);
-        }
-      },
+  const [value, setValue] = useMergedState(props.defaultValue, {
+    value: props.value,
+    onChange: (value) => {
+      props.onChange?.(value as T);
     },
-  );
+  });
 
-  const CalendarComponent = React.useMemo(() => {
-    if (!props.mode || props.mode === "single") {
-      const x = value as T | undefined;
-      return (
-        <Calendar
-          mode="single"
-          defaultMonth={x && toDate(x)}
-          selected={x ? toDate(x) : undefined}
-          onSelect={(date) => {
-            if (date) {
-              setValue(getDestinationValue(date) as T);
-            }
-          }}
-        />
-      );
-    } else {
-      const x = value as [T, T | undefined] | undefined;
-      return (
-        <Calendar
-          mode="range"
-          // showYearSwitcher
-          numberOfMonths={2}
-          defaultMonth={x?.[0] && toDate(x[0])}
-          selected={
-            x
-              ? {
-                  from: x[0] && toDate(x[0]),
-                  to: x[1] && toDate(x[1]),
+  return (
+    <>
+      <Popover
+        className="w-auto p-0"
+        trigger="click"
+        sideOffset={8}
+        placement="bottomLeft"
+        open={open}
+        onOpenChange={setOpen}
+        // onInteractOutside={(event) => {
+        //   if (
+        //     event.target &&
+        //     "id" in event.target &&
+        //     event.target.id !== inputId
+        //   ) {
+        //     setOpen(false);
+        //   }
+        // }}
+        // onOpenAutoFocus={(event) => {
+        //   event.preventDefault();
+        // }}
+        content={
+          <div className="flex">
+            <Calendar
+              mode="single"
+              defaultMonth={value && toDate(value)}
+              selected={value ? toDate(value) : undefined}
+              onSelect={(date) => {
+                if (date) {
+                  setValue(getDestinationValue(date) as T);
                 }
-              : undefined
-          }
-          onSelect={(dateRange) => {
-            if (dateRange?.from && dateRange.to) {
-              setValue([
-                getDestinationValue(dateRange.from) as T,
-                getDestinationValue(dateRange.to) as T,
-              ]);
-            }
-          }}
-        />
-      );
-    }
-  }, [props.mode, value, setValue, getDestinationValue]);
-
-  const ValueComponent = React.useMemo(() => {
-    if (!props.mode || props.mode === "single") {
-      const x = value as T | undefined;
-      const input = x ? formatDate(toDate(x), format) : undefined;
-      return (
+                setOpen(false);
+              }}
+              initialFocus
+            />
+          </div>
+        }
+      >
         <div
           ref={ref}
           className={cn(
             inputVariants({ disabled, readOnly }),
             inputSizeVariants(),
-            "gap-2",
+            "cursor-pointer gap-2",
             className,
             // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
           )}
-          onClick={() => {
-            if (!open) setOpen(true);
-          }}
+          // onClick={() => {
+          //   if (!open) setOpen(true);
+          // }}
         >
-          <div>
-            <span>{input}</span>
-          </div>
+          <span>{value ? formatDate(toDate(value), format) : placeholder}</span>
           <Icon
             icon="icon-[mingcute--calendar-2-line]"
             className="ml-auto size-4 opacity-50"
           />
         </div>
-      );
-    } else {
-      const x = value as [T, T | undefined] | undefined;
-      const input1 = x?.[0] ? formatDate(toDate(x[0]), format) : undefined;
-      const input2 = x?.[1] ? formatDate(toDate(x[1]), format) : undefined;
-      return (
-        <div
-          className={cn(
-            inputVariants({ disabled, readOnly }),
-            inputSizeVariants(),
-            "gap-2",
-            className,
-            // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
-          )}
-          onClick={() => {
-            if (!open) setOpen(true);
-          }}
-        >
-          <div>
-            <span>{input1}</span>
-            <span
-              className={cn(
-                "px-2 text-center text-foreground-muted",
-                !input1 && !input2 && "opacity-0",
-              )}
-            >
-              -
-            </span>
-            <span>{input2}</span>
-          </div>
-          <Icon
-            icon="icon-[mingcute--calendar-2-line]"
-            className="ml-auto size-4 opacity-50"
-          />
-        </div>
-      );
-    }
-  }, [
-    format,
-    props.mode,
-    value,
-    // allowClear,
-    // borderless,
-    // inputId,
-    open,
-    // size,
-    // status,
-    // ref,
-    disabled,
-    readOnly,
-  ]);
-
-  return (
-    <>
-      <Popover
-        open={open}
-        className="w-auto p-0"
-        trigger="click"
-        sideOffset={8}
-        placement="bottomLeft"
-        onInteractOutside={(event) => {
-          if (
-            event.target &&
-            "id" in event.target &&
-            event.target.id !== inputId
-          ) {
-            setOpen(false);
-          }
-        }}
-        onOpenAutoFocus={(event) => {
-          event.preventDefault();
-        }}
-        content={<div className="flex">{CalendarComponent}</div>}
-      >
-        {ValueComponent}
       </Popover>
     </>
   );
 };
+
+export type { DatePickerProps, DateType, DatePickerBaseProps };
 
 export const DatePicker = React.forwardRef(DatePickerInternal) as <
   T extends DateType = Date,
