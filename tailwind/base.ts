@@ -14,7 +14,7 @@ const baseColors = {
   primary: {
     DEFAULT: "hsl(var(--primary-600))",
     hover: "hsl(var(--primary-700))",
-    foreground: "hsl(var(--primary-foreground))",
+    foreground: "hsl(var(--foreground))",
     100: "hsl(var(--primary-100))",
     200: "hsl(var(--primary-200))",
     300: "hsl(var(--primary-300))",
@@ -164,6 +164,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
         /* Own */
         ...baseColors,
         foreground: {
@@ -211,17 +221,6 @@ export default {
           active: baseColors.gray[600],
         },
         placeholder: baseColors.gray[700],
-
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
       },
       /* End Colors */
 
