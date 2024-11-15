@@ -25,7 +25,7 @@ const color: Record<string, string> = {
 const tagVariants = tv({
   base: [
     "text-xs",
-    "inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex items-center justify-center rounded-full px-2.5 py-0.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   ],
   variants: {
     variant: {
@@ -55,13 +55,20 @@ interface TagProps
   //
 }
 
-const Tag = ({ className, variant, color, ...props }: TagProps) => {
+const Tag = ({
+  className,
+  variant,
+  color,
+  bordered = false,
+  ...props
+}: TagProps) => {
   return (
     <div
       className={cn(
         tagVariants({
           variant,
           color,
+          bordered,
         }),
         className,
       )}
