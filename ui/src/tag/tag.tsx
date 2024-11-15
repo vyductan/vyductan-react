@@ -17,6 +17,7 @@ const color: Record<string, string> = {
   fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
   green: "bg-green-200 text-green-900 border-green-600",
   red: "bg-red-200 text-red-900 border-red-600",
+  rose: "bg-rose-100 text-rose-600 border-rose-400",
   pink: "bg-pink-300 text-pink-900 border-pink-600",
   purple: "bg-purple-200 text-purple-900 border-purple-600",
   teal: "bg-teal-300 text-teal-900 border-teal-600",
