@@ -176,6 +176,7 @@ export default {
         },
         /* Own */
         ...baseColors,
+        disabled: baseColors.gray[500],
         foreground: {
           DEFAULT: "hsl(var(--foreground))",
           muted: {
