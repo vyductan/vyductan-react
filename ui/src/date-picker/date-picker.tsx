@@ -27,11 +27,13 @@ type DatePickerBaseProps = InputVariants &
     allowClear?: boolean;
     className?: string;
   };
+
 type DatePickerProps<T extends DateType = Date> = DatePickerBaseProps & {
   defaultValue?: T;
   value?: T;
-  placeholder?: string;
+  /** Callback function, can be executed when the selected time is changing */
   onChange?: (date: T | undefined) => void;
+  placeholder?: string;
 };
 const DatePickerInternal = <T extends DateType = Date>(
   {
@@ -110,6 +112,7 @@ const DatePickerInternal = <T extends DateType = Date>(
           <div className="flex">
             <Calendar
               mode="single"
+              initialFocus
               defaultMonth={value && toDate(value)}
               selected={value ? toDate(value) : undefined}
               onSelect={(date) => {
@@ -118,7 +121,6 @@ const DatePickerInternal = <T extends DateType = Date>(
                 }
                 setOpen(false);
               }}
-              initialFocus
             />
           </div>
         }
