@@ -162,3 +162,5 @@ export {
   TableCell,
   TableCaption,
 };
+
+export * from "./view-options";
