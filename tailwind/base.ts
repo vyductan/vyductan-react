@@ -14,7 +14,7 @@ const baseColors = {
   primary: {
     DEFAULT: "hsl(var(--primary-600))",
     hover: "hsl(var(--primary-700))",
-    foreground: "hsl(var(--foreground))",
+    foreground: "oklch(var(--ds-background-100) / <alpha-value>)",
     100: "hsl(var(--primary-100))",
     200: "hsl(var(--primary-200))",
     300: "hsl(var(--primary-300))",
@@ -182,6 +182,7 @@ export default {
           muted: {
             DEFAULT: baseColors.gray[900],
           },
+          reserve: baseColors.surface.DEFAULT,
         },
         background: {
           DEFAULT: "hsl(var(--background))",
