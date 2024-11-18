@@ -26,6 +26,8 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   | "groupClassName"
   | "optionRender"
   | "optionsRender"
+  | "dropdownRender"
+  | "dropdownFooter"
 > & {
   options: Option<T>[];
   optionsToSearch?: { value: string; label: string }[];
@@ -37,8 +39,6 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   allowClear?: boolean;
 
   onSearchChange?: (search: string) => void;
-
-  dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
 };
 
 const AutoCompleteInner = <T extends ValueType = string>(
@@ -73,8 +73,6 @@ const AutoCompleteInner = <T extends ValueType = string>(
 
     onChange,
     onSearchChange,
-
-    dropdownRender,
 
     ...props
   }: AutoCompleteProps<T>,
@@ -137,7 +135,6 @@ const AutoCompleteInner = <T extends ValueType = string>(
           }}
           filter={filter}
           onSearchChange={onSearchChange}
-          dropdownRender={dropdownRender}
           {...props}
         />
       }

@@ -3,6 +3,7 @@ import { useMergedState } from "rc-util";
 import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
+import { Divider } from "../divider";
 import { Icon } from "../icons";
 import {
   CommandEmpty,
@@ -37,6 +38,7 @@ export type CommandProps<T extends ValueType> = Omit<
   optionsRender?: (options: Option<T>[]) => React.ReactNode;
 
   dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
+  dropdownFooter?: React.ReactNode;
 };
 
 export const Command = <T extends ValueType = string>({
@@ -54,6 +56,8 @@ export const Command = <T extends ValueType = string>({
   onChange,
 
   filter,
+
+  dropdownFooter,
 }: CommandProps<T>) => {
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
@@ -65,39 +69,42 @@ export const Command = <T extends ValueType = string>({
     },
   });
   const panel = (
-    <>
-      {/* to allow user set value that not in options */}
-      {!!value && !options.some((o) => o.value === value) && value !== "" && (
-        <CommandItem checked={true} value={value as string}>
-          {value}
-        </CommandItem>
-      )}
-      {options.length > 0 ? (
-        optionsRender ? (
-          optionsRender(options)
+    <CommandList>
+      <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
+      <CommandGroup className={groupClassName}>
+        {/* to allow user set value that not in options */}
+        {!!value && !options.some((o) => o.value === value) && value !== "" && (
+          <CommandItem checked={true} value={value as string}>
+            {value}
+          </CommandItem>
+        )}
+        {options.length > 0 ? (
+          optionsRender ? (
+            optionsRender(options)
+          ) : (
+            options.map((item) => (
+              <CommandItem
+                key={item.value.toString()}
+                value={item.value as string}
+                onSelect={(value) => {
+                  setValue(value as T);
+                }}
+                checked={value === item.value}
+              >
+                {optionRender?.icon ? (
+                  <span className="mr-2">{optionRender.icon(item)}</span>
+                ) : (
+                  item.icon && <Icon icon={item.icon} />
+                )}
+                {optionRender?.label ? optionRender.label(item) : item.label}
+              </CommandItem>
+            ))
+          )
         ) : (
-          options.map((item) => (
-            <CommandItem
-              key={item.value.toString()}
-              value={item.value as string}
-              onSelect={(value) => {
-                setValue(value as T);
-              }}
-              checked={value === item.value}
-            >
-              {optionRender?.icon ? (
-                <span className="mr-2">{optionRender.icon(item)}</span>
-              ) : (
-                item.icon && <Icon icon={item.icon} />
-              )}
-              {optionRender?.label ? optionRender.label(item) : item.label}
-            </CommandItem>
-          ))
-        )
-      ) : (
-        <>{/* <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty> */}</>
-      )}
-    </>
+          <>{/* <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty> */}</>
+        )}
+      </CommandGroup>
+    </CommandList>
   );
 
   const PanelComp = dropdownRender ? dropdownRender(panel) : panel;
@@ -108,10 +115,18 @@ export const Command = <T extends ValueType = string>({
         placeholder={placeholder ?? defaultPlaceholder}
         onValueChange={onSearchChange}
       />
-      <CommandList>
-        <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
-        <CommandGroup className={groupClassName}>{PanelComp}</CommandGroup>
-      </CommandList>
+      {PanelComp}
+      {/* <CommandList> */}
+      {/*   <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty> */}
+      {/*   <CommandGroup className={groupClassName}>{PanelComp}</CommandGroup> */}
+      {/* </CommandList> */}
+      {/* <div>XXX</div> */}
+      {dropdownFooter && (
+        <>
+          <Divider className="mb-1 mt-0" />
+          <div className="px-1 pb-1">{dropdownFooter}</div>
+        </>
+      )}
     </CommandRoot>
   );
 };
