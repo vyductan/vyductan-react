@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Fragment } from "react";
 
 import { useResponsive } from "@acme/hooks/useResponsive";
@@ -27,8 +27,10 @@ type DescriptionProps = {
   classNames?: {
     label?: string;
     content?: string;
+    th?: string;
     td?: string;
   };
+  labelStyle?: CSSProperties;
   colon?: boolean;
   extra?: ReactNode;
 };
@@ -40,6 +42,7 @@ export const Descriptions = ({
   className,
 
   classNames,
+  labelStyle,
   bordered,
   column = 3,
   layout = "horizontal",
@@ -78,14 +81,18 @@ export const Descriptions = ({
     labelClassName,
     bordered && "border-e bg-surface-secondary",
     layout === "horizontal" && "py-4",
+    layout === "horizontal" && bordered && "px-6 py-4",
     layout === "vertical" && "pb-1 pl-3 first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
+    classNames?.th,
   );
   const tdClassName = cn(
     "break-all",
     bordered && "border-e",
     layout === "horizontal" && "pb-4 pr-4 last:pr-0",
-    layout === "vertical" && "pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
+    layout === "horizontal" && bordered && "px-6 py-4",
+    layout === "vertical" &&
+      "flex gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
     classNames?.td,
     contentClassName,
@@ -100,7 +107,7 @@ export const Descriptions = ({
         </div>
       )}
 
-      <div className={cn(bordered && "border")}>
+      <div className={cn(bordered && "rounded-md border")}>
         <table
           className={cn("w-full", bordered ? "table-auto" : "table-fixed")}
         >
@@ -118,7 +125,13 @@ export const Descriptions = ({
                   typeof col === "object" && "label" in col ? (
                     bordered ? (
                       <Fragment key={col.key ?? index}>
-                        <th className={thClassName}>
+                        <th
+                          className={cn(
+                            "w-[1%] whitespace-nowrap",
+                            thClassName,
+                          )}
+                          style={labelStyle}
+                        >
                           <span>{col.label}</span>
                         </th>
                         <td className={cn(tdClassName, "last:border-none")}>
@@ -128,11 +141,11 @@ export const Descriptions = ({
                     ) : (
                       <td
                         key={col.key ?? index}
-                        className={cn("flex gap-1", tdClassName, col.className)}
+                        className={cn(tdClassName, col.className)}
                       >
                         <span className={labelClassName}>
                           {col.label}
-                          {colon ? ":" : ""}
+                          {colon ? ": " : ""}
                         </span>
                         <span className={contentClassName}>{col.children}</span>
                       </td>
