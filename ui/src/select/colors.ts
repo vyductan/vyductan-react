@@ -13,6 +13,7 @@ export const selectColors: Record<string, string> = {
   green:
     "bg-green-200 text-green-900 hover:border-green-500 focus-within:border-green-600 focus-within:ring-green-100",
   red: "bg-red-200 text-red-900 hover:border-red-500 focus-within:border-red-600 focus-within:ring-red-100",
+  rose: "bg-rose-200 text-rose-900 border-rose-300 hover:border-rose-500 focus-within:border-rose-600 focus-within:ring-rose-100",
   pink: "bg-pink-300 text-pink-900 hover:border-pink-500 focus-within:border-pink-600 focus-within:ring-pink-100",
   purple:
     "bg-purple-200 text-purple-900 hover:border-purple-500 focus-within:border-purple-600 focus-within:ring-purple-100",

@@ -14,6 +14,7 @@ import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
 import { Popover } from "../popover";
+import { selectColors } from "../select/colors";
 
 export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
@@ -149,6 +150,16 @@ const AutoCompleteInner = <T extends ValueType = string>(
         className={cn(
           "w-full justify-between text-sm font-normal",
           !value && "text-muted-foreground",
+          selectColors[options.find((o) => o.value === value)?.color ?? ""],
+          "hover:" +
+            selectColors[
+              options.find((o) => o.value === value)?.color ?? ""
+            ]?.slice(
+              0,
+              selectColors[
+                options.find((o) => o.value === value)?.color ?? ""
+              ]?.indexOf(" "),
+            ),
           className,
         )}
       >

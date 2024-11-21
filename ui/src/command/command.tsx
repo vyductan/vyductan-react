@@ -3,8 +3,10 @@ import { useMergedState } from "rc-util";
 import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
+import { cn } from "..";
 import { Divider } from "../divider";
 import { Icon } from "../icons";
+import { selectColors } from "../select/colors";
 import {
   CommandEmpty,
   CommandGroup,
@@ -82,21 +84,25 @@ export const Command = <T extends ValueType = string>({
           optionsRender ? (
             optionsRender(options)
           ) : (
-            options.map((item) => (
+            options.map((o) => (
               <CommandItem
-                key={item.value.toString()}
-                value={item.value as string}
+                key={o.value.toString()}
+                value={o.value as string}
                 onSelect={(value) => {
                   setValue(value as T);
                 }}
-                checked={value === item.value}
+                checked={value === o.value}
+                className={cn(
+                  o.color ? selectColors[o.color] : "",
+                  "bg-transparent",
+                )}
               >
                 {optionRender?.icon ? (
-                  <span className="mr-2">{optionRender.icon(item)}</span>
+                  <span className="mr-2">{optionRender.icon(o)}</span>
                 ) : (
-                  item.icon && <Icon icon={item.icon} />
+                  o.icon && <Icon icon={o.icon} />
                 )}
-                {optionRender?.label ? optionRender.label(item) : item.label}
+                {optionRender?.label ? optionRender.label(o) : o.label}
               </CommandItem>
             ))
           )
