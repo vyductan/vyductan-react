@@ -89,7 +89,8 @@ export const Descriptions = ({
   const tdClassName = cn(
     "break-all",
     bordered && "border-e",
-    layout === "horizontal" && "pb-4 pr-4 last:pr-0",
+    layout === "horizontal" && "pb-4 pr-4",
+    layout === "horizontal" && !bordered && "last:pr-0",
     layout === "horizontal" && bordered && "px-6 py-4",
     layout === "vertical" &&
       "flex gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
@@ -117,7 +118,7 @@ export const Descriptions = ({
                 key={rowIndex}
                 className={cn(
                   bordered && "mb-px border-b last:border-none",
-                  "[&:last-child>td]:pb-0",
+                  !bordered && "[&:last-child>td]:pb-0",
                 )}
               >
                 {cols.map((col, index) =>
