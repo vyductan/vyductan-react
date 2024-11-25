@@ -101,14 +101,20 @@ const useForm = <
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const submit = useCallback(
+    (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
+      return props
+        ? methods.handleSubmit(props.onSubmit)(event)
+        : Promise.resolve();
+    },
+    [methods, props],
+  );
 
   const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
     {
       ...methods,
       schema: props?.schema,
-      submit: props
-        ? methods.handleSubmit(props.onSubmit)
-        : () => Promise.resolve(),
+      submit,
       resetFields,
       setFieldsValue,
     };
