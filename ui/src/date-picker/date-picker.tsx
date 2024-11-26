@@ -13,6 +13,7 @@ import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
+import { useUi } from "../store";
 
 type DateType = Date | string | number | undefined | null;
 
@@ -45,7 +46,7 @@ const DatePickerInternal = <T extends DateType = Date>(
     disabled,
     readOnly,
     // borderless,
-    format = "dd/MM/yyyy",
+    format: propFormat = "dd/MM/yyyy",
     // size,
     // status,
 
@@ -61,6 +62,11 @@ const DatePickerInternal = <T extends DateType = Date>(
   const [open, setOpen] = React.useState(false);
 
   // ====================== Format Date =======================
+  const datePickerConfig = useUi((state) => state.componentConfig.datePicker);
+  let format = propFormat;
+  if (datePickerConfig.format) {
+    format = datePickerConfig.format;
+  }
   format = showTime ? `${format} HH:mm` : format;
 
   const getDestinationValue = React.useCallback(
