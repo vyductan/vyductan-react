@@ -5,7 +5,9 @@ import { createContext, useContext, useRef } from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
+import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
+import type { TagProps } from "./tag";
 
 // type TDateFormat = {
 //   date: string;
@@ -13,8 +15,10 @@ import type { DatePickerProps } from "./date-picker";
 //   dateTimeWithSeconds: string;
 // };
 type UiState = {
-  componentConfig: {
-    datePicker: Partial<Pick<DatePickerProps, "format">>;
+  componentConfig?: {
+    button?: Partial<Pick<ButtonProps, "classNames">>;
+    datePicker?: Partial<Pick<DatePickerProps, "format">>;
+    tag?: Partial<Pick<TagProps, "className" | "borderless">>;
   };
 };
 // type UiActions = {
@@ -22,13 +26,7 @@ type UiState = {
 // };
 type UiStore = UiState;
 
-const defaultInitState: UiState = {
-  componentConfig: {
-    datePicker: {
-      format: "dd/mm/yyyy",
-    },
-  },
-};
+const defaultInitState: UiState = {};
 
 const createUserStore = (initState: UiState = defaultInitState) => {
   return createStore<UiStore>()(() => ({
