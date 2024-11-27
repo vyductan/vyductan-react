@@ -65,7 +65,7 @@ const buttonVariants = tv({
         "data-[state=open]:bg-background-hover",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: "border-0 p-0 font-normal underline-offset-2 hover:underline",
+      link: "gap-1 border-0 p-0 font-normal underline-offset-2 hover:underline",
       text: "border-0 px-0",
     },
     shape: {
@@ -291,7 +291,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       href,
       children,
       className,
-      classNames,
       color,
       disabled,
       loading,
@@ -308,7 +307,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const buttonConfig = useUi((state) => state.componentConfig?.button);
 
     const Comp = asChild || href ? Slot : "button";
-    console.log("ssssss", size);
+
     const ChildrenToRender = (
       <>
         {(!!loading || icon) && (
@@ -339,9 +338,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </>
     );
 
-    if (classNames?.variants) {
-      console.log(classNames.variants);
-    }
     return (
       <Wave>
         <Comp
