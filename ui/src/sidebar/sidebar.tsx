@@ -120,6 +120,10 @@ export const Sidebar = ({
         );
       }
 
+      if (item.hidden) {
+        return;
+      }
+
       // if type === "item" or undefined
       const { key, children: _, label, icon, path } = item;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
