@@ -75,6 +75,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       header?: string;
       row?: string | ((record: TRecord, index: number) => string);
       th?: string;
+      td?: string;
     };
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
@@ -539,6 +540,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   cell.id.endsWith("selection") && "px-0",
                                   // column className
                                   cell.column.columnDef.meta?.className,
+                                  classNames?.td,
                                 )}
                               >
                                 {flexRender(
