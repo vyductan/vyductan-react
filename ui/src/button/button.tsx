@@ -41,7 +41,7 @@ const buttonVariants = tv({
     },
     size: {
       sm: "h-6 rounded-sm px-2 py-0 font-normal",
-      default: "rounded-md px-3 py-1",
+      default: "h-8 rounded-md px-3 py-1",
       lg: "h-10 rounded-lg px-4 py-2",
       xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
     },
@@ -65,7 +65,7 @@ const buttonVariants = tv({
         "data-[state=open]:bg-background-hover",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: "gap-1 border-0 p-0 font-normal underline-offset-2 hover:underline",
+      link: "h-auto gap-1 border-0 p-0 font-normal underline-offset-2 hover:underline",
       text: "border-0 px-0",
     },
     shape: {
