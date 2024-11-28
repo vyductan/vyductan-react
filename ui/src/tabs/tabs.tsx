@@ -18,6 +18,9 @@ type TabsProps = Omit<
   "defaultValue" | "onValueChange" | "onChange"
 > & {
   type?: TabsType;
+  classNames?: {
+    active?: string;
+  };
   /**
    * Initial active TabPane's key, if activeKey is not set
    */
@@ -45,6 +48,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
     {
       type,
       className,
+      classNames,
 
       defaultActiveKey,
       activeKey,
@@ -68,6 +72,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
       assertExtra.right = tabBarExtraContent;
     }
 
+    console.log("cccccc", classNames);
     return (
       <>
         <TabsRoot
@@ -85,6 +90,7 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
                 key={x.key}
                 value={x.key}
                 tabsType={type}
+                classNames={classNames}
                 {...triggerProps}
               >
                 {x.label}

@@ -40,11 +40,14 @@ type TabsTriggerProps = React.ComponentPropsWithoutRef<
   typeof TabsPrimitive.Trigger
 > & {
   tabsType?: TabsType;
+  classNames?: {
+    active?: string;
+  };
 };
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
->(({ tabsType, className, ...props }, ref) => (
+>(({ tabsType, className, classNames, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -63,6 +66,13 @@ const TabsTrigger = React.forwardRef<
         // "pb-px",
         // "shadow-[0_-1px_0_var(--gray-300)_inset]",
       ],
+      [
+        classNames?.active
+          ?.split(" ")
+          .map((c) => "data-[state=active]:" + c)
+          .join(" "),
+      ],
+      classNames?.active,
       className,
     )}
     {...props}
