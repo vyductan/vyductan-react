@@ -77,7 +77,7 @@ const PageHeader = (props: PageHeaderProps) => {
   const children = renderChildren(props);
 
   return (
-    <div className={cn("pb-5", className)}>
+    <div className={cn("pb-4", className)}>
       <Title {...props} />
       {children}
     </div>
