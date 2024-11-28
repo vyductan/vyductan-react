@@ -42,8 +42,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
 
           // meta props
           align,
-          className,
           fixed,
+          className,
+          classNames,
           sorter,
 
           ...restProps
@@ -75,7 +76,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableResizing,
           enableHiding,
           size: width,
-          meta: { title, align, className, fixed },
+          meta: { title, align, fixed, className, classNames },
           // sorting
           ...(sorter
             ? {

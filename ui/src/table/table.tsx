@@ -539,8 +539,9 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   // selection column
                                   cell.id.endsWith("selection") && "px-0",
                                   // column className
-                                  cell.column.columnDef.meta?.className,
                                   classNames?.td,
+                                  cell.column.columnDef.meta?.className,
+                                  cell.column.columnDef.meta?.classNames?.td,
                                 )}
                               >
                                 {flexRender(
