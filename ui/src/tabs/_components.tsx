@@ -25,10 +25,11 @@ const TabsList = React.forwardRef<
       "flex items-baseline",
       type === "secondary" &&
         "justify-center rounded-md bg-background-muted p-1",
-      type === undefined && [
-        "pb-px",
-        // "shadow-[0_-1px_0_var(--gray-300)_inset]",
-      ],
+      type === undefined &&
+        [
+          // "pb-px",
+          // "shadow-[0_-1px_0_var(--gray-300)_inset]",
+        ],
       className,
     )}
     {...props}
@@ -40,14 +41,11 @@ type TabsTriggerProps = React.ComponentPropsWithoutRef<
   typeof TabsPrimitive.Trigger
 > & {
   tabsType?: TabsType;
-  classNames?: {
-    active?: string;
-  };
 };
 const TabsTrigger = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
->(({ tabsType, className, classNames, ...props }, ref) => (
+>(({ tabsType, className, ...props }, ref) => (
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -66,13 +64,6 @@ const TabsTrigger = React.forwardRef<
         // "pb-px",
         // "shadow-[0_-1px_0_var(--gray-300)_inset]",
       ],
-      [
-        classNames?.active
-          ?.split(" ")
-          .map((c) => "data-[state=active]:" + c)
-          .join(" "),
-      ],
-      classNames?.active,
       className,
     )}
     {...props}

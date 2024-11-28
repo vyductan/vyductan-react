@@ -19,7 +19,9 @@ type TabsProps = Omit<
 > & {
   type?: TabsType;
   classNames?: {
-    active?: string;
+    root?: string;
+    list?: string;
+    trigger?: string;
   };
   /**
    * Initial active TabPane's key, if activeKey is not set
@@ -72,7 +74,6 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
       assertExtra.right = tabBarExtraContent;
     }
 
-    console.log("cccccc", classNames);
     return (
       <>
         <TabsRoot
@@ -83,14 +84,14 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
           className={cn("w-full", className)}
           {...props}
         >
-          <TabsList type={type} {...listProps}>
+          <TabsList type={type} className={classNames?.list} {...listProps}>
             {assertExtra.left && <div className="mr-4">{assertExtra.left}</div>}
             {items.map((x) => (
               <TabsTrigger
                 key={x.key}
                 value={x.key}
                 tabsType={type}
-                classNames={classNames}
+                className={classNames?.trigger}
                 {...triggerProps}
               >
                 {x.label}
