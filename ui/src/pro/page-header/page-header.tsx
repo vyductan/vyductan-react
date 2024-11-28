@@ -27,14 +27,14 @@ const Title = (props: PageHeaderProps) => {
   // const backIcon = getBackIcon(props, direction);
   // const backIconDom = renderBack(backIcon, onBack);
   return (
-    <div className={cn("flex justify-between")}>
+    <div className={cn("flex items-center justify-between")}>
       <div className="">
         {/* {backIconDom} */}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
         {title && (
           <h3
             title={typeof title === "string" ? title : undefined}
-            className="text-xl font-semibold dark:text-white dark:hover:text-white"
+            className="my-1.5 text-xl font-semibold dark:text-white dark:hover:text-white"
           >
             {title}
           </h3>

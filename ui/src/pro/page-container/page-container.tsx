@@ -24,7 +24,7 @@ export const PageContainer = ({
     <main
       className={cn(
         "mx-auto w-full max-w-screen-lg",
-        "flex flex-1 flex-col gap-4 p-4 lg:gap-3 lg:p-6",
+        "flex flex-1 flex-col p-4 lg:p-6",
         className,
       )}
     >
