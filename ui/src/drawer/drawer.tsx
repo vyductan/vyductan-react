@@ -1,21 +1,25 @@
 import type { SheetContentProps, SheetRootProps } from "./_components";
+import { cn } from "..";
 import {
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetRoot,
   SheetTitle,
-  // SheetTrigger,
+  SheetTrigger,
 } from "./_components";
 
 type DrawerProps = SheetRootProps & {
   title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
+  trigger?: React.ReactNode;
 
   classNames?: {
     header?: string;
     title?: string;
+    description?: string;
+    content?: string;
   };
   placement?: SheetContentProps["side"];
   closeIcon?: SheetContentProps["closeIcon"];
@@ -24,6 +28,7 @@ const Drawer = ({
   title,
   description,
   children,
+  trigger,
 
   classNames,
   placement = "right",
@@ -32,14 +37,18 @@ const Drawer = ({
 }: DrawerProps) => {
   return (
     <SheetRoot {...props}>
-      {/* <SheetTrigger>Open</SheetTrigger> */}
+      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent side={placement} closeIcon={closeIcon}>
-        <SheetHeader className={classNames?.header}>
+        <SheetHeader className={cn("p-6 pb-0", classNames?.header)}>
           <SheetTitle className={classNames?.title}>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
+          <SheetDescription
+            className={cn(description ? "" : "hidden", classNames?.description)}
+          >
+            {description}
+          </SheetDescription>
         </SheetHeader>
 
-        <div>{children}</div>
+        <div className={cn("p-6", classNames?.content)}>{children}</div>
       </SheetContent>
     </SheetRoot>
   );
