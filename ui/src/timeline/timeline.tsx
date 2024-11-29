@@ -35,9 +35,8 @@ export const Timeline = ({ items }: TimelineProps) => {
             <div
               className={cn(
                 "absolute",
-                x.dot
-                  ? "flex -translate-x-1/2 -translate-y-1/2 bg-white py-1"
-                  : "size-2.5 rounded-full bg-gray-800",
+                "flex -translate-x-1/2 -translate-y-1/2 bg-white py-1",
+                // x.dot ? "bg-white py-1" : "size-2.5 rounded-full bg-gray-800",
               )}
               style={{
                 insetBlockStart: "calc(10px / 2)",
@@ -45,7 +44,7 @@ export const Timeline = ({ items }: TimelineProps) => {
                 // height: "calc(100% - 10px)",
               }}
             >
-              {x.dot}
+              {x.dot ?? <span className="size-2.5 rounded-full bg-gray-800" />}
             </div>
             <div className="relative ml-6" style={{ insetBlockStart: -6 }}>
               {x.children}
