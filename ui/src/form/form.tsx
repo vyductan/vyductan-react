@@ -5,6 +5,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { FormInstance } from "./use-form";
 import { FormProvider } from "./context";
+import { FormErrorsNotification } from "./form-errors-notification";
 
 type FormProps<
   TFieldValues extends FieldValues,
@@ -38,6 +39,7 @@ const Form = <
       <form onSubmit={form.submit} {...restProps}>
         {typeof children === "function" ? children(form) : children}
       </form>
+      <FormErrorsNotification />
     </FormProvider>
   );
 };
