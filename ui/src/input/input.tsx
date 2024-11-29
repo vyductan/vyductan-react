@@ -36,9 +36,9 @@ export const inputVariants = cva(
           "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
         ],
       },
-      readOnly: {
-        true: ["pointer-events-none cursor-not-allowed"],
-      },
+      // readOnly: {
+      //   true: ["pointer-events-none cursor-not-allowed"],
+      // },
       status: {
         default: [
           "hover:border-primary-500",
