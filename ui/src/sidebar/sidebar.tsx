@@ -120,22 +120,12 @@ export const Sidebar = ({
         );
       }
 
+      /* Item type Render */
       if (item.hidden) {
         return;
       }
-
-      // if type === "item" or undefined
       const { key, children: _, label, icon, path } = item;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      // const labelToRender =
-      //   typeof label === "object" ? (
-      //     label
-      //   ) : (
-      //     <div>
-      //       {typeof icon === "string" ? <Icon icon={icon} /> : icon}
-      //       {typeof label === "string" ? <span>{label}</span> : label}
-      //     </div>
-      //   );
       const labelToRender = path ? (
         <Link href={`${path}`}>
           {typeof icon === "string" ? <Icon icon={icon} /> : icon}
