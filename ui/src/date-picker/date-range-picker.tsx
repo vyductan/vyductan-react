@@ -24,7 +24,6 @@ const DateRangePickerInternal = <T extends DateType = Date>(
     id: inputId,
 
     disabled,
-    readOnly,
     // borderless,
     format = "dd/MM/yyyy",
     // size,
@@ -111,7 +110,7 @@ const DateRangePickerInternal = <T extends DateType = Date>(
       <div
         ref={ref}
         className={cn(
-          inputVariants({ disabled, readOnly }),
+          inputVariants({ disabled }),
           inputSizeVariants(),
           "gap-2",
           className,
@@ -151,7 +150,6 @@ const DateRangePickerInternal = <T extends DateType = Date>(
     // status,
     // ref,
     disabled,
-    readOnly,
   ]);
 
   return (

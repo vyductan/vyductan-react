@@ -4,14 +4,17 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import { format as formatDate, toDate } from "date-fns";
+import { useEffect } from "react";
+import { useClickAway, useFocusWithin } from "ahooks";
+import { format as formatDate, isValid, parse, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
+import { composeRef } from "rc-util/lib/ref";
 
-import type { InputVariants } from "../input";
+import type { inputSizeVariants, InputVariants } from "../input";
 import { cn } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
-import { inputSizeVariants, inputVariants } from "../input";
+import { Input } from "../input";
 import { Popover } from "../popover";
 import { useUi } from "../store";
 
@@ -19,8 +22,8 @@ type DateType = Date | string | number | undefined | null;
 
 type DatePickerBaseProps = InputVariants &
   VariantProps<typeof inputSizeVariants> & {
-    valueType?: "date" | "string" | "number" | "format";
     id?: string;
+    valueType?: "date" | "string" | "number" | "format";
     format?: string;
     /** To provide an additional time selection **/
     showTime?: boolean;
@@ -38,26 +41,23 @@ type DatePickerProps<T extends DateType = Date> = DatePickerBaseProps & {
 };
 const DatePickerInternal = <T extends DateType = Date>(
   {
-    // mode,
-    // id: inputId,
+    id,
 
     placeholder,
-
-    disabled,
-    readOnly,
-    // borderless,
-    format: propFormat = "dd/MM/yyyy",
-    // size,
-    // status,
-
     valueType,
+    format: propFormat = "dd/MM/yyyy",
     showTime,
 
-    // allowClear = false,
+    disabled,
+    allowClear = false,
+    borderless,
+    size,
+    status,
+
     className,
     ...props
   }: DatePickerProps<T>,
-  ref: React.Ref<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLInputElement>,
 ) => {
   const [open, setOpen] = React.useState(false);
 
@@ -71,10 +71,8 @@ const DatePickerInternal = <T extends DateType = Date>(
 
   const getDestinationValue = React.useCallback(
     (date: Date) => {
-      // if(!date) return undefined
       if (valueType === "string") {
         return formatDate(date, "yyyy-MM-dd'T'HH:mm:ss");
-        // return date.toISOString();
       } else if (valueType === "format") {
         return formatDate(date, format);
       } else if (typeof valueType === "number") {
@@ -86,12 +84,66 @@ const DatePickerInternal = <T extends DateType = Date>(
     [format, valueType],
   );
 
+  // ====================== Value =======================
   const [value, setValue] = useMergedState(props.defaultValue, {
     value: props.value,
     onChange: (value) => {
       props.onChange?.(value as T);
     },
   });
+  const preInputValue = value ? formatDate(toDate(value), format) : "";
+  const [inputValue, setInputValue] = useMergedState(preInputValue);
+  const handleChange = (input: string | Date) => {
+    const date = toDate(input);
+    if (valueType === "string") {
+      setValue(date.toISOString() as T);
+    } else if (valueType === "format") {
+      setValue(formatDate(date, format) as T);
+    } else if (typeof valueType === "number") {
+      setValue(date.getTime() as T);
+    } else {
+      setValue(date as T);
+    }
+  };
+
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const composedRef = composeRef(ref, inputRef);
+  const handleChangeInput = (value: string) => {
+    if (isValidDateStringExact(value, format)) {
+      handleChange(inputValue);
+    } else {
+      setInputValue(preInputValue);
+    }
+  };
+  // handle click outside from input (is focus within)
+  const [isFocused, setIsFocused] = React.useState(false);
+  useFocusWithin(inputRef, {
+    onFocus: () => {
+      setIsFocused(true);
+    },
+  });
+  useClickAway((event) => {
+    if (
+      isFocused &&
+      !(event.target && "name" in event.target && event.target.name === "day") // check if choose a day in panel or not
+    ) {
+      handleChangeInput(inputValue);
+      setOpen(false);
+    }
+  }, inputRef);
+
+  // prevent click label to focus input (open popover)
+  useEffect(() => {
+    const labelElm = document.querySelector(`label[for="${id}"]`);
+    console.log("llllll", labelElm);
+    const eventFn = (event: Event) => {
+      event.preventDefault();
+    };
+    labelElm?.addEventListener("click", eventFn);
+    return () => {
+      labelElm?.removeEventListener("click", eventFn);
+    };
+  }, [id]);
 
   return (
     <>
@@ -102,23 +154,19 @@ const DatePickerInternal = <T extends DateType = Date>(
         placement="bottomLeft"
         open={open}
         onOpenChange={setOpen}
-        // onInteractOutside={(event) => {
-        //   if (
-        //     event.target &&
-        //     "id" in event.target &&
-        //     event.target.id !== inputId
-        //   ) {
-        //     setOpen(false);
-        //   }
-        // }}
-        // onOpenAutoFocus={(event) => {
-        //   event.preventDefault();
-        // }}
+        onInteractOutside={(event) => {
+          if (event.target === inputRef.current) {
+            setOpen(false);
+          }
+        }}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+        }}
         content={
           <div className="flex">
             <Calendar
               mode="single"
-              initialFocus
+              // initialFocus // disable default focus (in shadcn default is true)
               defaultMonth={value && toDate(value)}
               selected={value ? toDate(value) : undefined}
               onSelect={(date) => {
@@ -131,7 +179,43 @@ const DatePickerInternal = <T extends DateType = Date>(
           </div>
         }
       >
-        <div
+        <Input
+          ref={composedRef}
+          id={id}
+          allowClear={allowClear}
+          borderless={borderless}
+          size={size}
+          disabled={disabled}
+          status={status}
+          className={cn("items-center", "justify-start text-left", className)}
+          placeholder={placeholder}
+          suffix={
+            <Icon
+              icon="icon-[mingcute--calendar-2-line]"
+              className="ml-auto size-4 opacity-50"
+            />
+          }
+          value={inputValue}
+          onClick={(event) => {
+            console.log("onClick", event.relatedTarget);
+            if (!open) setOpen(true);
+          }}
+          onKeyUp={(event) => {
+            event.stopPropagation();
+            if (event.key === "Enter" || event.key === "Escape") {
+              handleChangeInput(event.currentTarget.value);
+              setOpen(false);
+            }
+          }}
+          onChange={(event) => {
+            setInputValue(event.currentTarget.value);
+            if (isValidDateStringExact(event.currentTarget.value, format)) {
+              handleChange(event.currentTarget.value);
+            }
+          }}
+        />
+
+        {/* <div
           ref={ref}
           className={cn(
             inputVariants({ disabled, readOnly }),
@@ -149,11 +233,25 @@ const DatePickerInternal = <T extends DateType = Date>(
             icon="icon-[mingcute--calendar-2-line]"
             className="ml-auto size-4 opacity-50"
           />
-        </div>
+        </div> */}
       </Popover>
     </>
   );
 };
+
+function isValidDateStringExact(
+  dateString: string,
+  formatString: string,
+): boolean {
+  const parsedDate = parse(dateString, formatString, new Date());
+
+  // Kiểm tra:
+  // 1. Ngày phải hợp lệ (`isValid(parsedDate)`).
+  // 2. Chuỗi định dạng lại (`format(parsedDate, formatString)`) phải trùng khớp với `dateString`.
+  return (
+    isValid(parsedDate) && formatDate(parsedDate, formatString) === dateString
+  );
+}
 
 export type { DatePickerProps, DateType, DatePickerBaseProps };
 
