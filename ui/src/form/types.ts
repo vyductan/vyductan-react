@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { AutoCompleteProps } from "../autocomplete";
@@ -134,7 +135,7 @@ type FieldsSchema<
     ? {
         type: TFieldType;
         name?: never;
-        render: () => void;
+        render: () => ReactNode;
       }
     : TFieldType extends FieldGroupType
       ? {
