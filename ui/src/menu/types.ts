@@ -33,6 +33,8 @@ export interface MenuItemGroupType extends ItemSharedProps {
 }
 export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
   type: "divider";
+
+  children?: never;
 }
 
 export type MenuItemDef = MenuItemType | MenuItemGroupType | MenuDividerType;
