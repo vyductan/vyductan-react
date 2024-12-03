@@ -368,6 +368,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             className,
           )}
           disabled={loading ?? disabled}
+          aria-disabled={loading ?? disabled}
           type="button"
           {...props}
         >
