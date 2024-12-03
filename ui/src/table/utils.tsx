@@ -1,4 +1,5 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
+import type { ReactNode } from "react";
 
 import type { TableProps } from "./table";
 import type { ExtraTableColumnDef, TableColumnDef } from "./types";
@@ -132,7 +133,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                     column,
                     row,
                   })
-              : getValue()}
+              : (getValue() as ReactNode)}
           </>
         );
         return columnDefMerged;
