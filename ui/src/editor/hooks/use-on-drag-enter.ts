@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import { DRAGGABLE_KEY } from "../constants";
-import { draggableStore } from "../stores/useDraggableStore";
+import { draggableStore } from "../stores/use-draggable-store";
 import { isHTMLElement } from "../utils/guard";
 
 export const useOnDragEnter = () => {

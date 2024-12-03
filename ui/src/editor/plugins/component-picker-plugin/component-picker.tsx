@@ -10,7 +10,7 @@ import * as ReactDOM from "react-dom";
 
 import type { ComponentPickerOption } from "./types";
 import { useModal } from "../../../modal";
-import { ComponentPickerMenuItem } from "./ComponentPickerMenuItem";
+import { ComponentPickerMenuItem } from "./component-picker-menu-item";
 import { getBaseOptions } from "./options";
 
 export default function ComponentPickerMenuPlugin(): JSX.Element {
@@ -31,7 +31,7 @@ export default function ComponentPickerMenuPlugin(): JSX.Element {
 
     const regex = new RegExp(queryString, "i");
 
-    return ( 
+    return (
       // ...getDynamicOptions(editor, queryString),
       baseOptions.filter(
         (option) =>

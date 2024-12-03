@@ -16,7 +16,7 @@ import type { InputProps } from "./input";
 import useCursor from "./hooks/use-cursor";
 import useFrame from "./hooks/use-frame";
 import { Input } from "./input";
-import { getDecupleSteps } from "./utils/numberUtil";
+import { getDecupleSteps } from "./utils/number-util";
 
 /**
  * We support `stringMode` which need handle correct type when user call in onChange

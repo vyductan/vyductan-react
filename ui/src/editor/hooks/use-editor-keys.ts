@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot } from "lexical";
 
-import { useDraggableStore } from "../stores/useDraggableStore";
+import { useDraggableStore } from "../stores/use-draggable-store";
 
 export const useEditorKeys = () => {
   const [editor] = useLexicalComposerContext();

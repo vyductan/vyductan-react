@@ -4,7 +4,7 @@ import { useEvent } from "rc-util";
 import raf from "rc-util/lib/raf";
 
 import type { ShowWave, WaveAllowedComponent } from "./interface";
-import showWaveEffect from "./WaveEffect";
+import showWaveEffect from "./wave-effect";
 
 export default function useWave(
   nodeRef: React.RefObject<HTMLElement>,

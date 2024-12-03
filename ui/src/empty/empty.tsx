@@ -1,5 +1,5 @@
 import { cn } from "..";
-import { EmptyIcon } from "./EmptyIcon";
+import { EmptyIcon } from "./empty-icon";
 
 type EmptyProps = {
   className?: string;

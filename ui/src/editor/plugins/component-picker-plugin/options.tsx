@@ -16,7 +16,7 @@ import {
 
 import type { useModal } from "../../../modal";
 import { Icon } from "../../../icons";
-import { InsertImage } from "../ImagesPlugin/InsertImage";
+import { InsertImage } from "../images-plugin/insert-image";
 import { ComponentPickerOption } from "./types";
 
 // function getDynamicOptions(editor: LexicalEditor, queryString: string) {
@@ -78,9 +78,9 @@ export function getBaseOptions(
               icon={
                 n === 1
                   ? "gravity-ui:heading-1"
-                  : (n === 2
+                  : n === 2
                     ? "gravity-ui:heading-2"
-                    : "gravity-ui:heading-3")
+                    : "gravity-ui:heading-3"
               }
             />
           ),

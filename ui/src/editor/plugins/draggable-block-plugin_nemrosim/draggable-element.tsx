@@ -3,7 +3,7 @@ import { memo, useCallback } from "react";
 
 import { cn } from "@acme/ui";
 
-import { useDraggableStore } from "../../stores/useDraggableStore";
+import { useDraggableStore } from "../../stores/use-draggable-store";
 
 const DraggableElement = () => {
   const { draggable, resetState } = useDraggableStore();

@@ -4,11 +4,11 @@ import React, { memo, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
 import useMergedState from "rc-util/lib/hooks/useMergedState";
 
-import type { FloatButtonProps } from "./FloatButton";
+import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";
 import { CloseOutlined } from "../icons";
 import { FloatButtonGroupProvider } from "./context";
-import { FloatButton } from "./FloatButton";
+import { FloatButton } from "./float-button";
 
 type FloatButtonGroupProps = FloatButtonProps & {
   children: React.ReactNode;

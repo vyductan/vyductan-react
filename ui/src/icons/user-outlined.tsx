@@ -1,5 +1,5 @@
-import type { IconWrapperProps } from "./Wrapper";
-import { IconWrapper } from "./Wrapper";
+import type { IconWrapperProps } from "./wrapper";
+import { IconWrapper } from "./wrapper";
 
 // lucide
 export const UserOutlined = (props: Omit<IconWrapperProps, "children">) => {

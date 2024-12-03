@@ -3,10 +3,10 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { COMMAND_PRIORITY_LOW, DRAGOVER_COMMAND } from "lexical";
 
 import { DRAGGABLE_KEY } from "../constants";
-import { draggableStore } from "../stores/useDraggableStore";
+import { draggableStore } from "../stores/use-draggable-store";
 import { isHTMLElement } from "../utils/guard";
-import { useEditorKeys } from "./useEditorKeys";
-import { useOnDragEnter } from "./useOnDragEnter";
+import { useEditorKeys } from "./use-editor-keys";
+import { useOnDragEnter } from "./use-on-drag-enter";
 
 export const useDragListeners = () => {
   const [editor] = useLexicalComposerContext();

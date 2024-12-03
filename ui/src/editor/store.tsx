@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { UploadService } from "./plugins/ImagesPlugin/types";
+import type { UploadService } from "./plugins/images-plugin/types";
 
 type EditorState = {
   uploadService: UploadService;

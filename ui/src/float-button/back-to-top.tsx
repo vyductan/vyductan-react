@@ -3,11 +3,11 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-import type { FloatButtonProps } from "./FloatButton";
+import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";
 import { Icon } from "../icons";
 import FloatButtonGroupContext from "./context";
-import { FloatButton } from "./FloatButton";
+import { FloatButton } from "./float-button";
 import { getScrollTarget, scrollTo } from "./utils";
 
 export type BackToTopProps = Omit<FloatButtonProps, "target"> & {

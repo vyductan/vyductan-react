@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import React, { useEffect, useRef } from "react";
 
-import { draggableStore } from "../../stores/useDraggableStore";
+import { draggableStore } from "../../stores/use-draggable-store";
 
 export const DRAGGABLE_WRAPPER_ID = "lexical-draggable-wrapper-id";
 

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { InsertImagePayload } from "./types";
 import { Tabs } from "../../../tabs";
 import { INSERT_IMAGE_COMMAND } from "./constants";
-import { Uploader } from "./Uploader";
+import { Uploader } from "./uploader";
 
 export const InsertImage = ({
   activeEditor,

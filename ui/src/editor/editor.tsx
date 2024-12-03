@@ -16,12 +16,12 @@ import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { cn } from "@acme/ui";
 
 import { ImageNode } from "./nodes/ImageNode";
-import { AutoLinkPlugin } from "./plugins/AutoLinkPlugin";
-import ComponentPickerMenuPlugin from "./plugins/ComponentPickerPlugin/ComponentPicker";
-import { DraggableBlockPlugin } from "./plugins/DraggableBlockPlugin";
+import { AutoLinkPlugin } from "./plugins/auto-link-plugin";
+import ComponentPickerMenuPlugin from "./plugins/component-picker-plugin/component-picker";
+import { DraggableBlockPlugin } from "./plugins/draggable-block-plugin";
 import { HistoryPlugin } from "./plugins/history";
-import { ImagesPlugin } from "./plugins/ImagesPlugin";
-import { LinkPlugin } from "./plugins/LinkPlugin";
+import { ImagesPlugin } from "./plugins/images-plugin";
+import { LinkPlugin } from "./plugins/link-plugin";
 import { OnChangePlugin } from "./plugins/on-change-plugin";
 
 export type EditorProps = {

@@ -6,7 +6,7 @@ import isVisible from "rc-util/lib/Dom/isVisible";
 import { composeRef, supportRef } from "rc-util/lib/ref";
 
 import type { WaveAllowedComponent } from "./interface";
-import useWave from "./useWave";
+import useWave from "./use-wave";
 
 export interface WaveProps {
   disabled?: boolean;

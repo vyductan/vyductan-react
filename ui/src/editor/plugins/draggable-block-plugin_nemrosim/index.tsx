@@ -1,11 +1,11 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { createPortal } from "react-dom";
 
-import { useDragListeners } from "../../hooks/useDragListeners";
-import { useOnDrop } from "../../hooks/useOnDrop";
-import { DraggableElement } from "./DraggableElement";
-import { DraggableLine } from "./DraggableLine";
-import { DRAGGABLE_WRAPPER_ID } from "./DraggableWrapper";
+import { useDragListeners } from "../../hooks/use-drag-listeners";
+import { useOnDrop } from "../../hooks/use-on-drop";
+import { DraggableElement } from "./draggable-element";
+import { DraggableLine } from "./draggable-line";
+import { DRAGGABLE_WRAPPER_ID } from "./draggable-wrapper";
 
 export const DraggableBlockPlugin: React.FC = () => {
   const [editor] = useLexicalComposerContext();
@@ -13,11 +13,13 @@ export const DraggableBlockPlugin: React.FC = () => {
   useDragListeners();
   useOnDrop();
 
-  const wrapperHtmlElement = document.getElementById(DRAGGABLE_WRAPPER_ID);
+  const wrapperHtmlElement = document.querySelector(
+    `[id='${DRAGGABLE_WRAPPER_ID}]`,
+  );
 
   const isEditable = editor.isEditable();
   if (!isEditable || !wrapperHtmlElement) {
-    return null;
+    return;
   }
 
   return createPortal(

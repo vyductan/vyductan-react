@@ -3,7 +3,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $getNodeByKey, COMMAND_PRIORITY_HIGH, DROP_COMMAND } from "lexical";
 
 import { DRAGGABLE_KEY } from "../constants";
-import { draggableStore } from "../stores/useDraggableStore";
+import { draggableStore } from "../stores/use-draggable-store";
 
 export const useOnDrop = () => {
   const [editor] = useLexicalComposerContext();

@@ -32,7 +32,7 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 
-import { useEditorHistory } from "../../stores/useHistory";
+import { useEditorHistory } from "../../stores/use-history";
 // import { createWebsocketProvider } from "../collaboration";
 // import { useSettings } from "../context/SettingsContext";
 // import { useSharedHistoryContext } from "../context/SharedHistoryContext";
@@ -59,7 +59,7 @@ function useSuspenseImage(source: string) {
       const img = new Image();
       img.src = source;
       // img.src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1280px-Image_created_with_a_mobile_phone.png"
-      img.addEventListener('load', () => {
+      img.addEventListener("load", () => {
         imageCache.add(source);
         resolve(null);
       });
