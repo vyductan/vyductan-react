@@ -21,10 +21,10 @@ type SelectTriggerProps = Omit<
 > &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> & {
-    allowClear: boolean | undefined;
-    onClear: () => void;
+    allowClear?: boolean | undefined;
+    onClear?: () => void;
     /* For clear */
-    value: ValueType | undefined;
+    value?: ValueType | undefined;
   };
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -77,7 +77,7 @@ const SelectTrigger = React.forwardRef<
             onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onClear();
+              onClear?.();
             }}
           >
             <Icon
