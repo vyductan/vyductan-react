@@ -1,11 +1,12 @@
 // export {useRouter} from 'next/navigation'
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export const useRouter = () => {
   const navigate = useNavigate();
   const router = {
-    push: navigate,
-    replace: (url: URL | string) => navigate(url.toString(), { replace: true }),
+    push: (url: URL | string) => void navigate(url.toString()),
+    replace: (url: URL | string) =>
+      void navigate(url.toString(), { replace: true }),
   };
   return router;
 };
