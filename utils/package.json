@@ -24,5 +24,8 @@
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
     "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
   }
 }
