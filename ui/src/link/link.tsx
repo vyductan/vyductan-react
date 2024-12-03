@@ -1,7 +1,7 @@
 import type { LinkProps as NextLinkProps } from "next/link";
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from "react";
 import { forwardRef } from "react";
-import { Link as RrdLink } from "react-router-dom";
+import { NavLink } from "react-router";
 
 type LinkProps = NextLinkProps &
   Omit<
@@ -11,13 +11,16 @@ type LinkProps = NextLinkProps &
     >,
     "href"
   >;
-// const X = globalThis.next ? NextLink : RrdLink;
 const Link = forwardRef(
-  ({ href, ...props }: LinkProps, ref: React.Ref<HTMLAnchorElement>) => {
+  (
+    { href, prefetch, ...props }: LinkProps,
+    ref: React.Ref<HTMLAnchorElement>,
+  ) => {
     return (
-      <RrdLink
+      <NavLink
         ref={ref}
         to={typeof href === "string" ? href : (href.href ?? "")}
+        prefetch={prefetch ? "render" : undefined}
         {...props}
       />
     );
