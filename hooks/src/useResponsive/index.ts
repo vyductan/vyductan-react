@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { useEffect, useState } from "react";
-import { theme } from "tailwindcss/defaultConfig";
+import tailwindDefaultConfig from "tailwindcss/defaultConfig";
 
 import isBrowser from "../utils/is-browser";
 
@@ -13,7 +13,10 @@ type ResponsiveInfo = Record<Screens, boolean>;
 
 let info: ResponsiveInfo;
 
-const tailwindScreensConfig = theme?.screens as Record<string, string>;
+const tailwindScreensConfig = tailwindDefaultConfig.theme?.screens as Record<
+  string,
+  string
+>;
 
 let responsiveConfig = (() => {
   const c: Record<string, number> = {};
