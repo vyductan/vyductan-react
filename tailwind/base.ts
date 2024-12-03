@@ -149,16 +149,20 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
+          // DEFAULT: "hsl(var(--muted))",
+          DEFAULT: baseColors.gray[100],
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          // DEFAULT: "hsl(var(--accent))",
+          // foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: baseColors.gray[100],
+          foreground: baseColors.gray[900],
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          // foreground: "hsl(var(--popover-foreground))",
+          foreground: baseColors.gray[950],
         },
         card: {
           DEFAULT: "hsl(var(--card))",
