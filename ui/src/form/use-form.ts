@@ -17,7 +17,7 @@ import type {
 import type { z, ZodSchema } from "zod";
 import { useCallback, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isEqual, transform } from "lodash";
+import _ from "lodash";
 import { useForm as useRHForm, useWatch } from "react-hook-form";
 
 import type { ResetAction } from "./types";
@@ -41,7 +41,7 @@ type UseFormProps<
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseRHFormProps<TFieldValues, TContext> & {
   schema?: z.ZodType<TFieldValues>;
-  onSubmit: TTransformedValues extends undefined
+  onSubmit?: TTransformedValues extends undefined
     ? SubmitHandler<TFieldValues>
     : TTransformedValues extends FieldValues
       ? SubmitHandler<TTransformedValues>
@@ -104,7 +104,7 @@ const useForm = <
   const submit = useCallback(
     (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
       return props
-        ? methods.handleSubmit(props.onSubmit)(event)
+        ? methods.handleSubmit(props.onSubmit ?? ((() => void 0) as any))(event)
         : Promise.resolve();
     },
     [methods, props],
@@ -127,7 +127,7 @@ const useForm = <
   useEffect(() => {
     if (
       props?.onValuesChange &&
-      !isEqual(formInstance.formState.defaultValues, w) &&
+      !_.isEqual(formInstance.formState.defaultValues, w) &&
       Object.keys(w).length > 0
     ) {
       props.onValuesChange(
@@ -151,10 +151,10 @@ const getChangedValues = (
   object2: Record<string, any>,
 ) => {
   if (!object1) return object2;
-  return transform(
+  return _.transform(
     object1,
     (result, value, key) => {
-      if (!isEqual(value, object2[key])) {
+      if (!_.isEqual(value, object2[key])) {
         result[key] = object2[key];
       }
     },
