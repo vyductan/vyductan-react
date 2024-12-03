@@ -20,4 +20,4 @@ const FieldDescription = forwardRef<
 });
 FieldDescription.displayName = "FormDescription";
 
-export { FieldDescription };
+export { FieldDescription, FieldDescription as FormDescription };

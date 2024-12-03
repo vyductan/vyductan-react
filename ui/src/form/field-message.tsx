@@ -30,4 +30,4 @@ const FieldMessage = forwardRef<
 });
 FieldMessage.displayName = "FieldMessage";
 
-export { FieldMessage };
+export { FieldMessage, FieldMessage as FormMessage };

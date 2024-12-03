@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import type { FormInstance } from "./use-form";
-import { FormProvider } from "./context";
+import { FormRoot } from "./context";
 import { FormErrorsNotification } from "./form-errors-notification";
 
 type FormProps<
@@ -35,12 +35,12 @@ const Form = <
   ...restProps
 }: FormProps<TFieldValues, TContext, TTransformedValues>) => {
   return (
-    <FormProvider {...form}>
+    <FormRoot {...form}>
       <form onSubmit={form.submit} {...restProps}>
         {typeof children === "function" ? children(form) : children}
       </form>
       <FormErrorsNotification />
-    </FormProvider>
+    </FormRoot>
   );
 };
 

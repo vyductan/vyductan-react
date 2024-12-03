@@ -17,4 +17,4 @@ const FieldLabel = React.forwardRef<
 });
 FieldLabel.displayName = "FieldLabel";
 
-export { FieldLabel };
+export { FieldLabel, FieldLabel as FormLabel };
