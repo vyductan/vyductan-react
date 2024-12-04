@@ -135,7 +135,6 @@ const DatePickerInternal = <T extends DateType = Date>(
   // prevent click label to focus input (open popover)
   useEffect(() => {
     const labelElm = document.querySelector(`label[for="${id}"]`);
-    console.log("llllll", labelElm);
     const eventFn = (event: Event) => {
       event.preventDefault();
     };
@@ -172,6 +171,7 @@ const DatePickerInternal = <T extends DateType = Date>(
               onSelect={(date) => {
                 if (date) {
                   setValue(getDestinationValue(date) as T);
+                  setInputValue(formatDate(date, format));
                 }
                 setOpen(false);
               }}
@@ -196,8 +196,7 @@ const DatePickerInternal = <T extends DateType = Date>(
             />
           }
           value={inputValue}
-          onClick={(event) => {
-            console.log("onClick", event.relatedTarget);
+          onClick={() => {
             if (!open) setOpen(true);
           }}
           onKeyUp={(event) => {
