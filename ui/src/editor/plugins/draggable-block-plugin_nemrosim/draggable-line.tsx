@@ -6,7 +6,7 @@ const DraggableLine: React.FC = () => {
   const { line } = useDraggableLineStore();
 
   if (!line?.data) {
-    return null;
+    return <></>;
   }
 
   const scrollOffset = document.body.getBoundingClientRect().top;

@@ -21,7 +21,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "no-scrollbar flex-nowrap overflow-x-scroll text-foreground-muted",
+      "flex-nowrap overflow-x-scroll text-foreground-muted no-scrollbar",
       "flex items-baseline",
       type === "secondary" &&
         "justify-center rounded-md bg-background-muted p-1",

@@ -12,7 +12,7 @@ export interface ActionProps extends React.HTMLAttributes<HTMLButtonElement> {
 }
 
 export const Action = forwardRef<HTMLButtonElement, ActionProps>(
-  ({ active, className, cursor, style, ...props }, ref) => {
+  ({ active: _, className, cursor, style, ...props }, ref) => {
     return (
       <button
         ref={ref}

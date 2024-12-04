@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -14,7 +15,7 @@ import * as React from "react";
 import { Suspense } from "react";
 import { $applyNodeReplacement, createEditor, DecoratorNode } from "lexical";
 
-const ImageComponent = React.lazy(() => import("./ImageComponent"));
+const ImageComponent = React.lazy(() => import("./image-component"));
 
 export interface ImagePayload {
   altText: string;

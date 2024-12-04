@@ -45,9 +45,8 @@ export const FloatButtonBackToTop = React.forwardRef<
   }));
 
   const getDefaultTarget = (): HTMLElement | Document | Window =>
-    internalRef.current?.ownerDocument
-      ? internalRef.current.ownerDocument
-      : window;
+    // eslint-disable-next-line unicorn/prefer-global-this
+    internalRef.current?.ownerDocument ?? window;
 
   const handleScroll = useCallback(
     (e: React.UIEvent<HTMLElement, UIEvent> | { target: any }) => {

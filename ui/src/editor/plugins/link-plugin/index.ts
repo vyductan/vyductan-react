@@ -1,1 +1,1 @@
-export * from "./LinkPlugin";
+export * from "./link-plugin";

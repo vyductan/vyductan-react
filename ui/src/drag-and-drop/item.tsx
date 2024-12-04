@@ -1,11 +1,6 @@
-import { UniqueIdentifier } from "@dnd-kit/core";
-import {
-  arrayMove,
-  rectSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-} from "@dnd-kit/sortable";
+/* eslint-disable unicorn/no-null */
+import type { UniqueIdentifier } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 import { motion } from "framer-motion";
 
 // import styles from "./item.module.css";
@@ -41,7 +36,7 @@ export const Item = ({ id }: { id: UniqueIdentifier }) => {
             }
       }
       transition={{
-        duration: !isDragging ? 0.25 : 0,
+        duration: isDragging ? 0 : 0.25,
         easings: {
           type: "spring",
         },

@@ -1,4 +1,4 @@
-import type { ImagePayload } from "../../nodes/ImageNode/ImageNode";
+import type { ImagePayload } from "../../nodes/image-node/image-node";
 
 export type InsertImagePayload = Readonly<ImagePayload>;
 

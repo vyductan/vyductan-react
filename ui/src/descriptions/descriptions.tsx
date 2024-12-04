@@ -3,7 +3,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Fragment } from "react";
 
-import { useResponsive } from "@acme/hooks/useResponsive";
+import { useResponsive } from "@acme/hooks/use-responsive";
 
 import type { Screens } from "../theme";
 import { cn } from "..";

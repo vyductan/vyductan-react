@@ -20,11 +20,11 @@ import {
 
 import type { InsertImagePayload } from "./types";
 // import { CAN_USE_DOM } from "../../constants";
-import { ImageNode } from "../../nodes/ImageNode";
+import { ImageNode } from "../../nodes/image-node";
 import {
   $createImageNode,
   $isImageNode,
-} from "../../nodes/ImageNode/ImageNode";
+} from "../../nodes/image-node/image-node";
 import { INSERT_IMAGE_COMMAND } from "./constants";
 
 // const getDOMSelection = (targetWindow: Window | null): Selection | null =>
@@ -80,7 +80,7 @@ export const ImagesPlugin = ({
     );
   }, [captionsEnabled, editor]);
 
-  return null;
+  return <></>;
 };
 
 const TRANSPARENT_IMAGE =
@@ -157,21 +157,25 @@ function onDrop(event: DragEvent, editor: LexicalEditor): boolean {
 function getImageNodeInSelection(): ImageNode | null {
   const selection = $getSelection();
   if (!$isNodeSelection(selection)) {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
   const nodes = selection.getNodes();
   const node = nodes[0];
+  // eslint-disable-next-line unicorn/no-null
   return $isImageNode(node) ? node : null;
 }
 
 function getDragImageData(event: DragEvent): null | InsertImagePayload {
   const dragData = event.dataTransfer?.getData("application/x-lexical-drag");
   if (!dragData) {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
 
   const { type, data } = JSON.parse(dragData);
   if (type !== "image") {
+    // eslint-disable-next-line unicorn/no-null
     return null;
   }
 

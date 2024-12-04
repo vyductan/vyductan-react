@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 import type {
   BaseSelection,
   LexicalCommand,
@@ -44,8 +45,8 @@ import { useEditorHistory } from "../../stores/use-history";
 // import ContentEditable from "../ui/ContentEditable";
 // import ImageResizer from "../ui/ImageResizer";
 // import Placeholder from "../ui/Placeholder";
-import { $isImageNode } from "./ImageNode";
-import ImageResizer from "./ImageResizer";
+import { $isImageNode } from "./image-node";
+import ImageResizer from "./image-resizer";
 
 const imageCache = new Set();
 
@@ -63,9 +64,10 @@ function useSuspenseImage(source: string) {
         imageCache.add(source);
         resolve(null);
       });
-      img.onerror = () => {
+      img.addEventListener("error", () => {
         imageCache.add(source);
-      };
+        console.warn(`Failed to load image: ${source}`);
+      });
     });
   }
 }
@@ -359,7 +361,7 @@ export default function ImageComponent({
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing;
   const isFocused = isSelected || isResizing;
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={undefined}>
       <>
         <div draggable={draggable} className="group flex w-full flex-col">
           <div className="relative self-center">

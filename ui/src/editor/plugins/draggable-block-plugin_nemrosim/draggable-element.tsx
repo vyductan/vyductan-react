@@ -20,7 +20,7 @@ const DraggableElement = () => {
   );
 
   if (!draggable?.data) {
-    return null;
+    return <></>;
   }
 
   const scrollOffset = document.body.getBoundingClientRect().top;

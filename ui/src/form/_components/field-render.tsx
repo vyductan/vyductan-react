@@ -32,8 +32,8 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       children,
 
       fieldId,
-      fieldDescriptionId,
-      fieldMessageId,
+      // fieldDescriptionId,
+      // fieldMessageId,
 
       fieldState,
 

@@ -21,6 +21,7 @@ const CommandRoot = React.forwardRef<
     ref={ref}
     className={cn(
       "flex size-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
+      // "w-full",
       className,
     )}
     {...props}
@@ -33,7 +34,17 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0">
-        <CommandRoot className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
+        <CommandRoot
+          className={cn(
+            "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+            "[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0",
+            "[&_[cmdk-group]]:px-2",
+            "[&_[cmdk-input-wrapper]_svg]:size-5",
+            "[&_[cmdk-input]]:h-12",
+            "[&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3",
+            "[&_[cmdk-item]_svg]:size-5",
+          )}
+        >
           {children}
         </CommandRoot>
       </DialogContent>
@@ -53,7 +64,9 @@ const CommandInput = React.forwardRef<
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none",
+        "placeholder:text-muted-foreground",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
       {...props}
@@ -115,7 +128,8 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
-      "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+      "overflow-hidden p-1 text-foreground",
+      "[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
       className,
     )}
     {...props}
@@ -138,7 +152,7 @@ CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
 
 type CommandItemProps<T extends ValueType = ValueType> =
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & {
-    checked: boolean;
+    checked?: boolean;
     optionRender?: {
       checked?: boolean;
       icon?: (option: Option<T>) => React.ReactNode;
@@ -163,15 +177,6 @@ const CommandItem = React.forwardRef<
     )}
     {...props}
   >
-    {/* {(!optionRender || optionRender.checked) && ( */}
-    {/*   <CheckFilled */}
-    {/*     className={cn( */}
-    {/*       "mr-2 size-4 shrink-0", */}
-    {/*       checked ? "opacity-100" : "opacity-0", */}
-    {/*     )} */}
-    {/*   /> */}
-    {/* )} */}
-
     {children}
 
     {(!optionRender || optionRender.checked) && (

@@ -15,7 +15,7 @@ import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 
 import { cn } from "@acme/ui";
 
-import { ImageNode } from "./nodes/ImageNode";
+import { ImageNode } from "./nodes/image-node";
 import { AutoLinkPlugin } from "./plugins/auto-link-plugin";
 import ComponentPickerMenuPlugin from "./plugins/component-picker-plugin/component-picker";
 import { DraggableBlockPlugin } from "./plugins/draggable-block-plugin";

@@ -16,6 +16,7 @@ import { getBaseOptions } from "./options";
 export default function ComponentPickerMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [modal, showModal] = useModal();
+  // eslint-disable-next-line unicorn/no-null
   const [queryString, setQueryString] = useState<string | null>(null);
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
@@ -69,30 +70,32 @@ export default function ComponentPickerMenuPlugin(): JSX.Element {
           anchorElementRef,
           { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) =>
-          anchorElementRef.current && options.length > 0
-            ? ReactDOM.createPortal(
-                <div className="min-w-48 rounded-sm border border-border p-1">
-                  <ul>
-                    {options.map((option, index: number) => (
-                      <ComponentPickerMenuItem
-                        index={index}
-                        isSelected={selectedIndex === index}
-                        onClick={() => {
-                          setHighlightedIndex(index);
-                          selectOptionAndCleanUp(option);
-                        }}
-                        onMouseEnter={() => {
-                          setHighlightedIndex(index);
-                        }}
-                        key={option.key}
-                        option={option}
-                      />
-                    ))}
-                  </ul>
-                </div>,
-                anchorElementRef.current,
-              )
-            : null
+          anchorElementRef.current && options.length > 0 ? (
+            ReactDOM.createPortal(
+              <div className="min-w-48 rounded-sm border border-border p-1">
+                <ul>
+                  {options.map((option, index: number) => (
+                    <ComponentPickerMenuItem
+                      index={index}
+                      isSelected={selectedIndex === index}
+                      onClick={() => {
+                        setHighlightedIndex(index);
+                        selectOptionAndCleanUp(option);
+                      }}
+                      onMouseEnter={() => {
+                        setHighlightedIndex(index);
+                      }}
+                      key={option.key}
+                      option={option}
+                    />
+                  ))}
+                </ul>
+              </div>,
+              anchorElementRef.current,
+            )
+          ) : (
+            <></>
+          )
         }
       />
     </>

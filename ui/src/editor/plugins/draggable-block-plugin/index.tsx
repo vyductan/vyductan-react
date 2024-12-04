@@ -60,9 +60,11 @@ function getCollapsedMargins(element: HTMLElement): {
     element: Element | null,
     margin: "marginTop" | "marginBottom",
   ): number =>
-    element ? Number.parseFloat(window.getComputedStyle(element)[margin]) : 0;
+    element
+      ? Number.parseFloat(globalThis.getComputedStyle(element)[margin])
+      : 0;
 
-  const { marginTop, marginBottom } = window.getComputedStyle(element);
+  const { marginTop, marginBottom } = globalThis.getComputedStyle(element);
   const prevElementSiblingMarginBottom = getMargin(
     element.previousElementSibling,
     "marginBottom",
@@ -183,7 +185,7 @@ function setMenuPosition(
   }
 
   const targetRect = targetElement.getBoundingClientRect();
-  const targetStyle = window.getComputedStyle(targetElement);
+  const targetStyle = globalThis.getComputedStyle(targetElement);
   const floatingElementRect = floatingElement.getBoundingClientRect();
   const anchorElementRect = anchorElement.getBoundingClientRect();
 
