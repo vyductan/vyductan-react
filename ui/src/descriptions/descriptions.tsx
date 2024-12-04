@@ -128,6 +128,9 @@ export const Descriptions = ({
                 key={rowIndex}
                 className={cn(
                   bordered && "mb-px border-b last:border-none",
+                  layout === "horizontal" &&
+                    bordered &&
+                    "mb-px [&:last-child>td]:border-b-0 [&:last-child>th]:border-b-0 [&>td]:border-b [&>th]:border-b",
                   !bordered && "[&:last-child>td]:pb-0",
                 )}
               >
@@ -145,7 +148,7 @@ export const Descriptions = ({
                         >
                           <span>{col.label}</span>
                         </th>
-                        <td className={cn(tdClassName, "last:border-none")}>
+                        <td className={cn(tdClassName, "last:border-r-0")}>
                           <span>{col.children ?? "-"}</span>
                         </td>
                       </Fragment>
