@@ -25,8 +25,11 @@ type DescriptionProps = {
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
   classNames?: {
-    label?: string;
+    header?: string;
+    title?: string;
     content?: string;
+    label?: string;
+    value?: string;
     th?: string;
     td?: string;
   };
@@ -75,7 +78,7 @@ export const Descriptions = ({
       : createVerticalRows(items, mergedColumn);
 
   const labelClassName = cn("text-foreground-muted", classNames?.label);
-  const contentClassName = cn(classNames?.content);
+  const valueClassName = cn(classNames?.value);
   const thClassName = cn(
     "text-start text-sm font-normal",
     labelClassName,
@@ -96,19 +99,21 @@ export const Descriptions = ({
       "flex gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
     layout === "vertical" && bordered && "px-6",
     classNames?.td,
-    contentClassName,
+    valueClassName,
   );
 
   return (
     <div className={className}>
       {(!!title || !!extra) && (
-        <div className="mb-4 flex items-center">
-          <div className="text-lg font-semibold">{title}</div>
+        <div className={cn("mb-4 flex items-center", classNames?.header)}>
+          <div className={cn("text-lg font-semibold", classNames?.title)}>
+            {title}
+          </div>
           {extra && <div className="ml-auto">{extra}</div>}
         </div>
       )}
 
-      <div className={cn(bordered && "rounded-md border")}>
+      <div className={cn(bordered && "rounded-md border", classNames?.content)}>
         <table
           className={cn("w-full", bordered ? "table-auto" : "table-fixed")}
         >
@@ -148,7 +153,7 @@ export const Descriptions = ({
                           {col.label}
                           {colon ? ": " : ""}
                         </span>
-                        <span className={contentClassName}>{col.children}</span>
+                        <span className={valueClassName}>{col.children}</span>
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
