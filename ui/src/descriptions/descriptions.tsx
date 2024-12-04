@@ -113,7 +113,12 @@ export const Descriptions = ({
         </div>
       )}
 
-      <div className={cn(bordered && "rounded-md border", classNames?.content)}>
+      <div
+        className={cn(
+          bordered && "overflow-hidden rounded-md border",
+          classNames?.content,
+        )}
+      >
         <table
           className={cn("w-full", bordered ? "table-auto" : "table-fixed")}
         >
