@@ -157,7 +157,57 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
     columnsDef.unshift(dragHandleColumn);
   }
   if (props?.rowSelection) {
-    const selectionColumn = createSelectColumn<TRecord>();
+    let lastSelectedId = "";
+
+    const selectionColumn: ColumnDef<TRecord> = {
+      id: "selection",
+      header: ({ table }) => (
+        <Checkbox
+          aria-label="Select all"
+          className="flex items-center justify-center"
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={table.getIsSomePageRowsSelected()}
+          onChange={table.toggleAllPageRowsSelected}
+        />
+      ),
+      cell: ({ row, table }) => {
+        const originNode = (
+          <Checkbox
+            aria-label="Select row"
+            className="flex items-center justify-center"
+            checked={row.getIsSelected()}
+            indeterminate={row.getIsSomeSelected()}
+            onChange={row.toggleSelected}
+            onClick={(event) => {
+              if (event.shiftKey) {
+                const { rows, rowsById } = table.getRowModel();
+                const rowsToToggle = getRowRange(rows, row.id, lastSelectedId);
+                const isLastSelected =
+                  rowsById[lastSelectedId]?.getIsSelected();
+                for (const row of rowsToToggle)
+                  row.toggleSelected(isLastSelected);
+              }
+
+              lastSelectedId = row.id;
+            }}
+          />
+        );
+        return props.rowSelection?.renderCell
+          ? props.rowSelection.renderCell({
+              checked: row.getIsSelected(),
+              record: row.original,
+              index: row.index,
+              originNode,
+            })
+          : originNode;
+      },
+      size: 40,
+      meta: {
+        align: "center",
+      },
+      enableSorting: false,
+      enableHiding: false,
+    };
     columnsDef.unshift(selectionColumn);
   }
 
@@ -193,48 +243,6 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
 
   return columnsDef;
 };
-
-function createSelectColumn<T>(): ColumnDef<T> {
-  let lastSelectedId = "";
-
-  return {
-    id: "selection",
-    header: ({ table }) => (
-      <Checkbox
-        aria-label="Select all"
-        className="flex items-center justify-center"
-        checked={table.getIsAllPageRowsSelected()}
-        indeterminate={table.getIsSomePageRowsSelected()}
-        onChange={table.toggleAllPageRowsSelected}
-      />
-    ),
-    cell: ({ row, table }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="flex items-center justify-center"
-        checked={row.getIsSelected()}
-        indeterminate={row.getIsSomeSelected()}
-        onChange={row.toggleSelected}
-        onClick={(event) => {
-          if (event.shiftKey) {
-            const { rows, rowsById } = table.getRowModel();
-            const rowsToToggle = getRowRange(rows, row.id, lastSelectedId);
-            const isLastSelected = rowsById[lastSelectedId]?.getIsSelected();
-            for (const row of rowsToToggle) row.toggleSelected(isLastSelected);
-          }
-
-          lastSelectedId = row.id;
-        }}
-      />
-    ),
-    size: 40,
-    meta: {
-      align: "center",
-    },
-    enableSorting: false,
-    enableHiding: false,
-  };
-}
 
 function getRowRange<T>(rows: Array<Row<T>>, idA: string, idB: string) {
   const range: Array<Row<T>> = [];

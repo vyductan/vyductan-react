@@ -82,6 +82,13 @@ export type RowSelection<TRecord> = {
     // selectedRowKeys: TRecord[keyof TRecord][],
     selectedRows: TRecord[],
   ) => void;
+  /** Renderer of the table cell. Same as render in column */
+  renderCell?: (args: {
+    checked: boolean;
+    record: TRecord;
+    index: number;
+    originNode: ReactNode;
+  }) => ReactNode;
 };
 
 export type TableSize = "sm" | "default";
