@@ -161,15 +161,23 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
 
     const selectionColumn: ColumnDef<TRecord> = {
       id: "selection",
-      header: ({ table }) => (
-        <Checkbox
-          aria-label="Select all"
-          className="flex items-center justify-center"
-          checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomePageRowsSelected()}
-          onChange={table.toggleAllPageRowsSelected}
-        />
-      ),
+      header: ({ table }) => {
+        const originNode = (
+          <Checkbox
+            aria-label="Select all"
+            className="flex items-center justify-center"
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onChange={table.toggleAllPageRowsSelected}
+          />
+        );
+        return props.rowSelection?.renderHeader
+          ? props.rowSelection.renderHeader({
+              checked: table.getIsAllPageRowsSelected(),
+              originNode,
+            })
+          : originNode;
+      },
       cell: ({ row, table }) => {
         const originNode = (
           <Checkbox

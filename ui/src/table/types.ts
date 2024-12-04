@@ -82,7 +82,12 @@ export type RowSelection<TRecord> = {
     // selectedRowKeys: TRecord[keyof TRecord][],
     selectedRows: TRecord[],
   ) => void;
-  /** Renderer of the table cell. Same as render in column */
+  /** Renderer of the `table` header */
+  renderHeader?: (args: {
+    checked: boolean;
+    originNode: ReactNode;
+  }) => ReactNode;
+  /** Renderer of the `table` cell. Same as render in column */
   renderCell?: (args: {
     checked: boolean;
     record: TRecord;
