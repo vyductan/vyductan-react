@@ -1,4 +1,6 @@
+/* eslint-disable unicorn/no-null */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
+// Jun 15, 2024
 import * as React from "react";
 import { cubicBezier, motion } from "framer-motion";
 import raf from "rc-util/lib/raf";
@@ -52,10 +54,14 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
     // Rect
     const { borderLeftWidth, borderTopWidth } = nodeStyle;
     setLeft(
-      isStatic ? target.offsetLeft : validateNumber(-Number.parseFloat(borderLeftWidth)),
+      isStatic
+        ? target.offsetLeft
+        : validateNumber(-Number.parseFloat(borderLeftWidth)),
     );
     setTop(
-      isStatic ? target.offsetTop : validateNumber(-Number.parseFloat(borderTopWidth)),
+      isStatic
+        ? target.offsetTop
+        : validateNumber(-Number.parseFloat(borderTopWidth)),
     );
     setWidth(target.offsetWidth);
     setHeight(target.offsetHeight);
@@ -125,7 +131,7 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
       style={waveStyle}
       initial={{ opacity: inititalOpacity }}
       animate={{
-        position: "absolute",
+        // position: "absolute", // fix framer motion warning
         boxShadow: "0 0 0 6px " + color,
         opacity: 0,
         transition: isSmallComponent
@@ -164,7 +170,10 @@ const showWaveEffect: ShowWaveEffect = (target, info) => {
   const { component } = info;
 
   // Skip for unchecked checkbox
-  if (component === "Checkbox" && !target.querySelector("input")?.checked) {
+  if (
+    component === "Checkbox" &&
+    !target.querySelector<HTMLInputElement>("input")?.checked
+  ) {
     return;
   }
 

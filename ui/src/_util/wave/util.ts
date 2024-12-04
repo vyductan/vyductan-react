@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 export function isNotGrey(color: string) {
   const match = /rgba?\((\d*), (\d*), (\d*)(, [\d.]*)?\)/.exec(color || "");
   if (match?.[1] && match[2] && match[3]) {

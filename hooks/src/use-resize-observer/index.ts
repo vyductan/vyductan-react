@@ -21,7 +21,7 @@ export function useResizeObserver<T extends HTMLElement = HTMLElement>() {
 
   const observer = useMemo(
     () =>
-      typeof window === "undefined"
+      typeof globalThis === "undefined"
         ? undefined
         : new ResizeObserver((entries) => {
             const entry = entries[0];
