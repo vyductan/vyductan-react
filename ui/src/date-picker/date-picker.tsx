@@ -1,5 +1,7 @@
 // https://github.com/shadcn-ui/ui/blob/805ed4120a6a8ae6f6e9714cbd776e18eeba92c7/apps/www/registry/new-york/example/date-picker-form.tsx
 // Nov 6, 2024
+// https://github.com/shadcn-ui/ui/pull/4371
+// https://github.com/shadcn-ui/ui/pull/4421
 "use client";
 
 import type { VariantProps } from "class-variance-authority";
