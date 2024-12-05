@@ -12,10 +12,6 @@ type FormFieldContextValue<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   name: TName;
-  // id: string;
-  // fieldId: string;
-  // fieldDescriptionId: string;
-  // fieldMessageId: string;
 };
 const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,

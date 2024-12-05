@@ -1,8 +1,9 @@
 import type { ReactElement, ReactNode } from "react";
 import type { ControllerFieldState } from "react-hook-form";
-import { forwardRef } from "react";
+import { forwardRef, useContext } from "react";
 
 import { cn } from "../..";
+import { FormItemContext } from "../context";
 import { FieldDescription } from "../field-description";
 import { FieldLabel } from "../field-label";
 import { FieldMessage } from "../field-message";
@@ -14,10 +15,6 @@ type FieldRenderProps = {
   label?: string | JSX.Element;
   description?: ReactNode;
   children?: ReactElement | null;
-
-  fieldId?: string;
-  fieldDescriptionId?: string;
-  fieldMessageId?: string;
 
   fieldState?: ControllerFieldState;
 
@@ -31,10 +28,6 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       description,
       children,
 
-      fieldId,
-      // fieldDescriptionId,
-      // fieldMessageId,
-
       fieldState,
 
       required,
@@ -43,6 +36,8 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
     },
     ref,
   ) => {
+    const { id } = useContext(FormItemContext);
+
     return (
       <div
         className={cn(
@@ -53,7 +48,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
         ref={ref}
         {...props}
       >
-        {!fieldId && children ? (
+        {!id && children ? (
           children
         ) : (
           <>
@@ -67,25 +62,8 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
                 label
               )
             ) : undefined}
-
             {/* Input */}
-            <FormControl>
-              {children}
-              {/* {children */}
-              {/*   ? typeof children === "function" */}
-              {/*     ? children() */}
-              {/*     : cloneElement(children) */}
-              {/*   : null} */}
-              {/* {children */}
-              {/*   ? typeof children === "function" */}
-              {/*     ? children({ */}
-              {/*         field, */}
-              {/*         fieldState, */}
-              {/*         formState, */}
-              {/*       }) */}
-              {/*     : cloneElement(children, field) */}
-              {/*   : null} */}
-            </FormControl>
+            <FormControl>{children}</FormControl>
             {/* Description */}
             {description && <FieldDescription>{description}</FieldDescription>}
             {/* Message */}

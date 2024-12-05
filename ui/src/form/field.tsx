@@ -10,10 +10,11 @@ import type {
   FieldValues,
   UseFormStateReturn,
 } from "react-hook-form";
-import { cloneElement, forwardRef, useId } from "react";
+import { cloneElement, forwardRef } from "react";
 import { Controller, useWatch } from "react-hook-form";
 
 import { FieldRender } from "./_components/field-render";
+import { FormItem } from "./_components/form-item";
 import { FormFieldContext, useFormContext } from "./context";
 import { useFieldOptionalityCheck } from "./use-field-optionality-check";
 
@@ -21,7 +22,6 @@ type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = Omit<ControllerProps<TFieldValues, TName>, "render" | "name"> & {
-  // Required<Pick<ControllerProps<TFieldValues, TName>, "control">> & {
   name?: TName;
   label?: string | JSX.Element;
   description?: ReactNode;
@@ -58,45 +58,37 @@ const FieldInner = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   {
-    // control,
+    //control,
     name,
     children,
+    render,
     required,
-    // label,
-    // description,
-    // children,
-    // className,
     onChange,
     ...props
   }: FieldProps<TFieldValues, TName>,
   ref: ForwardedRef<HTMLDivElement>,
 ) => {
-  const id = useId();
-  const fieldId = `${id}-form-item`;
-  const fieldDescriptionId = `${id}-form-item-description`;
-  const fieldMessageId = `${id}-form-item-message`;
-
-  // const form =
-  //   useFormContext<TFieldValues>() as UseFormReturn<TFieldValues> | null;
   const form = useFormContext<TFieldValues>();
 
-  // console.log(form.control._options.resolver({[field.name]: field.value}, context, {}))
-  //
-
   const isOptional = useFieldOptionalityCheck(name, form?.schema);
+  const isRequired =
+    required ?? (isOptional === undefined ? false : !isOptional);
 
+  if (render && name) {
+    return (
+      <FormFieldContext.Provider value={{ name: name }}>
+        <Controller name={name} render={render} {...props} />
+      </FormFieldContext.Provider>
+    );
+  }
   if (form && name) {
     return (
       <FieldController
-        id={id}
-        fieldId={fieldId}
-        fieldMessageId={fieldMessageId}
-        fieldDescriptionId={fieldDescriptionId}
         control={form.control}
         name={name}
         children={children}
         onChange={onChange}
-        required={required ?? (isOptional === undefined ? false : !isOptional)}
+        required={isRequired}
         {...props}
       />
     );
@@ -106,34 +98,22 @@ const FieldInner = <
       <FormFieldContext.Provider
         value={{
           name,
-          // id,
-          // fieldId,
-          // fieldDescriptionId,
-          // fieldMessageId,
         }}
       >
-        <FieldRender
-          fieldId={fieldId}
-          fieldMessageId={fieldMessageId}
-          fieldDescriptionId={fieldDescriptionId}
-          children={children}
-          ref={ref}
-          required={required}
-          {...props}
-        />
+        <FormItem>
+          <FieldRender
+            children={children}
+            ref={ref}
+            required={required}
+            {...props}
+          />
+        </FormItem>
       </FormFieldContext.Provider>
     );
   }
 
   if (typeof children !== "function") {
-    return (
-      <FieldRender
-        fieldId={fieldId}
-        children={children}
-        required={required}
-        {...props}
-      />
-    );
+    return <FieldRender children={children} required={required} {...props} />;
   }
   return;
 };
@@ -157,10 +137,6 @@ type FieldControllerProps<
       }) => React.ReactElement);
   onChange?: (...event: any[]) => any;
 
-  id: string;
-  fieldId: string;
-  fieldMessageId: string;
-  fieldDescriptionId: string;
   disabled?: boolean;
   required?: boolean;
 };
@@ -173,10 +149,6 @@ const InternalFieldController = <
     name,
     onChange,
     children,
-    // id,
-    fieldId,
-    fieldMessageId,
-    fieldDescriptionId,
     disabled,
     required,
     ...props
@@ -187,62 +159,60 @@ const InternalFieldController = <
     control,
     name,
   });
+
   return (
     <FormFieldContext.Provider
       value={{
         name,
-        // id,
-        // fieldId,
-        // fieldDescriptionId,
-        // fieldMessageId,
       }}
     >
       <Controller
         control={control}
         name={name}
         disabled={disabled}
-        render={({ field, fieldState, formState }) => (
-          <FieldRender
-            fieldId={fieldId}
-            fieldMessageId={fieldMessageId}
-            fieldDescriptionId={fieldDescriptionId}
-            fieldState={fieldState}
-            required={required}
-            children={
-              children
-                ? typeof children === "function"
-                  ? children({
-                      field,
-                      fieldState,
-                      formState,
-                    })
-                  : cloneElement(children, {
-                      ...field,
-                      value: watchedValue ?? "",
-                      onBlur: (event: any) => {
-                        (
-                          children.props as {
-                            onBlur?: (...event: any[]) => any;
-                          }
-                        ).onBlur?.(event);
-                        // field.onBlur(onChange ? onChange(event) : event);
-                        field.onBlur();
-                      },
-                      onChange: (event: any) => {
-                        (
-                          children.props as {
-                            onChange?: (...event: any[]) => any;
-                          }
-                        ).onChange?.(event);
-                        field.onChange(onChange ? onChange(event) : event);
-                      },
-                    })
-                : undefined
-            }
-            ref={ref}
-            {...props}
-          />
-        )}
+        render={({ field, fieldState, formState }) => {
+          return (
+            <FormItem>
+              <FieldRender
+                fieldState={fieldState}
+                required={required}
+                children={
+                  children
+                    ? typeof children === "function"
+                      ? children({
+                          field,
+                          fieldState,
+                          formState,
+                        })
+                      : cloneElement(children, {
+                          ...field,
+                          value: watchedValue ?? "",
+                          onBlur: (event: any) => {
+                            (
+                              children.props as {
+                                onBlur?: (...event: any[]) => any;
+                              }
+                            ).onBlur?.(event);
+                            // field.onBlur(onChange ? onChange(event) : event);
+                            field.onBlur();
+                          },
+                          onChange: (event: any) => {
+                            (
+                              children.props as {
+                                onChange?: (...event: any[]) => any;
+                              }
+                            ).onChange?.(event);
+                            field.onChange(onChange ? onChange(event) : event);
+                          },
+                        })
+                    : undefined
+                }
+                ref={ref}
+                {...props}
+              />
+            </FormItem>
+          );
+        }}
       />
     </FormFieldContext.Provider>
   );
