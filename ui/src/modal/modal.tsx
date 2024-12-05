@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import type { DialogProps } from "./_components";
+import { cn } from "..";
 import { Button } from "../button";
 import { ScrollArea } from "../scroll-area";
 import {
@@ -110,8 +111,8 @@ const Modal = ({
     >
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
-      <DialogContent className={className}>
-        <DialogHeader>
+      <DialogContent className={cn("px-0", className)}>
+        <DialogHeader className="px-6">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
@@ -123,7 +124,7 @@ const Modal = ({
           {children}
         </ScrollArea>
 
-        <DialogFooter>{footerToRender}</DialogFooter>
+        <DialogFooter className="px-6">{footerToRender}</DialogFooter>
       </DialogContent>
     </Dialog>
   );
