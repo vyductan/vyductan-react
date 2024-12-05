@@ -4,7 +4,6 @@ import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 import { cn } from "..";
-import { GenericSlot } from "../slot";
 
 type SeparatorProps = React.ComponentPropsWithoutRef<
   typeof SeparatorPrimitive.Root
@@ -34,8 +33,10 @@ const Separator = React.forwardRef<
         orientation={orientation}
         className={cn(
           "shrink-0 bg-border",
-          orientation === "horizontal" ? "h-px" : "h-full w-px",
-          orientation === "horizontal" && children ? "grow basis-0" : "w-full",
+          orientation === "horizontal" && "my-6 h-px w-full",
+          orientation === "horizontal" && children && "grow basis-0",
+          orientation === "vertical" && "h-full w-px",
+          className,
         )}
         {...props}
       >
@@ -44,7 +45,7 @@ const Separator = React.forwardRef<
     );
 
     const Comp = children ? (
-      <div className="flex items-center justify-between gap-2">
+      <div className={cn("flex items-center justify-between gap-2", className)}>
         {separator}
         <div className="mb-px">{children}</div>
         {separator}
@@ -52,7 +53,7 @@ const Separator = React.forwardRef<
     ) : (
       separator
     );
-    return <GenericSlot className={cn("my-6", className)}>{Comp}</GenericSlot>;
+    return Comp;
   },
 );
 Separator.displayName = SeparatorPrimitive.Root.displayName;
