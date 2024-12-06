@@ -3,9 +3,16 @@ import { Fragment } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "..";
+import { Icon } from "../icons";
 import { Skeleton } from "../skeleton";
 
-type BreadcrumbItem = { key?: Key; title: React.ReactNode; href?: string };
+type BreadcrumbItem = {
+  key?: Key;
+  title: React.ReactNode;
+  href?: string;
+  icon?: React.ReactNode;
+  className?: string;
+};
 type BreadcrumbProps<
   T extends Record<string, string> = Record<string, string>,
 > = {
@@ -31,14 +38,25 @@ const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbProps) => {
                 className={cn(
                   index !== items.length - 1 && "text-secondary",
                   "-mx-1 rounded px-1",
-                  "hover:bg-background-hover",
+                  // "hover:bg-background-hover",
                 )}
                 aria-current={index === items.length - 1 ? true : undefined}
               >
                 {skeleton ? (
                   <Skeleton as="li" className="w-20" />
                 ) : (
-                  <li>{x.title}</li>
+                  <li>
+                    {x.icon && (
+                      <span className="mr-2">
+                        {typeof x.icon === "string" ? (
+                          <Icon icon={x.icon} />
+                        ) : (
+                          x.icon
+                        )}
+                      </span>
+                    )}
+                    {x.title}
+                  </li>
                 )}
               </Slot>
               {index < items.length - 1 && (
