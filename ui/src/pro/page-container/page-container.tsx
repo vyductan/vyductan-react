@@ -24,7 +24,8 @@ export const PageContainer = ({
     <main
       className={cn(
         "mx-auto w-full max-w-screen-lg",
-        "flex flex-1 flex-col p-4 lg:p-6",
+        "flex flex-1 flex-col p-4 lg:p-6 xl:p-8",
+        "space-y-8",
         className,
       )}
     >
@@ -33,7 +34,9 @@ export const PageContainer = ({
       ) : (
         <>
           {header && <PageHeader {...header} />}
-          <div className={cn("relative", classNames?.content)}>{children}</div>
+          <div className={cn("relative space-y-8", classNames?.content)}>
+            {children}
+          </div>
         </>
       )}
     </main>

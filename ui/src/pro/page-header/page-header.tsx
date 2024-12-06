@@ -17,7 +17,7 @@ type PageHeaderProps = {
   onBack?: (event?: React.MouseEvent<HTMLElement>) => void;
 };
 
-const Title = (props: PageHeaderProps) => {
+const renderTitle = (props: PageHeaderProps) => {
   const { title, avatar, subTitle, tags, extra } = props;
   const hasHeading = title ?? subTitle ?? tags ?? extra;
   // If there is nothing, return a null
@@ -32,17 +32,20 @@ const Title = (props: PageHeaderProps) => {
         {/* {backIconDom} */}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
         {title && (
-          <h3
+          <h1
             title={typeof title === "string" ? title : undefined}
-            className="my-1.5 text-xl font-semibold dark:text-white dark:hover:text-white"
+            className="text-2xl font-bold"
           >
             {title}
-          </h3>
+          </h1>
         )}
         {subTitle && (
-          <span title={typeof subTitle === "string" ? subTitle : undefined}>
+          <p
+            title={typeof subTitle === "string" ? subTitle : undefined}
+            className="text-muted-foreground"
+          >
             {subTitle}
-          </span>
+          </p>
         )}
         {tags && <span>{tags}</span>}
       </div>
@@ -74,11 +77,12 @@ const PageHeader = (props: PageHeaderProps) => {
     // layout,
   } = props;
 
+  const title = renderTitle(props);
   const children = renderChildren(props);
 
   return (
-    <div className={cn("pb-4", className)}>
-      <Title {...props} />
+    <div className={cn(className)}>
+      {title}
       {children}
     </div>
   );
