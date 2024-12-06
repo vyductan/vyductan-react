@@ -1,10 +1,13 @@
+/* eslint-disable unicorn/no-null */
+// Oct 30, 2024
+// https://github.com/shadcn-ui/ui/blob/main/apps/www/registry/new-york/ui/sidebar.tsx
+
 "use client";
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { PanelLeft } from "lucide-react";
 
 import { useIsMobile } from "@acme/hooks/use-mobile";
 
@@ -12,6 +15,7 @@ import { cn } from "..";
 import { Button } from "../button";
 import { Divider } from "../divider";
 import { SheetContent, SheetRoot } from "../drawer";
+import { Icon } from "../icons";
 import { Input } from "../input";
 import { Skeleton } from "../skeleton";
 import {
@@ -20,14 +24,34 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from "../tooltip";
-import { SidebarContext, useSidebar } from "./use-sidebar";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "12rem";
+const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
+
+type SidebarContext = {
+  state: "expanded" | "collapsed";
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  openMobile: boolean;
+  setOpenMobile: (open: boolean) => void;
+  isMobile: boolean;
+  toggleSidebar: () => void;
+};
+
+const SidebarContext = React.createContext<SidebarContext | null>(null);
+
+function useSidebar() {
+  const context = React.useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider.");
+  }
+
+  return context;
+}
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
@@ -268,8 +292,8 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
-      <span className="sr-only"></span>
+      <Icon icon="icon-[lucide--panel-left]" />
+      <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );
 });
@@ -429,7 +453,9 @@ const SidebarGroupLabel = React.forwardRef<
       ref={ref}
       data-sidebar="group-label"
       className={cn(
-        "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
+        "[&>span[class^='icon-']]:size-4 [&>span[class^='icon-']]:shrink-0",
         "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
         className,
       )}
@@ -450,7 +476,9 @@ const SidebarGroupAction = React.forwardRef<
       ref={ref}
       data-sidebar="group-action"
       className={cn(
-        "absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+        "absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2",
+        "[&>svg]:size-4 [&>svg]:shrink-0",
+        "[&>span[class^='icon-']]:size-4 [&>span[class^='icon-']]:shrink-0",
         // Increases the hit area of the button on mobile.
         "after:absolute after:-inset-2 after:md:hidden",
         "group-data-[collapsible=icon]:hidden",
@@ -500,66 +528,6 @@ const SidebarMenuItem = React.forwardRef<
   />
 ));
 SidebarMenuItem.displayName = "SidebarMenuItem";
-// const SidebarMenuItem = React.forwardRef<
-//   HTMLLIElement,
-//   Omit<React.ComponentProps<"li">, "onSelect"> &
-//     Omit<MenuItemType, "key" | "children"> & {
-//       menuKey: React.Key;
-//       isActive?: boolean;
-//       onSelect?: (args: {
-//         item: MenuItemType;
-//         key: React.Key;
-//         event:
-//           | React.MouseEvent<HTMLLIElement>
-//           | React.KeyboardEvent<HTMLLIElement>;
-//       }) => void;
-//     }
-// >(({ className, menuKey, isActive, label, icon, onSelect, ...props }, ref) => {
-//   const labelToRender = (
-//     <div>
-//       {typeof icon === "string" ? <Icon icon={icon} /> : icon}
-//       {typeof label === "string" ? <span>{label}</span> : label}
-//     </div>
-//   );
-//
-//   return (
-//     <li
-//       ref={ref}
-//       data-sidebar="menu-item"
-//       className={cn(
-//         "group/menu-item relative",
-//         isActive
-//           ? "border-primary bg-primary-100 text-primary-600 hover:text-primary-700"
-//           : "hover:border-foreground-muted",
-//         className,
-//       )}
-//       onClick={(event) => {
-//         onSelect?.({ item: { key: menuKey, label }, key: menuKey, event });
-//       }}
-//       onKeyUp={(event) => {
-//         onSelect?.({ item: { key: menuKey, label }, key: menuKey, event });
-//       }}
-//       {...props}
-//     >
-//       <Slot
-//         className={cn(
-//           "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2",
-//         )}
-//       >
-//         {/* {href ? ( */}
-//         {/*   <Link href={href}> */}
-//         {/*     {typeof icon === "string" ? <Icon icon={icon} /> : icon} */}
-//         {/*     {labelToRender} */}
-//         {/*   </Link> */}
-//         {/* ) : ( */}
-//         {/*   labelToRender */}
-//         {/* )} */}
-//         {labelToRender}
-//       </Slot>
-//     </li>
-//   );
-// });
-// SidebarMenuItem.displayName = "SidebarMenuItem";
 
 const sidebarMenuButtonVariants = cva(
   [
@@ -778,7 +746,10 @@ const SidebarMenuSubButton = React.forwardRef<
       data-size={size}
       data-active={isActive}
       className={cn(
-        "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
+        "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+        "[&>span:last-child]:truncate",
+        "[&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
+        "[&>span[class^='icon-']]:size-4 [&>span[class^='icon-']]:shrink-0 [&>span[class^='icon-']]:text-sidebar-accent-foreground",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
         size === "sm" && "text-xs",
         size === "md" && "text-sm",
@@ -815,4 +786,5 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 };
