@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { PageHeaderProps } from "../page-header";
 import { cn } from "../..";
+import { useUi } from "../../store";
 import { PageHeader } from "../page-header";
 
 export type PageContainerProps = {
@@ -12,6 +13,7 @@ export type PageContainerProps = {
     content?: string;
   };
   loading?: boolean;
+  loadingIcon?: ReactNode;
 };
 export const PageContainer = ({
   children,
@@ -19,7 +21,12 @@ export const PageContainer = ({
   className,
   classNames,
   loading = false,
+  loadingIcon = <>Loding...</>,
 }: PageContainerProps) => {
+  const { componentConfig } = useUi();
+  const mergedLoadingIconConfig =
+    componentConfig?.layout?.pageContainer?.loadingIcon ?? loadingIcon;
+
   return (
     <main
       className={cn(
@@ -30,7 +37,9 @@ export const PageContainer = ({
       )}
     >
       {loading ? (
-        <>Loading</>
+        <div className="flex items-center justify-center">
+          {mergedLoadingIconConfig}
+        </div>
       ) : (
         <>
           {header && <PageHeader {...header} />}
