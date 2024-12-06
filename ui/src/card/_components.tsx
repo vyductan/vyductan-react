@@ -8,7 +8,10 @@ const CardRoot = React.forwardRef<HTMLDivElement, CardRootProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("rounded-lg border bg-surface shadow-sm", className)}
+      className={cn(
+        "rounded-xl border bg-card text-card-foreground shadow-sm",
+        className,
+      )}
       {...props}
     />
   ),
@@ -34,7 +37,8 @@ const CardTitle = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight",
+      "font-semibold leading-none tracking-tight",
+      "text-2xl",
       className,
     )}
     {...props}
@@ -61,7 +65,7 @@ const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, size, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(size === "sm" ? "p-3" : "p-3 lg:p-6", className)}
+      className={cn(size === "sm" ? "p-3" : "p-3 lg:p-6", "pt-0", className)}
       {...props}
     />
   ),
