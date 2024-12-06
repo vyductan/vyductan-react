@@ -19,6 +19,11 @@ type UiState = {
     button?: Partial<Pick<ButtonProps, "classNames">>;
     datePicker?: Partial<Pick<DatePickerProps, "format">>;
     tag?: Partial<Pick<TagProps, "className" | "borderless">>;
+    layout?: {
+      pageContainer?: {
+        loadingIcon?: ReactNode;
+      };
+    };
   };
 };
 // type UiActions = {
