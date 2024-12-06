@@ -5,8 +5,15 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "..";
 import { Icon } from "../icons";
 import { Skeleton } from "../skeleton";
+import {
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbRoot,
+  BreadcrumbSeparator,
+} from "./_components";
 
-type BreadcrumbItem = {
+type BreadcrumbItemDef = {
   key?: Key;
   title: React.ReactNode;
   href?: string;
@@ -16,20 +23,29 @@ type BreadcrumbItem = {
 type BreadcrumbProps<
   T extends Record<string, string> = Record<string, string>,
 > = {
-  items: BreadcrumbItem[];
-  className?: string;
+  items?: BreadcrumbItemDef[];
+  params?: Record<string, string>;
   itemRender?: (
-    route: BreadcrumbItem,
-    params: T,
-    routes: BreadcrumbItem[],
+    route: BreadcrumbItemDef,
+    params: T | undefined,
+    routes: BreadcrumbItemDef[],
     paths: string[],
   ) => React.ReactNode;
+  meta?: Record<string, string>;
+  className?: string;
   skeleton?: boolean;
 };
-const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbProps) => {
+const Breadcrumb = ({
+  items = [],
+  className,
+  skeleton,
+  params,
+  itemRender,
+  meta: ___,
+}: BreadcrumbProps) => {
   return (
-    <nav aria-label="Breadcrumb" className={className}>
-      <ol className="flex gap-2">
+    <BreadcrumbRoot className={items.length === 1 ? "hidden" : className}>
+      <BreadcrumbList>
         {items.map((x, index) => {
           const key = x.key ?? index;
           return (
@@ -45,30 +61,51 @@ const Breadcrumb = ({ items = [], className, skeleton }: BreadcrumbProps) => {
                 {skeleton ? (
                   <Skeleton as="li" className="w-20" />
                 ) : (
-                  <li>
-                    {x.icon && (
-                      <span className="mr-2">
-                        {typeof x.icon === "string" ? (
-                          <Icon icon={x.icon} />
+                  <>
+                    {index < items.length - 1 ? (
+                      <BreadcrumbItem>
+                        {itemRender ? (
+                          itemRender(x, params, items, [])
                         ) : (
-                          x.icon
+                          <>
+                            {x.icon && (
+                              <span className="mr-2">
+                                {typeof x.icon === "string" ? (
+                                  <Icon icon={x.icon} />
+                                ) : (
+                                  x.icon
+                                )}
+                              </span>
+                            )}
+                            {x.title}
+                          </>
                         )}
-                      </span>
+                      </BreadcrumbItem>
+                    ) : (
+                      <BreadcrumbPage>
+                        {x.icon && (
+                          <span className="mr-2">
+                            {typeof x.icon === "string" ? (
+                              <Icon icon={x.icon} />
+                            ) : (
+                              x.icon
+                            )}
+                          </span>
+                        )}
+                        {x.title}
+                      </BreadcrumbPage>
                     )}
-                    {x.title}
-                  </li>
+                  </>
                 )}
               </Slot>
-              {index < items.length - 1 && (
-                <li className="text-secondary"> / </li>
-              )}
+              {index < items.length - 1 && <BreadcrumbSeparator />}
             </Fragment>
           );
         })}
-      </ol>
-    </nav>
+      </BreadcrumbList>
+    </BreadcrumbRoot>
   );
 };
 
-export type { BreadcrumbItem, BreadcrumbProps };
+export type { BreadcrumbItemDef, BreadcrumbProps };
 export { Breadcrumb };
