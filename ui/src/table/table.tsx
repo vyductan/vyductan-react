@@ -270,7 +270,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
           className={cn(
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             toolbar && "mt-4",
-            "rounded-md border",
+            bordered && "rounded-md border",
           )}
         >
           <TableRoot
@@ -324,7 +324,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           // column className
                           header.column.columnDef.meta?.className,
                           // bordered
-                          bordered && "border-b border-e",
+                          bordered && "border-b border-e last:border-e-0",
                           // align
                           header.column.columnDef.meta?.align === "center" &&
                             "text-center",
@@ -524,7 +524,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                                   //       index,
                                   //     ),
                                   // bordered
-                                  bordered && "border-e",
+                                  bordered && "border-e last:border-e-0",
                                   // align
                                   cell.column.columnDef.meta?.align ===
                                     "center" && "text-center",
@@ -558,7 +558,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             <TableCell
                               colSpan={row.getVisibleCells().length}
                               size={size}
-                              className="border-x border-b px-2 text-[13px]"
+                              className="border-x border-b px-4 text-[13px]"
                             >
                               {expandable.expandedRowRender(row.original)}
                             </TableCell>

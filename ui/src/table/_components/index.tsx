@@ -10,7 +10,11 @@ const TableRoot = React.forwardRef<
   <>
     <table
       ref={ref}
-      className={cn("caption-bottom text-sm", className)}
+      className={cn(
+        // "w-full",
+        "caption-bottom text-sm",
+        className,
+      )}
       {...props}
     />
   </>
@@ -31,11 +35,7 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className, sticky, ...props }, ref) => (
     <thead
       ref={ref}
-      className={cn(
-        "[&_tr:hover]:bg-transparent [&_tr]:border-b",
-        "text-foreground-muted",
-        className,
-      )}
+      className={cn("[&_tr]:border-b", className)}
       style={{
         position: sticky ? "sticky" : undefined,
         top: sticky
@@ -70,7 +70,7 @@ const TableFooter = React.forwardRef<
   <tfoot
     ref={ref}
     className={cn(
-      "bg-gray-900 font-medium text-gray-50 dark:bg-gray-50 dark:text-gray-900",
+      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
       className,
     )}
     {...props}
@@ -84,10 +84,9 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
     <tr
       ref={ref}
       className={cn(
-        "group",
         "border-b transition-colors",
-        "data-[state=selected]:bg-gray-100/50 dark:data-[state=selected]:bg-gray-800",
-        "hover:bg-gray-100/50",
+        "hover:bg-muted/50 data-[state=selected]:bg-muted",
+        // "group",
         className,
       )}
       {...props}
@@ -106,9 +105,10 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
       className={cn(
         "px-2",
         size === "sm" ? "py-2" : "py-3",
-        "text-left",
-        "break-words font-medium",
-        "first:rounded-tl-md last:rounded-tr-md",
+        "text-left align-middle font-medium text-muted-foreground",
+        "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // "break-words",
+        // "first:rounded-tl-md last:rounded-tr-md",
 
         className,
       )}
@@ -128,7 +128,9 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
       className={cn(
         "px-2",
         size === "sm" ? "py-2" : "py-3",
-        "break-words",
+        "align-middle",
+        "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // "break-words",
         // "group-hover:bg-background-hover",
         className,
       )}
@@ -144,7 +146,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("mt-4 text-sm text-gray-500 dark:text-gray-400", className)}
+    className={cn("mt-4 text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
