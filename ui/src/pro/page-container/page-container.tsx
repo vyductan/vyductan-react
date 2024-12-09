@@ -14,6 +14,8 @@ export type PageContainerProps = {
   };
   loading?: boolean;
   loadingIcon?: ReactNode;
+  exception?: boolean;
+  exceptionRender?: ReactNode;
 };
 export const PageContainer = ({
   children,
@@ -22,6 +24,8 @@ export const PageContainer = ({
   classNames,
   loading = false,
   loadingIcon = <>Loding...</>,
+  exception = false,
+  exceptionRender = <>Error</>,
 }: PageContainerProps) => {
   const { componentConfig } = useUi();
   const mergedLoadingIconConfig =
@@ -36,18 +40,20 @@ export const PageContainer = ({
         className,
       )}
     >
-      {loading ? (
-        <div className="flex items-center justify-center">
-          {mergedLoadingIconConfig}
+      <>
+        {header && <PageHeader {...header} />}
+        <div className={cn("relative space-y-8", classNames?.content)}>
+          {loading ? (
+            <div className="flex items-center justify-center">
+              {mergedLoadingIconConfig}
+            </div>
+          ) : exception ? (
+            <>{exceptionRender}</>
+          ) : (
+            <>{children}</>
+          )}
         </div>
-      ) : (
-        <>
-          {header && <PageHeader {...header} />}
-          <div className={cn("relative space-y-8", classNames?.content)}>
-            {children}
-          </div>
-        </>
-      )}
+      </>
     </main>
   );
 };
