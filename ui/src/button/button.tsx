@@ -228,6 +228,11 @@ const buttonVariants = tv({
         "hover:bg-green-100",
       ],
     },
+    {
+      variant: "ghost",
+      color: "link",
+      className: ["text-link", "hover:text-link-hover", "hover:bg-link-muted"],
+    },
     // Size
     {
       size: "sm",
