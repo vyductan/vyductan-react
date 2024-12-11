@@ -26,7 +26,7 @@ export function TableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 self-start lg:flex"
+          className="ml-auto flex h-8 self-start"
         >
           <MixerHorizontalIcon className="mr-2 size-4" />
           View
