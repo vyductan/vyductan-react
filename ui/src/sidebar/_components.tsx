@@ -14,7 +14,12 @@ import { useIsMobile } from "@acme/hooks/use-mobile";
 import { cn } from "..";
 import { Button } from "../button";
 import { Divider } from "../divider";
-import { SheetContent, SheetRoot } from "../drawer";
+import {
+  SheetContent,
+  SheetDescription,
+  SheetRoot,
+  SheetTitle,
+} from "../drawer";
 import { Icon } from "../icons";
 import { Input } from "../input";
 import { Skeleton } from "../skeleton";
@@ -24,6 +29,7 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from "../tooltip";
+import { VisuallyHidden } from "../visualy-hidden";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -209,6 +215,10 @@ const SidebarRoot = React.forwardRef<
     if (isMobile) {
       return (
         <SheetRoot open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <VisuallyHidden>
+            <SheetTitle>Navigation</SheetTitle>
+            <SheetDescription>Navigation</SheetDescription>
+          </VisuallyHidden>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
