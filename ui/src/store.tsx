@@ -8,6 +8,7 @@ import { createStore } from "zustand/vanilla";
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
 import type { TagProps } from "./tag";
+import { Link } from "./link";
 
 // type TDateFormat = {
 //   date: string;
@@ -15,7 +16,7 @@ import type { TagProps } from "./tag";
 //   dateTimeWithSeconds: string;
 // };
 type UiState = {
-  componentConfig?: {
+  componentConfig: {
     button?: Partial<Pick<ButtonProps, "classNames">>;
     datePicker?: Partial<Pick<DatePickerProps, "format">>;
     tag?: Partial<Pick<TagProps, "className" | "borderless">>;
@@ -24,6 +25,9 @@ type UiState = {
         loadingIcon?: ReactNode;
       };
     };
+    link: {
+      default: typeof Link;
+    };
   };
 };
 // type UiActions = {
@@ -31,7 +35,13 @@ type UiState = {
 // };
 type UiStore = UiState;
 
-const defaultInitState: UiState = {};
+const defaultInitState: UiState = {
+  componentConfig: {
+    link: {
+      default: Link,
+    },
+  },
+};
 
 const createUserStore = (initState: UiState = defaultInitState) => {
   return createStore<UiStore>()(() => ({
