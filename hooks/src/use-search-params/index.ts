@@ -1,7 +1,7 @@
 import { useSearchParams as rrdUseSearchParams } from "react-router";
 
 export const useSearchParams = () => {
-  const [searchparam] = rrdUseSearchParams();
+  const [searchParam] = rrdUseSearchParams();
 
-  return searchparam;
+  return searchParam;
 };
