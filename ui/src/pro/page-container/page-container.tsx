@@ -27,15 +27,15 @@ export const PageContainer = ({
   exception = false,
   exceptionRender = <>Error</>,
 }: PageContainerProps) => {
-  const { componentConfig } = useUi();
+  const { layout } = useUi((s) => s.componentConfig);
   const mergedLoadingIconConfig =
-    componentConfig?.layout?.pageContainer?.loadingIcon ?? loadingIcon;
+    layout?.pageContainer?.loadingIcon ?? loadingIcon;
 
   return (
     <main
       className={cn(
-        "mx-auto w-full max-w-screen-lg",
         "flex flex-1 flex-col p-4 lg:p-6 xl:p-8",
+        "mx-auto w-full max-w-[100vw] md:max-w-[calc(100vw-var(--sidebar-width))]",
         "space-y-8",
         className,
       )}
