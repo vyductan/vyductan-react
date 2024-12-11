@@ -7,6 +7,7 @@ import { cloneElement, Fragment } from "react";
 
 import type { Placement } from "../types";
 import { cn } from "..";
+import { useUi } from "../store";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -47,6 +48,10 @@ export const Dropdown = ({
   placement,
   ...rest
 }: DropdownProps) => {
+  const {
+    link: { default: Link },
+  } = useUi((s) => s.componentConfig);
+
   const side = placement?.includes("top")
     ? "top"
     : placement?.includes("right")
@@ -80,7 +85,7 @@ export const Dropdown = ({
               className={cn(menu.itemsClassName, className)}
             >
               {href ? (
-                <a href={href}>
+                <Link href={href}>
                   {icon &&
                     cloneElement(icon, {
                       className: "mr-2 h-4 w-4",
@@ -89,7 +94,7 @@ export const Dropdown = ({
                   {shortcut && (
                     <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
                   )}
-                </a>
+                </Link>
               ) : (
                 <>
                   {icon &&
