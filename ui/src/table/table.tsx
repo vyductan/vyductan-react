@@ -268,6 +268,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
         <div
           // ref={wrapperRef}
           className={cn(
+            "w-full overflow-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             toolbar && "mt-4",
             bordered && "rounded-md border",
