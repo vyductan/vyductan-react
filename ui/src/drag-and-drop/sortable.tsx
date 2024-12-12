@@ -328,7 +328,7 @@ interface SortableItemProps
   useDragOverlay?: boolean;
   onRemove?(id: UniqueIdentifier): void;
   style(values: any): React.CSSProperties;
-  renderItem?(args: any): React.ReactElement;
+  renderItem?(args: any): React.ReactElement<any>;
   wrapperStyle: SortableProps["wrapperStyle"];
 }
 

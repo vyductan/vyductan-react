@@ -22,7 +22,7 @@ type MenuItem = {
   key?: string;
   label?: ReactNode;
   className?: string;
-  icon?: ReactElement;
+  icon?: ReactElement<any>;
   shortcut?: ReactNode;
   group?: MenuItem[];
   as?: "title" | "separator";

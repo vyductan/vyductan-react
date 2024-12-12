@@ -1,5 +1,7 @@
 import { MenuOption } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 
+import type { JSX } from "react";
+
 export class ComponentPickerOption extends MenuOption {
   // What shows up in the editor
   title: string;

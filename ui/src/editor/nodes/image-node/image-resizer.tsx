@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
-import { useRef } from "react";
+import { useRef, type JSX } from "react";
 
 import { cn } from "../../..";
 import { Icon } from "../../../icons";

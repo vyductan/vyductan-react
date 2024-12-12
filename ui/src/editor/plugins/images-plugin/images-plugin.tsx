@@ -1,5 +1,5 @@
 import type { LexicalEditor } from "lexical";
-import { useEffect } from "react";
+import { useEffect, type JSX } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $wrapNodeInElement, mergeRegister } from "@lexical/utils";
 import {

@@ -1,12 +1,10 @@
 import React from "react";
 
+import type { GenericSlotProps } from "../../slot";
 import { GenericSlot } from "../../slot";
 import { useFormField } from "../use-field";
 
-const FormControl = React.forwardRef<
-  React.ElementRef<typeof GenericSlot>,
-  React.ComponentPropsWithoutRef<typeof GenericSlot>
->(({ ...props }, ref: React.Ref<HTMLElement>) => {
+const FormControl = ({ ...props }: GenericSlotProps) => {
   const {
     error,
     fieldId,
@@ -16,7 +14,6 @@ const FormControl = React.forwardRef<
 
   return (
     <GenericSlot
-      ref={ref}
       id={fieldId}
       aria-describedby={
         error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
@@ -26,7 +23,7 @@ const FormControl = React.forwardRef<
       {...props}
     />
   );
-});
+};
 FormControl.displayName = "FormControl";
 
 export { FormControl };

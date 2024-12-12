@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode } from "react";
+import type { ReactElement, ReactNode, JSX } from "react";
 import type { ControllerFieldState } from "react-hook-form";
 import { forwardRef, useContext } from "react";
 
@@ -14,7 +14,7 @@ type FieldRenderProps = {
 
   label?: string | JSX.Element;
   description?: ReactNode;
-  children?: ReactElement | null;
+  children?: ReactElement<any> | null;
 
   fieldState?: ControllerFieldState;
 

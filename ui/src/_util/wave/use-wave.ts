@@ -7,7 +7,7 @@ import type { ShowWave, WaveAllowedComponent } from "./interface";
 import showWaveEffect from "./wave-effect";
 
 export default function useWave(
-  nodeRef: React.RefObject<HTMLElement>,
+  nodeRef: React.RefObject<HTMLElement | null>,
   className: string,
   component?: WaveAllowedComponent,
 ) {
@@ -28,7 +28,7 @@ export default function useWave(
     });
   });
 
-  const rafId = React.useRef<number>();
+  const rafId = React.useRef<number | undefined>(undefined);
 
   // Merge trigger event into one for each frame
   const showDebounceWave: ShowWave = (event) => {
