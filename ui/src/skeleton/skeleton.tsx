@@ -13,6 +13,7 @@ function Skeleton({
       // className={cn("animate-pulse rounded-md bg-muted", className)}
       className={cn(
         "animate-skeleton-loading rounded-md bg-[linear-gradient(270deg,#fafafa,#eaeaea,#eaeaea,#fafafa)] bg-[length:400%_100%]",
+        "h-4 w-full",
         className,
       )}
       {...props}

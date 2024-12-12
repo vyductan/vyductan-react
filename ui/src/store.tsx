@@ -7,6 +7,7 @@ import { createStore } from "zustand/vanilla";
 
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
+import type { PageContainerProps } from "./pro/page-container";
 import type { TagProps } from "./tag";
 import { Link } from "./link";
 
@@ -21,12 +22,18 @@ type UiState = {
     datePicker?: Partial<Pick<DatePickerProps, "format">>;
     tag?: Partial<Pick<TagProps, "className" | "borderless">>;
     layout?: {
-      pageContainer?: {
-        loadingIcon?: ReactNode;
-      };
+      pageContainer?: Partial<Pick<PageContainerProps, "loadingRender">>;
     };
     link: {
       default: typeof Link;
+    };
+    result: {
+      500?: {
+        icon?: ReactNode;
+        title?: ReactNode;
+        subtitle?: ReactNode;
+        extra?: ReactNode;
+      };
     };
   };
 };
@@ -39,6 +46,14 @@ const defaultInitState: UiState = {
   componentConfig: {
     link: {
       default: Link,
+    },
+    result: {
+      500: {
+        icon: <></>,
+        title: <></>,
+        subtitle: <></>,
+        extra: <></>,
+      },
     },
   },
 };
@@ -55,8 +70,9 @@ type UiStoreApi = ReturnType<typeof createUserStore>;
 
 const UiStoreContext = createContext<UiStoreApi | undefined>(undefined);
 
-type UiStoreProviderProps = Partial<UiState> & {
+type UiStoreProviderProps = {
   children: ReactNode;
+  componentConfig?: Partial<UiState["componentConfig"]>;
 };
 export const UiProvider = ({
   children,
@@ -65,7 +81,10 @@ export const UiProvider = ({
   const storeRef = useRef<UiStoreApi>();
   if (!storeRef.current) {
     storeRef.current = createUserStore({
-      componentConfig: componentConfig ?? defaultInitState.componentConfig,
+      componentConfig: {
+        ...defaultInitState.componentConfig,
+        ...componentConfig,
+      },
     });
   }
   return (

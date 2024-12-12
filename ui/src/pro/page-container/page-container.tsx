@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 
+import type { ResultProps } from "../../result";
 import type { PageHeaderProps } from "../page-header";
 import { cn } from "../..";
+import { Result } from "../../result/result";
 import { useUi } from "../../store";
 import { PageHeader } from "../page-header";
 
@@ -13,9 +15,8 @@ export type PageContainerProps = {
     content?: string;
   };
   loading?: boolean;
-  loadingIcon?: ReactNode;
-  exception?: boolean;
-  exceptionRender?: ReactNode;
+  loadingRender?: ReactNode;
+  exception?: boolean | ResultProps;
 };
 export const PageContainer = ({
   children,
@@ -23,13 +24,13 @@ export const PageContainer = ({
   className,
   classNames,
   loading = false,
-  loadingIcon = <>Loding...</>,
+  loadingRender = <>Loading...</>,
   exception = false,
-  exceptionRender = <>Error</>,
 }: PageContainerProps) => {
   const { layout } = useUi((s) => s.componentConfig);
-  const mergedLoadingIconConfig =
-    layout?.pageContainer?.loadingIcon ?? loadingIcon;
+  console.log("llll", layout);
+  const mergedLoadingRender =
+    layout?.pageContainer?.loadingRender ?? loadingRender;
 
   return (
     <main
@@ -42,13 +43,17 @@ export const PageContainer = ({
     >
       <>
         {header && <PageHeader {...header} />}
-        <div className={cn("relative space-y-8", classNames?.content)}>
+        <div className={cn("relative h-full space-y-8", classNames?.content)}>
           {loading ? (
-            <div className="flex items-center justify-center">
-              {mergedLoadingIconConfig}
-            </div>
+            <>{mergedLoadingRender}</>
           ) : exception ? (
-            <>{exceptionRender}</>
+            <div className="absolute inset-x-0 top-0 flex items-center justify-center p-10">
+              {typeof exception === "boolean" ? (
+                <Result status="500" />
+              ) : (
+                <Result {...exception} />
+              )}
+            </div>
           ) : (
             <>{children}</>
           )}

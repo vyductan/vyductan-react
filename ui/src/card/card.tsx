@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { CardRootProps } from "./_components";
 import { cn } from "..";
+import { Skeleton } from "../skeleton";
 import {
   CardContent,
   CardDescription,
@@ -11,12 +12,14 @@ import {
 } from "./_components";
 
 type CardProps = CardRootProps & {
+  skeleton?: boolean;
+  bordered?: boolean;
   classNames?: {
     title?: string;
     description?: string;
     content?: string;
   };
-  bordered?: boolean;
+
   title?: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
@@ -24,9 +27,10 @@ type CardProps = CardRootProps & {
   size?: "default" | "sm";
 };
 const Card = ({
-  classNames,
+  skeleton = false,
   bordered = true,
   className,
+  classNames,
   title,
   description,
   children,
@@ -34,6 +38,17 @@ const Card = ({
   size = "default",
   ...props
 }: CardProps) => {
+  if (skeleton) {
+    return (
+      <div className="flex flex-col space-y-3">
+        <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[250px]" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>
+      </div>
+    );
+  }
   return (
     <CardRoot
       className={cn(bordered ? "" : "border-none", className)}

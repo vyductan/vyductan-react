@@ -1,6 +1,9 @@
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import KeyCode from "rc-util/lib/KeyCode";
+
+import { usePathname } from "@acme/hooks/use-pathname";
+import { useRouter } from "@acme/hooks/use-router";
+import { useSearchParams } from "@acme/hooks/use-search-params";
 
 import type { PaginationItemProps } from "./_components";
 import type { PaginationLocale } from "./types";

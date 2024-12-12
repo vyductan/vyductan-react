@@ -7,6 +7,7 @@ import { useResponsive } from "@acme/hooks/use-responsive";
 
 import type { Screens } from "../theme";
 import { cn } from "..";
+import { Skeleton } from "../skeleton";
 
 export type DescriptionsItem = {
   key?: React.Key;
@@ -22,6 +23,7 @@ type DescriptionProps = {
   title?: React.ReactNode;
   items: DescriptionsItem[];
 
+  skeleton?: boolean;
   className?: string;
 
   bordered?: boolean;
@@ -46,6 +48,7 @@ export const Descriptions = ({
   items,
   extra,
 
+  skeleton = false,
   size,
   className,
 
@@ -163,7 +166,11 @@ export const Descriptions = ({
                           <span>{col.label}</span>
                         </th>
                         <td className={cn(tdClassName, "last:border-r-0")}>
-                          <span>{col.children ?? "-"}</span>
+                          {skeleton ? (
+                            <Skeleton />
+                          ) : (
+                            <span>{col.children ?? "-"}</span>
+                          )}
                         </td>
                       </Fragment>
                     ) : (
@@ -175,7 +182,11 @@ export const Descriptions = ({
                           {col.label}
                           {colon ? ": " : ""}
                         </span>
-                        <span className={valueClassName}>{col.children}</span>
+                        {skeleton ? (
+                          <Skeleton />
+                        ) : (
+                          <span className={valueClassName}>{col.children}</span>
+                        )}
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
@@ -198,7 +209,11 @@ export const Descriptions = ({
                       )}
                       colSpan={col.span}
                     >
-                      {(col as VerticalCell).content}
+                      {skeleton ? (
+                        <Skeleton className="h-6" />
+                      ) : (
+                        (col as VerticalCell).content
+                      )}
                     </td>
                   ),
                 )}
