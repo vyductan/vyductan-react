@@ -7,7 +7,7 @@ import { createStore } from "zustand/vanilla";
 
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
-import type { PageContainerProps } from "./pro/page-container";
+import type { PageContainerProps } from "./layout/page-container";
 import type { TagProps } from "./tag";
 import { Link } from "./link";
 
@@ -37,9 +37,6 @@ type UiState = {
     };
   };
 };
-// type UiActions = {
-//   setUser: (user: User) => void;
-// };
 type UiStore = UiState;
 
 const defaultInitState: UiState = {
@@ -58,15 +55,13 @@ const defaultInitState: UiState = {
   },
 };
 
-const createUserStore = (initState: UiState = defaultInitState) => {
+const createUiStore = (initState: UiState = defaultInitState) => {
   return createStore<UiStore>()(() => ({
     ...initState,
-    // user: undefined,
-    // setUser: (user) => set({ user }),
   }));
 };
 
-type UiStoreApi = ReturnType<typeof createUserStore>;
+type UiStoreApi = ReturnType<typeof createUiStore>;
 
 const UiStoreContext = createContext<UiStoreApi | undefined>(undefined);
 
@@ -80,7 +75,7 @@ export const UiProvider = ({
 }: UiStoreProviderProps) => {
   const storeRef = useRef<UiStoreApi>();
   if (!storeRef.current) {
-    storeRef.current = createUserStore({
+    storeRef.current = createUiStore({
       componentConfig: {
         ...defaultInitState.componentConfig,
         ...componentConfig,
@@ -100,7 +95,7 @@ export function useUi<T>(selector?: (store: UiStore) => T): T {
   const appStoreContext = useContext(UiStoreContext);
 
   if (!appStoreContext) {
-    throw new Error(`useUser must be used within UserStoreProvider`);
+    throw new Error(`useUi must be used within UiStoreProvider`);
   }
 
   return useStore(
