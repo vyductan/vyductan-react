@@ -5,4 +5,7 @@ export type Option<T extends ValueType = string> = {
   value: T;
   icon?: string;
   color?: string;
+  checked?: boolean;
+  className?: string;
+  onSelect?: () => void;
 };

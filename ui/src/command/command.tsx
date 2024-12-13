@@ -17,33 +17,44 @@ import {
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
-export type CommandProps<T extends ValueType> = Omit<
+type CommandSingleValue<T extends ValueType = string> = {
+  mode?: never;
+  value?: T;
+  defaultValue?: T;
+  onChange?: (value?: T, option?: Option<T>) => void;
+};
+type CommandMultipleValue<T extends ValueType = string> = {
+  mode: "multiple";
+  value?: T[];
+  defaultValue?: T[];
+  onChange?: (value: T[], options?: Option<T>[]) => void;
+};
+export type CommandProps<T extends ValueType = string> = Omit<
   CommandRootProps,
   "defaultValue" | "value" | "onChange"
-> & {
-  defaultValue?: T;
-  value?: T;
-  options: Option<T>[];
-  onChange?: (value?: T, option?: Option<T>) => void;
+> &
+  (CommandSingleValue<T> | CommandMultipleValue<T>) & {
+    options: Option<T>[];
 
-  empty?: React.ReactNode;
-  placeholder?: string;
+    empty?: React.ReactNode;
+    placeholder?: string;
 
-  onSearchChange?: (search: string) => void;
+    onSearchChange?: (search: string) => void;
 
-  groupClassName?: string;
-  optionRender?: {
-    checked?: boolean;
-    icon?: (option: Option<T>) => React.ReactNode;
-    label?: (option: Option<T>) => React.ReactNode;
+    groupClassName?: string;
+    optionRender?: {
+      checked?: boolean;
+      icon?: (option: Option<T>) => React.ReactNode;
+      label?: (option: Option<T>) => React.ReactNode;
+    };
+    optionsRender?: (options: Option<T>[]) => React.ReactNode;
+
+    dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
+    dropdownFooter?: React.ReactNode;
   };
-  optionsRender?: (options: Option<T>[]) => React.ReactNode;
-
-  dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
-  dropdownFooter?: React.ReactNode;
-};
 
 export const Command = <T extends ValueType = string>({
+  mode,
   options,
   defaultValue: defaultValueProp,
   value: valueProp,
@@ -64,10 +75,19 @@ export const Command = <T extends ValueType = string>({
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
     onChange: (value) => {
-      onChange?.(
-        value,
-        options.find((o) => o.value === value),
-      );
+      if (mode === undefined && !Array.isArray(value)) {
+        onChange?.(
+          value,
+          options.find((o) => o.value === value),
+        );
+        return;
+      } else if (mode === "multiple" && Array.isArray(value)) {
+        onChange?.(
+          value,
+          options.filter((o) => value.includes(o.value)),
+        );
+        return;
+      }
     },
   });
   const panel = (
@@ -75,11 +95,14 @@ export const Command = <T extends ValueType = string>({
       <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
       <CommandGroup className={groupClassName}>
         {/* to allow user set value that not in options */}
-        {!!value && !options.some((o) => o.value === value) && value !== "" && (
-          <CommandItem checked={true} value={value as string}>
-            {value}
-          </CommandItem>
-        )}
+        {!Array.isArray(value) &&
+          !!value &&
+          !options.some((o) => o.value === value) &&
+          value !== "" && (
+            <CommandItem checked={true} value={value as string}>
+              {value}
+            </CommandItem>
+          )}
         {options.length > 0 ? (
           optionsRender ? (
             optionsRender(options)
@@ -88,13 +111,28 @@ export const Command = <T extends ValueType = string>({
               <CommandItem
                 key={o.value.toString()}
                 value={o.value as string}
-                onSelect={(value) => {
-                  setValue(value as T);
+                onSelect={(selected) => {
+                  if (mode === "multiple" && Array.isArray(value)) {
+                    if (value.includes(o.value)) {
+                      setValue(value.filter((x) => x !== o.value));
+                    } else {
+                      setValue([...value, selected as T]);
+                    }
+                  } else {
+                    setValue(selected as T);
+                  }
+                  o.onSelect?.();
                 }}
-                checked={value === o.value}
+                checked={
+                  o.checked ??
+                  (Array.isArray(value)
+                    ? value.includes(o.value)
+                    : value === o.value)
+                }
                 className={cn(
                   o.color ? selectColors[o.color] : "",
                   "bg-transparent",
+                  o.className,
                 )}
               >
                 {optionRender?.icon ? (
@@ -122,11 +160,6 @@ export const Command = <T extends ValueType = string>({
         onValueChange={onSearchChange}
       />
       {PanelComp}
-      {/* <CommandList> */}
-      {/*   <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty> */}
-      {/*   <CommandGroup className={groupClassName}>{PanelComp}</CommandGroup> */}
-      {/* </CommandList> */}
-      {/* <div>XXX</div> */}
       {dropdownFooter && (
         <>
           <Divider className="mb-1 mt-0" />

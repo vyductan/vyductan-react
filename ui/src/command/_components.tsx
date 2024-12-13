@@ -9,7 +9,6 @@ import { cn } from "@acme/ui";
 import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { Icon } from "../icons";
-import { CheckFilled } from "../icons/check-filled";
 import { Dialog, DialogContent } from "../modal/_components";
 
 type CommandRootProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
@@ -180,9 +179,10 @@ const CommandItem = React.forwardRef<
     {children}
 
     {(!optionRender || optionRender.checked) && (
-      <CheckFilled
+      <Icon
+        icon="icon-[lucide--check]"
         className={cn(
-          "ml-auto size-4 shrink-0",
+          "ml-auto shrink-0",
           checked ? "opacity-100" : "opacity-0",
         )}
       />

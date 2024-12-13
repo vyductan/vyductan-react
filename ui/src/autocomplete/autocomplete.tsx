@@ -18,9 +18,6 @@ import { selectColors } from "../select/colors";
 
 export type AutoCompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
-  | "defaultValue"
-  | "value"
-  | "onChange"
   | "filter"
   | "placeholder"
   | "empty"
@@ -30,6 +27,9 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   | "dropdownRender"
   | "dropdownFooter"
 > & {
+  value?: T;
+  defaultValue?: T;
+  onChange?: (value?: T, option?: Option<T>) => void;
   options: Option<T>[];
   optionsToSearch?: { value: string; label: string }[];
 
@@ -54,6 +54,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
     disabled,
 
     filter = (value, search, _) => {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const label = (optionsToSearch ?? options)
         .find((item) => item.value === value)
         ?.label?.toString();
