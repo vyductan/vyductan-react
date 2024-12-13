@@ -100,7 +100,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     /** Override default table elements */
     components?: TableComponents<TRecord>;
     /** Toolbar */
-    toolbar?: (table: TableDef<TRecord>) => JSX.Element;
+    toolbar?: (table: TableDef<TRecord>) => React.JSX.Element;
 
     dnd?: Pick<SortableContextProps, "onDragEnd">;
   };

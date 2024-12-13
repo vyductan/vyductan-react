@@ -28,7 +28,6 @@ export const PageContainer = ({
   exception = false,
 }: PageContainerProps) => {
   const { layout } = useUi((s) => s.componentConfig);
-  console.log("llll", layout);
   const mergedLoadingRender =
     layout?.pageContainer?.loadingRender ?? loadingRender;
 

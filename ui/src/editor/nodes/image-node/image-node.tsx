@@ -12,7 +12,7 @@ import type {
   Spread,
 } from "lexical";
 import * as React from "react";
-import { Suspense } from "react";
+import { Suspense, type JSX } from "react";
 import { $applyNodeReplacement, createEditor, DecoratorNode } from "lexical";
 
 const ImageComponent = React.lazy(() => import("./image-component"));

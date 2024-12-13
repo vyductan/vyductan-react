@@ -73,7 +73,7 @@ export const UiProvider = ({
   children,
   componentConfig,
 }: UiStoreProviderProps) => {
-  const storeRef = useRef<UiStoreApi>();
+  const storeRef = useRef<UiStoreApi>(null);
   if (!storeRef.current) {
     storeRef.current = createUiStore({
       componentConfig: {

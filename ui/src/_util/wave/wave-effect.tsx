@@ -1,13 +1,66 @@
 /* eslint-disable unicorn/no-null */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 // Jun 15, 2024
+import type { Root } from "react-dom/client";
 import * as React from "react";
 import { cubicBezier, motion } from "framer-motion";
 import raf from "rc-util/lib/raf";
-import { render, unmount } from "rc-util/lib/React/render";
+import { unmount } from "rc-util/lib/React/render";
+import ReactDOM from "react-dom";
 
 import type { ShowWaveEffect, WaveAllowedComponent } from "./interface";
 import { getTargetWaveColor, isNotGrey } from "./util";
+
+// https://github.com/react-component/util/blob/master/src/React/render.ts
+// May 10, 2022
+// Let compiler not to search module usage
+const fullClone = {
+  ...ReactDOM,
+} as typeof ReactDOM & {
+  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?: {
+    usingClientEntryPoint?: boolean;
+  };
+  createRoot?: CreateRoot;
+};
+
+type CreateRoot = (container: ContainerType) => Root;
+
+const { version } = fullClone;
+
+let createRoot: CreateRoot | undefined;
+try {
+  const mainVersion = Number((version || "").split(".")[0]);
+  if (mainVersion >= 18) {
+    ({ createRoot } = fullClone);
+  }
+} catch {
+  // Do nothing;
+}
+
+function toggleWarning(skip: boolean) {
+  const { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } = fullClone;
+
+  if (
+    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED &&
+    typeof __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED === "object"
+  ) {
+    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.usingClientEntryPoint =
+      skip;
+  }
+}
+const MARK = "__rc_react_root__";
+type ContainerType = (Element | DocumentFragment) & {
+  [MARK]?: Root;
+};
+function modernRender(node: React.ReactElement, container: ContainerType) {
+  toggleWarning(true);
+  const root = container[MARK] ?? createRoot?.(container);
+  toggleWarning(false);
+
+  root?.render(node);
+
+  container[MARK] = root;
+}
 
 function validateNumber(value: number) {
   return Number.isNaN(value) ? 0 : value;
@@ -184,7 +237,7 @@ const showWaveEffect: ShowWaveEffect = (target, info) => {
   holder.style.top = "0px";
   target?.insertBefore(holder, target?.firstChild);
 
-  render(<WaveEffect {...info} target={target} />, holder);
+  modernRender(<WaveEffect {...info} target={target} />, holder);
 };
 
 export default showWaveEffect;

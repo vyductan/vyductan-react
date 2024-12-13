@@ -33,7 +33,7 @@ type FieldListProps<
         name: string;
       }[];
     },
-  ) => ReactElement;
+  ) => ReactElement<any>;
 };
 const FieldList = <
   TFieldValues extends FieldValues = FieldValues,

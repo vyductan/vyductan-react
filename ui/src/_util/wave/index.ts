@@ -61,7 +61,7 @@ const Wave: React.FC<WaveProps> = (props) => {
   }
 
   const ref = supportRef(children)
-    ? composeRef((children as any).ref, containerRef)
+    ? composeRef((children as any).props.ref, containerRef)
     : containerRef;
 
   return cloneElement<any>(children, { ref });

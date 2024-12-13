@@ -4,10 +4,9 @@ import type {
   Row,
   RowData,
 } from "@tanstack/react-table";
-import type { ReactNode } from "react";
 
 type Meta<TRecord> = {
-  title?: ReactNode;
+  title?: React.ReactNode;
   align?: "left" | "right" | "center";
   fixed?: "left" | "right";
   className?: string;
@@ -44,7 +43,7 @@ export type ExtraTableColumnDef<TRecord> = {
 
 type DefWithOutDataIndex<TRecord> = BaseTableColumnDef<TRecord> & {
   dataIndex?: never;
-  render?: (context: RenderContext<TRecord>) => ReactNode;
+  render?: (context: RenderContext<TRecord>) => React.ReactNode;
 };
 export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
   (
@@ -57,7 +56,7 @@ export type TableColumnDef<TRecord> = ExtraTableColumnDef<TRecord> &
               context: RenderContext<TRecord, K> & {
                 value: TRecord[K];
               },
-            ) => ReactNode;
+            ) => React.ReactNode;
           };
         }[keyof TRecord])
   );
@@ -85,15 +84,15 @@ export type RowSelection<TRecord> = {
   /** Renderer of the `table` header */
   renderHeader?: (args: {
     checked: boolean;
-    originNode: ReactNode;
-  }) => ReactNode;
+    originNode: React.ReactNode;
+  }) => React.ReactNode;
   /** Renderer of the `table` cell. Same as render in column */
   renderCell?: (args: {
     checked: boolean;
     record: TRecord;
     index: number;
-    originNode: ReactNode;
-  }) => ReactNode;
+    originNode: React.ReactNode;
+  }) => React.ReactNode;
 };
 
 export type TableSize = "sm" | "default";
@@ -111,7 +110,8 @@ type Component<P> =
   | React.ComponentType<P>
   | React.ForwardRefExoticComponent<P>
   | React.FC<P>
-  | keyof React.ReactHTML;
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  | React.HTMLElementType;
 
 export type CustomizeComponent = Component<any>;
 

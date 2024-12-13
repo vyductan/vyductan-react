@@ -1,6 +1,5 @@
 "use client";
 
-import type { ForwardedRef, ReactElement, ReactNode } from "react";
 import type {
   Control,
   ControllerFieldState,
@@ -10,7 +9,7 @@ import type {
   FieldValues,
   UseFormStateReturn,
 } from "react-hook-form";
-import { cloneElement, forwardRef } from "react";
+import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 
 import { FieldRender } from "./_components/field-render";
@@ -23,8 +22,8 @@ type FieldProps<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = Omit<ControllerProps<TFieldValues, TName>, "render" | "name"> & {
   name?: TName;
-  label?: string | JSX.Element;
-  description?: ReactNode;
+  label?: string | React.JSX.Element;
+  description?: React.ReactNode;
   className?: string;
   required?: boolean;
   /*
@@ -32,7 +31,7 @@ type FieldProps<
    * */
   onChange?: (...event: any[]) => any;
   children?:
-    | ReactElement
+    | React.ReactElement<any>
     | (({
         field,
         fieldState,
@@ -41,7 +40,7 @@ type FieldProps<
         field: FieldControllerRenderProps<TFieldValues, TName>;
         fieldState: ControllerFieldState;
         formState: UseFormStateReturn<TFieldValues>;
-      }) => React.ReactElement);
+      }) => React.ReactElement<any>);
 
   render?: ({
     field,
@@ -51,7 +50,7 @@ type FieldProps<
     field: FieldControllerRenderProps<TFieldValues, TName>;
     fieldState: ControllerFieldState;
     formState: UseFormStateReturn<TFieldValues>;
-  }) => React.ReactElement;
+  }) => React.ReactElement<any>;
 };
 const FieldInner = <
   TFieldValues extends FieldValues = FieldValues,
@@ -66,7 +65,7 @@ const FieldInner = <
     onChange,
     ...props
   }: FieldProps<TFieldValues, TName>,
-  ref: ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const form = useFormContext<TFieldValues>();
 
@@ -125,7 +124,7 @@ type FieldControllerProps<
   control: Control<TFieldValues>;
   name: TName;
   children?:
-    | ReactElement
+    | React.ReactElement<any>
     | (({
         field,
         fieldState,
@@ -134,7 +133,7 @@ type FieldControllerProps<
         field: FieldControllerRenderProps<TFieldValues, TName>;
         fieldState: ControllerFieldState;
         formState: UseFormStateReturn<TFieldValues>;
-      }) => React.ReactElement);
+      }) => React.ReactElement<any>);
   onChange?: (...event: any[]) => any;
 
   disabled?: boolean;
@@ -153,7 +152,7 @@ const InternalFieldController = <
     required,
     ...props
   }: FieldControllerProps<TFieldValues, TName>,
-  ref: ForwardedRef<HTMLDivElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const watchedValue = useWatch({
     control,
@@ -184,27 +183,36 @@ const InternalFieldController = <
                           fieldState,
                           formState,
                         })
-                      : cloneElement(children, {
-                          ...field,
-                          value: watchedValue ?? "",
-                          onBlur: (event: any) => {
-                            (
-                              children.props as {
-                                onBlur?: (...event: any[]) => any;
-                              }
-                            ).onBlur?.(event);
-                            // field.onBlur(onChange ? onChange(event) : event);
-                            field.onBlur();
+                      : React.cloneElement(
+                          children as React.ReactElement<{
+                            value?: any;
+                            onBlur?: (...event: any[]) => any;
+                            onChange?: (...event: any[]) => any;
+                          }>,
+                          {
+                            ...field,
+                            value: watchedValue ?? "",
+                            onBlur: (event: any) => {
+                              (
+                                children.props as {
+                                  onBlur?: (...event: any[]) => any;
+                                }
+                              ).onBlur?.(event);
+                              // field.onBlur(onChange ? onChange(event) : event);
+                              field.onBlur();
+                            },
+                            onChange: (event: any) => {
+                              (
+                                children.props as {
+                                  onChange?: (...event: any[]) => any;
+                                }
+                              ).onChange?.(event);
+                              field.onChange(
+                                onChange ? onChange(event) : event,
+                              );
+                            },
                           },
-                          onChange: (event: any) => {
-                            (
-                              children.props as {
-                                onChange?: (...event: any[]) => any;
-                              }
-                            ).onChange?.(event);
-                            field.onChange(onChange ? onChange(event) : event);
-                          },
-                        })
+                        )
                     : undefined
                 }
                 ref={ref}
@@ -217,7 +225,7 @@ const InternalFieldController = <
     </FormFieldContext.Provider>
   );
 };
-const FieldController = forwardRef(InternalFieldController) as <
+const FieldController = React.forwardRef(InternalFieldController) as <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
@@ -229,7 +237,7 @@ type FieldControllerRenderProps<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = ControllerRenderProps<TFieldValues, TName>;
 
-const Field = forwardRef(FieldInner) as <
+const Field = React.forwardRef(FieldInner) as <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(

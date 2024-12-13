@@ -24,7 +24,7 @@ type ModalProps = DialogProps & {
   footer?:
     | ((params: {
         originNode: React.ReactNode;
-        extra: { OkBtn: React.ReactElement; CancelBtn: React.ReactElement };
+        extra: { OkBtn: React.ReactElement<any>; CancelBtn: React.ReactElement<any> };
       }) => React.ReactNode)
     | React.ReactNode;
   okText?: string;
@@ -34,7 +34,7 @@ type ModalProps = DialogProps & {
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 
-  scrollAreaViewportRef?: React.RefObject<HTMLDivElement>;
+  scrollAreaViewportRef?: React.RefObject<HTMLDivElement | null>;
 };
 const Modal = ({
   className,

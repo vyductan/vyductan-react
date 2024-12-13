@@ -6,7 +6,7 @@ import * as React from "react";
 import { Modal } from "./modal";
 
 export const useModal = (): [
-  JSX.Element | undefined,
+  React.JSX.Element | undefined,
   (options: {
     title: string;
     content: (onCancel: () => void) => React.ReactNode;

@@ -57,7 +57,7 @@ export interface ItemProps {
     nodes?: {
       Handle?: React.ReactNode;
     };
-  }): React.ReactElement;
+  }): React.ReactElement<any>;
 
   adjustScale?: boolean;
 }

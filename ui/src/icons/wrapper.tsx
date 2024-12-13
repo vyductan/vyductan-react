@@ -4,7 +4,7 @@ import { cloneElement } from "react";
 import { cn } from "@acme/ui";
 
 type IconWrapperProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
-  children: ReactElement;
+  children: ReactElement<any>;
   srOnly?: string;
 };
 const IconWrapper = ({
@@ -15,9 +15,8 @@ const IconWrapper = ({
 }: IconWrapperProps) => {
   return (
     <>
-      <span className={cn(className)} {...props}>
+      <span className={cn("[&>svg]:size-6", className)} {...props}>
         {cloneElement(children, {
-          className: cn("size-6", className),
           "aria-hidden": "true",
           role: "img",
           ...props,

@@ -35,7 +35,7 @@ const message = Object.assign(
     message: (message: React.ReactNode, options?: ExternalToast) =>
       baseFunction(toast.message, message, options),
     custom: (
-      jsx: (id: number | string) => React.ReactElement,
+      jsx: (id: number | string) => React.ReactElement<any>,
       options?: ExternalToast,
     ) => toast.custom(jsx, { position: "top-center", ...options }),
     promise: <ToastData>(
@@ -73,7 +73,7 @@ const notification = Object.assign(
     message: (options: NotificationProps) =>
       baseNotification(toast.message, options),
     custom: (
-      jsx: (id: number | string) => React.ReactElement,
+      jsx: (id: number | string) => React.ReactElement<any>,
       options?: ExternalToast,
     ) => toast.custom(jsx, options),
     promise: <ToastData>(

@@ -1,8 +1,6 @@
 "use client";
 
 import type { Table } from "@tanstack/react-table";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 
 import { Button } from "../../button";
 import {
@@ -11,7 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuRoot,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "../../dropdown";
+import { Icon } from "../../icons";
 
 interface TableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -27,8 +27,8 @@ export function TableViewOptions<TData>({
           variant="outline"
           size="sm"
           className="ml-auto flex h-8 self-start"
+          icon={<Icon icon="icon-[radix-icons--mixer-horizontal]" />}
         >
-          <MixerHorizontalIcon className="mr-2 size-4" />
           View
         </Button>
       </DropdownMenuTrigger>
