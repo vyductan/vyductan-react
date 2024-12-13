@@ -1,5 +1,5 @@
 import type { LexicalEditor } from "lexical";
-import { useEffect, type JSX } from "react";
+import React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $wrapNodeInElement, mergeRegister } from "@lexical/utils";
 import {
@@ -34,10 +34,10 @@ export const ImagesPlugin = ({
   captionsEnabled,
 }: {
   captionsEnabled?: boolean;
-}): JSX.Element | null => {
+}): React.JSX.Element | null => {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!editor.hasNodes([ImageNode])) {
       throw new Error("ImagesPlugin: ImageNode not registered on editor");
     }

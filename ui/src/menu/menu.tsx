@@ -59,7 +59,7 @@ export const Menu = ({
           <li key={index} role="presentation" className="my-1 text-left">
             <div
               role="presentation"
-              title={item.label?.toString()}
+              title={typeof item.label === "string" ? item.label : ""}
               className="py-2"
             >
               {item.label}

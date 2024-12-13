@@ -6,7 +6,7 @@ import type {
   NodeKey,
 } from "lexical";
 import * as React from "react";
-import { Suspense, useCallback, useEffect, useRef, useState, type JSX } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -88,7 +88,7 @@ function LazyImage({
   maxWidth: number;
   src: string;
   width: "inherit" | number;
-}): JSX.Element {
+}): React.JSX.Element {
   useSuspenseImage(src);
   return (
     <img
@@ -129,7 +129,7 @@ export default function ImageComponent({
   src: string;
   width: "inherit" | number;
   captionsEnabled: boolean;
-}): JSX.Element {
+}): React.JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
@@ -166,6 +166,7 @@ export default function ImageComponent({
       ) {
         if (showCaption) {
           // Move focus into nested editor
+
           $setSelection(null);
           event.preventDefault();
           caption.focus();

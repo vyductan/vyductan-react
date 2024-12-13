@@ -1,5 +1,6 @@
 import type { LexicalEditor } from "lexical";
-import { useEffect, useRef, type JSX } from "react";
+import type { JSX } from "react";
+import { useEffect, useRef } from "react";
 
 import type { InsertImagePayload } from "./types";
 import { Tabs } from "../../../tabs";

@@ -63,7 +63,7 @@ const Tag = ({
   borderless: borderlessProp = false,
   ...props
 }: TagProps) => {
-  const tagConfig = useUi((state) => state.componentConfig?.tag);
+  const tagConfig = useUi((state) => state.componentConfig.tag);
 
   return (
     <div

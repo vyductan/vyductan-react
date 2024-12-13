@@ -64,7 +64,7 @@ const DatePickerInternal = <T extends DateType = Date>(
   const [open, setOpen] = React.useState(false);
 
   // ====================== Format Date =======================
-  const datePickerConfig = useUi((state) => state.componentConfig?.datePicker);
+  const datePickerConfig = useUi((state) => state.componentConfig.datePicker);
   let format = propFormat;
   if (datePickerConfig?.format) {
     format = datePickerConfig.format;

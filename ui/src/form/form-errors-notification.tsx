@@ -43,7 +43,9 @@ export const FormErrorsNotification = () => {
         notification.error({
           message: "Unexpected Form Errors",
           description: errorsToNotify.map((error) => {
-            return `${error.path}: ${String(error.message)}`;
+            const message =
+              typeof error.message === "string" ? error.message : "";
+            return `${error.path}: ${message}`;
           }),
           duration: Infinity,
           closeButton: true,

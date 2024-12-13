@@ -309,7 +309,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const buttonConfig = useUi((state) => state.componentConfig?.button);
+    const buttonConfig = useUi((state) => state.componentConfig.button);
 
     const Comp = asChild || href ? Slot : "button";
 

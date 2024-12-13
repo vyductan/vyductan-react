@@ -110,7 +110,6 @@ type Component<P> =
   | React.ComponentType<P>
   | React.ForwardRefExoticComponent<P>
   | React.FC<P>
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   | React.HTMLElementType;
 
 export type CustomizeComponent = Component<any>;

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
-import { useRef, type JSX } from "react";
 
 import { cn } from "../../..";
 import { Icon } from "../../../icons";
@@ -38,13 +37,13 @@ export default function ImageResizer({
   setShowCaption: (show: boolean) => void;
   showCaption: boolean;
   captionsEnabled: boolean;
-}): JSX.Element {
-  const controlWrapperRef = useRef<HTMLDivElement>(null);
-  const userSelect = useRef({
+}): React.JSX.Element {
+  const controlWrapperRef = React.useRef<HTMLDivElement>(null);
+  const userSelect = React.useRef({
     priority: "",
     value: "default",
   });
-  const positioningRef = useRef<{
+  const positioningRef = React.useRef<{
     currentHeight: "inherit" | number;
     currentWidth: "inherit" | number;
     direction: number;
