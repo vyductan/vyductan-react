@@ -7,7 +7,6 @@
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { useEffect } from "react";
-import { useClickAway, useFocusWithin } from "ahooks";
 import { format as formatDate, isValid, parse, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 import { composeRef } from "rc-util/lib/ref";
@@ -118,21 +117,33 @@ const DatePickerInternal = <T extends DateType = Date>(
     }
   };
   // handle click outside from input (is focus within)
-  const [isFocused, setIsFocused] = React.useState(false);
-  useFocusWithin(inputRef, {
-    onFocus: () => {
-      setIsFocused(true);
-    },
-  });
-  useClickAway((event) => {
-    if (
-      isFocused &&
-      !(event.target && "name" in event.target && event.target.name === "day") // check if choose a day in panel or not
-    ) {
-      handleChangeInput(inputValue);
-      setOpen(false);
-    }
-  }, inputRef);
+  // const [isFocused, setIsFocused] = React.useState(false);
+  // useFocusWithin(inputRef, {
+  //   onFocus: () => {
+  //     setIsFocused(true);
+  //   },
+  // });
+  // useClickAway((event) => {
+  //   const target = event.target as HTMLElement | null;
+  //   // if (target === inputRef.current) {
+  //   //   setIsFocused(false);
+  //   //   return;
+  //   // }
+  //   // if (
+  //   //   isFocused &&
+  //   //   // check if choose a day in panel or not
+  //   //   !(target && "name" in target && target.name === "day") &&
+  //   //   // condition click to navigate month
+  //   //   !(
+  //   //     target?.tagName === "SPAN" &&
+  //   //     target.parentElement &&
+  //   //     "name" in target.parentElement
+  //   //   )
+  //   // ) {
+  //   //   handleChangeInput(inputValue);
+  //   //   setOpen(false);
+  //   // }
+  // }, inputRef);
 
   // prevent click label to focus input (open popover)
   useEffect(() => {
@@ -154,9 +165,22 @@ const DatePickerInternal = <T extends DateType = Date>(
         sideOffset={8}
         placement="bottomLeft"
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={() => {
+          if (!open) {
+            setOpen(true);
+          }
+        }}
         onInteractOutside={(event) => {
-          if (event.target === inputRef.current) {
+          // console.log(
+          //   "interact outside",
+          //   event.target,
+          //   inputRef.current,
+          //   event.target?.querySelector("input") === inputRef.current,
+          //   event.target === inputRef.current,
+          // );
+          // TODO: fix click div still close and reopen popup (maybe use clickaway)
+          // TODO: fix pres ESC doesn't close
+          if (event.target !== inputRef.current) {
             setOpen(false);
           }
         }}
@@ -184,23 +208,24 @@ const DatePickerInternal = <T extends DateType = Date>(
         <Input
           ref={composedRef}
           id={id}
+          value={inputValue}
+          placeholder={placeholder}
+          status={status}
           allowClear={allowClear}
           borderless={borderless}
           size={size}
           disabled={disabled}
-          status={status}
           className={cn("items-center", "justify-start text-left", className)}
-          placeholder={placeholder}
           suffix={
             <Icon
               icon="icon-[mingcute--calendar-2-line]"
               className="ml-auto size-4 opacity-50"
             />
           }
-          value={inputValue}
-          onClick={() => {
-            if (!open) setOpen(true);
-          }}
+          // onClick={() => {
+          //   console.log("click", open);
+          //   if (!open) setOpen(true);
+          // }}
           onKeyUp={(event) => {
             event.stopPropagation();
             if (event.key === "Enter" || event.key === "Escape") {
@@ -215,26 +240,6 @@ const DatePickerInternal = <T extends DateType = Date>(
             }
           }}
         />
-
-        {/* <div
-          ref={ref}
-          className={cn(
-            inputVariants({ disabled, readOnly }),
-            inputSizeVariants(),
-            "cursor-pointer gap-2",
-            className,
-            // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
-          )}
-          // onClick={() => {
-          //   if (!open) setOpen(true);
-          // }}
-        >
-          <span>{value ? formatDate(toDate(value), format) : placeholder}</span>
-          <Icon
-            icon="icon-[mingcute--calendar-2-line]"
-            className="ml-auto size-4 opacity-50"
-          />
-        </div> */}
       </Popover>
     </>
   );

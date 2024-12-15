@@ -27,19 +27,17 @@ import type { SortableContextProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
 import type { RowSelection, TableColumnDef, TableComponents } from "./types";
 import { cn } from "..";
-import { Icon } from "../icons";
 import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
 import { Spin } from "../spin";
-import { Tooltip } from "../tooltip";
 import {
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRoot,
   TableRow,
 } from "./_components";
+import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformColumnDefs } from "./utils";
@@ -72,13 +70,21 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     };
     rowKey?: keyof TRecord;
     classNames?: {
+      wrapper?: string;
+      table?: string;
       header?: string;
       row?: string | ((record: TRecord, index: number) => string);
       th?: string;
+      tr?: string;
       td?: string;
     };
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
+    sorting?: {
+      default?: SortingState;
+      state?: SortingState;
+      onChange?: (state: SortingState) => void;
+    };
     pagination?: PaginationProps;
     loading?: boolean;
     skeleton?: boolean;
@@ -108,7 +114,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
 const TableInner = <TRecord extends Record<string, unknown>>(
   {
     className,
-    bordered,
+    bordered = false,
     size,
     loading = false,
     skeleton = false,
@@ -120,6 +126,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     rowKey = "id",
     classNames,
     rowSelection: propRowSelection,
+    sorting: propSorting,
 
     sticky,
     scroll,
@@ -205,7 +212,10 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       },
     },
   );
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = useMergedState(propSorting?.default ?? [], {
+    value: propSorting?.state,
+    onChange: propSorting?.onChange,
+  });
 
   const table = useReactTable({
     data,
@@ -272,6 +282,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             toolbar && "mt-4",
             bordered && "rounded-md border",
+            classNames?.wrapper,
           )}
         >
           <TableRoot
@@ -282,6 +293,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               // bordered &&
               //   "border-separate border-spacing-0 rounded-md border-s border-t",
               size === "sm" ? "[&_th]:" : "",
+              classNames?.table,
             )}
             style={tableStyles}
             {...props}
@@ -312,20 +324,21 @@ const TableInner = <TRecord extends Record<string, unknown>>(
               className={classNames?.header}
             >
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead
+                      <TableHeadAdvanced
                         key={header.id}
+                        locale={locale}
+                        column={header.column}
                         scope="col"
                         colSpan={header.colSpan}
+                        bordered={bordered}
                         size={size}
                         style={getCommonPinningStyles(header.column)}
                         className={cn(
                           // column className
                           header.column.columnDef.meta?.className,
-                          // bordered
-                          bordered && "border-b border-e last:border-e-0",
                           // align
                           header.column.columnDef.meta?.align === "center" &&
                             "text-center",
@@ -345,56 +358,14 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                           header.id === "selection" && "px-0",
                           classNames?.th,
                         )}
-                        onClick={header.column.getToggleSortingHandler()}
                       >
-                        <Tooltip
-                          open={header.column.getCanSort()}
-                          title={
-                            header.column.getCanSort()
-                              ? header.column.getNextSortingOrder() === "asc"
-                                ? locale.triggerAsc
-                                : header.column.getNextSortingOrder() === "desc"
-                                  ? locale.triggerDesc
-                                  : locale.cancelSort
-                              : undefined
-                          }
-                        >
-                          <span
-                            className={cn(
-                              // sorting
-                              header.column.getCanSort() &&
-                                "flex cursor-pointer items-center justify-between",
+                        {header.isPlaceholder
+                          ? undefined
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
                             )}
-                          >
-                            {header.isPlaceholder
-                              ? undefined
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                            {header.column.getCanSort() ? (
-                              <div>
-                                <Icon
-                                  icon="ant-design:caret-up-filled"
-                                  className={cn(
-                                    "size-3",
-                                    header.column.getIsSorted() !== "asc" &&
-                                      "text-gray-400",
-                                  )}
-                                />
-                                <Icon
-                                  icon="ant-design:caret-down-filled"
-                                  className={cn(
-                                    "-mt-1 size-3",
-                                    header.column.getIsSorted() !== "desc" &&
-                                      "text-gray-400",
-                                  )}
-                                />
-                              </div>
-                            ) : undefined}
-                          </span>
-                        </Tooltip>
-                      </TableHead>
+                      </TableHeadAdvanced>
                     );
                   })}
                 </TableRow>
@@ -430,6 +401,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                       <TableRow
                         key={row.id}
                         className={cn(
+                          classNames?.tr,
                           row.original._customRowClassName as string,
                         )}
                         style={row.original._customRowStyle as CSSProperties}
@@ -507,6 +479,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
                             // classNames.row?.className,
                             // rowClassName?.(row.original, index),
                             row.getIsExpanded() ? "border-x" : "",
+                            classNames?.tr,
                           )}
                         >
                           {row.getVisibleCells().map((cell) => {

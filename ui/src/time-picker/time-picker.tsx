@@ -91,6 +91,7 @@ const TimePickerInternal = (
         }
       >
         <Input
+          ref={ref}
           id={inputId}
           autoComplete="off"
           {...inputProps}
@@ -99,11 +100,12 @@ const TimePickerInternal = (
           // size={size}
           // status={status}
           placeholder={placeholder}
-          className={cn("items-center", "justify-start text-left", className)}
-          classNames={{
-            wrapper: "w-[128px]",
-          }}
-          ref={ref}
+          className={cn(
+            "items-center",
+            "justify-start text-left",
+            "w-[128px]",
+            className,
+          )}
           suffix={
             <Icon
               icon="icon-[mingcute--time-line]"
@@ -111,9 +113,9 @@ const TimePickerInternal = (
             />
           }
           value={inputValue}
-          // onClick={() => {
-          //   if (!open) setOpen(true);
-          // }}
+          onClick={() => {
+            if (!open) setOpen(true);
+          }}
           onKeyUp={(event) => {
             event.stopPropagation();
             if (event.key === "Enter" || event.key === "Escape") {
@@ -138,11 +140,6 @@ const TimePickerInternal = (
                 //
               }
             }
-          }}
-          wrapperProps={{
-            onClick: () => {
-              if (!open) setOpen(true);
-            },
           }}
         />
       </Popover>

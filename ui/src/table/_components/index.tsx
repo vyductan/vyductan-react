@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import type { TableProps } from "../table";
 import type { TableSize } from "../types";
 import { cn } from "../..";
 
@@ -97,9 +98,9 @@ TableRow.displayName = "TableRow";
 
 type TableHeadProps = React.ThHTMLAttributes<HTMLTableCellElement> & {
   size?: TableSize;
-};
+} & Pick<TableProps, "bordered">;
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, size, ...props }, ref) => (
+  ({ className, size, bordered, ...props }, ref) => (
     <th
       ref={ref}
       className={cn(
@@ -109,6 +110,9 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         // "break-words",
         // "first:rounded-tl-md last:rounded-tr-md",
+        bordered && "border-b border-e last:border-e-0",
+        !bordered &&
+          "before:absolute before:right-0 before:top-1/2 before:h-[1.6em] before:w-px before:-translate-y-1/2 before:bg-accent before:content-[''] last:before:bg-transparent",
 
         className,
       )}
@@ -152,7 +156,7 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
-export type { TableRowProps };
+export type { TableRowProps, TableHeadProps };
 
 export {
   TableRoot,

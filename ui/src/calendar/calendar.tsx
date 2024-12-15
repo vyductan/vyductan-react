@@ -78,22 +78,13 @@ function Calendar({
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
-        ...classNames,
       }}
       components={{
         IconLeft: ({ ...props }) => (
-          <Icon
-            icon="icon-[mingcute--left-fill]"
-            className="size-4"
-            {...props}
-          />
+          <Icon icon="icon-[mingcute--left-fill]" {...props} />
         ),
         IconRight: ({ ...props }) => (
-          <Icon
-            icon="icon-[mingcute--right-fill]"
-            className="size-4"
-            {...props}
-          />
+          <Icon icon="icon-[mingcute--right-fill]" {...props} />
         ),
       }}
       {...props}

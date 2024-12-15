@@ -2,6 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { useHover } from "ahooks";
 import { cva } from "class-variance-authority";
 import { useMergedState } from "rc-util";
@@ -84,13 +85,9 @@ type InputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
     suffix?: React.ReactNode;
     addonBefore?: React.ReactNode;
     addonAfter?: React.ReactNode;
-    classNames?: {
-      wrapper?: string;
-    };
-    wrapperProps?: React.DetailedHTMLProps<
-      React.HTMLAttributes<HTMLDivElement>,
-      HTMLDivElement
-    >;
+    // classNames?: {
+    //   wrapper?: string;
+    // };
     "data-state"?: boolean;
   };
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -98,7 +95,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     {
       borderless,
       className,
-      classNames,
+      // classNames,
       disabled,
       hidden,
       size,
@@ -112,15 +109,21 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
       onChange,
 
-      id: idProp,
-      type,
+      // Popover Props
       "aria-haspopup": ariaHasPopup,
       "aria-expanded": ariaExpanded,
       "aria-controls": ariaControls,
       "data-state": dataState,
 
-      wrapperProps,
-      ...props
+      // Input Props
+      id: idProp,
+      type,
+      name,
+      value: valueProp,
+      defaultValue: defaultValueProp,
+      // Wrapper Props
+      onClick,
+      ...rest
     },
     ref,
   ) => {
@@ -136,8 +139,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     });
 
     // ====================== Value =======================
-    const [value, setValue] = useMergedState(props.defaultValue, {
-      value: props.value,
+    const [value, setValue] = useMergedState(defaultValueProp, {
+      value: valueProp,
     });
 
     // ================== Prefix & Suffix ================== //
@@ -149,39 +152,33 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {prefix}
       </span>
     ) : undefined;
-    const suffixComp = suffix ? (
-      allowClear && isHovering && value ? (
-        <button
-          type="button"
-          className={cn(
-            "flex opacity-30 hover:opacity-50",
-            inputSizeVariants({ size }),
-          )}
-          onClick={() => {
-            triggerNativeEventFor(document.querySelector(`[id='${id}']`), {
-              event: "input",
-              value: "",
-            });
-          }}
-        >
-          <Icon
-            icon="icon-[ant-design--close-circle-filled]"
-            className="pointer-events-none size-4"
-          />
-        </button>
-      ) : (
-        <span
-          className={cn(
-            "flex items-center",
-            inputSizeVariants({ size }),
-            "pl-0",
-          )}
-        >
-          {suffix}
-        </span>
-      )
-    ) : undefined;
+    const clearButton = (
+      <button
+        type="button"
+        className={cn("ml-1 flex opacity-30 hover:opacity-50")}
+        onClick={() => {
+          triggerNativeEventFor(document.querySelector(`[id='${id}']`), {
+            event: "input",
+            value: "",
+          });
+        }}
+      >
+        <Icon
+          icon="icon-[ant-design--close-circle-filled]"
+          className="pointer-events-none size-4"
+        />
+      </button>
+    );
+    const suffixComp =
+      allowClear && value && (!suffix || (isHovering && suffix)) ? (
+        clearButton
+      ) : suffix ? (
+        <Slot className={cn("ml-1 flex items-center")}>
+          {typeof suffix === "string" ? <span>{suffix}</span> : suffix}
+        </Slot>
+      ) : undefined;
 
+    // ================== Popover condition props ================== //
     const conditionWrapperProps = ariaHasPopup
       ? {
           "aria-haspopup": ariaHasPopup,
@@ -192,6 +189,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         }
       : {};
     const conditionInputProps = ariaHasPopup ? {} : { type };
+
     return (
       <div
         ref={wrapperRef}
@@ -200,14 +198,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           inputVariants({ borderless, disabled, status }),
           inputSizeVariants({ size }),
           "cursor-text",
-          classNames?.wrapper,
+          className,
         )}
-        {...wrapperProps}
         {...conditionWrapperProps}
         onClick={(e) => {
-          wrapperProps?.onClick?.(e);
+          // e.stopPropagation();
+          // TODO: triger focus
+          // onInputClick https://github.com/react-component/input/blob/master/src/BaseInput.tsx
           document.querySelector<HTMLInputElement>(`[id='${id}']`)?.focus();
+          onClick?.(e as React.MouseEvent<HTMLInputElement, MouseEvent>);
         }}
+        {...rest}
       >
         {addonBefore && (
           <span
@@ -221,23 +222,23 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         {prefixComp && prefixComp}
         <input
-          id={id}
           ref={inputRef}
+          id={id}
+          name={name}
+          value={value}
           className={cn(
-            "w-full",
+            "flex-1",
             "text-left",
             "bg-transparent",
             // "placeholder:text-muted-foreground",
             "placeholder:text-placeholder",
             "border-none outline-none",
-            className,
           )}
           disabled={disabled}
           onChange={(event) => {
             setValue(event.currentTarget.value);
             onChange?.(event);
           }}
-          {...props}
           {...conditionInputProps}
         />
         {suffixComp && suffixComp}

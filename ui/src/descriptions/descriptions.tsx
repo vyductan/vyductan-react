@@ -145,9 +145,7 @@ export const Descriptions = ({
                 key={rowIndex}
                 className={cn(
                   bordered && "mb-px border-b last:border-none",
-                  layout === "horizontal" &&
-                    bordered &&
-                    "mb-px [&:last-child>td]:border-b-0 [&:last-child>th]:border-b-0 [&>td]:border-b [&>th]:border-b",
+                  // layout === "horizontal" && bordered && "mb-px",
                   !bordered && "[&:last-child>td]:pb-0",
                 )}
               >
