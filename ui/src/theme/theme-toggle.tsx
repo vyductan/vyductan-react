@@ -3,13 +3,13 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 
-import { Button } from "@acme/ui/button";
-import { Dropdown } from "@acme/ui/dropdown";
-
+import type { ButtonProps } from "../button";
+import { Button } from "../button";
+import { Dropdown } from "../dropdown";
 import { Icon } from "../icons";
 
-function ThemeToggle() {
-  const { setTheme } = useTheme();
+function ThemeToggle(props: ButtonProps) {
+  const { theme, systemTheme, setTheme } = useTheme();
 
   return (
     <>
@@ -42,18 +42,17 @@ function ThemeToggle() {
         <Button
           shape="circle"
           icon={
-            <>
-              <Icon
-                icon="radix-icons:sun"
-                className="block size-4 rotate-0 transition-all dark:hidden dark:-rotate-90"
-              />
-              <Icon
-                icon="radix-icons:moon"
-                className="hidden size-4 rotate-90 transition-all dark:block dark:rotate-0"
-              />
-              <span className="sr-only">Toggle theme</span>
-            </>
+            theme === "dark" ||
+            (theme === "system" && systemTheme === "dark") ? (
+              <Icon icon="icon-[radix-icons--moon]" />
+            ) : (
+              <Icon icon="icon-[radix-icons--sun]" />
+            )
           }
+          variant="ghost"
+          aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+          {...props}
         />
       </Dropdown>
     </>
