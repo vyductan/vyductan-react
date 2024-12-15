@@ -17,6 +17,11 @@ import {
 } from "./_components";
 
 type SidebarProps = {
+  className?: string;
+  classNames?: {
+    menuButton?: string;
+    icon?: string;
+  };
   header?: ReactNode;
   items?: MenuItemDef[];
   defaultSelectedKeys?: string[];
@@ -28,6 +33,8 @@ type SidebarProps = {
   }) => void;
 };
 export const Sidebar = ({
+  className,
+  classNames,
   header,
   items = [],
   defaultSelectedKeys: defaultSelectedKeysProp,
@@ -128,7 +135,11 @@ export const Sidebar = ({
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
       const labelToRender = path ? (
         <Link href={`${path}`}>
-          {typeof icon === "string" ? <Icon icon={icon} /> : icon}
+          {typeof icon === "string" ? (
+            <Icon icon={icon} className={classNames?.icon} />
+          ) : (
+            icon
+          )}
           <span>{label}</span>
         </Link>
       ) : (
@@ -144,7 +155,12 @@ export const Sidebar = ({
             onSelect?.({ item: { key, label }, key, event });
           }}
         >
-          <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
+          <SidebarMenuButton
+            asChild
+            isActive={isActive}
+            tooltip={item.label}
+            className={classNames?.menuButton}
+          >
             {labelToRender}
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -153,7 +169,7 @@ export const Sidebar = ({
   };
 
   return (
-    <SidebarRoot collapsible="icon">
+    <SidebarRoot collapsible="icon" className={className}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>{header}</SidebarMenuItem>
