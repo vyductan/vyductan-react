@@ -21,7 +21,7 @@ export const inputVariants = cva(
     // "disabled:cursor-not-allowed disabled:opacity-50",
     "md:text-sm",
 
-    "flex w-full text-base",
+    "flex w-full",
 
     "items-center border border-input ring-offset-background",
     "focus-within:outline-none",

@@ -136,7 +136,7 @@ const EditorInternal = (
         h4: "text-2xl font-bold dark:text-white",
         h5: "text-xl font-bold dark:text-white",
       },
-      paragraph: "text-base",
+      paragraph: "",
     },
     onError: (error, editor) => {
       console.log("error", error, editor);
@@ -157,7 +157,7 @@ const EditorInternal = (
                   aria-placeholder="Write something or press '/' for commands..."
                   placeholder={
                     <div
-                      className="absolute left-0.5 top-0.5 text-base text-placeholder"
+                      className="absolute left-0.5 top-0.5 text-placeholder"
                       onClick={() => editorRef.current?.focus()}
                     >
                       Write something or press '/' for commands...
