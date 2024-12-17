@@ -60,17 +60,17 @@ const Card = ({
             <CardTitle className={classNames?.title}>{title}</CardTitle>
             {extra && <div className="ml-auto">{extra}</div>}
           </div>
-          <CardDescription
-            className={cn(description ? "" : "hidden", classNames?.description)}
-          >
-            {description}
-          </CardDescription>
+          {description && (
+            <CardDescription className={cn(classNames?.description)}>
+              {description}
+            </CardDescription>
+          )}
         </CardHeader>
       )}
       <CardContent
         className={cn(
+          !title && !description && !extra && "pt-6",
           classNames?.content,
-          (!!title || !!description || !!extra) && "pt-0 lg:pt-0",
         )}
         size={size}
       >
