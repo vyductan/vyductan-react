@@ -6,3 +6,5 @@ export type Placement =
   | "top"
   | "topLeft"
   | "topRight";
+
+export type AnyObject = Record<PropertyKey, any>;
