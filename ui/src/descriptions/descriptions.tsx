@@ -33,9 +33,12 @@ type DescriptionProps = {
   classNames?: {
     header?: string;
     title?: string;
-    content?: string;
+
+    view?: string;
     label?: string;
     value?: string;
+
+    tr?: string;
     th?: string;
     td?: string;
   };
@@ -85,36 +88,46 @@ export const Descriptions = ({
       ? chunkArray(items, mergedColumn)
       : createVerticalRows(items, mergedColumn);
 
+  const headerClassName = cn("mb-4 flex items-center", classNames?.header);
+  const viewClassName = cn(
+    bordered && "overflow-hidden rounded-md border",
+    classNames?.view,
+  );
   const labelClassName = cn("text-foreground-muted", classNames?.label);
   const valueClassName = cn(classNames?.value);
+  const tbodyClassName = cn(
+    layout === "horizontal" && [
+      bordered &&
+        "[&_tr:last-child>td]:border-b-0 [&_tr:last-child>th]:border-b-0",
+    ],
+  );
   const thClassName = cn(
     "text-start text-sm font-normal",
-    labelClassName,
-    bordered && "border-e bg-surface-secondary",
     layout === "horizontal" && [
-      bordered && ["px-6"],
+      bordered && ["px-6", "border-b border-e bg-surface-secondary"],
       size === "sm" && "py-2",
       size === "default" || (!size && "py-3"),
     ],
-    layout === "vertical" && "pb-1 pl-3 font-medium first:pl-0 last:pr-0",
-    layout === "vertical" && bordered && "px-6",
+    layout === "vertical" && [
+      "pb-1 pl-3 font-medium first:pl-0 last:pr-0",
+      bordered && "px-6",
+    ],
     classNames?.th,
+    labelClassName,
   );
   const tdClassName = cn(
     "break-all",
-    bordered && "border-e",
     layout === "horizontal" && [
-      "pb-4 pr-4",
+      "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
-      bordered && [
-        "px-6",
-        size === "sm" && "py-2",
-        size === "default" || (!size && "py-3"),
-      ],
+      bordered && ["px-6", "border-b border-e"],
+      size === "sm" && "py-2",
+      size === "default" || (!size && "py-3"),
     ],
-    layout === "vertical" &&
-      "gap-1 pb-4 pl-3 pr-4 align-top text-base first:pl-0 last:pr-0",
-    layout === "vertical" && bordered && "px-6",
+    layout === "vertical" && [
+      "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
+      bordered && "px-6",
+    ],
     classNames?.td,
     valueClassName,
   );
@@ -122,7 +135,7 @@ export const Descriptions = ({
   return (
     <div className={className}>
       {(!!title || !!extra) && (
-        <div className={cn("mb-4 flex items-center", classNames?.header)}>
+        <div className={headerClassName}>
           <div className={cn("text-lg font-semibold", classNames?.title)}>
             {title}
           </div>
@@ -130,23 +143,17 @@ export const Descriptions = ({
         </div>
       )}
 
-      <div
-        className={cn(
-          bordered && "overflow-hidden rounded-md border",
-          classNames?.content,
-        )}
-      >
+      <div className={viewClassName}>
         <table
           className={cn("w-full", bordered ? "table-auto" : "table-fixed")}
         >
-          <tbody>
+          <tbody className={tbodyClassName}>
             {rows.map((cols, rowIndex) => (
               <tr
                 key={rowIndex}
                 className={cn(
-                  bordered && "mb-px border-b last:border-none",
-                  // layout === "horizontal" && bordered && "mb-px",
                   !bordered && "[&:last-child>td]:pb-0",
+                  classNames?.tr,
                 )}
               >
                 {cols.map((col, index) =>
