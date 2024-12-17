@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 "use client";
 
 import type {
   ExpandedState,
+  OnChangeFn,
+  RowSelectionState,
   SortingState,
   Table as TableDef,
 } from "@tanstack/react-table";
@@ -11,7 +14,13 @@ import type {
   HTMLAttributes,
   ReactNode,
 } from "react";
-import React, { forwardRef, Fragment, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -20,11 +29,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useScroll, useSize } from "ahooks";
-import _ from "lodash";
+import _, { set } from "lodash";
 import { useMergedState } from "rc-util";
 
 import type { SortableContextProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
+import type { AnyObject } from "../types";
 import type { RowSelection, TableColumnDef, TableComponents } from "./types";
 import { cn } from "..";
 import { Pagination } from "../pagination";
@@ -40,11 +50,9 @@ import {
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import { transformColumnDefs } from "./utils";
+import { transformColumnDefs, transformedRowSelection } from "./utils";
 
-type RecordWithCustomRow<
-  TRecord extends Record<string, unknown> = Record<string, unknown>,
-> =
+type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
       _customRow?: undefined;
       _customRowClassName?: undefined;
@@ -59,7 +67,26 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
   HTMLAttributes<HTMLTableElement> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
+
+    title?: React.ReactNode;
+    extra?: React.ReactNode;
+    alertRender?:
+      | React.ReactNode
+      | ((args?: {
+          selectedRowKeys: TRecord[keyof TRecord][];
+          selectedRows: TRecord[];
+        }) => React.ReactNode);
+
     bordered?: boolean | "wrapper";
+    classNames?: {
+      table?: string;
+      header?: string;
+      row?: string | ((record: TRecord, index: number) => string);
+      th?: string;
+      tr?: string;
+      td?: string;
+    };
+
     // emptyRender?: EmptyProps;
     /** Expandable config */
     expandable?: {
@@ -68,16 +95,8 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       rowExpandable?: (record: TRecord) => boolean;
       onExpand?: (record: TRecord) => void;
     };
+    /** Row key config */
     rowKey?: keyof TRecord;
-    classNames?: {
-      wrapper?: string;
-      table?: string;
-      header?: string;
-      row?: string | ((record: TRecord, index: number) => string);
-      th?: string;
-      tr?: string;
-      td?: string;
-    };
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
     sorting?: {
@@ -111,7 +130,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     dnd?: Pick<SortableContextProps, "onDragEnd">;
   };
 
-const TableInner = <TRecord extends Record<string, unknown>>(
+const TableInner = <TRecord extends AnyObject>(
   {
     className,
     bordered = false,
@@ -119,12 +138,17 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     loading = false,
     skeleton = false,
 
+    title,
+    extra,
+    alertRender,
+
     columns: propColumns = [],
     dataSource = [],
     pagination,
     expandable,
-    rowKey = "id",
     classNames,
+
+    rowKey = "id",
     rowSelection: propRowSelection,
     sorting: propSorting,
 
@@ -171,47 +195,102 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       .map((x) => x.key),
   };
 
-  const [rowSelection, setRowSelection] = useMergedState(
-    {},
-    {
-      value: (() => {
-        const rowSelectionTst: Record<string, boolean> = {};
-        if (propRowSelection?.selectedRowKeys)
-          if (rowKey) {
-            for (const x of propRowSelection.selectedRowKeys) {
-              rowSelectionTst[x as string] = true;
-              // const index = dataSource.findIndex((d) => d[rowKey] === x);
-              // if (index !== -1) rowSelectionTst[index] = true;
-            }
-          } else {
-            for (const x of propRowSelection.selectedRowKeys) {
-              const index = dataSource.findIndex((d) => d[rowKey] === x);
-              if (index !== -1) rowSelectionTst[index] = true;
-            }
-          }
-        return rowSelectionTst;
-      })(),
-      onChange: (value) => {
-        if (propRowSelection) {
-          const selectedRowKeys = Object.keys(value).map(
-            // (k) => dataSource[Number.parseInt(k)]![rowKey],
-            (k) => k as TRecord[keyof TRecord],
-          );
-          propRowSelection.onChange?.(
-            _.union(
-              // ignore already selected in other pages
-              _.filter(
-                propRowSelection.selectedRowKeys ?? [],
-                (n) => !dataSource.map((x) => x[rowKey]).includes(n),
-              ),
-              selectedRowKeys,
-            ),
-            dataSource.filter((row) => selectedRowKeys.includes(row[rowKey])),
-          );
-        }
-      },
-    },
+  // ====================== Row Selection =======================
+  // NOTE: cannot use `useMergedState`
+  const [selectedRowKeys, setSelectedRowKeys] = useState<
+    TRecord[keyof TRecord][]
+  >(propRowSelection?.selectedRowKeys ?? []);
+  const [selectedRows, setSelectedRows] = useState(
+    dataSource.filter((row) => selectedRowKeys.includes(row[rowKey])),
   );
+  const rowSelection = transformedRowSelection(
+    selectedRowKeys,
+    dataSource,
+    rowKey,
+  );
+  // const [rowSelection, setRowSelection] = useState(
+  //   transformedRowSelection(
+  //     propRowSelection?.selectedRowKeys ?? [],
+  //     dataSource,
+  //     rowKey,
+  //   ),
+  // );
+  // TODO: handle below features
+  // NOTE: that keep the selectedRows (if pagination) ||||||| how to cover all datasource if pagination
+
+  useEffect(() => {
+    setSelectedRowKeys(propRowSelection?.selectedRowKeys ?? []);
+    // setSelectedRows(pre => {
+
+    // })
+    // setRowSelection(
+    //   transformedRowSelection(
+    //     propRowSelection?.selectedRowKeys ?? [],
+    //     dataSource,
+    //     rowKey,
+    //   ),
+    // );
+  }, [propRowSelection?.selectedRowKeys, dataSource, rowKey]);
+  const onRowSelectionChange: OnChangeFn<RowSelectionState> = (
+    updaterOrValue,
+  ) => {
+    let value = updaterOrValue;
+    if (typeof updaterOrValue === "function") {
+      value = updaterOrValue(rowSelection);
+    }
+
+    // https://chatgpt.com/c/676154ea-e108-8010-bd5b-abe71b6a529d
+    const currentPageRowKeys = new Set(dataSource.map((x) => x[rowKey]));
+    const newSelectedKeys: TRecord[keyof TRecord][] =
+      typeof updaterOrValue === "function"
+        ? (Object.keys(
+            updaterOrValue(rowSelection),
+          ) as TRecord[keyof TRecord][])
+        : (Object.keys(updaterOrValue) as TRecord[keyof TRecord][]);
+
+    // Combine the selected keys and remove any keys that are not on the current page if necessary.
+    const updatedSelectedKeys = [
+      ...new Set([
+        ...selectedRowKeys.filter((key) => !currentPageRowKeys.has(key)),
+        ...newSelectedKeys,
+      ]),
+    ];
+    // Update the list of selected rows from the entire current data.
+    const updatedSelectedRows = [
+      ...selectedRows.filter((row) => !currentPageRowKeys.has(row[rowKey])), // Keep rows from previous pages
+      ...dataSource.filter((row) => newSelectedKeys.includes(row[rowKey])), // Add rows from current page
+    ];
+    setSelectedRowKeys(updatedSelectedKeys);
+    setSelectedRows(updatedSelectedRows);
+
+    //     // Combine previously selected row keys with new selections
+    // const selectedRowKeysSet = new Set([
+    //   // Retain row keys that are not part of the current page
+    //   ...(propRowSelection?.selectedRowKeys?.filter((key) => !currentPageRowKeys.includes(key)) ?? []),
+    //   // Add new row keys
+    //   ...Object.keys(value),
+    // ]);
+    // const selectedRowKeys = Array.from(selectedRowKeysSet);
+    // // Filter rows that match the selected keys
+    // const selectedRows = dataSource.filter((row) => selectedRowKeysSet.has(row[rowKey]));
+
+    // _.union -> The result ensures previously selected rows are not lost while adding any new selections.
+    // _.filter -> Removes keys that are already present in the current dataSource.
+    // const selectedRowKeys = _.union(
+    //   _.filter(
+    //     propRowSelection?.selectedRowKeys ?? [],
+    //     (n) => !currentPageRowKeys.includes(n),
+    //   ),
+    //   Object.keys(value) as TRecord[keyof TRecord][],
+    // );
+    // const selectedRows = dataSource.filter((row) =>
+    //   selectedRowKeys.includes(row[rowKey]),
+    // );
+
+    propRowSelection?.onChange?.(updatedSelectedKeys, updatedSelectedRows);
+  };
+
+  // ====================== Sorting =======================
   const [sorting, setSorting] = useMergedState(propSorting?.default ?? [], {
     value: propSorting?.state,
     onChange: propSorting?.onChange,
@@ -231,7 +310,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     },
     getCoreRowModel: getCoreRowModel(),
     // rowKey
-    getRowId: (originalRow) => originalRow[rowKey] as string,
+    getRowId: (originalRow) => originalRow[rowKey],
     // expandable
     enableExpanding: !!expandable,
     getExpandedRowModel: getExpandedRowModel(),
@@ -240,7 +319,7 @@ const TableInner = <TRecord extends Record<string, unknown>>(
     onExpandedChange: setExpanded,
     // selection
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange,
     // sorting
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
@@ -271,297 +350,330 @@ const TableInner = <TRecord extends Record<string, unknown>>(
       ? components.body.row
       : TableRow;
 
+  const TableAlertSection = alertRender ? (
+    typeof alertRender === "function" ? (
+      alertRender({
+        selectedRowKeys,
+        selectedRows,
+      })
+    ) : (
+      <div className="mb-4">{alertRender}</div>
+    )
+  ) : (
+    <></>
+  );
+
   return (
     <>
-      <Spin spinning={loading} className={cn("relative space-y-4", className)}>
+      <Spin
+        spinning={loading}
+        className={cn(
+          "relative space-y-4",
+          "w-full overflow-auto",
+          scroll?.x && "overflow-x-auto overflow-y-hidden",
+          bordered && [
+            "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
+            "[&_th:last-child]:border-e-0 [&_th]:border-e",
+            "[&_td:last-child]:border-e-0 [&_td]:border-e",
+          ],
+          !bordered && [
+            "[&_th:last-child]:before:bg-transparent [&_th]:before:absolute [&_th]:before:right-0 [&_th]:before:top-1/2 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:bg-accent [&_th]:before:content-['']",
+          ],
+          className,
+        )}
+      >
         {toolbar?.(table)}
-        <div
-          // ref={wrapperRef}
-          className={cn(
-            "w-full overflow-auto",
-            scroll?.x && "overflow-x-auto overflow-y-hidden",
-            toolbar && "mt-4",
-            bordered && "rounded-md border",
-            classNames?.wrapper,
-          )}
-        >
-          <TableRoot
-            ref={ref}
+        {title && (
+          <div
             className={cn(
-              !scroll?.x && "w-full",
-              // bordered
-              // bordered &&
-              //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              size === "sm" ? "[&_th]:" : "",
-              classNames?.table,
+              "flex items-center justify-between",
+              bordered ? "mb-4" : "mb-1",
+              toolbar && "mt-4",
             )}
-            style={tableStyles}
-            {...props}
           >
-            {columns.some((column) => column.size) && (
-              <colgroup>
-                {columns.map((col, index) => (
-                  <col
-                    key={index}
-                    {...(col.size === undefined
-                      ? {}
-                      : { style: { width: col.size } })}
-                  />
-                ))}
-              </colgroup>
-            )}
+            <div className="font-semibold leading-none tracking-tight">
+              {title}
+            </div>
+            {extra && <div>{extra}</div>}
+          </div>
+        )}
+        {TableAlertSection}
+        <TableRoot
+          ref={ref}
+          className={cn(
+            !scroll?.x && "w-full",
+            // bordered
+            // bordered &&
+            //   "border-separate border-spacing-0 rounded-md border-s border-t",
+            size === "sm" ? "[&_th]:" : "",
 
-            <TableHeader
-              style={{
-                position: sticky ? "sticky" : undefined,
-                top: sticky
-                  ? typeof sticky === "boolean"
-                    ? 0
-                    : sticky.offsetHeader
-                  : undefined,
-                zIndex: sticky ? 11 : undefined,
-              }}
-              className={classNames?.header}
-            >
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHeadAdvanced
-                        key={header.id}
-                        locale={locale}
-                        column={header.column}
-                        scope="col"
-                        colSpan={header.colSpan}
-                        bordered={bordered}
+            classNames?.table,
+          )}
+          style={tableStyles}
+          {...props}
+        >
+          {columns.some((column) => column.size) && (
+            <colgroup>
+              {columns.map((col, index) => (
+                <col
+                  key={index}
+                  {...(col.size === undefined
+                    ? {}
+                    : { style: { width: col.size } })}
+                />
+              ))}
+            </colgroup>
+          )}
+
+          <TableHeader
+            style={{
+              position: sticky ? "sticky" : undefined,
+              top: sticky
+                ? typeof sticky === "boolean"
+                  ? 0
+                  : sticky.offsetHeader
+                : undefined,
+              zIndex: sticky ? 11 : undefined,
+            }}
+            className={classNames?.header}
+          >
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHeadAdvanced
+                      key={header.id}
+                      locale={locale}
+                      column={header.column}
+                      scope="col"
+                      colSpan={header.colSpan}
+                      size={size}
+                      style={getCommonPinningStyles(header.column)}
+                      className={cn(
+                        // column className
+                        header.column.columnDef.meta?.className,
+                        // align
+                        header.column.columnDef.meta?.align === "center" &&
+                          "text-center",
+                        header.column.columnDef.meta?.align === "right" &&
+                          "text-right",
+                        // pinning
+                        // scroll?.x &&
+                        getCommonPinningClassName(
+                          header.column,
+                          {
+                            scrollLeft: wrapperScrollLeft,
+                            scrollRight: wrapperScrollRight,
+                          },
+                          true,
+                        ),
+                        // selection column
+                        header.id === "selection" && "px-0",
+                        classNames?.th,
+                      )}
+                    >
+                      {header.isPlaceholder
+                        ? undefined
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHeadAdvanced>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          {/* padding with header [disable if bordered]*/}
+          {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
+
+          {skeleton ? (
+            <TableBody>
+              {Array.from({ length: 5 })
+                .fill(0)
+                .map((_, index) => {
+                  return (
+                    <TableRow key={index} className="hover:bg-transparent">
+                      {table.getVisibleFlatColumns().map((x) => {
+                        return (
+                          <TableCell key={x.id}>
+                            <Skeleton className="h-4 w-full" />
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+            </TableBody>
+          ) : (
+            <TableBody>
+              {table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row, index) =>
+                  "_customRow" in row.original ? (
+                    <TableRow
+                      key={row.id}
+                      className={cn(
+                        classNames?.tr,
+                        row.original._customRowClassName as string,
+                      )}
+                      style={row.original._customRowStyle as CSSProperties}
+                    >
+                      <TableCell
+                        colSpan={columns.length}
                         size={size}
-                        style={getCommonPinningStyles(header.column)}
                         className={cn(
-                          // column className
-                          header.column.columnDef.meta?.className,
-                          // align
-                          header.column.columnDef.meta?.align === "center" &&
-                            "text-center",
-                          header.column.columnDef.meta?.align === "right" &&
-                            "text-right",
-                          // pinning
-                          // scroll?.x &&
-                          getCommonPinningClassName(
-                            header.column,
-                            {
-                              scrollLeft: wrapperScrollLeft,
-                              scrollRight: wrapperScrollRight,
-                            },
-                            true,
-                          ),
-                          // selection column
-                          header.id === "selection" && "px-0",
-                          classNames?.th,
+                          row.original._customCellClassName as string,
                         )}
                       >
-                        {header.isPlaceholder
-                          ? undefined
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                      </TableHeadAdvanced>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-
-            {/* padding with header [disable if bordered]*/}
-            {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
-
-            {skeleton ? (
-              <TableBody>
-                {Array.from({ length: 5 })
-                  .fill(0)
-                  .map((_, index) => {
-                    return (
-                      <TableRow key={index} className="hover:bg-transparent">
-                        {table.getVisibleFlatColumns().map((x) => {
+                        {row.original._customRow as React.ReactNode}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    <Fragment key={row.id}>
+                      {/* {components?.body && */}
+                      {/* "row" in components.body && */}
+                      {/* components.body.row ? ( */}
+                      {/*   <components.body.row> */}
+                      {/*     {row.getVisibleCells().map((cell) => { */}
+                      {/*       return ( */}
+                      {/*         <TableCell */}
+                      {/*           key={cell.id} */}
+                      {/*           size={size} */}
+                      {/*           style={getCommonPinningStyles(cell.column)} */}
+                      {/*           className={cn( */}
+                      {/*             // row className */}
+                      {/*             // typeof cell.column.columnDef.meta?.className === */}
+                      {/*             //   "string" */}
+                      {/*             //   ? cell.column.columnDef.meta.className */}
+                      {/*             //   : cell.column.columnDef.meta?.className?.( */}
+                      {/*             //       row.original, */}
+                      {/*             //       index, */}
+                      {/*             //     ), */}
+                      {/*             // bordered */}
+                      {/*             bordered && "border-e", */}
+                      {/*             // align */}
+                      {/*             cell.column.columnDef.meta?.align === "center" && */}
+                      {/*               "text-center", */}
+                      {/*             cell.column.columnDef.meta?.align === "right" && */}
+                      {/*               "text-right", */}
+                      {/*             // pinning */}
+                      {/*             // scroll?.x && */}
+                      {/*             getCommonPinningClassName(cell.column, { */}
+                      {/*               scrollLeft: wrapperScrollLeft, */}
+                      {/*               scrollRight: wrapperScrollRight, */}
+                      {/*             }), */}
+                      {/*             // selection column */}
+                      {/*             cell.id.endsWith("selection") && "px-0", */}
+                      {/*             // column className */}
+                      {/*             cell.column.columnDef.meta?.className, */}
+                      {/*           )} */}
+                      {/*         > */}
+                      {/*           {flexRender( */}
+                      {/*             cell.column.columnDef.cell, */}
+                      {/*             cell.getContext(), */}
+                      {/*           )} */}
+                      {/*         </TableCell> */}
+                      {/*       ); */}
+                      {/*     })} */}
+                      {/*   </components.body.row> */}
+                      {/* ) : ( */}
+                      {/*   <></> */}
+                      {/* )} */}
+                      <TableRowComp
+                        data-state={row.getIsSelected() && "selected"}
+                        data-row-key={row.original[rowKey]}
+                        className={cn(
+                          classNames?.row
+                            ? typeof classNames.row === "string"
+                              ? classNames.row
+                              : classNames.row(row.original, index)
+                            : "",
+                          // classNames.row?.className,
+                          // rowClassName?.(row.original, index),
+                          row.getIsExpanded() ? "border-x" : "",
+                          classNames?.tr,
+                        )}
+                      >
+                        {row.getVisibleCells().map((cell) => {
                           return (
-                            <TableCell key={x.id}>
-                              <Skeleton className="h-4 w-full" />
+                            <TableCell
+                              key={cell.id}
+                              size={size}
+                              style={getCommonPinningStyles(cell.column)}
+                              className={cn(
+                                // row className
+                                // typeof cell.column.columnDef.meta?.className ===
+                                //   "string"
+                                //   ? cell.column.columnDef.meta.className
+                                //   : cell.column.columnDef.meta?.className?.(
+                                //       row.original,
+                                //       index,
+                                //     ),
+                                // bordered
+                                bordered && "border-e last:border-e-0",
+                                // align
+                                cell.column.columnDef.meta?.align ===
+                                  "center" && "text-center",
+                                cell.column.columnDef.meta?.align === "right" &&
+                                  "text-right",
+                                // pinning
+                                // scroll?.x &&
+                                getCommonPinningClassName(cell.column, {
+                                  scrollLeft: wrapperScrollLeft,
+                                  scrollRight: wrapperScrollRight,
+                                }),
+                                // selection column
+                                cell.id.endsWith("selection") && "px-0",
+                                // column className
+                                classNames?.td,
+                                cell.column.columnDef.meta?.className,
+                                cell.column.columnDef.meta?.classNames?.td,
+                              )}
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
                             </TableCell>
                           );
                         })}
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            ) : (
-              <TableBody>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row, index) =>
-                    "_customRow" in row.original ? (
-                      <TableRow
-                        key={row.id}
-                        className={cn(
-                          classNames?.tr,
-                          row.original._customRowClassName as string,
-                        )}
-                        style={row.original._customRowStyle as CSSProperties}
-                      >
-                        <TableCell
-                          colSpan={columns.length}
-                          size={size}
-                          className={cn(
-                            row.original._customCellClassName as string,
-                          )}
-                        >
-                          {row.original._customRow as React.ReactNode}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <Fragment key={row.id}>
-                        {/* {components?.body && */}
-                        {/* "row" in components.body && */}
-                        {/* components.body.row ? ( */}
-                        {/*   <components.body.row> */}
-                        {/*     {row.getVisibleCells().map((cell) => { */}
-                        {/*       return ( */}
-                        {/*         <TableCell */}
-                        {/*           key={cell.id} */}
-                        {/*           size={size} */}
-                        {/*           style={getCommonPinningStyles(cell.column)} */}
-                        {/*           className={cn( */}
-                        {/*             // row className */}
-                        {/*             // typeof cell.column.columnDef.meta?.className === */}
-                        {/*             //   "string" */}
-                        {/*             //   ? cell.column.columnDef.meta.className */}
-                        {/*             //   : cell.column.columnDef.meta?.className?.( */}
-                        {/*             //       row.original, */}
-                        {/*             //       index, */}
-                        {/*             //     ), */}
-                        {/*             // bordered */}
-                        {/*             bordered && "border-e", */}
-                        {/*             // align */}
-                        {/*             cell.column.columnDef.meta?.align === "center" && */}
-                        {/*               "text-center", */}
-                        {/*             cell.column.columnDef.meta?.align === "right" && */}
-                        {/*               "text-right", */}
-                        {/*             // pinning */}
-                        {/*             // scroll?.x && */}
-                        {/*             getCommonPinningClassName(cell.column, { */}
-                        {/*               scrollLeft: wrapperScrollLeft, */}
-                        {/*               scrollRight: wrapperScrollRight, */}
-                        {/*             }), */}
-                        {/*             // selection column */}
-                        {/*             cell.id.endsWith("selection") && "px-0", */}
-                        {/*             // column className */}
-                        {/*             cell.column.columnDef.meta?.className, */}
-                        {/*           )} */}
-                        {/*         > */}
-                        {/*           {flexRender( */}
-                        {/*             cell.column.columnDef.cell, */}
-                        {/*             cell.getContext(), */}
-                        {/*           )} */}
-                        {/*         </TableCell> */}
-                        {/*       ); */}
-                        {/*     })} */}
-                        {/*   </components.body.row> */}
-                        {/* ) : ( */}
-                        {/*   <></> */}
-                        {/* )} */}
-                        <TableRowComp
-                          data-state={row.getIsSelected() && "selected"}
-                          data-row-key={row.original[rowKey]}
-                          className={cn(
-                            classNames?.row
-                              ? typeof classNames.row === "string"
-                                ? classNames.row
-                                : classNames.row(row.original, index)
-                              : "",
-                            // classNames.row?.className,
-                            // rowClassName?.(row.original, index),
-                            row.getIsExpanded() ? "border-x" : "",
-                            classNames?.tr,
-                          )}
-                        >
-                          {row.getVisibleCells().map((cell) => {
-                            return (
-                              <TableCell
-                                key={cell.id}
-                                size={size}
-                                style={getCommonPinningStyles(cell.column)}
-                                className={cn(
-                                  // row className
-                                  // typeof cell.column.columnDef.meta?.className ===
-                                  //   "string"
-                                  //   ? cell.column.columnDef.meta.className
-                                  //   : cell.column.columnDef.meta?.className?.(
-                                  //       row.original,
-                                  //       index,
-                                  //     ),
-                                  // bordered
-                                  bordered && "border-e last:border-e-0",
-                                  // align
-                                  cell.column.columnDef.meta?.align ===
-                                    "center" && "text-center",
-                                  cell.column.columnDef.meta?.align ===
-                                    "right" && "text-right",
-                                  // pinning
-                                  // scroll?.x &&
-                                  getCommonPinningClassName(cell.column, {
-                                    scrollLeft: wrapperScrollLeft,
-                                    scrollRight: wrapperScrollRight,
-                                  }),
-                                  // selection column
-                                  cell.id.endsWith("selection") && "px-0",
-                                  // column className
-                                  classNames?.td,
-                                  cell.column.columnDef.meta?.className,
-                                  cell.column.columnDef.meta?.classNames?.td,
-                                )}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
-                              </TableCell>
-                            );
-                          })}
-                        </TableRowComp>
-                        {row.getIsExpanded() && expandable && (
-                          <TableRow className="bg-gray-50">
-                            {/* 2nd row is a custom 1 cell row */}
-                            <TableCell
-                              colSpan={row.getVisibleCells().length}
-                              size={size}
-                              className="border-x border-b px-4 text-[13px]"
-                            >
-                              {expandable.expandedRowRender(row.original)}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </Fragment>
-                    ),
-                  )
-                ) : (
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell
-                      colSpan={columns.length}
-                      className={cn("h-48 text-center", bordered && "border-e")}
-                    >
-                      {!loading && locale.emptyText}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            )}
-          </TableRoot>
-        </div>
+                      </TableRowComp>
+                      {row.getIsExpanded() && expandable && (
+                        <TableRow className="bg-gray-50">
+                          {/* 2nd row is a custom 1 cell row */}
+                          <TableCell
+                            colSpan={row.getVisibleCells().length}
+                            size={size}
+                            className="border-x border-b px-4 text-[13px]"
+                          >
+                            {expandable.expandedRowRender(row.original)}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </Fragment>
+                  ),
+                )
+              ) : (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell
+                    colSpan={columns.length}
+                    className={cn("h-48 text-center", bordered && "border-e")}
+                  >
+                    {!loading && locale.emptyText}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          )}
+        </TableRoot>
         {pagination && <Pagination className="my-4" {...pagination} />}
       </Spin>
     </>
   );
 };
 
-const Table = forwardRef(TableInner) as <T extends Record<string, unknown>>(
+const Table = forwardRef(TableInner) as <T extends AnyObject>(
   props: TableProps<T> & { ref?: ForwardedRef<HTMLTableElement> },
 ) => ReturnType<typeof TableInner>;
 

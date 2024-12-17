@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import type { TableProps } from "../table";
 import type { TableSize } from "../types";
 import { cn } from "../..";
 
@@ -36,7 +35,10 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className, sticky, ...props }, ref) => (
     <thead
       ref={ref}
-      className={cn("[&_tr]:border-b", className)}
+      className={cn(
+        // "[&_tr]:border-b",
+        className,
+      )}
       style={{
         position: sticky ? "sticky" : undefined,
         top: sticky
@@ -58,7 +60,11 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
+    className={cn(
+      // "[&_tr:last-child]:border-0",
+      "[&_tr:last-child>td]:border-b-0",
+      className,
+    )}
     {...props}
   />
 ));
@@ -85,7 +91,8 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
     <tr
       ref={ref}
       className={cn(
-        "border-b transition-colors",
+        "transition-colors",
+        // "border-b",
         "hover:bg-muted/50 data-[state=selected]:bg-muted",
         // "group",
         className,
@@ -98,9 +105,9 @@ TableRow.displayName = "TableRow";
 
 type TableHeadProps = React.ThHTMLAttributes<HTMLTableCellElement> & {
   size?: TableSize;
-} & Pick<TableProps, "bordered">;
+};
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, size, bordered, ...props }, ref) => (
+  ({ className, size, ...props }, ref) => (
     <th
       ref={ref}
       className={cn(
@@ -110,10 +117,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         // "break-words",
         // "first:rounded-tl-md last:rounded-tr-md",
-        bordered && "border-b border-e last:border-e-0",
-        !bordered &&
-          "before:absolute before:right-0 before:top-1/2 before:h-[1.6em] before:w-px before:-translate-y-1/2 before:bg-accent before:content-[''] last:before:bg-transparent",
-
+        "border-b",
         className,
       )}
       {...props}
@@ -136,6 +140,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         // "break-words",
         // "group-hover:bg-background-hover",
+        "border-b",
         className,
       )}
       {...props}

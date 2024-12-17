@@ -31,11 +31,7 @@ export function TableHeadAdvanced<TData, TValue>({
 
   return (
     <TableHead
-      className={cn(
-        "flex items-center gap-2 px-0",
-
-        className,
-      )}
+      className={cn("px-0", className)}
       aria-label={
         column.getIsSorted() === "desc"
           ? "Sorted descending. Click to sort ascending."

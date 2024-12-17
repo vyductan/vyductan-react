@@ -1,6 +1,7 @@
 import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
+import type { AnyObject } from "../types";
 import type { TableProps } from "./table";
 import type { ExtraTableColumnDef, TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
@@ -184,8 +185,8 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
             aria-label="Select row"
             className="flex items-center justify-center"
             checked={row.getIsSelected()}
-            indeterminate={row.getIsSomeSelected()}
-            onChange={row.toggleSelected}
+            disabled={!row.getCanSelect()}
+            onChange={row.getToggleSelectedHandler()}
             onClick={(event) => {
               if (event.shiftKey) {
                 const { rows, rowsById } = table.getRowModel();
@@ -238,9 +239,9 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
             className="flex w-full cursor-pointer items-center justify-center"
           >
             {row.getIsExpanded() ? (
-              <Icon icon="icon-[lucide--chevron-down]" className="text-base" />
+              <Icon icon="icon-[lucide--chevron-down]" />
             ) : (
-              <Icon icon="icon-[lucide--chevron-right]" className="text-base" />
+              <Icon icon="icon-[lucide--chevron-right]" />
             )}
           </button>
         ) : undefined;
@@ -278,3 +279,22 @@ function getRowRange<T>(rows: Array<Row<T>>, idA: string, idB: string) {
 
   return range;
 }
+
+export const transformedRowSelection = <TRecord extends AnyObject>(
+  selectedRowKeys: string[],
+  dataSource: TRecord[],
+  rowKey: keyof TRecord,
+) => {
+  const rowSelectionTst: Record<string, boolean> = {};
+  if (rowKey) {
+    for (const x of selectedRowKeys) {
+      rowSelectionTst[x] = true;
+    }
+  } else {
+    for (const x of selectedRowKeys) {
+      const index = dataSource.findIndex((d) => d[rowKey] === x);
+      if (index !== -1) rowSelectionTst[index] = true;
+    }
+  }
+  return rowSelectionTst;
+};
