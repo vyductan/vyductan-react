@@ -55,8 +55,9 @@ export function TableHeadAdvanced<TData, TValue>({
       >
         <div
           className={cn(
+            "-my-2 p-2",
             "flex w-full items-center justify-between",
-            "cursor-pointer rounded-md border-none p-2 hover:bg-accent hover:text-accent-foreground",
+            "cursor-pointer rounded-md border-none hover:bg-accent hover:text-accent-foreground",
           )}
           onClick={column.getToggleSortingHandler()}
         >

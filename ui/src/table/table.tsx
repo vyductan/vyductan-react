@@ -29,7 +29,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useScroll, useSize } from "ahooks";
-import _, { set } from "lodash";
+import _ from "lodash";
 import { useMergedState } from "rc-util";
 
 import type { SortableContextProps } from "../drag-and-drop";
@@ -77,7 +77,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
           selectedRows: TRecord[];
         }) => React.ReactNode);
 
-    bordered?: boolean | "wrapper";
+    bordered?: boolean | "around";
     classNames?: {
       table?: string;
       header?: string;
@@ -197,6 +197,7 @@ const TableInner = <TRecord extends AnyObject>(
 
   // ====================== Row Selection =======================
   // NOTE: cannot use `useMergedState`
+  // NOTE: should keep the selectedRows (if pagination)
   const [selectedRowKeys, setSelectedRowKeys] = useState<
     TRecord[keyof TRecord][]
   >(propRowSelection?.selectedRowKeys ?? []);
@@ -208,37 +209,12 @@ const TableInner = <TRecord extends AnyObject>(
     dataSource,
     rowKey,
   );
-  // const [rowSelection, setRowSelection] = useState(
-  //   transformedRowSelection(
-  //     propRowSelection?.selectedRowKeys ?? [],
-  //     dataSource,
-  //     rowKey,
-  //   ),
-  // );
-  // TODO: handle below features
-  // NOTE: that keep the selectedRows (if pagination) ||||||| how to cover all datasource if pagination
-
   useEffect(() => {
     setSelectedRowKeys(propRowSelection?.selectedRowKeys ?? []);
-    // setSelectedRows(pre => {
-
-    // })
-    // setRowSelection(
-    //   transformedRowSelection(
-    //     propRowSelection?.selectedRowKeys ?? [],
-    //     dataSource,
-    //     rowKey,
-    //   ),
-    // );
   }, [propRowSelection?.selectedRowKeys, dataSource, rowKey]);
   const onRowSelectionChange: OnChangeFn<RowSelectionState> = (
     updaterOrValue,
   ) => {
-    let value = updaterOrValue;
-    if (typeof updaterOrValue === "function") {
-      value = updaterOrValue(rowSelection);
-    }
-
     // https://chatgpt.com/c/676154ea-e108-8010-bd5b-abe71b6a529d
     const currentPageRowKeys = new Set(dataSource.map((x) => x[rowKey]));
     const newSelectedKeys: TRecord[keyof TRecord][] =
@@ -262,30 +238,6 @@ const TableInner = <TRecord extends AnyObject>(
     ];
     setSelectedRowKeys(updatedSelectedKeys);
     setSelectedRows(updatedSelectedRows);
-
-    //     // Combine previously selected row keys with new selections
-    // const selectedRowKeysSet = new Set([
-    //   // Retain row keys that are not part of the current page
-    //   ...(propRowSelection?.selectedRowKeys?.filter((key) => !currentPageRowKeys.includes(key)) ?? []),
-    //   // Add new row keys
-    //   ...Object.keys(value),
-    // ]);
-    // const selectedRowKeys = Array.from(selectedRowKeysSet);
-    // // Filter rows that match the selected keys
-    // const selectedRows = dataSource.filter((row) => selectedRowKeysSet.has(row[rowKey]));
-
-    // _.union -> The result ensures previously selected rows are not lost while adding any new selections.
-    // _.filter -> Removes keys that are already present in the current dataSource.
-    // const selectedRowKeys = _.union(
-    //   _.filter(
-    //     propRowSelection?.selectedRowKeys ?? [],
-    //     (n) => !currentPageRowKeys.includes(n),
-    //   ),
-    //   Object.keys(value) as TRecord[keyof TRecord][],
-    // );
-    // const selectedRows = dataSource.filter((row) =>
-    //   selectedRowKeys.includes(row[rowKey]),
-    // );
 
     propRowSelection?.onChange?.(updatedSelectedKeys, updatedSelectedRows);
   };
@@ -350,6 +302,9 @@ const TableInner = <TRecord extends AnyObject>(
       ? components.body.row
       : TableRow;
 
+  const TableToolbarSection = toolbar ? (
+    <div className="mb-4">{toolbar(table)}</div>
+  ) : undefined;
   const TableAlertSection = alertRender ? (
     typeof alertRender === "function" ? (
       alertRender({
@@ -373,22 +328,23 @@ const TableInner = <TRecord extends AnyObject>(
           scroll?.x && "overflow-x-auto overflow-y-hidden",
           bordered && [
             "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
-            "[&_th:last-child]:border-e-0 [&_th]:border-e",
-            "[&_td:last-child]:border-e-0 [&_td]:border-e",
+            typeof bordered === "boolean" &&
+              "[&_th:last-child]:border-e-0 [&_th]:border-e",
+            typeof bordered === "boolean" &&
+              "[&_td:last-child]:border-e-0 [&_td]:border-e",
           ],
-          !bordered && [
+          (!bordered || bordered === "around") && [
             "[&_th:last-child]:before:bg-transparent [&_th]:before:absolute [&_th]:before:right-0 [&_th]:before:top-1/2 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:bg-accent [&_th]:before:content-['']",
           ],
           className,
         )}
       >
-        {toolbar?.(table)}
+        {TableToolbarSection}
         {title && (
           <div
             className={cn(
               "flex items-center justify-between",
               bordered ? "mb-4" : "mb-1",
-              toolbar && "mt-4",
             )}
           >
             <div className="font-semibold leading-none tracking-tight">
@@ -531,55 +487,6 @@ const TableInner = <TRecord extends AnyObject>(
                     </TableRow>
                   ) : (
                     <Fragment key={row.id}>
-                      {/* {components?.body && */}
-                      {/* "row" in components.body && */}
-                      {/* components.body.row ? ( */}
-                      {/*   <components.body.row> */}
-                      {/*     {row.getVisibleCells().map((cell) => { */}
-                      {/*       return ( */}
-                      {/*         <TableCell */}
-                      {/*           key={cell.id} */}
-                      {/*           size={size} */}
-                      {/*           style={getCommonPinningStyles(cell.column)} */}
-                      {/*           className={cn( */}
-                      {/*             // row className */}
-                      {/*             // typeof cell.column.columnDef.meta?.className === */}
-                      {/*             //   "string" */}
-                      {/*             //   ? cell.column.columnDef.meta.className */}
-                      {/*             //   : cell.column.columnDef.meta?.className?.( */}
-                      {/*             //       row.original, */}
-                      {/*             //       index, */}
-                      {/*             //     ), */}
-                      {/*             // bordered */}
-                      {/*             bordered && "border-e", */}
-                      {/*             // align */}
-                      {/*             cell.column.columnDef.meta?.align === "center" && */}
-                      {/*               "text-center", */}
-                      {/*             cell.column.columnDef.meta?.align === "right" && */}
-                      {/*               "text-right", */}
-                      {/*             // pinning */}
-                      {/*             // scroll?.x && */}
-                      {/*             getCommonPinningClassName(cell.column, { */}
-                      {/*               scrollLeft: wrapperScrollLeft, */}
-                      {/*               scrollRight: wrapperScrollRight, */}
-                      {/*             }), */}
-                      {/*             // selection column */}
-                      {/*             cell.id.endsWith("selection") && "px-0", */}
-                      {/*             // column className */}
-                      {/*             cell.column.columnDef.meta?.className, */}
-                      {/*           )} */}
-                      {/*         > */}
-                      {/*           {flexRender( */}
-                      {/*             cell.column.columnDef.cell, */}
-                      {/*             cell.getContext(), */}
-                      {/*           )} */}
-                      {/*         </TableCell> */}
-                      {/*       ); */}
-                      {/*     })} */}
-                      {/*   </components.body.row> */}
-                      {/* ) : ( */}
-                      {/*   <></> */}
-                      {/* )} */}
                       <TableRowComp
                         data-state={row.getIsSelected() && "selected"}
                         data-row-key={row.original[rowKey]}
@@ -602,16 +509,6 @@ const TableInner = <TRecord extends AnyObject>(
                               size={size}
                               style={getCommonPinningStyles(cell.column)}
                               className={cn(
-                                // row className
-                                // typeof cell.column.columnDef.meta?.className ===
-                                //   "string"
-                                //   ? cell.column.columnDef.meta.className
-                                //   : cell.column.columnDef.meta?.className?.(
-                                //       row.original,
-                                //       index,
-                                //     ),
-                                // bordered
-                                bordered && "border-e last:border-e-0",
                                 // align
                                 cell.column.columnDef.meta?.align ===
                                   "center" && "text-center",
