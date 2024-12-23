@@ -1,4 +1,4 @@
-import type { ColumnDef, Row } from "@tanstack/react-table";
+import type { ColumnDef, ColumnSort, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import type { AnyObject } from "../types";
@@ -11,14 +11,14 @@ import { DragHandle } from "./_components/table-row-sortable";
 
 export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
-  props?: Pick<
+  props: Pick<
     TableProps<TRecord>,
-    "rowKey" | "rowSelection" | "expandable" | "dnd"
+    "rowKey" | "rowSelection" | "expandable" | "sorting" | "dnd"
   >,
   isNotFirstDeepColumn?: boolean,
 ) => {
   const mergedColumns: TableColumnDef<TRecord>[] = [
-    ...(props?.dnd
+    ...(props.dnd
       ? [
           {
             key: "sort",
@@ -57,7 +57,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           ExtraTableColumnDef<TRecord> = {
           // accessorKey: dataIndex,
           ...(typeof dataIndex === "string"
-            ? { accessorKey: dataIndex }
+            ? { id: dataIndex, accessorKey: dataIndex }
             : { id: index.toString(), accessorFn: () => index.toString() }),
           header: () => title,
           ...(children
@@ -72,23 +72,33 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                 children: transformColumnDefs(
                   // add fixed to children
                   children.map((x) => ({ ...x, fixed })),
+                  props,
                 ),
               }
             : {}),
           enableResizing,
           enableHiding,
           size: width,
-          meta: { title, align, fixed, className, classNames },
+          meta: { title, align, fixed, sorter, className, classNames },
           // sorting
-          ...(sorter
+          ...(sorter || props.sorting?.state?.find((x) => x.id === dataIndex)
             ? {
-                enableSorting: true,
-                sortingFn:
-                  typeof sorter === "boolean"
-                    ? "auto"
-                    : typeof sorter === "string"
-                      ? sorter
-                      : (rowA, rowB) => sorter(rowA.original, rowB.original),
+                // enableSorting: true,
+                sortingFn: sorter
+                  ? typeof sorter === "string"
+                    ? sorter
+                    : typeof sorter === "function"
+                      ? (rowA, rowB) => sorter(rowA.original, rowB.original)
+                      : // object
+                        typeof sorter === "object"
+                        ? sorter.compare
+                          ? (rowA, rowB) =>
+                              sorter.compare!(rowA.original, rowB.original)
+                          : "auto"
+                        : // boolean
+                          "auto"
+                  : // undefined
+                    "auto",
               }
             : { enableSorting: false }),
           ...restProps,
@@ -141,7 +151,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
       },
     );
 
-  if (props?.dnd) {
+  if (props.dnd) {
     const dragHandleColumn: ColumnDef<TRecord> = {
       id: "sort",
       // header: () => undefined,
@@ -157,7 +167,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
     };
     columnsDef.unshift(dragHandleColumn);
   }
-  if (props?.rowSelection) {
+  if (props.rowSelection) {
     let lastSelectedId = "";
 
     const selectionColumn: ColumnDef<TRecord> = {
@@ -220,7 +230,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
     columnsDef.unshift(selectionColumn);
   }
 
-  if (props?.expandable) {
+  if (props.expandable) {
     const expandColumn: ColumnDef<TRecord> = {
       id: "expander",
       // header: () => undefined,
@@ -297,4 +307,11 @@ export const transformedRowSelection = <TRecord extends AnyObject>(
     }
   }
   return rowSelectionTst;
+};
+
+/* Type Guard */
+export const isColumnSortType = (
+  item: Partial<ColumnSort>,
+): item is ColumnSort => {
+  return item.id !== undefined;
 };

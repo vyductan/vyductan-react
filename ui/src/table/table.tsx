@@ -4,6 +4,7 @@
 import type {
   ExpandedState,
   OnChangeFn,
+  Row,
   RowSelectionState,
   SortingState,
   Table as TableDef,
@@ -83,7 +84,6 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       header?: string;
       row?: string | ((record: TRecord, index: number) => string);
       th?: string;
-      tr?: string;
       td?: string;
     };
 
@@ -172,8 +172,9 @@ const TableInner = <TRecord extends AnyObject>(
         rowSelection: propRowSelection,
         expandable,
         dnd,
+        sorting: propSorting,
       }),
-    [propColumns, rowKey, propRowSelection, expandable, dnd],
+    [propColumns, rowKey, propRowSelection, expandable, dnd, propSorting],
   );
 
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -246,6 +247,25 @@ const TableInner = <TRecord extends AnyObject>(
   const [sorting, setSorting] = useMergedState(propSorting?.default ?? [], {
     value: propSorting?.state,
     onChange: propSorting?.onChange,
+    postState: (value) => {
+      // Sort by priority
+      value.sort((a, b) => {
+        const columnDefA = columns.find((c) => c.id === a.id);
+        const columnDefB = columns.find((c) => c.id === b.id);
+        if (
+          typeof columnDefA?.meta?.sorter === "object" &&
+          typeof columnDefB?.meta?.sorter === "object"
+        ) {
+          return (
+            columnDefB.meta.sorter.multiple - columnDefA.meta.sorter.multiple
+          );
+        }
+        return 0;
+      });
+      // Doesn't change local state if sorting is controlled
+      // if (propSorting?.onChange) propSorting.onChange(value);
+      return value;
+    },
   });
 
   const table = useReactTable({
@@ -275,6 +295,12 @@ const TableInner = <TRecord extends AnyObject>(
     // sorting
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
+    // enableMultiSort: true, // Don't allow shift key to sort multiple columns - default on/true
+    isMultiSortEvent: columns.some(
+      (col) => typeof col.meta?.sorter === "object",
+    )
+      ? () => true
+      : undefined, // Make all clicks multi-sort - default requires `shift` key
   });
 
   // ---- Table styles ----//
@@ -317,6 +343,15 @@ const TableInner = <TRecord extends AnyObject>(
   ) : (
     <></>
   );
+
+  // ---- classes ----//
+  const getRowClassName = (row: Row<TRecord>, index: number) => {
+    return classNames?.row
+      ? typeof classNames.row === "string"
+        ? classNames.row
+        : classNames.row(row.original, index)
+      : "";
+  };
 
   return (
     <>
@@ -470,7 +505,7 @@ const TableInner = <TRecord extends AnyObject>(
                     <TableRow
                       key={row.id}
                       className={cn(
-                        classNames?.tr,
+                        getRowClassName(row, index),
                         row.original._customRowClassName as string,
                       )}
                       style={row.original._customRowStyle as CSSProperties}
@@ -491,15 +526,8 @@ const TableInner = <TRecord extends AnyObject>(
                         data-state={row.getIsSelected() && "selected"}
                         data-row-key={row.original[rowKey]}
                         className={cn(
-                          classNames?.row
-                            ? typeof classNames.row === "string"
-                              ? classNames.row
-                              : classNames.row(row.original, index)
-                            : "",
-                          // classNames.row?.className,
-                          // rowClassName?.(row.original, index),
                           row.getIsExpanded() ? "border-x" : "",
-                          classNames?.tr,
+                          getRowClassName(row, index),
                         )}
                       >
                         {row.getVisibleCells().map((cell) => {
