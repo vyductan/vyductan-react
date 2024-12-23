@@ -145,7 +145,6 @@ const SortableContext = ({
     }),
   );
 
-  console.log("iiiiii", items);
   return (
     <DndContext
       accessibility={{

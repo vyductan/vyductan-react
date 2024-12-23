@@ -82,7 +82,6 @@ const DateRangePickerInternal = <T extends DateType = Date>(
             : undefined
         }
         onSelect={(dateRange) => {
-          console.log("ddd", dateRange);
           if (!dateRange) {
             setValue(undefined);
             return;
