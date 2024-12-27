@@ -44,6 +44,7 @@ import { Spin } from "../spin";
 import {
   TableBody,
   TableCell,
+  TableFooter,
   TableHeader,
   TableRoot,
   TableRow,
@@ -82,6 +83,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     classNames?: {
       table?: string;
       header?: string;
+      footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
       th?: string;
       td?: string;
@@ -126,12 +128,15 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     components?: TableComponents<TRecord>;
     /** Toolbar */
     toolbar?: (table: TableDef<TRecord>) => React.JSX.Element;
+    /** Summary content */
+    summary?: (currentData: TRecord[]) => React.ReactNode;
 
     dnd?: Pick<SortableContextProps, "onDragEnd">;
   };
 
 const TableInner = <TRecord extends AnyObject>(
   {
+    style,
     className,
     bordered = false,
     size,
@@ -160,6 +165,8 @@ const TableInner = <TRecord extends AnyObject>(
 
     components,
     toolbar,
+    summary,
+
     ...props
   }: TableProps<TRecord>,
   ref: ForwardedRef<HTMLTableElement>,
@@ -313,6 +320,9 @@ const TableInner = <TRecord extends AnyObject>(
     };
   }
 
+  // ====================== Scroll ======================
+  // const stickyOffsets = useStickyOffsets(colWidths, flattenColumns, direction);
+
   // ---- scroll X ----//
   // ---- to show or disable box-shadow ----//
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -362,7 +372,8 @@ const TableInner = <TRecord extends AnyObject>(
           "w-full overflow-auto",
           scroll?.x && "overflow-x-auto overflow-y-hidden",
           bordered && [
-            "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
+            // "[&_table]:border-separate",
+            "[&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
             typeof bordered === "boolean" &&
               "[&_th:last-child]:border-e-0 [&_th]:border-e",
             typeof bordered === "boolean" &&
@@ -373,6 +384,7 @@ const TableInner = <TRecord extends AnyObject>(
           ],
           className,
         )}
+        style={style}
       >
         {TableToolbarSection}
         {title && (
@@ -590,6 +602,16 @@ const TableInner = <TRecord extends AnyObject>(
                 </TableRow>
               )}
             </TableBody>
+          )}
+
+          {summary && (
+            <TableFooter
+              className={classNames?.footer}
+              // flattenColumns={[]}
+              // stickyOffsets={{ left: 0, right: 0 }}
+            >
+              {summary(dataSource)}
+            </TableFooter>
           )}
         </TableRoot>
         {pagination && <Pagination className="my-4" {...pagination} />}

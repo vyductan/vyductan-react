@@ -103,11 +103,20 @@ export type TableSize = "sm" | "default";
 
 export type Key = React.Key;
 
+export type FixedType = "left" | "right" | boolean;
+
 export type ScrollConfig = {
   index?: number;
   key?: Key;
   top?: number;
 };
+
+// ================= Fix Column =================
+export interface StickyOffsets {
+  left: readonly number[];
+  right: readonly number[];
+  isSticky?: boolean;
+}
 
 // ================= Customized =================
 type Component<P> =
