@@ -1,7 +1,4 @@
-/** @type {import('eslint').Linter.Config} */
-const config = {
-  extends: ["plugin:drizzle/recommended"],
-  plugins: ["drizzle"],
-};
+import drizzlePlugin from "eslint-plugin-drizzle";
 
-module.exports = config;
+/** @type {Awaited<import('typescript-eslint').Config>} */
+export default [drizzlePlugin.configs["recommended"]];

@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
+import plugin from "tailwindcss/plugin";
 
 import base from "./base";
 
@@ -42,5 +43,23 @@ export default {
       },
     },
   },
-  plugins: [animate],
+  plugins: [
+    animate,
+    plugin(function (api) {
+      api.addUtilities({
+        /* Hide scrollbar for IE, Edge and Firefox */
+        ".no-scrollbar": {
+          /* IE and Edge */
+          "-ms-overflow-style": "none",
+          /* Firefox */
+          "scrollbar-width": "none",
+          /* Safari and Chrome */
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+        ".toaster": {},
+      });
+    }),
+  ],
 } satisfies Config;

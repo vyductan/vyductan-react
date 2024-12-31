@@ -1,3 +1,3 @@
-export * from "./BackToTop";
-export * from "./FloatButton";
-export * from "./FloatButtonGroup";
+export * from "./back-to-top";
+export * from "./float-button";
+export * from "./float-button-group";

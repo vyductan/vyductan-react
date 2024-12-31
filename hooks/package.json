@@ -23,18 +23,15 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "prettier": "@acme/prettier-config",
-  "dependencies": {
-    "@tanstack/react-router": "^1.49.1"
-  },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@types/react": "catalog:react18",
-    "@types/react-dom": "catalog:react18",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "react": "catalog:react18",
+    "react": "catalog:react19",
     "typescript": "catalog:"
   }
 }

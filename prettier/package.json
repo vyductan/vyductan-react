@@ -14,10 +14,10 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
     "prettier": "catalog:",
-    "prettier-plugin-packagejson": "^2.5.0",
-    "prettier-plugin-tailwindcss": "^0.6.6"
+    "prettier-plugin-packagejson": "^2.5.6",
+    "prettier-plugin-tailwindcss": "^0.6.9"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",

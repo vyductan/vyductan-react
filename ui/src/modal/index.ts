@@ -1,2 +1,3 @@
-export * from "./Modal";
-export * from "./useModal";
+export * from "./modal";
+export * from "./_components";
+export * from "./use-modal";

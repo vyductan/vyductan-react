@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Icon } from "../icons";
 
 type AccordionRootProps = React.ComponentPropsWithoutRef<
@@ -27,7 +27,7 @@ const AccordionTrigger = React.forwardRef<
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
-      className={clsm(
+      className={cn(
         "flex flex-1 items-center justify-between py-2.5 transition-all",
         "[&[data-state=open]>svg]:rotate-180",
         className,
@@ -62,7 +62,7 @@ const AccordionContent = React.forwardRef<
       asChild
       {...props}
     >
-      <Comp className={clsm(className)}>{children}</Comp>
+      <Comp className={cn(className)}>{children}</Comp>
     </AccordionPrimitive.Content>
   );
 });

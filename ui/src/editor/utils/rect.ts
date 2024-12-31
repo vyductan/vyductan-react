@@ -105,10 +105,10 @@ export class Rect {
   public intersectsWith(rect: Rect): boolean {
     const { left: x1, top: y1, width: w1, height: h1 } = rect;
     const { left: x2, top: y2, width: w2, height: h2 } = this;
-    const maxX = x1 + w1 >= x2 + w2 ? x1 + w1 : x2 + w2;
-    const maxY = y1 + h1 >= y2 + h2 ? y1 + h1 : y2 + h2;
-    const minX = x1 <= x2 ? x1 : x2;
-    const minY = y1 <= y2 ? y1 : y2;
+    const maxX = Math.max(x1 + w1, x2 + w2);
+    const maxY = Math.max(y1 + h1, y2 + h2);
+    const minX = Math.min(x1, x2);
+    const minY = Math.min(y1, y2);
     return maxX - minX <= w1 + w2 && maxY - minY <= h1 + h2;
   }
 

@@ -1,4 +1,4 @@
-import { clsm } from "..";
+import { cn } from "..";
 
 export const LoadingIcon = ({
   className,
@@ -10,7 +10,7 @@ export const LoadingIcon = ({
       width="1em"
       height="1em"
       viewBox="0 0 24 24"
-      className={clsm("animate-spin", className)}
+      className={cn("animate-spin", className)}
       {...props}
     >
       <defs>

@@ -2,7 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { cva } from "class-variance-authority";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 const alertVariants = cva(
   "relative w-full rounded-lg border px-3 py-2 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
@@ -29,7 +29,7 @@ const AlertRoot = React.forwardRef<HTMLDivElement, AlertRootProps>(
     <div
       ref={ref}
       role="alert"
-      className={clsm(alertVariants({ type }), className)}
+      className={cn(alertVariants({ type }), className)}
       {...props}
     />
   ),
@@ -42,7 +42,7 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={clsm("mb-1 font-medium leading-none tracking-tight", className)}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
   />
 ));
@@ -54,7 +54,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={clsm("text-sm [&_p]:leading-relaxed", className)}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
     {...props}
   />
 ));

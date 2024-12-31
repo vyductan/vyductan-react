@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
@@ -6,7 +7,7 @@ import isVisible from "rc-util/lib/Dom/isVisible";
 import { composeRef, supportRef } from "rc-util/lib/ref";
 
 import type { WaveAllowedComponent } from "./interface";
-import useWave from "./useWave";
+import useWave from "./use-wave";
 
 export interface WaveProps {
   disabled?: boolean;
@@ -60,7 +61,7 @@ const Wave: React.FC<WaveProps> = (props) => {
   }
 
   const ref = supportRef(children)
-    ? composeRef((children as any).ref, containerRef)
+    ? composeRef((children as any).props.ref, containerRef)
     : containerRef;
 
   return cloneElement<any>(children, { ref });

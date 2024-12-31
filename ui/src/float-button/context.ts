@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import type { FloatButtonProps } from "./FloatButton";
+import type { FloatButtonProps } from "./float-button";
 
 const FloatButtonGroupContext = React.createContext<
   FloatButtonProps["shape"] | undefined

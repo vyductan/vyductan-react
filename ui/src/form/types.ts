@@ -1,17 +1,23 @@
-import type { FieldValues,  } from "react-hook-form";
+import type { ReactNode } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import type { AutoCompleteProps } from "../autocomplete";
 import type { DatePickerProps, DateRangePickerProps } from "../date-picker";
-import type { EditorProps } from "../editor/Editor";
+import type { EditorProps } from "../editor";
 import type { InputProps } from "../input";
-import type { InputPasswordProps } from "../input/Password";
+import type { InputPasswordProps } from "../input/password";
 import type { RadioGroupProps } from "../radio";
 import type { SelectProps } from "../select";
 import type { TextareaProps } from "../textarea";
-import type { FieldProps } from "./Field";
-import type { FieldArrayProps } from "./FieldArray";
+import type { FieldProps } from "./field";
+import type { FieldArrayProps } from "./field-list";
 
 export type ValueType = string | number | boolean;
+
+export type FieldError = {
+  path: string[];
+  message: string;
+};
 
 type AutoFormFieldBaseProps = {
   // title?: ReactNode;
@@ -129,7 +135,7 @@ type FieldsSchema<
     ? {
         type: TFieldType;
         name?: never;
-        render: () => void;
+        render: () => ReactNode;
       }
     : TFieldType extends FieldGroupType
       ? {
@@ -231,6 +237,6 @@ export type ResetAction<TFieldValues> = (
   formValues: TFieldValues,
 ) => TFieldValues;
 
-export type { FieldsSchema, FieldType,  };
+export type { FieldsSchema, FieldType };
 
-export {type SubmitHandler} from "react-hook-form";
+export { type SubmitHandler } from "react-hook-form";

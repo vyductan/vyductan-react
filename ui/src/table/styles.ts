@@ -1,12 +1,12 @@
 import type { Column } from "@tanstack/react-table";
 import type { CSSProperties } from "react";
 
-import { clsm } from "..";
+import { cn } from "..";
 
 // export const tableStyles = {
 //   row: {
-//     classNames: clsm("bg-background"),
-//     hoverClassNames: clsm("bg-gray-100 dark:bg-gray-800"),
+//     classNames: cn("bg-background"),
+//     hoverClassNames: cn("bg-gray-100 dark:bg-gray-800"),
 //     hoverByCssClassNames: "hover:bg-gray-100 dark:hover:bg-gray-800",
 //   },
 // };
@@ -24,15 +24,15 @@ export const getCommonPinningStyles = <T>(column: Column<T>): CSSProperties => {
 export const getCommonPinningClassName = <T>(
   column: Column<T>,
   { scrollLeft, scrollRight }: { scrollLeft: number; scrollRight: number },
-  isHeader?: boolean,
+  _isHeader?: boolean,
 ): string => {
   const isPinned = column.getIsPinned();
   const isLastLeftPinnedColumn =
     isPinned === "left" && column.getIsLastColumn("left");
   const isFirstRightPinnedColumn =
     isPinned === "right" && column.getIsFirstColumn("right");
-  return clsm(
-    isPinned && !isHeader && "bg-background",
+  return cn(
+    // isPinned && !isHeader && "bg-surface",
     isPinned ? "sticky z-10" : "relative",
     isLastLeftPinnedColumn && [
       "after:absolute after:inset-y-0 after:right-0 after:w-[30px] after:translate-x-full",

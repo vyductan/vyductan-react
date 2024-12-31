@@ -1,10 +1,10 @@
 import * as React from "react";
-import Link from "next/link";
 
 import type { ButtonProps } from "../button";
-import { clsm } from "..";
+import { cn } from "..";
 import { buttonVariants } from "../button";
 import { Icon } from "../icons";
+import { Link } from "../link";
 
 const PaginationRoot = ({
   className,
@@ -13,7 +13,7 @@ const PaginationRoot = ({
   <nav
     role="navigation"
     aria-label="pagination"
-    className={clsm("mx-auto flex w-full justify-center", className)}
+    className={cn("mx-auto flex w-full justify-center", className)}
     {...props}
   />
 );
@@ -25,7 +25,7 @@ const PaginationContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ul
     ref={ref}
-    className={clsm("flex flex-row items-center gap-1", className)}
+    className={cn("flex flex-row items-center gap-1", className)}
     {...props}
   />
 ));
@@ -35,9 +35,7 @@ type PaginationItemProps = React.ComponentProps<"li">;
 
 const PaginationItem = React.forwardRef<HTMLLIElement, PaginationItemProps>(
   ({ className, ...props }, ref) => {
-    return (
-      <li ref={ref} className={clsm("select-none", className)} {...props} />
-    );
+    return <li ref={ref} className={cn("select-none", className)} {...props} />;
   },
 );
 PaginationItem.displayName = "PaginationItem";
@@ -58,7 +56,7 @@ const PaginationLink = ({
 }: PaginationLinkProps) => (
   <Link
     aria-current={isActive ? "page" : undefined}
-    className={clsm(
+    className={cn(
       buttonVariants({
         variant: isActive ? "outline" : "ghost",
         size,
@@ -80,7 +78,7 @@ const PaginationPrevious = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label="Go to previous page"
-    className={clsm(className)}
+    className={cn(className)}
     {...props}
   >
     <Icon icon="mingcute:left-fill" className="size-4" />
@@ -94,7 +92,7 @@ const PaginationNext = ({
 }: React.ComponentProps<typeof PaginationLink>) => (
   <PaginationLink
     aria-label="Go to next page"
-    className={clsm(className)}
+    className={cn(className)}
     {...props}
   >
     <Icon icon="icon-[mingcute:right-fill]" className="size-4" />
@@ -108,7 +106,7 @@ const PaginationEllipsis = ({
 }: React.ComponentProps<"span">) => (
   <span
     aria-hidden
-    className={clsm("flex size-9 items-center justify-center", className)}
+    className={cn("flex size-9 items-center justify-center", className)}
     {...props}
   >
     <Icon icon="icon-[mingcute--more-1-fill] size-4" className="size-4" />
@@ -121,7 +119,7 @@ const PaginationTotal = ({
   className,
   ...props
 }: React.ComponentProps<"li">) => {
-  return <li className={clsm("", className)} {...props} />;
+  return <li className={cn("", className)} {...props} />;
 };
 PaginationTotal.displayName = "PaginationTotal";
 

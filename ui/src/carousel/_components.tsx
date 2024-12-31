@@ -4,7 +4,7 @@ import type { UseEmblaCarouselType } from "embla-carousel-react";
 import * as React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
-import { clsm } from "..";
+import { cn } from "..";
 import { Button } from "../button";
 import { Icon } from "../icons";
 
@@ -29,7 +29,9 @@ type CarouselContextProps = {
   canScrollNext: boolean;
 } & CarouselProps;
 
-const CarouselContext = React.createContext<CarouselContextProps | null>(null);
+const CarouselContext = React.createContext<CarouselContextProps | undefined>(
+  undefined,
+);
 
 function useCarousel() {
   const context = React.useContext(CarouselContext);
@@ -135,7 +137,7 @@ const Carousel = React.forwardRef<
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
-          className={clsm("relative", className)}
+          className={cn("relative", className)}
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -158,7 +160,7 @@ const CarouselContent = React.forwardRef<
     <div ref={carouselRef} className="overflow-hidden">
       <div
         ref={ref}
-        className={clsm(
+        className={cn(
           "flex",
           orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
           className,
@@ -181,7 +183,7 @@ const CarouselItem = React.forwardRef<
       ref={ref}
       role="group"
       aria-roledescription="slide"
-      className={clsm(
+      className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className,
@@ -203,7 +205,7 @@ const CarouselPrevious = React.forwardRef<
       ref={ref}
       variant={variant}
       shape={shape}
-      className={clsm(
+      className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
@@ -232,7 +234,7 @@ const CarouselNext = React.forwardRef<
       ref={ref}
       variant={variant}
       shape={shape}
-      className={clsm(
+      className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
           ? "-right-12 top-1/2 -translate-y-1/2"

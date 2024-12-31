@@ -12,6 +12,7 @@ const config = {
     "prettier-plugin-tailwindcss",
   ],
   tailwindConfig: fileURLToPath(new URL("../tailwind/web.ts", import.meta.url)),
+  tailwindFunctions: ["tv"],
   importOrder: [
     "<TYPES>",
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",

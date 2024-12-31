@@ -1,10 +1,9 @@
 import * as path from "node:path";
-import { fileURLToPath } from "url";
+// import { fileURLToPath } from "url";
 // @ts-expect-error
 import tailwindPlugin from "eslint-plugin-tailwindcss";
 
-const __filename = fileURLToPath(import.meta.url);
-const config = path.join(import.meta.dirname, "../tailwind/web.ts");
+// const __filename = fileURLToPath(import.meta.url);
 
 /** @type {Awaited<import('typescript-eslint').Config>} */
 export default [
@@ -18,8 +17,9 @@ export default [
     // },
     settings: {
       tailwindcss: {
-        callees: ["clsm", "cva", "cx"],
-        config,
+        callees: ["cn", "cva", "cx"],
+        config: path.join(import.meta.dirname, "../tailwind/web.ts"),
+        // config: "../tailwind/web.ts",
         // config: fileURLToPath(
         //   new URL("../tailwind/web.ts", "file://" + __filename),
         // ),
