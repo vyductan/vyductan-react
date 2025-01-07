@@ -565,7 +565,7 @@ const TableInner = <TRecord extends AnyObject>(
                                 // column className
                                 classNames?.td,
                                 cell.column.columnDef.meta?.className,
-                                cell.column.columnDef.meta?.classNames?.td,
+                                cell.column.columnDef.meta?.classNames?.cell,
                               )}
                             >
                               {flexRender(
