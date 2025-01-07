@@ -50,7 +50,7 @@ const SelectInner = <T extends ValueType = string>(
   {
     id,
     value,
-    options,
+    options: optionsProp,
     placeholder,
 
     allowClear,
@@ -66,6 +66,9 @@ const SelectInner = <T extends ValueType = string>(
   }: SelectProps<T>,
   _: React.ForwardedRef<HTMLInputElement>,
 ) => {
+  /* Remove duplicate options */
+  const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
+
   const [open, setOpen] = React.useState(false);
 
   // fix placeholder did not back when set value to undefined
