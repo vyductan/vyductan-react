@@ -1,5 +1,5 @@
 import type { TextNode } from "lexical";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type JSX } from "react";
 import * as React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -34,11 +34,9 @@ export default function ComponentPickerMenuPlugin(): React.JSX.Element {
 
     return (
       // ...getDynamicOptions(editor, queryString),
-      baseOptions.filter(
-        (option) =>
-          regex.test(option.title) ||
-          option.keywords.some((keyword) => regex.test(keyword)),
-      )
+      (baseOptions.filter((option) =>
+        regex.test(option.title) ||
+        option.keywords.some((keyword) => regex.test(keyword))))
     );
   }, [editor, queryString, showModal]);
 
