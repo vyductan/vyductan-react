@@ -1,12 +1,12 @@
 "use client";
 
 import type { Column } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
 import type { TableHeadProps } from ".";
 import type { tableLocale_en } from "../locale/en-us";
 import { TableHead } from ".";
 import { cn } from "../..";
+import { Icon } from "../../icons";
 import { Tooltip } from "../../tooltip";
 
 interface TableHeadAdvancedProps<TData, TValue> extends TableHeadProps {
@@ -63,11 +63,23 @@ export function TableHeadAdvanced<TData, TValue>({
         >
           {children}
           {column.getCanSort() && column.getIsSorted() === "desc" ? (
-            <ArrowDown className="ml-2.5 size-4" aria-hidden="true" />
+            <Icon
+              icon="icon-[lucide--arrow-down]"
+              className="ml-2.5 size-4"
+              aria-hidden="true"
+            />
           ) : column.getIsSorted() === "asc" ? (
-            <ArrowUp className="ml-2.5 size-4" aria-hidden="true" />
+            <Icon
+              icon="icon-[lucide--arrow-up"
+              className="ml-2.5 size-4"
+              aria-hidden="true"
+            />
           ) : (
-            <ChevronsUpDown className="ml-2.5 size-4" aria-hidden="true" />
+            <Icon
+              icon="icon-[lucide--chevrons-up-down]"
+              className="ml-2.5 size-4"
+              aria-hidden="true"
+            />
           )}
         </div>
       </Tooltip>
