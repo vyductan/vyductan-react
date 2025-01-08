@@ -1,4 +1,5 @@
 // https://github.com/vercel/next.js/discussions/36723#discussioncomment-5186972
+// TODO: check if breadcrumb has 3 level and click random link in breadcrumb then is correct back to parrent path
 
 import { useEffect } from "react";
 import { create } from "zustand";
