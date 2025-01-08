@@ -11,7 +11,7 @@ type Meta<TRecord> = {
   fixed?: "left" | "right";
   className?: string;
   classNames?: {
-    td?: string;
+    cell?: string;
   };
   // rowName?: string | ((record: TRecord, index: number) => string);
   /** Sort function for local sort, see Array.sort's compareFunction. If it is server-side sorting, set to true, but if you want to support multi-column sorting, you can set it to { multiple: number }
