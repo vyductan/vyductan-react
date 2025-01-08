@@ -410,22 +410,21 @@ const TableInner = <TRecord extends AnyObject>(
 
               classNames?.table,
             )}
+            style={tableStyles}
+            {...props}
           >
-            <div className="font-semibold leading-none tracking-tight">
-              {title}
-            </div>
-            {extra && <div>{extra}</div>}
-          </div>
-        )}
-        {TableAlertSection}
-        <TableRoot
-          ref={ref}
-          className={cn(
-            !scroll?.x && "w-full",
-            // bordered
-            // bordered &&
-            //   "border-separate border-spacing-0 rounded-md border-s border-t",
-            size === "sm" ? "[&_th]:" : "",
+            {columns.some((column) => column.size) && (
+              <colgroup>
+                {columns.map((col, index) => (
+                  <col
+                    key={index}
+                    {...(col.size === undefined
+                      ? {}
+                      : { style: { width: col.size } })}
+                  />
+                ))}
+              </colgroup>
+            )}
 
             <TableHeader
               style={{
@@ -485,153 +484,22 @@ const TableInner = <TRecord extends AnyObject>(
                   })}
                 </TableRow>
               ))}
-            </colgroup>
-          )}
+            </TableHeader>
 
-          <TableHeader
-            style={{
-              position: sticky ? "sticky" : undefined,
-              top: sticky
-                ? typeof sticky === "boolean"
-                  ? 0
-                  : sticky.offsetHeader
-                : undefined,
-              zIndex: sticky ? 11 : undefined,
-            }}
-            className={classNames?.header}
-          >
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHeadAdvanced
-                      key={header.id}
-                      locale={locale}
-                      column={header.column}
-                      scope="col"
-                      colSpan={header.colSpan}
-                      size={size}
-                      style={getCommonPinningStyles(header.column)}
-                      className={cn(
-                        // column className
-                        header.column.columnDef.meta?.className,
-                        // align
-                        header.column.columnDef.meta?.align === "center" &&
-                          "text-center",
-                        header.column.columnDef.meta?.align === "right" &&
-                          "text-right",
-                        // pinning
-                        // scroll?.x &&
-                        getCommonPinningClassName(
-                          header.column,
-                          {
-                            scrollLeft: wrapperScrollLeft,
-                            scrollRight: wrapperScrollRight,
-                          },
-                          true,
-                        ),
-                        // selection column
-                        header.id === "selection" && "px-0",
-                        classNames?.th,
-                      )}
-                    >
-                      {header.isPlaceholder
-                        ? undefined
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHeadAdvanced>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
+            {/* padding with header [disable if bordered]*/}
+            {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
 
-          {/* padding with header [disable if bordered]*/}
-          {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
-
-          {skeleton ? (
-            <TableBody>
-              {Array.from({ length: 5 })
-                .fill(0)
-                .map((_, index) => {
-                  return (
-                    <TableRow key={index} className="hover:bg-transparent">
-                      {table.getVisibleFlatColumns().map((x) => {
-                        return (
-                          <TableCell key={x.id}>
-                            <Skeleton className="h-4 w-full" />
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          ) : (
-            <TableBody>
-              {table.getRowModel().rows.length > 0 ? (
-                table.getRowModel().rows.map((row, index) =>
-                  "_customRow" in row.original ? (
-                    <TableRow
-                      key={row.id}
-                      className={cn(
-                        getRowClassName(row, index),
-                        row.original._customRowClassName as string,
-                      )}
-                      style={row.original._customRowStyle as CSSProperties}
-                    >
-                      <TableCell
-                        colSpan={columns.length}
-                        size={size}
-                        className={cn(
-                          row.original._customCellClassName as string,
-                        )}
-                      >
-                        {row.original._customRow as React.ReactNode}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    <Fragment key={row.id}>
-                      <TableRowComp
-                        data-state={row.getIsSelected() && "selected"}
-                        data-row-key={row.original[rowKey]}
-                        className={cn(
-                          row.getIsExpanded() ? "border-x" : "",
-                          getRowClassName(row, index),
-                        )}
-                      >
-                        {row.getVisibleCells().map((cell) => {
+            {skeleton ? (
+              <TableBody>
+                {Array.from({ length: 5 })
+                  .fill(0)
+                  .map((_, index) => {
+                    return (
+                      <TableRow key={index} className="hover:bg-transparent">
+                        {table.getVisibleFlatColumns().map((x) => {
                           return (
-                            <TableCell
-                              key={cell.id}
-                              size={size}
-                              style={getCommonPinningStyles(cell.column)}
-                              className={cn(
-                                // align
-                                cell.column.columnDef.meta?.align ===
-                                  "center" && "text-center",
-                                cell.column.columnDef.meta?.align === "right" &&
-                                  "text-right",
-                                // pinning
-                                // scroll?.x &&
-                                getCommonPinningClassName(cell.column, {
-                                  scrollLeft: wrapperScrollLeft,
-                                  scrollRight: wrapperScrollRight,
-                                }),
-                                // selection column
-                                cell.id.endsWith("selection") && "px-0",
-                                // column className
-                                classNames?.td,
-                                cell.column.columnDef.meta?.className,
-                                cell.column.columnDef.meta?.classNames?.td,
-                              )}
-                            >
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
+                            <TableCell key={x.id}>
+                              <Skeleton className="h-4 w-full" />
                             </TableCell>
                           );
                         })}
