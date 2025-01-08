@@ -15,14 +15,14 @@ export const InputSearch = ({ placeholder, ...props }: SearchProps) => {
 
   const { run: handleSearch } = useDebounceFn(
     (term: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set("page", "1");
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("page", "1");
       if (term) {
-        params.set("query", term);
+        newSearchParams.set("query", term);
       } else {
-        params.delete("query");
+        newSearchParams.delete("query");
       }
-      router.replace(`${pathname}?${params.toString()}`);
+      router.replace(`${pathname}?${newSearchParams.toString()}`);
     },
     {
       wait: 300,
