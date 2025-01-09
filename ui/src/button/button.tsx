@@ -11,7 +11,7 @@ import { cn } from "..";
 import Wave from "../_util/wave";
 import { Link } from "../link";
 import { GenericSlot } from "../slot";
-import { useUi } from "../store";
+import { useUiConfig } from "../store";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
@@ -309,7 +309,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const buttonConfig = useUi((state) => state.componentConfig.button);
+    const buttonConfig = useUiConfig((state) => state.components.button);
 
     const Comp = asChild || href ? Slot : "button";
 

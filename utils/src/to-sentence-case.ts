@@ -1,3 +1,5 @@
+"use client";
+
 export function toSentenceCase(string_: string) {
   return string_
     .replaceAll("_", " ")

@@ -2,7 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
 import { cn } from "..";
-import { useUi } from "../store";
+import { useUiConfig } from "../store";
 
 const color: Record<string, string> = {
   default: "bg-gray-200 text-gray-950 border-gray-600",
@@ -63,7 +63,7 @@ const Tag = ({
   borderless: borderlessProp = false,
   ...props
 }: TagProps) => {
-  const tagConfig = useUi((state) => state.componentConfig.tag);
+  const tagConfig = useUiConfig((state) => state.components.tag);
 
   return (
     <div

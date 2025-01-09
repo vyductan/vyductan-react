@@ -16,8 +16,8 @@ import { Link } from "./link";
 //   dateTime: string;
 //   dateTimeWithSeconds: string;
 // };
-type UiState = {
-  componentConfig: {
+type UiConfigState = {
+  components: {
     button?: Partial<Pick<ButtonProps, "classNames">>;
     datePicker?: Partial<Pick<DatePickerProps, "format">>;
     tag?: Partial<Pick<TagProps, "className" | "borderless">>;
@@ -37,10 +37,10 @@ type UiState = {
     };
   };
 };
-type UiStore = UiState;
+type UiConfigStore = UiConfigState;
 
-const defaultInitState: UiState = {
-  componentConfig: {
+const defaultInitState: UiConfigState = {
+  components: {
     link: {
       default: Link,
     },
@@ -55,51 +55,53 @@ const defaultInitState: UiState = {
   },
 };
 
-const createUiStore = (initState: UiState = defaultInitState) => {
-  return createStore<UiStore>()(() => ({
+const createUiConfigStore = (initState: UiConfigState = defaultInitState) => {
+  return createStore<UiConfigStore>()(() => ({
     ...initState,
   }));
 };
 
-type UiStoreApi = ReturnType<typeof createUiStore>;
+type UiConfigStoreApi = ReturnType<typeof createUiConfigStore>;
 
-const UiStoreContext = createContext<UiStoreApi | undefined>(undefined);
+const UiConfigStoreContext = createContext<UiConfigStoreApi | undefined>(
+  undefined,
+);
 
 type UiStoreProviderProps = {
   children: ReactNode;
-  componentConfig?: Partial<UiState["componentConfig"]>;
+  componentConfig?: Partial<UiConfigState["components"]>;
 };
-export const UiProvider = ({
+export const UiConfigProvider = ({
   children,
   componentConfig,
 }: UiStoreProviderProps) => {
-  const storeRef = useRef<UiStoreApi>(null);
+  const storeRef = useRef<UiConfigStoreApi>(null);
   if (!storeRef.current) {
-    storeRef.current = createUiStore({
-      componentConfig: {
-        ...defaultInitState.componentConfig,
+    storeRef.current = createUiConfigStore({
+      components: {
+        ...defaultInitState.components,
         ...componentConfig,
       },
     });
   }
   return (
-    <UiStoreContext.Provider value={storeRef.current}>
+    <UiConfigStoreContext.Provider value={storeRef.current}>
       {children}
-    </UiStoreContext.Provider>
+    </UiConfigStoreContext.Provider>
   );
 };
 
-export function useUi(): UiStore;
-export function useUi<T>(selector: (store: UiStore) => T): T;
-export function useUi<T>(selector?: (store: UiStore) => T): T {
-  const appStoreContext = useContext(UiStoreContext);
+export function useUiConfig(): UiConfigStore;
+export function useUiConfig<T>(selector: (store: UiConfigStore) => T): T;
+export function useUiConfig<T>(selector?: (store: UiConfigStore) => T): T {
+  const appStoreContext = useContext(UiConfigStoreContext);
 
   if (!appStoreContext) {
-    throw new Error(`useUi must be used within UiStoreProvider`);
+    throw new Error(`useUiConfig must be used within UiConfigProvider`);
   }
 
   return useStore(
     appStoreContext,
-    selector ?? ((store: UiStore) => store as T),
+    selector ?? ((store: UiConfigStore) => store as T),
   );
 }

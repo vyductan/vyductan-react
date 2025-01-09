@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Icon } from "../icons";
-import { useUi } from "../store";
+import { useUiConfig } from "../store";
 
 type ResultProps = {
   status?: "success" | "info" | "warning" | "error" | "500";
@@ -10,15 +10,15 @@ type ResultProps = {
   extra?: React.ReactNode;
 };
 const Result = ({ status, title, subtitle, extra }: ResultProps) => {
-  const { result } = useUi((s) => s.componentConfig);
+  const { result } = useUiConfig((s) => s.components);
   let icon: ReactNode = <></>;
   switch (status) {
     case "success": {
-      icon = <Icon icon="icon-[mingcute--success-fill]" />;
+      icon = <Icon icon="icon-[ep--success-filled]" />;
       break;
     }
     case "info": {
-      icon = <Icon icon="icon-[mingcute--info-fill]" />;
+      icon = <Icon icon="icon-[si--info-fill]" />;
       break;
     }
     case "warning": {
@@ -26,14 +26,14 @@ const Result = ({ status, title, subtitle, extra }: ResultProps) => {
       break;
     }
     case "error": {
-      icon = <Icon icon="icon-[mingcute--error-fill]" />;
+      icon = <Icon icon="icon-[ix--error-filled]" />;
       break;
     }
     case "500": {
       icon = result[500] ? (
         result[500].icon
       ) : (
-        <Icon icon="icon-[mingcute--error-fill]" />
+        <Icon icon="icon-[ix--error-filled]" />
       );
       title = title ?? (result[500] ? result[500].title : "500");
       subtitle = (
