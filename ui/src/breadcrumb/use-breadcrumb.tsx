@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+import type { AnyObject } from "../types";
 import type { BreadcrumbProps } from "./breadcrumb";
 
 type BreadcrumbState<
@@ -30,9 +31,7 @@ const useBreadcrumbBase = create<BreadcrumbStore>()((set) => ({
 
 // apply generic type
 const useBreadcrumb = useBreadcrumbBase as {
-  <
-    TMeta extends Record<string, string> = Record<string, string>,
-  >(): BreadcrumbStore<TMeta>;
+  <TMeta extends AnyObject = AnyObject>(): BreadcrumbStore<TMeta>;
   <TMeta extends Record<string, string>, U>(
     selector: (s: BreadcrumbStore<TMeta>) => U,
   ): U;
