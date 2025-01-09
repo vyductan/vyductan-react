@@ -1,5 +1,1 @@
-
-
-
-
-export {HistoryPlugin} from "@lexical/react/LexicalHistoryPlugin";
+export { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
