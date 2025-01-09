@@ -58,7 +58,9 @@ export const Swiper = ({ images }: SwiperProps) => {
               setActiveIndex(index);
             }}
           >
-            <div className="swiper-zoom-container">
+            <div
+            // className="swiper-zoom-container"
+            >
               <img className="max-h-full rounded-md" {...imgProps} />
             </div>
           </SwiperSlide>

@@ -12,7 +12,7 @@ const cn = (...inputs: Parameters<typeof cx>) => twMerge(cx(inputs));
 
 export { cn };
 
-export { UiProvider } from "./store";
+export { UiConfigProvider } from "./store";
 
 // import type { CnOptions } from "tailwind-variants";
 // import { cnBase, defaultConfig } from "tailwind-variants";

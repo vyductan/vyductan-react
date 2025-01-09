@@ -7,7 +7,7 @@ import { cloneElement, Fragment } from "react";
 
 import type { Placement } from "../types";
 import { cn } from "..";
-import { useUi } from "../store";
+import { useUiConfig } from "../store";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -50,7 +50,7 @@ export const Dropdown = ({
 }: DropdownProps) => {
   const {
     link: { default: Link },
-  } = useUi((s) => s.componentConfig);
+  } = useUiConfig((s) => s.components);
 
   const side = placement?.includes("top")
     ? "top"
