@@ -24,8 +24,8 @@ type UiConfigState = {
     layout?: {
       pageContainer?: Partial<Pick<PageContainerProps, "loadingRender">>;
     };
-    link: {
-      default: typeof Link;
+    link?: {
+      default?: typeof Link;
     };
     result: {
       500?: {
