@@ -27,7 +27,7 @@ export const getAsPath = () => asPathStore.getState();
 export const useAsPathInitializer = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { currentAsPath } = useAsPath();
+  const { currentAsPath, prevAsPath } = useAsPath();
 
   useEffect(() => {
     const asPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
@@ -42,7 +42,14 @@ export const useAsPathInitializer = () => {
     }
 
     // /path
-    if (currentAsPathWithoutSearchParams !== pathname) {
+    if (
+      currentAsPathWithoutSearchParams !== pathname &&
+      // check if currentAsPathWithoutSearchParams is longer than pathname
+      // TODO: maybe should use history stack (replace)
+      (!currentAsPathWithoutSearchParams ||
+        currentAsPathWithoutSearchParams.split("/").length <
+          pathname.split("/").length)
+    ) {
       asPathStore.setState((state) => ({
         ...state,
         currentAsPath: asPath,
@@ -50,4 +57,5 @@ export const useAsPathInitializer = () => {
       }));
     }
   }, [pathname, currentAsPath, searchParams]);
+  console.log("xxxxxx", prevAsPath, currentAsPath);
 };
