@@ -1,5 +1,4 @@
 // https://github.com/vercel/next.js/discussions/36723#discussioncomment-5186972
-// TODO: check if breadcrumb has 3 level and click random link in breadcrumb then is correct back to parrent path
 
 import { useEffect } from "react";
 import { create } from "zustand";
@@ -27,7 +26,7 @@ export const getAsPath = () => asPathStore.getState();
 export const useAsPathInitializer = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { currentAsPath } = useAsPath();
+  const { currentAsPath, prevAsPath } = useAsPath();
 
   useEffect(() => {
     const asPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
@@ -42,7 +41,14 @@ export const useAsPathInitializer = () => {
     }
 
     // /path
-    if (currentAsPathWithoutSearchParams !== pathname) {
+    if (
+      currentAsPathWithoutSearchParams !== pathname &&
+      // check if currentAsPathWithoutSearchParams is longer than pathname
+      // TODO: maybe should use history stack (replace)
+      (!currentAsPathWithoutSearchParams ||
+        currentAsPathWithoutSearchParams.split("/").length <
+          pathname.split("/").length)
+    ) {
       asPathStore.setState((state) => ({
         ...state,
         currentAsPath: asPath,
@@ -50,4 +56,5 @@ export const useAsPathInitializer = () => {
       }));
     }
   }, [pathname, currentAsPath, searchParams]);
+  console.log("xxxxxx", prevAsPath, currentAsPath);
 };
