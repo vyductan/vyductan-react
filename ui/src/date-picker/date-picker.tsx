@@ -17,7 +17,7 @@ import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { Input } from "../input";
 import { Popover } from "../popover";
-import { useUi } from "../store";
+import { useUiConfig } from "../store";
 
 type DateType = Date | string | number | undefined | null;
 
@@ -63,7 +63,7 @@ const DatePickerInternal = <T extends DateType = Date>(
   const [open, setOpen] = React.useState(false);
 
   // ====================== Format Date =======================
-  const datePickerConfig = useUi((state) => state.componentConfig.datePicker);
+  const datePickerConfig = useUiConfig((state) => state.components.datePicker);
   let format = propFormat;
   if (datePickerConfig?.format) {
     format = datePickerConfig.format;

@@ -36,7 +36,7 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@hookform/resolvers": "^3.10.0",
-    "@iconify/json": "^2.2.292",
+    "@iconify/json": "^2.2.293",
     "@lexical/react": "^0.23.0",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
@@ -63,7 +63,7 @@
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.0.4",
     "date-fns": "^4.1.0",
-    "embla-carousel-react": "^8.5.1",
+    "embla-carousel-react": "^8.5.2",
     "framer-motion": "^11.16.0",
     "lexical": "^0.23.0",
     "next-themes": "^0.4.4",
@@ -83,7 +83,7 @@
     "type-fest": "^4.30.2",
     "usehooks-ts": "^3.1.0",
     "vaul": "^1.1.2",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
