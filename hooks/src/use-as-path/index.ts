@@ -26,7 +26,7 @@ export const getAsPath = () => asPathStore.getState();
 export const useAsPathInitializer = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { currentAsPath, prevAsPath } = useAsPath();
+  const { currentAsPath } = useAsPath();
 
   useEffect(() => {
     const asPath = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
@@ -56,5 +56,4 @@ export const useAsPathInitializer = () => {
       }));
     }
   }, [pathname, currentAsPath, searchParams]);
-  console.log("xxxxxx", prevAsPath, currentAsPath);
 };
