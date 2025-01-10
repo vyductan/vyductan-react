@@ -70,7 +70,7 @@ export function TableHeadAdvanced<TData, TValue>({
             />
           ) : column.getIsSorted() === "asc" ? (
             <Icon
-              icon="icon-[lucide--arrow-up"
+              icon="icon-[lucide--arrow-up]"
               className="ml-2.5 size-4"
               aria-hidden="true"
             />
