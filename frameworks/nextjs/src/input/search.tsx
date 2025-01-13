@@ -3,12 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounceFn } from "ahooks";
 
-import type { InputProps } from "./input";
-import { Icon } from "../icons";
-import { Input } from "./input";
+import type { InputProps } from "@acme/ui/input";
+import { Icon } from "@acme/ui/icons";
+import { Input } from "@acme/ui/input";
 
-type SearchProps = InputProps;
-export const InputSearch = ({ placeholder, ...props }: SearchProps) => {
+type InputSearchProps = InputProps;
+export const InputSearch = ({ placeholder, ...props }: InputSearchProps) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -28,6 +28,13 @@ export const InputSearch = ({ placeholder, ...props }: SearchProps) => {
       wait: 300,
     },
   );
+  // return <InputSearchBase defaultValue={searchParams.get("query")?.toString()}
+  // placeholder={placeholder ?? "Search..."}
+  // prefix={<Icon icon="icon-[lucide--search]" />}
+  // onChange={(event) => {
+  //   handleSearch(event.target.value);
+  // }}
+  // {...props}/>
 
   return (
     <Input

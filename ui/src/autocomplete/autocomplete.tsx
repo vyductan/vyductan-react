@@ -46,14 +46,33 @@ const AutoCompleteInner = <T extends ValueType = string>(
   {
     defaultValue: defaultValueProp,
     value: valueProp,
-    options,
+    options: optionsProp,
     optionsToSearch,
 
     className,
     size,
     disabled,
 
-    filter = (value, search, _) => {
+    filter: filterProp,
+
+    placeholder,
+
+    allowClear,
+
+    onChange,
+    onSearchChange,
+
+    ...props
+  }: AutoCompleteProps<T>,
+  _: React.ForwardedRef<HTMLInputElement>,
+) => {
+  /* Remove duplicate options */
+  const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
+
+  /* Filter Detault*/
+  const filter =
+    filterProp ??
+    ((value, search, _) => {
       // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const label = (optionsToSearch ?? options)
         .find((item) => item.value === value)
@@ -67,19 +86,8 @@ const AutoCompleteInner = <T extends ValueType = string>(
         return 1;
       }
       return 0;
-    },
+    });
 
-    placeholder,
-
-    allowClear,
-
-    onChange,
-    onSearchChange,
-
-    ...props
-  }: AutoCompleteProps<T>,
-  _: React.ForwardedRef<HTMLInputElement>,
-) => {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,

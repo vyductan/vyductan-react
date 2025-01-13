@@ -115,7 +115,9 @@ export const SwiperPreview = ({
             >
               {images.map((imgProps) => (
                 <SwiperSlide>
-                  <div className="swiper-zoom-container">
+                  <div
+                  // className="swiper-zoom-container"
+                  >
                     <img {...imgProps} />
                   </div>
                 </SwiperSlide>
@@ -135,7 +137,9 @@ export const SwiperPreview = ({
             >
               {images.map((imgProps) => (
                 <SwiperSlide className="h-[100px] !w-auto cursor-pointer rounded-md border border-white p-1 opacity-40">
-                  <div className="swiper-zoom-container">
+                  <div
+                  // className="swiper-zoom-container"
+                  >
                     <img {...imgProps} />
                   </div>
                 </SwiperSlide>

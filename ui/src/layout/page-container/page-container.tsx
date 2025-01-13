@@ -4,7 +4,7 @@ import type { ResultProps } from "../../result";
 import type { PageHeaderProps } from "../page-header";
 import { cn } from "../..";
 import { Result } from "../../result/result";
-import { useUi } from "../../store";
+import { useUiConfig } from "../../store";
 import { PageHeader } from "../page-header";
 
 export type PageContainerProps = {
@@ -27,7 +27,7 @@ export const PageContainer = ({
   loadingRender = <>Loading...</>,
   exception = false,
 }: PageContainerProps) => {
-  const { layout } = useUi((s) => s.componentConfig);
+  const { layout } = useUiConfig((s) => s.components);
   const mergedLoadingRender =
     layout?.pageContainer?.loadingRender ?? loadingRender;
 
