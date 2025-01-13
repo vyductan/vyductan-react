@@ -18,6 +18,7 @@ const buttonVariants = tv({
   base: [
     "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-white transition-colors",
     "border",
+    "text-foreground",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
   ],
@@ -47,14 +48,11 @@ const buttonVariants = tv({
     },
     variant: {
       default: [
-        "bg-primary text-white",
-        "hover:bg-primary-hover hover:text-white",
+        "border-primary bg-primary text-white",
+        "hover:border-primary-hover hover:bg-primary-hover hover:text-white",
         "active:ring-primary",
       ],
-      outline: [
-        "border-border",
-        "hover:border-border-hover hover:bg-background-hover",
-      ],
+      outline: ["border-border", "hover:border-border-hover hover:bg-gray-100"],
       dashed: [
         "border border-dashed border-border",
         "hover:border-primary-hover hover:text-primary-hover",
@@ -152,10 +150,7 @@ const buttonVariants = tv({
     // light
     {
       variant: "light",
-      className: [
-        "bg-gray-200 text-gray-950",
-        "hover:bg-gray-700 hover:text-white",
-      ],
+      className: ["bg-gray-100 text-gray-950", "hover:bg-gray-200"],
     },
     {
       variant: "light",
