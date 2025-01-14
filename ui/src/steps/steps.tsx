@@ -3,6 +3,7 @@
 "use client";
 
 import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
+import React from "react";
 import { useMergedState } from "rc-util";
 
 import { cn } from "..";
@@ -58,7 +59,7 @@ const Steps = (props: StepsProps) => {
     <div className={cn("flex w-full items-center", className)}>
       {items.map((x, index) => {
         return (
-          <>
+          <React.Fragment key={index}>
             <div
               className={cn(
                 // "px-4 first:ps-0",
@@ -104,7 +105,7 @@ const Steps = (props: StepsProps) => {
                 )}
               />
             )}
-          </>
+          </React.Fragment>
         );
       })}
     </div>
