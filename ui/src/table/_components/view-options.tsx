@@ -7,19 +7,23 @@ import React from "react";
 
 import { toSentenceCase } from "@acme/utils/to-sentence-case";
 
+import type { PopoverProps } from "../../popover";
+import { cn } from "../..";
 import { Button } from "../../button";
 import { Command } from "../../command";
 import { Icon } from "../../icons";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "../../popover";
 
-interface TableViewOptionsProps<TData> {
+type TableViewOptionsProps<TData> = PopoverProps & {
   table: Table<TData>;
-}
+};
 
 export function TableViewOptions<TData>({
   table,
+  className,
 }: TableViewOptionsProps<TData>) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
+  console.log("ccccc", className);
 
   return (
     <PopoverRoot modal>
@@ -29,7 +33,7 @@ export function TableViewOptions<TData>({
           aria-label="Toggle columns"
           role="combobox"
           variant="outline"
-          className="ml-auto hidden md:flex"
+          className={cn("ml-auto hidden md:flex", className)}
           icon={<Icon icon="icon-[lucide--settings-2]" />}
         >
           View

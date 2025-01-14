@@ -472,6 +472,7 @@ const TableInner = <TRecord extends AnyObject>(
                           header.id === "selection" && "px-0",
                           classNames?.th,
                         )}
+                        {...header.column.columnDef.meta?.headAttributes}
                       >
                         {header.isPlaceholder
                           ? undefined
