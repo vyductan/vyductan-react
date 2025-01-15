@@ -23,7 +23,6 @@ export function TableViewOptions<TData>({
   className,
 }: TableViewOptionsProps<TData>) {
   const triggerRef = React.useRef<HTMLButtonElement>(null);
-  console.log("ccccc", className);
 
   return (
     <PopoverRoot modal>
