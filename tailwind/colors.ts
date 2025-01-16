@@ -1,4 +1,5 @@
 import type {
+  Config,
   RecursiveKeyValuePair,
   ResolvableTo,
 } from "tailwindcss/types/config";
@@ -120,3 +121,12 @@ export const baseColors = {
     950: "oklch(var(--ds-teal-950) / <alpha-value>)",
   },
 } satisfies ResolvableTo<RecursiveKeyValuePair>;
+
+export const colorsConfig = {
+  content: [],
+  theme: {
+    extend: {
+      colors: baseColors,
+    },
+  },
+} satisfies Config;

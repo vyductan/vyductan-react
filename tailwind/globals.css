@@ -1,5 +1,7 @@
 /* https://github.com/shadcn-ui/ui/blob/main/apps/www/styles/globals.css */
-@tailwind base;
+/* @tailwind base; */ /* use @import instead to fix https://github.com/tailwindlabs/tailwindcss/discussions/1761#discussioncomment-5741905 */
+@import "tailwindcss/base";
+@import "./token.css";
 @tailwind components;
 @tailwind utilities;
 

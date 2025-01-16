@@ -2,11 +2,13 @@ import type { Config } from "tailwindcss";
 import { addDynamicIconSelectors } from "@iconify/tailwind";
 import { fontSize } from "tailwindcss/defaultTheme";
 
-import { baseColors } from "./colors";
+import { baseColors, colorsConfig } from "./colors";
+import { tokenConfig } from "./token";
 
 export default {
   darkMode: ["class"],
   content: ["src/**/*.{ts,tsx}"],
+  presets: [colorsConfig, tokenConfig],
   theme: {
     extend: {
       colors: {
@@ -63,7 +65,6 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         /* Own */
-        ...baseColors,
         disabled: baseColors.gray[500],
         foreground: {
           DEFAULT: baseColors.gray[950],
