@@ -1,5 +1,3 @@
-// import { ArrowLeftOutlined, ArrowRightOutlined } from "@acme/ui/icons";
-
 import type { AvatarProps } from "../../avatar";
 import type { BreadcrumbProps } from "../../breadcrumb";
 import type { TagProps } from "../../tag";
@@ -25,6 +23,7 @@ type PageHeaderProps = {
   render?: (
     originNodes: {
       title: React.ReactNode;
+      extra: React.ReactNode;
       breadcrumb: React.ReactNode;
     },
     className?: string,
@@ -32,8 +31,8 @@ type PageHeaderProps = {
 };
 
 const renderTitle = (props: PageHeaderProps) => {
-  const { title, avatar, subTitle, tags, extra } = props;
-  const hasHeading = title ?? subTitle ?? tags ?? extra;
+  const { title, avatar, subTitle, tags } = props;
+  const hasHeading = title ?? subTitle ?? tags;
   // If there is nothing, return a null
   if (!hasHeading) {
     return;
@@ -41,36 +40,37 @@ const renderTitle = (props: PageHeaderProps) => {
   // const backIcon = getBackIcon(props, direction);
   // const backIconDom = renderBack(backIcon, onBack);
   return (
-    <div className={cn("flex h-10 items-center justify-between")}>
-      <div className="">
-        {/* {backIconDom} */}
-        {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
-        {title && (
-          <h1
-            title={typeof title === "string" ? title : undefined}
-            className="text-2xl font-bold"
-          >
-            {title}
-          </h1>
-        )}
-        {subTitle && (
-          <p
-            title={typeof subTitle === "string" ? subTitle : undefined}
-            className="text-muted-foreground"
-          >
-            {subTitle}
-          </p>
-        )}
-        {tags && <span>{tags}</span>}
-      </div>
-      {extra && (
-        <span>
-          <div>{extra}</div>
-        </span>
+    <div className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
+      {/* {backIconDom} */}
+      {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
+      {title && (
+        <h1
+          title={typeof title === "string" ? title : undefined}
+          className="text-2xl font-bold"
+        >
+          {title}
+        </h1>
       )}
+      {subTitle && (
+        <p
+          title={typeof subTitle === "string" ? subTitle : undefined}
+          className="text-muted-foreground"
+        >
+          {subTitle}
+        </p>
+      )}
+      {tags && <span>{tags}</span>}
     </div>
   );
 };
+const renderExtra = (props: PageHeaderProps) => {
+  const { extra } = props;
+  if (!extra) {
+    return;
+  }
+  return <span className={cn(`my-[calc(var(--margin-xs)/2)]`)}>{extra}</span>;
+};
+
 const renderChildren = (props: PageHeaderProps) => {
   const { children } = props;
   if (!children) {
@@ -87,17 +87,21 @@ const renderBreadcrumb = (breadcrumb?: PageHeaderProps["breadcrumb"]) => {
 
 const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
   const title = renderTitle(props);
+  const extra = renderExtra(props);
   const children = renderChildren(props);
   const breadcrumb = renderBreadcrumb(props.breadcrumb);
 
   if (render) {
-    return render({ title, breadcrumb }, className);
+    return render({ title, extra, breadcrumb }, className);
   }
 
   return (
     <div className={cn("space-y-2", className)}>
       {breadcrumb}
-      {title}
+      <div className={cn("flex justify-between")}>
+        {title}
+        {extra}
+      </div>
       {children}
     </div>
   );
