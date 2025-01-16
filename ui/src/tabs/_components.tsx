@@ -21,7 +21,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg p-1 text-muted-foreground",
+      "inline-flex items-center justify-center rounded-lg p-1 text-muted-foreground",
       // "bg-muted",
       // "flex-nowrap overflow-x-scroll text-foreground-muted no-scrollbar",
       // "flex items-baseline",
@@ -45,7 +45,7 @@ type TabsTriggerProps = React.ComponentPropsWithoutRef<
   tabsType?: TabsType;
 };
 const TabsTrigger = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
 >(({ tabsType, className, ...props }, ref) => (
   <TabsPrimitive.Trigger
