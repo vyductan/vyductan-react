@@ -99,7 +99,7 @@ const Steps = (props: StepsProps) => {
                 className={cn(
                   // "absolute start-0 top-1 h-10 w-full px-6",
                   // "after:ms-10 after:inline-block after:h-px after:w-full after:bg-background-muted after:transition-colors after:duration-300",
-                  "mx-4 inline-block h-px w-full bg-background-muted transition-colors duration-300",
+                  "mx-4 inline-block h-px w-full bg-accents-2 transition-colors duration-300",
                   current > index && "bg-primary-600",
                   classNames?.line,
                 )}

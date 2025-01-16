@@ -5,6 +5,9 @@ import type {
 } from "tailwindcss/types/config";
 
 export const baseColors = {
+  accents: {
+    2: "oklch(var(--accents-2) / <alpha-value>)",
+  },
   surface: {
     DEFAULT: "oklch(var(--ds-background-100) / <alpha-value>)",
     secondary: "oklch(var(--ds-background-200) / <alpha-value>)",
