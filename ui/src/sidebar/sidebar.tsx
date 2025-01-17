@@ -131,7 +131,8 @@ export const Sidebar = ({
       if (item.hidden) {
         return;
       }
-      const { key, children: _, label, icon, path } = item;
+      const { key, children: _, label, title, icon, path } = item;
+      const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
       const labelToRender = path ? (
         <Link href={`${path}`}>
@@ -140,25 +141,25 @@ export const Sidebar = ({
           ) : (
             icon
           )}
-          <span>{label}</span>
+          <span>{mergedLabel}</span>
         </Link>
       ) : (
-        label
+        mergedLabel
       );
       return (
         <SidebarMenuItem
           key={key}
           onClick={(event) => {
-            onSelect?.({ item: { key, label }, key, event });
+            onSelect?.({ item: { key, label: mergedLabel }, key, event });
           }}
           onKeyUp={(event) => {
-            onSelect?.({ item: { key, label }, key, event });
+            onSelect?.({ item: { key, label: mergedLabel }, key, event });
           }}
         >
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            tooltip={item.label}
+            tooltip={mergedLabel}
             className={classNames?.menuButton}
           >
             {labelToRender}

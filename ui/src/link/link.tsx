@@ -1,5 +1,6 @@
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from "react";
-import { forwardRef } from "react";
+
+import { useUiConfig } from "../store";
 
 type LinkProps = DetailedHTMLProps<
   AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -7,9 +8,13 @@ type LinkProps = DetailedHTMLProps<
 > & {
   prefetch?: boolean;
 };
-const Link = forwardRef((props: LinkProps) => {
+const Link = (props: LinkProps) => {
+  const linkConfig = useUiConfig((s) => s.components.link);
+  if (linkConfig?.default) {
+    return <linkConfig.default {...props} />;
+  }
   return <a {...props} />;
-});
+};
 
 export type { LinkProps };
 export { Link };
