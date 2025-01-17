@@ -19,6 +19,7 @@ const buttonVariants = tv({
     "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-white transition-colors",
     "border",
     "text-foreground",
+    "shrink-0", // disable flex box sizing
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
   ],
