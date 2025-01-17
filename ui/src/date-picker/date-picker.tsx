@@ -45,7 +45,7 @@ const DatePickerInternal = <T extends DateType = Date>(
     id,
 
     placeholder,
-    valueType,
+    valueType = "string",
     format: propFormat = "dd/MM/yyyy",
     showTime,
 
