@@ -246,7 +246,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-e-md",
-              "border-s bg-background",
+              "border-s bg-background-muted",
               "whitespace-nowrap",
               // p-0 for use Select component
               React.isValidElement(addonAfter) &&
