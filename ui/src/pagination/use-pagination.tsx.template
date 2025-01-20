@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-import { usePathname } from "@acme/hooks/use-pathname";
-import { useRouter } from "@acme/hooks/use-router";
-import { useSearchParams } from "@acme/hooks/use-search-params";
+import { useRouter } from "@acme/react-router/use-router";
+import { usePathname } from "@acme/react-router/use-pathname";
+import { useSearchParams } from "@acme/react-router/use-search-params";
 
 export const usePagination = (options?: {
   page?: number;
