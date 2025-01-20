@@ -15,7 +15,7 @@ type TabsListProps = RdxTabsListProps & {
   type?: TabsType;
 };
 const TabsList = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentRef<typeof TabsPrimitive.List>,
   TabsListProps
 >(({ type, className, ...props }, ref) => (
   <TabsPrimitive.List
@@ -32,6 +32,9 @@ const TabsList = React.forwardRef<
           // "pb-px",
           // "shadow-[0_-1px_0_var(--gray-300)_inset]",
         ],
+
+      // antd
+      "relative w-full",
       className,
     )}
     {...props}
