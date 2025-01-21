@@ -13,6 +13,11 @@ import { cn } from "..";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "./_components";
 
 type TabBarExtraMap = { left?: React.ReactNode; right?: React.ReactNode };
+type TabItemDef = {
+  key: string;
+  label: React.ReactNode;
+  children: React.ReactNode;
+};
 type TabsProps = Omit<
   TabsRootProps,
   "defaultValue" | "onValueChange" | "onChange"
@@ -28,11 +33,7 @@ type TabsProps = Omit<
    */
   defaultActiveKey?: TabsRootProps["defaultValue"];
   activeKey?: TabsRootProps["value"];
-  items: {
-    key: string;
-    label: React.ReactNode;
-    children: React.ReactNode;
-  }[];
+  items: TabItemDef[];
   onChange?: (activeKey: string) => void;
 
   /**
@@ -116,4 +117,4 @@ const Tabs = React.forwardRef<TabsRootRef, TabsProps>(
 Tabs.displayName = "Tabs";
 
 export { Tabs };
-export type { TabsProps };
+export type { TabsProps, TabItemDef };
