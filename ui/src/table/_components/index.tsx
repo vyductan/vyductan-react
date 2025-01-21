@@ -97,10 +97,12 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
     <th
       ref={ref}
       className={cn(
-        "px-2",
-        size === "sm" ? "py-2" : "py-3",
+        // "h-10 px-2",
         "text-left align-middle font-medium text-muted-foreground",
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+
+        "p-3",
+        size === "sm" && "p-2 leading-[22px]",
         // "break-words",
         // "first:rounded-tl-md last:rounded-tr-md",
         "border-b",
@@ -120,10 +122,12 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
     <td
       ref={ref}
       className={cn(
-        "px-2",
-        size === "sm" ? "py-2" : "py-3",
+        // "p-2",
         "align-middle",
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+
+        "p-3",
+        size === "sm" && "p-2 leading-[22px]",
         // "break-words",
         // "group-hover:bg-background-hover",
         "border-b",

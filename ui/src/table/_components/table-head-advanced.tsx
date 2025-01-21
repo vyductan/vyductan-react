@@ -17,13 +17,16 @@ interface TableHeadAdvancedProps<TData, TValue> extends TableHeadProps {
 export function TableHeadAdvanced<TData, TValue>({
   column,
   children,
+
+  size,
   className,
+
   locale,
   ...props
 }: TableHeadAdvancedProps<TData, TValue>) {
   if (!column.getCanSort()) {
     return (
-      <TableHead className={cn(className)} {...props}>
+      <TableHead size={size} className={cn(className)} {...props}>
         {children}
       </TableHead>
     );
@@ -31,7 +34,8 @@ export function TableHeadAdvanced<TData, TValue>({
 
   return (
     <TableHead
-      className={cn("px-0", className)}
+      size={size}
+      className={cn("px-1", className)}
       aria-label={
         column.getIsSorted() === "desc"
           ? "Sorted descending. Click to sort ascending."
@@ -56,6 +60,7 @@ export function TableHeadAdvanced<TData, TValue>({
         <div
           className={cn(
             "-my-2 p-2",
+            size === "sm" && "p-1",
             "flex w-full items-center justify-between",
             "cursor-pointer rounded-md border-none hover:bg-accent hover:text-accent-foreground",
           )}

@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 import animate from "tailwindcss-animate";
-import plugin from "tailwindcss/plugin";
 
 import base from "./base";
 
@@ -31,6 +30,10 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
         /* Vercel */
         "skeleton-loading": {
           "0%": { backgroundPosition: "200% 0" },
@@ -40,27 +43,10 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
         "skeleton-loading": "skeleton-loading 8s ease-in-out infinite",
       },
     },
   },
-  plugins: [
-    animate,
-    plugin(function (api) {
-      api.addUtilities({
-        /* Hide scrollbar for IE, Edge and Firefox */
-        ".no-scrollbar": {
-          /* IE and Edge */
-          "-ms-overflow-style": "none",
-          /* Firefox */
-          "scrollbar-width": "none",
-          /* Safari and Chrome */
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-        },
-        ".toaster": {},
-      });
-    }),
-  ],
+  plugins: [animate],
 } satisfies Config;
