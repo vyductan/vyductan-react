@@ -46,6 +46,8 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   InputProps,
   "onChange" | "type" | "value" | "defaultValue"
 > & {
+  ref?: React.ForwardedRef<HTMLInputElement>;
+
   /** value will show as string */
   stringMode?: boolean;
 
@@ -84,42 +86,42 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   keyboard?: boolean;
   changeOnWheel?: boolean;
 };
-const InternalInputNumber = (
-  {
-    stringMode = false,
+const InputNumber = ({
+  ref,
+  stringMode = false,
 
-    defaultValue,
-    value,
-    onChange,
-    onBlur,
-    onInput,
-    onPressEnter,
+  defaultValue,
+  value,
+  onChange,
+  onBlur,
+  onInput,
+  onPressEnter,
 
-    readOnly,
-    disabled,
+  readOnly,
+  disabled,
 
-    min,
-    max,
-    step = 1,
-    onStep,
+  min,
+  max,
+  step = 1,
+  onStep,
 
-    formatter,
-    parser,
-    precision,
-    decimalSeparator,
+  formatter,
+  parser,
+  precision,
+  decimalSeparator,
 
-    changeOnBlur = true,
+  changeOnBlur = true,
 
-    // upHandler,
-    // downHandler,
-    keyboard,
-    changeOnWheel,
+  // upHandler,
+  // downHandler,
+  keyboard,
+  changeOnWheel,
 
-    ...inputProps
-  }: InputNumberProps,
-  ref: React.ForwardedRef<HTMLInputElement>,
-) => {
+  ...inputProps
+}: InputNumberProps) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useImperativeHandle(ref, () => inputRef.current!);
 
   const [focus, setFocus] = React.useState(false);
 
@@ -639,21 +641,12 @@ const InternalInputNumber = (
           : (decimalValue.toString() as any)
       }
       {...inputProps}
-      ref={composeRef(inputRef, ref)}
+      ref={ref ? composeRef(ref, inputRef) : inputRef}
       onChange={onInternalInput}
       value={inputValue}
     />
   );
 };
-// InputNumber.displayName = "Input";
-
-const InputNumber = React.forwardRef(InternalInputNumber) as <
-  T extends ValueType,
->(
-  props: InputNumberProps<T> & {
-    ref?: React.ForwardedRef<HTMLInputElement>;
-  },
-) => ReturnType<typeof InternalInputNumber>;
 
 export { InputNumber };
 export type { InputNumberProps };
