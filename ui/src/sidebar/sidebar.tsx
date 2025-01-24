@@ -190,9 +190,7 @@ export const Sidebar = ({
           <SidebarMenuItem>{header}</SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        {renderItems([...items, ...items, ...items, ...items])}
-      </SidebarContent>
+      <SidebarContent>{renderItems(items)}</SidebarContent>
     </SidebarRoot>
   );
 };
