@@ -67,7 +67,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customRowStyle?: CSSProperties;
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
-  HTMLAttributes<HTMLTableElement> & {
+  Omit<HTMLAttributes<HTMLTableElement>, "title"> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
 

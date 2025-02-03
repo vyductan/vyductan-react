@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "./_components";
 
-type CardProps = CardRootProps & {
+type CardProps = Omit<CardRootProps, "title"> & {
   skeleton?: boolean;
   bordered?: boolean;
   classNames?: {
