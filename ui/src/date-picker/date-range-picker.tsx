@@ -13,17 +13,24 @@ import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
 
+type RangeValueType<DateType> = [
+  start: DateType | null | undefined,
+  end: DateType | null | undefined,
+];
+type NoUndefinedRangeValueType<DateType> = [
+  start: DateType | null,
+  end: DateType | null,
+];
+
 type DateRangePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
-    ref: React.Ref<HTMLDivElement>;
+    ref?: React.Ref<HTMLDivElement>;
 
     valueType?: T;
-    defaultValue?: [DateType<T>, DateType<T> | undefined];
-    value?: [DateType<T>, DateType<T> | undefined];
+    value?: RangeValueType<DateType<T>> | null;
+    defaultValue?: RangeValueType<DateType<T>>;
     /** Callback function, can be executed when the selected time is changing */
-    onChange?: (
-      dates: [DateType<T>, DateType<T> | undefined] | undefined,
-    ) => void;
+    onChange?: (dates: NoUndefinedRangeValueType<DateType<T>> | null) => void;
 
     placeholder?: [string, string];
   };
@@ -73,7 +80,11 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   const [value, setValue] = useMergedState(props.defaultValue, {
     value: props.value,
     onChange: (value) => {
-      props.onChange?.(value);
+      const start = value?.[0];
+      const end = value?.[1];
+      if (start !== undefined && end !== undefined) {
+        props.onChange?.([start, end]);
+      }
     },
   });
 
@@ -84,12 +95,12 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         // showYearSwitcher
         initialFocus
         numberOfMonths={2}
-        defaultMonth={value?.[0] && toDate(value[0])}
+        defaultMonth={value?.[0] ? toDate(value[0]) : undefined}
         selected={
           value
             ? {
-                from: value[0] && toDate(value[0]),
-                to: value[1] && toDate(value[1]),
+                from: value[0] ? toDate(value[0]) : undefined,
+                to: value[1] ? toDate(value[1]) : undefined,
               }
             : undefined
         }

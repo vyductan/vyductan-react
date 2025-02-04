@@ -1,7 +1,7 @@
 "use client";
 
 import type { LexicalEditor } from "lexical";
-import type { DragEvent as ReactDragEvent, JSX } from "react";
+import type { JSX, DragEvent as ReactDragEvent } from "react";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";

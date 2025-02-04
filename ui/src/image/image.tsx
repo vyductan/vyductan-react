@@ -12,7 +12,7 @@ type ImageProps = React.DetailedHTMLProps<
   preview?: boolean;
   placeholder?: React.ReactNode;
 };
-export const Image = memo(function Image({
+const Image = memo(function Image({
   src,
   width,
   height,
@@ -104,3 +104,6 @@ export const Image = memo(function Image({
     </>
   );
 });
+
+export type { ImageProps };
+export { Image };
