@@ -53,6 +53,10 @@ export const inputVariants = cva(
         ],
         warning: [],
       },
+      variant: {
+        default: [],
+        outline: [],
+      },
     },
     defaultVariants: {
       borderless: false,
