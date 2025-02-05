@@ -30,7 +30,7 @@ export const FormErrorsNotification = () => {
       );
       // handle show notification
       if (Object.keys(formErrors).length > 0) {
-        const errorsToNotify = Object.keys(formErrors)
+        const unmountedErrorsToNotify = Object.keys(formErrors)
           .filter((key) => {
             return unmountedRequiredFields.has(key);
           })
@@ -40,16 +40,18 @@ export const FormErrorsNotification = () => {
               message: formErrors[key]?.message,
             };
           });
-        notification.error({
-          message: "Unexpected Form Errors",
-          description: errorsToNotify.map((error) => {
-            const message =
-              typeof error.message === "string" ? error.message : "";
-            return `${error.path}: ${message}`;
-          }),
-          duration: Infinity,
-          closeButton: true,
-        });
+        if (unmountedErrorsToNotify.length > 0) {
+          notification.error({
+            message: "Unexpected Form Errors",
+            description: unmountedErrorsToNotify.map((error) => {
+              const message =
+                typeof error.message === "string" ? error.message : "";
+              return `${error.path}: ${message}`;
+            }),
+            duration: Infinity,
+            closeButton: true,
+          });
+        }
       }
     }
   }, [formErrors, formFields, formSchema]);

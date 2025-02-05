@@ -36,7 +36,11 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("font-semibold leading-none tracking-tight", className)}
+    className={cn(
+      "font-semibold leading-none tracking-tight",
+      "flex-1", // fix if not has extra the title width not full
+      className,
+    )}
     {...props}
   />
 ));

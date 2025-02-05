@@ -48,6 +48,8 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           className,
           classNames,
           sorter,
+          attributes,
+          headAttributes,
 
           ...restProps
         },
@@ -79,7 +81,16 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableResizing,
           enableHiding,
           size: width,
-          meta: { title, align, fixed, sorter, className, classNames },
+          meta: {
+            title,
+            align,
+            fixed,
+            sorter,
+            className,
+            classNames,
+            attributes,
+            headAttributes,
+          },
           // sorting
           ...(sorter || props.sorting?.state?.find((x) => x.id === dataIndex)
             ? {

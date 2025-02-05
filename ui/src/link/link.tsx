@@ -1,29 +1,20 @@
-import type { LinkProps as NextLinkProps } from "next/link";
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from "react";
-import { forwardRef } from "react";
-import { NavLink } from "react-router";
 
-type LinkProps = NextLinkProps &
-  Omit<
-    DetailedHTMLProps<
-      AnchorHTMLAttributes<HTMLAnchorElement>,
-      HTMLAnchorElement
-    >,
-    "href"
-  >;
-const Link = forwardRef(
-  (
-    { href, prefetch, ...props }: LinkProps,
-    ref: React.Ref<HTMLAnchorElement>,
-  ) => {
-    return (
-      <NavLink
-        ref={ref}
-        to={typeof href === "string" ? href : (href.href ?? "")}
-        prefetch={prefetch ? "render" : undefined}
-        {...props}
-      />
-    );
-  },
-);
+import { useUiConfig } from "../store";
+
+type LinkProps = DetailedHTMLProps<
+  AnchorHTMLAttributes<HTMLAnchorElement>,
+  HTMLAnchorElement
+> & {
+  prefetch?: boolean;
+};
+const Link = (props: LinkProps) => {
+  const linkConfig = useUiConfig((s) => s.components.link);
+  if (linkConfig?.default) {
+    return <linkConfig.default {...props} />;
+  }
+  return <a {...props} />;
+};
+
+export type { LinkProps };
 export { Link };

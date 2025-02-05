@@ -1,0 +1,6 @@
+@layer base {
+  :root {
+    --margin-xs: 8px;
+    --control-height: 32px;
+  }
+}

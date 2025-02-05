@@ -39,7 +39,6 @@ const MonthPickerInternal = (
       open={open}
       className="w-auto p-0"
       trigger="click"
-      sideOffset={8}
       placement="bottomLeft"
       onInteractOutside={(event) => {
         if (

@@ -13,7 +13,8 @@ const Toaster = ({ richColors = true, ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      className="group toaster"
+      // eslint-disable-next-line tailwindcss/no-custom-classname
+      className="toaster group"
       toastOptions={{
         classNames: {
           toast: cn(

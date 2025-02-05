@@ -1,157 +1,123 @@
 "use client";
 
-import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { cva } from "class-variance-authority";
+import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "..";
-import { Icon } from "../icons";
 
-type SheetRootProps = SheetPrimitive.DialogProps;
-const SheetRoot = SheetPrimitive.Root;
-
-const SheetTrigger = SheetPrimitive.Trigger;
-
-const SheetClose = SheetPrimitive.Close;
-
-const SheetPortal = SheetPrimitive.Portal;
-
-const SheetOverlay = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Overlay
-    className={cn(
-      // "bg-black/80",
-      "fixed inset-0 z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      "bg-black/50",
-      className,
-    )}
+type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
+const DrawerRoot = ({
+  shouldScaleBackground = true,
+  ...props
+}: DrawerRootProps) => (
+  <DrawerPrimitive.Root
+    shouldScaleBackground={shouldScaleBackground}
     {...props}
+  />
+);
+DrawerRoot.displayName = "DrawerRoot";
+
+const DrawerTrigger = DrawerPrimitive.Trigger;
+
+const DrawerPortal = DrawerPrimitive.Portal;
+
+const DrawerClose = DrawerPrimitive.Close;
+
+const DrawerOverlay = React.forwardRef<
+  React.ComponentRef<typeof DrawerPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Overlay
     ref={ref}
+    className={cn("fixed inset-0 z-50 bg-black/80", className)}
+    {...props}
   />
 ));
-SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
+DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName;
 
-const sheetVariants = cva(
-  [
-    "fixed z-50 gap-4 bg-background transition ease-in-out",
-    "data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
-    // p-6 shadow-lg
-    "shadow-[-6px_0_16px_0_rgba(0,_0,_0,_0.08),_-3px_0_6px_-4px_rgba(0,_0,_0,_0.12),_-9px_0_28px_8px_rgba(0,_0,_0,_0.05)]",
-  ],
-  {
-    variants: {
-      side: {
-        top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        bottom:
-          "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        right:
-          "inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
-      },
-    },
-    defaultVariants: {
-      side: "right",
-    },
-  },
-);
-
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {
-  closeIcon?: React.ReactNode | false;
-}
-
-const SheetContent = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Content>,
-  SheetContentProps
->(({ side = "right", className, children, closeIcon, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
+type DrawerContentProps = React.ComponentPropsWithoutRef<
+  typeof DrawerPrimitive.Content
+>;
+const DrawerContent = React.forwardRef<
+  React.ComponentRef<typeof DrawerPrimitive.Content>,
+  DrawerContentProps
+>(({ className, children, ...props }, ref) => (
+  <DrawerPortal>
+    <DrawerOverlay />
+    <DrawerPrimitive.Content
       ref={ref}
-      className={cn(sheetVariants({ side }), className)}
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        className,
+      )}
       {...props}
     >
+      {/* <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" /> */}
       {children}
-      {closeIcon === false
-        ? undefined
-        : (closeIcon ?? (
-            <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-              <Icon icon="icon-[lucide--x]" className="size-4" />
-
-              <span className="sr-only">Close</span>
-            </SheetPrimitive.Close>
-          ))}
-    </SheetPrimitive.Content>
-  </SheetPortal>
+    </DrawerPrimitive.Content>
+  </DrawerPortal>
 ));
-SheetContent.displayName = SheetPrimitive.Content.displayName;
+DrawerContent.displayName = "DrawerContent";
 
-const SheetHeader = ({
+const DrawerHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      "flex flex-col space-y-2 text-center sm:text-left",
-      className,
-    )}
+    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
     {...props}
   />
 );
-SheetHeader.displayName = "SheetHeader";
+DrawerHeader.displayName = "DrawerHeader";
 
-const SheetFooter = ({
+const DrawerFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      className,
-    )}
+    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
     {...props}
   />
 );
-SheetFooter.displayName = "SheetFooter";
+DrawerFooter.displayName = "DrawerFooter";
 
-const SheetTitle = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
+const DrawerTitle = React.forwardRef<
+  React.ComponentRef<typeof DrawerPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title
+  <DrawerPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold text-foreground", className)}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight",
+      className,
+    )}
     {...props}
   />
 ));
-SheetTitle.displayName = SheetPrimitive.Title.displayName;
+DrawerTitle.displayName = DrawerPrimitive.Title.displayName;
 
-const SheetDescription = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
+const DrawerDescription = React.forwardRef<
+  React.ComponentRef<typeof DrawerPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description
+  <DrawerPrimitive.Description
     ref={ref}
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ));
-SheetDescription.displayName = SheetPrimitive.Description.displayName;
+DrawerDescription.displayName = DrawerPrimitive.Description.displayName;
 
-export type { SheetRootProps, SheetContentProps };
+export type { DrawerRootProps, DrawerContentProps };
 export {
-  SheetRoot,
-  SheetPortal,
-  SheetOverlay,
-  SheetTrigger,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
-  SheetDescription,
+  DrawerRoot,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
 };

@@ -20,7 +20,6 @@ export function getCellFixedInfo(
   stickyOffsets: StickyOffsets,
   direction: Direction,
 ): FixedInfo {
-  console.log("aaaaaa", columns);
   const startColumn = columns[colStart] ?? {};
   const endColumn = columns[colEnd] ?? {};
 

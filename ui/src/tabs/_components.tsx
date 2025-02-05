@@ -15,13 +15,14 @@ type TabsListProps = RdxTabsListProps & {
   type?: TabsType;
 };
 const TabsList = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentRef<typeof TabsPrimitive.List>,
   TabsListProps
 >(({ type, className, ...props }, ref) => (
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-9 items-center justify-center rounded-lg p-1 text-muted-foreground",
+      "inline-flex items-center rounded-lg p-1 text-muted-foreground",
+      // "justify-center",
       // "bg-muted",
       // "flex-nowrap overflow-x-scroll text-foreground-muted no-scrollbar",
       // "flex items-baseline",
@@ -32,6 +33,9 @@ const TabsList = React.forwardRef<
           // "pb-px",
           // "shadow-[0_-1px_0_var(--gray-300)_inset]",
         ],
+
+      // antd
+      "relative w-full",
       className,
     )}
     {...props}
@@ -45,7 +49,7 @@ type TabsTriggerProps = React.ComponentPropsWithoutRef<
   tabsType?: TabsType;
 };
 const TabsTrigger = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentRef<typeof TabsPrimitive.Trigger>,
   TabsTriggerProps
 >(({ tabsType, className, ...props }, ref) => (
   <TabsPrimitive.Trigger
@@ -76,7 +80,7 @@ const TabsTrigger = React.forwardRef<
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 const TabsContent = React.forwardRef<
-  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => (
   <TabsPrimitive.Content

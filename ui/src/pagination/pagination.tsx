@@ -1,30 +1,35 @@
 import React from "react";
+import { useMergedState } from "rc-util";
 import KeyCode from "rc-util/lib/KeyCode";
 
-import { usePathname } from "@acme/hooks/use-pathname";
-import { useRouter } from "@acme/hooks/use-router";
-import { useSearchParams } from "@acme/hooks/use-search-params";
-
 import type { PaginationItemProps } from "./_components";
+import type { SizeChangerRender } from "./_components/page-size-options";
+import type { PagerProps } from "./pager";
 import type { PaginationLocale } from "./types";
 import { cn } from "..";
 import { Icon } from "../icons";
 import {
   PaginationContent,
-  // PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
   PaginationRoot,
   PaginationTotal,
 } from "./_components";
+import { PageSizeOptions } from "./_components/page-size-options";
 import enUS from "./locale/en-us";
-import { usePagination } from "./use-pagination";
+import { Pager } from "./pager";
 
 export type PaginationProps = {
   className?: string;
   total: number;
+
+  // control
+  current?: number;
+  defaultCurrent?: number;
+  pageSize?: number;
+  defaultPageSize?: number;
+  onChange?: (page: number, pageSize: number) => void;
 
   disabled?: boolean;
   hideOnSinglePage?: boolean;
@@ -36,6 +41,9 @@ export type PaginationProps = {
   showTitle?: boolean;
   showTotal?: (total: number, range: [number, number]) => React.ReactNode;
   totalBoundaryShowSizeChanger?: number;
+  sizeChangerRender?: SizeChangerRender;
+  pageSizeOptions: number[];
+  onShowSizeChange?: (page: number, pageSize: number) => void;
 
   itemRender?: (
     page: number,
@@ -45,33 +53,45 @@ export type PaginationProps = {
 };
 export const Pagination = (props: PaginationProps) => {
   const {
-    className,
-    total,
-
     disabled,
+    className,
+
+    // control
+    current: currentProp,
+    defaultCurrent = 1,
+    total = 0,
+    pageSize: pageSizeProp,
+    defaultPageSize = 10,
+    onChange,
+
+    // config
     hideOnSinglePage,
     locale = enUS,
     simple,
     showLessItems,
     showPrevNextJumpers = true,
-    // showSizeChanger: showSizeChangerProp,
-    showTitle,
+    showTitle = true,
     showTotal,
-    // totalBoundaryShowSizeChanger = 50,
+    totalBoundaryShowSizeChanger = 50,
+    showSizeChanger = total > totalBoundaryShowSizeChanger,
+    sizeChangerRender,
+    pageSizeOptions,
+    onShowSizeChange,
 
     itemRender = defaultItemRender,
   } = props;
 
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { page: current, pageSize } = usePagination();
+  const [pageSize, setPageSize] = useMergedState<number>(10, {
+    value: pageSizeProp,
+    defaultValue: defaultPageSize,
+  });
 
-  const createPageURL = (pageNumber: number | string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", pageNumber.toString());
-    return `${pathname}?${params.toString()}`;
-  };
+  const [current, setCurrent] = useMergedState<number>(1, {
+    value: currentProp,
+    defaultValue: defaultCurrent,
+    postState: (c) =>
+      Math.max(1, Math.min(c, calculatePage(undefined, pageSize, total))),
+  });
 
   const [internalInputValue, setInternalInputValue] = React.useState(current);
 
@@ -89,6 +109,18 @@ export const Pagination = (props: PaginationProps) => {
     return isInteger(page) && page !== current && isInteger(total) && total > 0;
   }
 
+  function changePageSize(size: number) {
+    const newCurrent = calculatePage(size, pageSize, total);
+    const nextCurrent =
+      current > newCurrent && newCurrent !== 0 ? newCurrent : current;
+
+    setPageSize(size);
+    setInternalInputValue(nextCurrent);
+    onShowSizeChange?.(current, size);
+    setCurrent(nextCurrent);
+    onChange?.(nextCurrent, size);
+  }
+
   function handleChange(page: number) {
     if (isValid(page) && !disabled) {
       const currentPage = calculatePage(undefined, pageSize, total);
@@ -103,7 +135,8 @@ export const Pagination = (props: PaginationProps) => {
         setInternalInputValue(newPage);
       }
 
-      router.push(createPageURL(newPage));
+      setCurrent(newPage);
+      onChange?.(newPage, pageSize);
 
       return newPage;
     }
@@ -113,8 +146,14 @@ export const Pagination = (props: PaginationProps) => {
 
   const hasPrev = current > 1;
   const hasNext = current < calculatePage(undefined, pageSize, total);
-  // const showSizeChanger =
-  //   showSizeChangerProp ?? total > totalBoundaryShowSizeChanger;
+
+  function prevHandle() {
+    if (hasPrev) handleChange(current - 1);
+  }
+
+  function nextHandle() {
+    if (hasNext) handleChange(current + 1);
+  }
 
   function jumpPrevHandle() {
     handleChange(jumpPrevPage);
@@ -127,17 +166,22 @@ export const Pagination = (props: PaginationProps) => {
   function runIfEnter(
     event: React.KeyboardEvent<HTMLLIElement>,
 
-    callback: (...params: any[]) => void,
+    callback: any,
 
     ...restParams: any[]
   ) {
-    if (
-      event.key === "Enter" ||
-      event.code === KeyCode.ENTER.toString()
-      // event..keyCode === KeyCode.ENTER
-    ) {
+    if (event.key === "Enter" || event.code === KeyCode.ENTER.toString()) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       callback(...restParams);
     }
+  }
+
+  function runIfEnterPrev(event: React.KeyboardEvent<HTMLLIElement>) {
+    runIfEnter(event, prevHandle);
+  }
+
+  function runIfEnterNext(event: React.KeyboardEvent<HTMLLIElement>) {
+    runIfEnter(event, nextHandle);
   }
 
   function runIfEnterJumpPrev(event: React.KeyboardEvent<HTMLLIElement>) {
@@ -146,6 +190,20 @@ export const Pagination = (props: PaginationProps) => {
 
   function runIfEnterJumpNext(event: React.KeyboardEvent<HTMLLIElement>) {
     runIfEnter(event, jumpNextHandle);
+  }
+
+  function renderPrev(prevPage: number) {
+    const prevButton = itemRender?.(prevPage, "prev", <PaginationPrevious />);
+    return React.isValidElement<HTMLButtonElement>(prevButton)
+      ? React.cloneElement(prevButton, { disabled: !hasPrev })
+      : prevButton;
+  }
+
+  function renderNext(nextPage: number) {
+    const nextButton = itemRender?.(nextPage, "next", <PaginationNext />);
+    return React.isValidElement<HTMLButtonElement>(nextButton)
+      ? React.cloneElement(nextButton, { disabled: !hasNext })
+      : nextButton;
   }
 
   let jumpPrev: React.ReactElement<PaginationItemProps> = <></>;
@@ -173,35 +231,35 @@ export const Pagination = (props: PaginationProps) => {
   if (hideOnSinglePage && total <= pageSize) {
     return;
   }
+
+  const pagerProps: PagerProps = {
+    onClick: handleChange,
+    onKeyPress: runIfEnter,
+    showTitle,
+    itemRender,
+    page: -1,
+  };
+
   // ====================== Normal ======================
   const pagerList: React.ReactElement<PaginationItemProps>[] = [];
 
   const prevPage = Math.max(current - 1, 0);
   const nextPage = Math.min(current + 1, allPages);
+  // ====================== Normal ======================
   const pageBufferSize = showLessItems ? 1 : 2;
   if (allPages <= 3 + pageBufferSize * 2) {
     if (!allPages) {
-      pagerList.push(
-        <PaginationItem
-          ref={undefined}
-          key="noPager"
-          // className={`${prefixCls}-item-disabled`}
-        >
-          <PaginationLink href={createPageURL(1)}>1</PaginationLink>
-        </PaginationItem>,
-      );
+      pagerList.push(<Pager {...pagerProps} key="noPager" page={1} />);
     }
 
     for (let index = 1; index <= allPages; index += 1) {
       pagerList.push(
-        <PaginationItem ref={undefined} key={index}>
-          <PaginationLink
-            href={createPageURL(index)}
-            isActive={current === index}
-          >
-            {index}
-          </PaginationLink>
-        </PaginationItem>,
+        <Pager
+          {...pagerProps}
+          key={index}
+          page={index}
+          active={current === index}
+        />,
       );
     }
   } else {
@@ -277,14 +335,12 @@ export const Pagination = (props: PaginationProps) => {
 
     for (let index = left; index <= right; index += 1) {
       pagerList.push(
-        <PaginationItem ref={undefined} key={index}>
-          <PaginationLink
-            href={createPageURL(index)}
-            isActive={current === index}
-          >
-            {index}
-          </PaginationLink>
-        </PaginationItem>,
+        <Pager
+          {...pagerProps}
+          key={index}
+          page={index}
+          active={current === index}
+        />,
       );
     }
 
@@ -312,49 +368,70 @@ export const Pagination = (props: PaginationProps) => {
     }
 
     if (left !== 1) {
-      pagerList.unshift(
-        <PaginationItem key={1}>
-          <PaginationLink href={createPageURL(1)}>1</PaginationLink>
-        </PaginationItem>,
-      );
+      pagerList.unshift(<Pager {...pagerProps} key={1} page={1} />);
     }
     if (right !== allPages) {
-      pagerList.push(
-        <PaginationItem key={allPages}>
-          <PaginationLink href={createPageURL(allPages)}>
-            {allPages}
-          </PaginationLink>
-        </PaginationItem>,
-      );
+      pagerList.push(<Pager {...pagerProps} key={allPages} page={allPages} />);
     }
   }
 
-  const prevDisabled = !hasPrev || !allPages;
-  const prev = (
-    <PaginationItem
-      aria-disabled={prevDisabled}
-      className={prevDisabled ? "cursor-not-allowed" : ""}
-    >
-      <PaginationPrevious
-        href={createPageURL(prevPage)}
-        shape="icon"
-        disabled={prevDisabled}
-      />
-    </PaginationItem>
-  );
+  /*
+   * Prev Button
+   */
+  let prev = renderPrev(prevPage);
+  if (prev) {
+    const prevDisabled = !hasPrev || !allPages;
+    prev = (
+      <PaginationItem
+        title={showTitle ? locale.prev_page : undefined}
+        onClick={prevHandle}
+        tabIndex={prevDisabled ? undefined : 0}
+        onKeyDown={runIfEnterPrev}
+        className={prevDisabled ? "cursor-not-allowed" : ""}
+        aria-disabled={prevDisabled}
+      >
+        {prev}
+      </PaginationItem>
+    );
+  }
 
   /*
    * Next Button
    */
-  const nextDisabled = simple ? !hasNext : !hasNext || !allPages;
-  const next = (
-    <PaginationItem aria-disabled={nextDisabled}>
-      <PaginationNext
-        href={createPageURL(nextPage)}
-        shape="icon"
-        disabled={nextDisabled}
-      />
-    </PaginationItem>
+  let next = renderNext(nextPage);
+  if (next) {
+    let nextDisabled: boolean, nextTabIndex: number | undefined;
+    if (simple) {
+      nextDisabled = !hasNext;
+      nextTabIndex = hasPrev ? 0 : undefined;
+    } else {
+      nextDisabled = !hasNext || !allPages;
+      nextTabIndex = nextDisabled ? undefined : 0;
+    }
+
+    next = (
+      <PaginationItem
+        title={showTitle ? locale.next_page : undefined}
+        onClick={nextHandle}
+        tabIndex={nextTabIndex}
+        onKeyDown={runIfEnterNext}
+        aria-disabled={nextDisabled}
+      >
+        {next}
+      </PaginationItem>
+    );
+  }
+
+  const sizeChanger = showSizeChanger ? (
+    <PageSizeOptions
+      locale={locale}
+      pageSize={pageSize}
+      pageSizeOptions={pageSizeOptions}
+      changeSize={changePageSize}
+      sizeChangerRender={sizeChangerRender}
+    />
+  ) : (
+    <></>
   );
 
   return (
@@ -364,6 +441,7 @@ export const Pagination = (props: PaginationProps) => {
         {prev}
         {pagerList}
         {next}
+        {sizeChanger}
       </PaginationContent>
     </PaginationRoot>
   );

@@ -22,6 +22,13 @@ type SidebarProps = {
     menuButton?: string;
     icon?: string;
   };
+
+  itemRender?: (
+    item: MenuItemDef,
+    classNames: SidebarProps["classNames"],
+    originalNode: ReactNode,
+  ) => ReactNode;
+
   header?: ReactNode;
   items?: MenuItemDef[];
   defaultSelectedKeys?: string[];
@@ -35,6 +42,9 @@ type SidebarProps = {
 export const Sidebar = ({
   className,
   classNames,
+
+  itemRender,
+
   header,
   items = [],
   defaultSelectedKeys: defaultSelectedKeysProp,
@@ -131,34 +141,39 @@ export const Sidebar = ({
       if (item.hidden) {
         return;
       }
-      const { key, children: _, label, icon, path } = item;
+      const { key, children: _, label, title, icon, path } = item;
+      const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      const labelToRender = path ? (
+      let labelToRender: ReactNode = path ? (
         <Link href={`${path}`}>
           {typeof icon === "string" ? (
             <Icon icon={icon} className={classNames?.icon} />
           ) : (
             icon
           )}
-          <span>{label}</span>
+          <span>{mergedLabel}</span>
         </Link>
       ) : (
-        label
+        mergedLabel
       );
+      labelToRender = itemRender
+        ? itemRender(item, classNames, labelToRender)
+        : labelToRender;
+
       return (
         <SidebarMenuItem
           key={key}
           onClick={(event) => {
-            onSelect?.({ item: { key, label }, key, event });
+            onSelect?.({ item: { key, label: mergedLabel }, key, event });
           }}
           onKeyUp={(event) => {
-            onSelect?.({ item: { key, label }, key, event });
+            onSelect?.({ item: { key, label: mergedLabel }, key, event });
           }}
         >
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            tooltip={item.label}
+            tooltip={mergedLabel}
             className={classNames?.menuButton}
           >
             {labelToRender}

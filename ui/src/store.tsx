@@ -1,13 +1,14 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { createContext, useContext, useRef } from "react";
+import React from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
 import type { PageContainerProps } from "./layout/page-container";
+import type { PaginationProps } from "./pagination";
+import type { TableProps } from "./table";
 import type { TagProps } from "./tag";
 import { Link } from "./link";
 
@@ -24,17 +25,19 @@ type UiConfigState = {
     layout?: {
       pageContainer?: Partial<Pick<PageContainerProps, "loadingRender">>;
     };
-    link: {
-      default: typeof Link;
+    link?: {
+      default?: typeof Link;
     };
     result: {
       500?: {
-        icon?: ReactNode;
-        title?: ReactNode;
-        subtitle?: ReactNode;
-        extra?: ReactNode;
+        icon?: React.ReactNode;
+        title?: React.ReactNode;
+        subtitle?: React.ReactNode;
+        extra?: React.ReactNode;
       };
     };
+    pagination?: Partial<Pick<PaginationProps, "itemRender">>;
+    table?: Partial<Pick<TableProps, "bordered">>;
   };
 };
 type UiConfigStore = UiConfigState;
@@ -63,19 +66,19 @@ const createUiConfigStore = (initState: UiConfigState = defaultInitState) => {
 
 type UiConfigStoreApi = ReturnType<typeof createUiConfigStore>;
 
-const UiConfigStoreContext = createContext<UiConfigStoreApi | undefined>(
+const UiConfigStoreContext = React.createContext<UiConfigStoreApi | undefined>(
   undefined,
 );
 
 type UiStoreProviderProps = {
-  children: ReactNode;
+  children: React.ReactNode;
   componentConfig?: Partial<UiConfigState["components"]>;
 };
 export const UiConfigProvider = ({
   children,
   componentConfig,
 }: UiStoreProviderProps) => {
-  const storeRef = useRef<UiConfigStoreApi>(null);
+  const storeRef = React.useRef<UiConfigStoreApi>(null);
   if (!storeRef.current) {
     storeRef.current = createUiConfigStore({
       components: {
@@ -94,7 +97,7 @@ export const UiConfigProvider = ({
 export function useUiConfig(): UiConfigStore;
 export function useUiConfig<T>(selector: (store: UiConfigStore) => T): T;
 export function useUiConfig<T>(selector?: (store: UiConfigStore) => T): T {
-  const appStoreContext = useContext(UiConfigStoreContext);
+  const appStoreContext = React.useContext(UiConfigStoreContext);
 
   if (!appStoreContext) {
     throw new Error(`useUiConfig must be used within UiConfigProvider`);
