@@ -2,11 +2,11 @@ import type { InputProps } from "../input";
 import type { BaseInputProps } from "../types";
 
 export function hasAddon(props: BaseInputProps | InputProps) {
-  return !!(props.addonBefore || props.addonAfter);
+  return !!(props.addonBefore ?? props.addonAfter);
 }
 
 export function hasPrefixSuffix(props: BaseInputProps | InputProps) {
-  return !!(props.prefix || props.suffix || props.allowClear);
+  return !!(props.prefix ?? props.suffix ?? props.allowClear);
 }
 
 export interface InputFocusOptions extends FocusOptions {
@@ -22,7 +22,7 @@ export function triggerFocus(
   element.focus(option);
 
   // Selection content
-  const { cursor } = option || {};
+  const { cursor } = option ?? {};
   if (cursor) {
     const length = element.value.length;
 
