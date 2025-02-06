@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@acme/auth",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "react-server": "./src/index.rsc.ts",
+      "default": "./src/index.ts"
+    },
+    "./env": "./env.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "prettier": "@acme/prettier-config",
+  "dependencies": {
+    "@acme/db": "workspace:*",
+    "@auth/core": "0.37.4",
+    "@auth/drizzle-adapter": "^1.7.4",
+    "@t3-oss/env-nextjs": "^0.11.1",
+    "next": "15.1.4",
+    "next-auth": "5.0.0-beta.25",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}

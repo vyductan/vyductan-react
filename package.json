@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "vyductan-apps",
+  "private": true,
+  "scripts": {
+    "app:dev": "turbo run dev --filter=app",
+    "build": "turbo run build",
+    "build:nextjs": "turbo build -F nextjs",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo run clean",
+    "db:push": "pnpm -F @acme/db push",
+    "db:studio": "pnpm -F @acmedb studio",
+    "dev": "turbo watch dev --continue",
+    "dev:nextjs": "turbo watch dev --continue -F nextjs...",
+    "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
+    "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
+    "postinstall": "pnpm lint:ws",
+    "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
+    "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
+    "lint:nextjs": "turbo run lint --continue -F nextjs... -- --cache --cache-location .cache/.eslintcache",
+    "lint:ws": "pnpm dlx sherif@latest",
+    "typecheck": "turbo run typecheck"
+  },
+  "prettier": "@acme/prettier-config",
+  "devDependencies": {
+    "@acme/prettier-config": "workspace:*",
+    "@turbo/gen": "^2.4.0",
+    "prettier": "catalog:",
+    "turbo": "^2.4.0",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.2.0",
+  "engines": {
+    "node": ">=v22.12.0",
+    "pnpm": "^10.2.0"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@acme/api",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./env": "./env.ts",
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./dist/src/*/index.d.ts",
+      "default": "./src/*/index.ts"
+    },
+    "./libs/*": {
+      "types": "./dist/src/_libs/*/index.d.ts",
+      "default": "./src/_libs/*/index.ts"
+    },
+    "./routers/*": {
+      "types": "./dist/src/routers/*/index.d.ts",
+      "default": "./src/routers/*/index.ts"
+    },
+    "./routers/*/validation": {
+      "types": "./dist/src/routers/*/*.validation.d.ts",
+      "default": "./src/routers/*/*.validation.ts"
+    },
+    "./*/types": {
+      "types": "./dist/src/routers/*/types.d.ts",
+      "default": "./src/routers/*/types.ts"
+    },
+    "./*/validators": {
+      "types": "./dist/src/routers/*/validators.d.ts",
+      "default": "./src/routers/*/validators.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "lint": "eslint",
+    "push": "pnpm with-env drizzle-kit push",
+    "studio": "pnpm with-env drizzle-kit studio",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "prettier": "@acme/prettier-config",
+  "dependencies": {
+    "@acme/auth": "workspace:*",
+    "@acme/db": "workspace:*",
+    "@acme/utils": "workspace:*",
+    "@acme/validators": "workspace:*",
+    "@t3-oss/env-core": "^0.11.1",
+    "@trpc/server": "catalog:",
+    "cheerio": "1.0.0",
+    "httpx": "^2.3.2",
+    "superjson": "2.2.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "typescript": "catalog:"
+  }
+}

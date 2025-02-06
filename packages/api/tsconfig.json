@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "extends": "@acme/tsconfig/internal-package.json",
+  "compilerOptions": {
+    // "outDir": "dist",
+    // "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "rootDir": ".",
+    "emitDeclarationOnly": true
+  },
+  "include": ["src", "*.ts", "@types"],
+  "exclude": ["node_modules"]
+  // "baseUrl": ".",
+  // "paths": {
+  //   "~/*": ["./src/*"]
+  // }
+}
