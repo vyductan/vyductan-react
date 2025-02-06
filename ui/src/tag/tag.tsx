@@ -38,9 +38,9 @@ const tagVariants = tv({
       outline: "text-foreground",
     },
     color,
-    borderless: {
-      true: "border-transparent",
-      false: "",
+    bordered: {
+      true: "",
+      false: "border-transparent",
     },
   },
   defaultVariants: {
@@ -60,7 +60,7 @@ const Tag = ({
   className,
   variant,
   color,
-  borderless: borderlessProp = false,
+  bordered: borderedProp = false,
   ...props
 }: TagProps) => {
   const tagConfig = useUiConfig((state) => state.components.tag);
@@ -71,7 +71,7 @@ const Tag = ({
         tagVariants({
           variant,
           color,
-          borderless: borderlessProp || tagConfig?.borderless,
+          bordered: borderedProp || tagConfig?.bordered,
         }),
         tagConfig?.className,
         className,
