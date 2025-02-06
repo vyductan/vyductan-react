@@ -13,7 +13,7 @@
     @apply scroll-smooth;
   }
   body {
-    @apply overscroll-none bg-background text-foreground;
+    @apply min-h-screen overscroll-none bg-background font-sans text-foreground antialiased;
     /* font-feature-settings: "rlig" 1, "calt" 1; */
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;

@@ -7,6 +7,8 @@ import { createStore } from "zustand/vanilla";
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
 import type { PageContainerProps } from "./layout/page-container";
+import type { PaginationProps } from "./pagination";
+import type { TableProps } from "./table";
 import type { TagProps } from "./tag";
 import { Link } from "./link";
 
@@ -34,6 +36,8 @@ type UiConfigState = {
         extra?: React.ReactNode;
       };
     };
+    pagination?: Partial<Pick<PaginationProps, "itemRender">>;
+    table?: Partial<Pick<TableProps, "bordered">>;
   };
 };
 type UiConfigStore = UiConfigState;

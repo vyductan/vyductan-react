@@ -1,28 +1,29 @@
-import type { SheetContentProps, SheetRootProps } from "./_components";
+import type { DrawerRootProps } from "./_components";
 import { cn } from "..";
 import {
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetRoot,
-  SheetTitle,
-  SheetTrigger,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
 } from "./_components";
 
-type DrawerProps = SheetRootProps & {
+type DrawerProps = DrawerRootProps & {
   title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
   trigger?: React.ReactNode;
 
+  className?: string;
   classNames?: {
     header?: string;
     title?: string;
     description?: string;
     content?: string;
   };
-  placement?: SheetContentProps["side"];
-  closeIcon?: SheetContentProps["closeIcon"];
+  placement?: DrawerRootProps["direction"];
+  // closeIcon?: DrawerContentProps["closeIcon"];
 };
 const Drawer = ({
   title,
@@ -30,27 +31,36 @@ const Drawer = ({
   children,
   trigger,
 
+  className,
   classNames,
   placement = "right",
-  closeIcon,
+  // closeIcon,
   ...props
 }: DrawerProps) => {
+  const placementClassName =
+    placement === "right"
+      ? cn(
+          "inset-y-0 left-auto right-0 mt-0 h-svh w-[378px] overflow-hidden rounded-none",
+        )
+      : "";
   return (
-    <SheetRoot {...props}>
-      {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent side={placement} closeIcon={closeIcon}>
-        <SheetHeader className={cn("p-6 pb-0", classNames?.header)}>
-          <SheetTitle className={classNames?.title}>{title}</SheetTitle>
-          <SheetDescription
+    <DrawerRoot direction={placement} {...props}>
+      {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
+      <DrawerContent className={cn(placementClassName, className)}>
+        <DrawerHeader className={cn("border-b p-6", classNames?.header)}>
+          <DrawerTitle className={classNames?.title}>{title}</DrawerTitle>
+          <DrawerDescription
             className={cn(description ? "" : "hidden", classNames?.description)}
           >
             {description}
-          </SheetDescription>
-        </SheetHeader>
+          </DrawerDescription>
+        </DrawerHeader>
 
-        <div className={cn("p-6", classNames?.content)}>{children}</div>
-      </SheetContent>
-    </SheetRoot>
+        <div className={cn("overflow-auto p-6", classNames?.content)}>
+          {children}
+        </div>
+      </DrawerContent>
+    </DrawerRoot>
   );
 };
 

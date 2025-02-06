@@ -22,6 +22,13 @@ type SidebarProps = {
     menuButton?: string;
     icon?: string;
   };
+
+  itemRender?: (
+    item: MenuItemDef,
+    classNames: SidebarProps["classNames"],
+    originalNode: ReactNode,
+  ) => ReactNode;
+
   header?: ReactNode;
   items?: MenuItemDef[];
   defaultSelectedKeys?: string[];
@@ -35,6 +42,9 @@ type SidebarProps = {
 export const Sidebar = ({
   className,
   classNames,
+
+  itemRender,
+
   header,
   items = [],
   defaultSelectedKeys: defaultSelectedKeysProp,
@@ -134,7 +144,7 @@ export const Sidebar = ({
       const { key, children: _, label, title, icon, path } = item;
       const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      const labelToRender = path ? (
+      let labelToRender: ReactNode = path ? (
         <Link href={`${path}`}>
           {typeof icon === "string" ? (
             <Icon icon={icon} className={classNames?.icon} />
@@ -146,6 +156,10 @@ export const Sidebar = ({
       ) : (
         mergedLabel
       );
+      labelToRender = itemRender
+        ? itemRender(item, classNames, labelToRender)
+        : labelToRender;
+
       return (
         <SidebarMenuItem
           key={key}

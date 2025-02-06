@@ -1,4 +1,4 @@
-import type { ReactElement, ReactNode, JSX } from "react";
+import type { JSX, ReactElement, ReactNode } from "react";
 import type { ControllerFieldState } from "react-hook-form";
 import { forwardRef, useContext } from "react";
 
@@ -10,6 +10,7 @@ import { FieldMessage } from "../field-message";
 import { FormControl } from "./form-control";
 
 type FieldRenderProps = {
+  layout?: "horizontal" | "vertical";
   className?: string;
 
   label?: string | JSX.Element;
@@ -23,6 +24,7 @@ type FieldRenderProps = {
 const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
   (
     {
+      layout = "vertical",
       className,
       label,
       description,
@@ -41,7 +43,8 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
     return (
       <div
         className={cn(
-          "flex h-full flex-col",
+          "flex h-full",
+          layout === "horizontal" ? "flex-row items-center" : "flex-col",
           fieldState?.error ? "" : "mb-6",
           className,
         )}
@@ -49,13 +52,36 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
         {...props}
       >
         {!id && children ? (
-          children
+          <>
+            {label ? (
+              typeof label === "string" ? (
+                <FieldLabel
+                  className={cn(
+                    layout === "horizontal" && "w-full",
+                    layout === "vertical" && "pb-2",
+                  )}
+                  required={required}
+                >
+                  {label}
+                </FieldLabel>
+              ) : (
+                label
+              )
+            ) : undefined}
+            {children}
+          </>
         ) : (
           <>
             {/* Label */}
             {label ? (
               typeof label === "string" ? (
-                <FieldLabel className="pb-2" required={required}>
+                <FieldLabel
+                  className={cn(
+                    layout === "horizontal" && "w-full",
+                    layout === "vertical" && "pb-2",
+                  )}
+                  required={required}
+                >
                   {label}
                 </FieldLabel>
               ) : (

@@ -41,6 +41,7 @@ import { cn } from "..";
 import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
 import { Spin } from "../spin";
+import { useUiConfig } from "../store";
 import {
   TableBody,
   TableCell,
@@ -66,7 +67,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customRowStyle?: CSSProperties;
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
-  HTMLAttributes<HTMLTableElement> & {
+  Omit<HTMLAttributes<HTMLTableElement>, "title"> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
 
@@ -138,7 +139,7 @@ const TableInner = <TRecord extends AnyObject>(
   {
     style,
     className,
-    bordered = false,
+    bordered: borderedProp,
     size,
     loading = false,
     skeleton = false,
@@ -352,6 +353,9 @@ const TableInner = <TRecord extends AnyObject>(
     <></>
   );
 
+  // ====================== UI ======================
+  const tableConfig = useUiConfig((s) => s.components.table);
+  const bordered = borderedProp ?? tableConfig?.bordered ?? false;
   // ---- classes ----//
   const getRowClassName = (row: Row<TRecord>, index: number) => {
     return classNames?.row
@@ -379,6 +383,9 @@ const TableInner = <TRecord extends AnyObject>(
             ],
             (!bordered || bordered === "around") && [
               "[&_th:last-child]:before:bg-transparent [&_th]:before:absolute [&_th]:before:right-0 [&_th]:before:top-1/2 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:bg-accent [&_th]:before:content-['']",
+            ],
+            bordered === "around" && [
+              "[&_table]:border-separate [&_table]:rounded-md",
             ],
             className,
           )}

@@ -25,6 +25,7 @@ type FieldProps<
   label?: string | React.JSX.Element;
   description?: React.ReactNode;
   className?: string;
+  layout?: "horizontal" | "vertical";
   required?: boolean;
   /*
    * Custome output for input component (like DatePicker, Upload)
@@ -63,6 +64,9 @@ const FieldInner = <
     render,
     required,
     onChange,
+
+    layout,
+
     ...props
   }: FieldProps<TFieldValues, TName>,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -88,6 +92,7 @@ const FieldInner = <
         children={children}
         onChange={onChange}
         required={isRequired}
+        layout={layout}
         {...props}
       />
     );
@@ -104,6 +109,7 @@ const FieldInner = <
             children={children}
             ref={ref}
             required={required}
+            layout={layout}
             {...props}
           />
         </FormItem>
@@ -112,7 +118,14 @@ const FieldInner = <
   }
 
   if (typeof children !== "function") {
-    return <FieldRender children={children} required={required} {...props} />;
+    return (
+      <FieldRender
+        children={children}
+        required={required}
+        layout={layout}
+        {...props}
+      />
+    );
   }
   return;
 };
@@ -138,6 +151,8 @@ type FieldControllerProps<
 
   disabled?: boolean;
   required?: boolean;
+
+  layout?: "horizontal" | "vertical";
 };
 const InternalFieldController = <
   TFieldValues extends FieldValues = FieldValues,
@@ -150,6 +165,7 @@ const InternalFieldController = <
     children,
     disabled,
     required,
+    layout,
     ...props
   }: FieldControllerProps<TFieldValues, TName>,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -216,6 +232,7 @@ const InternalFieldController = <
                     : undefined
                 }
                 ref={ref}
+                layout={layout}
                 {...props}
               />
             </FormItem>

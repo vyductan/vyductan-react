@@ -165,12 +165,19 @@ export const Descriptions = ({
                           className={cn(
                             "w-[1%] whitespace-nowrap",
                             thClassName,
+                            col.classNames?.label,
                           )}
                           style={labelStyle}
                         >
                           <span>{col.label}</span>
                         </th>
-                        <td className={cn(tdClassName, "last:border-r-0")}>
+                        <td
+                          className={cn(
+                            tdClassName,
+                            col.classNames?.value,
+                            "last:border-r-0",
+                          )}
+                        >
                           {skeleton ? (
                             <Skeleton />
                           ) : (

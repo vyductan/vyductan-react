@@ -7,6 +7,7 @@ import { useHover } from "ahooks";
 import { cva } from "class-variance-authority";
 import { useMergedState } from "rc-util";
 
+import type { InputRef } from "./types";
 import { cn } from "..";
 import { triggerNativeEventFor } from "../_util/event";
 import { Icon } from "../icons";
@@ -52,6 +53,10 @@ export const inputVariants = cva(
         ],
         warning: [],
       },
+      variant: {
+        default: [],
+        outline: [],
+      },
     },
     defaultVariants: {
       borderless: false,
@@ -90,7 +95,7 @@ type InputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
     // };
     "data-state"?: boolean;
   };
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
+const Input = React.forwardRef<InputRef, InputProps>(
   (
     {
       borderless,
@@ -131,12 +136,28 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const id = idProp ?? _id;
 
     const inputRef = React.useRef<HTMLInputElement>(null);
-    const wrapperRef = React.useRef(null);
+    const wrapperRef = React.useRef<HTMLDivElement>(null);
 
     // ======================= Ref ========================
-    React.useImperativeHandle(ref, () => {
-      return inputRef.current!;
-    });
+    React.useImperativeHandle(ref, () => inputRef.current!);
+    // React.useImperativeHandle(ref, () => ({
+    //     focus,
+    //     blur: () => {
+    //       inputRef.current?.blur();
+    //     },
+    //     setSelectionRange: (
+    //       start: number,
+    //       end: number,
+    //       direction?: "forward" | "backward" | "none",
+    //     ) => {
+    //       inputRef.current?.setSelectionRange(start, end, direction);
+    //     },
+    //     select: () => {
+    //       inputRef.current?.select();
+    //     },
+    //     input: inputRef.current,
+    //     nativeElement: inputRef.current,
+    //   }));
 
     // ====================== Value =======================
     const [value, setValue] = useMergedState(defaultValueProp, {
@@ -246,7 +267,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-e-md",
-              "border-s bg-background",
+              "border-s bg-background-muted",
               "whitespace-nowrap",
               // p-0 for use Select component
               React.isValidElement(addonAfter) &&

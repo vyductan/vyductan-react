@@ -14,6 +14,7 @@ export * from "./close-outlined";
 export * from "./delete-icon";
 export * from "./download-icon";
 export * from "./edit-icon";
+export * from "./info-filled";
 export * from "./logout-outlined";
 export * from "./mail-outlined";
 export * from "./user-outlined";
