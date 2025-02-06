@@ -21,7 +21,7 @@ type UiConfigState = {
   components: {
     button?: Partial<Pick<ButtonProps, "classNames">>;
     datePicker?: Partial<Pick<DatePickerProps, "format">>;
-    tag?: Partial<Pick<TagProps, "className" | "borderless">>;
+    tag?: Partial<Pick<TagProps, "className" | "bordered">>;
     layout?: {
       pageContainer?: Partial<Pick<PageContainerProps, "loadingRender">>;
     };
