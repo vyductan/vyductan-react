@@ -8,7 +8,7 @@ import { Label } from "../label";
 import { useField } from "./use-field";
 
 const FieldLabel = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
+  React.ComponentRef<typeof LabelPrimitive.Root>,
   LabelProps
 >(({ className, ...props }, ref) => {
   const { fieldId } = useField();

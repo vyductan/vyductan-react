@@ -2,42 +2,59 @@ import React from "react";
 import { formatDate, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import type { DatePickerBaseProps, DateType } from "./date-picker";
+import type {
+  DatePickerBaseProps,
+  DatePickerValueType,
+  DateType,
+} from "./date-picker";
 import { cn } from "..";
 import { Calendar } from "../calendar";
 import { Icon } from "../icons";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
 
-type DateRangePickerProps<T extends DateType = Date> = DatePickerBaseProps & {
-  defaultValue?: [T, T | undefined];
-  value?: [T, T | undefined];
-  /** Callback function, can be executed when the selected time is changing */
-  onChange?: (dates: [T, T | undefined] | undefined) => void;
+type RangeValueType<DateType> = [
+  start: DateType | null | undefined,
+  end: DateType | null | undefined,
+];
+type NoUndefinedRangeValueType<DateType> = [
+  start: DateType | null,
+  end: DateType | null,
+];
 
-  placeholder?: [string, string];
-};
+type DateRangePickerProps<T extends DatePickerValueType = "date"> =
+  DatePickerBaseProps & {
+    ref?: React.Ref<HTMLDivElement>;
 
-const DateRangePickerInternal = <T extends DateType = Date>(
-  {
-    // mode,
-    id: inputId,
+    valueType?: T;
+    value?: RangeValueType<DateType<T>> | null;
+    defaultValue?: RangeValueType<DateType<T>>;
+    /** Callback function, can be executed when the selected time is changing */
+    onChange?: (dates: NoUndefinedRangeValueType<DateType<T>> | null) => void;
 
-    disabled,
-    // borderless,
-    format = "dd/MM/yyyy",
-    // size,
-    // status,
+    placeholder?: [string, string];
+  };
 
-    valueType,
-    showTime,
+const DateRangePicker = <T extends DatePickerValueType = "date">({
+  valueType,
 
-    // allowClear = false,
-    className,
-    ...props
-  }: DateRangePickerProps<T>,
-  ref: React.Ref<HTMLDivElement>,
-) => {
+  ref,
+
+  id: inputId,
+
+  disabled,
+  // borderless,
+  format = "dd/MM/yyyy",
+  // size,
+  // status,
+
+  // valueType,
+  showTime,
+
+  // allowClear = false,
+  className,
+  ...props
+}: DateRangePickerProps<T>) => {
   const [open, setOpen] = React.useState(false);
 
   // ====================== Format Date =======================
@@ -45,15 +62,17 @@ const DateRangePickerInternal = <T extends DateType = Date>(
 
   const getDestinationValue = React.useCallback(
     (date: Date) => {
+      let result;
       if (valueType === "string") {
-        return formatDate(date, "yyyy-MM-dd'T'HH:mm:ss");
+        result = formatDate(date, "yyyy-MM-dd'T'HH:mm:ss");
       } else if (valueType === "format") {
-        return formatDate(date, format);
+        result = formatDate(date, format);
       } else if (typeof valueType === "number") {
-        return date.getTime();
+        result = date.getTime();
       } else {
-        return date;
+        result = date;
       }
+      return result as DateType<T>;
     },
     [format, valueType],
   );
@@ -61,7 +80,11 @@ const DateRangePickerInternal = <T extends DateType = Date>(
   const [value, setValue] = useMergedState(props.defaultValue, {
     value: props.value,
     onChange: (value) => {
-      props.onChange?.(value);
+      const start = value?.[0];
+      const end = value?.[1];
+      if (start !== undefined && end !== undefined) {
+        props.onChange?.([start, end]);
+      }
     },
   });
 
@@ -72,12 +95,12 @@ const DateRangePickerInternal = <T extends DateType = Date>(
         // showYearSwitcher
         initialFocus
         numberOfMonths={2}
-        defaultMonth={value?.[0] && toDate(value[0])}
+        defaultMonth={value?.[0] ? toDate(value[0]) : undefined}
         selected={
           value
             ? {
-                from: value[0] && toDate(value[0]),
-                to: value[1] && toDate(value[1]),
+                from: value[0] ? toDate(value[0]) : undefined,
+                to: value[1] ? toDate(value[1]) : undefined,
               }
             : undefined
         }
@@ -87,10 +110,10 @@ const DateRangePickerInternal = <T extends DateType = Date>(
             return;
           }
           if (dateRange.from) {
-            setValue([getDestinationValue(dateRange.from) as T, value?.[1]]);
+            setValue([getDestinationValue(dateRange.from), value?.[1]]);
           }
           if (dateRange.to && value) {
-            setValue([value[0], getDestinationValue(dateRange.to) as T]);
+            setValue([value[0], getDestinationValue(dateRange.to)]);
             setOpen(false);
           }
         }}
@@ -157,7 +180,6 @@ const DateRangePickerInternal = <T extends DateType = Date>(
         open={open}
         className="w-auto p-0"
         trigger="click"
-        sideOffset={8}
         placement="bottomLeft"
         onInteractOutside={(event) => {
           if (
@@ -180,11 +202,4 @@ const DateRangePickerInternal = <T extends DateType = Date>(
 };
 
 export type { DateRangePickerProps };
-
-export const DateRangePicker = React.forwardRef(DateRangePickerInternal) as <
-  T extends DateType = Date,
->(
-  props: DateRangePickerProps<T> & {
-    ref?: React.ForwardedRef<HTMLInputElement>;
-  },
-) => ReturnType<typeof DateRangePickerInternal>;
+export { DateRangePicker };

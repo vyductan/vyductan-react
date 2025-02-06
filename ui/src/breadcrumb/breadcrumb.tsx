@@ -19,19 +19,19 @@ type BreadcrumbItemDef = {
   href?: string;
   icon?: React.ReactNode;
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 type BreadcrumbProps<
-  T extends Record<string, string> = Record<string, string>,
+  TParams extends Record<string, string> = Record<string, string>,
 > = {
   items?: BreadcrumbItemDef[];
   params?: Record<string, string>;
   itemRender?: (
     route: BreadcrumbItemDef,
-    params: T | undefined,
+    params: TParams | undefined,
     routes: BreadcrumbItemDef[],
     paths: string[],
   ) => React.ReactNode;
-  meta?: Record<string, string>;
   className?: string;
   skeleton?: boolean;
 };
@@ -41,7 +41,6 @@ const Breadcrumb = ({
   skeleton,
   params,
   itemRender,
-  meta: ___,
 }: BreadcrumbProps) => {
   return (
     <BreadcrumbRoot className={items.length === 1 ? "hidden" : className}>

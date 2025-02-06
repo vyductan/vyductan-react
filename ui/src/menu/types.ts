@@ -9,6 +9,10 @@ export type MenuItemType = {
 
   type?: "item";
 
+  /* Page Title */
+  title?: string;
+
+  /* Menu Label */
   label?: string;
 
   path?: string;

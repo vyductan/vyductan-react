@@ -1,10 +1,8 @@
-import type { ForwardedRef } from "react";
 import React from "react";
 import { format as formatDate, parse } from "date-fns";
 import { useMergedState } from "rc-util";
 
-import type { InputProps } from "../input";
-import type { TimeSelectProps } from "./_components/time-select";
+import type { InputProps, InputRef } from "../input";
 import { cn } from "..";
 import { Icon } from "../icons";
 import { Input } from "../input";
@@ -12,6 +10,7 @@ import { Popover } from "../popover";
 import { TimeSelect } from "./_components/time-select";
 
 type TimePickerProps = Omit<InputProps, "defaultValue" | "value"> & {
+  ref?: React.Ref<InputRef>;
   id?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -22,10 +21,7 @@ type TimePickerProps = Omit<InputProps, "defaultValue" | "value"> & {
   value?: string;
   onChange?: (time: string | undefined) => void;
 };
-const TimePickerInternal = (
-  props: TimePickerProps,
-  ref: ForwardedRef<HTMLInputElement>,
-) => {
+const TimePicker = (props: TimePickerProps) => {
   const {
     id: inputId,
     open: openProp,
@@ -61,7 +57,6 @@ const TimePickerInternal = (
         open={open}
         className="w-auto p-0"
         trigger="click"
-        sideOffset={8}
         placement="bottomLeft"
         onInteractOutside={(event) => {
           if (
@@ -91,7 +86,6 @@ const TimePickerInternal = (
         }
       >
         <Input
-          ref={ref}
           id={inputId}
           autoComplete="off"
           {...inputProps}
@@ -147,8 +141,4 @@ const TimePickerInternal = (
   );
 };
 
-export const TimePicker = React.forwardRef(TimePickerInternal) as (
-  props: TimeSelectProps & {
-    ref?: React.ForwardedRef<HTMLInputElement>;
-  },
-) => ReturnType<typeof TimePickerInternal>;
+export { TimePicker };

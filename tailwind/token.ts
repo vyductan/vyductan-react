@@ -1,3 +1,7 @@
+// } satisfies GlobalToken;
+
+import type { Config } from "tailwindcss/types/config";
+
 // import { theme } from "antd";
 // import type { GlobalToken } from "antd";
 
@@ -8,7 +12,7 @@
  * Button bg - default: 600, hover: 500
  *
  */
-export const THEME_TOKEN = {
+export const DEFAULT_THEME_TOKEN = {
   // ...theme.getDesignToken(),
   // colorPrimary: defaultColors.blue[600],
   // colorPrimaryBorder: defaultColors.blue[300],
@@ -24,4 +28,17 @@ export const THEME_TOKEN = {
   controlHeightLG: 48,
   // colorError: defaultColors.red[500],
 };
-// } satisfies GlobalToken;
+
+export const tokenConfig = {
+  content: [],
+  theme: {
+    extend: {
+      margin: {
+        xs: "var(--margin-xs)",
+      },
+      height: {
+        control: "var(--control-height)",
+      },
+    },
+  },
+} satisfies Config;

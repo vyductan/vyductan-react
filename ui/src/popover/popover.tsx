@@ -1,16 +1,19 @@
 import React from "react";
 import { PopoverArrow } from "@radix-ui/react-popover";
 
-import type { Placement } from "../types";
+import type { AlignType, Placement } from "../types";
 import type { PopoverContentProps, PopoverRootProps } from "./_components";
 import { cn } from "..";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_components";
 
 export type PopoverProps = PopoverRootProps &
-  Omit<PopoverContentProps, "content"> & {
+  Omit<PopoverContentProps, "content" | "sideOffset" | "align"> & {
     trigger?: "click" | "hover" | "focus";
     content?: React.ReactNode;
+
+    align?: AlignType;
     placement?: Placement;
+
     arrow?: boolean;
   };
 export const Popover = ({
@@ -19,8 +22,9 @@ export const Popover = ({
   content,
   open,
 
-  className,
+  align: domAlign,
   placement,
+  className,
   arrow,
   onOpenChange,
   ...props
@@ -38,6 +42,9 @@ export const Popover = ({
       : placement.includes("Left")
         ? "start"
         : "end";
+
+  const alignOffset = domAlign?.offset?.[0];
+  const sideOffset = domAlign?.offset?.[1];
 
   return (
     <PopoverRoot open={open} onOpenChange={onOpenChange}>
@@ -81,7 +88,9 @@ export const Popover = ({
       {/* )} */}
       <PopoverContent
         side={side}
+        sideOffset={sideOffset}
         align={align}
+        alignOffset={alignOffset}
         className={cn(arrow ? "border-none" : "", className)}
         {...props}
       >
