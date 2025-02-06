@@ -4,7 +4,28 @@ import { tv } from "tailwind-variants";
 import { cn } from "..";
 import { useUiConfig } from "../store";
 
+// Based on Vercel
 const color: Record<string, string> = {
+  default: "bg-gray-200 text-gray-950 border-gray-600",
+  primary: "bg-primary-200 text-primary-900 border-primary-600",
+  success: "bg-success-muted text-success border-green-600",
+  processing: "bg-blue-200 text-blue-900 border-blue-600",
+  error: "bg-red-200 text-red-900 border-red-600",
+  warning: "bg-amber-200 text-amber-900 border-amber-600",
+  gray: "bg-gray-200 text-gray-950 border-gray-600",
+  amber: "bg-amber-200 text-amber-900 border-amber-600",
+  blue: "bg-blue-200 text-blue-900 border-blue-600",
+  fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
+  green: "bg-green-200 text-green-900 border-green-600",
+  red: "bg-red-200 text-red-900 border-red-600",
+  rose: "bg-rose-100 text-rose-600 border-rose-400",
+  pink: "bg-pink-300 text-pink-900 border-pink-600",
+  purple: "bg-purple-200 text-purple-900 border-purple-600",
+  teal: "bg-teal-300 text-teal-900 border-teal-600",
+};
+
+// Based on antd
+const colorBordered: Record<string, string> = {
   default: "bg-gray-200 text-gray-950 border-gray-600",
   primary: "bg-primary-200 text-primary-900 border-primary-600",
   success: "bg-success-muted text-success border-green-600",
@@ -48,6 +69,18 @@ const tagVariants = tv({
     color: "default",
     bordered: true,
   },
+  compoundVariants: [
+    {
+      bordered: true,
+      color: "default",
+      className: colorBordered.default,
+    },
+    {
+      bordered: true,
+      color: "primary",
+      className: colorBordered.primary,
+    },
+  ],
 });
 
 interface TagProps
