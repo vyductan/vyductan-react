@@ -53,7 +53,10 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600 hover:text-white",
         "active:ring-primary",
       ],
-      outline: ["border-border", "hover:border-border-hover hover:bg-gray-100"],
+      outline: [
+        "border-input bg-background border shadow-xs",
+        "hover:text-accent-foreground hover:bg-accent",
+      ],
       dashed: [
         "border-border border border-dashed",
         "hover:border-primary-600 hover:text-primary-600",
