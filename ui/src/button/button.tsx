@@ -16,11 +16,11 @@ import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-white transition-colors",
+    "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-colors",
     "border",
     "text-foreground",
     "shrink-0", // disable flex box sizing
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2",
+    "focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-hidden",
     "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
   ],
   variants: {
@@ -49,14 +49,14 @@ const buttonVariants = tv({
     },
     variant: {
       default: [
-        "border-primary bg-primary text-white",
-        "hover:border-primary-hover hover:bg-primary-hover hover:text-white",
+        "border-primary-500 bg-primary-500 text-white",
+        "hover:border-primary-600 hover:bg-primary-600 hover:text-white",
         "active:ring-primary",
       ],
       outline: ["border-border", "hover:border-border-hover hover:bg-gray-100"],
       dashed: [
-        "border border-dashed border-border",
-        "hover:border-primary-hover hover:text-primary-hover",
+        "border-border border border-dashed",
+        "hover:border-primary-600 hover:text-primary-600",
       ],
       ghost: [
         "border-transparent",
@@ -70,20 +70,9 @@ const buttonVariants = tv({
     shape: {
       default: "",
       icon: [
-        // "p-0 ",
-        // "sm:[&:has(span.sm:not-sr-only)]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
-        // '[&:has(span[class*="sm:not-sr-only"])]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
-        // "sm:[&:has(span.size-4)]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
-        // "sm:has-[span.size-4]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
-        // "has-[span.sm\\:not-sr-only]:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0",
-        // "has-[span.sm\\:not-sr-only]:w-auto",
-        // 'has-[span[class*="sm:not-sr-only"]]:sm:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
-        // '[&:has(span[class*="sm:not-sr-only"])]:sm:w-auto [&:not(:has(span.sm\\:not-sr-only))]:p-0',
-        // "!p-[unset]",
-        // 'has-[span[class*="sm:not-sr-only"]]:sm:w-auto has-[span[class*="sm:not-sr-only"]]:p-0 has-[span[class*="sm:not-sr-only"]]:sm:p-[auto]',
-        'has-[span[class*="sm:not-sr-only"]]:sm:w-auto',
-        'has-[span[class*="sm:not-sr-only"]]:max-sm:p-0',
-        '[&:not(:has(span[class*="sm:not-sr-only"]))]:p-0',
+        'sm:has-[span[class*="sm::not-sr-only"]]:w-auto',
+        'max-sm:has-[span[class*="sm::not-sr-only"]]:p-0',
+        '[&:not(:has(span[class*="sm::not-sr-only"]))]:p-0',
       ],
       circle: "rounded-full",
     },
@@ -112,40 +101,40 @@ const buttonVariants = tv({
       primary: true,
       color: "amber",
       className: [
-        "border-amber-600 bg-amber-600",
-        "hover:border-amber-700 hover:bg-amber-700",
+        "border-amber-500 bg-amber-500",
+        "hover:border-amber-600 hover:bg-amber-600",
       ],
     },
     {
       primary: true,
       color: "gray",
       className: [
-        "border-gray-600 bg-gray-600",
-        "hover:border-gray-700 hover:bg-gray-700",
+        "border-gray-500 bg-gray-500",
+        "hover:border-gray-600 hover:bg-gray-600",
       ],
     },
     {
       primary: true,
       color: "green",
       className: [
-        "border-green-600 bg-green-600",
-        "hover:border-green-700 hover:bg-green-700",
+        "border-green-500 bg-green-500",
+        "hover:border-green-600 hover:bg-green-600",
       ],
     },
     {
       primary: true,
       color: "teal",
       className: [
-        "border-teal-600 bg-teal-600",
-        "hover:border-teal-700 hover:bg-teal-700",
+        "border-teal-500 bg-teal-500",
+        "hover:border-teal-600 hover:bg-teal-600",
       ],
     },
     {
       primary: true,
       color: "pink",
       className: [
-        "border-pink-600 bg-pink-600",
-        "hover:border-pink-700 hover:bg-pink-700",
+        "border-pink-500 bg-pink-500",
+        "hover:border-pink-600 hover:bg-pink-600",
       ],
     },
     // light
@@ -157,8 +146,8 @@ const buttonVariants = tv({
       variant: "light",
       primary: true,
       className: [
-        "bg-primary-300 text-primary-600",
-        "hover:bg-primary-700 hover:text-white",
+        "bg-primary-200 text-primary-500",
+        "hover:bg-primary-600 hover:text-white",
       ],
     },
     {
@@ -190,7 +179,7 @@ const buttonVariants = tv({
       primary: true,
       variant: "outline",
       className: [
-        "border-primary bg-transparent text-primary",
+        "border-primary text-primary bg-transparent",
         "hover:bg-primary-active hover:border-primary-hover hover:text-primary-hover",
         "hover:bg-blue-100 dark:hover:bg-blue-300",
       ],

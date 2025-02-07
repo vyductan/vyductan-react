@@ -25,7 +25,7 @@ const color: Record<string, string> = {
 const tagVariants = tv({
   base: [
     "inline-flex items-center justify-center rounded-sm border px-2.5 py-0.5 text-xs font-medium transition-colors",
-    "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
     "h-[22px] whitespace-nowrap",
   ],
   variants: {

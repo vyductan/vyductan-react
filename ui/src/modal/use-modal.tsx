@@ -33,7 +33,7 @@ export const useModal = (): [
         open={!!modalState}
         title={title}
         onCancel={onCancel}
-        className="max-w-screen-md"
+        className="max-w-(--breakpoint-md)"
         // closeOnClickOutside={closeOnClickOutside}>
       >
         {content}
