@@ -13,8 +13,8 @@ export const metadata: Metadata = {
       ? "https://vyductan.com"
       : `http://localhost:${env.PORT ?? 3000}`,
   ),
-  title: "VyDucTan",
-  description: "Simple monorepo with shared backend for web & mobile apps",
+  title: "Sweet Delights Cake Shop",
+  description: "Delicious cakes for every occasion",
   // openGraph: {
   //   title: "Create T3 Turbo",
   //   description: "Simple monorepo with shared backend for web & mobile apps",
@@ -44,11 +44,7 @@ export default function RootLayout({
     // https://github.com/pacocoursey/next-themes/issues/224#issuecomment-1755634035
     // https://www.npmjs.com/package/geist?activeTab=readme#with-tailwind-css
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans text-foreground antialiased",
-        )}
-      >
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>
