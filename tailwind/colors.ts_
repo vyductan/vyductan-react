@@ -1,8 +1,4 @@
-import type {
-  Config,
-  RecursiveKeyValuePair,
-  ResolvableTo,
-} from "tailwindcss/types/config";
+import type { Config } from "tailwindcss";
 
 export const baseColors = {
   accents: {
@@ -87,18 +83,6 @@ export const baseColors = {
     900: "oklch(var(--ds-red-900) / <alpha-value>)",
     950: "oklch(var(--ds-red-950) / <alpha-value>)",
   },
-  pink: {
-    100: "oklch(var(--ds-pink-100) / <alpha-value>)",
-    200: "oklch(var(--ds-pink-200) / <alpha-value>)",
-    300: "oklch(var(--ds-pink-300) / <alpha-value>)",
-    400: "oklch(var(--ds-pink-400) / <alpha-value>)",
-    500: "oklch(var(--ds-pink-500) / <alpha-value>)",
-    600: "oklch(var(--ds-pink-600) / <alpha-value>)",
-    700: "oklch(var(--ds-pink-700) / <alpha-value>)",
-    800: "oklch(var(--ds-pink-800) / <alpha-value>)",
-    900: "oklch(var(--ds-pink-900) / <alpha-value>)",
-    950: "oklch(var(--ds-pink-950) / <alpha-value>)",
-  },
   purple: {
     100: "oklch(var(--ds-purple-100) / <alpha-value>)",
     200: "oklch(var(--ds-purple-200) / <alpha-value>)",
@@ -123,7 +107,7 @@ export const baseColors = {
     900: "oklch(var(--ds-teal-900) / <alpha-value>)",
     950: "oklch(var(--ds-teal-950) / <alpha-value>)",
   },
-} satisfies ResolvableTo<RecursiveKeyValuePair>;
+} satisfies NonNullable<Config["theme"]>["extend"];
 
 export const colorsConfig = {
   content: [],
