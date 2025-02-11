@@ -3,32 +3,14 @@
 
 @plugin "tailwindcss-animate";
 
-@import "./shadcn.css" layer(base);
 @import "./colors.css" layer(base);
+@import "./shadcn.css" layer(base);
 @import "./token.css" layer(base);
+@import "./utilities.css" layer(base);
 
 @config "./plugins.ts";
 
 @custom-variant dark (&:is(.dark *));
-
-@utility no-scrollbar {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-/*@utility border-border {*/
-/*  border-color: oklch(var(--ds-gray-400) / <alpha-value>);*/
-/*}*/
-/*@utility bg-background {*/
-/*  background: oklch(var(--ds-background-100) / <alpha-value>);*/
-/*}*/
-/*@utility text-foreground {*/
-/*  color: var(--color-gray-950);*/
-/*}*/
 
 @layer base {
   * {
