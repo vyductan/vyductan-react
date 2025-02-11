@@ -69,7 +69,10 @@ const Card = ({
       )}
       <CardContent
         className={cn(
-          !title && !description && !extra && "pt-6",
+          !title &&
+            !description &&
+            !extra &&
+            cn(size === "default" ? "pt-6" : "pt-3"),
           classNames?.content,
         )}
         size={size}

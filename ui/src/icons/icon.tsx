@@ -20,7 +20,7 @@ export const Icon = forwardRef(
       <>
         <span
           ref={ref}
-          className={cn(icon, "size-4", className)}
+          className={cn(icon, "block size-4", className)}
           {...props}
         ></span>
         {srOnly && <span className="sr-only">{srOnly}</span>}
