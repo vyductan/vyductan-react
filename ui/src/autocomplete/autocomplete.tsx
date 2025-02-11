@@ -184,7 +184,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
               "absolute right-[11px]",
               "flex size-5 items-center justify-center transition-opacity",
               "opacity-0",
-              "hover:!opacity-50",
+              "hover:opacity-50!",
               value && "group-hover:opacity-30",
             )}
             onPointerDown={(e) => {

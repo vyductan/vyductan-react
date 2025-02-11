@@ -64,7 +64,7 @@ const Steps = (props: StepsProps) => {
               className={cn(
                 // "px-4 first:ps-0",
                 "flex-1 last:flex-none",
-                "outline-none",
+                "outline-hidden",
                 // "relative inline-block pe-4",
                 "flex items-center",
                 labelPlacement === "vertical" && "flex-col",

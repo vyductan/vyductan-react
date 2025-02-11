@@ -11,7 +11,7 @@ export const TableToolbarRoot = ({
   return (
     <div
       className={cn(
-        "flex w-full flex-col gap-2 overflow-auto md:flex-row md:items-center md:justify-between",
+        "flex w-full flex-col gap-2 overflow-auto py-1 md:flex-row md:items-center md:justify-between",
         className,
       )}
       {...props}

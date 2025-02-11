@@ -54,8 +54,8 @@ const SelectTrigger = React.forwardRef<
           inputVariants({ borderless, status }),
           inputSizeVariants({ size }),
           "items-center justify-between",
-          "data-[placeholder]:text-muted-foreground",
-          "focus:outline-none",
+          "data-placeholder:text-muted-foreground",
+          "focus:outline-hidden",
           // "focus:ring-2 focus:ring-ring focus:ring-offset-2",
           // "disabled:text-placeholder disabled:cursor-not-allowed disabled:pointer-events-none",
           // "[&>span]:line-clamp-1", ???  disabled for middle arrow
@@ -71,7 +71,7 @@ const SelectTrigger = React.forwardRef<
               "absolute right-[11px]",
               "flex size-5 items-center justify-center transition-opacity",
               "opacity-0",
-              "hover:!opacity-50",
+              "hover:opacity-50!",
               value && "group-hover:opacity-30",
             )}
             onPointerDown={(e) => {
@@ -188,11 +188,11 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 text-sm outline-none",
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 text-sm outline-hidden",
       // "pr-2 pl-8",
       "px-2",
       "focus:bg-background-hover",
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "data-disabled:pointer-events-none data-disabled:opacity-50",
       className,
     )}
     {...props}

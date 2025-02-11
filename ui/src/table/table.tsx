@@ -371,7 +371,7 @@ const TableInner = <TRecord extends AnyObject>(
         <div
           className={cn(
             "relative",
-            "w-full space-y-3 overflow-auto",
+            "w-full space-y-2 overflow-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
               // "[&_table]:border-separate",

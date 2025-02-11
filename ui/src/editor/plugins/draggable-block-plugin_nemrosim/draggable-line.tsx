@@ -13,7 +13,7 @@ const DraggableLine: React.FC = () => {
 
   return (
     <div
-      className="pointer-events-none absolute z-[20000] h-1 w-full bg-blue-300"
+      className="pointer-events-none absolute z-20000 h-1 w-full bg-blue-300"
       style={{
         top: line.data.top + line.data.height - scrollOffset,
         left: line.data.left,

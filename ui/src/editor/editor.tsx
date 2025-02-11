@@ -79,7 +79,7 @@ const EditorInternal = (
   //             // "relative border-0 px-7 py-2 outline-0",
   //             // "flex flex-col",
   //             // "text-base",
-  //             // "[&>*]:py-[3px]",
+  //             // "*:py-[3px]",
   //           )}
   //         />
   //       </div>
@@ -172,7 +172,7 @@ const EditorInternal = (
                     // "relative border-0 px-7 py-2 outline-0",
                     // "flex flex-col",
                     // "text-base",
-                    // "[&>*]:py-[3px]",
+                    // "*:py-[3px]",
                   )}
                 />
               </div>

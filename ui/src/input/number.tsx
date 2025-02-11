@@ -144,7 +144,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
           "bg-transparent",
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
-          "border-none outline-none",
+          "border-none outline-hidden",
         ),
         // inputSizeVariants({ size: mergedSize })
         variant: cn(),

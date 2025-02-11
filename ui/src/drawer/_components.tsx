@@ -4,7 +4,6 @@ import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "..";
-import { Icon } from "../icons";
 
 type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
 const DrawerRoot = ({
