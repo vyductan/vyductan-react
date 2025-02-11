@@ -45,7 +45,7 @@ const TableFooter = <TRecord extends AnyObject>({
         ref={ref}
         className={cn(
           "border-t bg-muted/50 font-medium",
-          //   "[&>tr]:last:border-b-0",
+          //   "last:[&>tr]:border-b-0",
           "[&_tr:last-child>td]:border-b-0",
           className,
         )}
@@ -64,7 +64,7 @@ TableFooter.displayName = "TableFooter";
 //   <tfoot
 //     ref={ref}
 //     className={cn(
-//       "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+//       "border-t bg-muted/50 font-medium last:[&>tr]:border-b-0",
 //       className,
 //     )}
 //     {...props}

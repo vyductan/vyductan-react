@@ -3,5 +3,5 @@ import { Icon } from "./icon";
 
 type ArrowRightOutlinedProps = Omit<IconProps, "icon">;
 export const ArrowRightOutlined = (props: ArrowRightOutlinedProps) => {
-  return <Icon icon="mingcute:arrow-right-fill" {...props} />;
+  return <Icon icon="icon-[mingcute--arrow-right-fill]" {...props} />;
 };

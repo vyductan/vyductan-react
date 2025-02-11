@@ -15,27 +15,27 @@ import { Icon } from "../icons";
 export const inputVariants = cva(
   [
     // "h-9",
-    "rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors",
+    "rounded-md border border-input bg-transparent px-3 py-1 shadow-xs transition-colors",
     // "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
     // "placeholder:text-muted-foreground",
-    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+    "focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring",
     // "disabled:cursor-not-allowed disabled:opacity-50",
     "md:text-sm",
 
     "flex w-full",
 
     "items-center border border-input ring-offset-background",
-    "focus-within:outline-none",
+    "focus-within:outline-hidden",
   ],
   {
     variants: {
       borderless: {
-        true: ["border-0", "focus-within:outline-none"],
+        true: ["border-0", "focus-within:outline-hidden"],
         false: ["border", "rounded-md", "focus-within:ring-2"],
       },
       disabled: {
         true: [
-          "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
+          "cursor-not-allowed bg-background-active opacity-50 hover:border-input!",
         ],
       },
       // readOnly: {
@@ -253,7 +253,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
             "bg-transparent",
             // "placeholder:text-muted-foreground",
             "placeholder:text-placeholder",
-            "border-none outline-none",
+            "border-none outline-hidden",
           )}
           disabled={disabled}
           onChange={(event) => {

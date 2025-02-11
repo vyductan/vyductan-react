@@ -180,7 +180,7 @@ export const Item = React.memo(
             "rounded-md border",
             disabled &&
               "cursor-not-allowed bg-background-muted text-foreground-muted",
-            handle ? "!cursor-default" : "",
+            handle ? "cursor-default!" : "",
 
             // styles.Item,
             // dragging && styles.dragging,
