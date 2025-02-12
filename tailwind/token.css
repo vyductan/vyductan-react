@@ -1,6 +1,13 @@
-@layer base {
-  :root {
-    --margin-xs: 8px;
-    --control-height: 32px;
-  }
+:root {
+  --color-link: var(--color-blue-500);
+  --color-link-hover: var(--color-blue-500);
+
+  --breakpoint-xs: 480px;
+  --control-height: 32px;
+  --margin-xs: 8px;
+}
+
+@theme inline {
+  --color-link: var(--color-link);
+  --color-link-hover: var(--color-link-hover);
 }
