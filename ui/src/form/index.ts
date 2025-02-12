@@ -2,7 +2,6 @@ export * from "./form";
 export * from "./context";
 export * from "./use-form";
 export * from "./hooks/use-watch";
-export * from "./auto-form";
 export * from "./field";
 export * from "./field-label";
 export * from "./field-message";

@@ -8,8 +8,9 @@ import {
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import * as ReactDOM from "react-dom";
 
+import { useModal } from "@acme/ui/modal";
+
 import type { ComponentPickerOption } from "./types";
-import { useModal } from "../../../modal";
 import { ComponentPickerMenuItem } from "./component-picker-menu-item";
 import { getBaseOptions } from "./options";
 
@@ -72,7 +73,7 @@ export default function ComponentPickerMenuPlugin(): React.JSX.Element {
         ) =>
           anchorElementRef.current && options.length > 0 ? (
             ReactDOM.createPortal(
-              <div className="min-w-48 rounded-sm border border-border p-1">
+              <div className="border-border min-w-48 rounded-sm border p-1">
                 <ul>
                   {options.map((option, index: number) => (
                     <ComponentPickerMenuItem

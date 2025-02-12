@@ -3,22 +3,19 @@
 import type { Control, FieldValues, Path, PathValue } from "react-hook-form";
 import React from "react";
 
+import type { FormInstance, FormProps } from "@acme/ui/form";
 import { cn } from "@acme/ui";
+import { Autocomplete } from "@acme/ui/autocomplete";
+import { Button } from "@acme/ui/button";
+import { Editor } from "@acme/ui/editor";
+import { Field, FieldList, Form } from "@acme/ui/form";
+import { DeleteIcon } from "@acme/ui/icons";
+import { Input, InputPassword } from "@acme/ui/input";
+import { RadioGroup } from "@acme/ui/radio";
+import { Tag } from "@acme/ui/tag";
+import { Textarea } from "@acme/ui/textarea";
 
-import type { FormProps } from "./form";
-import type { FieldsSchema, FieldType, InputUnion } from "./types";
-import type { FormInstance } from "./use-form";
-import { Autocomplete } from "../autocomplete";
-import { Button } from "../button";
-import { Editor } from "../editor";
-import { DeleteIcon } from "../icons/delete-icon";
-import { Input, InputPassword } from "../input";
-import { RadioGroup } from "../radio";
-import { Tag } from "../tag";
-import { Textarea } from "../textarea";
-import { Field } from "./field";
-import { FieldList } from "./field-list";
-import { Form } from "./form";
+import { FieldsSchema, FieldType, InputUnion } from "./types";
 
 /*
  * Docs: https://procomponents.ant.design/en-US/components/schema-form

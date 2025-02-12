@@ -14,8 +14,9 @@ import {
   $isRangeSelection,
 } from "lexical";
 
-import type { useModal } from "../../../modal";
-import { Icon } from "../../../icons";
+import { Icon } from "@acme/ui/icons";
+import { useModal } from "@acme/ui/modal";
+
 import { InsertImage } from "../images-plugin/insert-image";
 import { ComponentPickerOption } from "./types";
 
