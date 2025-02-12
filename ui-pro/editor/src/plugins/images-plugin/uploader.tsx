@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { cn } from "@acme/ui";
+import { message } from "@acme/ui/toast";
 
 import type { InsertImagePayload } from "./types";
-import { message } from "../../../toast";
 import { useEditor } from "../../store";
 
 type UploadProps = {

@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@acme/ui-pro",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module"
+}

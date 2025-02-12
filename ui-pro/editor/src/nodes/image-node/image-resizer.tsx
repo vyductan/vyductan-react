@@ -2,9 +2,9 @@
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
 
-import { cn } from "../../..";
-import { Icon } from "../../../icons";
-import { Tooltip } from "../../../tooltip";
+import { cn } from "@acme/ui";
+import { Icon } from "@acme/ui/icons";
+import { Tooltip } from "@acme/ui/tooltip";
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -263,7 +263,7 @@ export default function ImageResizer({
       )}
       <div
         className={cn(
-          "absolute right-1 top-1 flex divide-x divide-white/50",
+          "absolute top-1 right-1 flex divide-x divide-white/50",
           "text-white",
         )}
       >
@@ -290,7 +290,7 @@ export default function ImageResizer({
       />
       <div
         className={cn(
-          "-left-2 bottom-[48%]",
+          "bottom-[48%] -left-2",
           "absolute h-10 w-2 cursor-col-resize bg-gray-400",
           "hover:bg-gray-500",
         )}
