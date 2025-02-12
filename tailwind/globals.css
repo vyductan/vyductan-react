@@ -6,7 +6,7 @@
 @import "./colors.css" layer(base);
 @import "./shadcn.css" layer(base);
 @import "./token.css" layer(base);
-@import "./utilities.css" layer(base);
+@import "./utilities.css";
 
 @config "./plugins.ts";
 
