@@ -13,7 +13,7 @@ const textareaVariants = cva(
     "bg-transparent",
     "text-sm",
     "placeholder:text-placeholder",
-    "focus-visible:outline-none",
+    "focus-visible:outline-hidden",
     "disabled:cursor-not-allowed disabled:opacity-50",
   ],
   {

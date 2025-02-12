@@ -95,7 +95,7 @@ const PaginationNext = ({
     className={cn(className)}
     {...props}
   >
-    <Icon icon="icon-[mingcute:right-fill]" className="size-4" />
+    <Icon icon="icon-[mingcute--right-fill]" className="size-4" />
   </PaginationLink>
 );
 PaginationNext.displayName = "PaginationNext";

@@ -48,14 +48,14 @@ const Radio = React.forwardRef<
           className={cn(
             "inline-flex cursor-pointer items-center justify-center whitespace-nowrap px-3 py-[5px] text-sm font-medium ring-offset-background transition-all",
             "border border-l-0 first:rounded-s-md first:border-l last:rounded-e-md",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             radioColors[color],
             disabled && "pointer-events-none cursor-not-allowed opacity-50",
             radioButtonSolidColors[color],
             preColor && radioButtonSolidColors[preColor]?.split(" ")[1],
             isActive &&
               radioButtonSolidActiveColors[color] +
-                " shadow-sm [&>button]:text-white",
+                " shadow-xs [&>button]:text-white",
             className,
           )}
         >
@@ -89,8 +89,8 @@ const Radio = React.forwardRef<
           ref={ref}
           value={value as string}
           className={cn(
-            "aspect-square size-4 rounded-full border shadow ring-offset-background",
-            "focus:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+            "aspect-square size-4 rounded-full border shadow-sm ring-offset-background",
+            "focus:outline-hidden focus-visible:ring-1 focus-visible:ring-ring",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[state=checked]:border-2",
           )}

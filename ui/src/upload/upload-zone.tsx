@@ -86,9 +86,9 @@ const UploadZone = ({
 
   return (
     <Spin spinning={uploading} tip="Đang tải lên" className="h-32" {...props}>
-      <div className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50">
+      <div className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-xs transition-all hover:bg-gray-50">
         <div
-          className="absolute z-[5] size-full rounded-md"
+          className="absolute z-5 size-full rounded-md"
           onDragOver={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -123,7 +123,7 @@ const UploadZone = ({
         ) : (
           <div
             className={cn(
-              "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
+              "absolute z-3 flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
               dragActive && "border-2 border-black",
               "bg-white opacity-100 hover:bg-gray-50",
             )}
@@ -172,7 +172,7 @@ const UploadZone = ({
         {/* )} */}
       </div>
 
-      <div className="mt-1 flex rounded-md shadow-sm">
+      <div className="mt-1 flex rounded-md shadow-xs">
         <input
           id="image-upload"
           type="file"
