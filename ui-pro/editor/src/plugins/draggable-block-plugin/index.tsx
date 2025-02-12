@@ -19,8 +19,8 @@ import {
 import { createPortal } from "react-dom";
 
 import { cn } from "@acme/ui";
+import { Icon } from "@acme/ui/icons";
 
-import { Icon } from "../../../icons";
 import { isHTMLElement } from "../../utils/guard";
 import { Point } from "../../utils/point";
 import { Rect } from "../../utils/rect";
@@ -429,7 +429,7 @@ function useDraggableBlockMenu(
     <>
       <div
         className={cn(
-          "absolute left-0 top-0 cursor-grab p-px will-change-transform",
+          "absolute top-0 left-0 cursor-grab p-px will-change-transform",
           "active:cursor-grabbing",
           "hover:bg-gray-100",
         )}
@@ -447,7 +447,7 @@ function useDraggableBlockMenu(
         )}
       </div>
       <div
-        className="pointer-events-none absolute left-0 top-0 h-1 bg-blue-300 opacity-0 will-change-transform"
+        className="pointer-events-none absolute top-0 left-0 h-1 bg-blue-300 opacity-0 will-change-transform"
         ref={targetLineRef}
       />
     </>,

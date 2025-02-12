@@ -11,17 +11,17 @@ const color: Record<string, string> = {
   success: "bg-success-muted text-success border-green-600",
   processing: "bg-blue-200 text-blue-900 border-blue-600",
   error: "bg-red-200 text-red-900 border-red-600",
-  warning: "bg-amber-200 text-amber-900 border-amber-600",
+  warning: "bg-amber-100 text-amber-600 border-amber-600",
   gray: "bg-gray-200 text-gray-950 border-gray-600",
-  amber: "bg-amber-200 text-amber-900 border-amber-600",
+  amber: "bg-amber-100 text-amber-600 border-amber-600",
   blue: "bg-blue-200 text-blue-900 border-blue-600",
   fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
-  green: "bg-green-200 text-green-900 border-green-600",
+  green: "bg-green-100 text-green-600 border-green-600",
   red: "bg-red-200 text-red-900 border-red-600",
   rose: "bg-rose-100 text-rose-600 border-rose-400",
   pink: "bg-pink-300 text-pink-900 border-pink-600",
   purple: "bg-purple-200 text-purple-900 border-purple-600",
-  teal: "bg-teal-300 text-teal-900 border-teal-600",
+  teal: "bg-teal-100 text-teal-600 border-teal-600",
 };
 
 // Based on antd
@@ -45,18 +45,24 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex items-center justify-center rounded-sm border px-2.5 py-0.5 text-xs font-medium transition-colors",
-    "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-    "h-[22px] whitespace-nowrap",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold whitespace-nowrap transition-[color,box-shadow]",
+    "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
+    "[&>svg]:pointer-events-none [&>svg]:size-3",
+    "focus-visible:ring-4 focus-visible:outline-1",
+    "aria-invalid:focus-visible:ring-0",
+
+    // "rounded-sm px-2.5 font-medium",
   ],
   variants: {
     variant: {
-      default: "border-transparent",
+      default:
+        "bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent shadow-sm",
       secondary:
-        "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 border-transparent",
       destructive:
-        "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-      outline: "text-foreground",
+        "bg-destructive text-destructive-foreground [a&]:hover:bg-destructive/90 border-transparent shadow-sm",
+      outline:
+        "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
     },
     color,
     bordered: {
