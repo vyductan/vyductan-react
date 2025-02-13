@@ -145,7 +145,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
           <span>{input1}</span>
           <span
             className={cn(
-              "px-2 text-center text-foreground-muted",
+              "px-2 text-center text-muted-foreground",
               !input1 && !input2 && "opacity-0",
             )}
           >

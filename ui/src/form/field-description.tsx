@@ -13,7 +13,7 @@ const FieldDescription = forwardRef<
     <div
       ref={ref}
       id={fieldDescriptionId}
-      className={cn("text-sm text-foreground-muted", className)}
+      className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
   );

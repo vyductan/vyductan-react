@@ -179,7 +179,7 @@ export const Item = React.memo(
             "relative flex grow items-center justify-between p-4",
             "rounded-md border",
             disabled &&
-              "cursor-not-allowed bg-background-muted text-foreground-muted",
+              "cursor-not-allowed bg-background-muted text-muted-foreground",
             handle ? "cursor-default!" : "",
 
             // styles.Item,
@@ -225,7 +225,7 @@ export const Item = React.memo(
           {/*     "relative flex grow items-center justify-between p-4", */}
           {/*     "rounded-md border", */}
           {/*     disabled && */}
-          {/*       "cursor-not-allowed bg-background-muted text-foreground-muted", */}
+          {/*       "cursor-not-allowed bg-background-muted text-muted-foreground", */}
           {/**/}
           {/*     // styles.Item, */}
           {/*     // dragging && styles.dragging, */}
