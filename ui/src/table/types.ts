@@ -5,6 +5,9 @@ import type {
   RowData,
 } from "@tanstack/react-table";
 
+import type { PaginationProps } from "../pagination";
+import type { AnyObject } from "../types";
+
 type Meta<TRecord> = {
   title?: React.ReactNode;
   align?: "left" | "right" | "center";
@@ -16,6 +19,7 @@ type Meta<TRecord> = {
   attributes?: Record<string, string>;
   headAttributes?: Record<string, string>;
   // rowName?: string | ((record: TRecord, index: number) => string);
+  defaultSortOrder?: SortOrder;
   /** Sort function for local sort, see Array.sort's compareFunction. If it is server-side sorting, set to true, but if you want to support multi-column sorting, you can set it to { multiple: number }
    * boolean
    * function
@@ -161,4 +165,34 @@ export interface TableComponents<RecordType> {
         row?: CustomizeComponent;
         cell?: CustomizeComponent;
       };
+}
+
+type TablePaginationPosition =
+  | "topLeft"
+  | "topCenter"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomCenter"
+  | "bottomRight"
+  | "none";
+export interface TablePaginationConfig extends PaginationProps {
+  position?: TablePaginationPosition[];
+}
+
+export type FilterValue = (Key | boolean)[];
+
+export type SortOrder = "descend" | "ascend" | null;
+export interface SorterResult<RecordType = AnyObject> {
+  column?: TableColumnDef<RecordType>;
+  order?: SortOrder;
+  // field?: Key | readonly Key[];
+  field?: Key;
+  columnKey?: Key;
+}
+
+declare const _TableActions: readonly ["paginate", "sort", "filter"];
+export type TableAction = (typeof _TableActions)[number];
+export interface TableCurrentDataSource<RecordType = AnyObject> {
+  currentDataSource: RecordType[];
+  action: TableAction;
 }
