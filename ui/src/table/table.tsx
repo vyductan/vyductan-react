@@ -63,7 +63,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customRowStyle?: React.CSSProperties;
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
-  Omit<React.ComponentProps<"table">, "title" | "onChange"> & {
+  Omit<React.ComponentProps<"table">, "title" | "onChange" | "summary"> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
 
