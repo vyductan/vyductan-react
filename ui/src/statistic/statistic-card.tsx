@@ -21,7 +21,7 @@ const StatisticCard = ({
       </div>
       <div className="flex flex-col">
         <div className="text-2xl font-bold">{valueToRender}</div>
-        <div className="text-foreground-muted">{title}</div>
+        <div className="text-muted-foreground">{title}</div>
       </div>
     </Card>
   );
