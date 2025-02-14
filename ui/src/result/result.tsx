@@ -37,7 +37,7 @@ const Result = ({ status, title, subtitle, extra }: ResultProps) => {
       );
       title = title ?? (result[500] ? result[500].title : "500");
       subtitle = (
-        <div className="text-foreground-muted">
+        <div className="text-muted-foreground">
           {subtitle ??
             (result[500] ? result[500].subtitle : "Something went wrong")}
         </div>

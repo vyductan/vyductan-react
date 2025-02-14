@@ -16,7 +16,7 @@ const Empty = ({ className, image, description, children }: EmptyProps) => {
       className={cn("flex flex-col items-center px-4 py-2 text-sm", className)}
     >
       <div className="mb-2">{ImageToRender}</div>
-      <div className="text-foreground-muted">{DescriptionToRender}</div>
+      <div className="text-muted-foreground">{DescriptionToRender}</div>
       <div className="mt-4">{children}</div>
     </div>
   );
