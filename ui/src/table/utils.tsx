@@ -319,11 +319,3 @@ export const transformedRowSelection = <TRecord extends AnyObject>(
   }
   return rowSelectionTst;
 };
-
-/* Type Guard */
-// @deprecated when define sort in columns
-// export const isColumnSortType = (
-//   item: Partial<ColumnSort>,
-// ): item is ColumnSort => {
-//   return item.id !== undefined;
-// };
