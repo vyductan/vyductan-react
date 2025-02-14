@@ -46,7 +46,9 @@ import {
   TableRoot,
   TableRow,
 } from "./_components";
+import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
+import { useColumns } from "./hooks/use-columns";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformColumnDefs, transformedRowSelection } from "./utils";
@@ -172,6 +174,8 @@ const Table = <TRecord extends AnyObject>({
   ...props
 }: TableProps<TRecord>) => {
   const data = React.useMemo(() => dataSource, [dataSource]);
+
+  // ====================== Column ======================
   const columns = React.useMemo(
     () =>
       transformColumnDefs(propColumns, {
@@ -182,7 +186,9 @@ const Table = <TRecord extends AnyObject>({
       }),
     [propColumns, rowKey, propRowSelection, expandable, dnd],
   );
+  const [_, flattenColumns] = useColumns({ columns: propColumns });
 
+  // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const defaultPinnings = {
@@ -387,6 +393,7 @@ const Table = <TRecord extends AnyObject>({
       : "";
   };
 
+  console.log("aaa", flattenColumns);
   return (
     <>
       <Spin spinning={loading}>
@@ -442,18 +449,7 @@ const Table = <TRecord extends AnyObject>({
             style={tableStyles}
             {...props}
           >
-            {columns.some((column) => column.size) && (
-              <colgroup>
-                {columns.map((col, index) => (
-                  <col
-                    key={index}
-                    {...(col.size === undefined
-                      ? {}
-                      : { style: { width: col.size } })}
-                  />
-                ))}
-              </colgroup>
-            )}
+            <ColGroup columns={flattenColumns} />
 
             <TableHeader
               style={{
@@ -480,8 +476,6 @@ const Table = <TRecord extends AnyObject>({
                         size={size}
                         style={getCommonPinningStyles(header.column)}
                         className={cn(
-                          // column className
-                          header.column.columnDef.meta?.className,
                           // align
                           header.column.columnDef.meta?.align === "center" &&
                             "text-center",
@@ -500,6 +494,9 @@ const Table = <TRecord extends AnyObject>({
                           // selection column
                           header.id === "selection" && "px-0",
                           classNames?.th,
+                          // column className
+                          header.column.columnDef.meta?.className,
+                          header.column.columnDef.meta?.classNames?.head,
                         )}
                         {...header.column.columnDef.meta?.headAttributes}
                       >
