@@ -40,6 +40,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableHiding,
           title,
           width,
+          minWidth,
           render,
 
           // meta props
@@ -82,6 +83,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableResizing,
           enableHiding,
           size: width,
+          minSize: minWidth,
           meta: {
             title,
             align,

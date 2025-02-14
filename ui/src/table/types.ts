@@ -11,9 +11,10 @@ import type { AnyObject } from "../types";
 type Meta<TRecord> = {
   title?: React.ReactNode;
   align?: "left" | "right" | "center";
-  fixed?: "left" | "right";
+  fixed?: FixedType;
   className?: string;
   classNames?: {
+    head?: string;
     cell?: string;
   };
   attributes?: Record<string, string>;
@@ -43,6 +44,7 @@ type BaseTableColumnDef<TRecord> = {
   key?: string;
   hidden?: boolean;
   width?: number;
+  minWidth?: number;
 
   enableResizing?: boolean;
   enableHiding?: boolean;
