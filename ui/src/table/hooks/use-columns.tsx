@@ -7,7 +7,6 @@ function flatColumns<TRecord>(
   columns: TableColumnDef<TRecord>[],
   parentKey = "key",
 ): TableColumnDef<TRecord>[] {
-  console.log("aaaaaaaa", columns);
   const flattenColumns: TableColumnDef<TRecord>[] = [];
   for (const [index, column] of columns.entries()) {
     if (typeof column === "object") {
@@ -35,34 +34,6 @@ function flatColumns<TRecord>(
     }
   }
   return flattenColumns;
-  // return columns
-  //   .filter((column) => typeof column === "object")
-  //   .reduce((list, column, index) => {
-  //     const { fixed } = column;
-  //     // Convert `fixed='true'` to `fixed='left'` instead
-  //     const parsedFixed = fixed === true ? "left" : fixed;
-  //     const mergedKey = `${parentKey}-${index}`;
-  //
-  //     // const subColumns = (column as ColumnGroupType<TRecord>).children;
-  //     const subColumns = column.children;
-  //     if (subColumns && subColumns.length > 0) {
-  //       return [
-  //         ...list,
-  //         ...flatColumns(subColumns, mergedKey).map((subColum) => ({
-  //           fixed: parsedFixed,
-  //           ...subColum,
-  //         })),
-  //       ];
-  //     }
-  //     return [
-  //       ...list,
-  //       {
-  //         key: mergedKey,
-  //         ...column,
-  //         fixed: parsedFixed,
-  //       },
-  //     ];
-  //   }, []);
 }
 
 export const useColumns = <TRecord extends AnyObject>({
