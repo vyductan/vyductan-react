@@ -6,21 +6,22 @@ import { useUiConfig } from "../store";
 
 // Based on Vercel
 const color: Record<string, string> = {
-  default: "bg-gray-200 text-gray-950 border-gray-600",
-  primary: "bg-primary-200 text-primary-900 border-primary-600",
+  default: "bg-gray-100 text-gray-600 border-gray-600",
+  primary: "bg-primary-100 text-primary-600 border-primary-600",
   success: "bg-success-muted text-success border-green-600",
-  processing: "bg-blue-200 text-blue-900 border-blue-600",
-  error: "bg-red-200 text-red-900 border-red-600",
+  processing: "bg-blue-100 text-blue-600 border-blue-600",
+  error: "bg-red-100 text-red-600 border-red-600",
   warning: "bg-amber-100 text-amber-600 border-amber-600",
-  gray: "bg-gray-200 text-gray-950 border-gray-600",
+  gray: "bg-gray-100 text-gray-600 border-gray-600",
   amber: "bg-amber-100 text-amber-600 border-amber-600",
-  blue: "bg-blue-200 text-blue-900 border-blue-600",
-  fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
+  blue: "bg-blue-100 text-blue-600 border-blue-600",
+  fuchsia: "bg-fuchsia-100 text-fuchsia-600 border-fuchsia-600",
   green: "bg-green-100 text-green-600 border-green-600",
-  red: "bg-red-200 text-red-900 border-red-600",
+  orange: "bg-orange-100 text-orange-600 border-orange-600",
+  red: "bg-red-100 text-red-600 border-red-600",
   rose: "bg-rose-100 text-rose-600 border-rose-400",
-  pink: "bg-pink-300 text-pink-900 border-pink-600",
-  purple: "bg-purple-200 text-purple-900 border-purple-600",
+  pink: "bg-pink-100 text-pink-600 border-pink-600",
+  purple: "bg-purple-100 text-purple-600 border-purple-600",
   teal: "bg-teal-100 text-teal-600 border-teal-600",
 };
 
