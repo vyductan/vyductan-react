@@ -40,6 +40,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableHiding,
           title,
           width,
+          minWidth,
           render,
 
           // meta props
@@ -82,6 +83,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableResizing,
           enableHiding,
           size: width,
+          minSize: minWidth,
           meta: {
             title,
             align,
@@ -319,11 +321,3 @@ export const transformedRowSelection = <TRecord extends AnyObject>(
   }
   return rowSelectionTst;
 };
-
-/* Type Guard */
-// @deprecated when define sort in columns
-// export const isColumnSortType = (
-//   item: Partial<ColumnSort>,
-// ): item is ColumnSort => {
-//   return item.id !== undefined;
-// };
