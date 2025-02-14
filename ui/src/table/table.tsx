@@ -393,7 +393,6 @@ const Table = <TRecord extends AnyObject>({
       : "";
   };
 
-  console.log("aaa", flattenColumns);
   return (
     <>
       <Spin spinning={loading}>
