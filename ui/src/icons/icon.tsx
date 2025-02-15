@@ -20,6 +20,7 @@ export const Icon = forwardRef(
       <>
         <span
           ref={ref}
+          role="img"
           className={cn(icon, "block size-4", className)}
           {...props}
         ></span>

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import { cn } from "@acme/ui";
+import { message } from "@acme/ui/toast";
 
 import type { InsertImagePayload } from "./types";
-import { message } from "../../../toast";
 import { useEditor } from "../../store";
 
 type UploadProps = {
@@ -66,10 +66,10 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
       <form>
         <label
           htmlFor="image-upload"
-          className="group relative mt-2 flex h-72 cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
+          className="group relative mt-2 flex h-72 cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-xs transition-all hover:bg-gray-50"
         >
           <div
-            className="absolute z-[5] size-full rounded-md"
+            className="absolute z-5 size-full rounded-md"
             onDragOver={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -98,7 +98,7 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
           />
           <div
             className={cn(
-              "absolute z-[3] flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
+              "absolute z-3 flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
               dragActive && "border-2 border-black",
               "bg-white opacity-100 hover:bg-gray-50",
             )}
@@ -146,7 +146,7 @@ export const Uploader = ({ onUploadSuccess }: UploadProps) => {
           {/* )} */}
         </label>
 
-        <div className="mt-1 flex rounded-md shadow-sm">
+        <div className="mt-1 flex rounded-md shadow-xs">
           <input
             id="image-upload"
             name="image"

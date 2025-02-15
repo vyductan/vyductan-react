@@ -24,7 +24,7 @@ const TabsList = React.forwardRef<
       "inline-flex items-center rounded-lg p-1 text-muted-foreground",
       // "justify-center",
       // "bg-muted",
-      // "flex-nowrap overflow-x-scroll text-foreground-muted no-scrollbar",
+      // "flex-nowrap overflow-x-scroll text-muted-foreground no-scrollbar",
       // "flex items-baseline",
       type === "secondary" &&
         "justify-center rounded-md bg-background-muted p-1",
@@ -56,13 +56,13 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-all",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       "disabled:pointer-events-none disabled:opacity-50",
       "py-3",
       tabsType === "secondary" && [
         "px-3",
         "rounded-sm",
-        "data-[state=active]:bg-surface-secondary data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+        "data-[state=active]:bg-surface-secondary data-[state=active]:text-foreground data-[state=active]:shadow-xs",
         // "justify-center rounded-md bg-background-muted p-1",
       ],
       tabsType === undefined && [
@@ -87,7 +87,7 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 ring-offset-background",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       className,
     )}
     {...props}

@@ -1,9 +1,11 @@
 import type { Config } from "tailwindcss";
 import { addDynamicIconSelectors } from "@iconify/tailwind";
-import { fontSize } from "tailwindcss/defaultTheme";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 import { baseColors, colorsConfig } from "./colors";
 import { tokenConfig } from "./token";
+
+const { fontSize } = defaultTheme;
 
 export default {
   darkMode: ["class"],

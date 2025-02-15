@@ -1,4 +1,4 @@
-import type { ColumnDef, ColumnSort, Row } from "@tanstack/react-table";
+import type { ColumnDef, Row } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import type { AnyObject } from "../types";
@@ -13,7 +13,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
   columns: TableColumnDef<TRecord>[],
   props: Pick<
     TableProps<TRecord>,
-    "rowKey" | "rowSelection" | "expandable" | "sorting" | "dnd"
+    "rowKey" | "rowSelection" | "expandable" | "dnd"
   >,
   isNotFirstDeepColumn?: boolean,
 ) => {
@@ -40,6 +40,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableHiding,
           title,
           width,
+          minWidth,
           render,
 
           // meta props
@@ -47,6 +48,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           fixed,
           className,
           classNames,
+          defaultSortOrder,
           sorter,
           attributes,
           headAttributes,
@@ -81,10 +83,12 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           enableResizing,
           enableHiding,
           size: width,
+          minSize: minWidth,
           meta: {
             title,
             align,
             fixed,
+            defaultSortOrder,
             sorter,
             className,
             classNames,
@@ -92,11 +96,11 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
             headAttributes,
           },
           // sorting
-          ...(sorter || props.sorting?.state?.find((x) => x.id === dataIndex)
+          ...(sorter
             ? {
                 // enableSorting: true,
-                sortingFn: sorter
-                  ? typeof sorter === "string"
+                sortingFn:
+                  typeof sorter === "string"
                     ? sorter
                     : typeof sorter === "function"
                       ? (rowA, rowB) => sorter(rowA.original, rowB.original)
@@ -107,9 +111,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
                               sorter.compare!(rowA.original, rowB.original)
                           : "auto"
                         : // boolean
-                          "auto"
-                  : // undefined
-                    "auto",
+                          "auto",
               }
             : { enableSorting: false }),
           ...restProps,
@@ -318,11 +320,4 @@ export const transformedRowSelection = <TRecord extends AnyObject>(
     }
   }
   return rowSelectionTst;
-};
-
-/* Type Guard */
-export const isColumnSortType = (
-  item: Partial<ColumnSort>,
-): item is ColumnSort => {
-  return item.id !== undefined;
 };
