@@ -16,7 +16,7 @@ import { Icon } from "../icons";
 import { Popover } from "../popover";
 import { selectColors } from "../select/colors";
 
-export type AutoCompleteProps<T extends ValueType = string> = Pick<
+export type AutocompleteProps<T extends ValueType = string> = Pick<
   CommandProps<T>,
   | "filter"
   | "placeholder"
@@ -42,30 +42,27 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   onSearchChange?: (search: string) => void;
 };
 
-const AutoCompleteInner = <T extends ValueType = string>(
-  {
-    defaultValue: defaultValueProp,
-    value: valueProp,
-    options: optionsProp,
-    optionsToSearch,
+const Autocomplete = <T extends ValueType = string>({
+  defaultValue: defaultValueProp,
+  value: valueProp,
+  options: optionsProp,
+  optionsToSearch,
 
-    className,
-    size,
-    disabled,
+  className,
+  size,
+  disabled,
 
-    filter: filterProp,
+  filter: filterProp,
 
-    placeholder,
+  placeholder,
 
-    allowClear,
+  allowClear,
 
-    onChange,
-    onSearchChange,
+  onChange,
+  onSearchChange,
 
-    ...props
-  }: AutoCompleteProps<T>,
-  _: React.ForwardedRef<HTMLInputElement>,
-) => {
+  ...props
+}: AutocompleteProps<T>) => {
   /* Remove duplicate options */
   const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
@@ -100,8 +97,6 @@ const AutoCompleteInner = <T extends ValueType = string>(
     },
   });
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
-
   const buttonText = (() => {
     if (!value) {
       return placeholder ?? <span className="opacity-0"></span>;
@@ -134,8 +129,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
       trigger="click"
       open={open}
       onOpenChange={setOpen}
-      className="p-0"
-      style={{ width: buttonRef.current?.offsetWidth }}
+      className="w-(--radix-popover-trigger-width) p-0"
       content={
         <Command
           options={options}
@@ -150,12 +144,11 @@ const AutoCompleteInner = <T extends ValueType = string>(
       }
     >
       <Button
-        size={size}
-        ref={buttonRef}
         variant="outline"
         role="combobox"
-        disabled={disabled}
         aria-expanded={open}
+        size={size}
+        disabled={disabled}
         className={cn(
           "w-full justify-between text-sm font-normal",
           !value && "text-muted-foreground",
@@ -206,10 +199,4 @@ const AutoCompleteInner = <T extends ValueType = string>(
   );
 };
 
-export const Autocomplete = React.forwardRef(AutoCompleteInner) as <
-  T extends ValueType,
->(
-  props: AutoCompleteProps<T> & {
-    ref?: React.ForwardedRef<HTMLUListElement>;
-  },
-) => ReturnType<typeof AutoCompleteInner>;
+export { Autocomplete };

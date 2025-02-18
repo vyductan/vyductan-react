@@ -51,7 +51,7 @@ import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { useColumns } from "./hooks/use-columns";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import { transformColumnDefs, transformedRowSelection } from "./utils";
+import { transformedRowSelection } from "./utils";
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
@@ -84,8 +84,8 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       header?: string;
       footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
-      th?: string;
-      td?: string;
+      head?: string;
+      cell?: string;
     };
 
     // emptyRender?: EmptyProps;
@@ -176,17 +176,23 @@ const Table = <TRecord extends AnyObject>({
   const data = React.useMemo(() => dataSource, [dataSource]);
 
   // ====================== Column ======================
-  const columns = React.useMemo(
-    () =>
-      transformColumnDefs(propColumns, {
-        rowKey,
-        rowSelection: propRowSelection,
-        expandable,
-        dnd,
-      }),
-    [propColumns, rowKey, propRowSelection, expandable, dnd],
-  );
-  const [_, flattenColumns] = useColumns({ columns: propColumns });
+  // const columns = React.useMemo(
+  //   () =>
+  //     transformColumnDefs(propColumns, {
+  //       rowKey,
+  //       rowSelection: propRowSelection,
+  //       expandable,
+  //       dnd,
+  //     }),
+  //   [propColumns, rowKey, propRowSelection, expandable, dnd],
+  // );
+  const [columns, flattenColumns] = useColumns({
+    columns: propColumns,
+    rowKey,
+    rowSelection: propRowSelection,
+    expandable,
+    dnd,
+  });
 
   // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -492,7 +498,7 @@ const Table = <TRecord extends AnyObject>({
                           ),
                           // selection column
                           header.id === "selection" && "px-0",
-                          classNames?.th,
+                          classNames?.head,
                           // column className
                           header.column.columnDef.meta?.className,
                           header.column.columnDef.meta?.classNames?.head,
@@ -589,7 +595,7 @@ const Table = <TRecord extends AnyObject>({
                                   // selection column
                                   cell.id.endsWith("selection") && "px-0",
                                   // column className
-                                  classNames?.td,
+                                  classNames?.cell,
                                   cell.column.columnDef.meta?.className,
                                   cell.column.columnDef.meta?.classNames?.cell,
                                 )}
