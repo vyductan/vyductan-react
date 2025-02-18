@@ -96,7 +96,7 @@ const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("flex flex-col gap-2", className)}>
       {breadcrumb}
       <div className={cn("flex justify-between")}>
         {title}
