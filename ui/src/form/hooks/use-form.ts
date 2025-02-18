@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import _ from "lodash";
 import { useForm as useRHForm, useWatch } from "react-hook-form";
 
-import type { ResetAction } from "./types";
+import type { ResetAction } from "../types";
 
 type FormInstance<
   TFieldValues extends FieldValues = FieldValues,

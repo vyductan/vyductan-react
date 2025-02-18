@@ -2,19 +2,16 @@ import React from "react";
 
 import type { GenericSlotProps } from "../../slot";
 import { GenericSlot } from "../../slot";
-import { useFormField } from "../use-field";
+import { useFormField } from "../hooks/use-form-field";
 
 const FormControl = ({ ...props }: GenericSlotProps) => {
-  const {
-    error,
-    fieldId,
-    fieldDescriptionId: formDescriptionId,
-    fieldMessageId: formMessageId,
-  } = useFormField();
+  const { error, formItemId, formDescriptionId, formMessageId } =
+    useFormField();
 
   return (
     <GenericSlot
-      id={fieldId}
+      data-slot="form-control"
+      id={formItemId}
       aria-describedby={
         error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
       }
@@ -24,6 +21,5 @@ const FormControl = ({ ...props }: GenericSlotProps) => {
     />
   );
 };
-FormControl.displayName = "FormControl";
 
 export { FormControl };
