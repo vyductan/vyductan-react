@@ -3,175 +3,173 @@ import type { ReactNode } from "react";
 
 import type { AnyObject } from "../types";
 import type { TableProps } from "./table";
-import type { ExtraTableColumnDef, TableColumnDef } from "./types";
+import type { TableColumnDef } from "./types";
 import { Checkbox } from "../checkbox";
 import { HandleButton } from "../drag-and-drop/_components/handle";
 import { Icon } from "../icons";
-import { DragHandle } from "./_components/table-row-sortable";
 
-export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
+// import { DragHandle } from "./_components/table-row-sortable";
+
+export const transformColumnDefs = <TRecord extends AnyObject>(
   columns: TableColumnDef<TRecord>[],
   props: Pick<
     TableProps<TRecord>,
     "rowKey" | "rowSelection" | "expandable" | "dnd"
   >,
   isNotFirstDeepColumn?: boolean,
-) => {
-  const mergedColumns: TableColumnDef<TRecord>[] = [
-    ...(props.dnd
-      ? [
-          {
-            key: "sort",
-            align: "center",
-            width: 80,
-            render: () => <DragHandle />,
-          } satisfies TableColumnDef<TRecord>,
-        ]
-      : []),
-    ...columns,
-  ];
-  const columnsDef: (ColumnDef<TRecord> & ExtraTableColumnDef<TRecord>)[] =
-    mergedColumns.map(
-      (
-        {
-          key,
-          children,
-          dataIndex,
-          enableResizing,
-          enableHiding,
-          title,
-          width,
-          minWidth,
-          render,
+): ColumnDef<TRecord>[] => {
+  // const mergedColumns: TableColumnDef<TRecord>[] = [
+  //   ...(props.dnd
+  //     ? [
+  //         {
+  //           key: "sort",
+  //           align: "center",
+  //           width: 80,
+  //           render: () => <DragHandle />,
+  //         } satisfies TableColumnDef<TRecord>,
+  //       ]
+  //     : []),
+  //   ...columns,
+  // ];
+  const columnsDef: ColumnDef<TRecord>[] = columns.map(
+    (
+      {
+        key,
+        children,
+        dataIndex,
+        enableResizing,
+        enableHiding,
+        title,
+        width,
+        minWidth,
+        render,
 
-          // meta props
+        // meta props
+        align,
+        fixed,
+        className,
+        classNames,
+        defaultSortOrder,
+        sorter,
+        attributes,
+        headAttributes,
+
+        ...restProps
+      },
+      index,
+    ) => {
+      const columnDefMerged: ColumnDef<TRecord> = {
+        // accessorKey: dataIndex,
+        ...(typeof dataIndex === "string"
+          ? { id: key ?? dataIndex, accessorKey: dataIndex }
+          : {
+              id: key ?? index.toString(),
+              accessorFn: () => key ?? index.toString(),
+            }),
+        header: () => title,
+        ...(children
+          ? {
+              columns: transformColumnDefs(
+                // add fixed to children
+                children.map((x) => ({ ...x, fixed })),
+                {},
+                index === 0 || false,
+              ),
+              // for use in Gantt
+              children: transformColumnDefs(
+                // add fixed to children
+                children.map((x) => ({ ...x, fixed })),
+                props,
+              ),
+            }
+          : {}),
+        enableResizing,
+        enableHiding,
+        size: width,
+        minSize: minWidth,
+        meta: {
+          title,
           align,
           fixed,
-          className,
-          classNames,
           defaultSortOrder,
           sorter,
+          className,
+          classNames,
           attributes,
           headAttributes,
-
-          ...restProps
         },
-        index,
-      ) => {
-        const columnDefMerged: ColumnDef<TRecord> &
-          ExtraTableColumnDef<TRecord> = {
-          // accessorKey: dataIndex,
-          ...(typeof dataIndex === "string"
-            ? { id: key ?? dataIndex, accessorKey: dataIndex }
-            : {
-                id: key ?? index.toString(),
-                accessorFn: () => key ?? index.toString(),
-              }),
-          header: () => title,
-          ...(children
-            ? {
-                columns: transformColumnDefs(
-                  // add fixed to children
-                  children.map((x) => ({ ...x, fixed })),
-                  {},
-                  index === 0 || false,
-                ),
-                // for use in Gantt
-                children: transformColumnDefs(
-                  // add fixed to children
-                  children.map((x) => ({ ...x, fixed })),
-                  props,
-                ),
-              }
-            : {}),
-          enableResizing,
-          enableHiding,
-          size: width,
-          minSize: minWidth,
-          meta: {
-            title,
-            align,
-            fixed,
-            defaultSortOrder,
-            sorter,
-            className,
-            classNames,
-            attributes,
-            headAttributes,
-          },
-          // sorting
-          ...(sorter
-            ? {
-                // enableSorting: true,
-                sortingFn:
-                  typeof sorter === "string"
-                    ? sorter
-                    : typeof sorter === "function"
-                      ? (rowA, rowB) => sorter(rowA.original, rowB.original)
-                      : // object
-                        typeof sorter === "object"
-                        ? sorter.compare
-                          ? (rowA, rowB) =>
-                              sorter.compare!(rowA.original, rowB.original)
-                          : "auto"
-                        : // boolean
-                          "auto",
-              }
-            : { enableSorting: false }),
-          ...restProps,
-        };
-        columnDefMerged.cell = ({ column, row, getValue }) => (
-          <>
-            {isNotFirstDeepColumn && index === 0 && (
-              <>
-                {row.depth > 0 && (
-                  <span
-                    style={{
-                      paddingLeft: `${row.depth * 2}rem`,
-                    }}
-                  />
-                )}
-                {row.getCanExpand() && row.original.children ? (
-                  <button
-                    onClick={row.getToggleExpandedHandler()}
-                    className="w-5"
-                  >
-                    {row.getIsExpanded() ? "👇" : "👉"}
-                  </button>
-                ) : (
-                  <span className="pl-5" />
-                )}
-              </>
-            )}
+        // sorting
+        ...(sorter
+          ? {
+              // enableSorting: true,
+              sortingFn:
+                typeof sorter === "string"
+                  ? sorter
+                  : typeof sorter === "function"
+                    ? (rowA, rowB) => sorter(rowA.original, rowB.original)
+                    : // object
+                      typeof sorter === "object"
+                      ? sorter.compare
+                        ? (rowA, rowB) =>
+                            sorter.compare!(rowA.original, rowB.original)
+                        : "auto"
+                      : // boolean
+                        "auto",
+            }
+          : { enableSorting: false }),
+        ...restProps,
+      };
+      columnDefMerged.cell = ({ column, row, getValue }) => (
+        <>
+          {isNotFirstDeepColumn && index === 0 && (
+            <>
+              {row.depth > 0 && (
+                <span
+                  style={{
+                    paddingLeft: `${row.depth * 2}rem`,
+                  }}
+                />
+              )}
+              {row.getCanExpand() && row.original.children ? (
+                <button
+                  onClick={row.getToggleExpandedHandler()}
+                  className="w-5"
+                >
+                  {row.getIsExpanded() ? "👇" : "👉"}
+                </button>
+              ) : (
+                <span className="pl-5" />
+              )}
+            </>
+          )}
 
-            {/* render value*/}
-            {render
-              ? typeof dataIndex === "string"
-                ? render({
-                    value: getValue() as never,
-                    record: row.original,
-                    index: row.index,
-                    column,
-                    row,
-                  })
-                : render({
-                    value: undefined as never,
-                    record: row.original,
-                    index: row.index,
-                    column,
-                    row,
-                  })
-              : (getValue() as ReactNode)}
-          </>
-        );
-        return columnDefMerged;
-      },
-    );
+          {/* render value*/}
+          {render
+            ? typeof dataIndex === "string"
+              ? render({
+                  value: getValue() as never,
+                  record: row.original,
+                  index: row.index,
+                  column,
+                  row,
+                })
+              : render({
+                  value: undefined as never,
+                  record: row.original,
+                  index: row.index,
+                  column,
+                  row,
+                })
+            : (getValue() as ReactNode)}
+        </>
+      );
+      return columnDefMerged;
+    },
+  );
 
   if (props.dnd) {
     const dragHandleColumn: ColumnDef<TRecord> = {
       id: "sort",
-      // header: () => undefined,
       size: 50,
       meta: {
         align: "center",
