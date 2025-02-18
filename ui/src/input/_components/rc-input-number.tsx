@@ -1,7 +1,8 @@
+"use client";
+
 /* eslint-disable unicorn/no-null */
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
 // Jan 28, 2025
-
 import type { DecimalClass, ValueType } from "@rc-component/mini-decimal";
 import React, { useCallback, useState } from "react";
 import getMiniDecimal, {
