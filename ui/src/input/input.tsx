@@ -254,7 +254,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           ref={inputRef}
           id={id}
           name={name}
-          value={value}
+          value={value ?? ""}
           className={cn(
             "flex-1",
             "text-left",
