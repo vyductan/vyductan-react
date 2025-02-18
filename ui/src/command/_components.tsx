@@ -199,12 +199,13 @@ function CommandItem({
       className={cn(
         "relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
         // "gap-2",
-        // "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground ",
+        // do not keep bg-accent when move mouse out of item | moved to own
+        // "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground",
         "data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50",
         "[&_svg:not([class*='text-'])]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
 
         // own
-        "hover:bg-background-hover",
+        "hover:bg-accent hover:text-accent-foreground",
         className,
       )}
       {...props}
