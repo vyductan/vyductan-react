@@ -7,22 +7,36 @@ import { cn } from "@acme/ui";
 
 import { ScrollBar } from "./scroll-bar";
 
-const ScrollArea = React.forwardRef<
-  React.ComponentRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport className="size-full rounded-[inherit]">
-      {children}
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
-ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
+function ScrollArea({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+  return (
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area"
+      className={cn(
+        "relative",
+        // old
+        // overflow-hidden
+        className,
+      )}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        data-slot="scroll-area-viewport"
+        className={cn(
+          "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
+          "size-full rounded-[inherit] transition-[color,box-shadow]",
+          "focus-visible:ring-4 focus-visible:outline-1",
+        )}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+}
 
 export { ScrollArea };

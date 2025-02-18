@@ -1,5 +1,3 @@
-import { forwardRef } from "react";
-
 import type { ValueType } from "../form";
 import { Checkbox } from "./checkbox";
 
@@ -9,12 +7,14 @@ type CheckboxGroupProps<T extends ValueType> = {
   options?: { label: string; value: T }[];
   onChange?: (checkedValue: T[]) => void;
 };
-const CheckboxGroupInner = <T extends ValueType = string>(
-  { name, value, options = [], onChange }: CheckboxGroupProps<T>,
-  _: React.ForwardedRef<HTMLInputElement>,
-) => {
+const CheckboxGroup = <T extends ValueType = string>({
+  name,
+  value,
+  options = [],
+  onChange,
+}: CheckboxGroupProps<T>) => {
   return (
-    <div>
+    <div data-slot="checkbox-group">
       {options.map((o) => {
         return (
           <Checkbox
@@ -38,10 +38,4 @@ const CheckboxGroupInner = <T extends ValueType = string>(
   );
 };
 
-export const CheckboxGroup = forwardRef(CheckboxGroupInner) as <
-  T extends ValueType,
->(
-  props: CheckboxGroupProps<T> & {
-    ref?: React.ForwardedRef<HTMLDivElement>;
-  },
-) => ReturnType<typeof CheckboxGroupInner>;
+export { CheckboxGroup };

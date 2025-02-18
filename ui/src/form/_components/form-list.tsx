@@ -9,9 +9,9 @@ import type {
 } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
 
-import { useFormContext } from "./context";
-import { Field } from "./field";
-import { useFieldOptionalityCheck } from "./use-field-optionality-check";
+import { useFormContext } from "../context";
+import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
+import { Field } from "./form-field";
 
 type FieldListProps<
   TFieldValues extends FieldValues = FieldValues,
