@@ -4,10 +4,10 @@ import { forwardRef, useContext } from "react";
 
 import { cn } from "../..";
 import { FormItemContext } from "../context";
-import { FieldDescription } from "../field-description";
-import { FieldLabel } from "../field-label";
-import { FieldMessage } from "../field-message";
 import { FormControl } from "./form-control";
+import { FieldDescription } from "./form-description";
+import { FieldLabel } from "./form-label";
+import { FieldMessage } from "./form-message";
 
 type FieldRenderProps = {
   layout?: "horizontal" | "vertical";

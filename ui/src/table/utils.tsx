@@ -34,6 +34,7 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
     mergedColumns.map(
       (
         {
+          key,
           children,
           dataIndex,
           enableResizing,
@@ -61,8 +62,11 @@ export const transformColumnDefs = <TRecord extends Record<string, unknown>>(
           ExtraTableColumnDef<TRecord> = {
           // accessorKey: dataIndex,
           ...(typeof dataIndex === "string"
-            ? { id: dataIndex, accessorKey: dataIndex }
-            : { id: index.toString(), accessorFn: () => index.toString() }),
+            ? { id: key ?? dataIndex, accessorKey: dataIndex }
+            : {
+                id: key ?? index.toString(),
+                accessorFn: () => key ?? index.toString(),
+              }),
           header: () => title,
           ...(children
             ? {

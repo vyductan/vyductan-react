@@ -12,7 +12,7 @@ function Skeleton({
     <Comp
       data-slot="skeleton"
       className={cn(
-        "bg-muted animate-pulse rounded-md",
+        "bg-primary/10 animate-pulse rounded-md",
         "h-4 w-full",
         className,
       )}
