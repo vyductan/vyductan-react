@@ -7,12 +7,12 @@ import { cn } from "..";
 import { Button } from "../button";
 import { ScrollArea } from "../scroll-area";
 import {
-  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogRoot,
   DialogTitle,
   DialogTrigger,
 } from "./_components";
@@ -100,7 +100,7 @@ const Modal = ({
   const ref = React.useRef<HTMLDivElement>(null);
   ref.current?.scrollTo(0, ref.current.scrollHeight);
   return (
-    <Dialog
+    <DialogRoot
       {...rest}
       onOpenChange={(isOpen) => {
         rest.onOpenChange?.(isOpen);
@@ -117,13 +117,13 @@ const Modal = ({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] px-5 [&>[data-radix-scroll-area-viewport]>div]:block! *:data-radix-scroll-area-viewport:px-1">
+        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
           {children}
         </ScrollArea>
 
         <DialogFooter className="px-6">{footerToRender}</DialogFooter>
       </DialogContent>
-    </Dialog>
+    </DialogRoot>
   );
 };
 export { Modal };
