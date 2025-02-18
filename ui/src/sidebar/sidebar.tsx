@@ -59,7 +59,9 @@ export const Sidebar = ({
     return items.map((item, index) => {
       if (item.type === "divider") {
         return (
-          <Divider key={index} as="li" role="separator" className="border-t" />
+          <Divider key={index} role="separator" className="border-t" asChild>
+            <li />
+          </Divider>
         );
       }
 

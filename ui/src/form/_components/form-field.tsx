@@ -12,15 +12,16 @@ import type {
 import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 
-import { FieldRender } from "./_components/field-render";
-import { FormItem } from "./_components/form-item";
-import { FormFieldContext, useFormContext } from "./context";
-import { useFieldOptionalityCheck } from "./use-field-optionality-check";
+import { FormFieldContext, useFormContext } from "../context";
+import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
+import { FieldRender } from "./form-field-render";
+import { FormItem } from "./form-item";
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = Omit<ControllerProps<TFieldValues, TName>, "render" | "name"> & {
+  ref?: React.ForwardedRef<HTMLDivElement>;
   name?: TName;
   label?: string | React.JSX.Element;
   description?: React.ReactNode;
@@ -53,24 +54,22 @@ type FieldProps<
     formState: UseFormStateReturn<TFieldValues>;
   }) => React.ReactElement<any>;
 };
-const FieldInner = <
+const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->(
-  {
-    //control,
-    name,
-    children,
-    render,
-    required,
-    onChange,
+>({
+  ref,
+  //control,
+  name,
+  children,
+  render,
+  required,
+  onChange,
 
-    layout,
+  layout,
 
-    ...props
-  }: FieldProps<TFieldValues, TName>,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => {
+  ...props
+}: FieldProps<TFieldValues, TName>) => {
   const form = useFormContext<TFieldValues>();
 
   const isOptional = useFieldOptionalityCheck(name, form?.schema);
@@ -134,6 +133,7 @@ type FieldControllerProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
+  ref?: React.ForwardedRef<HTMLDivElement>;
   control: Control<TFieldValues>;
   name: TName;
   children?:
@@ -154,22 +154,20 @@ type FieldControllerProps<
 
   layout?: "horizontal" | "vertical";
 };
-const InternalFieldController = <
+const FieldController = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->(
-  {
-    control,
-    name,
-    onChange,
-    children,
-    disabled,
-    required,
-    layout,
-    ...props
-  }: FieldControllerProps<TFieldValues, TName>,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => {
+>({
+  ref,
+  control,
+  name,
+  onChange,
+  children,
+  disabled,
+  required,
+  layout,
+  ...props
+}: FieldControllerProps<TFieldValues, TName>) => {
   const watchedValue = useWatch({
     control,
     name,
@@ -242,24 +240,11 @@ const InternalFieldController = <
     </FormFieldContext.Provider>
   );
 };
-const FieldController = React.forwardRef(InternalFieldController) as <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->(
-  props: FieldControllerProps<TFieldValues, TName>,
-) => ReturnType<typeof InternalFieldController>;
 
 type FieldControllerRenderProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = ControllerRenderProps<TFieldValues, TName>;
 
-const Field = React.forwardRef(FieldInner) as <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->(
-  props: FieldProps<TFieldValues, TName>,
-) => ReturnType<typeof FieldInner>;
-
-export { Field, Field as FormField };
+export { FormField, FormField as Field };
 export type { FieldProps };

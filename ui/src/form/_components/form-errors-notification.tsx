@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { z } from "zod";
 
-import { notification } from "../toast";
-import { useFormContext } from "./context";
+import { notification } from "../../toast";
+import { useFormContext } from "../context";
 
 export const FormErrorsNotification = () => {
   const form = useFormContext();
