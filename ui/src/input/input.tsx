@@ -235,7 +235,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-s-md",
-              "border-e bg-background",
+              "bg-background border-e",
             )}
           >
             {addonBefore}
@@ -246,7 +246,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           ref={inputRef}
           id={id}
           name={name}
-          value={value}
+          value={value ?? ""}
           className={cn(
             "flex-1",
             "text-left",
@@ -267,7 +267,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-e-md",
-              "border-s bg-background-muted",
+              "bg-background-muted border-s",
               "whitespace-nowrap",
               // p-0 for use Select component
               React.isValidElement(addonAfter) &&
