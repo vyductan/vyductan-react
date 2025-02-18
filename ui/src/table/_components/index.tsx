@@ -3,25 +3,19 @@ import * as React from "react";
 import type { TableSize } from "../types";
 import { cn } from "../..";
 
-const TableRoot = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <>
-    <table
-      ref={ref}
-      className={cn(
-        // "w-full",
-        "caption-bottom text-sm",
-        className,
-      )}
-      {...props}
-    />
-  </>
-));
-TableRoot.displayName = "TableRoot";
+function TableRoot({ className, ...props }: React.ComponentProps<"table">) {
+  return (
+    <div className="relative w-full overflow-auto">
+      <table
+        data-slot="table"
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
+    </div>
+  );
+}
 
-type TableHeaderProps = React.HTMLAttributes<HTMLTableSectionElement> & {
+type TableHeaderProps = React.ComponentProps<"thead"> & {
   /** Set sticky header and scroll bar */
   sticky?:
     | boolean
@@ -31,10 +25,10 @@ type TableHeaderProps = React.HTMLAttributes<HTMLTableSectionElement> & {
         getContainer?: () => HTMLElement;
       };
 };
-const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
-  ({ className, sticky, ...props }, ref) => (
+function TableHeader({ className, sticky, ...props }: TableHeaderProps) {
+  return (
     <thead
-      ref={ref}
+      data-slot="table-header"
       className={cn(
         // "[&_tr]:border-b",
         className,
@@ -50,9 +44,8 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(
       }}
       {...props}
     />
-  ),
-);
-TableHeader.displayName = "TableHeader";
+  );
+}
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
@@ -98,7 +91,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
       ref={ref}
       className={cn(
         // "h-10 px-2",
-        "text-left align-middle font-medium text-muted-foreground",
+        "text-muted-foreground text-left align-middle font-medium",
         "[&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
 
         "p-3",
@@ -145,7 +138,7 @@ const TableCaption = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <caption
     ref={ref}
-    className={cn("mt-4 text-sm text-muted-foreground", className)}
+    className={cn("text-muted-foreground mt-4 text-sm", className)}
     {...props}
   />
 ));

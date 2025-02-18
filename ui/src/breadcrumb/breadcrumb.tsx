@@ -51,7 +51,7 @@ const Breadcrumb = ({
             <Fragment key={key}>
               <Slot
                 className={cn(
-                  index !== items.length - 1 && "text-foreground-muted",
+                  index !== items.length - 1 && "text-muted-foreground",
                   "-mx-1 rounded px-1",
                   // "hover:bg-background-hover",
                 )}

@@ -15,10 +15,13 @@ const IconWrapper = ({
 }: IconWrapperProps) => {
   return (
     <>
-      <span className={cn("[&>svg]:size-6", className)} {...props}>
+      <span role="img" className={cn("size-4", className)} {...props}>
         {cloneElement(children, {
           "aria-hidden": "true",
-          role: "img",
+          style: {
+            width: "100%",
+            height: "100%",
+          },
           ...props,
         })}
       </span>

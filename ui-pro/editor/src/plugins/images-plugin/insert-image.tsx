@@ -2,8 +2,9 @@ import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
+import { Tabs } from "@acme/ui/tabs";
+
 import type { InsertImagePayload } from "./types";
-import { Tabs } from "../../../tabs";
 import { INSERT_IMAGE_COMMAND } from "./constants";
 import { Uploader } from "./uploader";
 

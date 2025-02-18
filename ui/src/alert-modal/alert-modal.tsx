@@ -1,3 +1,5 @@
+import React from "react";
+
 import type { ModalProps } from "../modal";
 import {
   AlertDialog,
@@ -18,8 +20,8 @@ export type AlertModalProps = Omit<ModalProps, "onOk"> & {
 export const AlertModal = ({
   className,
   description,
-  okText,
-  okLoading,
+  okText = "Confirm",
+  okLoading = false,
   title,
   trigger,
   onConfirm,
@@ -27,16 +29,18 @@ export const AlertModal = ({
   onOpenChange,
   ...rest
 }: AlertModalProps) => {
+  const handleOpenChange = React.useCallback(
+    (isOpen: boolean) => {
+      onOpenChange?.(isOpen);
+      if (!isOpen) {
+        onCancel?.();
+      }
+    },
+    [onOpenChange, onCancel],
+  );
+
   return (
-    <AlertDialog
-      onOpenChange={(isOpen) => {
-        onOpenChange?.(isOpen);
-        if (!isOpen) {
-          onCancel?.();
-        }
-      }}
-      {...rest}
-    >
+    <AlertDialog onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
         <AlertDialogHeader>
@@ -52,7 +56,7 @@ export const AlertModal = ({
             onClick={onConfirm}
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
           >
-            {okText ?? "Confirm"}
+            {okText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

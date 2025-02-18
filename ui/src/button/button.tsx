@@ -16,12 +16,19 @@ import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-colors",
-    "border",
-    "text-foreground",
+    "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-[color,box-shadow]",
+    "disabled:pointer-events-none disabled:opacity-50",
+    // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
+    "focus-visible:ring-4 focus-visible:outline-1",
+    "aria-invalid:focus-visible:ring-0",
+
+    // "border",
+    // "text-foreground",
     "shrink-0", // disable flex box sizing
-    "focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 focus-visible:outline-hidden",
-    "dark:ring-offset-gray-950 dark:focus-visible:ring-gray-300",
+    // `[&[type="button"]]:bg-red-500`,
+    // TODO: check svg does not have span role="img"
+    "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
     primary: {
@@ -43,14 +50,14 @@ const buttonVariants = tv({
     },
     size: {
       sm: "h-6 rounded-sm px-2 py-0 font-normal",
-      default: "h-8 rounded-md px-3 py-1",
-      lg: "h-10 rounded-lg px-4 py-2",
+      default: "h-8 rounded-md px-3 py-1 has-[>svg]:px-2.5",
+      lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
       xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
     },
     variant: {
       default: [
-        "border-primary-500 bg-primary-500 text-white",
-        "hover:border-primary-600 hover:bg-primary-600 hover:text-white",
+        "border-primary-500 bg-primary-500 text-primary-foreground shadow-sm",
+        "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
       outline: [
@@ -62,12 +69,15 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:text-primary-600",
       ],
       ghost: [
-        "border-transparent",
-        "hover:bg-background-hover",
-        "data-[state=open]:bg-background-hover",
+        // "border-transparent",
+        "hover:bg-accent hover:text-accent-foreground",
+        // "data-[state=open]:bg-background-hover",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: "h-auto gap-1 border-0 p-0 font-normal underline-offset-2 hover:underline",
+      link: [
+        "text-primary underline-offset-4 hover:underline",
+        // "h-auto gap-1 border-0 p-0 font-normal",
+      ],
       text: "border-0 px-0",
     },
     shape: {
@@ -96,8 +106,8 @@ const buttonVariants = tv({
       // danger: true,
       color: "danger",
       className: [
-        "border-error bg-error",
-        "hover:border-error-hover hover:bg-error-hover",
+        "border-red-500 bg-red-500",
+        "hover:border-red-600 hover:bg-red-600",
       ],
     },
     {
@@ -269,7 +279,6 @@ export interface ButtonProps
   href?: string;
   loading?: boolean;
   icon?: React.ReactNode;
-  // icon?: React.ReactElement<IconProps>;
   color?: NonNullable<ButtonVariants["color"]>;
   variant?: Exclude<ButtonVariants["variant"], "primary">;
   classNames?: {
