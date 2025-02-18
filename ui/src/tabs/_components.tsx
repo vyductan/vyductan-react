@@ -71,8 +71,8 @@ function TabsTrigger({
           // "justify-center rounded-md bg-background-muted p-1",
         ],
         tabsType === "line" && [
-          "mx-3 h-10 first:ml-0",
-          "text-muted-foreground relative rounded-none border-b-2 border-b-transparent bg-transparent font-semibold shadow-none transition-none",
+          "mx-3 h-[calc(100%+2px)] first:ml-0",
+          "text-muted-foreground rounded-none border-b-2 border-b-transparent bg-transparent font-semibold shadow-none transition-none",
           "data-[state=active]:text-foreground data-[state=active]:border-b-primary data-[state=active]:shadow-none",
         ],
         className,
