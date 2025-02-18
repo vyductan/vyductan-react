@@ -631,11 +631,7 @@ const Table = <TRecord extends AnyObject>({
             )}
 
             {summary && (
-              <TableFooter
-                className={classNames?.footer}
-                // flattenColumns={[]}
-                // stickyOffsets={{ left: 0, right: 0 }}
-              >
+              <TableFooter className={classNames?.footer}>
                 {summary(dataSource)}
               </TableFooter>
             )}

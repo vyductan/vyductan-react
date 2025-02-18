@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { FormFieldContext, FormItemContext, useFormContext } from "./context";
+import { FormFieldContext, FormItemContext, useFormContext } from "../context";
 
-const useField = () => {
+const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
   const form = useFormContext();
@@ -16,13 +16,13 @@ const useField = () => {
   const { id } = itemContext;
 
   return {
-    // ...fieldContext,
+    id,
     name: fieldContext.name,
-    fieldId: `${id}-form-item`,
-    fieldDescriptionId: `${id}-form-item-description`,
-    fieldMessageId: `${id}-form-item-message`,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
     ...fieldState,
   };
 };
 
-export { useField, useField as useFormField };
+export { useFormField };

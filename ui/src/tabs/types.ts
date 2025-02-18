@@ -1,1 +1,1 @@
-export type TabsType = "default" | "secondary";
+export type TabsType = "line" | "card" | "solid";
