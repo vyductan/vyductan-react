@@ -18,6 +18,7 @@ export function TableHeadAdvanced<TData, TValue>({
   column,
   children,
 
+  align,
   size,
   className,
 
@@ -62,11 +63,12 @@ export function TableHeadAdvanced<TData, TValue>({
             "-my-2 p-2",
             size === "sm" && "p-1",
             "flex w-full items-center justify-between",
-            "cursor-pointer rounded-md border-none hover:bg-accent hover:text-accent-foreground",
+            "hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md border-none",
           )}
           onClick={column.getToggleSortingHandler()}
         >
-          {children}
+          {align === "center" && <span className="mr-2.5 size-4"></span>}
+          <span className="flex-1">{children}</span>
           {column.getCanSort() && column.getIsSorted() === "desc" ? (
             <Icon
               icon="icon-[lucide--arrow-down]"
