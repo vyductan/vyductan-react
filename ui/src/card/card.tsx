@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 
 import type { SizeType } from "../types";
-import type { CardRootProps } from "./_components";
+import type { CardRootProps } from "./_shadcn";
 import { cn } from "..";
 import { Skeleton } from "../skeleton";
 import {
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardRoot,
   CardTitle,
@@ -20,6 +21,7 @@ type CardProps = Omit<CardRootProps, "title"> & {
     title?: string;
     description?: string;
     content?: string;
+    footer?: string;
   };
 
   title?: ReactNode;
@@ -53,11 +55,14 @@ const Card = ({
   }
   return (
     <CardRoot
+      size={size}
       className={cn(bordered ? "" : "border-none", className)}
       {...props}
     >
       {(!!title || !!description || !!extra) && (
-        <CardHeader className={cn(size === "sm" && "p-3", classNames?.header)}>
+        <CardHeader
+          className={cn(size === "sm" && "px-3 pt-3", classNames?.header)}
+        >
           <div className="flex items-center">
             <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {extra && <div className="ml-auto">{extra}</div>}
@@ -81,6 +86,7 @@ const Card = ({
       >
         {children}
       </CardContent>
+      <CardFooter size={size} className={classNames?.footer}></CardFooter>
     </CardRoot>
   );
 };

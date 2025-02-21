@@ -1,38 +1,34 @@
-import * as React from "react";
-
 import type { CardProps } from "./card";
 import { cn } from "..";
+import {
+  CardContent as OriCardContent,
+  CardFooter as OriCardFooter,
+  CardRoot as OriCardRoot,
+  CardTitle as OriCardTitle,
+} from "./_shadcn";
 
-type CardRootProps = React.ComponentProps<"div">;
-function CardRoot({ className, ...props }: CardRootProps) {
+function CardRoot({
+  size,
+  className,
+  ...props
+}: React.ComponentProps<typeof OriCardRoot> & {
+  size?: CardProps["size"];
+}) {
   return (
-    <div
-      data-slot="card"
-      className={cn(
-        "bg-card text-card-foreground rounded-xl border shadow-sm",
-        className,
-      )}
+    <OriCardRoot
+      className={cn(size === "sm" && "gap-3", className)}
       {...props}
     />
   );
 }
 
-function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+function CardTitle({
+  className,
+  ...props
+}: React.ComponentProps<typeof OriCardTitle>) {
   return (
-    <div
-      data-slot="card-header"
-      className={cn("flex flex-col gap-1.5 p-6", className)}
-      {...props}
-    />
-  );
-}
-
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
+    <OriCardTitle
       className={cn(
-        "leading-none font-semibold tracking-tight",
         "flex-1", // fix if not has extra the title width not full
         className,
       )}
@@ -41,46 +37,36 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-description"
-      className={cn("text-muted-foreground text-sm", className)}
-      {...props}
-    />
-  );
-}
-
-type CardContentProps = React.ComponentProps<"div"> & {
+function CardContent({
+  className,
+  size,
+  ...props
+}: React.ComponentProps<typeof OriCardContent> & {
   size?: CardProps["size"];
-};
-function CardContent({ className, size, ...props }: CardContentProps) {
+}) {
   return (
-    <div
-      data-slot="card-content"
-      className={cn("p-6 pt-0", size === "sm" && "p-3", className)}
+    <OriCardContent
+      className={cn(size === "sm" && "px-3", className)}
       {...props}
     />
   );
 }
 
-function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+function CardFooter({
+  className,
+  size,
+  ...props
+}: React.ComponentProps<typeof OriCardFooter> & {
+  size?: CardProps["size"];
+}) {
   return (
-    <div
-      data-slot="card-footer"
-      className={cn("flex items-center p-6 pt-0", className)}
+    <OriCardFooter
+      className={cn(size === "sm" && "px-3", className)}
       {...props}
     />
   );
 }
 
-export type { CardRootProps };
+export { CardRoot, CardTitle, CardContent, CardFooter };
 
-export {
-  CardRoot,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardDescription,
-  CardContent,
-};
+export { CardHeader, CardDescription } from "./_shadcn";
