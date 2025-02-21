@@ -150,6 +150,12 @@ const buttonVariants = tv({
         "hover:border-pink-600 hover:bg-pink-600",
       ],
     },
+    // outline
+    {
+      variant: "outline",
+      color: "link",
+      className: ["text-link", "hover:bg-link-hover hover:text-white"],
+    },
     // light
     {
       variant: "light",
