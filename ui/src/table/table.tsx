@@ -480,6 +480,7 @@ const Table = <TRecord extends AnyObject>({
                         colSpan={header.colSpan}
                         size={size}
                         style={getCommonPinningStyles(header.column)}
+                        align={header.column.columnDef.meta?.align}
                         className={cn(
                           // align
                           header.column.columnDef.meta?.align === "center" &&
