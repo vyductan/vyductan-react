@@ -19,16 +19,12 @@ import { inputSizeVariants, inputVariants } from "./input";
 interface InputNumberProps<T extends ValueType = ValueType>
   extends Omit<RcInputNumberProps<T>, "prefix" | "size" | "controls"> {
   ref?: Ref<HTMLInputElement>;
-  // prefixCls?: string;
-  // rootClassName?: string;
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   size?: SizeType;
   disabled?: boolean;
-  /** @deprecated Use `variant` instead. */
-  // bordered?: boolean;
   status?: InputStatus;
   controls?: boolean | { upIcon?: React.ReactNode; downIcon?: React.ReactNode };
   /**
@@ -45,15 +41,12 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   const {
     className,
-    // rootClassName,
     size: customizeSize,
     disabled: customDisabled,
-    // prefixCls: customizePrefixCls,
     addonBefore,
     addonAfter,
     prefix,
     suffix,
-    // bordered,
     readOnly,
     status: customStatus,
     controls,
