@@ -20,7 +20,7 @@ export interface StepHandlerProps {
   downNode?: React.ReactNode;
   upDisabled?: boolean;
   downDisabled?: boolean;
-  onStep: (up: boolean) => void;
+  onStep: (up: boolean, emitter: "handler" | "keyboard" | "wheel") => void;
 }
 
 export default function StepHandler({
@@ -46,11 +46,11 @@ export default function StepHandler({
     e.preventDefault();
     onStopStep();
 
-    onStepRef.current?.(up);
+    onStepRef.current?.(up, "handler");
 
     // Loop step for interval
     function loopStep() {
-      onStepRef.current?.(up);
+      onStepRef.current?.(up, "handler");
 
       stepTimeoutRef.current = setTimeout(loopStep, STEP_INTERVAL);
     }
@@ -96,7 +96,7 @@ export default function StepHandler({
         }}
         aria-label="Increase Value"
         aria-disabled={upDisabled}
-        className={"flex bg-muted p-px hover:bg-muted-foreground"}
+        className={"bg-muted hover:bg-muted-foreground flex p-px"}
       >
         {upNode ?? (
           <span
@@ -112,7 +112,7 @@ export default function StepHandler({
         }}
         aria-label="Decrease Value"
         aria-disabled={downDisabled}
-        className={"flex bg-muted p-px hover:bg-muted-foreground"}
+        className={"bg-muted hover:bg-muted-foreground flex p-px"}
       >
         {downNode ?? (
           <span
