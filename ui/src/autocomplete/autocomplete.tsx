@@ -39,6 +39,7 @@ export type AutocompleteProps<T extends ValueType = string> = Pick<
 
   allowClear?: boolean;
 
+  searchPlaceholder?: string;
   onSearchChange?: (search: string) => void;
 };
 
@@ -59,6 +60,8 @@ const Autocomplete = <T extends ValueType = string>({
   allowClear,
 
   onChange,
+
+  searchPlaceholder,
   onSearchChange,
 
   ...props
@@ -132,6 +135,7 @@ const Autocomplete = <T extends ValueType = string>({
       className="w-(--radix-popover-trigger-width) p-0"
       content={
         <Command
+          placeholder={searchPlaceholder}
           options={options}
           value={value}
           onChange={(value) => {
