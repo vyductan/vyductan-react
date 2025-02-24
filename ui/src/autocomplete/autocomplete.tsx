@@ -13,6 +13,7 @@ import { cn } from "..";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
+import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
 import { selectColors } from "../select/colors";
 
@@ -45,7 +46,7 @@ export type AutocompleteProps<T extends ValueType = string> = Pick<
 const Autocomplete = <T extends ValueType = string>({
   defaultValue: defaultValueProp,
   value: valueProp,
-  options: optionsProp,
+  options,
   optionsToSearch,
 
   className,
@@ -64,7 +65,7 @@ const Autocomplete = <T extends ValueType = string>({
   ...props
 }: AutocompleteProps<T>) => {
   /* Remove duplicate options */
-  const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
+  // const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
   /* Filter Detault*/
   const filter =
@@ -121,7 +122,7 @@ const Autocomplete = <T extends ValueType = string>({
         </>
       );
     }
-    return "";
+    return <span className="truncate">{value}</span>;
   })();
 
   return (
@@ -150,6 +151,7 @@ const Autocomplete = <T extends ValueType = string>({
         size={size}
         disabled={disabled}
         className={cn(
+          "group",
           "w-full justify-between text-sm font-normal",
           !value && "text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
@@ -162,30 +164,37 @@ const Autocomplete = <T extends ValueType = string>({
                 options.find((o) => o.value === value)?.color ?? ""
               ]?.indexOf(" "),
             ),
+          inputSizeVariants({ size }),
           className,
         )}
       >
         {buttonText}
         <Icon
           icon="icon-[lucide--chevrons-up-down]"
-          className="ml-2 size-4 shrink-0 opacity-50"
+          className={cn(
+            "size-4 shrink-0 opacity-50",
+            !buttonText && "ml-auto",
+            allowClear &&
+              value &&
+              "transition-opacity duration-300 group-hover:opacity-0",
+          )}
         />
         {allowClear && (
           <button
             className={cn(
               "z-10",
-              "absolute right-[11px]",
-              "flex size-5 items-center justify-center transition-opacity",
-              "opacity-0",
-              "hover:opacity-50!",
-              value && "group-hover:opacity-30",
+              "absolute right-[13px]",
+              "opacity-0 transition-opacity",
+              value && "transition-opacity duration-300 group-hover:opacity-30",
+              value && "hover:opacity-50",
             )}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
             onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              // onClear();
               onChange?.();
-              // setOpen(false);
             }}
           >
             <Icon
