@@ -58,7 +58,7 @@ const Checkbox = ({
           defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
           className={cn(
             "",
-            "peer border-input size-4 rounded-[4px] border shadow-xs transition-[color,box-shadow]",
+            "peer border-input size-4 rounded-[4px] border shadow-xs transition-shadow",
             "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "data-[state=checked]:text-primary-foreground",
@@ -78,7 +78,8 @@ const Checkbox = ({
           <CheckboxPrimitive.Indicator
             data-slot="checkbox-indicator"
             className={cn(
-              "flex items-center justify-center text-current",
+              "flex items-center justify-center text-current transition-none",
+              // own
               "size-full",
             )}
           >
