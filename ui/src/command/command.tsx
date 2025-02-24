@@ -94,15 +94,15 @@ export const Command = <T extends ValueType = string>({
     <CommandList>
       <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
       <CommandGroup className={groupClassName}>
-        {/* to allow user set value that not in options */}
-        {!Array.isArray(value) &&
+        {/* to allow user set value that not in options - update 20250224 should not show - same antd */}
+        {/* {!Array.isArray(value) &&
           !!value &&
           !options.some((o) => o.value === value) &&
           value !== "" && (
             <CommandItem checked={true} value={value as string}>
               {value}
             </CommandItem>
-          )}
+          )} */}
         {options.length > 0 ? (
           optionsRender ? (
             optionsRender(options)
@@ -162,7 +162,7 @@ export const Command = <T extends ValueType = string>({
       {PanelComp}
       {dropdownFooter && (
         <>
-          <Divider className="mb-1 mt-0" />
+          <Divider className="mt-0 mb-1" />
           <div className="px-1 pb-1">{dropdownFooter}</div>
         </>
       )}
