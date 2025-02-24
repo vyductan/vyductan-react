@@ -51,8 +51,10 @@ const Breadcrumb = ({
             <Fragment key={key}>
               <Slot
                 className={cn(
+                  "cursor-pointer",
                   index !== items.length - 1 && "text-muted-foreground",
                   "-mx-1 rounded px-1",
+                  "hover:text-foreground",
                   // "hover:bg-background-hover",
                 )}
                 aria-current={index === items.length - 1 ? true : undefined}
