@@ -180,7 +180,8 @@ const Autocomplete = <T extends ValueType = string>({
           )}
         />
         {allowClear && (
-          <button
+          <span
+            role="button"
             className={cn(
               "z-10",
               "absolute right-[13px]",
@@ -201,7 +202,7 @@ const Autocomplete = <T extends ValueType = string>({
               icon="icon-[ant-design--close-circle-filled]"
               className="pointer-events-none size-3.5"
             />
-          </button>
+          </span>
         )}
       </Button>
     </Popover>
