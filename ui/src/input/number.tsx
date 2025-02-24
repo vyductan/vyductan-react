@@ -51,14 +51,22 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
     status: customStatus,
     controls,
     variant: customVariant,
+
+    onKeyDown,
     ...others
   } = props;
 
   let upIcon = (
-    <Icon icon="icon-[teenyicons--up-solid]" className="h-2 w-3 opacity-70" />
+    <Icon
+      icon="icon-[fluent-mdl2--caret-up-solid-8]"
+      className="h-2.5 w-4 opacity-70"
+    />
   );
   let downIcon = (
-    <Icon icon="icon-[teenyicons--down-solid]" className="h-2 w-3 opacity-70" />
+    <Icon
+      icon="icon-[teenyicons--down-solid]"
+      className="h-2.5 w-4 opacity-70"
+    />
   );
   const controlsTemporary =
     typeof controls === "boolean" ? controls : undefined;
@@ -167,6 +175,13 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
         // },
         // getStatusClassNames(`${prefixCls}-group-wrapper`, mergedStatus, hasFeedback),
         // hashId,
+      }}
+      // prevent user enter non-numeric characters || https://stackoverflow.com/a/74850574
+      onKeyDown={(e) => {
+        if (!/[0-9]/.test(e.key)) {
+          e.preventDefault();
+        }
+        onKeyDown?.(e);
       }}
       {...others}
     />
