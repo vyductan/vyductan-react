@@ -2,12 +2,6 @@ import * as React from "react";
 
 import type { SizeType } from "../types";
 import { cn } from "..";
-import {
-  CardContent as OriCardContent,
-  CardFooter as OriCardFooter,
-  CardRoot as OriCardRoot,
-  CardTitle as OriCardTitle,
-} from "./_shadcn";
 
 type CardRootProps = React.ComponentProps<"div"> & {
   size?: SizeType;
@@ -106,6 +100,12 @@ function CardFooter({
   );
 }
 
-export { CardRoot, CardTitle, CardContent, CardFooter };
-
-export { CardHeader, CardDescription } from "./_shadcn";
+export type { CardRootProps };
+export {
+  CardRoot,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};
