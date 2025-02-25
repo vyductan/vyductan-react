@@ -4,7 +4,6 @@ import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { cn } from "..";
-import { Divider } from "../divider";
 import { Icon } from "../icons";
 import { selectColors } from "../select/colors";
 import {
@@ -161,10 +160,9 @@ export const Command = <T extends ValueType = string>({
       />
       {PanelComp}
       {dropdownFooter && (
-        <>
-          <Divider className="mt-0 mb-1" />
-          <div className="px-1 pb-1">{dropdownFooter}</div>
-        </>
+        <div data-slot="command-footer" className="border-t p-1">
+          {dropdownFooter}
+        </div>
       )}
     </CommandRoot>
   );

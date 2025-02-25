@@ -81,17 +81,7 @@ const Radio = ({
         data-slot="radio-group-item"
         value={value as string}
         className={cn(
-          "border-input text-primary aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow]",
-          "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
-          "focus-visible:ring-4 focus-visible:outline-1",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          "aria-invalid:focus-visible:ring-0",
-
-          // old
-          // "ring-offset-background aspect-square size-4 rounded-full border shadow-sm",
-          // "focus-visible:ring-ring focus:outline-hidden focus-visible:ring-1",
-          // "disabled:cursor-not-allowed disabled:opacity-50",
-          // "data-[state=checked]:border-2",
+          "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
         )}
         disabled={disabled}
         {...props}
@@ -103,7 +93,6 @@ const Radio = ({
           <Icon
             icon="icon-[bi--circle-fill]"
             className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
-            // className="size-2 fill-current text-current"
           />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>

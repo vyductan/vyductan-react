@@ -32,6 +32,8 @@ interface InputNumberProps<T extends ValueType = ValueType>
    * @default "outlined"
    */
   variant?: InputVariant;
+
+  forFormItem?: boolean;
 }
 
 const InputNumber = ({ ref, ...props }: InputNumberProps) => {
@@ -53,6 +55,9 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
     variant: customVariant,
 
     onKeyDown,
+    forFormItem,
+    onChange,
+
     ...others
   } = props;
 
@@ -182,6 +187,14 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
           e.preventDefault();
         }
         onKeyDown?.(e);
+      }}
+      onChange={(value) => {
+        if (forFormItem) {
+          // eslint-disable-next-line unicorn/no-null
+          onChange?.(value ? value.toString() : null);
+        } else {
+          onChange?.(value);
+        }
       }}
       {...others}
     />
