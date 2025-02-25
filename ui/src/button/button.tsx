@@ -16,18 +16,13 @@ import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-[color,box-shadow]",
+    "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-[color,box-shadow] outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
-    // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-    "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
-    "focus-visible:ring-4 focus-visible:outline-1",
-    "aria-invalid:focus-visible:ring-0",
-
-    // "border",
-    // "text-foreground",
+    // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", // moved to &_span
+    "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+    "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+    // own
     "shrink-0", // disable flex box sizing
-    // `[&[type="button"]]:bg-red-500`,
-    // TODO: check svg does not have span role="img"
     "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
@@ -56,7 +51,7 @@ const buttonVariants = tv({
     },
     variant: {
       default: [
-        "border-primary-500 bg-primary-500 text-primary-foreground shadow-sm",
+        "border-primary-500 bg-primary-500 text-primary-foreground shadow-xs",
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],

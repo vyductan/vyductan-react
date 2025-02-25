@@ -46,22 +46,21 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex w-fit shrink-0 items-center justify-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold whitespace-nowrap transition-[color,box-shadow]",
-    "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-auto rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
-    "focus-visible:ring-4 focus-visible:outline-1",
-    "aria-invalid:focus-visible:ring-0",
+    "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+    "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 
-    // "rounded-sm px-2.5 font-medium",
+    // "px-2.5",
   ],
   variants: {
     variant: {
       default:
-        "bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent shadow-sm",
+        "bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent",
       secondary:
         "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 border-transparent",
       destructive:
-        "bg-destructive text-destructive-foreground [a&]:hover:bg-destructive/90 border-transparent shadow-sm",
+        "bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 text-white",
       outline:
         "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
     },

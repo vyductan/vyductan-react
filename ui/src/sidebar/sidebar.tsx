@@ -1,3 +1,5 @@
+"use client";
+
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useMergedState } from "rc-util";
 
@@ -175,7 +177,9 @@ export const Sidebar = ({
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            tooltip={mergedLabel}
+            tooltip={
+              typeof mergedLabel === "string" ? mergedLabel : key.toString()
+            }
             className={classNames?.menuButton}
           >
             {labelToRender}
