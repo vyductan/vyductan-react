@@ -33,14 +33,7 @@ function PaginationContent({
 
 type PaginationItemProps = React.ComponentProps<"li">;
 function PaginationItem({ ...props }: React.ComponentProps<"li">) {
-  return (
-    <li
-      data-slot="pagination-item"
-      // old
-      // className={cn("select-none", className)}
-      {...props}
-    />
-  );
+  return <li data-slot="pagination-item" {...props} />;
 }
 
 type PaginationLinkProps = {
@@ -128,11 +121,7 @@ function PaginationEllipsis({
 
 function PaginationTotal({ className, ...props }: React.ComponentProps<"li">) {
   return (
-    <li
-      data-slot="pageination-total"
-      className={cn("", className)}
-      {...props}
-    />
+    <li data-slot="pagination-total" className={cn("", className)} {...props} />
   );
 }
 

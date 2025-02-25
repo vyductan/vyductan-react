@@ -57,18 +57,8 @@ const Checkbox = ({
           }
           defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
           className={cn(
-            "",
-            "peer border-input size-4 rounded-[4px] border shadow-xs transition-[color,box-shadow]",
-            "ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            "data-[state=checked]:text-primary-foreground",
-            // "data-[state=checked]:border-primary data-[state=checked]:bg-primary"
-            "focus-visible:ring-4 focus-visible:outline-1 aria-invalid:focus-visible:ring-0",
-            "data-[state=indeterminate]:text-gray-900",
-            // "focus-visible:ring-offset-2 focus-visible:outline-hidden "
-            // "hover:bg-background-hover",
-            // "ring-offset-background"
-            // "self-center",
+            "peer border-input data-[state=checked]:text-primary-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+            // "data-[state=checked]:border-primary data-[state=checked]:bg-primary" // moved to own
             // own
             "data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600",
           )}
@@ -78,7 +68,8 @@ const Checkbox = ({
           <CheckboxPrimitive.Indicator
             data-slot="checkbox-indicator"
             className={cn(
-              "flex items-center justify-center text-current",
+              "flex items-center justify-center text-current transition-none",
+              // own
               "size-full",
             )}
           >
@@ -88,11 +79,7 @@ const Checkbox = ({
                 className="size-[10px]"
               />
             ) : (
-              <Icon
-                icon="icon-[mingcute--check-fill]"
-                // className="size-4"
-                className="size-[14px]"
-              />
+              <Icon icon="icon-[lucide--check]" className="size-3.5" />
             )}
           </CheckboxPrimitive.Indicator>
         </CheckboxPrimitive.Root>

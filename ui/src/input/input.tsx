@@ -14,17 +14,12 @@ import { Icon } from "../icons";
 
 export const inputVariants = cva(
   [
-    "border-input flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm",
-    // "h-9",
+    "border-input file:text-foreground selection:bg-primary selection:text-primary-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium md:text-sm",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-
-    "selection:bg-primary selection:text-primary-foreground",
-    "file:text-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium",
-    // moved to <input>
-    // "placeholder:text-muted-foreground ",
-    // moved to variant disabled
-    // "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 ",
+    // "h-9",
+    // "placeholder:text-muted-foreground", // moved to <input>
+    // disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 // moved to variant disabled
 
     // old
     // "focus-visible:outline-hidden",
@@ -130,6 +125,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
       name,
       value: valueProp,
       defaultValue: defaultValueProp,
+      placeholder,
       // Wrapper Props
       onClick,
       ...rest
@@ -172,7 +168,11 @@ const Input = React.forwardRef<InputRef, InputProps>(
     const isHovering = useHover(wrapperRef);
     const prefixComp = prefix ? (
       <span
-        className={cn("flex items-center", inputSizeVariants({ size }), "pr-0")}
+        className={cn(
+          "flex items-center",
+          inputSizeVariants({ size }),
+          "h-auto ps-0",
+        )}
       >
         {prefix}
       </span>
@@ -252,6 +252,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           id={id}
           name={name}
           value={value ?? ""}
+          placeholder={placeholder}
           className={cn(
             "flex-1",
             "text-left",
