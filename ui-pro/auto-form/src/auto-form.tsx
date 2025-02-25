@@ -15,7 +15,7 @@ import { RadioGroup } from "@acme/ui/radio";
 import { Tag } from "@acme/ui/tag";
 import { Textarea } from "@acme/ui/textarea";
 
-import { FieldsSchema, FieldType, InputUnion } from "./types";
+import type { FieldsSchema, FieldType, InputUnion } from "./types";
 
 /*
  * Docs: https://procomponents.ant.design/en-US/components/schema-form
