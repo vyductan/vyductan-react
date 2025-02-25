@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 
-import type { SizeType } from "../types";
-import type { CardRootProps } from "./_shadcn";
+import type { CardRootProps } from "./_components";
 import { cn } from "..";
 import { Skeleton } from "../skeleton";
 import {
@@ -28,7 +27,7 @@ type CardProps = Omit<CardRootProps, "title"> & {
   description?: ReactNode;
   children?: ReactNode;
   extra?: ReactNode;
-  size?: SizeType;
+  footer?: ReactNode;
 };
 const Card = ({
   skeleton = false,
@@ -39,6 +38,8 @@ const Card = ({
   description,
   children,
   extra,
+  footer,
+
   size = "default",
   ...props
 }: CardProps) => {
@@ -60,9 +61,7 @@ const Card = ({
       {...props}
     >
       {(!!title || !!description || !!extra) && (
-        <CardHeader
-          className={cn(size === "sm" && "px-3 pt-3", classNames?.header)}
-        >
+        <CardHeader className={cn(classNames?.header)}>
           <div className="flex items-center">
             <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {extra && <div className="ml-auto">{extra}</div>}
@@ -74,19 +73,14 @@ const Card = ({
           )}
         </CardHeader>
       )}
-      <CardContent
-        className={cn(
-          !title &&
-            !description &&
-            !extra &&
-            cn(size === "default" ? "pt-6" : "pt-3"),
-          classNames?.content,
-        )}
-        size={size}
-      >
+      <CardContent size={size} className={classNames?.content}>
         {children}
       </CardContent>
-      <CardFooter size={size} className={classNames?.footer}></CardFooter>
+      {footer && (
+        <CardFooter size={size} className={classNames?.footer}>
+          {footer}
+        </CardFooter>
+      )}
     </CardRoot>
   );
 };

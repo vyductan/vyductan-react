@@ -3,8 +3,8 @@
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
+import type { SizeType } from "../types";
 import { cn } from "..";
-import { SizeType } from "../types";
 
 type AvatarRootProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: SizeType;

@@ -4,6 +4,7 @@ import type { TagProps } from "../../tag";
 import { cn } from "../..";
 import { Avatar } from "../../avatar";
 import { Breadcrumb } from "../../breadcrumb";
+import { Button } from "../../button";
 
 type PageHeaderProps = {
   title?: React.ReactNode;
@@ -15,7 +16,9 @@ type PageHeaderProps = {
   };
   avatar?: AvatarProps;
   tags?: React.ReactElement<TagProps> | React.ReactElement<TagProps>[];
-  onBack?: (event?: React.MouseEvent<HTMLElement>) => void;
+  onBack?:
+    | { asChild: React.ReactNode }
+    | React.MouseEventHandler<HTMLButtonElement>;
 
   className?: string;
   backIcon?: React.ReactNode;
@@ -31,7 +34,7 @@ type PageHeaderProps = {
 };
 
 const renderTitle = (props: PageHeaderProps) => {
-  const { title, avatar, subTitle, tags } = props;
+  const { title, avatar, subTitle, tags, onBack } = props;
   const hasHeading = title ?? subTitle ?? tags;
   // If there is nothing, return a null
   if (!hasHeading) {
@@ -42,15 +45,27 @@ const renderTitle = (props: PageHeaderProps) => {
   return (
     <div className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
       {/* {backIconDom} */}
-      {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
-      {title && (
-        <h1
-          title={typeof title === "string" ? title : undefined}
-          className="text-2xl font-bold"
-        >
-          {title}
-        </h1>
-      )}
+      <div className="flex items-center gap-2">
+        {onBack && (
+          <Button
+            shape="icon"
+            variant="ghost"
+            // icon={<Icon icon="icon-[lucide--arrow-left]" />}
+            asChild={typeof onBack === "object"}
+          >
+            {typeof onBack === "object" && onBack.asChild}
+          </Button>
+        )}
+        {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
+        {title && (
+          <h1
+            title={typeof title === "string" ? title : undefined}
+            className="text-2xl font-bold"
+          >
+            {title}
+          </h1>
+        )}
+      </div>
       {subTitle && (
         <p
           title={typeof subTitle === "string" ? subTitle : undefined}
@@ -82,7 +97,7 @@ const renderChildren = (props: PageHeaderProps) => {
 const renderBreadcrumb = (breadcrumb?: PageHeaderProps["breadcrumb"]) => {
   if (breadcrumb?.render) return breadcrumb.render(breadcrumb);
   if (!breadcrumb?.items?.length) return <></>;
-  return <Breadcrumb {...breadcrumb} />;
+  return <Breadcrumb className="hidden sm:flex" {...breadcrumb} />;
 };
 
 const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {

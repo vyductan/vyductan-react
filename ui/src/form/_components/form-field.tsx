@@ -153,6 +153,8 @@ type FieldControllerProps<
   required?: boolean;
 
   layout?: "horizontal" | "vertical";
+
+  className?: string;
 };
 const FieldController = <
   TFieldValues extends FieldValues = FieldValues,
@@ -166,6 +168,8 @@ const FieldController = <
   disabled,
   required,
   layout,
+
+  className,
   ...props
 }: FieldControllerProps<TFieldValues, TName>) => {
   const watchedValue = useWatch({
@@ -185,7 +189,7 @@ const FieldController = <
         disabled={disabled}
         render={({ field, fieldState, formState }) => {
           return (
-            <FormItem>
+            <FormItem className={className}>
               <FieldRender
                 fieldState={fieldState}
                 required={required}
