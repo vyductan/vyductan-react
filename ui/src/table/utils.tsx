@@ -235,7 +235,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
             })
           : originNode;
       },
-      size: 40,
+      size: 32,
+      minSize: 32,
       meta: {
         align: "center",
       },

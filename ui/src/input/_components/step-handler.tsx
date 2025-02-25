@@ -88,7 +88,9 @@ export default function StepHandler({
   };
 
   return (
-    <div className={cn("flex flex-col opacity-0", "group-hover:opacity-100")}>
+    <div
+      className={cn("flex flex-col justify-center", "group-hover:opacity-100")}
+    >
       <span
         {...sharedHandlerProps}
         onMouseDown={(e) => {
@@ -96,7 +98,7 @@ export default function StepHandler({
         }}
         aria-label="Increase Value"
         aria-disabled={upDisabled}
-        className={"bg-muted hover:bg-muted-foreground flex p-px"}
+        className={"bg-muted hover:bg-muted-foreground flex"}
       >
         {upNode ?? (
           <span
@@ -112,7 +114,7 @@ export default function StepHandler({
         }}
         aria-label="Decrease Value"
         aria-disabled={downDisabled}
-        className={"bg-muted hover:bg-muted-foreground flex p-px"}
+        className={"bg-muted hover:bg-muted-foreground flex"}
       >
         {downNode ?? (
           <span
