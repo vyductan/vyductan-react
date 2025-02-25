@@ -34,7 +34,7 @@ export const PageContainer = ({
   return (
     <main
       className={cn(
-        "flex flex-1 flex-col p-4 lg:p-6 xl:p-8",
+        "flex flex-1 flex-col p-4 pb-10 lg:p-6 xl:p-8",
         "mx-auto w-full max-w-[100vw] md:max-w-[calc(100vw-var(--sidebar-width))]",
         "space-y-8",
         className,

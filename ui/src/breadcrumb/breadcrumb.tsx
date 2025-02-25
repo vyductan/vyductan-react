@@ -7,6 +7,7 @@ import { Icon } from "../icons";
 import { Skeleton } from "../skeleton";
 import {
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbRoot,
@@ -52,9 +53,9 @@ const Breadcrumb = ({
               <Slot
                 className={cn(
                   "cursor-pointer",
-                  index !== items.length - 1 && "text-muted-foreground",
+                  // index !== items.length - 1 && "text-muted-foreground",
                   "-mx-1 rounded px-1",
-                  "hover:text-foreground",
+                  // "hover:text-foreground",
                   // "hover:bg-background-hover",
                 )}
                 aria-current={index === items.length - 1 ? true : undefined}
@@ -62,24 +63,47 @@ const Breadcrumb = ({
                 {skeleton ? (
                   <Skeleton as="li" className="w-20" />
                 ) : index < items.length - 1 ? (
-                  <BreadcrumbItem>
-                    {itemRender ? (
-                      itemRender(x, params, items, [])
-                    ) : (
-                      <>
-                        {x.icon && (
-                          <span className="mr-2">
-                            {typeof x.icon === "string" ? (
-                              <Icon icon={x.icon} />
-                            ) : (
-                              x.icon
+                  <>
+                    {x.href ? (
+                      <BreadcrumbLink>
+                        {itemRender ? (
+                          itemRender(x, params, items, [])
+                        ) : (
+                          <>
+                            {x.icon && (
+                              <span className="mr-2">
+                                {typeof x.icon === "string" ? (
+                                  <Icon icon={x.icon} />
+                                ) : (
+                                  x.icon
+                                )}
+                              </span>
                             )}
-                          </span>
+                            {x.title}
+                          </>
                         )}
-                        {x.title}
-                      </>
+                      </BreadcrumbLink>
+                    ) : (
+                      <BreadcrumbItem>
+                        {itemRender ? (
+                          itemRender(x, params, items, [])
+                        ) : (
+                          <>
+                            {x.icon && (
+                              <span className="mr-2">
+                                {typeof x.icon === "string" ? (
+                                  <Icon icon={x.icon} />
+                                ) : (
+                                  x.icon
+                                )}
+                              </span>
+                            )}
+                            {x.title}
+                          </>
+                        )}
+                      </BreadcrumbItem>
                     )}
-                  </BreadcrumbItem>
+                  </>
                 ) : (
                   <BreadcrumbPage>
                     {x.icon && (
