@@ -1,14 +1,17 @@
 import type { ReactNode } from "react";
 import type { FieldValues } from "react-hook-form";
 
-import { AutoCompleteProps } from "@acme/ui/autocomplete";
-import { DatePickerProps, DateRangePickerProps } from "@acme/ui/date-picker";
-import { EditorProps } from "@acme/ui/editor";
-import { FieldArrayProps, FieldProps, ValueType } from "@acme/ui/form";
-import { InputPasswordProps, InputProps } from "@acme/ui/input";
-import { RadioGroupProps } from "@acme/ui/radio";
-import { SelectProps } from "@acme/ui/select";
-import { TextareaProps } from "@acme/ui/textarea";
+import type { AutocompleteProps } from "@acme/ui/autocomplete";
+import type {
+  DatePickerProps,
+  DateRangePickerProps,
+} from "@acme/ui/date-picker";
+import type { EditorProps } from "@acme/ui/editor";
+import type { FieldArrayProps, FieldProps, ValueType } from "@acme/ui/form";
+import type { InputPasswordProps, InputProps } from "@acme/ui/input";
+import type { RadioGroupProps } from "@acme/ui/radio";
+import type { SelectProps } from "@acme/ui/select";
+import type { TextareaProps } from "@acme/ui/textarea";
 
 type AutoFormFieldBaseProps = {
   // title?: ReactNode;
@@ -31,7 +34,7 @@ export type FieldWithType<TType, TFieldProps> = Omit<
 
 // https://procomponents.ant.design/en-US/components/schema#valuetype-lists
 export type InputUnion<TValue extends ValueType = string> =
-  | FieldWithType<"autocomplete", AutoCompleteProps>
+  | FieldWithType<"autocomplete", AutocompleteProps>
   | FieldWithType<"date", DatePickerProps>
   | FieldWithType<"date-range", DateRangePickerProps>
   | FieldWithType<"editor", EditorProps>

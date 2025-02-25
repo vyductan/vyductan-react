@@ -15,7 +15,7 @@ const FormLabel = ({ className, ...props }: LabelProps) => {
       data-slot="form-label"
       htmlFor={formItemId}
       data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={cn("data-[error=true]:text-destructive-foreground", className)}
       {...props}
     />
   );

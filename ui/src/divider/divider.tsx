@@ -43,4 +43,4 @@ const Separator = ({
 };
 
 export type { SeparatorProps as DividerProps };
-export { Separator as Divider };
+export { Separator as Divider, Separator };

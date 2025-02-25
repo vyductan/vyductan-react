@@ -13,8 +13,9 @@ type SwitchProps = Omit<
 };
 const Switch = ({ className, onChange, ...props }: SwitchProps) => (
   <SwitchPrimitives.Root
+    data-slot="switch"
     className={cn(
-      "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input ring-ring/10 dark:ring-ring/20 dark:outline-ring/40 outline-ring/50 inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-[color,box-shadow] focus-visible:ring-4 focus-visible:outline-hidden focus-visible:outline-1 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:focus-visible:ring-0",
+      "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
       // "h-5 w-9"
       // own
       "h-[22px] w-11",
@@ -26,8 +27,10 @@ const Switch = ({ className, onChange, ...props }: SwitchProps) => (
     {...props}
   >
     <SwitchPrimitives.Thumb
+      data-slot="switch-thumb"
       className={cn(
         "bg-background pointer-events-none block rounded-full ring-0 shadow-lg transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0",
+        // "size-4"
         // own
         "size-[18px]",
       )}

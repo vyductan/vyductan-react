@@ -125,7 +125,7 @@ function DrawerTitle({
     <DrawerPrimitive.Title
       data-slot="drawer-title"
       className={cn(
-        "text-foreground font-semibold tracking-tight",
+        "text-foreground font-semibold",
         // same modal
         // "text-lg leading-none",
         className,

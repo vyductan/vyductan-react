@@ -11,7 +11,7 @@ export const alertVariants = cva(
       type: {
         default: "bg-background text-foreground",
         // destructive:
-        //   "border-destructive/50 text-destructive dark:text-destructive-foreground/80 dark:border-destructive [&>svg]:text-current dark:bg-destructive/50",
+        // "text-destructive-foreground [&>svg]:text-current *:data-[slot=alert-description]:text-destructive-foreground/80",
         error: "border-red-300 bg-red-100 text-red-600",
         info: "border-blue-300 bg-blue-100 text-blue-600",
         warning: "border-amber-300 bg-amber-100 text-amber-600",
@@ -65,7 +65,7 @@ function AlertDescription({
     <div
       data-slot="alert-description"
       className={cn(
-        "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        "text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
         className,
       )}
       {...props}
