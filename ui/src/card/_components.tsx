@@ -101,7 +101,6 @@ function CardFooter({
 }
 
 export type { CardRootProps };
-
 export {
   CardRoot,
   CardHeader,
