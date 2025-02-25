@@ -5,6 +5,3 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-export function isHTMLElement(x: unknown): x is HTMLElement {
-  return x instanceof HTMLElement
-}

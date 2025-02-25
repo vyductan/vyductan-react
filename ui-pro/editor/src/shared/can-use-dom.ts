@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-export function isHTMLElement(x: unknown): x is HTMLElement {
-  return x instanceof HTMLElement
-}
+
+export const CAN_USE_DOM: boolean =
+  typeof window !== 'undefined' &&
+  typeof window.document !== 'undefined' &&
+  typeof window.document.createElement !== 'undefined'
