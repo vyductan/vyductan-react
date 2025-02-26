@@ -522,7 +522,7 @@ const Table = <TRecord extends AnyObject>({
 
             {skeleton ? (
               <TableBody>
-                {Array.from({ length: 5 })
+                {Array.from({ length: pagination?.pageSize ?? 5 })
                   .fill(0)
                   .map((_, index) => {
                     return (
@@ -641,7 +641,9 @@ const Table = <TRecord extends AnyObject>({
               </TableFooter>
             )}
           </TableRoot>
-          {pagination && <Pagination className="my-4" {...pagination} />}
+          {pagination && (
+            <Pagination className="my-4 justify-end" {...pagination} />
+          )}
         </div>
       </Spin>
     </>
