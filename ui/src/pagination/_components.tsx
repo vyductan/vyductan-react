@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
 
 import type { ButtonProps } from "../button";
 import { cn } from "..";
@@ -39,7 +40,9 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean;
 } & Pick<ButtonProps, "disabled" | "size" | "shape"> &
-  React.ComponentProps<typeof Link>;
+  React.ComponentProps<typeof Link> & {
+    asChild?: boolean;
+  };
 
 function PaginationLink({
   className,
@@ -47,10 +50,14 @@ function PaginationLink({
   isActive,
   size,
   shape = "icon",
+
+  asChild,
   ...props
 }: PaginationLinkProps) {
+  const LinkComp = asChild ? Slot : Link;
   return (
-    <Link
+    <LinkComp
+      rel="nofollow"
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
@@ -87,6 +94,7 @@ function PaginationPrevious({
 
 function PaginationNext({
   className,
+  // asChild,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
@@ -110,10 +118,14 @@ function PaginationEllipsis({
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn("flex size-9 items-center justify-center", className)}
+      className={cn(
+        "flex items-center justify-center",
+        //size-9,
+        className,
+      )}
       {...props}
     >
-      <Icon icon="lucide--more-horizontal" />
+      <Icon icon="icon-[lucide--more-horizontal]" />
       <span className="sr-only">More pages</span>
     </span>
   );
@@ -121,7 +133,11 @@ function PaginationEllipsis({
 
 function PaginationTotal({ className, ...props }: React.ComponentProps<"li">) {
   return (
-    <li data-slot="pagination-total" className={cn("", className)} {...props} />
+    <li
+      data-slot="pagination-total"
+      className={cn("mr-1 text-sm", className)}
+      {...props}
+    />
   );
 }
 
