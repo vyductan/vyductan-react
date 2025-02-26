@@ -30,7 +30,11 @@ type Meta<TRecord> = {
     | boolean
     | BuiltInSortingFn
     | ((a: TRecord, b: TRecord) => number)
-    | { multiple: number; compare?: (a: TRecord, b: TRecord) => number };
+    | {
+        multiple: number;
+        // false to allow sorting by server api
+        compare?: false | ((a: TRecord, b: TRecord) => number);
+      };
 };
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type

@@ -101,7 +101,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         // sorting
         ...(sorter
           ? {
-              // enableSorting: true,
+              enableSorting: true,
               sortingFn:
                 typeof sorter === "string"
                   ? sorter
@@ -109,9 +109,16 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
                     ? (rowA, rowB) => sorter(rowA.original, rowB.original)
                     : // object
                       typeof sorter === "object"
-                      ? sorter.compare
-                        ? (rowA, rowB) =>
-                            sorter.compare!(rowA.original, rowB.original)
+                      ? "compare" in sorter
+                        ? typeof sorter.compare === "boolean"
+                          ? () => 0
+                          : (rowA, rowB) =>
+                              (
+                                sorter.compare as (
+                                  a: TRecord,
+                                  b: TRecord,
+                                ) => number
+                              )(rowA.original, rowB.original)
                         : "auto"
                       : // boolean
                         "auto",
