@@ -105,7 +105,9 @@ const DatePicker = <T extends DatePickerValueType = "date">({
     },
   });
   const preInputValue = value ? formatDate(toDate(value), format) : "";
-  const [inputValue, setInputValue] = useMergedState(preInputValue);
+  const [inputValue, setInputValue] = useMergedState(preInputValue, {
+    value: preInputValue,
+  });
   const handleChange = (input: string | Date) => {
     const date = toDate(input);
     let result;
@@ -177,6 +179,10 @@ const DatePicker = <T extends DatePickerValueType = "date">({
         className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
+        align={{
+          // fix panel offset -  based on input size
+          offset: [-12, 10],
+        }}
         open={open}
         onOpenChange={() => {
           if (!open) {
@@ -218,44 +224,46 @@ const DatePicker = <T extends DatePickerValueType = "date">({
           </div>
         }
       >
-        {/* Use div to temp fix panel offset */}
-        <div>
-          <Input
-            ref={composedRef}
-            id={id}
-            value={inputValue}
-            placeholder={placeholder}
-            status={status}
-            allowClear={allowClear}
-            borderless={borderless}
-            size={size}
-            disabled={disabled}
-            className={cn("items-center", "justify-start text-left", className)}
-            suffix={
-              <Icon
-                icon="icon-[mingcute--calendar-2-line]"
-                className="ml-auto size-4 opacity-50"
-              />
+        <Input
+          ref={composedRef}
+          id={id}
+          value={inputValue}
+          placeholder={placeholder}
+          status={status}
+          allowClear={allowClear}
+          borderless={borderless}
+          size={size}
+          disabled={disabled}
+          className={cn(
+            "items-center",
+            "justify-start text-left",
+            "[&>input]:w-full", // fix width of input is not fit with parent width
+            className,
+          )}
+          suffix={
+            <Icon
+              icon="icon-[mingcute--calendar-2-line]"
+              className="ml-auto size-4 opacity-50"
+            />
+          }
+          // onClick={() => {
+          //   console.log("click", open);
+          //   if (!open) setOpen(true);
+          // }}
+          onKeyUp={(event) => {
+            event.stopPropagation();
+            if (event.key === "Enter" || event.key === "Escape") {
+              handleChangeInput(event.currentTarget.value);
+              setOpen(false);
             }
-            // onClick={() => {
-            //   console.log("click", open);
-            //   if (!open) setOpen(true);
-            // }}
-            onKeyUp={(event) => {
-              event.stopPropagation();
-              if (event.key === "Enter" || event.key === "Escape") {
-                handleChangeInput(event.currentTarget.value);
-                setOpen(false);
-              }
-            }}
-            onChange={(event) => {
-              setInputValue(event.currentTarget.value);
-              if (isValidDateStringExact(event.currentTarget.value, format)) {
-                handleChange(event.currentTarget.value);
-              }
-            }}
-          />
-        </div>
+          }}
+          onChange={(event) => {
+            setInputValue(event.currentTarget.value);
+            if (isValidDateStringExact(event.currentTarget.value, format)) {
+              handleChange(event.currentTarget.value);
+            }
+          }}
+        />
       </Popover>
     </>
   );
