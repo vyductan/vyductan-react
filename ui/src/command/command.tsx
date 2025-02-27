@@ -1,6 +1,5 @@
 import { useMergedState } from "rc-util";
 
-import type { ValueType } from "../form/types";
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { cn } from "..";
@@ -16,19 +15,20 @@ import {
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
-type CommandSingleValue<T extends ValueType = string> = {
+export type CommandValueType = string;
+type CommandSingleValue<T extends CommandValueType = string> = {
   mode?: never;
   value?: T;
   defaultValue?: T;
   onChange?: (value?: T, option?: Option<T>) => void;
 };
-type CommandMultipleValue<T extends ValueType = string> = {
+type CommandMultipleValue<T extends CommandValueType = string> = {
   mode: "multiple";
   value?: T[];
   defaultValue?: T[];
   onChange?: (value: T[], options?: Option<T>[]) => void;
 };
-export type CommandProps<T extends ValueType = string> = Omit<
+export type CommandProps<T extends CommandValueType = string> = Omit<
   CommandRootProps,
   "defaultValue" | "value" | "onChange"
 > &
@@ -52,7 +52,7 @@ export type CommandProps<T extends ValueType = string> = Omit<
     dropdownFooter?: React.ReactNode;
   };
 
-export const Command = <T extends ValueType = string>({
+export const Command = <T extends CommandValueType = string>({
   mode,
   options,
   defaultValue: defaultValueProp,
