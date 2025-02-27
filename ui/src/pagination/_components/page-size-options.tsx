@@ -78,14 +78,19 @@ const PageSizeOptions = ({
     })
   ) : (
     <Select
+      value={pageSize}
       options={getPageSizeOptions().map((opt) => ({
         label: mergeBuildOptionText(opt),
         value: opt,
       }))}
+      onChange={(value) => {
+        if (value) {
+          changeSize?.(value);
+        }
+      }}
     />
   );
-
-  return <li>{changeSelect}</li>;
+  return <li className="ml-1">{changeSelect}</li>;
 };
 
 export type { OptionsProps, SizeChangerRender };

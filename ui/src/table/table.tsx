@@ -345,16 +345,6 @@ const Table = <TRecord extends AnyObject>({
       : undefined, // Make all clicks multi-sort - default requires `shift` key
   });
 
-  // ---- Table styles ----//
-  let tableStyles: React.CSSProperties = {};
-  if (scroll?.x) {
-    tableStyles = {
-      width: scroll.x,
-      tableLayout: "fixed",
-      minWidth: "100%",
-    };
-  }
-
   // ====================== Scroll ======================
   // const stickyOffsets = useStickyOffsets(colWidths, flattenColumns, direction);
 
@@ -451,7 +441,15 @@ const Table = <TRecord extends AnyObject>({
 
               classNames?.table,
             )}
-            style={tableStyles}
+            style={{
+              ...(scroll?.x
+                ? {
+                    width: scroll.x,
+                    tableLayout: "fixed",
+                    minWidth: "100%",
+                  }
+                : {}),
+            }}
             {...props}
           >
             <ColGroup columns={flattenColumns} />
@@ -524,7 +522,7 @@ const Table = <TRecord extends AnyObject>({
 
             {skeleton ? (
               <TableBody>
-                {Array.from({ length: 5 })
+                {Array.from({ length: pagination?.pageSize ?? 5 })
                   .fill(0)
                   .map((_, index) => {
                     return (
@@ -643,7 +641,9 @@ const Table = <TRecord extends AnyObject>({
               </TableFooter>
             )}
           </TableRoot>
-          {pagination && <Pagination className="my-4" {...pagination} />}
+          {pagination && (
+            <Pagination className="my-4 justify-end" {...pagination} />
+          )}
         </div>
       </Spin>
     </>
