@@ -6,8 +6,8 @@ import { useMergedState } from "rc-util";
 import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
 
 import type { ButtonProps } from "../button";
-import type { CommandProps } from "../command";
-import type { ValueType } from "../form";
+import type { CommandProps, CommandValueType } from "../command";
+// import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { cn } from "..";
 import { Button } from "../button";
@@ -17,7 +17,7 @@ import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
 import { selectColors } from "../select/colors";
 
-export type AutocompleteProps<T extends ValueType = string> = Pick<
+export type AutocompleteProps<T extends CommandValueType = string> = Pick<
   CommandProps<T>,
   | "filter"
   | "placeholder"
@@ -44,7 +44,7 @@ export type AutocompleteProps<T extends ValueType = string> = Pick<
   onSearchChange?: (search: string) => void;
 };
 
-const Autocomplete = <T extends ValueType = string>({
+const Autocomplete = <T extends CommandValueType = string>({
   defaultValue: defaultValueProp,
   value: valueProp,
   options,
@@ -128,6 +128,7 @@ const Autocomplete = <T extends ValueType = string>({
     return <span className="truncate">{value}</span>;
   })();
 
+  console.log("aaaaaaa", options);
   return (
     <Popover
       trigger="click"
@@ -140,6 +141,7 @@ const Autocomplete = <T extends ValueType = string>({
           options={options}
           value={value}
           onChange={(value) => {
+            console.log("cccc", value);
             setValue(value);
           }}
           filter={filter}
