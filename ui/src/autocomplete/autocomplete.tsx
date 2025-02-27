@@ -128,7 +128,6 @@ const Autocomplete = <T extends CommandValueType = string>({
     return <span className="truncate">{value}</span>;
   })();
 
-  console.log("aaaaaaa", options);
   return (
     <Popover
       trigger="click"
@@ -141,7 +140,6 @@ const Autocomplete = <T extends CommandValueType = string>({
           options={options}
           value={value}
           onChange={(value) => {
-            console.log("cccc", value);
             setValue(value);
           }}
           filter={filter}
