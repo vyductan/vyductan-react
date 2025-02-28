@@ -393,9 +393,9 @@ const Table = <TRecord extends AnyObject>({
     <>
       <Spin spinning={loading}>
         <div
+          data-slot="table-container"
           className={cn(
-            "relative",
-            "w-full space-y-3 overflow-auto",
+            "relative w-full space-y-3 overflow-x-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
               // "[&_table]:border-separate",
