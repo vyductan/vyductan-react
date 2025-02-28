@@ -5,7 +5,7 @@ import { useFormField } from "../hooks/use-form-field";
 
 function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error.message) : props.children;
+  const body = error ? String(error.message ?? "") : props.children;
 
   if (!body) {
     return <></>;
