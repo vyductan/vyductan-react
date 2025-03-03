@@ -99,6 +99,7 @@ function TableHead({ className, size, ...props }: TableHeadProps) {
       data-slot="table-head"
       className={cn(
         "text-muted-foreground text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // 'whitespace-nowrap',
         // "h-10 px-2",
         // own
         "p-3",
@@ -122,6 +123,7 @@ function TableCell({ className, size, ...props }: TableCellProps) {
       data-slot="table-cell"
       className={cn(
         "align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // 'whitespace-nowrap',
         // "p-2",
         // own
         "p-3",
