@@ -187,13 +187,6 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
           e.preventDefault();
         }
         onKeyDown?.(e);
-      onChange={(value) => {
-        if (forFormItem) {
-          // eslint-disable-next-line unicorn/no-null
-          onChange?.(value ? value.toString() : null);
-        } else {
-          onChange?.(value);
-        }
       }}
       onChange={(value) => {
         if (forFormItem) {
