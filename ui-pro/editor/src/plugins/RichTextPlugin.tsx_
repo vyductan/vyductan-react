@@ -1,0 +1,18 @@
+import { useMemo } from "react";
+import { ContentEditable as LexicalContentEditable } from "@lexical/react/LexicalContentEditable";
+import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
+import { RichTextPlugin as LexicalRichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+
+type Props = {
+  onRef: (_floatingAnchorElem: HTMLDivElement) => void;
+};
+export const RichTextPlugin = ({ onRef }: Props) => {
+  
+  return (
+    <LexicalRichTextPlugin
+      contentEditable={ContentEditable}
+      placeholder={Placeholder}
+      ErrorBoundary={LexicalErrorBoundary}
+    />
+  );
+};
