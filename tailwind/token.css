@@ -1,13 +1,14 @@
 :root {
-  --color-link: var(--color-blue-500);
-  --color-link-hover: var(--color-blue-500);
-
   --breakpoint-xs: 480px;
   --control-height: 32px;
   --margin-xs: 8px;
 }
 
 @theme inline {
-  --color-link: var(--color-link);
-  --color-link-hover: var(--color-link-hover);
+  --color-error: var(--color-red-500);
+  --color-error-hover: var(--color-red-600);
+  --color-link: var(--color-blue-500);
+  --color-link-hover: var(--color-blue-600);
+  --color-success: var(--color-green-500);
+  --color-success-hover: var(--color-green-600);
 }
