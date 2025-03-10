@@ -8,7 +8,7 @@ const MyImage = ({ src, placeholder, ...props }: ImageProps) => {
   const [imageSrc, setImageSrc] = useState(src);
 
   const base64Placeholder =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/ehjKOcAAAAASUVORK5CYII="; // Màu xám
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/ehjKOcAAAAASUVORK5CYII=";
 
   return (
     <Image

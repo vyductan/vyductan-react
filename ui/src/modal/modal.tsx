@@ -54,7 +54,7 @@ const Modal = ({
 }: ModalProps) => {
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
-  //     <Button variant="outline">Hủy</Button>
+  //     <Button variant="outline">Cancel</Button>
   //   </DialogClose>
   // );
   // const OkBtn = useMemo(
@@ -77,7 +77,7 @@ const Modal = ({
           ),
           CancelBtn: (
             <DialogClose asChild onClick={onCancel}>
-              <Button variant="outline">Huỷ</Button>
+              <Button variant="outline">Cancel</Button>
             </DialogClose>
           ),
         },
