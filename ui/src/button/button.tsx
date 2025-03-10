@@ -212,11 +212,7 @@ const buttonVariants = tv({
     {
       variant: "ghost",
       color: "danger",
-      className: [
-        "text-error",
-        "hover:text-error-hover",
-        "hover:bg-red-100 dark:hover:bg-red-300",
-      ],
+      className: ["text-error", "hover:text-error-hover", "hover:bg-red-100"],
     },
     {
       variant: "ghost",
@@ -230,7 +226,7 @@ const buttonVariants = tv({
     {
       variant: "ghost",
       color: "link",
-      className: ["text-link", "hover:text-link-hover", "hover:bg-link-muted"],
+      className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
     },
     // Size
     {

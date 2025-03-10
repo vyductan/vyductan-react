@@ -28,7 +28,6 @@
   "dependencies": {
     "@acme/hooks": "workspace:*",
     "@acme/ui": "workspace:*",
-    "@acme/utils": "workspace:*",
     "next": "15.1.7"
   },
   "devDependencies": {

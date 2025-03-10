@@ -7,6 +7,7 @@ export default [
     rules: {
       "unicorn/prevent-abbreviations": "off",
       "unicorn/no-nested-ternary": "off", // off beause conflict with prettier
+      "unicorn/no-null": "off", // off beause sometime backend return null
     },
   },
 ];
