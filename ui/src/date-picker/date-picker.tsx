@@ -275,9 +275,9 @@ function isValidDateStringExact(
 ): boolean {
   const parsedDate = parse(dateString, formatString, new Date());
 
-  // Kiểm tra:
-  // 1. Ngày phải hợp lệ (`isValid(parsedDate)`).
-  // 2. Chuỗi định dạng lại (`format(parsedDate, formatString)`) phải trùng khớp với `dateString`.
+  // Validation:
+  // 1. The date must be valid (`isValid(parsedDate)`).
+  // 2. The reformatted string (`format(parsedDate, formatString)`) must match `dateString`.
   return (
     isValid(parsedDate) && formatDate(parsedDate, formatString) === dateString
   );
