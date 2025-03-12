@@ -5,8 +5,6 @@
 import type { Table } from "@tanstack/react-table";
 import React from "react";
 
-import { toSentenceCase } from "@acme/utils/to-sentence-case";
-
 import type { PopoverProps } from "../../popover";
 import { cn } from "../..";
 import { Button } from "../../button";
@@ -57,7 +55,7 @@ export function TableViewOptions<TData>({
                 column.accessorFn !== undefined && column.getCanHide(),
             )
             .map((column) => ({
-              label: column.columnDef.meta?.title ?? toSentenceCase(column.id),
+              label: column.columnDef.meta?.title ?? column.id,
               value: column.id,
               checked: column.getIsVisible(),
               className: "truncate",

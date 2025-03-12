@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@acme/nextjs",
+  "name": "@ui-pro/tree",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -9,10 +9,6 @@
     ".": {
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
-    },
-    "./*": {
-      "types": "./dist/src/*/index.d.ts",
-      "default": "./src/*/index.ts"
     }
   },
   "scripts": {
@@ -26,9 +22,9 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@acme/hooks": "workspace:*",
     "@acme/ui": "workspace:*",
-    "next": "15.1.7"
+    "@lexical/react": "^0.23.1",
+    "lexical": "^0.23.1"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
