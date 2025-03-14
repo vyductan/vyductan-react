@@ -7,7 +7,7 @@ import type { SizeType } from "../types";
 import { cn } from "..";
 
 type AvatarRootProps = React.ComponentProps<typeof AvatarPrimitive.Root> & {
-  size?: SizeType;
+  size?: SizeType | number;
 };
 function AvatarRoot({ className, size, ...props }: AvatarRootProps) {
   return (
