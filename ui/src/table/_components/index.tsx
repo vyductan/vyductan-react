@@ -6,3 +6,4 @@ export * from "./table-summary-cell";
 export * from "./table-toolbar-root";
 export * from "./table-toolbar-left";
 export * from "./table-toolbar-right";
+export * from "./table-sortable-row";
