@@ -28,7 +28,7 @@
   "dependencies": {
     "@acme/hooks": "workspace:*",
     "@acme/ui": "workspace:*",
-    "next": "15.1.7"
+    "next": "15.2.1"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
