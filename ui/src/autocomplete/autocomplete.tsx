@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useMergedState } from "rc-util";
 
-import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
-
 import type { ButtonProps } from "../button";
 import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
@@ -80,8 +78,8 @@ const Autocomplete = <T extends CommandValueType = string>({
         ?.label?.toString();
       if (
         label &&
-        removeVietnameseTones(label.toLowerCase()).includes(
-          removeVietnameseTones(search.toLowerCase()),
+        removeTones(label.toLowerCase()).includes(
+          removeTones(search.toLowerCase()),
         )
       ) {
         return 1;
@@ -214,3 +212,11 @@ const Autocomplete = <T extends CommandValueType = string>({
 };
 
 export { Autocomplete };
+
+export function removeTones(string_: string): string {
+  return string_
+    .normalize("NFD")
+    .replaceAll(/[\u0300-\u036F]/g, "")
+    .replaceAll("đ", "d")
+    .replaceAll("Đ", "D");
+}
