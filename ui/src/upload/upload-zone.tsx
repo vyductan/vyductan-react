@@ -172,8 +172,7 @@ const UploadZone = ({
         )}
         classNames={{
           // content: "h-full relative p-0",
-          content:
-            "flex items-center h-full justify-center flex-col relative p-0",
+          content: "flex items-center h-full justify-center flex-col relative",
         }}
         onDragOver={(e) => {
           e.preventDefault();
