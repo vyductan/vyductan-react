@@ -57,6 +57,7 @@ const SelectTrigger = ({
         // own
         "group relative",
         inputVariants({ borderless, status }),
+        // "text-sm",
         // "items-center justify-between",
         inputSizeVariants({ size }),
         // "data-placeholder:text-muted-foreground",
@@ -65,7 +66,6 @@ const SelectTrigger = ({
         // own not used
         // "focus:ring-2 focus:ring-ring focus:ring-offset-2",
         // "disabled:text-placeholder disabled:cursor-not-allowed disabled:pointer-events-none",
-        // "[&>span]:line-clamp-1", ???  disabled for middle arrow
         className,
       )}
       {...props}
