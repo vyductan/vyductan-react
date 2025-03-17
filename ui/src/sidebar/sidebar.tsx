@@ -21,6 +21,7 @@ import {
 type SidebarProps = {
   className?: string;
   classNames?: {
+    header?: string;
     menuButton?: string;
     icon?: string;
   };
@@ -30,6 +31,7 @@ type SidebarProps = {
     classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
+  contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
   items?: MenuItemDef[];
@@ -46,6 +48,7 @@ export const Sidebar = ({
   classNames,
 
   itemRender,
+  contentRender,
 
   header,
   items = [],
@@ -191,12 +194,12 @@ export const Sidebar = ({
 
   return (
     <SidebarRoot collapsible="icon" className={className}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>{header}</SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>{renderItems(items)}</SidebarContent>
+      <SidebarHeader className={classNames?.header}>{header}</SidebarHeader>
+      <SidebarContent>
+        {contentRender
+          ? contentRender({ itemNodes: renderItems(items) })
+          : renderItems(items)}
+      </SidebarContent>
     </SidebarRoot>
   );
 };
