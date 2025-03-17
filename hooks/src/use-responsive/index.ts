@@ -9,8 +9,8 @@ type Subscriber = () => void;
 
 const subscribers = new Set<Subscriber>();
 
-type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
-type ResponsiveInfo = Record<Screens, boolean>;
+export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type ResponsiveInfo = Record<Breakpoint, boolean>;
 
 let info: ResponsiveInfo;
 
@@ -36,7 +36,7 @@ let responsiveConfig = (() => {
     xs: 0,
     ...c,
   };
-})() as Record<Screens, number>;
+})() as Record<Breakpoint, number>;
 type ResponsiveConfig = typeof responsiveConfig;
 
 function handleResize() {
@@ -54,7 +54,7 @@ function calculate() {
   const width = window.innerWidth;
   const newInfo = {} as ResponsiveInfo;
   let shouldUpdate = false;
-  for (const key of Object.keys(responsiveConfig) as Screens[]) {
+  for (const key of Object.keys(responsiveConfig) as Breakpoint[]) {
     newInfo[key] = width >= responsiveConfig[key];
     if (newInfo[key] !== info[key]) {
       shouldUpdate = true;

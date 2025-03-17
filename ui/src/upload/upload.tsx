@@ -126,6 +126,7 @@ const Upload = ({
 
       {!props.multiple && (
         <>
+          {/* <UploadZone style={{ width, height }}>{children}</UploadZone> */}
           {files.length > 0 ? (
             <div className="group relative" style={{ width, height }}>
               {render?.image ? (
@@ -155,7 +156,10 @@ const Upload = ({
               onUploadSuccess={(file) => {
                 setFiles([file]);
               }}
-            />
+              overrideClick={overrideClick}
+            >
+              {children}
+            </UploadZone>
           )}
         </>
       )}
