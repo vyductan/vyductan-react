@@ -358,7 +358,12 @@ function SidebarSeparator({ className, ...props }: DividerProps) {
     <Divider
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn("bg-sidebar-border mx-2 w-auto", className)}
+      className={cn(
+        "bg-sidebar-border mx-2 w-auto",
+        // own
+        "my-0",
+        className,
+      )}
       {...props}
     />
   );
@@ -706,6 +711,7 @@ function SidebarMenuSubButton({
     />
   );
 }
+
 export {
   SidebarRoot,
   SidebarContent,
@@ -732,3 +738,6 @@ export {
   SidebarTrigger,
   useSidebar,
 };
+
+// own
+export { sidebarMenuButtonVariants };
