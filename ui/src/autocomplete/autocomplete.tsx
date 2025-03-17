@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useMergedState } from "rc-util";
 
-import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
-
 import type { ButtonProps } from "../button";
 import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
@@ -38,6 +36,8 @@ export type AutocompleteProps<T extends CommandValueType = string> = Pick<
   size?: ButtonProps["size"];
   disabled?: boolean;
 
+  open?: boolean;
+
   allowClear?: boolean;
 
   searchPlaceholder?: string;
@@ -53,6 +53,7 @@ const Autocomplete = <T extends CommandValueType = string>({
   className,
   size,
   disabled,
+  open: openProp,
 
   filter: filterProp,
 
@@ -80,8 +81,8 @@ const Autocomplete = <T extends CommandValueType = string>({
         ?.label?.toString();
       if (
         label &&
-        removeVietnameseTones(label.toLowerCase()).includes(
-          removeVietnameseTones(search.toLowerCase()),
+        removeTones(label.toLowerCase()).includes(
+          removeTones(search.toLowerCase()),
         )
       ) {
         return 1;
@@ -89,7 +90,9 @@ const Autocomplete = <T extends CommandValueType = string>({
       return 0;
     });
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useMergedState(false, {
+    value: openProp,
+  });
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
     onChange: (value) => {
@@ -118,14 +121,14 @@ const Autocomplete = <T extends CommandValueType = string>({
             o.icon && <Icon icon={o.icon} />
           )}
           {typeof label === "string" ? (
-            <span className="truncate">{label}</span>
+            <span className="line-clamp-1">{label}</span>
           ) : (
             label
           )}
         </>
       );
     }
-    return <span className="truncate">{value}</span>;
+    return <span className="line-clamp-1">{value}</span>;
   })();
 
   return (
@@ -133,7 +136,13 @@ const Autocomplete = <T extends CommandValueType = string>({
       trigger="click"
       open={open}
       onOpenChange={setOpen}
-      className="w-(--radix-popover-trigger-width) p-0"
+      placement="bottomLeft"
+      className={cn(
+        "p-0",
+        //w-(--radix-popover-trigger-width)
+        // own
+        "w-full min-w-(--radix-popover-trigger-width)", // make same select width
+      )}
       content={
         <Command
           placeholder={searchPlaceholder}
@@ -156,7 +165,9 @@ const Autocomplete = <T extends CommandValueType = string>({
         disabled={disabled}
         className={cn(
           "group",
-          "w-full justify-between text-sm font-normal",
+          "w-full justify-between font-normal",
+          // own
+          "whitespace-normal",
           !value && "text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
@@ -214,3 +225,11 @@ const Autocomplete = <T extends CommandValueType = string>({
 };
 
 export { Autocomplete };
+
+export function removeTones(string_: string): string {
+  return string_
+    .normalize("NFD")
+    .replaceAll(/[\u0300-\u036F]/g, "")
+    .replaceAll("đ", "d")
+    .replaceAll("Đ", "D");
+}

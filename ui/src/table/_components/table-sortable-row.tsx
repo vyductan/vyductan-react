@@ -29,7 +29,7 @@ interface TableRowSortableProps
   extends React.HTMLAttributes<HTMLTableRowElement> {
   "data-row-key": string;
 }
-const TableRowSortable: React.FC<TableRowSortableProps> = (props) => {
+const TableSortableRow: React.FC<TableRowSortableProps> = (props) => {
   const {
     attributes,
     listeners,
@@ -59,4 +59,4 @@ const TableRowSortable: React.FC<TableRowSortableProps> = (props) => {
   );
 };
 
-export { TableRowSortable, DragHandle };
+export { TableSortableRow as TableRowSortable, DragHandle };

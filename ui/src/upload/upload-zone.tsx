@@ -164,23 +164,6 @@ const UploadZone = ({
 
   return (
     <>
-      {/* <Spin */}
-      {/*   spinning={isUploading} */}
-      {/*   tip="Đang tải lên" */}
-      {/*   // className="h-32" */}
-      {/*   {...props} */}
-      {/* > */}
-      {/* <label */}
-      {/*   htmlFor="image-upload" */}
-      {/*   className="block w-fit" */}
-      {/*   // style={props.style} */}
-      {/*   // className="group relative flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-xs transition-all hover:bg-gray-50" */}
-      {/*   onClick={(event) => { */}
-      {/*     if (overrideClick) { */}
-      {/*       event.preventDefault(); */}
-      {/*     } */}
-      {/*   }} */}
-      {/* > */}
       <Card
         className={cn(
           "w-full border-2 border-dashed",
@@ -189,8 +172,7 @@ const UploadZone = ({
         )}
         classNames={{
           // content: "h-full relative p-0",
-          content:
-            "flex items-center h-full justify-center flex-col relative p-0",
+          content: "flex items-center h-full justify-center flex-col relative",
         }}
         onDragOver={(e) => {
           e.preventDefault();
@@ -353,8 +335,6 @@ const UploadZone = ({
       {/* )} */}
 
       {/* </label> */}
-
-      {/* </Spin> */}
     </>
   );
 };
