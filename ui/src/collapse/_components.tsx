@@ -26,12 +26,22 @@ function AccordionItem({
 
 type AccordionTriggerProps = React.ComponentProps<
   typeof AccordionPrimitive.Trigger
->;
+> & {
+  expandIconPosition?: "start" | "end";
+};
 function AccordionTrigger({
   className,
   children,
+
+  expandIconPosition = "end",
   ...props
 }: AccordionTriggerProps) {
+  const expandIcon = (
+    <Icon
+      icon="icon-[lucide--chevron-down]"
+      className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200"
+    />
+  );
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
@@ -42,15 +52,17 @@ function AccordionTrigger({
           "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
           "disabled:pointer-events-none disabled:opacity-50",
           "[&[data-state=open]>svg]:rotate-180",
+
+          // Own
+          "[&[data-state=open]>span[role='img']]:rotate-180",
+          expandIconPosition === "start" && "justify-start gap-3",
           className,
         )}
         {...props}
       >
+        {expandIconPosition === "start" && expandIcon}
         {children}
-        <Icon
-          icon="icon-[lucide--chevron-down]"
-          className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200"
-        />
+        {expandIconPosition === "end" && expandIcon}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   );
