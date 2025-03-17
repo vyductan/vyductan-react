@@ -5,6 +5,8 @@ import type {
   RowData,
 } from "@tanstack/react-table";
 
+import type { Breakpoint } from "@acme/hooks/use-responsive";
+
 import type { PaginationProps } from "../pagination";
 import type { AnyObject } from "../types";
 
@@ -12,6 +14,7 @@ type Meta<TRecord> = {
   title?: React.ReactNode;
   align?: "left" | "right" | "center";
   fixed?: FixedType;
+  responsive?: Breakpoint[];
   className?: string;
   classNames?: {
     head?: string;

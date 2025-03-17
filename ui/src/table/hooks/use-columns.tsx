@@ -1,6 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import React from "react";
 
+import type { ResponsiveInfo } from "@acme/hooks/use-responsive";
+import { useResponsive } from "@acme/hooks/use-responsive";
+
 import type { AnyObject } from "../../types";
 import type { TableProps } from "../table";
 import type { TableColumnDef } from "../types";
@@ -53,22 +56,29 @@ export const useColumns = <TRecord extends AnyObject>({
   rowKey,
   rowSelection: rowSelectionProp,
   expandable,
-  dnd,
-}: Pick<
-  TableProps<TRecord>,
-  "rowKey" | "rowSelection" | "expandable" | "dnd"
-> & {
+}: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable"> & {
   columns: TableColumnDef<TRecord>[];
 }): [
   columns: ColumnDef<TRecord>[],
   flattenColumns: readonly ColumnDef<TRecord>[],
 ] => {
-  const columns = transformColumnDefs(columnsProp, {
-    rowKey,
-    rowSelection: rowSelectionProp,
-    expandable,
-    dnd,
-  });
+  const responsive = useResponsive();
+  const breakpoints = new Set(
+    Object.entries((responsive as ResponsiveInfo) ?? {})
+      .filter(([, value]) => value)
+      .map(([key]) => key),
+  );
+
+  const columns = transformColumnDefs(
+    columnsProp.filter(
+      (c) => !c.responsive || c.responsive.some((r) => breakpoints.has(r)),
+    ),
+    {
+      rowKey,
+      rowSelection: rowSelectionProp,
+      expandable,
+    },
+  );
   // ========================== Flatten =========================
   const flattenColumns = React.useMemo(() => {
     return flatColumns(columns);

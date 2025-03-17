@@ -21,7 +21,6 @@ import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
 import { useMergedState } from "rc-util";
 
-import type { SortableContextProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
 import type { AnyObject } from "../types";
 import type {
@@ -127,8 +126,6 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     /** Summary content */
     summary?: (currentData: TRecord[]) => React.ReactNode;
 
-    dnd?: Pick<SortableContextProps, "onDragEnd">;
-
     onChange?: (
       pagination: TablePaginationConfig,
       filters: Record<string, FilterValue | null>,
@@ -163,8 +160,6 @@ const Table = <TRecord extends AnyObject>({
   scroll,
   locale = tableLocale_en.Table,
 
-  dnd,
-
   components,
   toolbar,
   summary,
@@ -191,7 +186,6 @@ const Table = <TRecord extends AnyObject>({
     rowKey,
     rowSelection: propRowSelection,
     expandable,
-    dnd,
   });
 
   // ====================== Expand ======================
