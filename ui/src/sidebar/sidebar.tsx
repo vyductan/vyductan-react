@@ -3,10 +3,9 @@
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useMergedState } from "rc-util";
 
-import type { MenuItemDef } from "../menu";
+import type { MenuItemDef, MenuItemType } from "../menu";
 import { Divider } from "../divider";
 import { Icon } from "../icons";
-import { Link } from "../link";
 import {
   SidebarContent,
   SidebarGroup,
@@ -27,7 +26,7 @@ type SidebarProps = {
   };
 
   itemRender?: (
-    item: MenuItemDef,
+    item: MenuItemType,
     classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
@@ -152,14 +151,14 @@ export const Sidebar = ({
       const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
       let labelToRender: ReactNode = path ? (
-        <Link href={`${path}`}>
+        <a href={`${path}`}>
           {typeof icon === "string" ? (
             <Icon icon={icon} className={classNames?.icon} />
           ) : (
             icon
           )}
           <span>{mergedLabel}</span>
-        </Link>
+        </a>
       ) : (
         mergedLabel
       );
