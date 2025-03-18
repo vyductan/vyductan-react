@@ -24,6 +24,8 @@ export type SelectProps<T extends ValueType = string> = Omit<
 > &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> & {
+    // ref?: React.ForwardedRef<HTMLUListElement>;
+
     id?: string;
     value?: T;
     options: Option<T>[];
@@ -46,26 +48,23 @@ export type SelectProps<T extends ValueType = string> = Omit<
     onChange?: (value?: T, option?: Option | Array<Option>) => void;
   };
 
-const SelectInner = <T extends ValueType = string>(
-  {
-    id,
-    value,
-    options: optionsProp,
-    placeholder,
+const Select = <T extends ValueType = string>({
+  id,
+  value,
+  options: optionsProp,
+  placeholder,
 
-    allowClear,
+  allowClear,
 
-    className,
-    borderless,
-    size,
-    status,
-    dropdownRender,
+  className,
+  borderless,
+  size,
+  status,
+  dropdownRender,
 
-    onChange,
-    ...props
-  }: SelectProps<T>,
-  _: React.ForwardedRef<HTMLInputElement>,
-) => {
+  onChange,
+  ...props
+}: SelectProps<T>) => {
   /* Remove duplicate options */
   const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
@@ -140,9 +139,4 @@ const SelectInner = <T extends ValueType = string>(
   );
 };
 
-const Select = React.forwardRef(SelectInner) as <T extends ValueType>(
-  props: SelectProps<T> & {
-    ref?: React.ForwardedRef<HTMLUListElement>;
-  },
-) => ReturnType<typeof SelectInner>;
 export { Select };

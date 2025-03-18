@@ -3,10 +3,9 @@
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useMergedState } from "rc-util";
 
-import type { MenuItemDef } from "../menu";
+import type { MenuItemDef, MenuItemType } from "../menu";
 import { Divider } from "../divider";
 import { Icon } from "../icons";
-import { Link } from "../link";
 import {
   SidebarContent,
   SidebarGroup,
@@ -21,15 +20,17 @@ import {
 type SidebarProps = {
   className?: string;
   classNames?: {
+    header?: string;
     menuButton?: string;
     icon?: string;
   };
 
   itemRender?: (
-    item: MenuItemDef,
+    item: MenuItemType,
     classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
+  contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
   items?: MenuItemDef[];
@@ -46,6 +47,7 @@ export const Sidebar = ({
   classNames,
 
   itemRender,
+  contentRender,
 
   header,
   items = [],
@@ -149,14 +151,14 @@ export const Sidebar = ({
       const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
       let labelToRender: ReactNode = path ? (
-        <Link href={`${path}`}>
+        <a href={`${path}`}>
           {typeof icon === "string" ? (
             <Icon icon={icon} className={classNames?.icon} />
           ) : (
             icon
           )}
           <span>{mergedLabel}</span>
-        </Link>
+        </a>
       ) : (
         mergedLabel
       );
@@ -191,12 +193,12 @@ export const Sidebar = ({
 
   return (
     <SidebarRoot collapsible="icon" className={className}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>{header}</SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>{renderItems(items)}</SidebarContent>
+      <SidebarHeader className={classNames?.header}>{header}</SidebarHeader>
+      <SidebarContent>
+        {contentRender
+          ? contentRender({ itemNodes: renderItems(items) })
+          : renderItems(items)}
+      </SidebarContent>
     </SidebarRoot>
   );
 };

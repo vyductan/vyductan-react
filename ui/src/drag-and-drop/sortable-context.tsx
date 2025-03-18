@@ -21,10 +21,12 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext as DndSortableContext,
   sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useMergedState } from "rc-util";
 
@@ -38,13 +40,17 @@ const screenReaderInstructions: ScreenReaderInstructions = {
   `,
 };
 
-type SortableContextProps = {
+type TableSortableContextProps = {
   items: SortableItemDef[];
   children: React.ReactNode;
 
   /* events */
   onDragStart?: (event: DragStartEvent) => void;
-  onDragEnd?: (activeIndex: number, overIndex: number) => void;
+  onDragEnd?: (events: {
+    activeIndex: number;
+    overIndex: number;
+    reorderedItems: SortableItemDef[];
+  }) => void;
   /* configs */
   activationConstraint?: PointerActivationConstraint;
   collisionDetection?: CollisionDetection;
@@ -71,11 +77,11 @@ const SortableContext = ({
   collisionDetection = closestCenter,
   coordinateGetter = sortableKeyboardCoordinates,
   measuring,
-  modifiers,
-  strategy,
+  modifiers = [restrictToVerticalAxis],
+  strategy = verticalListSortingStrategy,
 
   reorderItems = arrayMove,
-}: SortableContextProps) => {
+}: TableSortableContextProps) => {
   const [items, setItems] = useMergedState<SortableItemDef[]>(itemsProp, {
     value: itemsProp,
     // onChange(value) {
@@ -147,6 +153,7 @@ const SortableContext = ({
 
   return (
     <DndContext
+      autoScroll={false} // disabled large scroll when drag to end
       accessibility={{
         announcements,
         screenReaderInstructions,
@@ -168,8 +175,9 @@ const SortableContext = ({
           const overIndex = getIndex(over.id);
 
           if (activeIndex !== overIndex) {
+            const reorderedItems = reorderItems(items, activeIndex, overIndex);
             setItems((items) => reorderItems(items, activeIndex, overIndex));
-            onDragEnd?.(activeIndex, overIndex);
+            onDragEnd?.({ activeIndex, overIndex, reorderedItems });
           }
         }
       }}
@@ -178,12 +186,11 @@ const SortableContext = ({
       modifiers={modifiers}
     >
       <DndSortableContext items={items} strategy={strategy}>
-        <button onClick={() => setItems([])}>x</button>
         {children}
       </DndSortableContext>
     </DndContext>
   );
 };
 
-export type { SortableContextProps };
+export type { TableSortableContextProps };
 export { SortableContext };

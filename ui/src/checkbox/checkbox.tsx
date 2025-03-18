@@ -37,7 +37,7 @@ const Checkbox = ({
       aria-describedby={ariaDescribedBy}
       aria-invalid={ariaInvalid}
       className={cn(
-        "inline-flex items-baseline",
+        "inline-flex items-center",
         "text-sm",
         loading && "items-center",
         className,

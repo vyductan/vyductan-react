@@ -2,6 +2,7 @@
 
 import * as React from "react";
 
+import type { ButtonProps } from "../button";
 import type { DialogProps } from "./_components";
 import { cn } from "..";
 import { Button } from "../button";
@@ -32,6 +33,8 @@ type ModalProps = DialogProps & {
     | React.ReactNode;
   okText?: string;
   okLoading?: boolean;
+  okButtonProps?: ButtonProps;
+  cancelText?: string;
   title: React.ReactNode;
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
@@ -44,6 +47,7 @@ const Modal = ({
   footer,
   okText,
   okLoading,
+  okButtonProps,
   title,
   trigger,
   onOk,
@@ -54,7 +58,7 @@ const Modal = ({
 }: ModalProps) => {
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
-  //     <Button variant="outline">Hủy</Button>
+  //     <Button variant="outline">Cancel</Button>
   //   </DialogClose>
   // );
   // const OkBtn = useMemo(
@@ -71,13 +75,13 @@ const Modal = ({
         originNode: undefined,
         extra: {
           OkBtn: (
-            <Button loading={okLoading} onClick={onOk}>
+            <Button loading={okLoading} onClick={onOk} {...okButtonProps}>
               {okText ?? "Ok"}
             </Button>
           ),
           CancelBtn: (
             <DialogClose asChild onClick={onCancel}>
-              <Button variant="outline">Huỷ</Button>
+              <Button variant="outline">Cancel</Button>
             </DialogClose>
           ),
         },
@@ -91,7 +95,7 @@ const Modal = ({
       <DialogClose asChild onClick={onCancel}>
         <Button variant="outline">Cancel</Button>
       </DialogClose>
-      <Button loading={okLoading} onClick={onOk}>
+      <Button loading={okLoading} onClick={onOk} {...okButtonProps}>
         {okText ?? "Ok"}
       </Button>
     </>
