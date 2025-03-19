@@ -1,7 +1,7 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import type { UploadZoneProps } from "./upload-zone";

@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemDef, MenuItemType } from "../menu";
 import { Divider } from "../divider";

@@ -1,6 +1,6 @@
 import React from "react";
+import { useMergedState } from "@rc-component/util";
 import { formatDate, toDate } from "date-fns";
-import { useMergedState } from "rc-util";
 
 import type {
   DatePickerBaseProps,
@@ -145,7 +145,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
           <span>{input1}</span>
           <span
             className={cn(
-              "px-2 text-center text-muted-foreground",
+              "text-muted-foreground px-2 text-center",
               !input1 && !input2 && "opacity-0",
             )}
           >

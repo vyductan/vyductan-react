@@ -34,7 +34,7 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from "@dnd-kit/sortable";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 import { createPortal } from "react-dom";
 
 import type { ItemProps } from "./_components/item";

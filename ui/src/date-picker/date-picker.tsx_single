@@ -4,7 +4,7 @@ import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { useClickAway, useFocusWithin } from "ahooks";
 import { format as formatDate, toDate } from "date-fns";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { inputSizeVariants, InputVariants } from "../input";
 import { cn } from "..";

@@ -3,9 +3,9 @@
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
+import { useMergedState } from "@rc-component/util";
 import { useHover } from "ahooks";
 import { cva } from "class-variance-authority";
-import { useMergedState } from "rc-util";
 
 import type { InputRef } from "./types";
 import { cn } from "..";
