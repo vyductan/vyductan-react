@@ -10,6 +10,7 @@ import type {
   Table as TableDef,
 } from "@tanstack/react-table";
 import React, { Fragment, useEffect, useRef, useState } from "react";
+import { useMergedState } from "@rc-component/util";
 import {
   flexRender,
   getCoreRowModel,
@@ -19,7 +20,6 @@ import {
 } from "@tanstack/react-table";
 import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
-import { useMergedState } from "rc-util";
 
 import type { PaginationProps } from "../pagination";
 import type { AnyObject } from "../types";

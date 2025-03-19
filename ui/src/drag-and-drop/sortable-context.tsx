@@ -28,7 +28,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { SortableItemDef } from "./types";
 

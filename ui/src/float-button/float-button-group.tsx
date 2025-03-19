@@ -1,8 +1,8 @@
 "use client";
 
 import React, { memo, useCallback, useEffect } from "react";
+import useMergedState from "@rc-component/util/lib/hooks/useMergedState";
 import { motion } from "framer-motion";
-import useMergedState from "rc-util/lib/hooks/useMergedState";
 
 import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";

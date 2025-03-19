@@ -1,6 +1,6 @@
 import React from "react";
-import { useMergedState } from "rc-util";
-import KeyCode from "rc-util/lib/KeyCode";
+import { useMergedState } from "@rc-component/util";
+import KeyCode from "@rc-component/util/lib/KeyCode";
 
 import type { PaginationItemProps } from "./_components";
 import type { SizeChangerRender } from "./_components/page-size-options";

@@ -1,5 +1,5 @@
+import { useMergedState } from "@rc-component/util";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMergedState } from "rc-util";
 
 import { cn } from "..";
 
@@ -32,7 +32,7 @@ export const ImagePreview = ({
           }}
           className={cn("fixed inset-0 z-99999", "bg-black")}
         >
-          <div className="absolute right-6 top-0 z-10 flex h-12 items-center justify-between text-white">
+          <div className="absolute top-0 right-6 z-10 flex h-12 items-center justify-between text-white">
             <div></div>
             <button
               onClick={() => {

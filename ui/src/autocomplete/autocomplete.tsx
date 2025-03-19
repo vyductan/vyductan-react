@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { ButtonProps } from "../button";
 import type { CommandProps, CommandValueType } from "../command";
