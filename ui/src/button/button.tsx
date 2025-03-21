@@ -16,7 +16,7 @@ import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex shrink-0 items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-[color,box-shadow] outline-none",
+    "inline-flex shrink-0 items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
     // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", // moved to &_span
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
@@ -56,17 +56,14 @@ const buttonVariants = tv({
         "active:ring-primary",
       ],
       outline: [
-        "border-input bg-background border shadow-xs",
-        "hover:text-accent-foreground hover:bg-accent",
+        "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
       dashed: [
         "border-border border border-dashed",
         "hover:border-primary-600 hover:text-primary-600",
       ],
       ghost: [
-        // "border-transparent",
-        "hover:bg-accent hover:text-accent-foreground",
-        // "data-[state=open]:bg-background-hover",
+        "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
       link: [
