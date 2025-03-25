@@ -158,7 +158,7 @@ const AutoCompleteInner = <T extends ValueType = string>(
         aria-expanded={open}
         className={cn(
           "w-full justify-between text-sm font-normal",
-          !value && "text-muted-foreground",
+          !value && "text-muted-foreground hover:text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
             selectColors[
@@ -190,9 +190,8 @@ const AutoCompleteInner = <T extends ValueType = string>(
             onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              // onClear();
-              onChange?.();
-              // setOpen(false);
+              // onChange?.();
+              setValue(undefined);
             }}
           >
             <Icon
