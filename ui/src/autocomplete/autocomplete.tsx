@@ -155,7 +155,7 @@ const Autocomplete = <T extends CommandValueType = string>({
         className={cn(
           "group",
           "w-full justify-between text-sm font-normal",
-          !value && "text-muted-foreground",
+          !value && "text-muted-foreground hover:text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
             selectColors[
@@ -197,7 +197,8 @@ const Autocomplete = <T extends CommandValueType = string>({
             onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onChange?.();
+              // onChange?.();
+              setValue(undefined);
             }}
           >
             <Icon
