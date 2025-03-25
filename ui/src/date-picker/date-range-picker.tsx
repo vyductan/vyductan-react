@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { formatDate, toDate } from "date-fns";
 import { useMergedState } from "rc-util";
 
@@ -28,7 +28,7 @@ type DateRangePickerProps<T extends DatePickerValueType = "date"> =
 
     valueType?: T;
     value?: RangeValueType<DateType<T>> | null;
-    defaultValue?: RangeValueType<DateType<T>>;
+    defaultValue?: RangeValueType<DateType<T>> | null;
     /** Callback function, can be executed when the selected time is changing */
     onChange?: (dates: NoUndefinedRangeValueType<DateType<T>> | null) => void;
 
@@ -47,6 +47,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   format = "dd/MM/yyyy",
   // size,
   // status,
+  placeholder,
 
   // valueType,
   showTime,
@@ -78,7 +79,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   );
 
   const [value, setValue] = useMergedState(props.defaultValue, {
-    value: props.value,
+    // value: props.value,
     onChange: (value) => {
       const start = value?.[0];
       const end = value?.[1];
@@ -87,6 +88,14 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
       }
     },
   });
+  useEffect(() => {
+    setValue((pre) => {
+      if (props.value?.[0] !== pre?.[0] || props.value?.[1] !== pre?.[1]) {
+        return props.value;
+      }
+      return pre;
+    });
+  }, [props.value, setValue]);
 
   const CalendarComponent = React.useMemo(() => {
     return (
@@ -134,7 +143,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         className={cn(
           inputVariants({ disabled }),
           inputSizeVariants(),
-          "gap-2",
+          "items-center gap-2",
           className,
         )}
         onClick={() => {
@@ -142,16 +151,15 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         }}
       >
         <div>
-          <span>{input1}</span>
-          <span
-            className={cn(
-              "px-2 text-center text-foreground-muted",
-              !input1 && !input2 && "opacity-0",
-            )}
-          >
+          <span className={cn(!input1 && "text-muted-foreground")}>
+            {input1 ?? placeholder?.[0] ?? "Start Date"}
+          </span>
+          <span className={cn("text-muted-foreground px-2 text-center")}>
             -
           </span>
-          <span>{input2}</span>
+          <span className={cn(!input2 && "text-muted-foreground")}>
+            {input2 ?? placeholder?.[1] ?? "End Date"}
+          </span>
         </div>
         <Icon
           icon="icon-[mingcute--calendar-2-line]"
@@ -172,6 +180,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     // status,
     // ref,
     disabled,
+    placeholder,
   ]);
 
   return (
