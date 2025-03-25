@@ -13,6 +13,7 @@ const color: Record<string, string> = {
   error: "bg-red-100 text-red-700 border-red-300",
   warning: "bg-amber-100 text-amber-700 border-amber-300",
   gray: "bg-gray-100 text-gray-700 border-gray-300",
+  yellow: "bg-yellow-100 text-yellow-700 border-yellow-300",
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
