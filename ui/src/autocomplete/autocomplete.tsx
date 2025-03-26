@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useMergedState } from "@rc-component/util";
 
+import type { AnyObject } from "..";
 import type { ButtonProps } from "../button";
 import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
@@ -15,7 +16,10 @@ import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
 import { selectColors } from "../select/colors";
 
-export type AutocompleteProps<T extends CommandValueType = string> = Pick<
+export type AutocompleteProps<
+  T extends CommandValueType = string,
+  TRecord extends AnyObject = AnyObject,
+> = Pick<
   CommandProps<T>,
   | "filter"
   | "placeholder"
@@ -28,8 +32,8 @@ export type AutocompleteProps<T extends CommandValueType = string> = Pick<
 > & {
   value?: T;
   defaultValue?: T;
-  onChange?: (value?: T, option?: Option<T>) => void;
-  options: Option<T>[];
+  onChange?: (value?: T, option?: Option<T, TRecord>) => void;
+  options: Option<T, TRecord>[];
   optionsToSearch?: { value: string; label: string }[];
 
   className?: string;
@@ -44,7 +48,10 @@ export type AutocompleteProps<T extends CommandValueType = string> = Pick<
   onSearchChange?: (search: string) => void;
 };
 
-const Autocomplete = <T extends CommandValueType = string>({
+const Autocomplete = <
+  T extends CommandValueType = string,
+  TRecord extends AnyObject = AnyObject,
+>({
   defaultValue: defaultValueProp,
   value: valueProp,
   options,
@@ -67,7 +74,7 @@ const Autocomplete = <T extends CommandValueType = string>({
   onSearchChange,
 
   ...props
-}: AutocompleteProps<T>) => {
+}: AutocompleteProps<T, TRecord>) => {
   /* Remove duplicate options */
   // const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
@@ -167,7 +174,7 @@ const Autocomplete = <T extends CommandValueType = string>({
           "group",
           "w-full justify-between font-normal",
           // own
-          "whitespace-normal text-sm",
+          "text-sm whitespace-normal",
           !value && "text-muted-foreground hover:text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
@@ -199,9 +206,9 @@ const Autocomplete = <T extends CommandValueType = string>({
             role="button"
             className={cn(
               "z-10",
-              "absolute right-[13px]",
-              "opacity-0 transition-opacity",
-              value && "transition-opacity duration-300 group-hover:opacity-30",
+              "absolute right-3",
+              "opacity-0 transition-opacity duration-300",
+              value && "group-hover:opacity-30",
               value && "hover:opacity-50",
             )}
             onClick={(e) => {
