@@ -1,6 +1,10 @@
+import React, { useEffect, useMemo } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "@rc-component/util";
-import React, { useEffect } from "react";
+import { composeRef } from "@rc-component/util/lib/ref";
+import { useHover } from "ahooks";
 import { formatDate, toDate } from "date-fns";
+import { motion } from "framer-motion";
 
 import type {
   DatePickerBaseProps,
@@ -24,7 +28,7 @@ type NoUndefinedRangeValueType<DateType> = [
 
 type DateRangePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
-    ref?: React.Ref<HTMLDivElement>;
+    ref?: React.RefObject<HTMLDivElement | null>;
 
     valueType?: T;
     value?: RangeValueType<DateType<T>> | null;
@@ -38,7 +42,7 @@ type DateRangePickerProps<T extends DatePickerValueType = "date"> =
 const DateRangePicker = <T extends DatePickerValueType = "date">({
   valueType,
 
-  ref,
+  ref: refProp,
 
   id: inputId,
 
@@ -52,8 +56,15 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   // valueType,
   showTime,
 
-  // allowClear = false,
   className,
+  allowClear = false,
+  suffix = (
+    <Icon icon="icon-[mingcute--calendar-2-line]" className="opacity-50" />
+  ),
+
+  defaultValue,
+  value: valueProp,
+  onChange,
   ...props
 }: DateRangePickerProps<T>) => {
   const [open, setOpen] = React.useState(false);
@@ -78,24 +89,16 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     [format, valueType],
   );
 
-  const [value, setValue] = useMergedState(props.defaultValue, {
-    // value: props.value,
-    onChange: (value) => {
-      const start = value?.[0];
-      const end = value?.[1];
-      if (start !== undefined && end !== undefined) {
-        props.onChange?.([start, end]);
-      }
-    },
-  });
+  const [value, setValue] = useMergedState(valueProp ?? defaultValue, {});
   useEffect(() => {
+    // sync parent value
     setValue((pre) => {
-      if (props.value?.[0] !== pre?.[0] || props.value?.[1] !== pre?.[1]) {
-        return props.value;
+      if (valueProp?.[0] !== pre?.[0] || valueProp?.[1] !== pre?.[1]) {
+        return valueProp;
       }
       return pre;
     });
-  }, [props.value, setValue]);
+  }, [valueProp, setValue]);
 
   const CalendarComponent = React.useMemo(() => {
     return (
@@ -114,6 +117,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             : undefined
         }
         onSelect={(dateRange) => {
+          console.log("ddddd", dateRange);
           if (!dateRange) {
             setValue(undefined);
             return;
@@ -122,13 +126,50 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             setValue([getDestinationValue(dateRange.from), value?.[1]]);
           }
           if (dateRange.to && value) {
-            setValue([value[0], getDestinationValue(dateRange.to)]);
-            setOpen(false);
+            setValue([
+              getDestinationValue(dateRange.from!),
+              getDestinationValue(dateRange.to),
+            ]);
+            // setOpen(false);
           }
         }}
       />
     );
   }, [value, setValue, getDestinationValue]);
+
+  const valueCompRef = React.useRef<HTMLDivElement>(null);
+  const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
+  const isHovering = useHover(ref as React.RefObject<HTMLDivElement | null>);
+  const ClearButton = useMemo(
+    () => (
+      <button
+        type="button"
+        className={cn("flex transition-opacity duration-300 hover:opacity-50")}
+        onClick={() => {
+          setValue(undefined);
+        }}
+      >
+        <Icon
+          icon="icon-[ant-design--close-circle-filled]"
+          className="pointer-events-none size-3.5"
+        />
+      </button>
+    ),
+    [setValue],
+  );
+  const SuffixComp = useMemo(() => {
+    if (allowClear && value && (!suffix || (isHovering && suffix))) {
+      return ClearButton;
+    } else if (suffix) {
+      return (
+        <Slot className={cn("flex shrink-0 items-center")}>
+          {typeof suffix === "string" ? <span>{suffix}</span> : suffix}
+        </Slot>
+      );
+    } else {
+      return null;
+    }
+  }, [allowClear, value, suffix, isHovering, ClearButton]);
 
   const ValueComponent = React.useMemo(() => {
     const input1 = value?.[0]
@@ -137,13 +178,14 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     const input2 = value?.[1]
       ? formatDate(toDate(value[1]), format)
       : undefined;
+
     return (
       <div
         ref={ref}
         className={cn(
           inputVariants({ disabled }),
           inputSizeVariants(),
-          "items-center gap-2",
+          "items-center justify-between gap-2",
           className,
         )}
         onClick={() => {
@@ -161,10 +203,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             {input2 ?? placeholder?.[1] ?? "End Date"}
           </span>
         </div>
-        <Icon
-          icon="icon-[mingcute--calendar-2-line]"
-          className="ml-auto size-4 opacity-50"
-        />
+        {SuffixComp}
       </div>
     );
   }, [
@@ -172,6 +211,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     format,
     className,
     value,
+    // setValue,
     // allowClear,
     // borderless,
     // inputId,
@@ -181,12 +221,31 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     // ref,
     disabled,
     placeholder,
+    SuffixComp,
   ]);
 
   return (
     <>
       <Popover
         open={open}
+        onOpenChange={(open) => {
+          setOpen(open);
+          if (!open) {
+            // trigger onChange when value is set and close popover
+            if (
+              !open &&
+              value &&
+              value[0] !== defaultValue?.[0] &&
+              value[1] !== defaultValue?.[1]
+            ) {
+              const start = value?.[0];
+              const end = value?.[1];
+              if (start !== undefined && end !== undefined) {
+                onChange?.([start, end]);
+              }
+            }
+          }
+        }}
         className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
