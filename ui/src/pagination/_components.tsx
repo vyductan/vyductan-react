@@ -77,8 +77,23 @@ function PaginationLink({
 
 function PaginationPrevious({
   className,
+  children: childrenProp,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: Omit<React.ComponentProps<typeof PaginationLink>, "children"> & {
+  children?: React.ReactElement<{ children?: React.ReactNode }>;
+}) {
+  const icon = (
+    <>
+      <Icon icon="icon-[lucide--chevron-left]" />
+      {/* <span className="hidden sm:block">Previous</span> */}
+    </>
+  );
+  const children = childrenProp
+    ? React.cloneElement(childrenProp, {
+        ...props,
+        children: icon,
+      })
+    : icon;
   return (
     <PaginationLink
       aria-label="Go to previous page"
@@ -86,17 +101,31 @@ function PaginationPrevious({
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
       {...props}
     >
-      <Icon icon="icon-[lucide--chevron-left]" />
-      {/* <span className="hidden sm:block">Previous</span> */}
+      {children}
     </PaginationLink>
   );
 }
 
 function PaginationNext({
   className,
-  // asChild,
+  children: childrenProp,
   ...props
-}: React.ComponentProps<typeof PaginationLink>) {
+}: Omit<React.ComponentProps<typeof PaginationLink>, "children"> & {
+  children?: React.ReactElement<{ children?: React.ReactNode }>;
+}) {
+  const icon = (
+    <>
+      {/* <span className="hidden sm:block">Next</span> */}
+      <Icon icon="icon-[lucide--chevron-right]" />
+    </>
+  );
+  const children = childrenProp
+    ? React.cloneElement(childrenProp, {
+        ...props,
+        children: icon,
+      })
+    : icon;
+
   return (
     <PaginationLink
       aria-label="Go to next page"
@@ -104,8 +133,7 @@ function PaginationNext({
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       {...props}
     >
-      {/* <span className="hidden sm:block">Next</span> */}
-      <Icon icon="icon-[lucide--chevron-right]" />
+      {children}
     </PaginationLink>
   );
 }

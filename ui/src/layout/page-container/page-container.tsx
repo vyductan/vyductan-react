@@ -35,9 +35,7 @@ export const PageContainer = ({
     <div
       className={cn(
         "@container",
-        "flex flex-1 flex-col p-4 pb-10 lg:p-6 xl:p-8",
-        // "mx-auto w-full max-w-[100vw] md:max-w-[calc(100vw-var(--sidebar-width))]",
-        // "space-y-8",
+        "flex flex-1 flex-col gap-4 p-4 pb-10 lg:p-6 xl:p-8",
         className,
       )}
     >

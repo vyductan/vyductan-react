@@ -98,11 +98,9 @@ function TableHead({ className, size, ...props }: TableHeadProps) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-muted-foreground text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        // 'whitespace-nowrap',
-        // "h-10 px-2",
+        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         // own
-        "p-3",
+        "h-auto p-3 whitespace-normal",
         size === "sm" && "p-2 leading-[22px]",
         // "break-words",
         // "first:rounded-tl-md last:rounded-tr-md",

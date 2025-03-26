@@ -10,10 +10,10 @@ export type AvatarProps = AvatarRootProps &
     fallback?: ReactNode;
     className?: string;
   };
-export const Avatar = ({ fallback, className, size, ...rest }: AvatarProps) => {
+export const Avatar = ({ fallback, size, src, alt, ...rest }: AvatarProps) => {
   return (
-    <AvatarRoot size={size} className={className}>
-      <AvatarImage {...rest} />
+    <AvatarRoot size={size} {...rest}>
+      <AvatarImage src={src} alt={alt} />
       <AvatarFallback>{fallback}</AvatarFallback>
     </AvatarRoot>
   );

@@ -8,9 +8,9 @@
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { useEffect } from "react";
+import { useMergedState } from "@rc-component/util";
+import { composeRef } from "@rc-component/util/lib/ref";
 import { format as formatDate, isValid, parse, toDate } from "date-fns";
-import { useMergedState } from "rc-util";
-import { composeRef } from "rc-util/lib/ref";
 
 import type { InputRef, inputSizeVariants, InputVariants } from "../input";
 import { cn } from "..";
@@ -30,7 +30,6 @@ type DateType<T extends DatePickerValueType> = T extends "date"
 
 type DatePickerBaseProps = InputVariants &
   VariantProps<typeof inputSizeVariants> & {
-    ref?: React.Ref<InputRef>;
     id?: string;
     format?: string;
     /** To provide an additional time selection **/
@@ -38,10 +37,12 @@ type DatePickerBaseProps = InputVariants &
 
     allowClear?: boolean;
     className?: string;
+    suffix?: React.ReactNode;
   };
 
 type DatePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
+    ref?: React.Ref<InputRef>;
     valueType?: T;
     defaultValue?: DateType<T>;
     value?: DateType<T>;
