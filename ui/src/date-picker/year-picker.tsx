@@ -1,6 +1,6 @@
 import type { ForwardedRef } from "react";
 import React from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import { cn } from "..";
 import { Icon } from "../icons";

@@ -14,6 +14,7 @@ export { cn };
 
 export { UiConfigProvider } from "./store";
 
+export * from "./types";
 // import type { CnOptions } from "tailwind-variants";
 // import { cnBase, defaultConfig } from "tailwind-variants";
 //

@@ -16,11 +16,12 @@
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "prettier": "catalog:",
-    "prettier-plugin-packagejson": "^2.5.8",
+    "prettier-plugin-packagejson": "^2.5.10",
     "prettier-plugin-tailwindcss": "^0.6.11"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
+    "@types/node": "^22.13.9",
     "typescript": "catalog:"
   }
 }

@@ -1,16 +1,13 @@
 /* https://github.com/shadcn-ui/ui/blob/main/apps/v4/app/globals.css */
-@import "tailwindcss";
+/* @import "tailwindcss"; */
 
-@plugin "tailwindcss-animate";
+@import "./shadcn.css";
 
 @import "./colors.css" layer(base);
-@import "./shadcn.css" layer(base);
 @import "./token.css" layer(base);
 @import "./utilities.css";
 
 @config "./plugins.ts";
-
-@custom-variant dark (&:is(.dark *));
 
 @layer base {
   * {
