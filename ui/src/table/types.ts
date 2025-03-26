@@ -20,6 +20,17 @@ type Meta<TRecord> = {
     head?: string;
     cell?: string;
   };
+  styles?: {
+    head?: React.CSSProperties;
+    cell?:
+      | React.CSSProperties
+      | ((ctx: {
+          record: TRecord;
+          index: number;
+          row: Row<TRecord>;
+          column: Column<TRecord>;
+        }) => React.CSSProperties);
+  };
   attributes?: Record<string, string>;
   headAttributes?: Record<string, string>;
   // rowName?: string | ((record: TRecord, index: number) => string);
