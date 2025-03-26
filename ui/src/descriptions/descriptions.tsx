@@ -93,7 +93,7 @@ export const Descriptions = ({
     bordered && "overflow-hidden rounded-md border",
     classNames?.view,
   );
-  const labelClassName = cn("text-foreground-muted", classNames?.label);
+  const labelClassName = cn("text-muted-foreground", classNames?.label);
   const valueClassName = cn(classNames?.value);
   const tbodyClassName = cn(
     layout === "horizontal" && [

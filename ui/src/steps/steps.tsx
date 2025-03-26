@@ -4,7 +4,7 @@
 
 import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from "react";
 import React from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import { cn } from "..";
 import { CloseOutlined } from "../icons";
@@ -64,11 +64,11 @@ const Steps = (props: StepsProps) => {
               className={cn(
                 // "px-4 first:ps-0",
                 "flex-1 last:flex-none",
-                "outline-none",
+                "outline-hidden",
                 // "relative inline-block pe-4",
                 "flex items-center",
                 labelPlacement === "vertical" && "flex-col",
-                current < index && "text-foreground-muted",
+                current < index && "text-muted-foreground",
                 // "after:mx-4 after:inline-block after:h-px after:w-full after:bg-background-muted after:transition-colors after:duration-300",
                 classNames?.item,
               )}
@@ -80,7 +80,7 @@ const Steps = (props: StepsProps) => {
                   <div
                     className={cn(
                       "flex size-8 items-center justify-center rounded-full transition-colors duration-300",
-                      "bg-background-muted text-foreground-muted",
+                      "bg-background-muted text-muted-foreground",
                       current === index && "bg-primary-600 text-white",
                       current > index && "bg-primary-200 text-primary-600",
                     )}
@@ -99,7 +99,7 @@ const Steps = (props: StepsProps) => {
                 className={cn(
                   // "absolute start-0 top-1 h-10 w-full px-6",
                   // "after:ms-10 after:inline-block after:h-px after:w-full after:bg-background-muted after:transition-colors after:duration-300",
-                  "mx-4 inline-block h-px w-full bg-accents-2 transition-colors duration-300",
+                  "bg-accents-2 mx-4 inline-block h-px w-full transition-colors duration-300",
                   current > index && "bg-primary-600",
                   classNames?.line,
                 )}

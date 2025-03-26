@@ -1,6 +1,6 @@
 import type { ForwardedRef } from "react";
 import React from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import { cn } from "..";
 import { Icon } from "../icons";
@@ -88,10 +88,10 @@ const YearPickerInternal = (
               >
                 <div
                   className={cn(
-                    "rounded-md px-4 py-0.5 hover:bg-background-hover",
+                    "hover:bg-background-hover rounded-md px-4 py-0.5",
                     number_ === new Date().getFullYear() && "bg-background",
                     value === index &&
-                      "bg-primary-600 text-white hover:bg-primary-600",
+                      "bg-primary-600 hover:bg-primary-600 text-white",
                   )}
                 >
                   {number_}
@@ -132,8 +132,8 @@ export const YearPicker = React.forwardRef(YearPickerInternal) as (
 ) => ReturnType<typeof YearPickerInternal>;
 
 function getCurrentDecadeRange(currentYear: number): number[] {
-  const startYear = Math.floor(currentYear / 10) * 10; // Lấy năm bắt đầu của thập kỷ
-  const endYear = startYear + 9; // Lấy năm kết thúc của thập kỷ
+  const startYear = Math.floor(currentYear / 10) * 10; // Get the start year of the decade
+  const endYear = startYear + 9; // Get the end year of the decade
   const years: number[] = [];
 
   for (let year = startYear; year <= endYear; year++) {

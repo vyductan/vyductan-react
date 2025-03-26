@@ -6,6 +6,7 @@ import { Skeleton } from "../skeleton";
 import {
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardRoot,
   CardTitle,
@@ -15,16 +16,18 @@ type CardProps = Omit<CardRootProps, "title"> & {
   skeleton?: boolean;
   bordered?: boolean;
   classNames?: {
+    header?: string;
     title?: string;
     description?: string;
     content?: string;
+    footer?: string;
   };
 
   title?: ReactNode;
   description?: ReactNode;
   children?: ReactNode;
   extra?: ReactNode;
-  size?: "default" | "sm";
+  footer?: ReactNode;
 };
 const Card = ({
   skeleton = false,
@@ -35,6 +38,8 @@ const Card = ({
   description,
   children,
   extra,
+  footer,
+
   size = "default",
   ...props
 }: CardProps) => {
@@ -51,13 +56,14 @@ const Card = ({
   }
   return (
     <CardRoot
+      size={size}
       className={cn(bordered ? "" : "border-none", className)}
       {...props}
     >
       {(!!title || !!description || !!extra) && (
-        <CardHeader>
+        <CardHeader className={cn(classNames?.header)}>
           <div className="flex items-center">
-            <CardTitle className={classNames?.title}>{title}</CardTitle>
+            <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {extra && <div className="ml-auto">{extra}</div>}
           </div>
           {description && (
@@ -67,15 +73,14 @@ const Card = ({
           )}
         </CardHeader>
       )}
-      <CardContent
-        className={cn(
-          !title && !description && !extra && "pt-6",
-          classNames?.content,
-        )}
-        size={size}
-      >
+      <CardContent size={size} className={classNames?.content}>
         {children}
       </CardContent>
+      {footer && (
+        <CardFooter size={size} className={classNames?.footer}>
+          {footer}
+        </CardFooter>
+      )}
     </CardRoot>
   );
 };

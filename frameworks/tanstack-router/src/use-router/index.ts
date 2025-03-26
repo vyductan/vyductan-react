@@ -2,8 +2,8 @@ import type {
   AnyRouter,
   NavigateOptions,
   RegisteredRouter,
-  RoutePaths,
 } from "@tanstack/react-router";
+import type { RoutePaths } from "@tanstack/router-core";
 import { useRouter as tanstackUseRouter } from "@tanstack/react-router";
 
 export const useRouter = <TRouter extends AnyRouter = RegisteredRouter>() => {

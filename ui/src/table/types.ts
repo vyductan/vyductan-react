@@ -5,17 +5,25 @@ import type {
   RowData,
 } from "@tanstack/react-table";
 
+import type { Breakpoint } from "@acme/hooks/use-responsive";
+
+import type { PaginationProps } from "../pagination";
+import type { AnyObject } from "../types";
+
 type Meta<TRecord> = {
   title?: React.ReactNode;
   align?: "left" | "right" | "center";
-  fixed?: "left" | "right";
+  fixed?: FixedType;
+  responsive?: Breakpoint[];
   className?: string;
   classNames?: {
+    head?: string;
     cell?: string;
   };
   attributes?: Record<string, string>;
   headAttributes?: Record<string, string>;
   // rowName?: string | ((record: TRecord, index: number) => string);
+  defaultSortOrder?: SortOrder;
   /** Sort function for local sort, see Array.sort's compareFunction. If it is server-side sorting, set to true, but if you want to support multi-column sorting, you can set it to { multiple: number }
    * boolean
    * function
@@ -25,7 +33,11 @@ type Meta<TRecord> = {
     | boolean
     | BuiltInSortingFn
     | ((a: TRecord, b: TRecord) => number)
-    | { multiple: number; compare?: (a: TRecord, b: TRecord) => number };
+    | {
+        multiple: number;
+        // false to allow sorting by server api
+        compare?: false | ((a: TRecord, b: TRecord) => number);
+      };
 };
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
@@ -39,6 +51,7 @@ type BaseTableColumnDef<TRecord> = {
   key?: string;
   hidden?: boolean;
   width?: number;
+  minWidth?: number;
 
   enableResizing?: boolean;
   enableHiding?: boolean;
@@ -161,4 +174,34 @@ export interface TableComponents<RecordType> {
         row?: CustomizeComponent;
         cell?: CustomizeComponent;
       };
+}
+
+type TablePaginationPosition =
+  | "topLeft"
+  | "topCenter"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomCenter"
+  | "bottomRight"
+  | "none";
+export interface TablePaginationConfig extends PaginationProps {
+  position?: TablePaginationPosition[];
+}
+
+export type FilterValue = (Key | boolean)[];
+
+export type SortOrder = "descend" | "ascend" | null;
+export interface SorterResult<RecordType = AnyObject> {
+  column?: TableColumnDef<RecordType>;
+  order?: SortOrder;
+  // field?: Key | readonly Key[];
+  field?: Key;
+  columnKey?: Key;
+}
+
+declare const _TableActions: readonly ["paginate", "sort", "filter"];
+export type TableAction = (typeof _TableActions)[number];
+export interface TableCurrentDataSource<RecordType = AnyObject> {
+  currentDataSource: RecordType[];
+  action: TableAction;
 }

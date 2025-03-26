@@ -9,19 +9,8 @@ import type {
   SortingState,
   Table as TableDef,
 } from "@tanstack/react-table";
-import type {
-  CSSProperties,
-  ForwardedRef,
-  HTMLAttributes,
-  ReactNode,
-} from "react";
-import React, {
-  forwardRef,
-  Fragment,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
+import { useMergedState } from "@rc-component/util";
 import {
   flexRender,
   getCoreRowModel,
@@ -31,12 +20,18 @@ import {
 } from "@tanstack/react-table";
 import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
-import { useMergedState } from "rc-util";
 
-import type { SortableContextProps } from "../drag-and-drop";
 import type { PaginationProps } from "../pagination";
 import type { AnyObject } from "../types";
-import type { RowSelection, TableColumnDef, TableComponents } from "./types";
+import type {
+  FilterValue,
+  RowSelection,
+  SorterResult,
+  TableColumnDef,
+  TableComponents,
+  TableCurrentDataSource,
+  TablePaginationConfig,
+} from "./types";
 import { cn } from "..";
 import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
@@ -50,10 +45,12 @@ import {
   TableRoot,
   TableRow,
 } from "./_components";
+import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
+import { useColumns } from "./hooks/use-columns";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import { transformColumnDefs, transformedRowSelection } from "./utils";
+import { transformedRowSelection } from "./utils";
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
@@ -61,13 +58,13 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customRowClassName?: undefined;
     })
   | (Partial<TRecord> & {
-      _customRow: ReactNode;
+      _customRow: React.ReactNode;
       _customRowClassName?: string;
       _customCellClassName?: string;
-      _customRowStyle?: CSSProperties;
+      _customRowStyle?: React.CSSProperties;
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
-  Omit<HTMLAttributes<HTMLTableElement>, "title"> & {
+  Omit<React.ComponentProps<"table">, "title" | "onChange" | "summary"> & {
     columns?: TableColumnDef<TRecord>[];
     dataSource?: TRecord[] | undefined;
 
@@ -86,15 +83,15 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       header?: string;
       footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
-      th?: string;
-      td?: string;
+      head?: string;
+      cell?: string;
     };
 
     // emptyRender?: EmptyProps;
     /** Expandable config */
     expandable?: {
       expandedRowKeys?: string[];
-      expandedRowRender: (record: TRecord) => ReactNode;
+      expandedRowRender: (record: TRecord) => React.ReactNode;
       rowExpandable?: (record: TRecord) => boolean;
       onExpand?: (record: TRecord) => void;
     };
@@ -102,11 +99,6 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     rowKey?: keyof TRecord;
     /** Row selection config */
     rowSelection?: RowSelection<TRecord>;
-    sorting?: {
-      default?: SortingState;
-      state?: SortingState;
-      onChange?: (state: SortingState) => void;
-    };
     pagination?: PaginationProps;
     loading?: boolean;
     skeleton?: boolean;
@@ -124,7 +116,9 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       x: number;
     };
     /** Translation */
-    locale?: Partial<Record<keyof typeof tableLocale_en.Table, ReactNode>>;
+    locale?: Partial<
+      Record<keyof typeof tableLocale_en.Table, React.ReactNode>
+    >;
     /** Override default table elements */
     components?: TableComponents<TRecord>;
     /** Toolbar */
@@ -132,59 +126,69 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     /** Summary content */
     summary?: (currentData: TRecord[]) => React.ReactNode;
 
-    dnd?: Pick<SortableContextProps, "onDragEnd">;
+    onChange?: (
+      pagination: TablePaginationConfig,
+      filters: Record<string, FilterValue | null>,
+      sorter: SorterResult<TRecord>[],
+      extra: TableCurrentDataSource<TRecord>,
+    ) => void;
   };
 
-const TableInner = <TRecord extends AnyObject>(
-  {
-    style,
-    className,
-    bordered: borderedProp,
-    size,
-    loading = false,
-    skeleton = false,
+const Table = <TRecord extends AnyObject>({
+  ref,
+  style,
+  className,
+  bordered: borderedProp,
+  size,
+  loading = false,
+  skeleton = false,
 
-    title,
-    extra,
-    alertRender,
+  title,
+  extra,
+  alertRender,
 
-    columns: propColumns = [],
-    dataSource = [],
-    pagination,
-    expandable,
-    classNames,
+  columns: propColumns = [],
+  dataSource = [],
+  pagination,
+  expandable,
+  classNames,
 
-    rowKey = "id",
-    rowSelection: propRowSelection,
-    sorting: propSorting,
+  rowKey = "id",
+  rowSelection: propRowSelection,
 
-    sticky,
-    scroll,
-    locale = tableLocale_en.Table,
+  sticky,
+  scroll,
+  locale = tableLocale_en.Table,
 
-    dnd,
+  components,
+  toolbar,
+  summary,
 
-    components,
-    toolbar,
-    summary,
+  onChange,
 
-    ...props
-  }: TableProps<TRecord>,
-  ref: ForwardedRef<HTMLTableElement>,
-) => {
+  ...props
+}: TableProps<TRecord>) => {
   const data = React.useMemo(() => dataSource, [dataSource]);
-  const columns = React.useMemo(
-    () =>
-      transformColumnDefs(propColumns, {
-        rowKey,
-        rowSelection: propRowSelection,
-        expandable,
-        dnd,
-        sorting: propSorting,
-      }),
-    [propColumns, rowKey, propRowSelection, expandable, dnd, propSorting],
-  );
 
+  // ====================== Column ======================
+  // const columns = React.useMemo(
+  //   () =>
+  //     transformColumnDefs(propColumns, {
+  //       rowKey,
+  //       rowSelection: propRowSelection,
+  //       expandable,
+  //       dnd,
+  //     }),
+  //   [propColumns, rowKey, propRowSelection, expandable, dnd],
+  // );
+  const [columns, flattenColumns] = useColumns({
+    columns: propColumns,
+    rowKey,
+    rowSelection: propRowSelection,
+    expandable,
+  });
+
+  // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const defaultPinnings = {
@@ -252,12 +256,36 @@ const TableInner = <TRecord extends AnyObject>(
   };
 
   // ====================== Sorting =======================
-  const [sorting, setSorting] = useMergedState(propSorting?.default ?? [], {
-    value: propSorting?.state,
-    onChange: propSorting?.onChange,
+  const collectedSorting: SortingState = columns
+    .filter((c) => c.meta?.defaultSortOrder && c.id)
+    .map((c) => {
+      return {
+        id: c.id!,
+        desc: c.meta?.defaultSortOrder === "ascend" ? false : true,
+      };
+    });
+  const [sorting, setSorting] = useMergedState(collectedSorting, {
+    onChange: (value) => {
+      onChange?.(
+        { total: 0, pageSizeOptions: [] },
+        {},
+        // (value as SortingState | undefined) to fix issue
+        (value as SortingState | undefined)?.map((sort) => ({
+          column: propColumns.find((c) => c.dataIndex === sort.id),
+          field: sort.id,
+          columnKey: undefined,
+          order: sort.desc ? "descend" : "ascend",
+        })) ?? [],
+        {
+          currentDataSource: dataSource,
+          action: "sort",
+        },
+      );
+    },
     postState: (value) => {
-      // Sort by priority
-      value.sort((a, b) => {
+      // Sort by priority similar antd
+      // (value as SortingState | undefined) to fix issue
+      (value as SortingState | undefined)?.sort((a, b) => {
         const columnDefA = columns.find((c) => c.id === a.id);
         const columnDefB = columns.find((c) => c.id === b.id);
         if (
@@ -311,16 +339,6 @@ const TableInner = <TRecord extends AnyObject>(
       : undefined, // Make all clicks multi-sort - default requires `shift` key
   });
 
-  // ---- Table styles ----//
-  let tableStyles: CSSProperties = {};
-  if (scroll?.x) {
-    tableStyles = {
-      width: scroll.x,
-      tableLayout: "fixed",
-      minWidth: "100%",
-    };
-  }
-
   // ====================== Scroll ======================
   // const stickyOffsets = useStickyOffsets(colWidths, flattenColumns, direction);
 
@@ -369,20 +387,20 @@ const TableInner = <TRecord extends AnyObject>(
     <>
       <Spin spinning={loading}>
         <div
+          data-slot="table-container"
           className={cn(
-            "relative",
-            "w-full space-y-2 overflow-auto",
+            "relative w-full space-y-3 overflow-x-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
               // "[&_table]:border-separate",
               "[&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
               typeof bordered === "boolean" &&
-                "[&_th:last-child]:border-e-0 [&_th]:border-e",
+                "[&_th]:border-e [&_th:last-child]:border-e-0",
               typeof bordered === "boolean" &&
-                "[&_td:last-child]:border-e-0 [&_td]:border-e",
+                "[&_td]:border-e [&_td:last-child]:border-e-0",
             ],
             (!bordered || bordered === "around") && [
-              "[&_th:last-child]:before:bg-transparent [&_th]:before:absolute [&_th]:before:right-0 [&_th]:before:top-1/2 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:bg-accent [&_th]:before:content-['']",
+              "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             bordered === "around" && [
               "[&_table]:border-separate [&_table]:rounded-md",
@@ -399,7 +417,7 @@ const TableInner = <TRecord extends AnyObject>(
                 bordered ? "mb-4" : "mb-1",
               )}
             >
-              <div className="font-semibold leading-none tracking-tight">
+              <div className="leading-none font-semibold tracking-tight">
                 {title}
               </div>
               {extra && <div>{extra}</div>}
@@ -417,21 +435,18 @@ const TableInner = <TRecord extends AnyObject>(
 
               classNames?.table,
             )}
-            style={tableStyles}
+            style={{
+              ...(scroll?.x
+                ? {
+                    width: scroll.x,
+                    tableLayout: "fixed",
+                    minWidth: "100%",
+                  }
+                : {}),
+            }}
             {...props}
           >
-            {columns.some((column) => column.size) && (
-              <colgroup>
-                {columns.map((col, index) => (
-                  <col
-                    key={index}
-                    {...(col.size === undefined
-                      ? {}
-                      : { style: { width: col.size } })}
-                  />
-                ))}
-              </colgroup>
-            )}
+            <ColGroup columns={flattenColumns} />
 
             <TableHeader
               style={{
@@ -457,9 +472,8 @@ const TableInner = <TRecord extends AnyObject>(
                         colSpan={header.colSpan}
                         size={size}
                         style={getCommonPinningStyles(header.column)}
+                        align={header.column.columnDef.meta?.align}
                         className={cn(
-                          // column className
-                          header.column.columnDef.meta?.className,
                           // align
                           header.column.columnDef.meta?.align === "center" &&
                             "text-center",
@@ -477,7 +491,10 @@ const TableInner = <TRecord extends AnyObject>(
                           ),
                           // selection column
                           header.id === "selection" && "px-0",
-                          classNames?.th,
+                          classNames?.head,
+                          // column className
+                          header.column.columnDef.meta?.className,
+                          header.column.columnDef.meta?.classNames?.head,
                         )}
                         {...header.column.columnDef.meta?.headAttributes}
                       >
@@ -499,7 +516,7 @@ const TableInner = <TRecord extends AnyObject>(
 
             {skeleton ? (
               <TableBody>
-                {Array.from({ length: 5 })
+                {Array.from({ length: pagination?.pageSize ?? 5 })
                   .fill(0)
                   .map((_, index) => {
                     return (
@@ -526,7 +543,9 @@ const TableInner = <TRecord extends AnyObject>(
                           getRowClassName(row, index),
                           row.original._customRowClassName as string,
                         )}
-                        style={row.original._customRowStyle as CSSProperties}
+                        style={
+                          row.original._customRowStyle as React.CSSProperties
+                        }
                       >
                         <TableCell
                           colSpan={columns.length}
@@ -569,7 +588,7 @@ const TableInner = <TRecord extends AnyObject>(
                                   // selection column
                                   cell.id.endsWith("selection") && "px-0",
                                   // column className
-                                  classNames?.td,
+                                  classNames?.cell,
                                   cell.column.columnDef.meta?.className,
                                   cell.column.columnDef.meta?.classNames?.cell,
                                 )}
@@ -611,25 +630,19 @@ const TableInner = <TRecord extends AnyObject>(
             )}
 
             {summary && (
-              <TableFooter
-                className={classNames?.footer}
-                // flattenColumns={[]}
-                // stickyOffsets={{ left: 0, right: 0 }}
-              >
+              <TableFooter className={classNames?.footer}>
                 {summary(dataSource)}
               </TableFooter>
             )}
           </TableRoot>
-          {pagination && <Pagination className="my-4" {...pagination} />}
+          {pagination && (
+            <Pagination className="my-4 justify-end" {...pagination} />
+          )}
         </div>
       </Spin>
     </>
   );
 };
-
-const Table = forwardRef(TableInner) as <T extends AnyObject>(
-  props: TableProps<T> & { ref?: ForwardedRef<HTMLTableElement> },
-) => ReturnType<typeof TableInner>;
 
 export { Table };
 

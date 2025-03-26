@@ -1,6 +1,6 @@
 import React from "react";
-import { useMergedState } from "rc-util";
-import KeyCode from "rc-util/lib/KeyCode";
+import { useMergedState } from "@rc-component/util";
+import KeyCode from "@rc-component/util/lib/KeyCode";
 
 import type { PaginationItemProps } from "./_components";
 import type { SizeChangerRender } from "./_components/page-size-options";
@@ -10,7 +10,9 @@ import { cn } from "..";
 import { Icon } from "../icons";
 import {
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
+  PaginationLink,
   PaginationNext,
   PaginationPrevious,
   PaginationRoot,
@@ -42,7 +44,7 @@ export type PaginationProps = {
   showTotal?: (total: number, range: [number, number]) => React.ReactNode;
   totalBoundaryShowSizeChanger?: number;
   sizeChangerRender?: SizeChangerRender;
-  pageSizeOptions: number[];
+  pageSizeOptions?: number[];
   onShowSizeChange?: (page: number, pageSize: number) => void;
 
   itemRender?: (
@@ -50,6 +52,8 @@ export type PaginationProps = {
     type: "page" | "prev" | "next" | "jump-prev" | "jump-next",
     originalElement: React.ReactNode,
   ) => React.ReactNode;
+
+  hrefGenerator?: (page: number) => string;
 };
 export const Pagination = (props: PaginationProps) => {
   const {
@@ -78,7 +82,9 @@ export const Pagination = (props: PaginationProps) => {
     pageSizeOptions,
     onShowSizeChange,
 
-    itemRender = defaultItemRender,
+    itemRender,
+    // itemRender = defaultItemRender,
+    hrefGenerator,
   } = props;
 
   const [pageSize, setPageSize] = useMergedState<number>(10, {
@@ -193,14 +199,30 @@ export const Pagination = (props: PaginationProps) => {
   }
 
   function renderPrev(prevPage: number) {
-    const prevButton = itemRender?.(prevPage, "prev", <PaginationPrevious />);
+    const originalElement = (
+      <PaginationPrevious href={hrefGenerator?.(prevPage)} />
+    );
+    const prevButton = itemRender ? (
+      <PaginationPrevious>
+        {itemRender(prevPage, "prev", originalElement)}
+      </PaginationPrevious>
+    ) : (
+      originalElement
+    );
     return React.isValidElement<HTMLButtonElement>(prevButton)
       ? React.cloneElement(prevButton, { disabled: !hasPrev })
       : prevButton;
   }
 
   function renderNext(nextPage: number) {
-    const nextButton = itemRender?.(nextPage, "next", <PaginationNext />);
+    const originalElement = <PaginationNext href={hrefGenerator?.(prevPage)} />;
+    const nextButton = itemRender ? (
+      <PaginationNext>
+        {itemRender(nextPage, "next", originalElement)}
+      </PaginationNext>
+    ) : (
+      originalElement
+    );
     return React.isValidElement<HTMLButtonElement>(nextButton)
       ? React.cloneElement(nextButton, { disabled: !hasNext })
       : nextButton;
@@ -238,6 +260,7 @@ export const Pagination = (props: PaginationProps) => {
     showTitle,
     itemRender,
     page: -1,
+    hrefGenerator,
   };
 
   // ====================== Normal ======================
@@ -266,60 +289,59 @@ export const Pagination = (props: PaginationProps) => {
     const prevItemTitle = showLessItems ? locale.prev_3 : locale.prev_5;
     const nextItemTitle = showLessItems ? locale.next_3 : locale.next_5;
 
-    const jumpPrevContent = itemRender?.(
-      jumpPrevPage,
-      "jump-prev",
-      <Icon
-        icon="icon-[heroicons-solid--chevron-double-left]"
-        aria-label="prev page"
-      />,
+    const originalJumpPrevElement = (
+      <Icon icon="icon-[heroicons-solid--chevron-double-left]" />
     );
-    const jumpNextContent = itemRender?.(
-      jumpNextPage,
-      "jump-next",
-      <Icon
-        icon="icon-[heroicons-solid--chevron-double-right]"
-        aria-label="next page"
-      />,
+    const jumpPrevContent = itemRender ? (
+      <PaginationLink className="opacity-0 group-hover:opacity-100" asChild>
+        {itemRender(jumpPrevPage, "jump-prev", originalJumpPrevElement)}
+      </PaginationLink>
+    ) : (
+      originalJumpPrevElement
+    );
+
+    const originalJumpNextElement = (
+      <Icon icon="icon-[heroicons-solid--chevron-double-right]" />
+    );
+    const jumpNextContent = itemRender ? (
+      <PaginationLink className="opacity-0 group-hover:opacity-100" asChild>
+        {itemRender(jumpNextPage, "jump-next", originalJumpNextElement)}
+      </PaginationLink>
+    ) : (
+      originalJumpNextElement
     );
 
     if (showPrevNextJumpers) {
-      jumpPrev = jumpPrevContent ? (
-        <li
+      jumpPrev = (
+        <PaginationItem
           title={showTitle ? prevItemTitle : undefined}
           key="prev"
           onClick={() => {
             handleChange(jumpPrevPage);
           }}
           onKeyDown={runIfEnterJumpPrev}
-          // tabIndex={0}
+          tabIndex={0}
           role="presentation"
-          // className={classNames(`${prefixCls}-jump-prev`, {
-          //   [`${prefixCls}-jump-prev-custom-icon`]: !!jumpPrevIcon,
-          // })}
+          className="group relative"
         >
           {jumpPrevContent}
-        </li>
-      ) : (
-        <></>
+          <PaginationEllipsis className="absolute inset-0 group-hover:-z-10 group-hover:opacity-0" />
+        </PaginationItem>
       );
 
-      jumpNext = jumpNextContent ? (
-        <li
+      jumpNext = (
+        <PaginationItem
           title={showTitle ? nextItemTitle : undefined}
           key="next"
           onClick={jumpNextHandle}
           onKeyDown={runIfEnterJumpNext}
-          // tabIndex={0}
+          tabIndex={0}
           role="presentation"
-          // className={classNames(`${prefixCls}-jump-next`, {
-          //   [`${prefixCls}-jump-next-custom-icon`]: !!jumpNextIcon,
-          // })}
+          className="group relative"
         >
           {jumpNextContent}
-        </li>
-      ) : (
-        <></>
+          <PaginationEllipsis className="absolute inset-0 group-hover:-z-10 group-hover:opacity-0" />
+        </PaginationItem>
       );
     }
 
@@ -379,48 +401,48 @@ export const Pagination = (props: PaginationProps) => {
    * Prev Button
    */
   let prev = renderPrev(prevPage);
-  if (prev) {
-    const prevDisabled = !hasPrev || !allPages;
-    prev = (
-      <PaginationItem
-        title={showTitle ? locale.prev_page : undefined}
-        onClick={prevHandle}
-        tabIndex={prevDisabled ? undefined : 0}
-        onKeyDown={runIfEnterPrev}
-        className={prevDisabled ? "cursor-not-allowed" : ""}
-        aria-disabled={prevDisabled}
-      >
-        {prev}
-      </PaginationItem>
-    );
-  }
+  // if (prev) {
+  const prevDisabled = !hasPrev || !allPages;
+  prev = (
+    <PaginationItem
+      title={showTitle ? locale.prev_page : undefined}
+      onClick={prevHandle}
+      tabIndex={prevDisabled ? undefined : 0}
+      onKeyDown={runIfEnterPrev}
+      className={prevDisabled ? "cursor-not-allowed" : ""}
+      aria-disabled={prevDisabled}
+    >
+      {prev}
+    </PaginationItem>
+  );
+  // }
 
   /*
    * Next Button
    */
   let next = renderNext(nextPage);
-  if (next) {
-    let nextDisabled: boolean, nextTabIndex: number | undefined;
-    if (simple) {
-      nextDisabled = !hasNext;
-      nextTabIndex = hasPrev ? 0 : undefined;
-    } else {
-      nextDisabled = !hasNext || !allPages;
-      nextTabIndex = nextDisabled ? undefined : 0;
-    }
-
-    next = (
-      <PaginationItem
-        title={showTitle ? locale.next_page : undefined}
-        onClick={nextHandle}
-        tabIndex={nextTabIndex}
-        onKeyDown={runIfEnterNext}
-        aria-disabled={nextDisabled}
-      >
-        {next}
-      </PaginationItem>
-    );
+  // if (next) {
+  let nextDisabled: boolean, nextTabIndex: number | undefined;
+  if (simple) {
+    nextDisabled = !hasNext;
+    nextTabIndex = hasPrev ? 0 : undefined;
+  } else {
+    nextDisabled = !hasNext || !allPages;
+    nextTabIndex = nextDisabled ? undefined : 0;
   }
+
+  next = (
+    <PaginationItem
+      title={showTitle ? locale.next_page : undefined}
+      onClick={nextHandle}
+      tabIndex={nextTabIndex}
+      onKeyDown={runIfEnterNext}
+      aria-disabled={nextDisabled}
+    >
+      {next}
+    </PaginationItem>
+  );
+  // }
 
   const sizeChanger = showSizeChanger ? (
     <PageSizeOptions
@@ -447,11 +469,11 @@ export const Pagination = (props: PaginationProps) => {
   );
 };
 
-const defaultItemRender: PaginationProps["itemRender"] = (
-  _page,
-  _type,
-  element,
-) => element;
+// const defaultItemRender: PaginationProps["itemRender"] = (
+//   _page,
+//   _type,
+//   element,
+// ) => element;
 
 function isInteger(v: number) {
   const value = Number(v);

@@ -1,22 +1,21 @@
 "use client";
 
 import * as React from "react";
-import { useMergedState } from "rc-util";
-
-import { removeVietnameseTones } from "@acme/utils/remove-vietnamese-tones";
+import { useMergedState } from "@rc-component/util";
 
 import type { ButtonProps } from "../button";
-import type { CommandProps } from "../command";
-import type { ValueType } from "../form";
+import type { CommandProps, CommandValueType } from "../command";
+// import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { cn } from "..";
 import { Button } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
+import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
 import { selectColors } from "../select/colors";
 
-export type AutoCompleteProps<T extends ValueType = string> = Pick<
+export type AutocompleteProps<T extends CommandValueType = string> = Pick<
   CommandProps<T>,
   | "filter"
   | "placeholder"
@@ -37,37 +36,40 @@ export type AutoCompleteProps<T extends ValueType = string> = Pick<
   size?: ButtonProps["size"];
   disabled?: boolean;
 
+  open?: boolean;
+
   allowClear?: boolean;
 
+  searchPlaceholder?: string;
   onSearchChange?: (search: string) => void;
 };
 
-const AutoCompleteInner = <T extends ValueType = string>(
-  {
-    defaultValue: defaultValueProp,
-    value: valueProp,
-    options: optionsProp,
-    optionsToSearch,
+const Autocomplete = <T extends CommandValueType = string>({
+  defaultValue: defaultValueProp,
+  value: valueProp,
+  options,
+  optionsToSearch,
 
-    className,
-    size,
-    disabled,
+  className,
+  size,
+  disabled,
+  open: openProp,
 
-    filter: filterProp,
+  filter: filterProp,
 
-    placeholder,
+  placeholder,
 
-    allowClear,
+  allowClear,
 
-    onChange,
-    onSearchChange,
+  onChange,
 
-    ...props
-  }: AutoCompleteProps<T>,
-  _: React.ForwardedRef<HTMLInputElement>,
-) => {
+  searchPlaceholder,
+  onSearchChange,
+
+  ...props
+}: AutocompleteProps<T>) => {
   /* Remove duplicate options */
-  const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
+  // const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
   /* Filter Detault*/
   const filter =
@@ -79,8 +81,8 @@ const AutoCompleteInner = <T extends ValueType = string>(
         ?.label?.toString();
       if (
         label &&
-        removeVietnameseTones(label.toLowerCase()).includes(
-          removeVietnameseTones(search.toLowerCase()),
+        removeTones(label.toLowerCase()).includes(
+          removeTones(search.toLowerCase()),
         )
       ) {
         return 1;
@@ -88,7 +90,9 @@ const AutoCompleteInner = <T extends ValueType = string>(
       return 0;
     });
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useMergedState(false, {
+    value: openProp,
+  });
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
     onChange: (value) => {
@@ -99,8 +103,6 @@ const AutoCompleteInner = <T extends ValueType = string>(
       setOpen(false);
     },
   });
-
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   const buttonText = (() => {
     if (!value) {
@@ -119,14 +121,14 @@ const AutoCompleteInner = <T extends ValueType = string>(
             o.icon && <Icon icon={o.icon} />
           )}
           {typeof label === "string" ? (
-            <span className="truncate">{label}</span>
+            <span className="line-clamp-1">{label}</span>
           ) : (
             label
           )}
         </>
       );
     }
-    return "";
+    return <span className="line-clamp-1">{value}</span>;
   })();
 
   return (
@@ -134,10 +136,16 @@ const AutoCompleteInner = <T extends ValueType = string>(
       trigger="click"
       open={open}
       onOpenChange={setOpen}
-      className="p-0"
-      style={{ width: buttonRef.current?.offsetWidth }}
+      placement="bottomLeft"
+      className={cn(
+        "p-0",
+        //w-(--radix-popover-trigger-width)
+        // own
+        "w-full min-w-(--radix-popover-trigger-width)", // make same select width
+      )}
       content={
         <Command
+          placeholder={searchPlaceholder}
           options={options}
           value={value}
           onChange={(value) => {
@@ -150,15 +158,17 @@ const AutoCompleteInner = <T extends ValueType = string>(
       }
     >
       <Button
-        size={size}
-        ref={buttonRef}
         variant="outline"
         role="combobox"
-        disabled={disabled}
         aria-expanded={open}
+        size={size}
+        disabled={disabled}
         className={cn(
-          "w-full justify-between text-sm font-normal",
-          !value && "text-muted-foreground",
+          "group",
+          "w-full justify-between font-normal",
+          // own
+          "whitespace-normal text-sm",
+          !value && "text-muted-foreground hover:text-muted-foreground",
           selectColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
             selectColors[
@@ -169,47 +179,58 @@ const AutoCompleteInner = <T extends ValueType = string>(
                 options.find((o) => o.value === value)?.color ?? ""
               ]?.indexOf(" "),
             ),
+          inputSizeVariants({ size }),
           className,
         )}
       >
         {buttonText}
         <Icon
           icon="icon-[lucide--chevrons-up-down]"
-          className="ml-2 size-4 shrink-0 opacity-50"
+          className={cn(
+            "size-4 shrink-0 opacity-50",
+            !buttonText && "ml-auto",
+            allowClear &&
+              value &&
+              "transition-opacity duration-300 group-hover:opacity-0",
+          )}
         />
         {allowClear && (
-          <button
+          <span
+            role="button"
             className={cn(
               "z-10",
-              "absolute right-[11px]",
-              "flex size-5 items-center justify-center transition-opacity",
-              "opacity-0",
-              "hover:!opacity-50",
-              value && "group-hover:opacity-30",
+              "absolute right-[13px]",
+              "opacity-0 transition-opacity",
+              value && "transition-opacity duration-300 group-hover:opacity-30",
+              value && "hover:opacity-50",
             )}
+            onClick={(e) => {
+              e.preventDefault();
+            }}
             onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              // onClear();
-              onChange?.();
-              // setOpen(false);
+              // onChange?.();
+              setValue(undefined);
             }}
           >
             <Icon
               icon="icon-[ant-design--close-circle-filled]"
               className="pointer-events-none size-3.5"
             />
-          </button>
+          </span>
         )}
       </Button>
     </Popover>
   );
 };
 
-export const Autocomplete = React.forwardRef(AutoCompleteInner) as <
-  T extends ValueType,
->(
-  props: AutoCompleteProps<T> & {
-    ref?: React.ForwardedRef<HTMLUListElement>;
-  },
-) => ReturnType<typeof AutoCompleteInner>;
+export { Autocomplete };
+
+export function removeTones(string_: string): string {
+  return string_
+    .normalize("NFD")
+    .replaceAll(/[\u0300-\u036F]/g, "")
+    .replaceAll("đ", "d")
+    .replaceAll("Đ", "D");
+}

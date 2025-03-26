@@ -1,4 +1,4 @@
-import { fileURLToPath } from "url";
+// import { fileURLToPath } from "node:url";
 
 /** @typedef {import("prettier").Config} PrettierConfig */
 /** @typedef {import("prettier-plugin-tailwindcss").PluginOptions} TailwindConfig */
@@ -11,7 +11,7 @@ const config = {
     "prettier-plugin-packagejson",
     "prettier-plugin-tailwindcss",
   ],
-  tailwindConfig: fileURLToPath(new URL("../tailwind/web.ts", import.meta.url)),
+  // tailwindConfig: fileURLToPath(new URL("../tailwind/web.ts", import.meta.url)),
   tailwindFunctions: ["tv"],
   importOrder: [
     "<TYPES>",

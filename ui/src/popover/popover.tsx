@@ -1,5 +1,7 @@
 import React from "react";
 import { PopoverArrow } from "@radix-ui/react-popover";
+import { useMergedState } from "@rc-component/util";
+import { useDebounce } from "ahooks";
 
 import type { AlignType, Placement } from "../types";
 import type { PopoverContentProps, PopoverRootProps } from "./_components";
@@ -20,12 +22,12 @@ export const Popover = ({
   children,
   trigger = "hover",
   content,
-  open,
+  open: openProp,
 
   align: domAlign,
   placement,
   className,
-  arrow,
+  arrow = true,
   onOpenChange,
   ...props
 }: PopoverProps) => {
@@ -36,8 +38,10 @@ export const Popover = ({
       : !placement || placement.includes("bottom")
         ? "bottom"
         : "left";
-  const align =
-    !placement || (!placement.includes("Left") && !placement.includes("Right"))
+  const align = placement?.includes("Top")
+    ? "start"
+    : !placement ||
+        (!placement.includes("Left") && !placement.includes("Right"))
       ? "center"
       : placement.includes("Left")
         ? "start"
@@ -46,52 +50,47 @@ export const Popover = ({
   const alignOffset = domAlign?.offset?.[0];
   const sideOffset = domAlign?.offset?.[1];
 
+  const [open, setOpen] = useMergedState(false, {
+    value: openProp,
+    onChange: (value) => onOpenChange?.(value),
+  });
+  const debouncedOpen = useDebounce(open, {
+    wait: 100,
+  });
   return (
-    <PopoverRoot open={open} onOpenChange={onOpenChange}>
-      {open === undefined ? (
-        <PopoverTrigger asChild>{children}</PopoverTrigger>
-      ) : (
-        <PopoverTrigger
-          asChild
-          {...(trigger === "hover"
-            ? {
-                onMouseOver: () => {
-                  if (!open) onOpenChange?.(true);
-                },
-                onMouseLeave: () => {
-                  if (open) onOpenChange?.(false);
-                },
-              }
-            : {})}
-        >
-          {children}
-        </PopoverTrigger>
-      )}
-      {/* {open === undefined ? ( */}
-      {/*   <PopoverTrigger asChild>{children}</PopoverTrigger> */}
-      {/* ) : ( */}
-      {/*   <PopoverAnchor */}
-      {/*     asChild */}
-      {/*     {...(trigger === "hover" */}
-      {/*       ? { */}
-      {/*           onMouseOver: () => { */}
-      {/*             if (!open) onOpenChange?.(true); */}
-      {/*           }, */}
-      {/*           onMouseLeave: () => { */}
-      {/*             if (open) onOpenChange?.(false); */}
-      {/*           }, */}
-      {/*         } */}
-      {/*       : {})} */}
-      {/*   > */}
-      {/*     {children} */}
-      {/*   </PopoverAnchor> */}
-      {/* )} */}
+    <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
+      <PopoverTrigger
+        asChild
+        {...(trigger === "hover"
+          ? {
+              onMouseOver: () => {
+                if (!open) setOpen(true);
+              },
+              onMouseLeave: () => {
+                if (open) setOpen(false);
+              },
+            }
+          : {})}
+      >
+        {children}
+      </PopoverTrigger>
+
       <PopoverContent
         side={side}
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
         className={cn(arrow ? "border-none" : "", className)}
+        {...(trigger === "hover"
+          ? {
+              onMouseOver: () => {
+                if (!open) setOpen(true);
+              },
+              onMouseLeave: () => {
+                if (open) setOpen(false);
+              },
+            }
+          : {})}
         {...props}
       >
         {arrow && <PopoverArrow className="fill-white" />}

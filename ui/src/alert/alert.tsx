@@ -5,20 +5,34 @@ import { cn } from "..";
 import { Icon } from "../icons";
 import { AlertDescription, AlertRoot, AlertTitle } from "./_components";
 
-type AlertProps = AlertRootProps & {
+type AlertProps = Omit<AlertRootProps, "title"> & {
   title?: ReactNode;
   message?: ReactNode;
   showIcon?: boolean;
+
+  bordered?: boolean;
+  classNames?: {
+    title?: string;
+  };
 };
-const Alert = ({ title, message, className, showIcon, type }: AlertProps) => {
+const Alert = ({
+  title,
+  message,
+  className,
+  showIcon,
+  type,
+
+  bordered = true,
+  classNames,
+}: AlertProps) => {
   const icon =
     type === "warning" ? (
       <Icon icon="icon-[mingcute--warning-line]" />
     ) : undefined;
   return (
-    <AlertRoot type={type} className={cn(className)}>
+    <AlertRoot type={type} bordered={bordered} className={cn(className)}>
       {showIcon && <span className="me-2">{icon}</span>}
-      {title && <AlertTitle>{title}</AlertTitle>}
+      {title && <AlertTitle className={classNames?.title}>{title}</AlertTitle>}
       {message && <AlertDescription>{message}</AlertDescription>}
     </AlertRoot>
   );
