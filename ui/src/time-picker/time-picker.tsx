@@ -1,6 +1,6 @@
 import React from "react";
+import { useMergedState } from "@rc-component/util";
 import { format as formatDate, parse } from "date-fns";
-import { useMergedState } from "rc-util";
 
 import type { InputProps, InputRef } from "../input";
 import { cn } from "..";

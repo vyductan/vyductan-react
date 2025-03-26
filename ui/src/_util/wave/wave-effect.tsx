@@ -1,11 +1,10 @@
-/* eslint-disable unicorn/no-null */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 // Jun 15, 2024
 import type { Root } from "react-dom/client";
 import * as React from "react";
+import raf from "@rc-component/util/lib/raf";
+import { unmount } from "@rc-component/util/lib/React/render";
 import { cubicBezier, motion } from "framer-motion";
-import raf from "rc-util/lib/raf";
-import { unmount } from "rc-util/lib/React/render";
 import ReactDOM from "react-dom";
 
 import type { ShowWaveEffect, WaveAllowedComponent } from "./interface";

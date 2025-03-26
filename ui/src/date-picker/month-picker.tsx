@@ -1,7 +1,7 @@
 import type { ForwardedRef } from "react";
 import React from "react";
+import { useMergedState } from "@rc-component/util";
 import { format } from "date-fns";
-import { useMergedState } from "rc-util";
 
 import { cn } from "..";
 import { Icon } from "../icons";
@@ -79,10 +79,10 @@ const MonthPickerInternal = (
               >
                 <div
                   className={cn(
-                    "rounded-md px-4 py-0.5 hover:bg-background-hover",
+                    "hover:bg-background-hover rounded-md px-4 py-0.5",
                     index === new Date().getMonth() && "bg-background",
                     value === index &&
-                      "bg-primary-600 text-white hover:bg-primary-600",
+                      "bg-primary-600 hover:bg-primary-600 text-white",
                   )}
                 >
                   {monthString}

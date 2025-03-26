@@ -1,4 +1,4 @@
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";

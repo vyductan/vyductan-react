@@ -1,6 +1,6 @@
+import { useMergedState } from "@rc-component/util";
 import React, { useEffect } from "react";
 import { formatDate, toDate } from "date-fns";
-import { useMergedState } from "rc-util";
 
 import type {
   DatePickerBaseProps,

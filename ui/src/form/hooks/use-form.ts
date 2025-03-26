@@ -86,21 +86,23 @@ const useForm = <
     [reset],
   );
 
-  const resetFields = useCallback((keepStateOptions?: KeepStateOptions) => {
-    if (props) {
-      if (typeof props.defaultValues === "function") {
-        // props
-        //   .defaultValues()
-        //   .then((values: TFieldValues) => {
-        //     return methods.reset(values, keepStateOptions);
-        //   })
-        //   .catch(() => void 0);
-      } else {
-        methods.reset(props.defaultValues, keepStateOptions);
+  const resetFields = useCallback(
+    (keepStateOptions?: KeepStateOptions) => {
+      if (props) {
+        if (typeof props.defaultValues === "function") {
+          // props
+          //   .defaultValues()
+          //   .then((values: TFieldValues) => {
+          //     return methods.reset(values, keepStateOptions);
+          //   })
+          //   .catch(() => void 0);
+        } else {
+          methods.reset(props.defaultValues, keepStateOptions);
+        }
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    },
+    [methods, props],
+  );
   const submit = useCallback(
     (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
       return props

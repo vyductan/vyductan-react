@@ -1,7 +1,7 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import type { UploadZoneProps } from "./upload-zone";
@@ -126,6 +126,7 @@ const Upload = ({
 
       {!props.multiple && (
         <>
+          {/* <UploadZone style={{ width, height }}>{children}</UploadZone> */}
           {files.length > 0 ? (
             <div className="group relative" style={{ width, height }}>
               {render?.image ? (
@@ -155,7 +156,10 @@ const Upload = ({
               onUploadSuccess={(file) => {
                 setFiles([file]);
               }}
-            />
+              overrideClick={overrideClick}
+            >
+              {children}
+            </UploadZone>
           )}
         </>
       )}

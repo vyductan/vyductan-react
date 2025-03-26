@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import React, { cloneElement, useRef } from "react";
-import isVisible from "rc-util/lib/Dom/isVisible";
-import { composeRef, supportRef } from "rc-util/lib/ref";
+import isVisible from "@rc-component/util/lib/Dom/isVisible";
+import { composeRef, supportRef } from "@rc-component/util/lib/ref";
 
 import type { WaveAllowedComponent } from "./interface";
 import useWave from "./use-wave";
