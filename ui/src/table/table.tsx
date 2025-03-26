@@ -405,6 +405,9 @@ const Table = <TRecord extends AnyObject>({
             bordered === "around" && [
               "[&_table]:border-separate [&_table]:rounded-md",
             ],
+            bordered === "around" && [
+              "[&_table]:border-separate [&_table]:rounded-md",
+            ],
             className,
           )}
           style={style}

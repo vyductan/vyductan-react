@@ -256,14 +256,25 @@ const DatePicker = <T extends DatePickerValueType = "date">({
               handleChangeInput(event.currentTarget.value);
               setOpen(false);
             }
-          }}
-          onChange={(event) => {
-            setInputValue(event.currentTarget.value);
-            if (isValidDateStringExact(event.currentTarget.value, format)) {
-              handleChange(event.currentTarget.value);
-            }
-          }}
-        />
+            // onClick={() => {
+            //   console.log("click", open);
+            //   if (!open) setOpen(true);
+            // }}
+            onKeyUp={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter" || event.key === "Escape") {
+                handleChangeInput(event.currentTarget.value);
+                setOpen(false);
+              }
+            }}
+            onChange={(event) => {
+              setInputValue(event.currentTarget.value);
+              if (isValidDateStringExact(event.currentTarget.value, format)) {
+                handleChange(event.currentTarget.value);
+              }
+            }}
+          />
+        </div>
       </Popover>
     </>
   );

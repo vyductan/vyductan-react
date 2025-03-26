@@ -71,6 +71,8 @@ const Checkbox = ({
               // own
               "size-full",
             )}
+            onCheckedChange={onChange}
+            {...props}
           >
             {indeterminate ? (
               <Icon

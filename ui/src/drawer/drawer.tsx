@@ -37,6 +37,12 @@ const Drawer = ({
   // closeIcon,
   ...props
 }: DrawerProps) => {
+  const placementClassName =
+    placement === "right"
+      ? cn(
+          "inset-y-0 left-auto right-0 mt-0 h-svh w-[378px] overflow-hidden rounded-none",
+        )
+      : "";
   return (
     <DrawerRoot direction={placement} {...props}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}

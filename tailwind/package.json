@@ -29,6 +29,8 @@
     "@iconify/tailwind": "^1.2.0",
     "@types/node": "^22.13.9",
     "eslint": "catalog:",
+    "postcss-import": "^16.1.0",
+    "postcss-preset-env": "^10.1.3",
     "prettier": "catalog:",
     "typescript": "catalog:"
   }
