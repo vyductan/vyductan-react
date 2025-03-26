@@ -21,6 +21,7 @@ export const AlertModal = ({
   className,
   description,
   okText = "Confirm",
+  cancelText = "Cancel",
   okLoading = false,
   title,
   trigger,
@@ -49,11 +50,14 @@ export const AlertModal = ({
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             isControlled={rest.open !== undefined}
             loading={okLoading}
-            onClick={onConfirm}
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm?.();
+            }}
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
           >
             {okText}

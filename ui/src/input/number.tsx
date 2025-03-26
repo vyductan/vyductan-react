@@ -183,14 +183,13 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
       }}
       // prevent user enter non-numeric characters || https://stackoverflow.com/a/74850574
       onKeyDown={(e) => {
-        if (!/[0-9]/.test(e.key)) {
+        if (!/[0-9]|Delete|Backspace/.test(e.key)) {
           e.preventDefault();
         }
         onKeyDown?.(e);
       }}
       onChange={(value) => {
         if (forFormItem) {
-          // eslint-disable-next-line unicorn/no-null
           onChange?.(value ? value.toString() : null);
         } else {
           onChange?.(value);

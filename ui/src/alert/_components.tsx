@@ -9,9 +9,9 @@ export const alertVariants = cva(
   {
     variants: {
       type: {
-        default: "bg-background text-foreground",
+        default: "bg-card text-card-foreground",
         // destructive:
-        // "text-destructive-foreground [&>svg]:text-current *:data-[slot=alert-description]:text-destructive-foreground/80",
+        // "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
         error: "border-red-300 bg-red-100 text-red-600",
         info: "border-blue-300 bg-blue-100 text-blue-600",
         warning: "border-amber-300 bg-amber-100 text-amber-600",

@@ -28,7 +28,7 @@
   "dependencies": {
     "@acme/hooks": "workspace:*",
     "@acme/ui": "workspace:*",
-    "@tanstack/react-router": "^1.105.0"
+    "@tanstack/react-router": "^1.112.18"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",

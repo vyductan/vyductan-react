@@ -5,6 +5,7 @@ import { cn } from "../..";
 import { Avatar } from "../../avatar";
 import { Breadcrumb } from "../../breadcrumb";
 import { Button } from "../../button";
+import { PageHeading } from "./_components";
 
 type PageHeaderProps = {
   title?: React.ReactNode;
@@ -57,14 +58,7 @@ const renderTitle = (props: PageHeaderProps) => {
           </Button>
         )}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
-        {title && (
-          <h1
-            title={typeof title === "string" ? title : undefined}
-            className="text-2xl font-bold"
-          >
-            {title}
-          </h1>
-        )}
+        {title && <PageHeading>{title}</PageHeading>}
       </div>
       {subTitle && (
         <p
