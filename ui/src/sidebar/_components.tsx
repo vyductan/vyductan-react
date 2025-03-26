@@ -584,6 +584,7 @@ function SidebarMenuAction({
         showOnHover &&
           "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         // own
+        "size-6",
         "right-1.5", // make button align with select dropdown icon
         "[&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
         className,
