@@ -19,16 +19,12 @@ import { inputSizeVariants, inputVariants } from "./input";
 interface InputNumberProps<T extends ValueType = ValueType>
   extends Omit<RcInputNumberProps<T>, "prefix" | "size" | "controls"> {
   ref?: Ref<HTMLInputElement>;
-  // prefixCls?: string;
-  // rootClassName?: string;
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
   size?: SizeType;
   disabled?: boolean;
-  /** @deprecated Use `variant` instead. */
-  // bordered?: boolean;
   status?: InputStatus;
   controls?: boolean | { upIcon?: React.ReactNode; downIcon?: React.ReactNode };
   /**
@@ -36,6 +32,8 @@ interface InputNumberProps<T extends ValueType = ValueType>
    * @default "outlined"
    */
   variant?: InputVariant;
+
+  forFormItem?: boolean;
 }
 
 const InputNumber = ({ ref, ...props }: InputNumberProps) => {
@@ -45,27 +43,35 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   const {
     className,
-    // rootClassName,
     size: customizeSize,
     disabled: customDisabled,
-    // prefixCls: customizePrefixCls,
     addonBefore,
     addonAfter,
     prefix,
     suffix,
-    // bordered,
     readOnly,
     status: customStatus,
     controls,
     variant: customVariant,
+
+    onKeyDown,
+    forFormItem,
+    onChange,
+
     ...others
   } = props;
 
   let upIcon = (
-    <Icon icon="icon-[teenyicons--up-solid]" className="h-2 w-3 opacity-70" />
+    <Icon
+      icon="icon-[fluent-mdl2--caret-up-solid-8]"
+      className="h-2.5 w-4 opacity-70"
+    />
   );
   let downIcon = (
-    <Icon icon="icon-[teenyicons--down-solid]" className="h-2 w-3 opacity-70" />
+    <Icon
+      icon="icon-[teenyicons--down-solid]"
+      className="h-2.5 w-4 opacity-70"
+    />
   );
   const controlsTemporary =
     typeof controls === "boolean" ? controls : undefined;
@@ -144,7 +150,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
           "bg-transparent",
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
-          "border-none outline-none",
+          "border-none outline-hidden",
         ),
         // inputSizeVariants({ size: mergedSize })
         variant: cn(),
@@ -174,6 +180,20 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
         // },
         // getStatusClassNames(`${prefixCls}-group-wrapper`, mergedStatus, hasFeedback),
         // hashId,
+      }}
+      // prevent user enter non-numeric characters || https://stackoverflow.com/a/74850574
+      onKeyDown={(e) => {
+        if (!/[0-9]|Delete|Backspace/.test(e.key)) {
+          e.preventDefault();
+        }
+        onKeyDown?.(e);
+      }}
+      onChange={(value) => {
+        if (forFormItem) {
+          onChange?.(value ? value.toString() : null);
+        } else {
+          onChange?.(value);
+        }
       }}
       {...others}
     />

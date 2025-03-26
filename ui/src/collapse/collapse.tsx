@@ -19,6 +19,12 @@ type CollapseItemDef = {
   key?: string;
   label: React.ReactNode;
   children: React.ReactNode;
+
+  className?: string;
+  classNames?: {
+    header?: string;
+    body?: string;
+  };
 };
 
 type CollapseProps = Omit<
@@ -37,15 +43,18 @@ type CollapseProps = Omit<
   triggerProps?: AccordionTriggerProps;
   contentProps?: AccordionContentProps;
   onChange?: (activeKeys: string[]) => void;
+
+  // antd
+  expandIconPosition?: "start" | "end";
 };
 export const Collapse = ({
   activeKey,
   defaultActiveKey,
   items,
   type = "multiple",
-  triggerProps,
-  contentProps,
   onChange,
+
+  expandIconPosition,
   ...props
 }: CollapseProps) => {
   const singleOrMultipleProps =
@@ -70,9 +79,18 @@ export const Collapse = ({
       {items.map((item, index) => {
         const key = item.key ?? index;
         return (
-          <AccordionItem key={key} value={String(key)}>
-            <AccordionTrigger {...triggerProps}>{item.label}</AccordionTrigger>
-            <AccordionContent {...contentProps}>
+          <AccordionItem
+            key={key}
+            value={String(key)}
+            className={item.className}
+          >
+            <AccordionTrigger
+              expandIconPosition={expandIconPosition}
+              className={item.classNames?.header}
+            >
+              {item.label}
+            </AccordionTrigger>
+            <AccordionContent className={item.classNames?.body}>
               {item.children}
             </AccordionContent>
           </AccordionItem>

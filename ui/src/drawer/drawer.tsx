@@ -46,7 +46,7 @@ const Drawer = ({
   return (
     <DrawerRoot direction={placement} {...props}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent className={cn(placementClassName, className)}>
+      <DrawerContent className={cn(className)}>
         <DrawerHeader className={cn("border-b p-6", classNames?.header)}>
           <DrawerTitle className={classNames?.title}>{title}</DrawerTitle>
           <DrawerDescription

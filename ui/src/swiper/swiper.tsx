@@ -26,7 +26,7 @@ export const Swiper = ({ images }: SwiperProps) => {
             "--swiper-pagination-color": "#fff",
           } as React.CSSProperties
         }
-        className="!ml-0"
+        className="ml-0!"
         freeMode={true}
         slidesPerView={1}
         spaceBetween={10}
@@ -45,14 +45,14 @@ export const Swiper = ({ images }: SwiperProps) => {
           },
         }}
         pagination={{
-          horizontalClass: "!bottom-0",
+          horizontalClass: "bottom-0!",
           clickable: true,
         }}
         modules={[Pagination, FreeMode]}
       >
         {images.map((imgProps, index) => (
           <SwiperSlide
-            className="h-[70px] !w-auto cursor-pointer"
+            className="h-[70px] w-auto! cursor-pointer"
             key={index}
             onClick={() => {
               setActiveIndex(index);

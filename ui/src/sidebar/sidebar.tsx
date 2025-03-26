@@ -1,10 +1,11 @@
-import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
-import { useMergedState } from "rc-util";
+"use client";
 
-import type { MenuItemDef } from "../menu";
+import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
+import { useMergedState } from "@rc-component/util";
+
+import type { MenuItemDef, MenuItemType } from "../menu";
 import { Divider } from "../divider";
 import { Icon } from "../icons";
-import { Link } from "../link";
 import {
   SidebarContent,
   SidebarGroup,
@@ -19,15 +20,17 @@ import {
 type SidebarProps = {
   className?: string;
   classNames?: {
+    header?: string;
     menuButton?: string;
     icon?: string;
   };
 
   itemRender?: (
-    item: MenuItemDef,
+    item: MenuItemType,
     classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
+  contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
   items?: MenuItemDef[];
@@ -44,6 +47,7 @@ export const Sidebar = ({
   classNames,
 
   itemRender,
+  contentRender,
 
   header,
   items = [],
@@ -59,7 +63,9 @@ export const Sidebar = ({
     return items.map((item, index) => {
       if (item.type === "divider") {
         return (
-          <Divider key={index} as="li" role="separator" className="border-t" />
+          <Divider key={index} role="separator" className="border-t" asChild>
+            <li />
+          </Divider>
         );
       }
 
@@ -145,14 +151,14 @@ export const Sidebar = ({
       const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
       let labelToRender: ReactNode = path ? (
-        <Link href={`${path}`}>
+        <a href={`${path}`}>
           {typeof icon === "string" ? (
             <Icon icon={icon} className={classNames?.icon} />
           ) : (
             icon
           )}
           <span>{mergedLabel}</span>
-        </Link>
+        </a>
       ) : (
         mergedLabel
       );
@@ -173,7 +179,9 @@ export const Sidebar = ({
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            tooltip={mergedLabel}
+            tooltip={
+              typeof mergedLabel === "string" ? mergedLabel : key.toString()
+            }
             className={classNames?.menuButton}
           >
             {labelToRender}
@@ -185,12 +193,12 @@ export const Sidebar = ({
 
   return (
     <SidebarRoot collapsible="icon" className={className}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>{header}</SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>{renderItems(items)}</SidebarContent>
+      <SidebarHeader className={classNames?.header}>{header}</SidebarHeader>
+      <SidebarContent>
+        {contentRender
+          ? contentRender({ itemNodes: renderItems(items) })
+          : renderItems(items)}
+      </SidebarContent>
     </SidebarRoot>
   );
 };

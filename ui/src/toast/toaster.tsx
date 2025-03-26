@@ -3,37 +3,29 @@
 import { useTheme } from "next-themes";
 import { Toaster as Sonner } from "sonner";
 
-import { cn } from "..";
-
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ richColors = true, ...props }: ToasterProps) => {
+const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      // eslint-disable-next-line tailwindcss/no-custom-classname
       className="toaster group"
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+        } as React.CSSProperties
+      }
       toastOptions={{
         classNames: {
-          toast: cn(
-            "border-border shadow-lg",
-            richColors ? "" : "",
-            // : "toast group group-[.toaster]:border-border group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:shadow-lg",
-          ),
-          // description: "group-[.toast]:text-muted-foreground",
-          description: "text-muted-foreground",
-          actionButton:
-            "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton:
-            "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
           closeButton: "-right-3.5 left-[unset]",
-          success: "bg-success-muted text-green-700 border-green-400",
-          error: "bg-error-muted text-red-700 border-red-400",
+          success: "!bg-green-100 !text-green-700 !border-green-300",
+          error: "!bg-red-100 !text-red-700 !border-red-300",
         },
       }}
-      // richColors={richColors}
       {...props}
     />
   );

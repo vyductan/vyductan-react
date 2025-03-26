@@ -13,6 +13,8 @@ type PagerProps = Pick<PaginationProps, "itemRender"> & {
     onClick: PagerProps["onClick"],
     page: PagerProps["page"],
   ) => void;
+
+  hrefGenerator?: (page: number) => string;
 };
 
 const Pager = ({
@@ -24,6 +26,7 @@ const Pager = ({
   onClick,
   onKeyPress,
   itemRender,
+  hrefGenerator,
 }: PagerProps) => {
   const handleClick = () => {
     onClick?.(page);
@@ -33,15 +36,20 @@ const Pager = ({
     onKeyPress?.(e, onClick, page);
   };
 
-  const pager = itemRender?.(
-    page,
-    "page",
-    <PaginationLink rel="nofollow" isActive={active}>
+  const originalElement = (
+    <PaginationLink isActive={active} href={hrefGenerator?.(page)}>
       {page}
-    </PaginationLink>,
+    </PaginationLink>
+  );
+  const pager = itemRender ? (
+    <PaginationLink isActive={active} asChild>
+      {itemRender(page, "page", originalElement)}
+    </PaginationLink>
+  ) : (
+    originalElement
   );
 
-  return pager ? (
+  return (
     <PaginationItem
       title={showTitle ? String(page) : undefined}
       className={className}
@@ -51,8 +59,6 @@ const Pager = ({
     >
       {pager}
     </PaginationItem>
-  ) : (
-    <></>
   );
 };
 

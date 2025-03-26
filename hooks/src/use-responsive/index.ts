@@ -2,7 +2,6 @@
 // https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useResponsive/index.ts
 // May 27, 2024
 import { useEffect, useState } from "react";
-import tailwindDefaultConfig from "tailwindcss/defaultConfig";
 
 import isBrowser from "../utils/is-browser";
 
@@ -10,26 +9,34 @@ type Subscriber = () => void;
 
 const subscribers = new Set<Subscriber>();
 
-type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
-type ResponsiveInfo = Record<Screens, boolean>;
+export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type ResponsiveInfo = Record<Breakpoint, boolean>;
 
 let info: ResponsiveInfo;
 
-const tailwindScreensConfig = tailwindDefaultConfig.theme?.screens as Record<
-  string,
-  string
->;
-
+const tailwindScreensConfig = {
+  xs: "480px",
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+  "2xl": "1536px",
+};
 let responsiveConfig = (() => {
   const c: Record<string, number> = {};
   Object.keys(tailwindScreensConfig).map((x) => {
-    c[x] = Number(tailwindScreensConfig[x]?.replace("px", ""));
+    c[x] = Number(
+      tailwindScreensConfig[x as keyof typeof tailwindScreensConfig]?.replace(
+        "px",
+        "",
+      ),
+    );
   });
   return {
     xs: 0,
     ...c,
   };
-})() as Record<Screens, number>;
+})() as Record<Breakpoint, number>;
 type ResponsiveConfig = typeof responsiveConfig;
 
 function handleResize() {
@@ -47,7 +54,7 @@ function calculate() {
   const width = window.innerWidth;
   const newInfo = {} as ResponsiveInfo;
   let shouldUpdate = false;
-  for (const key of Object.keys(responsiveConfig) as Screens[]) {
+  for (const key of Object.keys(responsiveConfig) as Breakpoint[]) {
     newInfo[key] = width >= responsiveConfig[key];
     if (newInfo[key] !== info[key]) {
       shouldUpdate = true;

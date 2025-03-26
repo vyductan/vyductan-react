@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent } from "react";
-import { useMergedState } from "rc-util";
+import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemDef } from "./types";
 import { cn } from "..";
@@ -50,7 +50,9 @@ export const Menu = ({
     return menu.map((item, index) => {
       if (item.type === "divider") {
         return (
-          <Divider key={index} as="li" role="separator" className="border-t" />
+          <Divider key={index} role="separator" className="border-t" asChild>
+            <li />
+          </Divider>
         );
       }
 
@@ -160,7 +162,7 @@ export const Menu = ({
   return (
     <ul
       className={cn(
-        mode === "inline" && "space-x-2 space-y-1 overflow-y-auto",
+        mode === "inline" && "space-y-1 space-x-2 overflow-y-auto",
         className,
       )}
     >

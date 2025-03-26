@@ -3,11 +3,12 @@
 // import type { Placement } from "@popperjs/core";
 import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
 import type { ReactElement, ReactNode } from "react";
-import { cloneElement, Fragment } from "react";
+import React, { cloneElement, Fragment } from "react";
 
 import type { Placement } from "../types";
 import { cn } from "..";
 import { Link } from "../link";
+import { GenericSlot } from "../slot";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,6 +29,8 @@ type MenuItem = {
   as?: "title" | "separator";
   href?: string;
   onSelect?: (event: Event) => void;
+
+  asChild?: React.ReactNode;
 };
 type Menu = {
   className?: string;
@@ -64,7 +67,18 @@ export const Dropdown = ({
   const renderMenu = (items: MenuItem[]): ReactNode => {
     return items.map(
       (
-        { as, group, href, key, label, className, icon, shortcut, onSelect },
+        {
+          as,
+          group,
+          href,
+          key,
+          label,
+          className,
+          icon,
+          shortcut,
+          onSelect,
+          asChild,
+        },
         index,
       ) => (
         <Fragment key={key ?? index}>
@@ -77,32 +91,34 @@ export const Dropdown = ({
           ) : (
             <DropdownMenuItem
               onSelect={onSelect}
-              asChild={!!href}
+              asChild={!!href || !!asChild}
               className={cn(menu.itemsClassName, className)}
             >
-              {href ? (
-                <Link href={href}>
-                  {icon &&
-                    cloneElement(icon, {
-                      className: "mr-2 h-4 w-4",
-                    })}
-                  <span>{label}</span>
-                  {shortcut && (
-                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
-                  )}
-                </Link>
-              ) : (
-                <>
-                  {icon &&
-                    cloneElement(icon, {
-                      className: "mr-2 h-4 w-4",
-                    })}
-                  <span>{label}</span>
-                  {shortcut && (
-                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
-                  )}
-                </>
-              )}
+              {asChild ??
+                (href ? (
+                  <Link href={href}>
+                    {icon &&
+                      cloneElement(icon, {
+                        className: "mr-2 h-4 w-4",
+                      })}
+                    <span>{label}</span>
+                    {shortcut && (
+                      <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                    )}
+                  </Link>
+                ) : (
+                  <>
+                    {icon && (
+                      <GenericSlot className="text-muted-foreground">
+                        <div>{icon}</div>
+                      </GenericSlot>
+                    )}
+                    <span>{label}</span>
+                    {shortcut && (
+                      <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                    )}
+                  </>
+                ))}
             </DropdownMenuItem>
           )}
         </Fragment>

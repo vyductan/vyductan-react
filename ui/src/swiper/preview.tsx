@@ -62,7 +62,7 @@ export const SwiperPreview = ({
           exit={{
             opacity: 0,
           }}
-          className={cn("fixed inset-0 z-[99999]", "bg-black")}
+          className={cn("fixed inset-0 z-99999", "bg-black")}
         >
           <div className="absolute right-6 top-0 z-10 flex h-12 items-center justify-between text-white">
             <div></div>
@@ -136,7 +136,7 @@ export const SwiperPreview = ({
               wrapperClass="[&>.swiper-slide-thumb-active]:opacity-100"
             >
               {images.map((imgProps) => (
-                <SwiperSlide className="h-[100px] !w-auto cursor-pointer rounded-md border border-white p-1 opacity-40">
+                <SwiperSlide className="h-[100px] w-auto! cursor-pointer rounded-md border border-white p-1 opacity-40">
                   <div
                   // className="swiper-zoom-container"
                   >

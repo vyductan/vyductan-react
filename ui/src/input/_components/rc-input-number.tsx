@@ -1,7 +1,8 @@
+"use client";
+
 /* eslint-disable unicorn/no-null */
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
 // Jan 28, 2025
-
 import type { DecimalClass, ValueType } from "@rc-component/mini-decimal";
 import React, { useCallback, useState } from "react";
 import getMiniDecimal, {
@@ -10,9 +11,9 @@ import getMiniDecimal, {
   toFixed,
   validateNumber,
 } from "@rc-component/mini-decimal";
+import { useLayoutUpdateEffect } from "@rc-component/util/lib/hooks/useLayoutEffect";
 import proxyObject from "@rc-component/util/lib/proxyObject";
-import { useLayoutUpdateEffect } from "rc-util/lib/hooks/useLayoutEffect";
-import { composeRef } from "rc-util/lib/ref";
+import { composeRef } from "@rc-component/util/lib/ref";
 
 import type { BaseInputProps } from "../types";
 import type { InputFocusOptions } from "../utils/common-utils";
@@ -86,7 +87,14 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   min?: T;
   max?: T;
   step?: ValueType;
-  onStep?: (value: T, info: { offset: ValueType; type: "up" | "down" }) => void;
+  onStep?: (
+    value: T,
+    info: {
+      offset: ValueType;
+      type: "up" | "down";
+      emitter: "handler" | "keyboard" | "wheel";
+    },
+  ) => void;
 
   /**
    * Trigger change onBlur event.
@@ -203,14 +211,14 @@ const InternalInputNumber = ({
   );
   // >>> Parser
   const mergedParser = React.useCallback(
-    (number_: string | number) => {
-      const numberString = String(number_);
+    (num: string | number) => {
+      const numStr = String(num);
 
       if (parser) {
-        return parser(numberString);
+        return parser(numStr);
       }
 
-      let parsedString = numberString;
+      let parsedString = numStr;
       if (decimalSeparator) {
         parsedString = parsedString.replace(decimalSeparator, ".");
       }
@@ -231,24 +239,24 @@ const InternalInputNumber = ({
         });
       }
 
-      let string_ = typeof number === "number" ? num2str(number) : number;
+      let str = typeof number === "number" ? num2str(number) : number;
 
       // User typing will not auto format with precision directly
       if (!userTyping) {
-        const mergedPrecision = getPrecision(string_, userTyping);
+        const mergedPrecision = getPrecision(str, userTyping);
 
         if (
-          validateNumber(string_) &&
-          (decimalSeparator || (mergedPrecision && mergedPrecision >= 0))
+          validateNumber(str) &&
+          (decimalSeparator || mergedPrecision! >= 0)
         ) {
           // Separator
           const separatorString = decimalSeparator ?? ".";
 
-          string_ = toFixed(string_, separatorString, mergedPrecision);
+          str = toFixed(str, separatorString, mergedPrecision);
         }
       }
 
-      return string_;
+      return str;
     },
     [formatter, getPrecision, decimalSeparator],
   );
@@ -370,18 +378,16 @@ const InternalInputNumber = ({
     }
 
     if (!readOnly && !disabled && isRangeValidate) {
-      const numberString = updateValue.toString();
-      const mergedPrecision = getPrecision(numberString, userTyping);
+      const numStr = updateValue.toString();
+      const mergedPrecision = getPrecision(numStr, userTyping);
       if (mergedPrecision && mergedPrecision >= 0) {
-        updateValue = getMiniDecimal(
-          toFixed(numberString, ".", mergedPrecision),
-        );
+        updateValue = getMiniDecimal(toFixed(numStr, ".", mergedPrecision));
 
         // When to fixed. The value may out of min & max range.
         // 4 in [0, 3.8] => 3.8 => 4 (toFixed)
         if (!isInRange(updateValue)) {
           updateValue = getMiniDecimal(
-            toFixed(numberString, ".", mergedPrecision, true),
+            toFixed(numStr, ".", mergedPrecision, true),
           );
         }
       }
@@ -464,7 +470,10 @@ const InternalInputNumber = ({
   };
 
   // ============================= Step =============================
-  const onInternalStep = (up: boolean) => {
+  const onInternalStep = (
+    up: boolean,
+    emitter: "handler" | "keyboard" | "wheel",
+  ) => {
     // Ignore step since out of range
     if ((up && upDisabled) || (!up && downDisabled)) {
       return;
@@ -487,10 +496,10 @@ const InternalInputNumber = ({
     );
 
     const updatedValue = triggerValueUpdate(target, false);
-    console.log("?????", target, updatedValue);
     onStep?.(getDecimalValue(stringMode, updatedValue), {
       offset: shiftKeyRef.current ? getDecupleSteps(step) : step,
       type: up ? "up" : "down",
+      emitter,
     });
 
     inputRef.current?.focus();
@@ -547,7 +556,7 @@ const InternalInputNumber = ({
       !compositionRef.current &&
       ["Up", "ArrowUp", "Down", "ArrowDown"].includes(key)
     ) {
-      onInternalStep(key === "Up" || key === "ArrowUp");
+      onInternalStep(key === "Up" || key === "ArrowUp", "keyboard");
       event.preventDefault();
     }
   };
@@ -562,7 +571,7 @@ const InternalInputNumber = ({
       const onWheel = (event: WheelEvent) => {
         // moving mouse wheel rises wheel event with deltaY < 0
         // scroll value grows from top to bottom, as screen Y coordinate
-        onInternalStep(event.deltaY < 0);
+        onInternalStep(event.deltaY < 0, "wheel");
         event.preventDefault();
       };
       const input = inputRef.current;
@@ -736,7 +745,6 @@ const InputNumber = ((props: InputNumberProps) => {
     <BaseInput
       className={className}
       triggerFocus={focus}
-      // prefixCls={prefixCls}
       value={value}
       disabled={disabled}
       style={style}

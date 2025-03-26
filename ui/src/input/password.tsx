@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import type { InputProps } from "./input";
@@ -19,9 +21,12 @@ export const InputPassword = React.forwardRef<
       suffix={
         <span className="cursor-pointer">
           {type === "password" ? (
-            <Icon icon="ant-design:eye-invisible-outlined" onClick={toggle} />
+            <Icon
+              icon="icon-[ant-design--eye-invisible-outlined]"
+              onClick={toggle}
+            />
           ) : (
-            <Icon icon="ant-design:eye-outlined" onClick={toggle} />
+            <Icon icon="icon-[ant-design--eye-outlined]" onClick={toggle} />
           )}
         </span>
       }

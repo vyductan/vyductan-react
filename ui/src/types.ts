@@ -12,7 +12,8 @@ export type Placement =
   | "bottomRight"
   | "top"
   | "topLeft"
-  | "topRight";
+  | "topRight"
+  | "rightTop";
 export type AlignPointTopBottom = "t" | "b" | "c";
 export type AlignPointLeftRight = "l" | "r" | "c";
 /** Two char of 't' 'b' 'c' 'l' 'r'. Example: 'lt' */
