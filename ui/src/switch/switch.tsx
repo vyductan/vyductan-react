@@ -6,34 +6,36 @@ import * as SwitchPrimitives from "@radix-ui/react-switch";
 import { cn } from "..";
 
 type SwitchProps = Omit<
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>,
+  React.ComponentProps<typeof SwitchPrimitives.Root>,
   "onChange" | "onCheckedChange"
 > & {
   onChange?: (checked: boolean) => void;
 };
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  SwitchProps
->(({ className, onChange, ...props }, ref) => (
+const Switch = ({ className, onChange, ...props }: SwitchProps) => (
   <SwitchPrimitives.Root
+    data-slot="switch"
     className={cn(
-      "peer inline-flex h-[22px] w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input",
+      "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+      // "h-5 w-9"
+      // own
+      "h-[22px] w-11",
       className,
     )}
     onCheckedChange={(checked) => {
       onChange?.(checked);
     }}
     {...props}
-    ref={ref}
   >
     <SwitchPrimitives.Thumb
+      data-slot="switch-thumb"
       className={cn(
-        "pointer-events-none block size-[18px] rounded-full bg-background shadow-lg ring-0 transition-transform",
-        "data-[state=checked]:translate-x-6 data-[state=unchecked]:translate-x-0.5",
+        "bg-background pointer-events-none block rounded-full ring-0 shadow-lg transition-transform data-[state=checked]:translate-x-4 data-[state=unchecked]:translate-x-0",
+        // "size-4"
+        // own
+        "size-[18px]",
       )}
     />
   </SwitchPrimitives.Root>
-));
-Switch.displayName = SwitchPrimitives.Root.displayName;
+);
 
 export { Switch };

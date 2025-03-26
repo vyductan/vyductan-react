@@ -2,7 +2,6 @@
 // https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useResponsive/index.ts
 // May 27, 2024
 import { useEffect, useState } from "react";
-import tailwindDefaultConfig from "tailwindcss/defaultConfig";
 
 import isBrowser from "../utils/is-browser";
 
@@ -15,15 +14,23 @@ type ResponsiveInfo = Record<Screens, boolean>;
 
 let info: ResponsiveInfo;
 
-const tailwindScreensConfig = tailwindDefaultConfig.theme?.screens as Record<
-  string,
-  string
->;
-
+const tailwindScreensConfig = {
+  xs: "480px",
+  sm: "640px",
+  md: "768px",
+  lg: "1024px",
+  xl: "1280px",
+  "2xl": "1536px",
+};
 let responsiveConfig = (() => {
   const c: Record<string, number> = {};
   Object.keys(tailwindScreensConfig).map((x) => {
-    c[x] = Number(tailwindScreensConfig[x]?.replace("px", ""));
+    c[x] = Number(
+      tailwindScreensConfig[x as keyof typeof tailwindScreensConfig]?.replace(
+        "px",
+        "",
+      ),
+    );
   });
   return {
     xs: 0,

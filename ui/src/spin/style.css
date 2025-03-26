@@ -7,7 +7,7 @@
   content: "";
   grid-area: 1/1;
   --c: no-repeat
-    radial-gradient(farthest-side, hsl(var(--primary-600)) 92%, #0000);
+    radial-gradient(farthest-side, var(--color-primary-600) 92%, #0000);
   background:
     var(--c) 50% 0,
     var(--c) 50% 100%,

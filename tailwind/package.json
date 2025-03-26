@@ -6,9 +6,6 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./web": "./web.ts",
-    "./colors": "./colors.ts",
-    "./token": "./token.ts",
     "./globals.css": "./globals.css",
     "./postcss.cjs": "./postcss.cjs"
   },
@@ -20,7 +17,8 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "postcss": "8.5.1",
+    "@tailwindcss/postcss": "^4.0.6",
+    "postcss": "8.5.2",
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "^1.0.7"
   },

@@ -1,13 +1,13 @@
-type StatisticProps = {
+type StatisticProps = Omit<React.ComponentProps<"div">, "title"> & {
   title: React.ReactNode;
   value: string | number;
 };
-const Statistic = ({ title, value }: StatisticProps) => {
+const Statistic = ({ title, value, ...props }: StatisticProps) => {
   const valueToRender =
     typeof value === "number" ? value.toLocaleString() : value;
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="text-foreground-muted">{title}</div>
+    <div {...props}>
+      <div className="text-muted-foreground mb-1 text-sm">{title}</div>
       <div className="text-2xl font-bold">{valueToRender}</div>
     </div>
   );

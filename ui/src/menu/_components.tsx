@@ -40,7 +40,7 @@ export const MenuItem = ({
         "my-1",
         "transition-all",
         "border-l-2 border-transparent",
-        "text-foreground-muted hover:text-foreground",
+        "text-muted-foreground hover:text-foreground",
         isActive
           ? "border-primary bg-primary-100 text-primary-600 hover:text-primary-700"
           : "hover:border-foreground-muted",
