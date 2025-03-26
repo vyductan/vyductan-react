@@ -1,3 +1,5 @@
+"use client";
+
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useMergedState } from "rc-util";
 
@@ -59,7 +61,9 @@ export const Sidebar = ({
     return items.map((item, index) => {
       if (item.type === "divider") {
         return (
-          <Divider key={index} as="li" role="separator" className="border-t" />
+          <Divider key={index} role="separator" className="border-t" asChild>
+            <li />
+          </Divider>
         );
       }
 
@@ -173,7 +177,9 @@ export const Sidebar = ({
           <SidebarMenuButton
             asChild
             isActive={isActive}
-            tooltip={mergedLabel}
+            tooltip={
+              typeof mergedLabel === "string" ? mergedLabel : key.toString()
+            }
             className={classNames?.menuButton}
           >
             {labelToRender}

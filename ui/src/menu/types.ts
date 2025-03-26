@@ -10,10 +10,10 @@ export type MenuItemType = {
   type?: "item";
 
   /* Page Title */
-  title?: string;
+  title?: React.ReactNode;
 
   /* Menu Label */
-  label?: string;
+  label?: React.ReactNode;
 
   path?: string;
 

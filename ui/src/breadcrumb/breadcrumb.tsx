@@ -1,12 +1,11 @@
 import type { Key } from "react";
 import { Fragment } from "react";
-import { Slot } from "@radix-ui/react-slot";
 
-import { cn } from "..";
 import { Icon } from "../icons";
 import { Skeleton } from "../skeleton";
 import {
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbRoot,
@@ -40,59 +39,47 @@ const Breadcrumb = ({
   className,
   skeleton,
   params,
-  itemRender,
+  itemRender: itemRenderProp,
 }: BreadcrumbProps) => {
   return (
     <BreadcrumbRoot className={items.length === 1 ? "hidden" : className}>
       <BreadcrumbList>
         {items.map((x, index) => {
           const key = x.key ?? index;
+          // if(skeleton) {
+          //   return <Skeleton key={key} as="li" className="w-20" />
+          // }
+          const itemRender = itemRenderProp ? (
+            itemRenderProp(x, params, items, [])
+          ) : (
+            <>
+              {x.icon && (
+                <span className="mr-2">
+                  {typeof x.icon === "string" ? <Icon icon={x.icon} /> : x.icon}
+                </span>
+              )}
+              {x.title}
+            </>
+          );
           return (
             <Fragment key={key}>
-              <Slot
-                className={cn(
-                  index !== items.length - 1 && "text-foreground-muted",
-                  "-mx-1 rounded px-1",
-                  // "hover:bg-background-hover",
-                )}
-                aria-current={index === items.length - 1 ? true : undefined}
-              >
-                {skeleton ? (
-                  <Skeleton as="li" className="w-20" />
-                ) : index < items.length - 1 ? (
-                  <BreadcrumbItem>
-                    {itemRender ? (
-                      itemRender(x, params, items, [])
+              {skeleton ? (
+                <Skeleton as="li" className="w-20" />
+              ) : x.href || x.icon || x.onClick ? (
+                index < items.length - 1 ? (
+                  <>
+                    {x.href && !itemRender ? (
+                      <BreadcrumbLink>{itemRender}</BreadcrumbLink>
                     ) : (
-                      <>
-                        {x.icon && (
-                          <span className="mr-2">
-                            {typeof x.icon === "string" ? (
-                              <Icon icon={x.icon} />
-                            ) : (
-                              x.icon
-                            )}
-                          </span>
-                        )}
-                        {x.title}
-                      </>
+                      <BreadcrumbItem>{itemRender}</BreadcrumbItem>
                     )}
-                  </BreadcrumbItem>
+                  </>
                 ) : (
-                  <BreadcrumbPage>
-                    {x.icon && (
-                      <span className="mr-2">
-                        {typeof x.icon === "string" ? (
-                          <Icon icon={x.icon} />
-                        ) : (
-                          x.icon
-                        )}
-                      </span>
-                    )}
-                    {x.title}
-                  </BreadcrumbPage>
-                )}
-              </Slot>
+                  <BreadcrumbPage>{itemRender}</BreadcrumbPage>
+                )
+              ) : (
+                x.title
+              )}
               {index < items.length - 1 && <BreadcrumbSeparator />}
             </Fragment>
           );

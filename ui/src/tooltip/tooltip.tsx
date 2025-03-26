@@ -7,7 +7,6 @@ import type {
 import * as React from "react";
 
 import {
-  TooltipArrow,
   TooltipContent,
   TooltipProvider,
   TooltipRoot,
@@ -21,12 +20,17 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
   title: React.ReactNode;
   placement?: TooltipContentProps["side"];
   hidden?: boolean;
+  classNames?: {
+    content?: string;
+    arrow?: string;
+  };
 };
 const Tooltip = ({
   children,
   title,
   placement,
   hidden,
+  classNames,
   ...rest
 }: TooltipProps) => {
   const triggerRef = React.useRef(null);
@@ -50,9 +54,12 @@ const Tooltip = ({
             onPointerDownOutside={(event) => {
               if (event.target === triggerRef.current) event.preventDefault();
             }}
+            className={classNames?.content}
+            classNames={{
+              arrow: classNames?.arrow,
+            }}
           >
             {title}
-            <TooltipArrow />
           </TooltipContent>
         </TooltipRoot>
       </TooltipProvider>

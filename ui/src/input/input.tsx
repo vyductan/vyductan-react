@@ -14,28 +14,27 @@ import { Icon } from "../icons";
 
 export const inputVariants = cva(
   [
+    "border-input file:text-foreground selection:bg-primary selection:text-primary-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium md:text-sm",
+    "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+    "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     // "h-9",
-    "rounded-md border border-input bg-transparent px-3 py-1 shadow-sm transition-colors",
-    // "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
-    // "placeholder:text-muted-foreground",
-    "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
-    // "disabled:cursor-not-allowed disabled:opacity-50",
-    "md:text-sm",
+    // "placeholder:text-muted-foreground", // moved to <input>
+    // disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 // moved to variant disabled
 
-    "flex w-full",
-
-    "items-center border border-input ring-offset-background",
-    "focus-within:outline-none",
+    // old
+    // "focus-visible:outline-hidden",
+    // "ring-offset-background",
+    // "focus-within:outline-hidden",
   ],
   {
     variants: {
       borderless: {
-        true: ["border-0", "focus-within:outline-none"],
+        true: ["border-0", "focus-within:outline-hidden"],
         false: ["border", "rounded-md", "focus-within:ring-2"],
       },
       disabled: {
         true: [
-          "cursor-not-allowed bg-background-active opacity-50 hover:!border-input",
+          "cursor-not-allowed bg-background-active opacity-50 hover:border-input!",
         ],
       },
       // readOnly: {
@@ -126,6 +125,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
       name,
       value: valueProp,
       defaultValue: defaultValueProp,
+      placeholder,
       // Wrapper Props
       onClick,
       ...rest
@@ -168,7 +168,11 @@ const Input = React.forwardRef<InputRef, InputProps>(
     const isHovering = useHover(wrapperRef);
     const prefixComp = prefix ? (
       <span
-        className={cn("flex items-center", inputSizeVariants({ size }), "pr-0")}
+        className={cn(
+          "flex items-center",
+          inputSizeVariants({ size }),
+          "h-auto ps-0",
+        )}
       >
         {prefix}
       </span>
@@ -235,7 +239,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-s-md",
-              "border-e bg-background",
+              "bg-background border-e",
             )}
           >
             {addonBefore}
@@ -243,17 +247,19 @@ const Input = React.forwardRef<InputRef, InputProps>(
         )}
         {prefixComp && prefixComp}
         <input
+          data-slot="input"
           ref={inputRef}
           id={id}
           name={name}
-          value={value}
+          value={value ?? ""}
+          placeholder={placeholder}
           className={cn(
             "flex-1",
             "text-left",
             "bg-transparent",
-            // "placeholder:text-muted-foreground",
-            "placeholder:text-placeholder",
-            "border-none outline-none",
+            "placeholder:text-muted-foreground",
+            // "placeholder:text-placeholder",
+            "border-none outline-hidden",
           )}
           disabled={disabled}
           onChange={(event) => {
@@ -267,7 +273,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           <span
             className={cn(
               !borderless && "rounded-e-md",
-              "border-s bg-background-muted",
+              "bg-background-muted border-s",
               "whitespace-nowrap",
               // p-0 for use Select component
               React.isValidElement(addonAfter) &&

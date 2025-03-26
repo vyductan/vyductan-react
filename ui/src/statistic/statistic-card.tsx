@@ -16,12 +16,12 @@ const StatisticCard = ({
     typeof value === "number" ? value.toLocaleString() : value;
   return (
     <Card classNames={{ content: "flex items-center gap-4" }} {...props}>
-      <div className="flex size-12 items-center justify-center rounded-md border ring ring-gray-100">
+      <div className="flex size-12 items-center justify-center rounded-md border ring-3 ring-gray-100">
         {icon}
       </div>
       <div className="flex flex-col">
         <div className="text-2xl font-bold">{valueToRender}</div>
-        <div className="text-foreground-muted">{title}</div>
+        <div className="text-muted-foreground">{title}</div>
       </div>
     </Card>
   );

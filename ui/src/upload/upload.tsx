@@ -1,20 +1,24 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import type { ForwardedRef } from "react";
-import { forwardRef } from "react";
 import { useMergedState } from "rc-util";
 
-import type { DownloadService, FileItem, UploadService } from "./types";
+import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import type { UploadZoneProps } from "./upload-zone";
 import { Button } from "../button";
 import { Card } from "../card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
 import { UploadZone } from "./upload-zone";
 
-type UploadProps = Pick<UploadZoneProps, "listType" | "placeholder"> & {
+type UploadProps = Omit<UploadZoneProps, "defaultValue" | "onChange"> & {
+  listType?: "picture-card";
+  showZone?: boolean;
+  /** show upload zone only (not show list or plus button) */
+  showZoneOnly?: boolean;
+  showUploadButton?: boolean;
+  // children?: React.ReactNode;
   render?: {
-    image: (file: FileItem) => React.ReactNode;
+    image: (file: UploadFileItem) => React.ReactNode;
   };
   uploadService?: UploadService;
   downloadService?: DownloadService;
@@ -25,7 +29,7 @@ type UploadProps = Pick<UploadZoneProps, "listType" | "placeholder"> & {
 } & (
     | {
         multiple?: false;
-        value?: string;
+        fileList?: string;
         defaultValue?: string;
         onChange?: (value: string | undefined) => void;
 
@@ -35,101 +39,150 @@ type UploadProps = Pick<UploadZoneProps, "listType" | "placeholder"> & {
       }
     | {
         multiple: true;
-        value?: FileItem[];
-        defaultValue?: FileItem[];
-        onChange?: (value: FileItem[] | undefined) => void;
+        fileList?: UploadFileItem[];
+        defaultValue?: UploadFileItem[];
+        onChange?: (value: UploadFileItem[]) => void;
       }
   );
-const Upload = forwardRef(
-  (
+const Upload = ({
+  progress,
+  // defaultValue,
+  uploadService,
+  downloadService,
+
+  width = 100,
+  height = 100,
+
+  render,
+  listType,
+  // placeholder,
+
+  children,
+
+  overrideClick,
+
+  showZoneOnly = false,
+  showUploadButton = true,
+  showUploadList = true,
+  // value,
+  ...props
+}: UploadProps) => {
+  const [files, setFiles] = useMergedState<UploadFileItem[]>(
+    props.defaultValue
+      ? Array.isArray(props.defaultValue)
+        ? props.defaultValue
+        : [
+            {
+              uid: props.defaultValue,
+              url: props.defaultValue,
+              name: props.defaultValue,
+            },
+          ]
+      : [],
     {
-      // defaultValue,
-      uploadService,
-      downloadService,
-
-      width,
-      height,
-
-      render,
-      listType,
-      placeholder,
-
-      // value,
-      ...props
-    }: UploadProps,
-    ref: ForwardedRef<HTMLDivElement>,
-  ) => {
-    const [files, setFiles] = useMergedState<FileItem[]>(
-      props.defaultValue
-        ? Array.isArray(props.defaultValue)
-          ? props.defaultValue
-          : [{ url: props.defaultValue, name: props.defaultValue }]
+      value: props.fileList
+        ? Array.isArray(props.fileList)
+          ? props.fileList
+          : [{ uid: props.fileList, url: props.fileList, name: props.fileList }]
         : [],
-      {
-        value: props.value
-          ? Array.isArray(props.value)
-            ? props.value
-            : [{ url: props.value, name: props.value }]
-          : [],
-        onChange: (value) => {
-          if (props.multiple) {
-            props.onChange?.(value);
-          } else {
-            props.onChange?.(value[0]?.url);
-          }
-        },
+      onChange: (value) => {
+        console.log("vvv", value);
+        if (props.multiple) {
+          props.onChange?.(value);
+        } else {
+          props.onChange?.(value[0]?.url);
+        }
       },
-    );
+    },
+  );
 
-    return (
-      <div ref={ref}>
-        {!props.multiple && (
-          <>
-            {files.length > 0 ? (
-              <div className="group relative" style={{ width, height }}>
-                {render?.image ? (
-                  render.image(files[0]!)
-                ) : (
-                  <img src={files[0]?.url} />
-                )}
+  //   const [inputFile, setInputFile] = useState<File | null>(null)
+  // const [isUploading, setIsUploading] = useState(false);
+  //
+  //    function reset() {
+  //   setIsUploading(false)
+  //   setInputFile(null)
+  //   // if (preview) {
+  //   //   URL.revokeObjectURL(preview)
+  //   // }
+  //   // setPreview(null)
+  // }
 
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
-                  <Button
-                    icon={<DeleteIcon />}
-                    variant="ghost"
-                    className="p-1 text-white hover:bg-black/10"
-                    title="Remove file"
-                    onClick={() => {
-                      setFiles([]);
-                    }}
-                  />
-                </div>
+  return (
+    <div>
+      {/* {children && ( */}
+      {/*   <UploadZone */}
+      {/*     progress={progress} */}
+      {/*     // listType={listType} */}
+      {/*     // style={{ width, height }} */}
+      {/*     uploadService={uploadService} */}
+      {/*     onUploadSuccess={(file) => { */}
+      {/*       setFiles([...files, file]); */}
+      {/*     }} */}
+      {/*   > */}
+      {/*     {children} */}
+      {/*   </UploadZone> */}
+      {/* )} */}
+
+      {!props.multiple && (
+        <>
+          {files.length > 0 ? (
+            <div className="group relative" style={{ width, height }}>
+              {render?.image ? (
+                render.image(files[0]!)
+              ) : (
+                <img src={files[0]?.url} />
+              )}
+
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
+                <Button
+                  icon={<DeleteIcon />}
+                  variant="ghost"
+                  className="p-1 text-white hover:bg-black/10"
+                  title="Remove file"
+                  onClick={() => {
+                    setFiles([]);
+                  }}
+                />
               </div>
-            ) : (
-              <UploadZone
-                listType={listType}
-                placeholder={placeholder}
-                style={{ width, height }}
-                uploadService={uploadService}
-                onUploadSuccess={(file) => {
-                  setFiles([file]);
-                }}
-              />
-            )}
-          </>
-        )}
-
-        {props.multiple && (
-          <>
+            </div>
+          ) : (
             <UploadZone
+              // listType={listType}
+              // placeholder={placeholder}
               style={{ width, height }}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([...files, file]);
+                setFiles([file]);
               }}
             />
-            <div className="mt-2 flex w-full flex-col gap-2">
-              {files.map((item, index) => (
+          )}
+        </>
+      )}
+
+      {props.multiple && listType !== "picture-card" && (
+        <>
+          <div className="mt-2 flex w-full flex-col gap-2">
+            {files.length === 0 ? (
+              <UploadZone
+                progress={progress}
+                // listType={listType}
+                // style={{ width, height }}
+                uploadService={uploadService}
+                onUploadSuccess={(file) => {
+                  setFiles([...files, file]);
+                }}
+                onChange={(file) => {
+                  console.log("changexxx", file, files);
+                  if (file) {
+                    setFiles([...files, file]);
+                  }
+                }}
+              >
+                {children}
+              </UploadZone>
+            ) : (
+              files.map((item, index) => (
                 <Card
                   key={index}
                   classNames={{
@@ -153,7 +206,6 @@ const Upload = forwardRef(
                       onClick={async () => {
                         await downloadService?.({
                           file: item,
-                          fileName: item.name,
                         });
                       }}
                     />
@@ -167,14 +219,74 @@ const Upload = forwardRef(
                     />
                   </div>
                 </Card>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  },
-);
+              ))
+            )}
+          </div>
+        </>
+      )}
+
+      {props.multiple && listType === "picture-card" && (
+        <div className="flex gap-2">
+          {showZoneOnly && (
+            <UploadZone
+              className="cursor-pointer"
+              showZoneOnly={showZoneOnly}
+              // style={{ width, height }}
+              overrideClick={overrideClick}
+              progress={progress}
+              uploadService={uploadService}
+              onUploadSuccess={(file) => {
+                console.log("success");
+                setFiles([...files, file]);
+              }}
+              onChange={(file) => {
+                console.log("change", file);
+                if (file) {
+                  setFiles([...files, file]);
+                }
+              }}
+            >
+              {children}
+            </UploadZone>
+          )}
+          {!showZoneOnly &&
+            showUploadList &&
+            files.map((file, index) => {
+              return (
+                <UploadZone key={index} style={{ width, height }} file={file}>
+                  {() => {
+                    return "+";
+                  }}
+                </UploadZone>
+              );
+            })}
+          {!showZoneOnly && showUploadButton && (
+            <UploadZone
+              className="cursor-pointer"
+              style={{ width, height }}
+              overrideClick={overrideClick}
+              progress={progress}
+              uploadService={uploadService}
+              onUploadSuccess={(file) => {
+                console.log("success");
+                setFiles([...files, file]);
+              }}
+              onChange={(file) => {
+                console.log("change", file);
+              }}
+            >
+              {files.length === 0
+                ? children
+                : () => {
+                    return "+";
+                  }}
+            </UploadZone>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export { Upload };
 export type { UploadProps };

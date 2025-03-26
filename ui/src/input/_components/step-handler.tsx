@@ -20,7 +20,7 @@ export interface StepHandlerProps {
   downNode?: React.ReactNode;
   upDisabled?: boolean;
   downDisabled?: boolean;
-  onStep: (up: boolean) => void;
+  onStep: (up: boolean, emitter: "handler" | "keyboard" | "wheel") => void;
 }
 
 export default function StepHandler({
@@ -46,11 +46,11 @@ export default function StepHandler({
     e.preventDefault();
     onStopStep();
 
-    onStepRef.current?.(up);
+    onStepRef.current?.(up, "handler");
 
     // Loop step for interval
     function loopStep() {
-      onStepRef.current?.(up);
+      onStepRef.current?.(up, "handler");
 
       stepTimeoutRef.current = setTimeout(loopStep, STEP_INTERVAL);
     }
@@ -88,7 +88,9 @@ export default function StepHandler({
   };
 
   return (
-    <div className={cn("flex flex-col opacity-0", "group-hover:opacity-100")}>
+    <div
+      className={cn("flex flex-col justify-center", "group-hover:opacity-100")}
+    >
       <span
         {...sharedHandlerProps}
         onMouseDown={(e) => {
@@ -96,7 +98,7 @@ export default function StepHandler({
         }}
         aria-label="Increase Value"
         aria-disabled={upDisabled}
-        className={"flex bg-muted p-px hover:bg-muted-foreground"}
+        className={"bg-muted hover:bg-muted-foreground flex"}
       >
         {upNode ?? (
           <span
@@ -112,7 +114,7 @@ export default function StepHandler({
         }}
         aria-label="Decrease Value"
         aria-disabled={downDisabled}
-        className={"flex bg-muted p-px hover:bg-muted-foreground"}
+        className={"bg-muted hover:bg-muted-foreground flex"}
       >
         {downNode ?? (
           <span
