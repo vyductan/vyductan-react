@@ -6,14 +6,14 @@ import { useUiConfig } from "../store";
 
 // Based on Vercel
 const color: Record<string, string> = {
-  default: "bg-gray-100 text-gray-700 border-gray-300",
+  default: "bg-gray-100 text-gray-600 border-gray-300",
   primary: "bg-primary-300 text-primary-700 border-primary-300",
   success: "bg-green-100 text-green-700 border-green-300",
   processing: "bg-blue-100 text-blue-700 border-blue-300",
   error: "bg-red-100 text-red-700 border-red-300",
   warning: "bg-amber-100 text-amber-700 border-amber-300",
-  gray: "bg-gray-100 text-gray-700 border-gray-300",
-  yellow: "bg-yellow-100 text-yellow-700 border-yellow-300",
+  gray: "bg-gray-100 text-gray-600 border-gray-300",
+  yellow: "bg-yellow-100 text-yellow-800 border-yellow-300",
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",

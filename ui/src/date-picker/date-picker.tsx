@@ -30,7 +30,6 @@ type DateType<T extends DatePickerValueType> = T extends "date"
 
 type DatePickerBaseProps = InputVariants &
   VariantProps<typeof inputSizeVariants> & {
-    ref?: React.Ref<InputRef>;
     id?: string;
     format?: string;
     /** To provide an additional time selection **/
@@ -38,10 +37,12 @@ type DatePickerBaseProps = InputVariants &
 
     allowClear?: boolean;
     className?: string;
+    suffix?: React.ReactNode;
   };
 
 type DatePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
+    ref?: React.Ref<InputRef>;
     valueType?: T;
     defaultValue?: DateType<T>;
     value?: DateType<T>;

@@ -572,7 +572,6 @@ const Table = <TRecord extends AnyObject>({
                               <TableCell
                                 key={cell.id}
                                 size={size}
-                                style={getCommonPinningStyles(cell.column)}
                                 className={cn(
                                   // align
                                   cell.column.columnDef.meta?.align ===
@@ -592,6 +591,18 @@ const Table = <TRecord extends AnyObject>({
                                   cell.column.columnDef.meta?.className,
                                   cell.column.columnDef.meta?.classNames?.cell,
                                 )}
+                                style={{
+                                  ...getCommonPinningStyles(cell.column),
+                                  ...(typeof cell.column.columnDef.meta?.styles
+                                    ?.cell === "function"
+                                    ? cell.column.columnDef.meta.styles.cell({
+                                        record: row.original,
+                                        index: row.index,
+                                        row,
+                                        column: cell.column,
+                                      })
+                                    : cell.column.columnDef.meta?.styles?.cell),
+                                }}
                               >
                                 {flexRender(
                                   cell.column.columnDef.cell,
