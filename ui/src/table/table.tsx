@@ -563,7 +563,10 @@ const Table = <TRecord extends AnyObject>({
                           data-state={row.getIsSelected() && "selected"}
                           data-row-key={row.original[rowKey]}
                           className={cn(
-                            row.getIsExpanded() ? "border-x" : "",
+                            row.getIsExpanded() && "bg-gray-50",
+                            row.getIsExpanded() && bordered === false
+                              ? "border-x"
+                              : "",
                             getRowClassName(row, index),
                           )}
                         >
@@ -618,7 +621,10 @@ const Table = <TRecord extends AnyObject>({
                             <TableCell
                               colSpan={row.getVisibleCells().length}
                               size={size}
-                              className="border-x border-b px-4 text-[13px]"
+                              className={cn(
+                                // "px-4 text-[13px]",
+                                bordered === false && "border-x border-b",
+                              )}
                             >
                               {expandable.expandedRowRender(row.original)}
                             </TableCell>
