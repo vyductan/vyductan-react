@@ -1,5 +1,6 @@
 import type { PaginationProps } from "./pagination";
 import { PaginationItem, PaginationLink } from "./_components";
+import { generateHref } from "./pagination";
 
 type PagerProps = Pick<PaginationProps, "itemRender"> & {
   showTitle: boolean;
@@ -13,8 +14,6 @@ type PagerProps = Pick<PaginationProps, "itemRender"> & {
     onClick: PagerProps["onClick"],
     page: PagerProps["page"],
   ) => void;
-
-  hrefGenerator?: (page: number) => string;
 };
 
 const Pager = ({
@@ -26,7 +25,6 @@ const Pager = ({
   onClick,
   onKeyPress,
   itemRender,
-  hrefGenerator,
 }: PagerProps) => {
   const handleClick = () => {
     onClick?.(page);
@@ -37,7 +35,7 @@ const Pager = ({
   };
 
   const originalElement = (
-    <PaginationLink isActive={active} href={hrefGenerator?.(page)}>
+    <PaginationLink isActive={active} href={generateHref(page)}>
       {page}
     </PaginationLink>
   );

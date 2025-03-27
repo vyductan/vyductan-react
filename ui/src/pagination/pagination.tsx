@@ -64,7 +64,7 @@ export const Pagination = (props: PaginationProps) => {
     page: pageProp,
     defaultPage = 1,
     total = 0,
-    pageSize: pageSizeProp,
+    pageSize: pageSizeProp = 10,
     defaultPageSize = 10,
     onChange,
 
@@ -474,7 +474,7 @@ export const Pagination = (props: PaginationProps) => {
 //   element,
 // ) => element;
 
-function generateHref(page: number) {
+export function generateHref(page: number) {
   const searchParams = new URLSearchParams(globalThis.location.search);
   searchParams.set("page", String(page));
   const newSearch = searchParams.toString();
