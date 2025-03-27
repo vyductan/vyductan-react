@@ -137,6 +137,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       record: TRecord;
       row: Row<TRecord>;
       table: TableDef<TRecord>;
+      event: React.MouseEvent;
     }) => void;
   };
 
@@ -576,11 +577,12 @@ const Table = <TRecord extends AnyObject>({
                               : "",
                             getRowClassName(row, index),
                           )}
-                          onClick={() => {
+                          onClick={(e: React.MouseEvent) => {
                             onRow?.({
                               record: row.original,
                               row,
                               table,
+                              event: e,
                             });
                           }}
                         >
