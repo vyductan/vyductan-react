@@ -132,6 +132,12 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       sorter: SorterResult<TRecord>[],
       extra: TableCurrentDataSource<TRecord>,
     ) => void;
+
+    onRow?: (ctx: {
+      record: TRecord;
+      row: Row<TRecord>;
+      table: TableDef<TRecord>;
+    }) => void;
   };
 
 const Table = <TRecord extends AnyObject>({
@@ -165,6 +171,7 @@ const Table = <TRecord extends AnyObject>({
   summary,
 
   onChange,
+  onRow,
 
   ...props
 }: TableProps<TRecord>) => {
@@ -569,6 +576,13 @@ const Table = <TRecord extends AnyObject>({
                               : "",
                             getRowClassName(row, index),
                           )}
+                          onClick={() => {
+                            onRow?.({
+                              record: row.original,
+                              row,
+                              table,
+                            });
+                          }}
                         >
                           {row.getVisibleCells().map((cell) => {
                             return (
