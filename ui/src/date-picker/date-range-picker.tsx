@@ -117,7 +117,6 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             : undefined
         }
         onSelect={(dateRange) => {
-          console.log("ddddd", dateRange);
           if (!dateRange) {
             setValue(undefined);
             return;
@@ -130,7 +129,22 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
               getDestinationValue(dateRange.from!),
               getDestinationValue(dateRange.to),
             ]);
-            // setOpen(false);
+            setOpen(false);
+            onChange?.([
+              getDestinationValue(dateRange.from!),
+              getDestinationValue(dateRange.to),
+            ]);
+            // if (
+            //   value &&
+            //   value[0] !== defaultValue?.[0] &&
+            //   value[1] !== defaultValue?.[1]
+            // ) {
+            //   const start = value?.[0];
+            //   const end = value?.[1];
+            //   if (start !== undefined && end !== undefined) {
+            //     onChange?.([start, end]);
+            //   }
+            // }
           }
         }}
       />
@@ -144,9 +158,12 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     () => (
       <button
         type="button"
-        className={cn("flex transition-opacity duration-300 hover:opacity-50")}
+        className={cn(
+          "flex opacity-30 transition-opacity duration-300 hover:opacity-50",
+        )}
         onClick={() => {
           setValue(undefined);
+          onChange?.([null, null]);
         }}
       >
         <Icon
@@ -158,7 +175,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     [setValue],
   );
   const SuffixComp = useMemo(() => {
-    if (allowClear && value && (!suffix || (isHovering && suffix))) {
+    if (allowClear && value?.[0] && (!suffix || (isHovering && suffix))) {
       return ClearButton;
     } else if (suffix) {
       return (
@@ -230,21 +247,6 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         open={open}
         onOpenChange={(open) => {
           setOpen(open);
-          if (!open) {
-            // trigger onChange when value is set and close popover
-            if (
-              !open &&
-              value &&
-              value[0] !== defaultValue?.[0] &&
-              value[1] !== defaultValue?.[1]
-            ) {
-              const start = value?.[0];
-              const end = value?.[1];
-              if (start !== undefined && end !== undefined) {
-                onChange?.([start, end]);
-              }
-            }
-          }
         }}
         className="w-auto p-0"
         trigger="click"
