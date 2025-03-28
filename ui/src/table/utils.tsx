@@ -247,7 +247,9 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           <button
             {...{
               onClick: () => {
-                row.getToggleExpandedHandler()();
+                if (!props.expandable?.expandRowByClick) {
+                  row.getToggleExpandedHandler()();
+                }
               },
             }}
             className="flex w-full cursor-pointer items-center justify-center"
