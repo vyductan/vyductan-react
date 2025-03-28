@@ -19,9 +19,6 @@ export const alertVariants = cva(
       bordered: {
         false: "border-transparent",
       },
-      bordered: {
-        false: "border-transparent",
-      },
     },
     defaultVariants: {
       type: "default",
