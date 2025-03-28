@@ -94,6 +94,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       expandedRowRender: (record: TRecord) => React.ReactNode;
       rowExpandable?: (record: TRecord) => boolean;
       onExpand?: (record: TRecord) => void;
+      expandRowByClick?: boolean;
     };
     /** Row key config */
     rowKey?: keyof TRecord;
@@ -401,7 +402,7 @@ const Table = <TRecord extends AnyObject>({
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
               // "[&_table]:border-separate",
-              "[&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
+              // "[&>table]:border-spacing-0 [&>table]:rounded-md [&>table]:border",
               typeof bordered === "boolean" &&
                 "[&_th]:border-e [&_th:last-child]:border-e-0",
               typeof bordered === "boolean" &&
@@ -452,6 +453,7 @@ const Table = <TRecord extends AnyObject>({
                   }
                 : {}),
             }}
+            bordered={bordered}
             {...props}
           >
             <ColGroup columns={flattenColumns} />
@@ -584,6 +586,17 @@ const Table = <TRecord extends AnyObject>({
                               table,
                               event: e,
                             });
+
+                            if (expandable?.expandRowByClick) {
+                              const selection = window.getSelection();
+                              if (selection?.type === "Range") {
+                                return;
+                              }
+                              row.getToggleExpandedHandler()();
+                              // row.getToggleExpandedHandler()();
+                            }
+                            // e.preventDefault();
+                            // e.stopPropagation();
                           }}
                         >
                           {row.getVisibleCells().map((cell) => {
