@@ -2,13 +2,22 @@ import * as React from "react";
 
 import type { TableSize } from "../types";
 import { cn } from "../..";
+import { TableProps } from "../table";
 
-function TableRoot({ className, ...props }: React.ComponentProps<"table">) {
+function TableRoot({
+  className,
+  bordered,
+  ...props
+}: React.ComponentProps<"table"> & { bordered?: TableProps["bordered"] }) {
   return (
     <div className="relative w-full overflow-auto">
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn(
+          "w-full caption-bottom text-sm",
+          bordered && cn(["border-spacing-0 rounded-md border"]),
+          className,
+        )}
         {...props}
       />
     </div>
