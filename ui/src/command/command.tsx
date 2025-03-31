@@ -4,7 +4,7 @@ import type { Option } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { cn } from "..";
 import { Icon } from "../icons";
-import { selectColors } from "../select/colors";
+import { tagColors } from "../tag";
 import {
   CommandEmpty,
   CommandGroup,
@@ -129,8 +129,8 @@ export const Command = <T extends CommandValueType = string>({
                     : value === o.value)
                 }
                 className={cn(
-                  o.color ? selectColors[o.color] : "",
-                  "bg-transparent",
+                  o.color ? tagColors[o.color] : "",
+                  o.color ? "hover:bg-current/10" : "",
                   o.className,
                 )}
               >
