@@ -14,7 +14,7 @@ import { Command } from "../command";
 import { Icon } from "../icons";
 import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
-import { selectColors } from "../select/colors";
+import { tagColors } from "../tag";
 
 export type AutocompleteProps<
   T extends CommandValueType = string,
@@ -176,13 +176,13 @@ const Autocomplete = <
           // own
           "text-sm whitespace-normal",
           !value && "text-muted-foreground hover:text-muted-foreground",
-          selectColors[options.find((o) => o.value === value)?.color ?? ""],
+          tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
-            selectColors[
+            tagColors[
               options.find((o) => o.value === value)?.color ?? ""
             ]?.slice(
               0,
-              selectColors[
+              tagColors[
                 options.find((o) => o.value === value)?.color ?? ""
               ]?.indexOf(" "),
             ),
