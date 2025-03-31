@@ -1,6 +1,8 @@
 :root {
   --breakpoint-xs: 480px;
   --control-height: 32px;
+  --control-height-lg: 40px;
+  --control-height-sm: 24px;
   --margin-xs: 8px;
 }
 
@@ -11,4 +13,8 @@
   --color-link-hover: var(--color-blue-600);
   --color-success: var(--color-green-500);
   --color-success-hover: var(--color-green-600);
+
+  --spacing-control: var(--control-height);
+  --spacing-control-sm: var(--control-height-sm);
+  --spacing-control-lg: var(--control-height-lg);
 }
