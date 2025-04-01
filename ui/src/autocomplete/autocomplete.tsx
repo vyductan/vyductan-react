@@ -150,6 +150,7 @@ const Autocomplete = <
         // own
         "w-full min-w-(--radix-popover-trigger-width)", // make same select width
       )}
+      arrow={false}
       content={
         <Command
           placeholder={searchPlaceholder}
