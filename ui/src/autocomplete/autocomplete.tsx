@@ -128,14 +128,14 @@ const Autocomplete = <
             o.icon && <Icon icon={o.icon} />
           )}
           {typeof label === "string" ? (
-            <span className="line-clamp-1">{label}</span>
+            <span className="truncate">{label}</span>
           ) : (
             label
           )}
         </>
       );
     }
-    return <span className="line-clamp-1">{value}</span>;
+    return <span className="truncate">{value}</span>;
   })();
 
   return (
@@ -175,7 +175,7 @@ const Autocomplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "text-sm whitespace-normal",
+          "text-start text-sm whitespace-normal",
           !value && "text-muted-foreground hover:text-muted-foreground",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
