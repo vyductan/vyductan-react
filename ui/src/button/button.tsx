@@ -76,6 +76,7 @@ const buttonVariants = tv({
         "border-border border border-dashed",
         "hover:border-primary-600 hover:text-primary-600",
       ],
+      filled: [],
       ghost: [
         "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
       ],
@@ -185,6 +186,15 @@ const buttonVariants = tv({
       className: [
         "border-green-600 text-green-600",
         "hover:border-green-700 hover:text-green-700",
+      ],
+    },
+    // filled
+    {
+      variant: "filled",
+      color: "green",
+      className: [
+        "bg-green-100 text-green-600",
+        "hover:bg-green-200 hover:text-green-700",
       ],
     },
     // light
@@ -364,7 +374,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     return (
-      <Wave>
+      <Wave component="Button" disabled={loading}>
         <Comp
           ref={ref}
           className={cn(
