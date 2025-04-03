@@ -34,14 +34,27 @@ const buttonVariants = tv({
     },
     color: {
       default: [],
-      link: [],
       danger: [],
+      link: [],
       success: [],
-      amber: [],
-      green: [],
       gray: [],
+      red: [],
+      orange: [],
+      amber: [],
+      yellow: [],
+      lime: [],
+      green: [],
+      emerald: [],
       teal: [],
+      cyan: [],
+      sky: [],
+      blue: [],
+      indigo: [],
+      violet: [],
+      purple: [],
+      fuchsia: [],
       pink: [],
+      rose: [],
     },
     size: {
       sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
@@ -55,6 +68,7 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
+      solid: ["text-white"],
       outline: [
         "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
@@ -142,11 +156,36 @@ const buttonVariants = tv({
         "hover:border-pink-600 hover:bg-pink-600",
       ],
     },
+    {
+      variant: "solid",
+      color: "green",
+      className: [
+        "border-green-600 bg-green-600",
+        "hover:border-green-700 hover:bg-green-700",
+      ],
+    },
     // outline
+    {
+      variant: "outline",
+      color: "danger",
+      className: [
+        "border-error",
+        "hover:border-error-hover hover:text-error-hover",
+        "hover:bg-red-100 dark:hover:bg-red-300",
+      ],
+    },
     {
       variant: "outline",
       color: "link",
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
+    },
+    {
+      variant: "outline",
+      color: "green",
+      className: [
+        "border-green-600 text-green-600",
+        "hover:border-green-700 hover:text-green-700",
+      ],
     },
     // light
     {
@@ -193,16 +232,6 @@ const buttonVariants = tv({
         "border-primary text-primary bg-transparent",
         "hover:bg-primary-active hover:border-primary-hover hover:text-primary-hover",
         "hover:bg-blue-100 dark:hover:bg-blue-300",
-      ],
-    },
-    // outline
-    {
-      variant: "outline",
-      color: "danger",
-      className: [
-        "border-error",
-        "hover:border-error-hover hover:text-error-hover",
-        "hover:bg-red-100 dark:hover:bg-red-300",
       ],
     },
     // Ghost
@@ -273,7 +302,7 @@ export interface ButtonProps
   href?: string;
   loading?: boolean;
   icon?: React.ReactNode;
-  color?: NonNullable<ButtonVariants["color"]>;
+  color?: ButtonVariants["color"];
   variant?: Exclude<ButtonVariants["variant"], "primary">;
   classNames?: {
     variants?: TVButtonOptions;

@@ -17,13 +17,15 @@ const color: Record<string, string> = {
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
-  green: "bg-green-100 text-green-700 border-green-300",
+  green: "bg-green-200  border-green-300",
   orange: "bg-orange-100 text-orange-700 border-orange-300",
   red: "bg-red-100 text-red-700 border-red-300",
   rose: "bg-rose-100 text-rose-700 border-rose-300",
   pink: "bg-pink-100 text-pink-700 border-pink-300",
   purple: "bg-purple-100 text-purple-700 border-purple-300",
   teal: "bg-teal-100 text-teal-700 border-teal-300",
+
+  "green-solid": "bg-green-600 text-white",
 };
 
 // Based on antd
@@ -64,6 +66,8 @@ const tagVariants = tv({
         "bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 text-white",
       outline:
         "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+      // own
+      solid: "text-white",
     },
     color,
     bordered: {
@@ -86,6 +90,16 @@ const tagVariants = tv({
       bordered: true,
       color: "primary",
       className: colorBordered.primary,
+    },
+    {
+      variant: "default",
+      color: "green",
+      className: "text-green-700",
+    },
+    {
+      variant: "solid",
+      color: "green",
+      className: "bg-green-600",
     },
   ],
 });
