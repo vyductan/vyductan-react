@@ -588,7 +588,7 @@ const Table = <TRecord extends AnyObject>({
                             });
 
                             if (expandable?.expandRowByClick) {
-                              const selection = window.getSelection();
+                              const selection = globalThis.getSelection();
                               if (selection?.type === "Range") {
                                 return;
                               }
@@ -666,7 +666,10 @@ const Table = <TRecord extends AnyObject>({
                   <TableRow className="hover:bg-transparent">
                     <TableCell
                       colSpan={columns.length}
-                      className={cn("h-48 text-center", bordered && "border-e")}
+                      className={cn(
+                        "text-muted-foreground h-48 text-center",
+                        bordered && "border-e",
+                      )}
                     >
                       {!loading && locale.emptyText}
                     </TableCell>
