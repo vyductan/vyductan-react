@@ -474,7 +474,7 @@ export const Pagination = (props: PaginationProps) => {
 //   element,
 // ) => element;
 
-export function generateHref(page: number) {
+function generateHref(page: number) {
   const searchParams = new URLSearchParams(globalThis.location.search);
   searchParams.set("page", String(page));
   const newSearch = searchParams.toString();

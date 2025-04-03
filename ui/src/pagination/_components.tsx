@@ -110,7 +110,6 @@ function PaginationPrevious({
 
 function PaginationNext({
   className,
-  asChild,
   children: childrenProp,
   ...props
 }: Omit<React.ComponentProps<typeof PaginationLink>, "children"> & {
