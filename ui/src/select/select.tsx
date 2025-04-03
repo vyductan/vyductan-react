@@ -32,10 +32,9 @@ export type SelectProps<T extends ValueType = string> = Omit<
     placeholder?: string;
 
     allowClear?: boolean;
+    loading?: boolean;
 
     className?: string;
-    groupClassName?: string;
-    loading?: boolean;
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     optionRender?: (option: Option<T>) => {
@@ -55,6 +54,7 @@ const Select = <T extends ValueType = string>({
   placeholder,
 
   allowClear,
+  loading,
 
   className,
   borderless,
@@ -122,6 +122,7 @@ const Select = <T extends ValueType = string>({
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           className,
         )}
+        loading={loading}
         borderless={borderless}
         size={size}
         status={status}

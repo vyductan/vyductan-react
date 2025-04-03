@@ -33,6 +33,7 @@ type SelectTriggerProps = Omit<
   VariantProps<typeof inputSizeVariants> & {
     allowClear?: boolean | undefined;
     onClear?: () => void;
+    loading?: boolean;
     /* For clear */
     value?: ValueType | undefined;
   };
@@ -46,6 +47,7 @@ const SelectTrigger = ({
 
   allowClear,
   onClear,
+  loading,
   value,
 
   ...props
@@ -90,12 +92,19 @@ const SelectTrigger = ({
           />
         </button>
       )}
+      {loading && (
+        <Icon
+          icon="icon-[lucide--loader]"
+          className="flex size-5 items-center justify-center pl-1 opacity-50 transition-opacity"
+        />
+      )}
       <SelectPrimitive.Icon
         // asChild
         className={cn(
           "flex size-5 items-center justify-center opacity-50 transition-opacity",
           "pl-1",
           allowClear && value && "group-hover:opacity-0",
+          loading && "opacity-0",
         )}
       >
         <Icon icon="icon-[lucide--chevron-down]" />
