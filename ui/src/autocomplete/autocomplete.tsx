@@ -9,7 +9,7 @@ import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { cn } from "..";
-import { Button } from "../button";
+import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
 import { inputSizeVariants } from "../input";
@@ -43,6 +43,7 @@ export type AutocompleteProps<
   open?: boolean;
 
   allowClear?: boolean;
+  loading?: boolean;
 
   searchPlaceholder?: string;
   onSearchChange?: (search: string) => void;
@@ -67,6 +68,7 @@ const Autocomplete = <
   placeholder,
 
   allowClear,
+  loading,
 
   onChange,
 
@@ -200,6 +202,7 @@ const Autocomplete = <
             allowClear &&
               value &&
               "transition-opacity duration-300 group-hover:opacity-0",
+            loading && "opacity-0",
           )}
         />
         {allowClear && (
@@ -227,6 +230,9 @@ const Autocomplete = <
               className="pointer-events-none size-3.5"
             />
           </span>
+        )}
+        {loading && (
+          <LoadingIcon className={cn("absolute right-3 z-10 size-3.5")} />
         )}
       </Button>
     </Popover>
