@@ -22,7 +22,6 @@ const defaultReactRender: RenderType = (node, container) => {
       10,
     );
     const fullKeys = Object.keys(ReactDOM);
-    console.log("??", React.version, majorVersion, fullKeys);
 
     warning(
       majorVersion < 19 || fullKeys.includes("createRoot"),
