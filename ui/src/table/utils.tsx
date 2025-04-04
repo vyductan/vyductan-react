@@ -43,6 +43,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         fixed,
         className,
         classNames,
+        styles,
         defaultSortOrder,
         sorter,
         attributes,
@@ -89,6 +90,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           sorter,
           className,
           classNames,
+          styles,
           attributes,
           headAttributes,
         },
@@ -245,7 +247,9 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           <button
             {...{
               onClick: () => {
-                row.getToggleExpandedHandler()();
+                if (!props.expandable?.expandRowByClick) {
+                  row.getToggleExpandedHandler()();
+                }
               },
             }}
             className="flex w-full cursor-pointer items-center justify-center"

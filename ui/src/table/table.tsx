@@ -94,6 +94,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       expandedRowRender: (record: TRecord) => React.ReactNode;
       rowExpandable?: (record: TRecord) => boolean;
       onExpand?: (record: TRecord) => void;
+      expandRowByClick?: boolean;
     };
     /** Row key config */
     rowKey?: keyof TRecord;
@@ -132,6 +133,13 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       sorter: SorterResult<TRecord>[],
       extra: TableCurrentDataSource<TRecord>,
     ) => void;
+
+    onRow?: (ctx: {
+      record: TRecord;
+      row: Row<TRecord>;
+      table: TableDef<TRecord>;
+      event: React.MouseEvent;
+    }) => void;
   };
 
 const Table = <TRecord extends AnyObject>({
@@ -165,6 +173,7 @@ const Table = <TRecord extends AnyObject>({
   summary,
 
   onChange,
+  onRow,
 
   ...props
 }: TableProps<TRecord>) => {
@@ -393,7 +402,7 @@ const Table = <TRecord extends AnyObject>({
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
               // "[&_table]:border-separate",
-              "[&_table]:border-spacing-0 [&_table]:rounded-md [&_table]:border",
+              // "[&>table]:border-spacing-0 [&>table]:rounded-md [&>table]:border",
               typeof bordered === "boolean" &&
                 "[&_th]:border-e [&_th:last-child]:border-e-0",
               typeof bordered === "boolean" &&
@@ -444,6 +453,7 @@ const Table = <TRecord extends AnyObject>({
                   }
                 : {}),
             }}
+            bordered={bordered}
             {...props}
           >
             <ColGroup columns={flattenColumns} />
@@ -563,16 +573,37 @@ const Table = <TRecord extends AnyObject>({
                           data-state={row.getIsSelected() && "selected"}
                           data-row-key={row.original[rowKey]}
                           className={cn(
-                            row.getIsExpanded() ? "border-x" : "",
+                            row.getIsExpanded() && "bg-gray-50",
+                            row.getIsExpanded() && bordered === false
+                              ? "border-x"
+                              : "",
                             getRowClassName(row, index),
                           )}
+                          onClick={(e: React.MouseEvent) => {
+                            onRow?.({
+                              record: row.original,
+                              row,
+                              table,
+                              event: e,
+                            });
+
+                            if (expandable?.expandRowByClick) {
+                              const selection = globalThis.getSelection();
+                              if (selection?.type === "Range") {
+                                return;
+                              }
+                              row.getToggleExpandedHandler()();
+                              // row.getToggleExpandedHandler()();
+                            }
+                            // e.preventDefault();
+                            // e.stopPropagation();
+                          }}
                         >
                           {row.getVisibleCells().map((cell) => {
                             return (
                               <TableCell
                                 key={cell.id}
                                 size={size}
-                                style={getCommonPinningStyles(cell.column)}
                                 className={cn(
                                   // align
                                   cell.column.columnDef.meta?.align ===
@@ -592,6 +623,18 @@ const Table = <TRecord extends AnyObject>({
                                   cell.column.columnDef.meta?.className,
                                   cell.column.columnDef.meta?.classNames?.cell,
                                 )}
+                                style={{
+                                  ...getCommonPinningStyles(cell.column),
+                                  ...(typeof cell.column.columnDef.meta?.styles
+                                    ?.cell === "function"
+                                    ? cell.column.columnDef.meta.styles.cell({
+                                        record: row.original,
+                                        index: row.index,
+                                        row,
+                                        column: cell.column,
+                                      })
+                                    : cell.column.columnDef.meta?.styles?.cell),
+                                }}
                               >
                                 {flexRender(
                                   cell.column.columnDef.cell,
@@ -607,7 +650,10 @@ const Table = <TRecord extends AnyObject>({
                             <TableCell
                               colSpan={row.getVisibleCells().length}
                               size={size}
-                              className="border-x border-b px-4 text-[13px]"
+                              className={cn(
+                                // "px-4 text-[13px]",
+                                bordered === false && "border-x border-b",
+                              )}
                             >
                               {expandable.expandedRowRender(row.original)}
                             </TableCell>
@@ -620,7 +666,10 @@ const Table = <TRecord extends AnyObject>({
                   <TableRow className="hover:bg-transparent">
                     <TableCell
                       colSpan={columns.length}
-                      className={cn("h-48 text-center", bordered && "border-e")}
+                      className={cn(
+                        "text-muted-foreground h-48 text-center",
+                        bordered && "border-e",
+                      )}
                     >
                       {!loading && locale.emptyText}
                     </TableCell>

@@ -1,80 +1,45 @@
+/* eslint-disable react-compiler/react-compiler */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 // Jun 15, 2024
-import type { Root } from "react-dom/client";
 import * as React from "react";
 import raf from "@rc-component/util/lib/raf";
-import { unmount } from "@rc-component/util/lib/React/render";
-import { cubicBezier, motion } from "framer-motion";
-import ReactDOM from "react-dom";
+import { motion } from "motion/react";
 
-import type { ShowWaveEffect, WaveAllowedComponent } from "./interface";
-import { getTargetWaveColor, isNotGrey } from "./util";
+import type { UnmountType } from "../../config-provider/unstable-context";
+import type { ShowWaveEffect, WaveComponent } from "./interface";
+import { getReactRender } from "../../config-provider/unstable-context";
+import { TARGET_CLS } from "./interface";
+import {
+  motionDurationSlow,
+  motionEaseInOut,
+  motionEaseOutCirc,
+} from "./token";
+import { getTargetWaveColor } from "./util";
 
-// https://github.com/react-component/util/blob/master/src/React/render.ts
-// May 10, 2022
-// Let compiler not to search module usage
-const fullClone = {
-  ...ReactDOM,
-} as typeof ReactDOM & {
-  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?: {
-    usingClientEntryPoint?: boolean;
-  };
-  createRoot?: CreateRoot;
-};
-
-type CreateRoot = (container: ContainerType) => Root;
-
-const { version } = fullClone;
-
-let createRoot: CreateRoot | undefined;
-try {
-  const mainVersion = Number((version || "").split(".")[0]);
-  if (mainVersion >= 18) {
-    ({ createRoot } = fullClone);
-  }
-} catch {
-  // Do nothing;
-}
-
-function toggleWarning(skip: boolean) {
-  const { __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED } = fullClone;
-
-  if (
-    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED &&
-    typeof __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED === "object"
-  ) {
-    __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.usingClientEntryPoint =
-      skip;
-  }
-}
-const MARK = "__rc_react_root__";
-type ContainerType = (Element | DocumentFragment) & {
-  [MARK]?: Root;
-};
-function modernRender(node: React.ReactElement, container: ContainerType) {
-  toggleWarning(true);
-  const root = container[MARK] ?? createRoot?.(container);
-  toggleWarning(false);
-
-  root?.render(node);
-
-  container[MARK] = root;
-}
-
-function validateNumber(value: number) {
+function validateNum(value: number) {
   return Number.isNaN(value) ? 0 : value;
 }
 
 export interface WaveEffectProps {
   className: string;
   target: HTMLElement;
-  component?: WaveAllowedComponent;
+  component?: WaveComponent;
+  registerUnmount: () => UnmountType | null;
 }
 
 const WaveEffect: React.FC<WaveEffectProps> = (props) => {
-  const { className, target, component } = props;
+  const { className, target, component, registerUnmount } = props;
   const divRef = React.useRef<HTMLDivElement>(null);
 
+  // ====================== Refs ======================
+  const unmountRef = React.useRef<UnmountType>(null);
+
+  React.useEffect(() => {
+    unmountRef.current = registerUnmount();
+  }, []);
+
+  // ===================== Effect =====================
   const [color, setWaveColor] = React.useState<string | null>(null);
   const [borderRadius, setBorderRadius] = React.useState<number[]>([]);
   const [left, setLeft] = React.useState(0);
@@ -83,21 +48,22 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
   const [height, setHeight] = React.useState(0);
   const [enabled, setEnabled] = React.useState(false);
 
-  const waveStyle = {
+  const waveStyle: React.CSSProperties = {
     left,
     top,
     width,
     height,
     borderRadius: borderRadius.map((radius) => `${radius}px`).join(" "),
-  } as React.CSSProperties & Record<string, number | string>;
+  };
 
-  // if (color) {
-  //   waveStyle["--wave-color"] = color;
-  // }
+  if (color) {
+    (waveStyle as Record<string, string>)["--wave-color"] = color;
+  }
 
   function syncPos() {
     const nodeStyle = getComputedStyle(target);
 
+    // console.log("cccc", getTargetWaveColor(target));
     // Get wave color from target
     setWaveColor(getTargetWaveColor(target));
 
@@ -108,12 +74,12 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
     setLeft(
       isStatic
         ? target.offsetLeft
-        : validateNumber(-Number.parseFloat(borderLeftWidth)),
+        : validateNum(-Number.parseFloat(borderLeftWidth)),
     );
     setTop(
       isStatic
         ? target.offsetTop
-        : validateNumber(-Number.parseFloat(borderTopWidth)),
+        : validateNum(-Number.parseFloat(borderTopWidth)),
     );
     setWidth(target.offsetWidth);
     setHeight(target.offsetHeight);
@@ -132,7 +98,7 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
         borderTopRightRadius,
         borderBottomRightRadius,
         borderBottomLeftRadius,
-      ].map((radius) => validateNumber(Number.parseFloat(radius))),
+      ].map((radius) => validateNum(Number.parseFloat(radius))),
     );
   }
 
@@ -159,58 +125,63 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
         resizeObserver?.disconnect();
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!enabled) {
     return null;
   }
 
-  const isSmallComponent = component === "Checkbox" || component === "Radio";
+  if (!enabled) {
+    return null;
+  }
 
-  // styles
-  // https://github.com/ant-design/ant-design/blob/2c029eacada8446da060ca3953400a2f2c02ab07/components/_util/wave/style.ts#L22
-  // https://github.com/ant-design/ant-design/blob/2c029eacada8446da060ca3953400a2f2c02ab07/components/theme/themes/seed.ts#L48C23-L48C56
-  const easeOutCirc = cubicBezier(0.08, 0.82, 0.17, 1);
-  const easeInOut = cubicBezier(0.645, 0.045, 0.355, 1);
-
-  const inititalOpacity = isNotGrey(color ?? "") ? 0.2 : 0.6;
+  // use for wave-quick or not
+  const isSmallComponent =
+    (component === "Checkbox" || component === "Radio") &&
+    target?.classList.contains(TARGET_CLS);
 
   return (
     <motion.div
       ref={divRef}
       className={className}
       style={waveStyle}
-      initial={{ opacity: inititalOpacity }}
+      initial={{
+        position: "absolute",
+        background: "transparent",
+        pointerEvents: "none",
+        boxSizing: "border-box",
+        color: `var(--wave-color, --color-primary-600)`,
+        opacity: 0.2,
+        boxShadow: "0 0 0 0 currentColor",
+      }}
       animate={{
-        // position: "absolute", // fix framer motion warning
-        boxShadow: "0 0 0 6px " + color,
+        boxShadow: "0 0 0 6px currentColor",
         opacity: 0,
         transition: isSmallComponent
           ? {
               boxShadow: {
-                ease: easeInOut,
-                duration: 0.3,
+                ease: motionEaseInOut,
+                duration: motionDurationSlow,
               },
               opacity: {
-                ease: easeInOut,
-                duration: 0.35,
+                ease: motionEaseInOut,
+                duration: motionDurationSlow,
               },
             }
           : {
               boxShadow: {
-                ease: easeOutCirc,
+                ease: motionEaseOutCirc,
                 duration: 0.4,
               },
               opacity: {
-                ease: easeOutCirc,
+                ease: motionEaseOutCirc,
                 duration: 2,
               },
             },
       }}
       onAnimationComplete={() => {
         const holder = divRef.current?.parentElement;
-        void unmount(holder!).then(() => {
+        void unmountRef.current?.().then(() => {
           holder?.remove();
         });
       }}
@@ -236,7 +207,18 @@ const showWaveEffect: ShowWaveEffect = (target, info) => {
   holder.style.top = "0px";
   target?.insertBefore(holder, target?.firstChild);
 
-  modernRender(<WaveEffect {...info} target={target} />, holder);
+  const reactRender = getReactRender();
+
+  let unmountCallback: UnmountType | null = null;
+
+  function registerUnmount() {
+    return unmountCallback;
+  }
+
+  unmountCallback = reactRender(
+    <WaveEffect {...info} target={target} registerUnmount={registerUnmount} />,
+    holder,
+  );
 };
 
 export default showWaveEffect;

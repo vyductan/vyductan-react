@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
+import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "@rc-component/util";
+import { composeRef } from "@rc-component/util/lib/ref";
+import { useHover } from "ahooks";
 import { formatDate, toDate } from "date-fns";
+import { motion } from "framer-motion";
 
 import type {
   DatePickerBaseProps,
@@ -24,11 +28,11 @@ type NoUndefinedRangeValueType<DateType> = [
 
 type DateRangePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
-    ref?: React.Ref<HTMLDivElement>;
+    ref?: React.RefObject<HTMLDivElement | null>;
 
     valueType?: T;
     value?: RangeValueType<DateType<T>> | null;
-    defaultValue?: RangeValueType<DateType<T>>;
+    defaultValue?: RangeValueType<DateType<T>> | null;
     /** Callback function, can be executed when the selected time is changing */
     onChange?: (dates: NoUndefinedRangeValueType<DateType<T>> | null) => void;
 
@@ -38,7 +42,7 @@ type DateRangePickerProps<T extends DatePickerValueType = "date"> =
 const DateRangePicker = <T extends DatePickerValueType = "date">({
   valueType,
 
-  ref,
+  ref: refProp,
 
   id: inputId,
 
@@ -47,12 +51,20 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   format = "dd/MM/yyyy",
   // size,
   // status,
+  placeholder,
 
   // valueType,
   showTime,
 
-  // allowClear = false,
   className,
+  allowClear = false,
+  suffix = (
+    <Icon icon="icon-[mingcute--calendar-2-line]" className="opacity-50" />
+  ),
+
+  defaultValue,
+  value: valueProp,
+  onChange,
   ...props
 }: DateRangePickerProps<T>) => {
   const [open, setOpen] = React.useState(false);
@@ -77,16 +89,16 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     [format, valueType],
   );
 
-  const [value, setValue] = useMergedState(props.defaultValue, {
-    value: props.value,
-    onChange: (value) => {
-      const start = value?.[0];
-      const end = value?.[1];
-      if (start !== undefined && end !== undefined) {
-        props.onChange?.([start, end]);
+  const [value, setValue] = useMergedState(valueProp ?? defaultValue, {});
+  useEffect(() => {
+    // sync parent value
+    setValue((pre) => {
+      if (valueProp?.[0] !== pre?.[0] || valueProp?.[1] !== pre?.[1]) {
+        return valueProp;
       }
-    },
-  });
+      return pre;
+    });
+  }, [valueProp, setValue]);
 
   const CalendarComponent = React.useMemo(() => {
     return (
@@ -113,13 +125,68 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             setValue([getDestinationValue(dateRange.from), value?.[1]]);
           }
           if (dateRange.to && value) {
-            setValue([value[0], getDestinationValue(dateRange.to)]);
+            setValue([
+              getDestinationValue(dateRange.from!),
+              getDestinationValue(dateRange.to),
+            ]);
             setOpen(false);
+            onChange?.([
+              getDestinationValue(dateRange.from!),
+              getDestinationValue(dateRange.to),
+            ]);
+            // if (
+            //   value &&
+            //   value[0] !== defaultValue?.[0] &&
+            //   value[1] !== defaultValue?.[1]
+            // ) {
+            //   const start = value?.[0];
+            //   const end = value?.[1];
+            //   if (start !== undefined && end !== undefined) {
+            //     onChange?.([start, end]);
+            //   }
+            // }
           }
         }}
       />
     );
   }, [value, setValue, getDestinationValue]);
+
+  const valueCompRef = React.useRef<HTMLDivElement>(null);
+  const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
+  const isHovering = useHover(ref as React.RefObject<HTMLDivElement | null>);
+  const ClearButton = useMemo(
+    () => (
+      <button
+        type="button"
+        className={cn(
+          "flex opacity-30 transition-opacity duration-300 hover:opacity-50",
+        )}
+        onClick={() => {
+          setValue(undefined);
+          onChange?.([null, null]);
+        }}
+      >
+        <Icon
+          icon="icon-[ant-design--close-circle-filled]"
+          className="pointer-events-none size-3.5"
+        />
+      </button>
+    ),
+    [setValue],
+  );
+  const SuffixComp = useMemo(() => {
+    if (allowClear && value?.[0] && (!suffix || (isHovering && suffix))) {
+      return ClearButton;
+    } else if (suffix) {
+      return (
+        <Slot className={cn("flex shrink-0 items-center")}>
+          {typeof suffix === "string" ? <span>{suffix}</span> : suffix}
+        </Slot>
+      );
+    } else {
+      return null;
+    }
+  }, [allowClear, value, suffix, isHovering, ClearButton]);
 
   const ValueComponent = React.useMemo(() => {
     const input1 = value?.[0]
@@ -128,13 +195,14 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     const input2 = value?.[1]
       ? formatDate(toDate(value[1]), format)
       : undefined;
+
     return (
       <div
         ref={ref}
         className={cn(
           inputVariants({ disabled }),
           inputSizeVariants(),
-          "gap-2",
+          "items-center justify-between gap-2",
           className,
         )}
         onClick={() => {
@@ -142,21 +210,17 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         }}
       >
         <div>
-          <span>{input1}</span>
-          <span
-            className={cn(
-              "text-muted-foreground px-2 text-center",
-              !input1 && !input2 && "opacity-0",
-            )}
-          >
+          <span className={cn(!input1 && "text-muted-foreground")}>
+            {input1 ?? placeholder?.[0] ?? "Start Date"}
+          </span>
+          <span className={cn("text-muted-foreground px-2 text-center")}>
             -
           </span>
-          <span>{input2}</span>
+          <span className={cn(!input2 && "text-muted-foreground")}>
+            {input2 ?? placeholder?.[1] ?? "End Date"}
+          </span>
         </div>
-        <Icon
-          icon="icon-[mingcute--calendar-2-line]"
-          className="ml-auto size-4 opacity-50"
-        />
+        {SuffixComp}
       </div>
     );
   }, [
@@ -164,6 +228,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     format,
     className,
     value,
+    // setValue,
     // allowClear,
     // borderless,
     // inputId,
@@ -172,12 +237,17 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
     // status,
     // ref,
     disabled,
+    placeholder,
+    SuffixComp,
   ]);
 
   return (
     <>
       <Popover
         open={open}
+        onOpenChange={(open) => {
+          setOpen(open);
+        }}
         className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"

@@ -1,12 +1,3 @@
-/* eslint-disable unicorn/no-null */
-export function isNotGrey(color: string) {
-  const match = /rgba?\((\d*), (\d*), (\d*)(, [\d.]*)?\)/.exec(color || "");
-  if (match?.[1] && match[2] && match[3]) {
-    return !(match[1] === match[2] && match[2] === match[3]);
-  }
-  return true;
-}
-
 export function isValidWaveColor(color: string) {
   return (
     color &&
@@ -14,7 +5,6 @@ export function isValidWaveColor(color: string) {
     color !== "#ffffff" &&
     color !== "rgb(255, 255, 255)" &&
     color !== "rgba(255, 255, 255, 1)" &&
-    // isNotGrey(color) && // disable this line to allow show wave on grey color
     !/rgba\((?:\d*, ){3}0\)/.test(color) && // any transparent rgba color
     color !== "transparent"
   );
