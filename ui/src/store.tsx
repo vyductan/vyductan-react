@@ -4,6 +4,7 @@ import React from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
+import type { WaveConfig } from "./_util/wave/interface";
 import type { ButtonProps } from "./button";
 import type { DatePickerProps } from "./date-picker";
 import type { PageContainerProps } from "./layout/page-container";
@@ -38,6 +39,7 @@ type UiConfigState = {
     };
     pagination?: Partial<Pick<PaginationProps, "itemRender">>;
     table?: Partial<Pick<TableProps, "bordered">>;
+    wave?: WaveConfig;
   };
 };
 type UiConfigStore = UiConfigState;
@@ -54,6 +56,9 @@ const defaultInitState: UiConfigState = {
         subtitle: <></>,
         extra: <></>,
       },
+    },
+    wave: {
+      disabled: false,
     },
   },
 };

@@ -9,6 +9,7 @@ import type { SelectRootProps } from "./_components";
 import type { Option } from "./types";
 import { cn } from "..";
 import { Empty } from "../empty";
+import { tagColors } from "../tag";
 import {
   SelectContent,
   SelectItem,
@@ -16,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./_components";
-import { selectColors } from "./colors";
 
 export type SelectProps<T extends ValueType = string> = Omit<
   SelectRootProps,
@@ -32,10 +32,9 @@ export type SelectProps<T extends ValueType = string> = Omit<
     placeholder?: string;
 
     allowClear?: boolean;
+    loading?: boolean;
 
     className?: string;
-    groupClassName?: string;
-    loading?: boolean;
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     optionRender?: (option: Option<T>) => {
@@ -55,6 +54,7 @@ const Select = <T extends ValueType = string>({
   placeholder,
 
   allowClear,
+  loading,
 
   className,
   borderless,
@@ -87,8 +87,8 @@ const Select = <T extends ValueType = string>({
             key={String(o.value)}
             value={o.value as string}
             className={cn(
-              o.color ? selectColors[o.color] : "",
-              "bg-transparent",
+              o.color ? tagColors[o.color] : "",
+              o.color ? "hover:bg-current/10" : "",
             )}
           >
             {o.label}
@@ -119,9 +119,10 @@ const Select = <T extends ValueType = string>({
         id={id}
         className={cn(
           "w-full",
-          selectColors[options.find((o) => o.value === value)?.color ?? ""],
+          tagColors[options.find((o) => o.value === value)?.color ?? ""],
           className,
         )}
+        loading={loading}
         borderless={borderless}
         size={size}
         status={status}
@@ -134,7 +135,14 @@ const Select = <T extends ValueType = string>({
       >
         <SelectValue placeholder={placeholder} className="h-5" />
       </SelectTrigger>
-      <SelectContent>{ContentComp}</SelectContent>
+      <SelectContent
+        // className={options.some((o) => o.color) ? "space-y-2" : ""}
+        classNames={{
+          viewport: options.some((o) => o.color) ? "space-y-2" : "",
+        }}
+      >
+        {ContentComp}
+      </SelectContent>
     </SelectRoot>
   );
 };

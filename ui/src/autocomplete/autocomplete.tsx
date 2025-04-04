@@ -9,12 +9,12 @@ import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { cn } from "..";
-import { Button } from "../button";
+import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
 import { Icon } from "../icons";
 import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
-import { selectColors } from "../select/colors";
+import { tagColors } from "../tag";
 
 export type AutocompleteProps<
   T extends CommandValueType = string,
@@ -43,6 +43,7 @@ export type AutocompleteProps<
   open?: boolean;
 
   allowClear?: boolean;
+  loading?: boolean;
 
   searchPlaceholder?: string;
   onSearchChange?: (search: string) => void;
@@ -67,6 +68,7 @@ const Autocomplete = <
   placeholder,
 
   allowClear,
+  loading,
 
   onChange,
 
@@ -128,14 +130,14 @@ const Autocomplete = <
             o.icon && <Icon icon={o.icon} />
           )}
           {typeof label === "string" ? (
-            <span className="line-clamp-1">{label}</span>
+            <span className="truncate">{label}</span>
           ) : (
             label
           )}
         </>
       );
     }
-    return <span className="line-clamp-1">{value}</span>;
+    return <span className="truncate">{value}</span>;
   })();
 
   return (
@@ -150,6 +152,7 @@ const Autocomplete = <
         // own
         "w-full min-w-(--radix-popover-trigger-width)", // make same select width
       )}
+      arrow={false}
       content={
         <Command
           placeholder={searchPlaceholder}
@@ -174,15 +177,15 @@ const Autocomplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "text-sm whitespace-normal",
+          "text-start text-sm whitespace-normal",
           !value && "text-muted-foreground hover:text-muted-foreground",
-          selectColors[options.find((o) => o.value === value)?.color ?? ""],
+          tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
-            selectColors[
+            tagColors[
               options.find((o) => o.value === value)?.color ?? ""
             ]?.slice(
               0,
-              selectColors[
+              tagColors[
                 options.find((o) => o.value === value)?.color ?? ""
               ]?.indexOf(" "),
             ),
@@ -199,6 +202,7 @@ const Autocomplete = <
             allowClear &&
               value &&
               "transition-opacity duration-300 group-hover:opacity-0",
+            loading && "opacity-0",
           )}
         />
         {allowClear && (
@@ -226,6 +230,9 @@ const Autocomplete = <
               className="pointer-events-none size-3.5"
             />
           </span>
+        )}
+        {loading && (
+          <LoadingIcon className={cn("absolute right-3 z-10 size-3.5")} />
         )}
       </Button>
     </Popover>

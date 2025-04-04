@@ -1,18 +1,17 @@
-/* eslint-disable unicorn/no-null */
+/* eslint-disable react-compiler/react-compiler */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import React, { cloneElement, useRef } from "react";
 import isVisible from "@rc-component/util/lib/Dom/isVisible";
-import { composeRef, supportRef } from "@rc-component/util/lib/ref";
+import { composeRef, getNodeRef, supportRef } from "@rc-component/util/lib/ref";
 
-import type { WaveAllowedComponent } from "./interface";
+import type { WaveComponent } from "./interface";
 import useWave from "./use-wave";
 
 export interface WaveProps {
   disabled?: boolean;
   children?: React.ReactNode;
-  component?: WaveAllowedComponent;
+  component?: WaveComponent;
 }
 
 const Wave: React.FC<WaveProps> = (props) => {
@@ -43,7 +42,6 @@ const Wave: React.FC<WaveProps> = (props) => {
       ) {
         return;
       }
-
       showWave(e);
     };
 
@@ -52,8 +50,7 @@ const Wave: React.FC<WaveProps> = (props) => {
     return () => {
       node.removeEventListener("click", onClick, true);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  }, [disabled, showWave]);
 
   // ============================== Render ==============================
   if (!React.isValidElement(children)) {
@@ -61,7 +58,7 @@ const Wave: React.FC<WaveProps> = (props) => {
   }
 
   const ref = supportRef(children)
-    ? composeRef((children as any).props.ref, containerRef)
+    ? composeRef(getNodeRef(children), containerRef)
     : containerRef;
 
   return cloneElement<any>(children, { ref });
