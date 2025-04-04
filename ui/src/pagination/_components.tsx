@@ -101,7 +101,7 @@ function PaginationPrevious({
       size="default"
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
       asChild={asChild}
-      {...(children ? props : {})}
+      {...(childrenProp ? {} : props)}
     >
       {children}
     </PaginationLink>
@@ -109,6 +109,7 @@ function PaginationPrevious({
 }
 
 function PaginationNext({
+  asChild,
   className,
   children: childrenProp,
   ...props
@@ -134,7 +135,7 @@ function PaginationNext({
       size="default"
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
       asChild={asChild}
-      {...(children ? props : {})}
+      {...(childrenProp ? {} : props)}
     >
       {children}
     </PaginationLink>
