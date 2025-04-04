@@ -38,7 +38,7 @@ const Pager = ({
   };
 
   const originalElement = (
-    <PaginationLink isActive={active} href={hrefGenerator?.(page)}>
+    <PaginationLink isActive={active} href={generateHref(page)}>
       {page}
     </PaginationLink>
   );
