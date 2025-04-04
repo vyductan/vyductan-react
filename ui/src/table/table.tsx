@@ -645,7 +645,7 @@ const Table = <TRecord extends AnyObject>({
                           })}
                         </TableRowComp>
                         {row.getIsExpanded() && expandable && (
-                          <TableRow className="bg-gray-50">
+                          <TableRow className="bg-primary-50 hover:bg-primary-50">
                             {/* 2nd row is a custom 1 cell row */}
                             <TableCell
                               colSpan={row.getVisibleCells().length}
