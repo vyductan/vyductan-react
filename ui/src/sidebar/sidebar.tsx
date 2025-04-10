@@ -76,7 +76,7 @@ export const Sidebar = ({
             // className="group-data-[collapsible=icon]:hidden"
           >
             {item.label && <SidebarGroupLabel>{item.label}</SidebarGroupLabel>}
-            <SidebarMenu>{renderItems(item.children)}</SidebarMenu>
+            <SidebarMenu>{renderItems(item.children ?? [])}</SidebarMenu>
             {/* {item.children.some((c) => !c.hiddenInNav) && ( */}
             {/*   <SidebarMenu> */}
             {/*     {item.children */}
