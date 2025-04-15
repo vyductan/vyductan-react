@@ -11,6 +11,7 @@ import type {
 } from "@tanstack/react-table";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { useMergedState } from "@rc-component/util";
+import { warning } from "@rc-component/util/lib/warning";
 import {
   flexRender,
   getCoreRowModel,
@@ -26,11 +27,13 @@ import type { AnyObject } from "../types";
 import type {
   ColumnsDef,
   FilterValue,
-  RowSelection,
+  // GetComponent,
+  GetRowKey,
   SorterResult,
   TableComponents,
   TableCurrentDataSource,
   TablePaginationConfig,
+  TableRowSelection,
 } from "./types";
 import { cn } from "..";
 import { Pagination } from "../pagination";
@@ -48,12 +51,10 @@ import {
 import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { useColumns } from "./hooks/use-columns";
-import { useLayoutState } from "./hooks/use-frame";
 import { TableStoreProvider } from "./hooks/use-table";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformedRowSelection } from "./utils";
-import { getColumnsKey } from "./utils/value-utils";
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
@@ -102,7 +103,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     /** Row key config */
     rowKey?: keyof TRecord;
     /** Row selection config */
-    rowSelection?: RowSelection<TRecord>;
+    rowSelection?: TableRowSelection<TRecord>;
     pagination?: PaginationProps;
     loading?: boolean;
     skeleton?: boolean;
@@ -182,13 +183,42 @@ const Table = <TRecord extends AnyObject>({
 }: TableProps<TRecord>) => {
   const data = React.useMemo(() => dataSource, [dataSource]);
 
+  // ==================== Customize =====================
+  // const getComponent = React.useCallback<GetComponent>(
+  //   (path, defaultComponent) => getValue(components, path) || defaultComponent,
+  //   [components],
+  // );
+
+  const getRowKey = React.useMemo<GetRowKey<TRecord>>(() => {
+    if (typeof rowKey === "function") {
+      return rowKey;
+    }
+    return (record: TRecord) => {
+      const key = record[rowKey];
+
+      if (process.env.NODE_ENV !== "production") {
+        warning(
+          key !== undefined,
+          "Each record in table should have a unique `key` prop, or set `rowKey` to an unique primary key.",
+        );
+      }
+
+      return key;
+    };
+  }, [rowKey]);
+
   // ====================== Column ======================
-  const [columns, columnsForTTTable, flattenColumns] = useColumns({
-    columns: columnsProp,
-    rowKey,
-    rowSelection: propRowSelection,
-    expandable,
-  });
+  const [columns, columnsForTTTable, flattenColumns] = useColumns<TRecord>(
+    {
+      columns: columnsProp,
+      // selections,
+      // rowKey,
+      rowSelection: propRowSelection,
+      expandable,
+      getRowKey,
+    },
+    null,
+  );
 
   // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
@@ -330,20 +360,19 @@ const Table = <TRecord extends AnyObject>({
   });
 
   // ====================== Scroll ======================
-  const [colsWidths, _updateColsWidths] = useLayoutState(
-    new Map<React.Key, number>(),
-  );
+  // const [colsWidths, _updateColsWidths] = useLayoutState(
+  //   new Map<React.Key, number>(),
+  // );
 
   // Convert map to number width
-  const colsKeys = getColumnsKey(flattenColumns);
-  const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey)!);
+  // const colsKeys = getColumnsKey(flattenColumns);
+  // const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey)!);
 
-  const colWidths = React.useMemo(
-    () => pureColWidths,
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pureColWidths.join("_")],
-  );
+  // const colWidths = React.useMemo(
+  //   () => pureColWidths,
+  //   // eslint-disable-next-line react-compiler/react-compiler
+  //   [pureColWidths.join("_")],
+  // );
   // const stickyOffsets = useStickyOffsets(colWidths, flattenColumns, direction);
 
   // ---- scroll X ----//
@@ -386,6 +415,27 @@ const Table = <TRecord extends AnyObject>({
         : classNames.row(row.original, index)
       : "";
   };
+
+  // ========================================================================
+  // ==                               Render                               ==
+  // ========================================================================
+  // =================== Render: Node ===================
+  // // Header props
+  // const headerProps = {
+  //   colWidths,
+  //   columCount: flattenColumns.length,
+  //   // stickyOffsets,
+  //   // onHeaderRow,
+  //   // fixHeader,
+  //   scroll,
+  // };
+
+  const bodyColGroup = (
+    <ColGroup
+      colWidths={flattenColumns.map(({ width }) => width)}
+      columns={flattenColumns}
+    />
+  );
 
   return (
     <TableStoreProvider>
@@ -451,7 +501,7 @@ const Table = <TRecord extends AnyObject>({
             bordered={bordered}
             {...props}
           >
-            <ColGroup columns={flattenColumns} colWidths={colWidths} />
+            {bodyColGroup}
 
             <TableHeader
               style={{
@@ -555,7 +605,7 @@ const Table = <TRecord extends AnyObject>({
                         key={row.id}
                         className={cn(
                           getRowClassName(row, index),
-                          row.original._customRowClassName as string,
+                          row.original._customRowClassName,
                         )}
                         style={
                           row.original._customRowStyle as React.CSSProperties
@@ -568,7 +618,7 @@ const Table = <TRecord extends AnyObject>({
                             row.original._customCellClassName as string,
                           )}
                         >
-                          {row.original._customRow as React.ReactNode}
+                          {row.original._customRow}
                         </TableCell>
                       </TableRow>
                     ) : (
