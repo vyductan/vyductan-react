@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable unicorn/no-null */
 import type { CSSProperties, ReactElement, ReactNode, Ref } from "react";
 import { cloneElement, useImperativeHandle, useRef } from "react";
 

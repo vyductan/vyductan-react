@@ -216,6 +216,7 @@ const UploadZone = ({
             className="h-full w-full object-contain"
           />
         ) : children ? (
+          // eslint-disable-next-line react-compiler/react-compiler
           <div>{children(fileInputRef, reset)}</div>
         ) : (
           <div

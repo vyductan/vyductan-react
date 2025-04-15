@@ -84,14 +84,12 @@ export const UiConfigProvider = ({
   componentConfig,
 }: UiStoreProviderProps) => {
   const storeRef = React.useRef<UiConfigStoreApi>(null);
-  if (!storeRef.current) {
-    storeRef.current = createUiConfigStore({
-      components: {
-        ...defaultInitState.components,
-        ...componentConfig,
-      },
-    });
-  }
+  storeRef.current ??= createUiConfigStore({
+    components: {
+      ...defaultInitState.components,
+      ...componentConfig,
+    },
+  });
   return (
     <UiConfigStoreContext.Provider value={storeRef.current}>
       {children}

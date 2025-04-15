@@ -1,4 +1,5 @@
-/* eslint-disable unicorn/no-null */
+/* eslint-disable unicorn/no-array-for-each */
+/* eslint-disable react-compiler/react-compiler */
 import * as React from "react";
 import useMobile from "@rc-component/util/lib/hooks/useMobile";
 import raf from "@rc-component/util/lib/raf";
@@ -62,7 +63,7 @@ export default function StepHandler({
   React.useEffect(
     () => () => {
       onStopStep();
-      for (const id of frameIds.current) raf.cancel(id);
+      frameIds.current.forEach((id) => raf.cancel(id));
     },
     [],
   );
