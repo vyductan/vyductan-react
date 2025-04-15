@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable unicorn/no-null */
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
 // Jan 28, 2025
 import type { DecimalClass, ValueType } from "@rc-component/mini-decimal";
@@ -301,11 +300,13 @@ const InternalInputNumber = ({
   // >>> Max & Min limit
   const maxDecimal = React.useMemo(
     () => getDecimalIfValidate(max ?? ""),
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [max, precision],
   );
   const minDecimal = React.useMemo(
     () => getDecimalIfValidate(min ?? ""),
+    // eslint-disable-next-line react-compiler/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [min, precision],
   );

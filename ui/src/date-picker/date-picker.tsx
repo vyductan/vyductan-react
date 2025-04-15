@@ -125,6 +125,7 @@ const DatePicker = <T extends DatePickerValueType = "date">({
   };
 
   const inputRef = React.useRef<InputRef>(null);
+  // eslint-disable-next-line react-compiler/react-compiler
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (isValidDateStringExact(value, format)) {
