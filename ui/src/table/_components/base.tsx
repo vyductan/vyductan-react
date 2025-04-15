@@ -1,8 +1,8 @@
 import * as React from "react";
 
+import type { TableProps } from "../table";
 import type { TableSize } from "../types";
 import { cn } from "../..";
-import { TableProps } from "../table";
 
 function TableRoot({
   className,
