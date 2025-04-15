@@ -4,7 +4,6 @@ import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
 import { useHover } from "ahooks";
 import { formatDate, toDate } from "date-fns";
-import { motion } from "framer-motion";
 
 import type {
   DatePickerBaseProps,
@@ -65,7 +64,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
   defaultValue,
   value: valueProp,
   onChange,
-  ...props
+  // ...props
 }: DateRangePickerProps<T>) => {
   const [open, setOpen] = React.useState(false);
 
@@ -172,7 +171,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         />
       </button>
     ),
-    [setValue],
+    [setValue, onChange],
   );
   const SuffixComp = useMemo(() => {
     if (allowClear && value?.[0] && (!suffix || (isHovering && suffix))) {
