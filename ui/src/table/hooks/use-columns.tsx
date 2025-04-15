@@ -1,76 +1,103 @@
-import type { ColumnDef } from "@tanstack/react-table";
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React from "react";
 
-import type { ResponsiveInfo } from "@acme/hooks/use-responsive";
 import { useResponsive } from "@acme/hooks/use-responsive";
 
 import type { AnyObject } from "../../types";
 import type { TableProps } from "../table";
-import type { TableColumnDef } from "../types";
+import type { ColumnDef, ColumnGroupDef, ColumnsDef } from "../types";
 import { transformColumnDefs } from "../utils";
 
 function flatColumns<TRecord extends AnyObject>(
-  columns: ColumnDef<TRecord>[],
+  columns: ColumnsDef<TRecord>,
   parentKey = "key",
-): ColumnDef<TRecord>[] {
+): {
+  flattenColumns: ColumnDef<TRecord>[];
+  // flattenColumnsForTTTable: TTColumnDef<TRecord>[];
+} {
   const flattenColumns: ColumnDef<TRecord>[] = [];
+  // const flattenColumnsForTTTable: TTColumnDef<TRecord>[] = [];
   for (const [index, column] of columns.entries()) {
-    if (typeof column === "object" && column.meta) {
-      const { fixed } = column.meta;
-      // Convert `fixed='true'` to `fixed='left'` instead
-      const parsedFixed = fixed === true ? "left" : fixed;
-      const mergedKey = `${parentKey}-${index}`;
+    const { fixed } = column;
+    const parsedFixed =
+      fixed === true || fixed === "left"
+        ? "start"
+        : fixed === "right"
+          ? "end"
+          : fixed;
+    const mergedKey = `${parentKey}-${index}`;
 
-      // const subColumns = (column as ColumnGroupType<TRecord>).children;
-      const subColumns =
-        "columns" in column && column.columns
-          ? transformColumnDefs<TRecord>(column.columns, {})
-          : [];
-      if (subColumns.length > 0) {
-        flattenColumns.push(
-          ...flatColumns(subColumns, mergedKey).map((subColum) => ({
-            ...subColum,
-            meta: {
-              ...subColum.meta,
-              fixed: parsedFixed,
-            },
-          })),
-        );
-      } else {
-        flattenColumns.push({
-          id: mergedKey,
-          ...column,
-          meta: {
-            ...column.meta,
+    const subColumns = (column as ColumnGroupDef<TRecord>).children;
+    // const subColumnsForTTTable =transformColumnDefs<TRecord>((column as ColumnGroupDef<TRecord>).children, {})
+
+    if (subColumns && subColumns.length > 0) {
+      flattenColumns.push(
+        ...flatColumns(subColumns, mergedKey).flattenColumns.map(
+          (subColum) => ({
             fixed: parsedFixed,
-          },
-        });
-      }
+            ...subColum,
+          }),
+        ),
+      );
+      // flattenColumnsForTTTable.push(
+      //   ...flatColumns(subColumns, mergedKey).flattenColumnsForTTTable.map(
+      //     (subColum) => ({
+      //       ...subColum,
+      //       meta: {
+      //         ...subColum.meta,
+      //         fixed: parsedFixed,
+      //       },
+      //     }),
+      //   ),
+      // );
+    } else {
+      flattenColumns.push({
+        key: mergedKey,
+        ...column,
+        fixed: parsedFixed,
+      });
+      // const columnsForTTTable = transformColumnDefs<TRecord>([column], {});
+      // flattenColumnsForTTTable.push({
+      //   id: mergedKey,
+      //   ...columnsForTTTable[0],
+      //   meta: {
+      //     ...columnsForTTTable[0]?.meta,
+      //     fixed: parsedFixed,
+      //   },
+      // });
     }
   }
-  return flattenColumns;
+  return {
+    flattenColumns,
+    // flattenColumnsForTTTable
+  };
 }
 
+/**
+ * Parse `columns` & `children` into `columns`.
+ */
 export const useColumns = <TRecord extends AnyObject>({
-  columns: columnsProp,
+  columns,
   rowKey,
   rowSelection: rowSelectionProp,
   expandable,
 }: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable"> & {
-  columns: TableColumnDef<TRecord>[];
+  columns: ColumnsDef<TRecord>;
 }): [
-  columns: ColumnDef<TRecord>[],
+  columns: ColumnsDef<TRecord>,
+  columnsForTTTable: TTColumnDef<TRecord>[],
   flattenColumns: readonly ColumnDef<TRecord>[],
 ] => {
   const responsive = useResponsive();
   const breakpoints = new Set(
-    Object.entries((responsive as ResponsiveInfo) ?? {})
+    Object.entries(responsive)
       .filter(([, value]) => value)
       .map(([key]) => key),
   );
 
-  const columns = transformColumnDefs(
-    columnsProp.filter(
+  const columnsForTTTable = transformColumnDefs(
+    columns.filter(
       (c) => !c.responsive || c.responsive.some((r) => breakpoints.has(r)),
     ),
     {
@@ -80,9 +107,9 @@ export const useColumns = <TRecord extends AnyObject>({
     },
   );
   // ========================== Flatten =========================
-  const flattenColumns = React.useMemo(() => {
+  const { flattenColumns } = React.useMemo(() => {
     return flatColumns(columns);
   }, [columns]);
 
-  return [columns, flattenColumns];
+  return [columns, columnsForTTTable, flattenColumns];
 };

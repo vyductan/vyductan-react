@@ -1,33 +1,23 @@
-import type { ColumnDef, Row } from "@tanstack/react-table";
+import type { Row, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import type { AnyObject } from "../types";
 import type { TableProps } from "./table";
-import type { TableColumnDef } from "./types";
+import type { ColumnDef, ColumnsDef } from "./types";
 import { Checkbox } from "../checkbox";
 import { Icon } from "../icons";
 
 export const transformColumnDefs = <TRecord extends AnyObject>(
-  columns: TableColumnDef<TRecord>[],
+  columns: ColumnsDef<TRecord>,
   props: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
   isNotFirstDeepColumn?: boolean,
-): ColumnDef<TRecord>[] => {
-  // const mergedColumns: TableColumnDef<TRecord>[] = [
-  //   ...(props.dnd
-  //     ? [
-  //         {
-  //           key: "sort",
-  //           align: "center",
-  //           width: 80,
-  //           render: () => <DragHandle />,
-  //         } satisfies TableColumnDef<TRecord>,
-  //       ]
-  //     : []),
-  //   ...columns,
-  // ];
-  const columnsDef: ColumnDef<TRecord>[] = columns.map(
-    (
-      {
+): TTColumnDef<TRecord>[] => {
+  const columnsDef: TTColumnDef<TRecord>[] = columns.map(
+    (columnProp, index) => {
+      const column = columnProp as ColumnDef<TRecord> & {
+        children?: ColumnsDef<TRecord>;
+      };
+      const {
         key,
         children,
         dataIndex,
@@ -50,10 +40,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         headAttributes,
 
         ...restProps
-      },
-      index,
-    ) => {
-      const columnDefMerged: ColumnDef<TRecord> = {
+      } = column;
+      const columnDefMerged: TTColumnDef<TRecord> = {
         // accessorKey: dataIndex,
         ...(typeof dataIndex === "string"
           ? { id: key ?? dataIndex, accessorKey: dataIndex }
@@ -80,7 +68,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           : {}),
         enableResizing,
         enableHiding,
-        size: width,
+        size: typeof width === "number" ? width : undefined,
         minSize: minWidth,
         meta: {
           title,
@@ -166,6 +154,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
             : (getValue() as ReactNode)}
         </>
       );
+
       return columnDefMerged;
     },
   );
@@ -173,7 +162,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
   if (props.rowSelection) {
     let lastSelectedId = "";
 
-    const selectionColumn: ColumnDef<TRecord> = {
+    const selectionColumn: TTColumnDef<TRecord> = {
       id: "selection",
       header: ({ table }) => {
         const originNode = (
@@ -235,9 +224,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
   }
 
   if (props.expandable) {
-    const expandColumn: ColumnDef<TRecord> = {
+    const expandColumn: TTColumnDef<TRecord> = {
       id: "expander",
-      // header: () => undefined,
       size: 50,
       meta: {
         align: "center",
