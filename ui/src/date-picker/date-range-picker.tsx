@@ -117,6 +117,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
             : undefined
         }
         onSelect={(dateRange) => {
+          console.log("ddddd", dateRange);
           if (!dateRange) {
             setValue(undefined);
             return;
@@ -129,22 +130,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
               getDestinationValue(dateRange.from!),
               getDestinationValue(dateRange.to),
             ]);
-            setOpen(false);
-            onChange?.([
-              getDestinationValue(dateRange.from!),
-              getDestinationValue(dateRange.to),
-            ]);
-            // if (
-            //   value &&
-            //   value[0] !== defaultValue?.[0] &&
-            //   value[1] !== defaultValue?.[1]
-            // ) {
-            //   const start = value?.[0];
-            //   const end = value?.[1];
-            //   if (start !== undefined && end !== undefined) {
-            //     onChange?.([start, end]);
-            //   }
-            // }
+            // setOpen(false);
           }
         }}
       />

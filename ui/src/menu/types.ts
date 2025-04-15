@@ -5,9 +5,9 @@ interface ItemSharedProps {
 }
 
 export type MenuItemType = {
-  key: React.Key;
-
   type?: "item";
+
+  key: React.Key;
 
   /* Page Title */
   title?: React.ReactNode;
@@ -19,7 +19,8 @@ export type MenuItemType = {
 
   icon?: React.ReactNode;
 
-  children?: MenuItemType[];
+  // children?: MenuItemType[];
+  children?: never;
 
   hidden?: boolean;
 
@@ -33,7 +34,7 @@ export type MenuItemType = {
 export interface MenuItemGroupType extends ItemSharedProps {
   type: "group";
   label?: React.ReactNode;
-  children: MenuItemType[];
+  children?: MenuItemType[];
 }
 export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
   type: "divider";
