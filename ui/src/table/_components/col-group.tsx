@@ -1,16 +1,13 @@
 /* eslint-disable unicorn/no-lonely-if */
 // Jun 6, 2024
-// https://github.com/react-component/table/blob/master/src/ColGroup.tsx
-import type { ColumnDef as TtColumnDef } from "@tanstack/react-table";
 
 import type { AnyObject } from "../../types";
 import type { ColumnDef } from "../types";
 import { useTableStore } from "../hooks/use-table";
 
 interface ColGroupProps<TRecord> {
-  colWidths: readonly (number | string)[];
+  colWidths: readonly (number | string | undefined)[];
   columns?: readonly ColumnDef<TRecord>[];
-  columns2?: readonly TtColumnDef<TRecord>[];
   columCount?: number;
 }
 const ColGroup = <TRecord extends AnyObject>({
@@ -57,23 +54,6 @@ const ColGroup = <TRecord extends AnyObject>({
       mustInsert = true;
     }
   }
-  // const mustInsert = columns?.some((column) => column.size ?? column.minSize);
-  // if (mustInsert) {
-  //   for (let index = len - 1; index >= 0; index -= 1) {
-  //     const column = columns && columns[index];
-  //     const width = column?.size;
-  //     const minWidth = column?.minSize;
-  //     cols.unshift(
-  //       <col
-  //         key={index}
-  //         style={{
-  //           width,
-  //           minWidth,
-  //         }}
-  //       />,
-  //     );
-  //   }
-  // }
 
   return <colgroup>{cols}</colgroup>;
 };
