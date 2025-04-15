@@ -4,6 +4,7 @@ import type {
   Column,
   Row,
   RowData,
+  Table,
 } from "@tanstack/react-table";
 
 import type { Breakpoint } from "@acme/hooks/use-responsive";
@@ -16,6 +17,8 @@ declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue>
     extends ColumnDef<TData> {}
 }
+
+export type SelectionItemSelectFn = (currentRowKeys: Key[]) => void;
 
 export interface CellType<RecordType> {
   key?: Key;
@@ -42,7 +45,9 @@ export interface RenderedCell<RecordType> {
 export type DataIndex<T = any> = DeepNamePath<T>;
 
 type ColumnSharedDef<TRecord> = {
-  title?: React.ReactNode;
+  title?:
+    | React.ReactNode
+    | ((ctx: { table: Table<TRecord> }) => React.ReactNode);
   key?: string;
   className?: string;
   hidden?: boolean;
@@ -120,10 +125,25 @@ export type ColumnDef<TRecord> = ColumnSharedDef<TRecord> & {
   onCell?: GetComponentProps<TRecord>;
 };
 
-export type ColumnsDef<TRecord = unknown> = readonly (
+export type ColumnsDef<TRecord = AnyObject> = (
   | ColumnGroupDef<TRecord>
   | ColumnDef<TRecord>
 )[];
+
+export interface SelectionItem {
+  key: string;
+  text: React.ReactNode;
+  onSelect?: SelectionItemSelectFn;
+}
+
+export type SelectionSelectFn<T = AnyObject> = (
+  record: T,
+  selected: boolean,
+  selectedRows: T[],
+  nativeEvent: Event,
+) => void;
+
+export type GetRowKey<RecordType> = (record: RecordType, index?: number) => Key;
 
 // type DefWithOutDataIndex<TRecord> = ColumnSharedDef<TRecord> & {
 //   dataIndex?: never;
@@ -148,16 +168,10 @@ export type ColumnsDef<TRecord = unknown> = readonly (
 //         }[keyof TRecord])
 //   );
 
-type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
-  record: TRecord;
-  index: number;
-  row: Row<TRecord>;
-  column: Column<TRecord>;
-  value: TKey extends keyof TRecord ? TRecord[TKey] : null;
-};
+export type RowSelectionType = "checkbox" | "radio";
 
-export type RowSelection<TRecord> = {
-  type?: "checkbox" | "radio";
+export type TableRowSelection<TRecord> = {
+  type?: RowSelectionType;
   /** Hide the selectAll checkbox and custom selection */
   hideSelectAll?: boolean;
   /** Controlled selected row keys */
@@ -278,6 +292,25 @@ export interface TableCurrentDataSource<RecordType = AnyObject> {
   action: TableAction;
 }
 
+// =================== Expand ===================
+export interface RenderExpandIconProps<RecordType> {
+  // prefixCls: string;
+  expanded: boolean;
+  record: RecordType;
+  expandable: boolean;
+  onExpand: TriggerEventHandler<RecordType>;
+}
+
+export type RenderExpandIcon<RecordType> = (
+  props: RenderExpandIconProps<RecordType>,
+) => React.ReactNode;
+
+// =================== Events ===================
+export type TriggerEventHandler<RecordType> = (
+  record: RecordType,
+  event: React.MouseEvent<HTMLElement>,
+) => void;
+
 // =================== Sticky ===================
 export interface TableSticky {
   offsetHeader?: number;
@@ -297,6 +330,7 @@ export type GetComponent = (
   defaultComponent?: CustomizeComponent,
 ) => CustomizeComponent;
 
+// ================= NamePath =================
 // source https://github.com/crazyair/field-form/blob/master/src/namePathType.ts
 
 type BaseNamePath = string | number | boolean | (string | number | boolean)[];
@@ -335,3 +369,13 @@ export type DeepNamePath<
                       [...ParentNamePath, FieldKey]
                     >; // If `Store[FieldKey]` is object
           }[keyof Store];
+
+// ================= Own =================
+type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
+  record: TRecord;
+  index: number;
+  table: Table<TRecord>;
+  row: Row<TRecord>;
+  column: Column<TRecord>;
+  value: TKey extends keyof TRecord ? TRecord[TKey] : null;
+};
