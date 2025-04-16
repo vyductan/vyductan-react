@@ -11,6 +11,7 @@ import type {
 } from "@tanstack/react-table";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { useMergedState } from "@rc-component/util";
+import { warning } from "@rc-component/util/lib/warning";
 import {
   flexRender,
   getCoreRowModel,
@@ -24,13 +25,15 @@ import _ from "lodash";
 import type { PaginationProps } from "../pagination";
 import type { AnyObject } from "../types";
 import type {
+  ColumnsDef,
   FilterValue,
-  RowSelection,
+  // GetComponent,
+  GetRowKey,
   SorterResult,
-  TableColumnDef,
   TableComponents,
   TableCurrentDataSource,
   TablePaginationConfig,
+  TableRowSelection,
 } from "./types";
 import { cn } from "..";
 import { Pagination } from "../pagination";
@@ -48,6 +51,7 @@ import {
 import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { useColumns } from "./hooks/use-columns";
+import { TableStoreProvider } from "./hooks/use-table";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformedRowSelection } from "./utils";
@@ -65,7 +69,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
   Omit<React.ComponentProps<"table">, "title" | "onChange" | "summary"> & {
-    columns?: TableColumnDef<TRecord>[];
+    columns?: ColumnsDef<TRecord>;
     dataSource?: TRecord[] | undefined;
 
     title?: React.ReactNode;
@@ -99,7 +103,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     /** Row key config */
     rowKey?: keyof TRecord;
     /** Row selection config */
-    rowSelection?: RowSelection<TRecord>;
+    rowSelection?: TableRowSelection<TRecord>;
     pagination?: PaginationProps;
     loading?: boolean;
     skeleton?: boolean;
@@ -155,7 +159,7 @@ const Table = <TRecord extends AnyObject>({
   extra,
   alertRender,
 
-  columns: propColumns = [],
+  columns: columnsProp = [],
   dataSource = [],
   pagination,
   expandable,
@@ -179,42 +183,51 @@ const Table = <TRecord extends AnyObject>({
 }: TableProps<TRecord>) => {
   const data = React.useMemo(() => dataSource, [dataSource]);
 
-  // ====================== Column ======================
-  // const columns = React.useMemo(
-  //   () =>
-  //     transformColumnDefs(propColumns, {
-  //       rowKey,
-  //       rowSelection: propRowSelection,
-  //       expandable,
-  //       dnd,
-  //     }),
-  //   [propColumns, rowKey, propRowSelection, expandable, dnd],
+  // ==================== Customize =====================
+  // const getComponent = React.useCallback<GetComponent>(
+  //   (path, defaultComponent) => getValue(components, path) || defaultComponent,
+  //   [components],
   // );
-  const [columns, flattenColumns] = useColumns({
-    columns: propColumns,
-    rowKey,
-    rowSelection: propRowSelection,
-    expandable,
-  });
+
+  const getRowKey = React.useMemo<GetRowKey<TRecord>>(() => {
+    if (typeof rowKey === "function") {
+      return rowKey;
+    }
+    return (record: TRecord) => {
+      const key = record[rowKey];
+
+      if (process.env.NODE_ENV !== "production") {
+        warning(
+          key !== undefined,
+          "Each record in table should have a unique `key` prop, or set `rowKey` to an unique primary key.",
+        );
+      }
+
+      return key;
+    };
+  }, [rowKey]);
+
+  // ====================== Column ======================
+  const [columns, columnsForTTTable, flattenColumns] = useColumns<TRecord>(
+    {
+      columns: columnsProp,
+      // selections,
+      // rowKey,
+      rowSelection: propRowSelection,
+      expandable,
+      getRowKey,
+    },
+    null,
+  );
 
   // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
   const defaultPinnings = {
-    left: propColumns
-      .map((x, index) => ({
-        key: x.dataIndex?.toString() ?? index.toString(),
-        fixed: x.fixed,
-      }))
-      .filter((x) => x.fixed === "left")
-      .map((x) => x.key),
-    right: propColumns
-      .map((x, index) => ({
-        key: x.dataIndex?.toString() ?? index.toString(),
-        fixed: x.fixed,
-      }))
-      .filter((x) => x.fixed === "right")
-      .map((x) => x.key),
+    left: columns.filter((x) => x.key && x.fixed === "left").map((x) => x.key!),
+    right: columns
+      .filter((x) => x.key && x.fixed === "right")
+      .map((x) => x.key!),
   };
 
   // ====================== Row Selection =======================
@@ -266,11 +279,11 @@ const Table = <TRecord extends AnyObject>({
 
   // ====================== Sorting =======================
   const collectedSorting: SortingState = columns
-    .filter((c) => c.meta?.defaultSortOrder && c.id)
+    .filter((c) => c.defaultSortOrder && c.key)
     .map((c) => {
       return {
-        id: c.id!,
-        desc: c.meta?.defaultSortOrder === "ascend" ? false : true,
+        id: c.key!,
+        desc: c.defaultSortOrder === "ascend" ? false : true,
       };
     });
   const [sorting, setSorting] = useMergedState(collectedSorting, {
@@ -280,7 +293,9 @@ const Table = <TRecord extends AnyObject>({
         {},
         // (value as SortingState | undefined) to fix issue
         (value as SortingState | undefined)?.map((sort) => ({
-          column: propColumns.find((c) => c.dataIndex === sort.id),
+          column: columnsProp.find(
+            (c) => "dataIndex" in c && c.dataIndex === sort.id,
+          ),
           field: sort.id,
           columnKey: undefined,
           order: sort.desc ? "descend" : "ascend",
@@ -295,15 +310,13 @@ const Table = <TRecord extends AnyObject>({
       // Sort by priority similar antd
       // (value as SortingState | undefined) to fix issue
       (value as SortingState | undefined)?.sort((a, b) => {
-        const columnDefA = columns.find((c) => c.id === a.id);
-        const columnDefB = columns.find((c) => c.id === b.id);
+        const columnDefA = columns.find((c) => c.key === a.id);
+        const columnDefB = columns.find((c) => c.key === b.id);
         if (
-          typeof columnDefA?.meta?.sorter === "object" &&
-          typeof columnDefB?.meta?.sorter === "object"
+          typeof columnDefA?.sorter === "object" &&
+          typeof columnDefB?.sorter === "object"
         ) {
-          return (
-            columnDefB.meta.sorter.multiple - columnDefA.meta.sorter.multiple
-          );
+          return columnDefB.sorter.multiple - columnDefA.sorter.multiple;
         }
         return 0;
       });
@@ -315,7 +328,7 @@ const Table = <TRecord extends AnyObject>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: columnsForTTTable,
     columnResizeMode: "onChange",
     initialState: {
       columnPinning: defaultPinnings,
@@ -341,14 +354,25 @@ const Table = <TRecord extends AnyObject>({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     // enableMultiSort: true, // Don't allow shift key to sort multiple columns - default on/true
-    isMultiSortEvent: columns.some(
-      (col) => typeof col.meta?.sorter === "object",
-    )
+    isMultiSortEvent: columns.some((col) => typeof col.sorter === "object")
       ? () => true
       : undefined, // Make all clicks multi-sort - default requires `shift` key
   });
 
   // ====================== Scroll ======================
+  // const [colsWidths, _updateColsWidths] = useLayoutState(
+  //   new Map<React.Key, number>(),
+  // );
+
+  // Convert map to number width
+  // const colsKeys = getColumnsKey(flattenColumns);
+  // const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey)!);
+
+  // const colWidths = React.useMemo(
+  //   () => pureColWidths,
+  //   // eslint-disable-next-line react-compiler/react-compiler
+  //   [pureColWidths.join("_")],
+  // );
   // const stickyOffsets = useStickyOffsets(colWidths, flattenColumns, direction);
 
   // ---- scroll X ----//
@@ -392,8 +416,29 @@ const Table = <TRecord extends AnyObject>({
       : "";
   };
 
+  // ========================================================================
+  // ==                               Render                               ==
+  // ========================================================================
+  // =================== Render: Node ===================
+  // // Header props
+  // const headerProps = {
+  //   colWidths,
+  //   columCount: flattenColumns.length,
+  //   // stickyOffsets,
+  //   // onHeaderRow,
+  //   // fixHeader,
+  //   scroll,
+  // };
+
+  const bodyColGroup = (
+    <ColGroup
+      colWidths={flattenColumns.map(({ width }) => width)}
+      columns={flattenColumns}
+    />
+  );
+
   return (
-    <>
+    <TableStoreProvider>
       <Spin spinning={loading}>
         <div
           data-slot="table-container"
@@ -456,7 +501,7 @@ const Table = <TRecord extends AnyObject>({
             bordered={bordered}
             {...props}
           >
-            <ColGroup columns={flattenColumns} />
+            {bodyColGroup}
 
             <TableHeader
               style={{
@@ -482,7 +527,16 @@ const Table = <TRecord extends AnyObject>({
                         colSpan={header.colSpan}
                         size={size}
                         style={getCommonPinningStyles(header.column)}
-                        align={header.column.columnDef.meta?.align}
+                        align={
+                          header.column.columnDef.meta?.align === "end"
+                            ? "right"
+                            : header.column.columnDef.meta?.align === "start"
+                              ? "left"
+                              : header.column.columnDef.meta?.align ===
+                                  "match-parent"
+                                ? undefined
+                                : header.column.columnDef.meta?.align
+                        }
                         className={cn(
                           // align
                           header.column.columnDef.meta?.align === "center" &&
@@ -551,7 +605,7 @@ const Table = <TRecord extends AnyObject>({
                         key={row.id}
                         className={cn(
                           getRowClassName(row, index),
-                          row.original._customRowClassName as string,
+                          row.original._customRowClassName,
                         )}
                         style={
                           row.original._customRowStyle as React.CSSProperties
@@ -564,7 +618,7 @@ const Table = <TRecord extends AnyObject>({
                             row.original._customCellClassName as string,
                           )}
                         >
-                          {row.original._customRow as React.ReactNode}
+                          {row.original._customRow}
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -689,7 +743,7 @@ const Table = <TRecord extends AnyObject>({
           )}
         </div>
       </Spin>
-    </>
+    </TableStoreProvider>
   );
 };
 

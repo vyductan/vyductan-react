@@ -101,8 +101,9 @@ const Modal = ({
     </>
   );
 
-  const ref = React.useRef<HTMLDivElement>(null);
-  ref.current?.scrollTo(0, ref.current.scrollHeight);
+  // ??
+  // const ref = React.useRef<HTMLDivElement>(null);
+  // ref.current?.scrollTo(0, ref.current.scrollHeight);
   return (
     <DialogRoot
       {...rest}

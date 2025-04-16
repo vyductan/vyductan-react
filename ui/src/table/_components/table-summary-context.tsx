@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import type { StickyOffsets, TableColumnDef } from "../types";
+import type { ColumnDef, StickyOffsets } from "../types";
 
-type FlattenColumns<RecordType> = readonly (TableColumnDef<RecordType> & {
+type FlattenColumns<RecordType> = readonly (ColumnDef<RecordType> & {
   scrollbar?: boolean;
 })[];
 
