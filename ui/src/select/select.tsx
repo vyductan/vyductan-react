@@ -3,6 +3,7 @@
 import type { VariantProps } from "class-variance-authority";
 import React from "react";
 
+import type { AnyObject } from "..";
 import type { ValueType } from "../form";
 import type { inputSizeVariants, inputVariants } from "../input";
 import type { SelectRootProps } from "./_components";
@@ -18,17 +19,17 @@ import {
   SelectValue,
 } from "./_components";
 
-export type SelectProps<T extends ValueType = string> = Omit<
-  SelectRootProps,
-  "value" | "onValueChange"
-> &
+export type SelectProps<
+  T extends ValueType = string,
+  TRecord extends AnyObject = AnyObject,
+> = Omit<SelectRootProps, "value" | "onValueChange"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> & {
     // ref?: React.ForwardedRef<HTMLUListElement>;
 
     id?: string;
     value?: T;
-    options: Option<T>[];
+    options: Option<T, TRecord>[];
     placeholder?: string;
 
     allowClear?: boolean;
@@ -37,17 +38,25 @@ export type SelectProps<T extends ValueType = string> = Omit<
     className?: string;
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
-    optionRender?: (option: Option<T>) => {
+    optionRender?: (option: Option<T, TRecord>) => {
       checked?: boolean;
       icon?: React.ReactNode;
       label?: React.ReactNode;
     };
-    optionsRender?: (options: Option<T>[]) => React.ReactNode;
+    optionsRender?: (options: Option<T, TRecord>[]) => React.ReactNode;
     onSearchChange?: (search: string) => void;
-    onChange?: (value?: T, option?: Option | Array<Option>) => void;
+    onChange?: (
+      value?: T,
+      option?: T extends Array<any>
+        ? Array<Option<T, TRecord>>
+        : Option<T, TRecord>,
+    ) => void;
   };
 
-const Select = <T extends ValueType = string>({
+const Select = <
+  T extends ValueType = string,
+  TRecord extends AnyObject = AnyObject,
+>({
   id,
   value,
   options: optionsProp,
@@ -57,14 +66,14 @@ const Select = <T extends ValueType = string>({
   loading,
 
   className,
-  borderless,
+  variant,
   size,
   status,
   dropdownRender,
 
   onChange,
   ...props
-}: SelectProps<T>) => {
+}: SelectProps<T, TRecord>) => {
   /* Remove duplicate options */
   const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
@@ -111,19 +120,23 @@ const Select = <T extends ValueType = string>({
         const o = options.find((x) => String(x.value) === String(changedValue));
         // to allow user set value that not in options
         if (!changedValue || !o) return;
-        onChange?.(o.value, o as Option);
+        onChange?.(
+          o.value,
+          o as T extends Array<any> ? Option<T, TRecord>[] : Option<T, TRecord>,
+        );
       }}
       {...props}
     >
       <SelectTrigger
         id={id}
+        value={value}
+        loading={loading}
         className={cn(
           "w-full",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           className,
         )}
-        loading={loading}
-        borderless={borderless}
+        variant={variant}
         size={size}
         status={status}
         allowClear={allowClear}
@@ -131,12 +144,10 @@ const Select = <T extends ValueType = string>({
           onChange?.();
           setKey(+Date.now());
         }}
-        value={value}
       >
         <SelectValue placeholder={placeholder} className="h-5" />
       </SelectTrigger>
       <SelectContent
-        // className={options.some((o) => o.color) ? "space-y-2" : ""}
         classNames={{
           viewport: options.some((o) => o.color) ? "space-y-2" : "",
         }}
