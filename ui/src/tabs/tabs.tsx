@@ -16,6 +16,7 @@ type TabItemDef = {
   key: string;
   label: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
 };
 type TabsProps = Omit<
   TabsRootProps,
@@ -98,7 +99,7 @@ const Tabs = ({
         </TabsList>
 
         {items.map((x) => (
-          <TabsContent key={x.key} value={x.key}>
+          <TabsContent key={x.key} value={x.key} className={x.className}>
             {x.children}
           </TabsContent>
         ))}
