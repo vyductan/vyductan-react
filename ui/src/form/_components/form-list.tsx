@@ -63,6 +63,7 @@ const FieldList = <
   const ctx = {
     fields,
     ...helper,
+    errors: control?._formState.errors[name],
   };
 
   const form = useFormContext<TFieldValues>();
