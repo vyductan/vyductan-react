@@ -21,9 +21,10 @@ const Separator = ({
       className={cn(
         "bg-border shrink-0",
         "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full",
-        "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+        "data-[orientation=vertical]:w-px",
         orientation === "horizontal" && "my-6",
         orientation === "horizontal" && children && "grow basis-0",
+        "self-stretch",
         className,
       )}
       {...props}
