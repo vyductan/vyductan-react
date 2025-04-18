@@ -2,6 +2,7 @@ import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
 import { cn } from "..";
+import { Icon } from "../icons";
 import { useUiConfig } from "../store";
 
 // Based on Vercel
@@ -107,7 +108,8 @@ const tagVariants = tv({
 interface TagProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof tagVariants> {
-  //
+  closeable?: boolean;
+  onClose?: () => void;
 }
 
 const Tag = ({
@@ -115,6 +117,8 @@ const Tag = ({
   variant,
   color,
   bordered: borderedProp = false,
+  closeable,
+  onClose,
   ...props
 }: TagProps) => {
   const tagConfig = useUiConfig((state) => state.components.tag);
@@ -131,7 +135,16 @@ const Tag = ({
         className,
       )}
       {...props}
-    />
+    >
+      {props.children}
+      {closeable && (
+        <Icon
+          icon="icon-[lucide--x]"
+          className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
+          onClick={onClose}
+        />
+      )}
+    </div>
   );
 };
 
