@@ -20,6 +20,12 @@ import {
 
 type ModalProps = DialogProps & {
   className?: string;
+  classNames?: {
+    header?: string;
+    title?: string;
+    description?: string;
+    footer?: string;
+  };
   children?: React.ReactNode;
   description?: React.ReactNode;
   footer?:
@@ -42,6 +48,7 @@ type ModalProps = DialogProps & {
 };
 const Modal = ({
   className,
+  classNames,
   children,
   description,
   footer,
@@ -117,16 +124,20 @@ const Modal = ({
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent className={cn("px-0", className)}>
-        <DialogHeader className="px-6">
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+        <DialogHeader className={classNames?.header}>
+          <DialogTitle className={classNames?.title}>{title}</DialogTitle>
+          <DialogDescription className={classNames?.description}>
+            {description}
+          </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
           {children}
         </ScrollArea>
 
-        <DialogFooter className="px-6">{footerToRender}</DialogFooter>
+        <DialogFooter className={classNames?.footer}>
+          {footerToRender}
+        </DialogFooter>
       </DialogContent>
     </DialogRoot>
   );
