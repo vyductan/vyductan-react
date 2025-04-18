@@ -14,6 +14,8 @@
   --color-success: var(--color-green-500);
   --color-success-hover: var(--color-green-600);
 
+  --color-text-placeholder: var(--color-muted-foreground);
+
   --spacing-control: var(--control-height);
   --spacing-control-sm: var(--control-height-sm);
   --spacing-control-lg: var(--control-height-lg);
