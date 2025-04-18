@@ -32,10 +32,6 @@ export const inputVariants = cva(
   ],
   {
     variants: {
-      borderless: {
-        true: ["border-0", "focus-within:outline-hidden"],
-        false: ["border", "rounded-md", "focus-within:ring-2"],
-      },
       disabled: {
         true: [
           "cursor-not-allowed bg-background-active opacity-50 hover:border-input!",
@@ -57,12 +53,14 @@ export const inputVariants = cva(
         warning: [],
       },
       variant: {
-        default: [],
+        default: ["border", "rounded-md", "focus-within:ring-2"],
         outline: [],
+        filled: ["border-none bg-accent focus-within:ring-0 shadow-none"],
+        borderless: ["border-0", "focus-within:outline-hidden"],
       },
     },
     defaultVariants: {
-      borderless: false,
+      variant: "default",
       status: "default",
       disabled: false,
     },
@@ -101,9 +99,9 @@ type InputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
 const Input = React.forwardRef<InputRef, InputProps>(
   (
     {
-      borderless,
       className,
       // classNames,
+      variant,
       disabled,
       hidden,
       size,
@@ -129,6 +127,8 @@ const Input = React.forwardRef<InputRef, InputProps>(
       name,
       value: valueProp,
       defaultValue: defaultValueProp,
+      readOnly,
+      tabIndex,
       placeholder,
       // Wrapper Props
       onClick,
@@ -224,7 +224,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
         ref={wrapperRef}
         aria-hidden={hidden ? "true" : undefined}
         className={cn(
-          inputVariants({ borderless, disabled, status }),
+          inputVariants({ variant, disabled, status }),
           inputSizeVariants({ size }),
           "cursor-text",
           className,
@@ -242,7 +242,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
         {addonBefore && (
           <span
             className={cn(
-              !borderless && "rounded-s-md",
+              variant !== "borderless" && "rounded-s-md",
               "bg-background border-e",
             )}
           >
@@ -266,6 +266,8 @@ const Input = React.forwardRef<InputRef, InputProps>(
             "border-none outline-hidden",
           )}
           disabled={disabled}
+          readOnly={readOnly}
+          tabIndex={tabIndex}
           onChange={(event) => {
             setValue(event.currentTarget.value);
             onChange?.(event);
@@ -276,7 +278,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
         {addonAfter && (
           <span
             className={cn(
-              !borderless && "rounded-e-md",
+              variant !== "borderless" && "rounded-e-md",
               "bg-background-muted border-s",
               "whitespace-nowrap",
               // p-0 for use Select component
