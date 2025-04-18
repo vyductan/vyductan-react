@@ -48,20 +48,21 @@ export const Dropdown = ({
   className,
   children,
   menu,
-  placement,
+  placement = "bottomLeft",
   ...rest
 }: DropdownProps) => {
-  const side = placement?.includes("top")
+  const side = placement.includes("top")
     ? "top"
-    : placement?.includes("right")
+    : placement.includes("right")
       ? "right"
-      : !placement || placement.includes("bottom")
+      : placement.includes("bottom")
         ? "bottom"
         : "left";
-  const align =
-    !placement || placement.includes("auto")
+  const align = placement.includes("Top")
+    ? "start"
+    : !placement.includes("Left") && !placement.includes("Right")
       ? "center"
-      : placement.includes("start")
+      : placement.includes("Left")
         ? "start"
         : "end";
   const renderMenu = (items: MenuItem[]): ReactNode => {
