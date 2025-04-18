@@ -89,6 +89,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       row?: string | ((record: TRecord, index: number) => string);
       head?: string;
       cell?: string;
+      empty?: string;
     };
 
     // emptyRender?: EmptyProps;
@@ -717,7 +718,9 @@ const Table = <TRecord extends AnyObject>({
                     ),
                   )
                 ) : (
-                  <TableRow className="hover:bg-transparent">
+                  <TableRow
+                    className={cn("hover:bg-transparent", classNames?.empty)}
+                  >
                     <TableCell
                       colSpan={columns.length}
                       className={cn(
