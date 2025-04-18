@@ -41,10 +41,9 @@ type SelectTriggerProps = Omit<
 const SelectTrigger = ({
   className,
   children,
-  borderless,
   size = "default",
   status,
-
+  variant,
   allowClear,
   onClear,
   loading,
@@ -61,7 +60,7 @@ const SelectTrigger = ({
         // data-[size=default]:h-9 data-[size=sm]:h-8
         // own
         "group relative",
-        inputVariants({ borderless, status }),
+        inputVariants({ variant, status }),
         // inputSizeVariants({ size }),
         // controlHeightVariants({ size }),
         "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
@@ -99,10 +98,8 @@ const SelectTrigger = ({
         />
       )}
       <SelectPrimitive.Icon
-        // asChild
         className={cn(
           "flex size-5 items-center justify-center opacity-50 transition-opacity",
-          "pl-1",
           allowClear && value && "group-hover:opacity-0",
           loading && "opacity-0",
         )}
@@ -186,16 +183,17 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 text-sm outline-hidden select-none",
-        // "pr-8 pl-2"
-        // "focus:bg-accent focus:text-accent-foreground",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "[&_svg:not([class*='text-'])]:text-muted-foreground",
-        "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 text-sm outline-hidden select-none",
+        // // "pr-8 pl-2"
+        // // "focus:bg-accent focus:text-accent-foreground",
+        // "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // "[&_svg:not([class*='text-'])]:text-muted-foreground",
+        // "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
 
         // own
-        "px-2",
+        "pr-2 pl-2",
         className,
       )}
       {...props}
@@ -210,7 +208,7 @@ function SelectItem({
         )}
       >
         <SelectPrimitive.ItemIndicator>
-          <Icon icon="icon-[lucide--check]" className="size-4" />
+          <Icon icon="icon-[lucide--check]" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
