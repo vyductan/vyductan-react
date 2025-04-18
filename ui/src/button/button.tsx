@@ -81,10 +81,7 @@ const buttonVariants = tv({
         "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: [
-        "text-primary underline-offset-4 hover:underline",
-        // "h-auto gap-1 border-0 p-0 font-normal",
-      ],
+      link: [],
       text: "border-0 px-0",
     },
     shape: {
@@ -264,6 +261,12 @@ const buttonVariants = tv({
       color: "link",
       className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
     },
+    // Link
+    {
+      variant: "link",
+      color: "default",
+      className: ["", "hover:text-primary"],
+    },
     // Size
     {
       size: "sm",
@@ -326,7 +329,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       href,
       children,
       className,
-      color,
+      color = "default",
       disabled,
       loading,
       primary,
