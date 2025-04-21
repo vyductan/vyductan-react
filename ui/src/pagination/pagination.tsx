@@ -23,13 +23,13 @@ import { Pager } from "./pager";
 
 export type PaginationProps = {
   className?: string;
-  total: number;
 
   // control
-  current?: number;
-  defaultCurrent?: number;
-  pageSize?: number;
+  defaultPage?: number;
   defaultPageSize?: number;
+  page?: number;
+  pageSize?: number;
+  total?: number;
   onChange?: (page: number, pageSize: number) => void;
 
   disabled?: boolean;
@@ -50,9 +50,9 @@ export type PaginationProps = {
     page: number,
     type: "page" | "prev" | "next" | "jump-prev" | "jump-next",
     originalElement: React.ReactNode,
-  ) => React.ReactNode;
+  ) => React.ReactElement<{ children?: React.ReactNode }>;
 
-  hrefGenerator?: (page: number) => string;
+  // hrefGenerator?: (page: number) => string;
 };
 export const Pagination = (props: PaginationProps) => {
   const {
@@ -60,10 +60,10 @@ export const Pagination = (props: PaginationProps) => {
     className,
 
     // control
-    current: currentProp,
-    defaultCurrent = 1,
+    page: pageProp,
+    defaultPage = 1,
     total = 0,
-    pageSize: pageSizeProp,
+    pageSize: pageSizeProp = 10,
     defaultPageSize = 10,
     onChange,
 
@@ -83,7 +83,7 @@ export const Pagination = (props: PaginationProps) => {
 
     itemRender,
     // itemRender = defaultItemRender,
-    hrefGenerator,
+    // hrefGenerator,
   } = props;
 
   const [pageSize, setPageSize] = useMergedState<number>(10, {
@@ -92,8 +92,8 @@ export const Pagination = (props: PaginationProps) => {
   });
 
   const [current, setCurrent] = useMergedState<number>(1, {
-    value: currentProp,
-    defaultValue: defaultCurrent,
+    value: pageProp,
+    defaultValue: defaultPage,
     postState: (c) =>
       Math.max(1, Math.min(c, calculatePage(undefined, pageSize, total))),
   });
@@ -199,10 +199,10 @@ export const Pagination = (props: PaginationProps) => {
 
   function renderPrev(prevPage: number) {
     const originalElement = (
-      <PaginationPrevious href={hrefGenerator?.(prevPage)} />
+      <PaginationPrevious href={generateHref(prevPage)} />
     );
     const prevButton = itemRender ? (
-      <PaginationPrevious>
+      <PaginationPrevious asChild>
         {itemRender(prevPage, "prev", originalElement)}
       </PaginationPrevious>
     ) : (
@@ -214,9 +214,9 @@ export const Pagination = (props: PaginationProps) => {
   }
 
   function renderNext(nextPage: number) {
-    const originalElement = <PaginationNext href={hrefGenerator?.(prevPage)} />;
+    const originalElement = <PaginationNext href={generateHref(nextPage)} />;
     const nextButton = itemRender ? (
-      <PaginationNext>
+      <PaginationNext asChild>
         {itemRender(nextPage, "next", originalElement)}
       </PaginationNext>
     ) : (
@@ -259,7 +259,6 @@ export const Pagination = (props: PaginationProps) => {
     showTitle,
     itemRender,
     page: -1,
-    hrefGenerator,
   };
 
   // ====================== Normal ======================
@@ -473,6 +472,14 @@ export const Pagination = (props: PaginationProps) => {
 //   _type,
 //   element,
 // ) => element;
+
+export function generateHref(page: number) {
+  const searchParams = new URLSearchParams(globalThis.location.search);
+  searchParams.set("page", String(page));
+  const newSearch = searchParams.toString();
+  const { origin, pathname } = globalThis.location;
+  return `${origin}${pathname}?${newSearch}`;
+}
 
 function isInteger(v: number) {
   const value = Number(v);

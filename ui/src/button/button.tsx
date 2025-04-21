@@ -34,14 +34,27 @@ const buttonVariants = tv({
     },
     color: {
       default: [],
-      link: [],
       danger: [],
+      link: [],
       success: [],
-      amber: [],
-      green: [],
       gray: [],
+      red: [],
+      orange: [],
+      amber: [],
+      yellow: [],
+      lime: [],
+      green: [],
+      emerald: [],
       teal: [],
+      cyan: [],
+      sky: [],
+      blue: [],
+      indigo: [],
+      violet: [],
+      purple: [],
+      fuchsia: [],
       pink: [],
+      rose: [],
     },
     size: {
       sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
@@ -55,6 +68,7 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
+      solid: ["text-white"],
       outline: [
         "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
@@ -62,14 +76,12 @@ const buttonVariants = tv({
         "border-border border border-dashed",
         "hover:border-primary-600 hover:text-primary-600",
       ],
+      filled: [],
       ghost: [
         "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: [
-        "text-primary underline-offset-4 hover:underline",
-        // "h-auto gap-1 border-0 p-0 font-normal",
-      ],
+      link: [],
       text: "border-0 px-0",
     },
     shape: {
@@ -142,11 +154,45 @@ const buttonVariants = tv({
         "hover:border-pink-600 hover:bg-pink-600",
       ],
     },
+    {
+      variant: "solid",
+      color: "green",
+      className: [
+        "border-green-600 bg-green-600",
+        "hover:border-green-700 hover:bg-green-700",
+      ],
+    },
     // outline
+    {
+      variant: "outline",
+      color: "danger",
+      className: [
+        "border-error",
+        "hover:border-error-hover hover:text-error-hover",
+        "hover:bg-red-100 dark:hover:bg-red-300",
+      ],
+    },
     {
       variant: "outline",
       color: "link",
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
+    },
+    {
+      variant: "outline",
+      color: "green",
+      className: [
+        "border-green-600 text-green-600",
+        "hover:border-green-700 hover:text-green-700",
+      ],
+    },
+    // filled
+    {
+      variant: "filled",
+      color: "green",
+      className: [
+        "bg-green-100 text-green-600",
+        "hover:bg-green-200 hover:text-green-700",
+      ],
     },
     // light
     {
@@ -195,16 +241,6 @@ const buttonVariants = tv({
         "hover:bg-blue-100 dark:hover:bg-blue-300",
       ],
     },
-    // outline
-    {
-      variant: "outline",
-      color: "danger",
-      className: [
-        "border-error",
-        "hover:border-error-hover hover:text-error-hover",
-        "hover:bg-red-100 dark:hover:bg-red-300",
-      ],
-    },
     // Ghost
     {
       variant: "ghost",
@@ -224,6 +260,12 @@ const buttonVariants = tv({
       variant: "ghost",
       color: "link",
       className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
+    },
+    // Link
+    {
+      variant: "link",
+      color: "default",
+      className: ["", "hover:text-primary"],
     },
     // Size
     {
@@ -273,7 +315,7 @@ export interface ButtonProps
   href?: string;
   loading?: boolean;
   icon?: React.ReactNode;
-  color?: NonNullable<ButtonVariants["color"]>;
+  color?: ButtonVariants["color"];
   variant?: Exclude<ButtonVariants["variant"], "primary">;
   classNames?: {
     variants?: TVButtonOptions;
@@ -287,7 +329,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       href,
       children,
       className,
-      color,
+      color = "default",
       disabled,
       loading,
       primary,
@@ -335,7 +377,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
 
     return (
-      <Wave>
+      <Wave component="Button" disabled={loading}>
         <Comp
           ref={ref}
           className={cn(

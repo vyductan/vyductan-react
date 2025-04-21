@@ -7,7 +7,6 @@ import type { inputSizeVariants } from "../input";
 import { cn } from "..";
 import { Icon } from "../icons";
 import { inputVariants } from "../input";
-import { controlHeightVariants } from "../size";
 
 type SelectRootProps = React.ComponentProps<typeof SelectPrimitive.Root>;
 function SelectRoot({ ...props }: SelectRootProps) {
@@ -34,6 +33,7 @@ type SelectTriggerProps = Omit<
   VariantProps<typeof inputSizeVariants> & {
     allowClear?: boolean | undefined;
     onClear?: () => void;
+    loading?: boolean;
     /* For clear */
     value?: ValueType | undefined;
   };
@@ -41,12 +41,12 @@ type SelectTriggerProps = Omit<
 const SelectTrigger = ({
   className,
   children,
-  borderless,
   size = "default",
   status,
-
+  variant,
   allowClear,
   onClear,
+  loading,
   value,
 
   ...props
@@ -56,12 +56,14 @@ const SelectTrigger = ({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // data-[size=default]:h-9 data-[size=sm]:h-8
         // own
         "group relative",
-        inputVariants({ borderless, status }),
+        inputVariants({ variant, status }),
         // inputSizeVariants({ size }),
-        controlHeightVariants({ size }),
+        // controlHeightVariants({ size }),
+        "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
         className,
       )}
       {...props}
@@ -89,12 +91,17 @@ const SelectTrigger = ({
           />
         </button>
       )}
+      {loading && (
+        <Icon
+          icon="icon-[lucide--loader]"
+          className="flex size-5 items-center justify-center pl-1 opacity-50 transition-opacity"
+        />
+      )}
       <SelectPrimitive.Icon
-        // asChild
         className={cn(
           "flex size-5 items-center justify-center opacity-50 transition-opacity",
-          "pl-1",
           allowClear && value && "group-hover:opacity-0",
+          loading && "opacity-0",
         )}
       >
         <Icon icon="icon-[lucide--chevron-down]" />
@@ -107,8 +114,15 @@ function SelectContent({
   className,
   children,
   position = "popper",
+
+  classNames,
+
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: React.ComponentProps<typeof SelectPrimitive.Content> & {
+  classNames?: {
+    viewport?: string;
+  };
+}) {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -131,6 +145,7 @@ function SelectContent({
 
             // own
             "px-[3px] py-1",
+            classNames?.viewport,
           )}
         >
           {children}
@@ -168,16 +183,17 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 text-sm outline-hidden select-none",
-        // "pr-8 pl-2"
-        "focus:bg-accent focus:text-accent-foreground",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        "[&_svg:not([class*='text-'])]:text-muted-foreground",
-        "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 text-sm outline-hidden select-none",
+        // // "pr-8 pl-2"
+        // // "focus:bg-accent focus:text-accent-foreground",
+        // "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        // "[&_svg:not([class*='text-'])]:text-muted-foreground",
+        // "*:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
 
         // own
-        "px-2",
+        "pr-2 pl-2",
         className,
       )}
       {...props}
@@ -192,7 +208,7 @@ function SelectItem({
         )}
       >
         <SelectPrimitive.ItemIndicator>
-          <Icon icon="icon-[lucide--check]" className="size-4" />
+          <Icon icon="icon-[lucide--check]" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

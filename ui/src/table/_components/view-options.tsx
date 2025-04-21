@@ -55,7 +55,11 @@ export function TableViewOptions<TData>({
                 column.accessorFn !== undefined && column.getCanHide(),
             )
             .map((column) => ({
-              label: column.columnDef.meta?.title ?? column.id,
+              label: column.columnDef.meta?.title
+                ? typeof column.columnDef.meta.title === "function"
+                  ? column.columnDef.meta.title({ table })
+                  : column.columnDef.meta.title
+                : column.id,
               value: column.id,
               checked: column.getIsVisible(),
               className: "truncate",

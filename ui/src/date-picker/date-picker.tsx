@@ -30,7 +30,6 @@ type DateType<T extends DatePickerValueType> = T extends "date"
 
 type DatePickerBaseProps = InputVariants &
   VariantProps<typeof inputSizeVariants> & {
-    ref?: React.Ref<InputRef>;
     id?: string;
     format?: string;
     /** To provide an additional time selection **/
@@ -38,10 +37,12 @@ type DatePickerBaseProps = InputVariants &
 
     allowClear?: boolean;
     className?: string;
+    suffix?: React.ReactNode;
   };
 
 type DatePickerProps<T extends DatePickerValueType = "date"> =
   DatePickerBaseProps & {
+    ref?: React.Ref<InputRef>;
     valueType?: T;
     defaultValue?: DateType<T>;
     value?: DateType<T>;
@@ -124,6 +125,7 @@ const DatePicker = <T extends DatePickerValueType = "date">({
   };
 
   const inputRef = React.useRef<InputRef>(null);
+  // eslint-disable-next-line react-compiler/react-compiler
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (isValidDateStringExact(value, format)) {
@@ -132,34 +134,6 @@ const DatePicker = <T extends DatePickerValueType = "date">({
       setInputValue(preInputValue);
     }
   };
-  // handle click outside from input (is focus within)
-  // const [isFocused, setIsFocused] = React.useState(false);
-  // useFocusWithin(inputRef, {
-  //   onFocus: () => {
-  //     setIsFocused(true);
-  //   },
-  // });
-  // useClickAway((event) => {
-  //   const target = event.target as HTMLElement | null;
-  //   // if (target === inputRef.current) {
-  //   //   setIsFocused(false);
-  //   //   return;
-  //   // }
-  //   // if (
-  //   //   isFocused &&
-  //   //   // check if choose a day in panel or not
-  //   //   !(target && "name" in target && target.name === "day") &&
-  //   //   // condition click to navigate month
-  //   //   !(
-  //   //     target?.tagName === "SPAN" &&
-  //   //     target.parentElement &&
-  //   //     "name" in target.parentElement
-  //   //   )
-  //   // ) {
-  //   //   handleChangeInput(inputValue);
-  //   //   setOpen(false);
-  //   // }
-  // }, inputRef);
 
   // prevent click label to focus input (open popover)
   useEffect(() => {
@@ -184,24 +158,8 @@ const DatePicker = <T extends DatePickerValueType = "date">({
           offset: [-12, 10],
         }}
         open={open}
-        onOpenChange={() => {
-          if (!open) {
-            setOpen(true);
-          }
-        }}
-        onInteractOutside={(event) => {
-          // console.log(
-          //   "interact outside",
-          //   event.target,
-          //   inputRef.current,
-          //   event.target?.querySelector("input") === inputRef.current,
-          //   event.target === inputRef.current,
-          // );
-          // TODO: fix click div still close and reopen popup (maybe use clickaway)
-          // TODO: fix pres ESC doesn't close
-          if (event.target !== inputRef.current) {
-            setOpen(false);
-          }
+        onOpenChange={(open) => {
+          setOpen(open);
         }}
         onOpenAutoFocus={(event) => {
           event.preventDefault();
@@ -246,10 +204,12 @@ const DatePicker = <T extends DatePickerValueType = "date">({
               className="ml-auto size-4 opacity-50"
             />
           }
-          // onClick={() => {
-          //   console.log("click", open);
-          //   if (!open) setOpen(true);
-          // }}
+          onClick={(e) => {
+            if (open) {
+              // prevent close when click into input if popover openning
+              e.preventDefault();
+            }
+          }}
           onKeyUp={(event) => {
             event.stopPropagation();
             if (event.key === "Enter" || event.key === "Escape") {
