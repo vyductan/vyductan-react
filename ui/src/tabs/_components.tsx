@@ -31,7 +31,7 @@ function TabsList({ className, type = "line", ...props }: TabsListProps) {
         // type === "solid" && "h-9 w-fit justify-center",
         type === "card" && "bg-background-muted justify-center rounded-md p-1",
         type === "line" &&
-          "h-10 justify-start rounded-none border-b bg-transparent p-0",
+          "h-10 justify-start rounded-none border-b bg-transparent p-0 *:data-[slot=tabs-trigger]:flex-none",
         // antd
         "relative w-full",
         className,
@@ -67,7 +67,8 @@ function TabsTrigger({
         tabsType === "line" && [
           "mx-3 h-[calc(100%+2px)] first:ml-0",
           "text-muted-foreground rounded-none border-b-2 border-b-transparent bg-transparent font-semibold shadow-none transition-none",
-          "data-[state=active]:text-foreground data-[state=active]:border-b-primary data-[state=active]:shadow-none",
+          "hover:text-primary-400",
+          "data-[state=active]:text-primary-500 data-[state=active]:border-b-primary-500 data-[state=active]:shadow-none",
         ],
         className,
       )}
