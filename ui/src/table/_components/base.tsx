@@ -56,7 +56,8 @@ function TableHeader({ className, sticky, ...props }: TableHeaderProps) {
   );
 }
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
+type TableBodyProps = React.ComponentProps<"tbody">;
+function TableBody({ className, ...props }: TableBodyProps) {
   return (
     <tbody
       data-slot="table-body"
@@ -158,7 +159,7 @@ function TableCaption({
   );
 }
 
-export type { TableRowProps, TableHeadProps };
+export type { TableHeaderProps, TableBodyProps, TableRowProps, TableHeadProps };
 
 export {
   TableRoot,
