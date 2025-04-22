@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
+import type { Table, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
 import warning from "@rc-component/util/lib/warning";
@@ -197,14 +197,10 @@ export const useColumns = <TRecord extends AnyObject>(
   const selectionColumn = React.useMemo<ColumnDef<TRecord> | undefined>(() => {
     if (rowSelection) {
       let lastSelectedId = "";
-      return {
-        key: "selection",
-        width: 32,
-        minWidth: 32,
-        align: "center",
-        //   enableSorting: false,
-        // enableHiding: false,
-        title: ({ table }) => {
+      const width = rowSelection.columnWidth ?? 32;
+      const columnTitle =
+        rowSelection.columnTitle ??
+        (({ table }: { table: Table<TRecord> }) => {
           const originNode = (
             <Checkbox
               aria-label="Select all"
@@ -220,7 +216,16 @@ export const useColumns = <TRecord extends AnyObject>(
                 originNode,
               })
             : originNode;
-        },
+        });
+
+      return {
+        key: "selection",
+        width,
+        minWidth: width,
+        align: "center",
+        //   enableSorting: false,
+        // enableHiding: false,
+        title: columnTitle,
         render: ({ table, row }) => {
           const originNode = (
             <Checkbox

@@ -2,6 +2,7 @@
 "use client";
 
 import type {
+  ColumnPinningState,
   ExpandedState,
   OnChangeFn,
   Row,
@@ -167,7 +168,7 @@ const Table = <TRecord extends AnyObject>({
   classNames,
 
   rowKey = "id",
-  rowSelection: propRowSelection,
+  rowSelection: rowSelectionProp,
 
   sticky,
   scroll,
@@ -214,7 +215,7 @@ const Table = <TRecord extends AnyObject>({
       columns: columnsProp,
       // selections,
       // rowKey,
-      rowSelection: propRowSelection,
+      rowSelection: rowSelectionProp,
       expandable,
       getRowKey,
     },
@@ -224,19 +225,30 @@ const Table = <TRecord extends AnyObject>({
   // ====================== Expand ======================
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
-  const defaultPinnings = {
-    left: columns.filter((x) => x.key && x.fixed === "left").map((x) => x.key!),
-    right: columns
-      .filter((x) => x.key && x.fixed === "right")
-      .map((x) => x.key!),
-  };
+  // ====================== Pinnings ======================
+
+  const [columnPinning, setColumnPinning] = useState<ColumnPinningState>({});
+
+  useEffect(() => {
+    const newPinnings = {
+      left: columnsForTTTable
+        .filter((x) => x.id && x.meta?.fixed === "left")
+        .map((x) => x.id!),
+      right: columnsForTTTable
+        .filter((x) => x.id && x.meta?.fixed === "right")
+        .map((x) => x.id!),
+    };
+    if (!_.isEqual(columnPinning, newPinnings)) {
+      setColumnPinning(newPinnings);
+    }
+  }, [columnsForTTTable, columnPinning]);
 
   // ====================== Row Selection =======================
   // NOTE: cannot use `useMergedState`
   // NOTE: should keep the selectedRows (if pagination)
   const [selectedRowKeys, setSelectedRowKeys] = useState<
     TRecord[keyof TRecord][]
-  >(propRowSelection?.selectedRowKeys ?? []);
+  >(rowSelectionProp?.selectedRowKeys ?? []);
   const [selectedRows, setSelectedRows] = useState(
     dataSource.filter((row) => selectedRowKeys.includes(row[rowKey])),
   );
@@ -246,8 +258,8 @@ const Table = <TRecord extends AnyObject>({
     rowKey,
   );
   useEffect(() => {
-    setSelectedRowKeys(propRowSelection?.selectedRowKeys ?? []);
-  }, [propRowSelection?.selectedRowKeys, dataSource, rowKey]);
+    setSelectedRowKeys(rowSelectionProp?.selectedRowKeys ?? []);
+  }, [rowSelectionProp?.selectedRowKeys, dataSource, rowKey]);
   const onRowSelectionChange: OnChangeFn<RowSelectionState> = (
     updaterOrValue,
   ) => {
@@ -275,7 +287,7 @@ const Table = <TRecord extends AnyObject>({
     setSelectedRowKeys(updatedSelectedKeys);
     setSelectedRows(updatedSelectedRows);
 
-    propRowSelection?.onChange?.(updatedSelectedKeys, updatedSelectedRows);
+    rowSelectionProp?.onChange?.(updatedSelectedKeys, updatedSelectedRows);
   };
 
   // ====================== Sorting =======================
@@ -331,13 +343,14 @@ const Table = <TRecord extends AnyObject>({
     data,
     columns: columnsForTTTable,
     columnResizeMode: "onChange",
-    initialState: {
-      columnPinning: defaultPinnings,
-    },
+    // initialState: {
+    //   columnPinning: defaultPinnings,
+    // },
     state: {
       expanded,
       rowSelection,
       sorting,
+      columnPinning: columnPinning,
     },
     getCoreRowModel: getCoreRowModel(),
     // rowKey
@@ -386,6 +399,16 @@ const Table = <TRecord extends AnyObject>({
   const wrapperScrollRight =
     (scroll?.x ?? 0) - (wrapperWidth + wrapperScrollLeft);
 
+  const TableHeaderComp =
+    components?.header &&
+    "wrapper" in components.header &&
+    components.header.wrapper
+      ? components.header.wrapper
+      : TableHeader;
+  const TableBodyComp =
+    components?.body && "wrapper" in components.body && components.body.wrapper
+      ? components.body.wrapper
+      : TableBody;
   const TableRowComp =
     components?.body && "row" in components.body && components.body.row
       ? components.body.row
@@ -440,7 +463,7 @@ const Table = <TRecord extends AnyObject>({
 
   return (
     <TableStoreProvider>
-      <Spin spinning={loading}>
+      <Spin spinning={loading} className={className}>
         <div
           data-slot="table-container"
           className={cn(
@@ -504,7 +527,7 @@ const Table = <TRecord extends AnyObject>({
           >
             {bodyColGroup}
 
-            <TableHeader
+            <TableHeaderComp
               style={{
                 position: sticky ? "sticky" : undefined,
                 top: sticky
@@ -574,7 +597,7 @@ const Table = <TRecord extends AnyObject>({
                   })}
                 </TableRow>
               ))}
-            </TableHeader>
+            </TableHeaderComp>
 
             {/* padding with header [disable if bordered]*/}
             {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
@@ -598,7 +621,7 @@ const Table = <TRecord extends AnyObject>({
                   })}
               </TableBody>
             ) : (
-              <TableBody>
+              <TableBodyComp>
                 {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row, index) =>
                     "_customRow" in row.original ? (
@@ -732,7 +755,7 @@ const Table = <TRecord extends AnyObject>({
                     </TableCell>
                   </TableRow>
                 )}
-              </TableBody>
+              </TableBodyComp>
             )}
 
             {summary && (
