@@ -1,5 +1,5 @@
 export type BadgeProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   count?: React.ReactNode;
 
   /** Set offset of the badge dot [left, top] */
@@ -10,7 +10,7 @@ export const Badge = ({ count, children, offset }: BadgeProps) => {
     <span className="relative">
       {children}
       <span
-        className="absolute end-0 top-0 origin-[100%_0%] -translate-y-1/2 translate-x-1/2"
+        className="absolute end-0 top-0 origin-[100%_0%] translate-x-1/2 -translate-y-1/2"
         style={
           offset
             ? {
