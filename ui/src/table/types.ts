@@ -172,6 +172,8 @@ export type RowSelectionType = "checkbox" | "radio";
 
 export type TableRowSelection<TRecord> = {
   type?: RowSelectionType;
+  columnTitle?: React.ReactNode;
+  columnWidth?: number;
   /** Hide the selectAll checkbox and custom selection */
   hideSelectAll?: boolean;
   /** Controlled selected row keys */
