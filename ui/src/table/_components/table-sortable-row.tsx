@@ -3,6 +3,7 @@ import React, { useContext, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+import type { ButtonProps } from "../../button";
 import { TableRow } from ".";
 import { Button } from "../../button";
 import { Icon } from "../../icons";
@@ -13,14 +14,19 @@ interface RowContextProps {
 }
 
 const RowContext = React.createContext<RowContextProps>({});
-const DragHandle: React.FC = () => {
+type DragHandleProps = ButtonProps & {
+  readOnly?: boolean;
+};
+const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
   const { setActivatorNodeRef, listeners } = useContext(RowContext);
   return (
     <Button
       variant="ghost"
+      size="sm"
       icon={<Icon icon="icon-[octicon--grabber-16]" />}
-      {...listeners}
-      ref={setActivatorNodeRef}
+      {...(readOnly ? {} : listeners)}
+      ref={readOnly ? undefined : setActivatorNodeRef}
+      {...props}
     />
   );
 };
@@ -28,8 +34,12 @@ const DragHandle: React.FC = () => {
 interface TableRowSortableProps
   extends React.HTMLAttributes<HTMLTableRowElement> {
   "data-row-key": string;
+  asHandle?: boolean;
 }
-const TableSortableRow: React.FC<TableRowSortableProps> = (props) => {
+const TableSortableRow: React.FC<TableRowSortableProps> = ({
+  asHandle = true,
+  ...props
+}) => {
   const {
     attributes,
     listeners,
@@ -44,6 +54,7 @@ const TableSortableRow: React.FC<TableRowSortableProps> = (props) => {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
+    ...(asHandle ? { cursor: "move" } : { cursor: "auto" }),
     ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
   };
 
@@ -54,7 +65,13 @@ const TableSortableRow: React.FC<TableRowSortableProps> = (props) => {
 
   return (
     <RowContext.Provider value={contextValue}>
-      <TableRow {...props} ref={setNodeRef} style={style} {...attributes} />
+      <TableRow
+        {...props}
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...(asHandle ? listeners : {})}
+      />
     </RowContext.Provider>
   );
 };
