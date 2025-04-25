@@ -172,15 +172,11 @@ export type RowSelectionType = "checkbox" | "radio";
 
 export type TableRowSelection<TRecord> = {
   type?: RowSelectionType;
-  columnTitle?: React.ReactNode;
-  columnWidth?: number;
-  /** Hide the selectAll checkbox and custom selection */
-  hideSelectAll?: boolean;
   /** Controlled selected row keys */
-  selectedRowKeys?: TRecord[keyof TRecord][];
+  selectedRowKeys?: Key[];
   /** Callback executed when selected rows change */
   onChange?: (
-    selectedRowKeys: TRecord[keyof TRecord][],
+    selectedRowKeys: Key[],
     // selectedRowKeys: TRecord[keyof TRecord][],
     selectedRows: TRecord[],
   ) => void;
@@ -191,11 +187,16 @@ export type TableRowSelection<TRecord> = {
   }) => React.ReactNode;
   /** Renderer of the `table` cell. Same as render in column */
   renderCell?: (args: {
-    checked: boolean;
+    value: boolean;
     record: TRecord;
     index: number;
     originNode: React.ReactNode;
   }) => React.ReactNode;
+
+  columnTitle?: React.ReactNode;
+  columnWidth?: number;
+  /** Hide the selectAll checkbox and custom selection */
+  hideSelectAll?: boolean;
 };
 
 export type TableSize = "sm" | "default";

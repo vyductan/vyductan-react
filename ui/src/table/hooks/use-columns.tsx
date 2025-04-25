@@ -254,7 +254,7 @@ export const useColumns = <TRecord extends AnyObject>(
           );
           return rowSelection?.renderCell
             ? rowSelection.renderCell({
-                checked: row.getIsSelected(),
+                value: row.getIsSelected(),
                 record: row.original,
                 index: row.index,
                 originNode,
