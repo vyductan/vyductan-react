@@ -285,21 +285,12 @@ export function getRowRange<T>(rows: Array<Row<T>>, idA: string, idB: string) {
   return range;
 }
 
-export const transformedRowSelection = <TRecord extends AnyObject>(
+export const transformedTanstackTableRowSelection = (
   selectedRowKeys: string[],
-  dataSource: TRecord[],
-  rowKey: keyof TRecord,
 ) => {
   const rowSelectionTst: Record<string, boolean> = {};
-  if (rowKey) {
-    for (const x of selectedRowKeys) {
-      rowSelectionTst[x] = true;
-    }
-  } else {
-    for (const x of selectedRowKeys) {
-      const index = dataSource.findIndex((d) => d[rowKey] === x);
-      if (index !== -1) rowSelectionTst[index] = true;
-    }
+  for (const x of selectedRowKeys) {
+    rowSelectionTst[x] = true;
   }
   return rowSelectionTst;
 };

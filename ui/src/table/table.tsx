@@ -11,8 +11,7 @@ import type {
   Table as TableDef,
 } from "@tanstack/react-table";
 import React, { Fragment, useEffect, useRef, useState } from "react";
-import { useMergedState } from "@rc-component/util";
-import { warning } from "@rc-component/util/lib/warning";
+import { useMergedState, warning } from "@rc-component/util";
 import {
   flexRender,
   getCoreRowModel,
@@ -30,6 +29,7 @@ import type {
   FilterValue,
   // GetComponent,
   GetRowKey,
+  Key,
   SorterResult,
   TableComponents,
   TableCurrentDataSource,
@@ -55,7 +55,7 @@ import { useColumns } from "./hooks/use-columns";
 import { TableStoreProvider } from "./hooks/use-table";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import { transformedRowSelection } from "./utils";
+import { transformedTanstackTableRowSelection } from "./utils";
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
@@ -78,7 +78,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     alertRender?:
       | React.ReactNode
       | ((args?: {
-          selectedRowKeys: TRecord[keyof TRecord][];
+          selectedRowKeys: Key[];
           selectedRows: TRecord[];
         }) => React.ReactNode);
 
@@ -96,14 +96,14 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     // emptyRender?: EmptyProps;
     /** Expandable config */
     expandable?: {
-      expandedRowKeys?: string[];
+      expandedRowKeys?: Key[];
       expandedRowRender: (record: TRecord) => React.ReactNode;
       rowExpandable?: (record: TRecord) => boolean;
       onExpand?: (record: TRecord) => void;
       expandRowByClick?: boolean;
     };
     /** Row key config */
-    rowKey?: keyof TRecord;
+    rowKey?: string | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
     rowSelection?: TableRowSelection<TRecord>;
     pagination?: PaginationProps;
@@ -167,7 +167,7 @@ const Table = <TRecord extends AnyObject>({
   expandable,
   classNames,
 
-  rowKey = "id",
+  rowKey = "key",
   rowSelection: rowSelectionProp,
 
   sticky,
@@ -196,7 +196,11 @@ const Table = <TRecord extends AnyObject>({
       return rowKey;
     }
     return (record: TRecord) => {
-      const key = record[rowKey];
+      let key = record[rowKey];
+      if (key === undefined) {
+        // "id" as other default key
+        key = record.id;
+      }
 
       if (process.env.NODE_ENV !== "production") {
         warning(
@@ -246,44 +250,59 @@ const Table = <TRecord extends AnyObject>({
   // ====================== Row Selection =======================
   // NOTE: cannot use `useMergedState`
   // NOTE: should keep the selectedRows (if pagination)
-  const [selectedRowKeys, setSelectedRowKeys] = useState<
-    TRecord[keyof TRecord][]
-  >(rowSelectionProp?.selectedRowKeys ?? []);
-  const [selectedRows, setSelectedRows] = useState(
-    dataSource.filter((row) => selectedRowKeys.includes(row[rowKey])),
+  // 2024-04-24: change from TRecord[keyof TRecord][] to React.Key (same antd)
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>(
+    rowSelectionProp?.selectedRowKeys ?? [],
   );
-  const rowSelection = transformedRowSelection(
-    selectedRowKeys,
-    dataSource,
-    rowKey,
+  const [selectedRows, setSelectedRows] = useState<TRecord[]>(
+    dataSource.filter((row, index) =>
+      selectedRowKeys.includes(getRowKey(row, index)),
+    ),
   );
   useEffect(() => {
     setSelectedRowKeys(rowSelectionProp?.selectedRowKeys ?? []);
   }, [rowSelectionProp?.selectedRowKeys, dataSource, rowKey]);
+
+  const rowSelection = transformedTanstackTableRowSelection(
+    selectedRowKeys.map((x) => x.toString()),
+  );
   const onRowSelectionChange: OnChangeFn<RowSelectionState> = (
     updaterOrValue,
   ) => {
     // https://chatgpt.com/c/676154ea-e108-8010-bd5b-abe71b6a529d
-    const currentPageRowKeys = new Set(dataSource.map((x) => x[rowKey]));
-    const newSelectedKeys: TRecord[keyof TRecord][] =
+    const currentPageRowKeys = new Set(
+      dataSource.map((x, index) => getRowKey(x, index)),
+    );
+    const newSelectedKeys =
       typeof updaterOrValue === "function"
-        ? (Object.keys(
-            updaterOrValue(rowSelection),
-          ) as TRecord[keyof TRecord][])
-        : (Object.keys(updaterOrValue) as TRecord[keyof TRecord][]);
+        ? Object.entries(updaterOrValue(rowSelection))
+            .filter((x) => x[1]) // check boolean
+            .map((x) => x[0]) // get key
+        : Object.keys(updaterOrValue);
 
     // Combine the selected keys and remove any keys that are not on the current page if necessary.
     const updatedSelectedKeys = [
       ...new Set([
         ...selectedRowKeys.filter((key) => !currentPageRowKeys.has(key)),
-        ...newSelectedKeys,
+        ...dataSource
+          .filter((x, index) =>
+            newSelectedKeys.includes(getRowKey(x, index).toString()),
+          )
+          .map((x, index) => getRowKey(x, index)),
+        // ...newSelectedKeys,
       ]),
     ];
+
     // Update the list of selected rows from the entire current data.
     const updatedSelectedRows = [
-      ...selectedRows.filter((row) => !currentPageRowKeys.has(row[rowKey])), // Keep rows from previous pages
-      ...dataSource.filter((row) => newSelectedKeys.includes(row[rowKey])), // Add rows from current page
+      ...selectedRows.filter(
+        (row, index) => !currentPageRowKeys.has(getRowKey(row, index)),
+      ), // Keep rows from previous pages
+      ...dataSource.filter((row, index) =>
+        newSelectedKeys.includes(getRowKey(row, index).toString()),
+      ), // Add rows from current page
     ];
+
     setSelectedRowKeys(updatedSelectedKeys);
     setSelectedRows(updatedSelectedRows);
 
@@ -343,18 +362,15 @@ const Table = <TRecord extends AnyObject>({
     data,
     columns: columnsForTTTable,
     columnResizeMode: "onChange",
-    // initialState: {
-    //   columnPinning: defaultPinnings,
-    // },
     state: {
       expanded,
       rowSelection,
       sorting,
-      columnPinning: columnPinning,
+      columnPinning,
     },
     getCoreRowModel: getCoreRowModel(),
     // rowKey
-    getRowId: (originalRow) => originalRow[rowKey],
+    getRowId: (originalRow, index) => getRowKey(originalRow, index).toString(),
     // expandable
     enableExpanding: !!expandable,
     getExpandedRowModel: getExpandedRowModel(),
@@ -623,12 +639,12 @@ const Table = <TRecord extends AnyObject>({
             ) : (
               <TableBodyComp>
                 {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row, index) =>
+                  table.getRowModel().rows.map((row, rowIndex) =>
                     "_customRow" in row.original ? (
                       <TableRow
                         key={row.id}
                         className={cn(
-                          getRowClassName(row, index),
+                          getRowClassName(row, rowIndex),
                           row.original._customRowClassName,
                         )}
                         style={
@@ -649,13 +665,13 @@ const Table = <TRecord extends AnyObject>({
                       <Fragment key={row.id}>
                         <TableRowComp
                           data-state={row.getIsSelected() && "selected"}
-                          data-row-key={row.original[rowKey]}
+                          data-row-key={getRowKey(row.original, rowIndex)}
                           className={cn(
                             row.getIsExpanded() && "bg-gray-50",
                             row.getIsExpanded() && bordered === false
                               ? "border-x"
                               : "",
-                            getRowClassName(row, index),
+                            getRowClassName(row, rowIndex),
                           )}
                           onClick={(e: React.MouseEvent) => {
                             onRow?.({
