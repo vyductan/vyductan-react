@@ -16,7 +16,7 @@ import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex shrink-0 items-center justify-center gap-2 text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
+    "inline-flex shrink-0 items-center justify-center gap-2 border text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
     // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", // moved to &_span
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
@@ -58,7 +58,7 @@ const buttonVariants = tv({
     },
     size: {
       sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
-      default: "h-8 rounded-md px-3 py-1 has-[>svg]:px-2.5",
+      default: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
       lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
       xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
     },
@@ -78,7 +78,7 @@ const buttonVariants = tv({
       ],
       filled: [],
       ghost: [
-        "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
       link: [],
