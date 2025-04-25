@@ -13,6 +13,7 @@ type DrawerProps = DrawerRootProps & {
   title: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
+  extra?: React.ReactNode;
   trigger?: React.ReactNode;
 
   className?: string;
@@ -29,6 +30,7 @@ const Drawer = ({
   title,
   description,
   children,
+  extra,
   trigger,
 
   className,
@@ -41,7 +43,7 @@ const Drawer = ({
     <DrawerRoot direction={placement} {...props}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       <DrawerContent className={cn(className)}>
-        <DrawerHeader className={cn("border-b p-6", classNames?.header)}>
+        <DrawerHeader className={cn(classNames?.header)} extra={extra}>
           <DrawerTitle className={classNames?.title}>{title}</DrawerTitle>
           <DrawerDescription
             className={cn(description ? "" : "hidden", classNames?.description)}
