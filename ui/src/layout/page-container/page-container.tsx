@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 
-import type { ResultProps } from "../../result";
+import { cn } from "@acme/ui/lib/utils";
+
+import type { ResultProps } from "../../components/result";
 import type { PageHeaderProps } from "../page-header";
-import { cn } from "../..";
-import { Result } from "../../result/result";
-import { useUiConfig } from "../../store";
+import { useUiConfig } from "../../components/config-provider/config-provider";
+import { Result } from "../../components/result/result";
 import { PageHeader } from "../page-header";
 
 export type PageContainerProps = {

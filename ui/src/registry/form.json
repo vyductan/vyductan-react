@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "form",
+  "type": "registry:component",
+  "title": "Form",
+  "files": [
+    {
+      "path": "components/form/form.tsx",
+      "content": "\"use client\";\n\nimport type { ReactNode } from \"react\";\nimport type { FieldValues } from \"react-hook-form\";\n\nimport type { FormInstance } from \"./hooks/use-form\";\nimport { FormErrorsNotification } from \"./_components/form-errors-notification\";\nimport { FormRoot } from \"./context\";\n\ntype FormProps<\n  TFieldValues extends FieldValues,\n  TContext,\n  TTransformedValues extends FieldValues = TFieldValues,\n> = Omit<\n  React.DetailedHTMLProps<\n    React.FormHTMLAttributes<HTMLFormElement>,\n    HTMLFormElement\n  >,\n  \"children\"\n> & {\n  form: FormInstance<TFieldValues, TContext, TTransformedValues>;\n  children:\n    | ReactNode\n    | ((\n        form: FormInstance<TFieldValues, TContext, TTransformedValues>,\n      ) => ReactNode);\n  layout?: \"vertical\" | \"horizontal\";\n};\nconst Form = <\n  TFieldValues extends FieldValues,\n  TContext,\n  TTransformedValues extends FieldValues = TFieldValues,\n>({\n  form,\n  children,\n  layout,\n  ...restProps\n}: FormProps<TFieldValues, TContext, TTransformedValues>) => {\n  return (\n    <FormRoot layout={layout} {...form}>\n      <form onSubmit={form.submit} {...restProps}>\n        {typeof children === \"function\" ? children(form) : children}\n      </form>\n      <FormErrorsNotification />\n    </FormRoot>\n  );\n};\n\nexport { Form };\nexport type { FormProps };\n",
+      "type": "registry:file",
+      "target": "components/form/form.tsx"
+    }
+  ]
+}
