@@ -1,4 +1,4 @@
-import { cn } from "../..";
+import { cn } from "@acme/ui/lib/utils";
 
 export const PageHeading = ({
   className,

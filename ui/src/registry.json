@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "VyDucTan",
+  "homepage": "https://vyductan.dev",
+  "items": [
+    {
+      "name": "form",
+      "title": "Form",
+      "path": "components/form",
+      "type": "registry:component",
+      "files": [
+        {
+          "target": "components/form/form.tsx",
+          "path": "components/form/form.tsx",
+          "type": "registry:file"
+        }
+      ]
+    }
+  ]
+}

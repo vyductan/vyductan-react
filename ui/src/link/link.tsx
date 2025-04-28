@@ -1,6 +1,6 @@
 import type { AnchorHTMLAttributes, DetailedHTMLProps } from "react";
 
-import { useUiConfig } from "../store";
+import { useUiConfig } from "../components/config-provider/config-provider";
 
 type LinkProps = DetailedHTMLProps<
   AnchorHTMLAttributes<HTMLAnchorElement>,
