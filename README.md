@@ -18,3 +18,13 @@ https://github.com/ant-design/ant-design
 
 Apr 17, 2025, 2:35 PM GMT+7
 <https://github.com/ant-design/ant-design/commit/f3bf6da30390f8e8ae791fbd29d7a8f6df07ba8f>
+
+## Upgrade
+
+### VSCode
+
+```regex
+(@acme/ui/)(?!components\b|shadcn\b|lib\b|icons\b|layout\b|src\b|\*|tailwind\b|theme\b)([^"]+)
+
+$1components/$2
+```
