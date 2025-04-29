@@ -9,6 +9,7 @@
     "./lib/*": "./src/lib/*.ts",
     "./shadcn/*": "./src/shadcn/*.tsx",
     "./components/*": "./src/components/*/index.ts",
+    "./layout/*": "./src/layout/*/index.ts",
     "./icons": "./src/icons/index.ts",
     "./icons/*": "./src/icons/*.tsx"
   },
@@ -56,7 +57,7 @@
     "date-fns": "^4.1.0",
     "embla-carousel-react": "^8.6.0",
     "motion": "^12.7.4",
-    "next-themes": "^0.4.6",
+    "next-themes": "catalog:",
     "react-day-picker": "^9.6.7",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.56.1",
