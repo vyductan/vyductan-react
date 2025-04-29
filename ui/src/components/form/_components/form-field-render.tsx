@@ -58,20 +58,30 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
         {!id && children ? (
           <>
             {label ? (
-              typeof label === "string" ? (
-                <FieldLabel
-                  className={cn(
-                    layout === "horizontal" && "w-6/24",
-                    layout === "vertical" && "pb-2",
-                    classNames?.label,
-                  )}
-                  required={required}
-                >
-                  {label}
-                </FieldLabel>
-              ) : (
-                label
-              )
+              // typeof label === "string" ? (
+              //   <FieldLabel
+              //     className={cn(
+              //       layout === "horizontal" && "w-6/24",
+              //       layout === "vertical" && "pb-2",
+              //       classNames?.label,
+              //     )}
+              //     required={required}
+              //   >
+              //     {label}
+              //   </FieldLabel>
+              // ) : (
+              //   label
+              // )
+              <FieldLabel
+                className={cn(
+                  layout === "horizontal" && "w-6/24",
+                  layout === "vertical" && "pb-2",
+                  classNames?.label,
+                )}
+                required={required}
+              >
+                {label}
+              </FieldLabel>
             ) : undefined}
             {children}
           </>
@@ -79,20 +89,30 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
           <>
             {/* Label */}
             {label ? (
-              typeof label === "string" ? (
-                <FieldLabel
-                  className={cn(
-                    layout === "horizontal" && "w-6/24",
-                    layout === "vertical" && "pb-2",
-                    classNames?.label,
-                  )}
-                  required={required}
-                >
-                  {label}
-                </FieldLabel>
-              ) : (
-                label
-              )
+              // typeof label === "string" ? (
+              //   <FieldLabel
+              //     className={cn(
+              //       layout === "horizontal" && "w-6/24",
+              //       layout === "vertical" && "pb-2",
+              //       classNames?.label,
+              //     )}
+              //     required={required}
+              //   >
+              //     {label}
+              //   </FieldLabel>
+              // ) : (
+              //   label
+              // )
+              <FieldLabel
+                className={cn(
+                  layout === "horizontal" && "w-6/24",
+                  layout === "vertical" && "pb-2",
+                  classNames?.label,
+                )}
+                required={required}
+              >
+                {label}
+              </FieldLabel>
             ) : undefined}
             {/* Input */}
             <FormControl>{children}</FormControl>
