@@ -9,7 +9,7 @@
     "./lib/*": "./src/lib/*.ts",
     "./shadcn/*": "./src/shadcn/*.tsx",
     "./components/*": "./src/components/*/index.ts",
-    "./layout/*": "./src/layout/*.tsx",
+    "./layout/*": "./src/layout/*/index.ts",
     "./icons": "./src/icons/index.ts",
     "./icons/*": "./src/icons/*.tsx"
   },
