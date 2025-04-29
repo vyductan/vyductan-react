@@ -1,7 +1,7 @@
 import type { DetailedHTMLProps, ForwardedRef, HTMLAttributes } from "react";
 import { forwardRef } from "react";
 
-import { cn } from "..";
+import { cn } from "@acme/ui/lib/utils";
 
 // https://icon-sets.iconify.design/
 export type IconProps = DetailedHTMLProps<

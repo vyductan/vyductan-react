@@ -17,17 +17,18 @@
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
-    "@tailwindcss/postcss": "^4.0.11",
+    "@tailwindcss/postcss": "^4.1.4",
     "postcss": "8.5.3",
     "tailwindcss": "catalog:",
-    "tw-animate-css": "^1.2.4"
+    "tw-animate-css": "^1.2.8"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@iconify/tailwind": "^1.2.0",
-    "@types/node": "^22.13.9",
+    "@iconify/json": "^2.2.314",
+    "@iconify/tailwind4": "^1.0.6",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "postcss-import": "^16.1.0",
     "postcss-preset-env": "^10.1.3",

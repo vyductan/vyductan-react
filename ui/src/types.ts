@@ -1,6 +1,6 @@
 import type { VariantProps } from "tailwind-variants";
 
-import type { inputSizeVariants } from "./input";
+import type { inputSizeVariants } from "./components/input";
 
 export type AnyObject = Record<PropertyKey, any>;
 

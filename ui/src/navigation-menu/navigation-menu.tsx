@@ -1,4 +1,4 @@
-import type { MenuItemDef } from "../menu/types";
+import type { MenuItemDef } from "../components/menu/types";
 import type { NavigationMenuRootProps } from "./components";
 import {
   NavigationMenuItem,
