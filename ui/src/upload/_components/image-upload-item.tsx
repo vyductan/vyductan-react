@@ -1,8 +1,9 @@
+import { cn } from "@acme/ui/lib/utils";
+
 import type { UploadFileItem } from "../types";
-import { cn } from "../..";
-import { Card } from "../../card";
 import { Checkbox } from "../../checkbox";
-import { Progress } from "../../progress";
+import { Card } from "../../components/card";
+import { Progress } from "../../components/progress";
 import MyImage from "./image";
 
 type Props = {

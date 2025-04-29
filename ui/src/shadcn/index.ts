@@ -1,0 +1,2 @@
+// a
+export * from "./avatar";
