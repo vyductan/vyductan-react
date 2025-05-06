@@ -47,11 +47,7 @@ type UseFormProps<
   TTransformedValues extends FieldValues | undefined = undefined,
 > = __UseFormProps<TFieldValues, TContext, TTransformedValues> & {
   schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
-  onSubmit?: TTransformedValues extends undefined
-    ? SubmitHandler<TFieldValues>
-    : TTransformedValues extends FieldValues
-      ? SubmitHandler<TTransformedValues>
-      : never;
+  onSubmit?: SubmitHandler<TTransformedValues>;
   onValuesChange?: (
     changedValues: TFieldValues,
     allValues: TFieldValues,
@@ -64,7 +60,7 @@ const useForm = <
 >(
   props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
-  const { schema, defaultValues, ...restProps } = props ?? {};
+  const { schema, defaultValues, onSubmit, ...restProps } = props ?? {};
 
   const methods = __useForm<TFieldValues, TContext, TTransformedValues>(
     props
@@ -118,17 +114,23 @@ const useForm = <
     },
     [methods, props],
   );
-  const submit = useCallback(
-    (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
-      return props
-        ? methods.handleSubmit(props.onSubmit ?? ((() => void 0) as any))(event)
-        : Promise.resolve();
-    },
-    [methods, props],
-  );
-
   const _formControl =
     useRef<FormInstance<TFieldValues, TContext, TTransformedValues>>(null);
+
+  const submit = useCallback(
+    (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
+      return onSubmit
+        ? methods.handleSubmit(onSubmit)(event)
+        : Promise.resolve();
+    },
+    [methods, onSubmit],
+  );
+
+  useEffect(() => {
+    if (_formControl.current) {
+      _formControl.current.submit = submit;
+    }
+  }, [submit]);
 
   _formControl.current ??= {
     ...methods,
