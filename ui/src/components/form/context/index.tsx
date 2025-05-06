@@ -1,8 +1,12 @@
 "use client";
 
-import type { FieldPath, FieldValues } from "react-hook-form";
+import type {
+  FieldPath,
+  FieldValues,
+  FormProviderProps as RHFormProviderProps,
+} from "react-hook-form";
 import * as React from "react";
-import { useContext } from "react";
+import { createContext, useContext } from "react";
 
 import type { FormInstance } from "../hooks/use-form";
 
@@ -25,53 +29,33 @@ const FormItemContext = React.createContext<FormItemContextValue>(
   {} as FormItemContextValue,
 );
 
-/* Form */
-type FormContextValue<
+/** FormProvider */
+type FormProviderProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = FormInstance<TFieldValues, TContext, TTransformedValues> & {
-  layout?: "vertical" | "horizontal";
-  classNames?: {
-    label?: string
-  }
-};
-const FormContext = React.createContext<FormContextValue>(
-  {} as FormContextValue,
-);
-// type FormProviderProps=  
-const FormProvider = <
-  TFieldValues extends FieldValues,
-  TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
->({
-  children,
-  ...props
-}: FormContextValue<TFieldValues, TContext, TTransformedValues> & {
-  children: React.ReactNode;
-}) => {
-  return (
-    <FormContext.Provider
-      value={props as unknown as FormContextValue<FieldValues, any, undefined>}
-    >
-      {children}
-    </FormContext.Provider>
-  );
-};
+> = RHFormProviderProps<TFieldValues, TContext, TTransformedValues> &
+  Pick<
+    FormInstance<TFieldValues, TContext, TTransformedValues>,
+    "resetFields" | "setFieldsValue" | "schema" | "submit"
+  > & {
+    layout?: "vertical" | "horizontal";
+    classNames?: {
+      label?: string;
+    };
+  };
+
+const FormContext = createContext<FormProviderProps>({} as FormProviderProps);
+
 const useFormContext = <
   TFieldValues extends FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 >() => {
   return useContext(FormContext) as unknown as
-    | FormContextValue<TFieldValues, TContext, TTransformedValues>
+    | FormProviderProps<TFieldValues, TContext, TTransformedValues>
     | undefined;
 };
 
-export {
-  FormFieldContext,
-  FormItemContext,
-  FormProvider,
-  FormProvider as FormRoot,
-  useFormContext,
-};
+export type { FormProviderProps };
+export { FormFieldContext, FormItemContext, FormContext, useFormContext };
