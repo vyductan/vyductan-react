@@ -18,7 +18,7 @@ type WithoutFormProp<
   FormInstance<TFieldValues, TContext, TTransformedValues>,
   "resetFields" | "setFieldsValue" | "submit"
 > & {
-  form: never;
+  form?: never;
 };
 
 type WithFormProp<
@@ -75,18 +75,22 @@ const Form = <
     return <FormWithoutFormProp {...props} />;
   }
 
-  return (
-    <FormRoot<TFieldValues, TContext, TTransformedValues>
-      {...form}
-      layout={layout}
-      classNames={classNames}
-    >
-      <form onSubmit={form.submit} {...props}>
-        {typeof children === "function" ? children(form) : children}
-      </form>
-      <FormErrorsNotification />
-    </FormRoot>
-  );
+  if (form) {
+    return (
+      <FormRoot<TFieldValues, TContext, TTransformedValues>
+        {...form}
+        layout={layout}
+        classNames={classNames}
+      >
+        <form onSubmit={form.submit} {...props}>
+          {typeof children === "function" ? children(form) : children}
+        </form>
+        <FormErrorsNotification />
+      </FormRoot>
+    );
+  }
+
+  return null;
 };
 
 const FormWithoutFormProp = <
