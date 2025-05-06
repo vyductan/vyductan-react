@@ -1,4 +1,3 @@
-/* eslint-disable react-compiler/react-compiler */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 
 import React, { cloneElement, useRef } from "react";
