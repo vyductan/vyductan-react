@@ -1,7 +1,9 @@
-/* eslint-disable react-compiler/react-compiler */
+/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 // https://github.com/alibaba/hooks/blob/master/packages/hooks/src/useResponsive/index.ts
 // May 27, 2024
+"use client";
+
 import { useEffect, useState } from "react";
 
 import isBrowser from "../utils/is-browser";

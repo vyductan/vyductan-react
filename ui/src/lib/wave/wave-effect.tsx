@@ -1,4 +1,4 @@
-/* eslint-disable react-compiler/react-compiler */
+/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 // Jun 15, 2024

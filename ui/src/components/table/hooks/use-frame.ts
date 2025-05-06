@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable react-compiler/react-compiler */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { useEffect, useRef, useState } from "react";
 

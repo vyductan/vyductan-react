@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable react-compiler/react-compiler */
 import * as React from "react";
 import useMobile from "@rc-component/util/lib/hooks/useMobile";
 import raf from "@rc-component/util/lib/raf";

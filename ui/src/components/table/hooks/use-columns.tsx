@@ -1,4 +1,4 @@
-/* eslint-disable react-compiler/react-compiler */
+/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
