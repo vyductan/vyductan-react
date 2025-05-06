@@ -147,6 +147,7 @@ const Tag = ({
           icon="icon-[lucide--x]"
           className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
           onClick={onClose}
+          tabIndex={-1}
         />
       )}
     </Badge>
