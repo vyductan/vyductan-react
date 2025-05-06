@@ -1,4 +1,4 @@
-/* eslint-disable react-compiler/react-compiler */
+/* eslint-disable react-hooks/react-compiler */
 "use client";
 
 import type { VariantProps } from "class-variance-authority";

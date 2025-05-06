@@ -198,10 +198,8 @@ const Table = <TRecord extends AnyObject>({
     }
     return (record: TRecord) => {
       let key = record[rowKey];
-      if (key === undefined) {
-        // "id" as other default key
-        key = record.id;
-      }
+      // "id" as other default key
+      key ??= record.id;
 
       if (process.env.NODE_ENV !== "production") {
         warning(
