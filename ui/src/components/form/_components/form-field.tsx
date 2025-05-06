@@ -228,7 +228,7 @@ const FieldController = <
                           }>,
                           {
                             ...field,
-                            value: watchedValue ?? "",
+                            value: watchedValue,
                             onBlur: (event: any) => {
                               (
                                 children.props as {
