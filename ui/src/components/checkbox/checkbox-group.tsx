@@ -1,4 +1,4 @@
-import type { ValueType } from "../components/form";
+import type { ValueType } from "../form";
 import { Checkbox } from "./checkbox";
 
 type CheckboxGroupProps<T extends ValueType> = {
