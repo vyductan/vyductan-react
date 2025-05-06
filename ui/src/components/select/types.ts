@@ -1,12 +1,8 @@
 import type { AnyObject } from "../../types";
-import type { ValueType } from "../form";
 
-export type Option<
-  T extends ValueType = string,
-  TRecord extends AnyObject = AnyObject,
-> = {
+export type Option<TValue = any, TRecord extends AnyObject = AnyObject> = {
   label: React.ReactNode;
-  value: T;
+  value: TValue;
   icon?: string;
   color?: string;
   checked?: boolean;
