@@ -149,7 +149,7 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
         }}
       />
     );
-  }, [value, setValue, getDestinationValue]);
+  }, [value, setValue, getDestinationValue, onChange]);
 
   const valueCompRef = React.useRef<HTMLDivElement>(null);
   const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
