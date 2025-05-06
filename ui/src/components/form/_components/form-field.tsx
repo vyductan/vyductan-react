@@ -12,10 +12,20 @@ import type {
 import React from "react";
 import { Controller, useWatch } from "react-hook-form";
 
-import { FormFieldContext, useFormContext } from "../context";
+import { useFormContext } from "../context";
 import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
 import { FieldRender } from "./form-field-render";
 import { FormItem } from "./form-item";
+
+type FormFieldContextValue<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+> = {
+  name: TName;
+};
+const FormFieldContext = React.createContext<FormFieldContextValue>(
+  {} as FormFieldContextValue,
+);
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,

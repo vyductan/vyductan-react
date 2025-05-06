@@ -6,19 +6,19 @@
  */
 import type { BaseSyntheticEvent } from "react";
 import type {
+  UseFormProps as __UseFormProps,
   DefaultValues,
   FieldValues,
   KeepStateOptions,
   SubmitHandler,
   UseFormReset,
   UseFormReturn,
-  UseFormProps as UseRHFormProps,
 } from "react-hook-form";
 import type { z, ZodSchema } from "zod";
 import { useCallback, useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";
-import { useForm as useRHForm, useWatch } from "react-hook-form";
+import { useForm as __useForm, useWatch } from "react-hook-form";
 
 import type { ResetAction } from "../types";
 
@@ -28,6 +28,11 @@ type FormInstance<
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
   schema: ZodSchema | undefined;
+  defaultValues: UseFormProps<
+    TFieldValues,
+    TContext,
+    TTransformedValues
+  >["defaultValues"];
   submit: (
     event?: BaseSyntheticEvent<object, unknown, unknown>,
   ) => Promise<void>;
@@ -39,8 +44,8 @@ type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = UseRHFormProps<TFieldValues, TContext> & {
-  schema?: z.ZodType<TFieldValues>;
+> = __UseFormProps<TFieldValues, TContext, TTransformedValues> & {
+  schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
   onSubmit?: TTransformedValues extends undefined
     ? SubmitHandler<TFieldValues>
     : TTransformedValues extends FieldValues
@@ -58,12 +63,20 @@ const useForm = <
 >(
   props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
-  const methods = useRHForm<TFieldValues, TContext, TTransformedValues>(
+  const { schema, ...restProps } = props ?? {};
+  const methods = __useForm<TFieldValues, TContext, TTransformedValues>(
     props
       ? {
-          defaultValues: props.defaultValues,
-          values: props.values,
-          resolver: props.schema ? zodResolver(props.schema) : undefined,
+          resolver: schema
+            ? standardSchemaResolver<
+                TFieldValues,
+                TContext,
+                TTransformedValues
+              >(schema)
+            : undefined,
+          // defaultValues: props.defaultValues,
+          // values: props.values,
+          ...restProps,
         }
       : undefined,
   );
@@ -116,6 +129,7 @@ const useForm = <
     {
       ...methods,
       schema: props?.schema,
+      defaultValues: props?.defaultValues,
       submit,
       resetFields,
       setFieldsValue,
@@ -125,7 +139,9 @@ const useForm = <
   // has onValuesChange
   // form has values
   // values not same defaultValues
-  const w = useWatch<TFieldValues>({ control: formInstance.control });
+  const w = useWatch<TFieldValues, TTransformedValues>({
+    control: formInstance.control,
+  });
   useEffect(() => {
     if (
       props?.onValuesChange &&
