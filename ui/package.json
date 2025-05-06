@@ -6,6 +6,7 @@
   "license": "MIT",
   "type": "module",
   "exports": {
+    "./types": "./src/types.ts",
     "./lib/*": "./src/lib/*.ts",
     "./shadcn/*": "./src/shadcn/*.tsx",
     "./components/*": "./src/components/*/index.ts",
