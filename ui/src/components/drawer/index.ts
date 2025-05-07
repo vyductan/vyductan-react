@@ -1,2 +1,9 @@
 export * from "./drawer";
-export * from "./_components";
+export {
+  Drawer as DrawerRoot,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../../shadcn/drawer";
