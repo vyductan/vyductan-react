@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./_components";
+} from "../../shadcn/alert-dialog";
 
 export type AlertModalProps = Omit<ModalProps, "onOk"> & {
   onConfirm?: () => void;

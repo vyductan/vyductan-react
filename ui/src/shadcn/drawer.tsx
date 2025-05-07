@@ -6,20 +6,11 @@ import { Drawer as DrawerPrimitive } from "vaul";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
-import { Icon } from "../../icons";
+import { Icon } from "../icons";
 
 type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
-function DrawerRoot({
-  // shouldScaleBackground = true,
-  ...props
-}: DrawerRootProps) {
-  return (
-    <DrawerPrimitive.Root
-      data-slot="drawer"
-      // shouldScaleBackground={shouldScaleBackground}
-      {...props}
-    />
-  );
+function Drawer({ ...props }: DrawerRootProps) {
+  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
 }
 
 function DrawerTrigger({
@@ -174,7 +165,7 @@ function DrawerDescription({
 
 export type { DrawerRootProps, DrawerContentProps };
 export {
-  DrawerRoot,
+  Drawer,
   DrawerPortal,
   DrawerOverlay,
   DrawerTrigger,

@@ -1,14 +1,14 @@
 import { cn } from "@acme/ui/lib/utils";
 
-import type { DrawerRootProps } from "./_components";
+import type { DrawerRootProps } from "../../shadcn/drawer";
 import {
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
-  DrawerRoot,
+  Drawer as DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
-} from "./_components";
+} from "../../shadcn/drawer";
 
 type DrawerProps = DrawerRootProps & {
   title: React.ReactNode;

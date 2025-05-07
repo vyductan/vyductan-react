@@ -7,9 +7,8 @@ import { Tag, tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../..";
-import type { SelectRootProps } from "../../shadcn/select";
 import type { ValueType } from "../form";
-import type { inputSizeVariants, InputVariants, inputVariants } from "../input";
+import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
 import {
   SelectContent,
