@@ -1,5 +1,4 @@
 import type { JSX, ReactElement, ReactNode } from "react";
-import type { ControllerFieldState } from "react-hook-form";
 import { forwardRef, useContext } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -20,8 +19,6 @@ type FieldRenderProps = {
   description?: ReactNode;
   children?: ReactElement<any> | null;
 
-  fieldState?: ControllerFieldState;
-
   required?: boolean;
 };
 const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
@@ -33,8 +30,6 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
       description,
       children,
       classNames,
-
-      fieldState,
 
       required,
 
@@ -49,7 +44,6 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
         className={cn(
           "flex",
           layout === "horizontal" ? "flex-row items-center" : "flex-col",
-          fieldState?.error ? "" : "mb-6",
           className,
         )}
         ref={ref}
@@ -72,14 +66,7 @@ const FieldRender = forwardRef<HTMLDivElement, FieldRenderProps>(
               // ) : (
               //   label
               // )
-              <FieldLabel
-                className={cn(
-                  layout === "horizontal" && "w-6/24",
-                  layout === "vertical" && "pb-2",
-                  classNames?.label,
-                )}
-                required={required}
-              >
+              <FieldLabel className={cn(classNames?.label)} required={required}>
                 {label}
               </FieldLabel>
             ) : undefined}

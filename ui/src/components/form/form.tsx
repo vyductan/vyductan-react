@@ -34,6 +34,7 @@ type WithFormProp<
   >,
   "children"
 >;
+
 type FormProps<
   TFieldValues extends FieldValues,
   TContext,
@@ -46,11 +47,7 @@ type FormProps<
     | WithoutFormProp<TFieldValues, TContext, TTransformedValues>
     | WithFormProp<TFieldValues, TContext, TTransformedValues>
   ) & {
-    children:
-      | ReactNode
-      | ((
-          form: FormInstance<TFieldValues, TContext, TTransformedValues>,
-        ) => ReactNode);
+    children: ReactNode;
   };
 
 const Form = <
@@ -59,21 +56,20 @@ const Form = <
   TTransformedValues extends FieldValues = TFieldValues,
 >({
   form,
-  children,
   layout,
   classNames,
   // ...restProps
   ...props
 }: FormProps<TFieldValues, TContext, TTransformedValues>) => {
-  if (
-    "formState" in props &&
-    children &&
-    typeof children === "object" &&
-    "type" in children &&
-    children.type === "form"
-  ) {
-    return <FormWithoutFormProp {...props} />;
-  }
+  // if (
+  //   "formState" in props &&
+  //   children &&
+  //   typeof children === "object" &&
+  //   "type" in children &&
+  //   children.type === "form"
+  // ) {
+  //   return <FormWithoutFormProp {...props} />;
+  // }
 
   if (form) {
     return (
@@ -82,15 +78,14 @@ const Form = <
         layout={layout}
         classNames={classNames}
       >
-        <form onSubmit={form.submit} {...props}>
-          {typeof children === "function" ? children(form) : children}
-        </form>
+        <form onSubmit={form.submit} {...props} />
         <FormErrorsNotification />
       </FormRoot>
     );
   }
+  return <FormWithoutFormProp {...props} />;
 
-  return null;
+  // return null;
 };
 
 const FormWithoutFormProp = <
@@ -102,10 +97,15 @@ const FormWithoutFormProp = <
     WithoutFormProp<TFieldValues, TContext, TTransformedValues>,
     "form"
   > &
-    React.DetailedHTMLProps<
-      React.FormHTMLAttributes<HTMLFormElement>,
-      HTMLFormElement
-    >,
+    Omit<
+      React.DetailedHTMLProps<
+        React.FormHTMLAttributes<HTMLFormElement>,
+        HTMLFormElement
+      >,
+      "children"
+    > & {
+      children: ReactNode;
+    },
 ) => {
   const { setFieldsValue, resetFields } = useExtraProps({
     defaultValues: props.defaultValues,
@@ -115,7 +115,6 @@ const FormWithoutFormProp = <
 
   return (
     <FormRoot<TFieldValues, TContext, TTransformedValues>
-      children={undefined}
       {...props}
       setFieldsValue={setFieldsValue}
       resetFields={resetFields}
