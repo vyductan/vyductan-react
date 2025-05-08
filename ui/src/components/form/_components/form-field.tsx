@@ -208,9 +208,8 @@ const FieldController = <
         disabled={disabled}
         render={({ field, fieldState, formState }) => {
           return (
-            <FormItem className={className}>
+            <FormItem className={className} layout={layout}>
               <FieldRender
-                fieldState={fieldState}
                 required={required}
                 children={
                   children
@@ -253,7 +252,6 @@ const FieldController = <
                     : undefined
                 }
                 ref={ref}
-                layout={layout}
                 classNames={classNames}
                 {...props}
               />
