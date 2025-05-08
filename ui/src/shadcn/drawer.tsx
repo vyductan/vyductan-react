@@ -108,8 +108,6 @@ function DrawerHeader({
             "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
             "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
             // "absolute top-4 right-4"
-            // own
-            "self-start",
           )}
         >
           <Icon icon="icon-[lucide--x]" className="size-5" />
