@@ -129,7 +129,7 @@ const Select = <
   const [key, setKey] = React.useState<number>(+Date.now());
 
   // ======================= TAGS/MULTIPLE MODE =======================
-  const isDefault = mode === "default";
+  const isDefault = !mode || mode === "default";
   const isTags = mode === "tags";
   const isMultiple = mode === "multiple" || isTags;
   const [inputValue, setInputValue] = React.useState("");
@@ -164,7 +164,6 @@ const Select = <
 
   // Handle select item
   const handleSelect = (val: TValue) => {
-    console.log("vvvvvv", val, selectedValues);
     if (isMultiple) {
       if (selectedValues.includes(val)) {
         removeTag(val);
