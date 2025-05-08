@@ -1,1 +1,1 @@
-export * from "../../shadcn/label";
+export * from "./label";
