@@ -734,13 +734,13 @@ const InputNumber = (({ ref, ...props }: InputNumberProps) => {
     }
   };
 
-  React.useImperativeHandle(ref, () =>
-    proxyObject(inputFocusRef.current!, {
-      focus,
-      nativeElement:
-        holderRef.current?.nativeElement ?? inputNumberDomRef.current,
-    }),
-  );
+  // React.useImperativeHandle(ref, () =>
+  //   proxyObject(inputFocusRef.current!, {
+  //     focus,
+  //     nativeElement:
+  //       holderRef.current?.nativeElement ?? inputNumberDomRef.current,
+  //   }),
+  // );
 
   return (
     <BaseInput
