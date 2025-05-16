@@ -1,38 +1,33 @@
 "use client";
 
-import type {
-  Control,
-  ControllerFieldState,
-  ControllerProps,
-  ControllerRenderProps,
-  FieldPath,
-  FieldValues,
-  UseFormStateReturn,
-} from "react-hook-form";
-import React from "react";
-import { Controller, useWatch } from "react-hook-form";
+import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
+import React, { cloneElement, isValidElement } from "react";
 
 import { useFormContext } from "../context";
 import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
-import { FieldRender } from "./form-field-render";
+import { FormControl } from "./form-control";
 import { FormItem } from "./form-item";
 
-type FormFieldContextValue<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  name: TName;
-};
-const FormFieldContext = React.createContext<FormFieldContextValue>(
-  {} as FormFieldContextValue,
-);
+// type FormFieldContextValue<
+//   TFieldValues extends FieldValues = FieldValues,
+//   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+// > = {
+//   name: TName;
+// };
+// const FormFieldContext = React.createContext<FormFieldContextValue>(
+//   {} as FormFieldContextValue,
+// );
 
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = Omit<ControllerProps<TFieldValues, TName>, "render" | "name"> & {
+  TTransformedValues = TFieldValues,
+> = Omit<
+  ControllerProps<TFieldValues, TName, TTransformedValues>,
+  "render" | "name"
+> & {
   ref?: React.ForwardedRef<HTMLDivElement>;
-  name?: TName;
+  name?: ControllerProps<TFieldValues, TName, TTransformedValues>["name"];
   label?: string | React.JSX.Element;
   description?: React.ReactNode;
   className?: string;
@@ -54,22 +49,14 @@ type FieldProps<
         formState: UseFormStateReturn<TFieldValues>;
       }) => React.ReactElement<any>);
 
-  render?: ({
-    field,
-    fieldState,
-    formState,
-  }: {
-    field: FieldControllerRenderProps<TFieldValues, TName>;
-    fieldState: ControllerFieldState;
-    formState: UseFormStateReturn<TFieldValues>;
-  }) => React.ReactElement<any>;
+  render?: ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
 };
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TTransformedValues = TFieldValues,
 >({
-  ref,
-  //control,
+  control,
   name,
   children,
   render,
@@ -79,7 +66,7 @@ const FormField = <
   layout: layoutProp,
 
   ...props
-}: FieldProps<TFieldValues, TName>) => {
+}: FieldProps<TFieldValues, TName, TTransformedValues>) => {
   const form = useFormContext<TFieldValues, any, TFieldValues>();
   const layout = layoutProp ?? form?.layout;
   const classNames = form?.classNames;
@@ -144,129 +131,129 @@ const FormField = <
   return;
 };
 
-type FieldControllerProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = {
-  ref?: React.ForwardedRef<HTMLDivElement>;
-  control: Control<TFieldValues>;
-  name: TName;
-  children?:
-    | React.ReactElement<any>
-    | (({
-        field,
-        fieldState,
-        formState,
-      }: {
-        field: FieldControllerRenderProps<TFieldValues, TName>;
-        fieldState: ControllerFieldState;
-        formState: UseFormStateReturn<TFieldValues>;
-      }) => React.ReactElement<any>);
-  onChange?: (...event: any[]) => any;
+// type FieldControllerProps<
+//   TFieldValues extends FieldValues = FieldValues,
+//   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+// > = {
+//   ref?: React.ForwardedRef<HTMLDivElement>;
+//   control: Control<TFieldValues>;
+//   name: TName;
+//   children?:
+//     | React.ReactElement<any>
+//     | (({
+//         field,
+//         fieldState,
+//         formState,
+//       }: {
+//         field: FieldControllerRenderProps<TFieldValues, TName>;
+//         fieldState: ControllerFieldState;
+//         formState: UseFormStateReturn<TFieldValues>;
+//       }) => React.ReactElement<any>);
+//   onChange?: (...event: any[]) => any;
 
-  disabled?: boolean;
-  required?: boolean;
+//   disabled?: boolean;
+//   required?: boolean;
 
-  layout?: "horizontal" | "vertical";
-  classNames?: {
-    label?: string;
-  };
+//   layout?: "horizontal" | "vertical";
+//   classNames?: {
+//     label?: string;
+//   };
 
-  className?: string;
-};
-const FieldController = <
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  ref,
-  control,
-  name,
-  onChange,
-  children,
-  disabled,
-  required,
-  layout,
+//   className?: string;
+// };
+// const FieldController = <
+//   TFieldValues extends FieldValues = FieldValues,
+//   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+// >({
+//   ref,
+//   control,
+//   name,
+//   onChange,
+//   children,
+//   disabled,
+//   required,
+//   layout,
 
-  className,
-  classNames,
-  ...props
-}: FieldControllerProps<TFieldValues, TName>) => {
-  const watchedValue = useWatch({
-    control,
-    name,
-  });
+//   className,
+//   classNames,
+//   ...props
+// }: FieldControllerProps<TFieldValues, TName>) => {
+//   const watchedValue = useWatch({
+//     control,
+//     name,
+//   });
 
-  return (
-    <FormFieldContext.Provider
-      value={{
-        name,
-      }}
-    >
-      <Controller
-        control={control}
-        name={name}
-        disabled={disabled}
-        render={({ field, fieldState, formState }) => {
-          return (
-            <FormItem className={className} layout={layout}>
-              <FieldRender
-                required={required}
-                children={
-                  children
-                    ? typeof children === "function"
-                      ? children({
-                          field,
-                          fieldState,
-                          formState,
-                        })
-                      : React.cloneElement(
-                          children as React.ReactElement<{
-                            value?: any;
-                            onBlur?: (...event: any[]) => any;
-                            onChange?: (...event: any[]) => any;
-                          }>,
-                          {
-                            ...field,
-                            value: watchedValue,
-                            onBlur: (event: any) => {
-                              (
-                                children.props as {
-                                  onBlur?: (...event: any[]) => any;
-                                }
-                              ).onBlur?.(event);
-                              // field.onBlur(onChange ? onChange(event) : event);
-                              field.onBlur();
-                            },
-                            onChange: (event: any) => {
-                              (
-                                children.props as {
-                                  onChange?: (...event: any[]) => any;
-                                }
-                              ).onChange?.(event);
-                              field.onChange(
-                                onChange ? onChange(event) : event,
-                              );
-                            },
-                          },
-                        )
-                    : undefined
-                }
-                ref={ref}
-                classNames={classNames}
-                {...props}
-              />
-            </FormItem>
-          );
-        }}
-      />
-    </FormFieldContext.Provider>
-  );
-};
+//   return (
+//     <FormFieldContext.Provider
+//       value={{
+//         name,
+//       }}
+//     >
+//       <Controller
+//         control={control}
+//         name={name}
+//         disabled={disabled}
+//         render={({ field, fieldState, formState }) => {
+//           return (
+//             <FormItem className={className} layout={layout}>
+//               <FieldRender
+//                 required={required}
+//                 children={
+//                   children
+//                     ? typeof children === "function"
+//                       ? children({
+//                           field,
+//                           fieldState,
+//                           formState,
+//                         })
+//                       : React.cloneElement(
+//                           children as React.ReactElement<{
+//                             value?: any;
+//                             onBlur?: (...event: any[]) => any;
+//                             onChange?: (...event: any[]) => any;
+//                           }>,
+//                           {
+//                             ...field,
+//                             value: watchedValue,
+//                             onBlur: (event: any) => {
+//                               (
+//                                 children.props as {
+//                                   onBlur?: (...event: any[]) => any;
+//                                 }
+//                               ).onBlur?.(event);
+//                               // field.onBlur(onChange ? onChange(event) : event);
+//                               field.onBlur();
+//                             },
+//                             onChange: (event: any) => {
+//                               (
+//                                 children.props as {
+//                                   onChange?: (...event: any[]) => any;
+//                                 }
+//                               ).onChange?.(event);
+//                               field.onChange(
+//                                 onChange ? onChange(event) : event,
+//                               );
+//                             },
+//                           },
+//                         )
+//                     : undefined
+//                 }
+//                 ref={ref}
+//                 classNames={classNames}
+//                 {...props}
+//               />
+//             </FormItem>
+//           );
+//         }}
+//       />
+//     </FormFieldContext.Provider>
+//   );
+// };
 
-type FieldControllerRenderProps<
-  TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-> = ControllerRenderProps<TFieldValues, TName>;
+// type FieldControllerRenderProps<
+//   TFieldValues extends FieldValues = FieldValues,
+//   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+// > = ControllerRenderProps<TFieldValues, TName>;
 
 export { FormField, FormField as Field };
 export type { FieldProps };

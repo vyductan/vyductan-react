@@ -28,8 +28,8 @@ type FormInstance<
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
-  schema: ZodSchema | undefined;
-  defaultValues: UseFormProps<
+  schema?: ZodSchema | undefined;
+  defaultValues?: UseFormProps<
     TFieldValues,
     TContext,
     TTransformedValues
@@ -45,14 +45,14 @@ type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = __UseFormProps<TFieldValues, TContext, TTransformedValues> & {
+> = {
   schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
   onSubmit?: SubmitHandler<TTransformedValues>;
   onValuesChange?: (
     changedValues: TFieldValues,
     allValues: TFieldValues,
   ) => void;
-};
+} & __UseFormProps<TFieldValues, TContext, TTransformedValues>;
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
