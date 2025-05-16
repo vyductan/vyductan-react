@@ -11,7 +11,6 @@ import warning from "@rc-component/util/lib/warning";
 
 import { useResponsive } from "@acme/hooks/use-responsive";
 import { Checkbox } from "@acme/ui/components/checkbox";
-import { Icon } from "@acme/ui/icons";
 
 import type { AnyObject, Direction } from "../../../types";
 import type { TableProps } from "../table";
@@ -21,6 +20,9 @@ import type {
   ColumnsDef,
   FixedType,
   GetRowKey,
+  Key,
+  RenderExpandIcon,
+  TriggerEventHandler,
   // Key,
   // RenderExpandIcon,
 } from "../types";
@@ -139,40 +141,45 @@ export const useColumns = <TRecord extends AnyObject>(
   {
     columns,
     rowSelection,
-    expandable,
 
     children,
-    columnTitle,
-    columnWidth,
+
+    // columnWidth,
     // rowKey,
     // rowSelection: rowSelectionProp,
     // rowSelection,
 
-    // expandable,
-    // expandedKeys,
-    // expandIcon,
+    expandable,
+    expandedKeys,
+    expandColumnTitle,
+    expandColumnWidth,
+    expandIcon,
     // expandIconColumnIndex,
-    // expandRowByClick,
-    // rowExpandable,
-    // onTriggerExpand,
+    expandRowByClick,
+    rowExpandable,
+    onTriggerExpand,
+
+    mergedChildrenColumnName,
 
     direction,
     fixed,
     getRowKey,
     scrollWidth,
-  }: Pick<TableProps<TRecord>, "columns" | "rowSelection" | "expandable"> & {
+  }: Pick<TableProps<TRecord>, "columns" | "rowSelection"> & {
     // columns: ColumnsDef<TRecord>;
     children?: React.ReactNode;
-    columnTitle?: React.ReactNode;
-    columnWidth?: number | string;
 
-    // expandable: boolean;
-    // expandedKeys: Set<Key>;
-    // expandIcon?: RenderExpandIcon<TRecord>;
-    // expandIconColumnIndex?: number;
-    // expandRowByClick?: boolean;
-    // rowExpandable?: (record: TRecord) => boolean;
-    // onTriggerExpand: TriggerEventHandler<TRecord>;
+    expandable: boolean;
+    expandedKeys: Set<Key>;
+    expandColumnTitle?: React.ReactNode;
+    expandColumnWidth?: number | string;
+    expandIcon?: RenderExpandIcon<TRecord>;
+    expandIconColumnIndex?: number;
+    expandRowByClick?: boolean;
+    rowExpandable?: (record: TRecord) => boolean;
+    onTriggerExpand: TriggerEventHandler<TRecord>;
+
+    mergedChildrenColumnName?: string;
 
     direction?: Direction;
     fixed?: FixedType;
@@ -330,49 +337,67 @@ export const useColumns = <TRecord extends AnyObject>(
         [INTERNAL_COL_DEFINE]: { columnType: "EXPAND_COLUMN" };
       } = {
         [INTERNAL_COL_DEFINE]: {
-          // className: `${prefixCls}-expand-icon-col`,
           columnType: "EXPAND_COLUMN",
         },
-        title: columnTitle,
+        title: expandColumnTitle,
         fixed: fixedColumn ?? undefined,
-        // className: `${prefixCls}-row-expand-icon-cell`,
-        width: columnWidth,
-        render: ({ row }) => {
-          return row.getCanExpand() ? (
-            <button
-              {...{
-                onClick: () => {
-                  if (!expandable?.expandRowByClick) {
-                    row.getToggleExpandedHandler()();
-                  }
-                },
-              }}
-              className="flex w-full cursor-pointer items-center justify-center"
-            >
-              {row.getIsExpanded() ? (
-                <Icon icon="icon-[lucide--chevron-down]" />
-              ) : (
-                <Icon icon="icon-[lucide--chevron-right]" />
-              )}
-            </button>
-          ) : undefined;
+        width: expandColumnWidth ?? 50,
+        render: ({ record, row, index }) => {
+          // const record = row.original;
+          // return row.getCanExpand() && row.original.children ? (
+          //   <button
+          //     {...(expandedKeys
+          //       ? {
+          //           onClick: () => {
+          //             if (!expandRowByClick) {
+          //               // row.getToggleExpandedHandler()();
+          //               onTriggerExpand?.(!expanded, record);
+          //             }
+          //           },
+          //         }
+          //       : {
+          //           onClick: () => {
+          //             if (!expandRowByClick) {
+          //               row.getToggleExpandedHandler()();
+          //             }
+          //           },
+          //         })}
+          //     className="flex w-full cursor-pointer items-center justify-center"
+          //   >
+          //     {row.getIsExpanded() ? (
+          //       <Icon icon="icon-[lucide--chevron-down]" />
+          //     ) : (
+          //       <Icon icon="icon-[lucide--chevron-right]" />
+          //     )}
+          //   </button>
+          // ) : undefined;
           // },
-          // const rowKey = getRowKey(record, index);
-          // const expanded = expandedKeys.has(rowKey);
-          // const recordExpandable = rowExpandable ? rowExpandable(record) : true;
+          const rowKey = getRowKey(record, index);
+          const expanded = expandedKeys.has(rowKey);
+          // const expanded = row.getIsExpanded();
 
-          // const icon = expandIcon?.({
-          //   // prefixCls,
-          //   expanded,
-          //   expandable: recordExpandable,
-          //   record,
-          //   onExpand: onTriggerExpand,
-          // });
+          const recordExpandable = rowExpandable
+            ? rowExpandable(record)
+            : (row.getCanExpand() ??
+              (mergedChildrenColumnName &&
+                !!record[mergedChildrenColumnName]) ??
+              true);
 
-          // if (expandRowByClick) {
-          //   return <span onClick={(e) => e.stopPropagation()}>{icon}</span>;
-          // }
-          // return icon;
+          const icon = expandIcon?.({
+            // prefixCls,
+            expanded,
+            expandable: recordExpandable,
+            record,
+            onExpand: (record, event) => {
+              onTriggerExpand(record, event);
+              row.getToggleExpandedHandler()();
+            },
+          });
+
+          if (expandRowByClick) {
+            return <span onClick={(e) => e.stopPropagation()}>{icon}</span>;
+          }
+          return icon;
         },
       };
 
@@ -397,8 +422,17 @@ export const useColumns = <TRecord extends AnyObject>(
     expandable,
     baseColumns,
     getRowKey,
-    // expandedKeys, expandIcon,
-    direction,
+    expandedKeys,
+    expandIcon,
+
+    // expandColumnTitle,
+    // expandColumnWidth,
+    // expandRowByClick,
+    // fixed,
+    // mergedChildrenColumnName,
+    // onTriggerExpand,
+    // rowExpandable,
+    // direction,
   ]);
 
   // ========================= Transform ========================

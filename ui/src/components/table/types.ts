@@ -214,6 +214,13 @@ export type ScrollConfig = {
   top?: number;
 };
 
+// ==================== Row =====================
+export type RowClassName<RecordType> = (
+  record: RecordType,
+  index: number,
+  indent: number,
+) => string;
+
 // ================= Fix Column =================
 export interface StickyOffsets {
   start: readonly number[];
@@ -296,17 +303,52 @@ export interface TableCurrentDataSource<RecordType = AnyObject> {
 }
 
 // =================== Expand ===================
-export interface RenderExpandIconProps<RecordType> {
+
+export type ExpandableType = false | "row" | "nest";
+
+export type ExpandedRowRender<TRcord> = (
+  record: TRcord,
+  index: number,
+  indent: number,
+  expanded: boolean,
+) => React.ReactNode;
+
+export interface RenderExpandIconProps<TRecord> {
   // prefixCls: string;
   expanded: boolean;
-  record: RecordType;
+  record: TRecord;
   expandable: boolean;
-  onExpand: TriggerEventHandler<RecordType>;
+  onExpand: TriggerEventHandler<TRecord>;
 }
 
-export type RenderExpandIcon<RecordType> = (
-  props: RenderExpandIconProps<RecordType>,
+export type RenderExpandIcon<TRecord> = (
+  props: RenderExpandIconProps<TRecord>,
 ) => React.ReactNode;
+
+export interface ExpandableConfig<TRecord> {
+  expandedRowKeys?: readonly Key[];
+  defaultExpandedRowKeys?: readonly Key[];
+  expandedRowRender?: ExpandedRowRender<TRecord>;
+  columnTitle?: React.ReactNode;
+  expandRowByClick?: boolean;
+  expandIcon?: RenderExpandIcon<TRecord>;
+  onExpand?: (expanded: boolean, record: TRecord) => void;
+  onExpandedRowsChange?: (expandedKeys: readonly Key[]) => void;
+  defaultExpandAllRows?: boolean;
+  indentSize?: number;
+  /** @deprecated Please use `EXPAND_COLUMN` in `columns` directly */
+  expandIconColumnIndex?: number;
+  showExpandColumn?: boolean;
+  expandedRowClassName?: string | RowClassName<TRecord>;
+  /**
+   * The property name for tree data children. Defaults to 'children'.
+   * Set this to match your nested data property (e.g., 'tasks').
+   */
+  childrenColumnName?: string;
+  rowExpandable?: (record: TRecord) => boolean;
+  columnWidth?: number | string;
+  fixed?: FixedType;
+}
 
 // =================== Events ===================
 export type TriggerEventHandler<RecordType> = (
