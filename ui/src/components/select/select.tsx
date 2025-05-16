@@ -7,6 +7,7 @@ import { Tag, tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../..";
+import type { SelectRootProps } from "../../shadcn/select";
 import type { ValueType } from "../form";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
@@ -56,15 +57,16 @@ type SelectMultipleOrTagsProps<
 export type SelectProps<
   TValue extends ValueType = string,
   TRecord extends AnyObject = AnyObject,
-> = (
-  | SelectDefaultProps<TValue, TRecord>
-  | SelectMultipleOrTagsProps<TValue, TRecord>
-) &
+> = Pick<SelectRootProps, "children" | "onValueChange"> &
+  (
+    | SelectDefaultProps<TValue, TRecord>
+    | SelectMultipleOrTagsProps<TValue, TRecord>
+  ) &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     id?: string;
     // value?: TValue;
-    options: Option<TValue, TRecord>[];
+    options?: Option<TValue, TRecord>[];
     placeholder?: string;
 
     allowClear?: boolean;
@@ -92,34 +94,36 @@ export type SelectProps<
 const Select = <
   TValue extends ValueType = string,
   TRecord extends AnyObject = AnyObject,
->({
-  id,
-  options: optionsProp,
-  placeholder,
+>(
+  props: SelectProps<TValue, TRecord>,
+) => {
+  const {
+    id,
+    options = [],
+    placeholder,
 
-  allowClear,
-  loading,
+    allowClear,
+    loading,
 
-  className,
-  variant,
-  size,
-  status,
-  dropdownRender,
+    className,
+    variant,
+    size,
+    status,
+    dropdownRender,
+    optionRender,
+    optionsRender,
 
-  mode, // NOTE: do not set default (for typescript work)
-  value,
-  onChange,
-  ...props
-}: SelectProps<TValue, TRecord>) => {
+    mode, // NOTE: do not set default (for typescript work)
+    value,
+    onChange,
+    ...restProps
+  } = props;
   // const { mode, value, onChange } = props;
 
   // if (mode === "default") {
   //   value;
   //   onChange;
   // }
-
-  /* Remove duplicate options */
-  const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
 
   const [open, setOpen] = React.useState(false);
 
@@ -193,6 +197,9 @@ const Select = <
       removeTag(selectedValues.at(-1)!);
     }
   };
+
+  const isShadcnSelect = !props.options;
+  if (isShadcnSelect) return <SelectRoot {...restProps} />;
 
   // Content for dropdown
   const content = (
@@ -300,6 +307,7 @@ const Select = <
           }
           setKey(+Date.now());
         }}
+        {...restProps} // for form-control
       >
         {isMultiple ? (
           <div className="flex flex-wrap">
