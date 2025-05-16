@@ -11,7 +11,6 @@ import getMiniDecimal, {
   validateNumber,
 } from "@rc-component/mini-decimal";
 import { useLayoutUpdateEffect } from "@rc-component/util/lib/hooks/useLayoutEffect";
-import proxyObject from "@rc-component/util/lib/proxyObject";
 import { composeRef } from "@rc-component/util/lib/ref";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -712,7 +711,6 @@ readOnly={readOnly}
 
 const InputNumber = ((props: InputNumberProps) => {
   const {
-    ref,
     disabled,
     style,
     value,

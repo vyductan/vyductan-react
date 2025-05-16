@@ -6,20 +6,11 @@ import { Drawer as DrawerPrimitive } from "vaul";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
-import { Icon } from "../../icons";
+import { Icon } from "../icons";
 
 type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
-function DrawerRoot({
-  // shouldScaleBackground = true,
-  ...props
-}: DrawerRootProps) {
-  return (
-    <DrawerPrimitive.Root
-      data-slot="drawer"
-      // shouldScaleBackground={shouldScaleBackground}
-      {...props}
-    />
-  );
+function Drawer({ ...props }: DrawerRootProps) {
+  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
 }
 
 function DrawerTrigger({
@@ -117,8 +108,6 @@ function DrawerHeader({
             "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
             "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
             // "absolute top-4 right-4"
-            // own
-            "self-start",
           )}
         >
           <Icon icon="icon-[lucide--x]" className="size-5" />
@@ -174,7 +163,7 @@ function DrawerDescription({
 
 export type { DrawerRootProps, DrawerContentProps };
 export {
-  DrawerRoot,
+  Drawer,
   DrawerPortal,
   DrawerOverlay,
   DrawerTrigger,

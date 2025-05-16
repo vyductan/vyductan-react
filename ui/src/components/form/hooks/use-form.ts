@@ -3,6 +3,7 @@
 /**
  * Docs
  * https://github.com/react-component/field-form/blob/master/src/useForm.ts
+ * https://github.com/react-hook-form/react-hook-form/blob/master/src/useForm.ts
  */
 import type { BaseSyntheticEvent } from "react";
 import type {
@@ -15,7 +16,7 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import type { z, ZodSchema } from "zod";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";
 import { useForm as __useForm, useWatch } from "react-hook-form";
@@ -27,8 +28,8 @@ type FormInstance<
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
-  schema: ZodSchema | undefined;
-  defaultValues: UseFormProps<
+  schema?: ZodSchema | undefined;
+  defaultValues?: UseFormProps<
     TFieldValues,
     TContext,
     TTransformedValues
@@ -44,18 +45,14 @@ type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues extends FieldValues | undefined = undefined,
-> = __UseFormProps<TFieldValues, TContext, TTransformedValues> & {
+> = {
   schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
-  onSubmit?: TTransformedValues extends undefined
-    ? SubmitHandler<TFieldValues>
-    : TTransformedValues extends FieldValues
-      ? SubmitHandler<TTransformedValues>
-      : never;
+  onSubmit?: SubmitHandler<TTransformedValues>;
   onValuesChange?: (
     changedValues: TFieldValues,
     allValues: TFieldValues,
   ) => void;
-};
+} & __UseFormProps<TFieldValues, TContext, TTransformedValues>;
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
@@ -63,7 +60,8 @@ const useForm = <
 >(
   props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
-  const { schema, ...restProps } = props ?? {};
+  const { schema, defaultValues, onSubmit, ...restProps } = props ?? {};
+
   const methods = __useForm<TFieldValues, TContext, TTransformedValues>(
     props
       ? {
@@ -116,49 +114,58 @@ const useForm = <
     },
     [methods, props],
   );
+  const _formControl =
+    useRef<FormInstance<TFieldValues, TContext, TTransformedValues>>(null);
+
   const submit = useCallback(
     (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
-      return props
-        ? methods.handleSubmit(props.onSubmit ?? ((() => void 0) as any))(event)
+      return onSubmit
+        ? methods.handleSubmit(onSubmit)(event)
         : Promise.resolve();
     },
-    [methods, props],
+    [methods, onSubmit],
   );
 
-  const formInstance: FormInstance<TFieldValues, TContext, TTransformedValues> =
-    {
-      ...methods,
-      schema: props?.schema,
-      defaultValues: props?.defaultValues,
-      submit,
-      resetFields,
-      setFieldsValue,
-    };
+  useEffect(() => {
+    if (_formControl.current) {
+      _formControl.current.submit = submit;
+    }
+  }, [submit]);
+
+  _formControl.current ??= {
+    ...methods,
+    schema,
+    defaultValues,
+    submit,
+    resetFields,
+    setFieldsValue,
+  };
 
   // onValuesChange
   // has onValuesChange
   // form has values
   // values not same defaultValues
+  const control = _formControl.current.control;
   const w = useWatch<TFieldValues, TTransformedValues>({
-    control: formInstance.control,
+    control,
   });
   useEffect(() => {
     if (
       props?.onValuesChange &&
-      !_.isEqual(formInstance.formState.defaultValues, w) &&
+      !_.isEqual(_formControl.current?.formState.defaultValues, w) &&
       Object.keys(w).length > 0
     ) {
       props.onValuesChange(
         getChangedValues(
-          formInstance.formState.defaultValues,
+          _formControl.current?.formState.defaultValues,
           w,
         ) as TFieldValues,
         w as TFieldValues,
       );
     }
-  }, [w, formInstance.formState.defaultValues, props]);
+  }, [w, _formControl.current.formState.defaultValues, props]);
 
-  return formInstance;
+  return _formControl.current;
 };
 
 export { useForm };

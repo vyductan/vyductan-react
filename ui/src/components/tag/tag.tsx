@@ -21,7 +21,7 @@ const color: Record<string, string> = {
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
-  green: "bg-green-100  border-green-300",
+  green: "bg-green-100 text-green-700 border-green-300",
   orange: "bg-orange-100 text-orange-700 border-orange-300",
   red: "bg-red-100 text-red-700 border-red-300",
   rose: "bg-rose-100 text-rose-700 border-rose-300",
@@ -53,11 +53,12 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 
+    "px-[7px]",
     // "px-2.5",
   ],
   variants: {
@@ -118,21 +119,23 @@ const Tag = ({
   className,
   variant,
   color,
-  bordered: borderedProp = false,
+  bordered: borderedProp,
   closeable,
   onClose,
   ...props
 }: TagProps) => {
   const tagConfig = useUiConfig((state) => state.components.tag);
 
+  const bordered = borderedProp ?? tagConfig?.bordered;
   return (
     <Badge
       className={cn(
         tagVariants({
           variant,
           color,
-          bordered: borderedProp || tagConfig?.bordered,
+          bordered,
         }),
+        closeable && "pr-1",
         tagConfig?.className,
         className,
       )}
@@ -144,6 +147,7 @@ const Tag = ({
           icon="icon-[lucide--x]"
           className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
           onClick={onClose}
+          tabIndex={-1}
         />
       )}
     </Badge>

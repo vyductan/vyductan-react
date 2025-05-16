@@ -29,6 +29,7 @@ import type { AnyObject } from "../../types";
 import type { PaginationProps } from "../pagination";
 import type {
   ColumnsDef,
+  ExpandableConfig,
   FilterValue,
   // GetComponent,
   GetRowKey,
@@ -53,10 +54,18 @@ import {
 import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { useColumns } from "./hooks/use-columns";
+import useExpand from "./hooks/use-expand";
 import { TableStoreProvider } from "./hooks/use-table";
 import { tableLocale_en } from "./locale/en-us";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 import { transformedTanstackTableRowSelection } from "./utils";
+import {
+  expandedStateToExpandedRowKeys,
+  findAllChildrenKeys,
+} from "./utils/expand-util";
+
+// Used for conditions cache
+const EMPTY_DATA: never[] = [];
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (TRecord & {
@@ -95,14 +104,16 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     };
 
     // emptyRender?: EmptyProps;
-    /** Expandable config */
-    expandable?: {
-      expandedRowKeys?: Key[];
-      expandedRowRender: (record: TRecord) => React.ReactNode;
-      rowExpandable?: (record: TRecord) => boolean;
-      onExpand?: (record: TRecord) => void;
-      expandRowByClick?: boolean;
-    };
+    /** Config expand rows */
+    expandable?: ExpandableConfig<TRecord>;
+    //  {
+    //   expandedRowKeys?: string[];
+    //   expandedRowRender?: (record: TRecord) => React.ReactNode;
+    //   rowExpandable?: (record: TRecord) => boolean;
+    //   onExpand?: (expanded: boolean, record: TRecord) => void;
+    //   expandRowByClick?: boolean;
+    //   columnWidth?: number;
+    // };
     /** Row key config */
     rowKey?: string | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
@@ -147,44 +158,66 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       table: TableDef<TRecord>;
       event: React.MouseEvent;
     }) => void;
+
+    // =================================== Internal ===================================
+    /**
+     * @private Internal usage, may remove by refactor. Should always use `columns` instead.
+     *
+     * !!! DO NOT USE IN PRODUCTION ENVIRONMENT !!!
+     */
+    internalHooks?: string;
   };
 
-const Table = <TRecord extends AnyObject>({
-  ref,
-  style,
-  className,
-  bordered: borderedProp,
-  size,
-  loading = false,
-  skeleton = false,
+const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
+  const props = {
+    rowKey: "key",
+    ...tableProps,
+  };
 
-  title,
-  extra,
-  alertRender,
+  const {
+    ref,
+    style,
+    className,
+    classNames,
+    bordered: borderedProp,
+    size,
 
-  columns: columnsProp = [],
-  dataSource = [],
-  pagination,
-  expandable,
-  classNames,
+    loading = false,
+    skeleton = false,
 
-  rowKey = "key",
-  rowSelection: rowSelectionProp,
+    dataSource,
+    pagination,
+    expandable,
 
-  sticky,
-  scroll,
-  locale = tableLocale_en.Table,
+    rowKey,
+    rowSelection: rowSelectionProp,
 
-  components,
-  toolbar,
-  summary,
+    sticky,
+    scroll,
+    locale = tableLocale_en.Table,
 
-  onChange,
-  onRow,
+    // Additional Part
+    title,
+    summary,
+    toolbar,
+    extra,
+    alertRender,
 
-  ...props
-}: TableProps<TRecord>) => {
-  const data = React.useMemo(() => dataSource, [dataSource]);
+    // Customize
+    components,
+
+    onChange,
+    onRow,
+
+    // Internal
+    //  internalHooks,
+
+    ...restProps
+  } = props;
+
+  const mergedData = dataSource ?? EMPTY_DATA;
+
+  // const data = React.useMemo(() => dataSource, [dataSource]);
 
   // ==================== Customize =====================
   // const getComponent = React.useCallback<GetComponent>(
@@ -212,21 +245,110 @@ const Table = <TRecord extends AnyObject>({
     };
   }, [rowKey]);
 
+  // ====================== Expand ======================
+  const [expanded, setExpanded] = useMergedState<ExpandedState>(
+    expandable?.defaultExpandAllRows ? true : {},
+    // expandable?.expandedRowKeys
+    //   ? expandable.expandedRowKeys.reduce((acc, key) => {
+    //       acc[key.toString()] = true;
+    //       return acc;
+    //     }, {} as ExpandedStateList)
+    //   : {},
+    // {
+    //   value: mergedExpandedKeysToExpandedState(
+    //     expandable?.expandedRowKeys ?? [],
+    //   ),
+    //   // onChange: (value) => {
+    //   //   // if (typeof value === "boolean") return;
+    //   //   // const expandedRowKeys = Object.keys(value).filter((key) => value[key]);
+    //   //   // expandable?.onExpand?.(expandedRowKeys, {});
+    //   // },
+    // },
+  );
+
+  const [
+    expandableConfig,
+    _expandableType,
+    mergedExpandedKeys,
+    mergedExpandIcon,
+    mergedChildrenColumnName,
+    onTriggerExpand,
+  ] = useExpand(
+    {
+      ...props,
+      expandable: {
+        ...props.expandable,
+        expandedRowKeys:
+          typeof expanded === "boolean"
+            ? findAllChildrenKeys<TRecord>(
+                mergedData,
+                getRowKey,
+                props.expandable?.childrenColumnName ?? "children",
+              )
+            : expandedStateToExpandedRowKeys(expanded),
+      },
+    },
+    mergedData,
+    getRowKey,
+  );
+
+  // useEffect(() => {
+  //   const expandedRowKeys = expandable?.expandedRowKeys ?? [];
+  //   setExpanded((prev) => {
+  //     if (typeof prev === "boolean") return prev;
+  //     const newExpanded = { ...prev };
+  //     for (const key of expandedRowKeys) {
+  //       newExpanded[key.toString()] = true;
+  //     }
+  //     return newExpanded;
+  //   });
+  // }, [expandable?.expandedRowKeys]);
+  // const [expanded, setExpanded] = useMergedState<ExpandedState>(
+  //   {},
+  //   {
+  //     value: expandable?.expandedRowKeys
+  //       ? expandable.expandedRowKeys.reduce((acc, key) => {
+  //           acc[key.toString()] = true;
+  //           return acc;
+  //         }, {} as ExpandedStateList)
+  //       : undefined,
+  //     onChange: () => {
+  //       // if (typeof value === "boolean") return;
+  //       // const expandedRowKeys = Object.keys(value).filter((key) => value[key]);
+  //       // expandable?.onExpand?.(expandedRowKeys, {});
+  //     },
+  //   },
+  // );
+
   // ====================== Column ======================
   const [columns, columnsForTTTable, flattenColumns] = useColumns<TRecord>(
     {
-      columns: columnsProp,
-      // selections,
-      // rowKey,
-      rowSelection: rowSelectionProp,
-      expandable,
+      ...props,
+      ...expandableConfig,
+      expandable:
+        !!expandableConfig.expandedRowRender ||
+        !!expandableConfig.childrenColumnName,
+      expandColumnTitle: expandableConfig.columnTitle,
+      expandedKeys: mergedExpandedKeys,
       getRowKey,
+      // https://github.com/ant-design/ant-design/issues/23894
+      onTriggerExpand,
+      expandIcon: mergedExpandIcon,
+      expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
+      // direction,
+      // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
+      // clientWidth: componentWidth,
+
+      //   expandable ??
+      //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
+      // getRowKey,
+
+      mergedChildrenColumnName,
+
+      rowSelection: rowSelectionProp,
     },
     null,
   );
-
-  // ====================== Expand ======================
-  const [expanded, setExpanded] = useState<ExpandedState>({});
 
   // ====================== Pinnings ======================
 
@@ -254,7 +376,7 @@ const Table = <TRecord extends AnyObject>({
     rowSelectionProp?.selectedRowKeys ?? [],
   );
   const [selectedRows, setSelectedRows] = useState<TRecord[]>(
-    dataSource.filter((row, index) =>
+    mergedData.filter((row, index) =>
       selectedRowKeys.includes(getRowKey(row, index)),
     ),
   );
@@ -270,7 +392,7 @@ const Table = <TRecord extends AnyObject>({
   ) => {
     // https://chatgpt.com/c/676154ea-e108-8010-bd5b-abe71b6a529d
     const currentPageRowKeys = new Set(
-      dataSource.map((x, index) => getRowKey(x, index)),
+      mergedData.map((x, index) => getRowKey(x, index)),
     );
     const newSelectedKeys =
       typeof updaterOrValue === "function"
@@ -283,7 +405,7 @@ const Table = <TRecord extends AnyObject>({
     const updatedSelectedKeys = [
       ...new Set([
         ...selectedRowKeys.filter((key) => !currentPageRowKeys.has(key)),
-        ...dataSource
+        ...mergedData
           .filter((x, index) =>
             newSelectedKeys.includes(getRowKey(x, index).toString()),
           )
@@ -297,7 +419,7 @@ const Table = <TRecord extends AnyObject>({
       ...selectedRows.filter(
         (row, index) => !currentPageRowKeys.has(getRowKey(row, index)),
       ), // Keep rows from previous pages
-      ...dataSource.filter((row, index) =>
+      ...mergedData.filter((row, index) =>
         newSelectedKeys.includes(getRowKey(row, index).toString()),
       ), // Add rows from current page
     ];
@@ -324,7 +446,7 @@ const Table = <TRecord extends AnyObject>({
         {},
         // (value as SortingState | undefined) to fix issue
         (value as SortingState | undefined)?.map((sort) => ({
-          column: columnsProp.find(
+          column: columns.find(
             (c) => "dataIndex" in c && c.dataIndex === sort.id,
           ),
           field: sort.id,
@@ -332,7 +454,7 @@ const Table = <TRecord extends AnyObject>({
           order: sort.desc ? "descend" : "ascend",
         })) ?? [],
         {
-          currentDataSource: dataSource,
+          currentDataSource: mergedData,
           action: "sort",
         },
       );
@@ -358,7 +480,7 @@ const Table = <TRecord extends AnyObject>({
   });
 
   const table = useReactTable({
-    data,
+    data: mergedData,
     columns: columnsForTTTable,
     columnResizeMode: "onChange",
     state: {
@@ -371,10 +493,11 @@ const Table = <TRecord extends AnyObject>({
     // rowKey
     getRowId: (originalRow, index) => getRowKey(originalRow, index).toString(),
     // expandable
-    enableExpanding: !!expandable,
+    // enableExpanding: !!expandable, ???
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: () => true,
-    getSubRows: (record) => record.children as TRecord[],
+    // getRowCanExpand: () => true, ???
+    getSubRows: (record) =>
+      record[expandable?.childrenColumnName ?? "children"] ?? [],
     onExpandedChange: setExpanded,
     // selection
     enableRowSelection: true,
@@ -476,6 +599,9 @@ const Table = <TRecord extends AnyObject>({
     />
   );
 
+  const isShadcnTable = !props.columns;
+  if (isShadcnTable) return <TableRoot {...restProps} />;
+
   return (
     <TableStoreProvider>
       <Spin spinning={loading} className={className}>
@@ -541,7 +667,7 @@ const Table = <TRecord extends AnyObject>({
                 : {}),
             }}
             bordered={bordered}
-            {...props}
+            {...restProps}
           >
             {bodyColGroup}
 
@@ -669,10 +795,10 @@ const Table = <TRecord extends AnyObject>({
                           data-state={row.getIsSelected() && "selected"}
                           data-row-key={getRowKey(row.original, rowIndex)}
                           className={cn(
-                            row.getIsExpanded() && "bg-gray-50",
-                            row.getIsExpanded() && bordered === false
-                              ? "border-x"
-                              : "",
+                            // row.getIsExpanded() && "bg-gray-50",
+                            // row.getIsExpanded() && bordered === false
+                            //   ? "border-x"
+                            //   : "",
                             getRowClassName(row, rowIndex),
                           )}
                           onClick={(e: React.MouseEvent) => {
@@ -740,21 +866,27 @@ const Table = <TRecord extends AnyObject>({
                             );
                           })}
                         </TableRowComp>
-                        {row.getIsExpanded() && expandable && (
-                          <TableRow className="bg-primary-50 hover:bg-primary-50">
-                            {/* 2nd row is a custom 1 cell row */}
-                            <TableCell
-                              colSpan={row.getVisibleCells().length}
-                              size={size}
-                              className={cn(
-                                // "px-4 text-[13px]",
-                                bordered === false && "border-x border-b",
-                              )}
-                            >
-                              {expandable.expandedRowRender(row.original)}
-                            </TableCell>
-                          </TableRow>
-                        )}
+                        {row.getIsExpanded() &&
+                          expandable?.expandedRowRender && (
+                            <TableRow className="bg-primary-50 hover:bg-primary-50">
+                              {/* 2nd row is a custom 1 cell row */}
+                              <TableCell
+                                colSpan={row.getVisibleCells().length}
+                                size={size}
+                                className={cn(
+                                  // "px-4 text-[13px]",
+                                  bordered === false && "border-x border-b",
+                                )}
+                              >
+                                {expandable.expandedRowRender(
+                                  row.original,
+                                  row.index,
+                                  row.index,
+                                  row.getIsExpanded(),
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          )}
                       </Fragment>
                     ),
                   )
@@ -778,7 +910,7 @@ const Table = <TRecord extends AnyObject>({
 
             {summary && (
               <TableFooter className={classNames?.footer}>
-                {summary(dataSource)}
+                {summary(mergedData)}
               </TableFooter>
             )}
           </TableRoot>

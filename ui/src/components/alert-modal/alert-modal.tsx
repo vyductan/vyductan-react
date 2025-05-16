@@ -1,14 +1,15 @@
 import React from "react";
 
 import type { ModalProps } from "../modal";
+import { LoadingIcon } from "../button";
 import {
-  AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogRoot,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./_components";
@@ -28,6 +29,9 @@ export const AlertModal = ({
   onConfirm,
   onCancel,
   onOpenChange,
+
+  children,
+
   ...rest
 }: AlertModalProps) => {
   const handleOpenChange = React.useCallback(
@@ -40,8 +44,17 @@ export const AlertModal = ({
     [onOpenChange, onCancel],
   );
 
+  const isShadcnAlertDialog = !!children;
+  if (isShadcnAlertDialog) {
+    return (
+      <AlertDialogRoot onOpenChange={onOpenChange} {...rest}>
+        {children}
+      </AlertDialogRoot>
+    );
+  }
+
   return (
-    <AlertDialog onOpenChange={handleOpenChange} {...rest}>
+    <AlertDialogRoot onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
         <AlertDialogHeader>
@@ -52,18 +65,18 @@ export const AlertModal = ({
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
-            isControlled={rest.open !== undefined}
-            loading={okLoading}
+            isOpenControlled={rest.open !== undefined}
             onClick={(e) => {
               e.preventDefault();
               onConfirm?.();
             }}
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
           >
+            {okLoading && <LoadingIcon />}
             {okText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
-    </AlertDialog>
+    </AlertDialogRoot>
   );
 };
