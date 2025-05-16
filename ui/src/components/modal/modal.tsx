@@ -64,6 +64,17 @@ const Modal = ({
   //
   ...rest
 }: ModalProps) => {
+  const isShadcnDialog = React.Children.toArray(children).some((child) => {
+    if (React.isValidElement(child)) {
+      const type =
+        typeof child.type === "string" ? child.type : child.type.name;
+      return type === "DialogContent";
+    }
+    return false;
+  });
+  if (isShadcnDialog) {
+    return <DialogRoot {...rest}>{children}</DialogRoot>;
+  }
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
   //     <Button variant="outline">Cancel</Button>

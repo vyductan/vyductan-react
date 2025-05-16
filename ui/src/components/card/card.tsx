@@ -1,16 +1,19 @@
 import type { ReactNode } from "react";
+import React, { Children, isValidElement } from "react";
 
-import type { CardRootProps } from "@acme/ui/shadcn/card";
 import { cn } from "@acme/ui/lib/utils";
+
+import type { CardRootProps } from "./_component";
+import { Skeleton } from "../skeleton";
 import {
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  Card as CardRoot,
+  CardRoot,
   CardTitle,
-} from "@acme/ui/shadcn/card";
-import { Skeleton } from "@acme/ui/shadcn/skeleton";
+} from "./_component";
+import { CardContext } from "./context";
 
 type CardProps = Omit<CardRootProps, "title"> & {
   skeleton?: boolean;
@@ -31,8 +34,6 @@ type CardProps = Omit<CardRootProps, "title"> & {
 };
 const Card = ({
   skeleton = false,
-  bordered = true,
-  className,
   classNames,
   title,
   description,
@@ -40,11 +41,12 @@ const Card = ({
   extra,
   footer,
 
-  size = "default",
   ...props
 }: CardProps) => {
+  let CardRender = <></>;
+
   if (skeleton) {
-    return (
+    CardRender = (
       <div className="flex flex-col space-y-3">
         <Skeleton className="h-[125px] w-[250px] rounded-xl" />
         <div className="space-y-2">
@@ -54,34 +56,48 @@ const Card = ({
       </div>
     );
   }
+
+  const isShadcnCard = Children.toArray(children).some((child) => {
+    if (isValidElement(child)) {
+      const type =
+        typeof child.type === "string" ? child.type : child.type.name;
+      return type === "CardContent";
+    }
+    return false;
+  });
+
+  if (isShadcnCard) {
+    CardRender = <CardRoot {...props}>{children}</CardRoot>;
+  }
+
+  if (!isShadcnCard) {
+    CardRender = (
+      <CardRoot {...props}>
+        {(!!title || !!description || !!extra) && (
+          <CardHeader className={cn(classNames?.header)}>
+            <div className="flex items-center">
+              <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
+              {extra && <div className="ml-auto">{extra}</div>}
+            </div>
+            {description && (
+              <CardDescription className={cn(classNames?.description)}>
+                {description}
+              </CardDescription>
+            )}
+          </CardHeader>
+        )}
+        <CardContent className={classNames?.content}>{children}</CardContent>
+        {footer && (
+          <CardFooter className={classNames?.footer}>{footer}</CardFooter>
+        )}
+      </CardRoot>
+    );
+  }
+
   return (
-    <CardRoot
-      size={size}
-      className={cn(bordered ? "" : "border-none", className)}
-      {...props}
-    >
-      {(!!title || !!description || !!extra) && (
-        <CardHeader className={cn(classNames?.header)}>
-          <div className="flex items-center">
-            <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
-            {extra && <div className="ml-auto">{extra}</div>}
-          </div>
-          {description && (
-            <CardDescription className={cn(classNames?.description)}>
-              {description}
-            </CardDescription>
-          )}
-        </CardHeader>
-      )}
-      <CardContent size={size} className={classNames?.content}>
-        {children}
-      </CardContent>
-      {footer && (
-        <CardFooter size={size} className={classNames?.footer}>
-          {footer}
-        </CardFooter>
-      )}
-    </CardRoot>
+    <CardContext.Provider value={{ size: props.size }}>
+      {CardRender}
+    </CardContext.Provider>
   );
 };
 

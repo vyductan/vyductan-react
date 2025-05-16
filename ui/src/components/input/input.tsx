@@ -16,11 +16,11 @@ import { triggerNativeEventFor } from "../../lib/event";
 export const inputVariants = cva(
   [
     "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-    "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     // "h-9 text-base md:text-sm",
     // "placeholder:text-muted-foreground", // moved to <input>
     // disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 // moved to variant disabled
+    // "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
 
     // old
     // "focus-visible:outline-hidden",
@@ -54,7 +54,12 @@ export const inputVariants = cva(
         warning: [],
       },
       variant: {
-        default: ["border", "rounded-md", "focus-within:ring-2"],
+        default: [
+          "border",
+          "rounded-md",
+          "focus-within:ring-2",
+          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        ],
         outline: [],
         filled: ["border-none bg-accent focus-within:ring-0 shadow-none"],
         borderless: ["border-0", "focus-within:outline-hidden", "shadow-none"],
@@ -256,7 +261,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
           ref={inputRef}
           id={id}
           name={name}
-          value={value ?? ""}
+          value={value}
           placeholder={placeholder}
           className={cn(
             "flex-1",

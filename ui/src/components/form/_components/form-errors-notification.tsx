@@ -24,6 +24,7 @@ export const FormErrorsNotification = () => {
       });
       // Get mounted fields from React Hook Form
       const mountedFields = Object.keys(formFields);
+      console.log("mmmmm", mountedFields, formFields);
       // Get required fields that are not mounted
       const unmountedRequiredFields = new Set(
         requiredFields.filter((field) => !mountedFields.includes(field)),

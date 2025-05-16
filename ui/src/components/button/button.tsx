@@ -70,6 +70,8 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
+      destructive:
+        "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white shadow-xs",
       solid: ["text-white"],
       outline: [
         "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",

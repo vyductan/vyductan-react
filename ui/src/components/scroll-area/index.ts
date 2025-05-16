@@ -1,2 +1,1 @@
-export * from "./scroll-area";
-export * from "./scroll-bar";
+export * from "@acme/ui/shadcn/scroll-area";

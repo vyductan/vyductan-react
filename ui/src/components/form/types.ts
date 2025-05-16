@@ -21,3 +21,5 @@ export type OnSubmit<
   : TTransformedValues extends FieldValues
     ? SubmitHandler<TTransformedValues>
     : never;
+
+export type FormLayout = "horizontal" | "vertical";

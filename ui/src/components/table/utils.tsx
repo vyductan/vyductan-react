@@ -8,10 +8,10 @@ import type { ColumnDef, ColumnsDef } from "./types";
 export const transformColumnDefs = <TRecord extends AnyObject>(
   columns: ColumnsDef<TRecord>,
   props: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
-  isNotFirstDeepColumn?: boolean,
+  _isNotFirstDeepColumn = true,
 ): TTColumnDef<TRecord>[] => {
   const columnsDef: TTColumnDef<TRecord>[] = columns.map(
-    (columnProp, index) => {
+    (columnProp, columnIndex) => {
       const column = columnProp as ColumnDef<TRecord> & {
         children?: ColumnsDef<TRecord>;
       };
@@ -44,8 +44,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         ...(typeof dataIndex === "string"
           ? { id: key ?? dataIndex, accessorKey: dataIndex }
           : {
-              id: key ?? index.toString(),
-              accessorFn: () => key ?? index.toString(),
+              id: key ?? columnIndex.toString(),
+              accessorFn: () => key ?? columnIndex.toString(),
             }),
         header: ({ table }) =>
           typeof title === "function" ? title({ table }) : title,
@@ -54,8 +54,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
               columns: transformColumnDefs(
                 // add fixed to children
                 children.map((x) => ({ ...x, fixed })),
-                {},
-                index === 0 || false,
+                props,
+                columnIndex === 0 || false,
               ),
               // for use in Gantt
               children: transformColumnDefs(
@@ -111,16 +111,18 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
       };
       columnDefMerged.cell = ({ column, row, getValue, table }) => (
         <>
-          {isNotFirstDeepColumn && index === 0 && (
-            <>
-              {row.depth > 0 && (
-                <span
-                  style={{
-                    paddingLeft: `${row.depth * 2}rem`,
-                  }}
-                />
-              )}
-              {row.getCanExpand() && row.original.children ? (
+          {/* Tree Data */}
+          {row.depth > 0 && column.getIndex() === 1 && (
+            <span
+              style={{
+                paddingLeft: `${row.depth * 2}rem`,
+              }}
+            />
+          )}
+          {/* {props.childrenColumnName &&
+            row.original[props.childrenColumnName] && (
+              <>
+                {row.getCanExpand() && row.original.children ? (
                 <button
                   onClick={row.getToggleExpandedHandler()}
                   className="w-5"
@@ -130,9 +132,8 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
               ) : (
                 <span className="pl-5" />
               )}
-            </>
-          )}
-
+              </>
+            )} */}
           {/* render value*/}
           {render
             ? typeof dataIndex === "string"

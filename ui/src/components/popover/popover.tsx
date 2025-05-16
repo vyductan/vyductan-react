@@ -65,6 +65,23 @@ export const Popover = ({
   const debouncedOpen = useDebounce(open, {
     wait: 100,
   });
+
+  const isShadcnPopover = React.Children.toArray(children).some((child) => {
+    if (React.isValidElement(child)) {
+      const type =
+        typeof child.type === "string" ? child.type : child.type.name;
+      return type === "PopoverContent";
+    }
+    return false;
+  });
+  if (isShadcnPopover) {
+    return (
+      <PopoverRoot open={open} onOpenChange={onOpenChange}>
+        {children}
+      </PopoverRoot>
+    );
+  }
+
   return (
     <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
       <PopoverTrigger

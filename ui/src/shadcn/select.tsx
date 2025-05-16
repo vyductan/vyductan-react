@@ -180,8 +180,11 @@ function SelectLabel({
 function SelectItem({
   className,
   children,
+  isActive,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+  isActive?: boolean;
+}) {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -210,9 +213,13 @@ function SelectItem({
           "h-full",
         )}
       >
-        <SelectPrimitive.ItemIndicator>
+        {isActive ? (
           <Icon icon="icon-[lucide--check]" />
-        </SelectPrimitive.ItemIndicator>
+        ) : (
+          <SelectPrimitive.ItemIndicator>
+            <Icon icon="icon-[lucide--check]" />
+          </SelectPrimitive.ItemIndicator>
+        )}
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>

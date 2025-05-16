@@ -6,7 +6,6 @@ import type { FieldValues } from "react-hook-form";
 import type { FormRootProps } from "./_components/form-root";
 // import type { FormBaseProps, FormContextValue } from "./context";
 import type { FormInstance } from "./hooks/use-form";
-import { FormErrorsNotification } from "./_components/form-errors-notification";
 import { FormRoot } from "./_components/form-root";
 import { useExtraProps } from "./hooks/use-extra-props";
 
@@ -18,7 +17,7 @@ type WithoutFormProp<
   FormInstance<TFieldValues, TContext, TTransformedValues>,
   "resetFields" | "setFieldsValue" | "submit"
 > & {
-  form: never;
+  form?: never;
 };
 
 type WithFormProp<
@@ -34,6 +33,7 @@ type WithFormProp<
   >,
   "children"
 >;
+
 type FormProps<
   TFieldValues extends FieldValues,
   TContext,
@@ -46,11 +46,7 @@ type FormProps<
     | WithoutFormProp<TFieldValues, TContext, TTransformedValues>
     | WithFormProp<TFieldValues, TContext, TTransformedValues>
   ) & {
-    children:
-      | ReactNode
-      | ((
-          form: FormInstance<TFieldValues, TContext, TTransformedValues>,
-        ) => ReactNode);
+    children: ReactNode;
   };
 
 const Form = <
@@ -59,34 +55,37 @@ const Form = <
   TTransformedValues extends FieldValues = TFieldValues,
 >({
   form,
-  children,
   layout,
   classNames,
   // ...restProps
   ...props
 }: FormProps<TFieldValues, TContext, TTransformedValues>) => {
-  if (
-    "formState" in props &&
-    children &&
-    typeof children === "object" &&
-    "type" in children &&
-    children.type === "form"
-  ) {
+  // if (
+  //   "formState" in props &&
+  //   children &&
+  //   typeof children === "object" &&
+  //   "type" in children &&
+  //   children.type === "form"
+  // ) {
+  //   return <FormWithoutFormProp {...props} />;
+  // }
+
+  if (form) {
+    return (
+      <FormRoot<TFieldValues, TContext, TTransformedValues>
+        {...form}
+        layout={layout}
+        classNames={classNames}
+      >
+        <form onSubmit={form.submit} {...props} />
+      </FormRoot>
+    );
+  }
+  if ("formState" in props) {
     return <FormWithoutFormProp {...props} />;
   }
 
-  return (
-    <FormRoot<TFieldValues, TContext, TTransformedValues>
-      {...form}
-      layout={layout}
-      classNames={classNames}
-    >
-      <form onSubmit={form.submit} {...props}>
-        {typeof children === "function" ? children(form) : children}
-      </form>
-      <FormErrorsNotification />
-    </FormRoot>
-  );
+  return null;
 };
 
 const FormWithoutFormProp = <
@@ -98,10 +97,15 @@ const FormWithoutFormProp = <
     WithoutFormProp<TFieldValues, TContext, TTransformedValues>,
     "form"
   > &
-    React.DetailedHTMLProps<
-      React.FormHTMLAttributes<HTMLFormElement>,
-      HTMLFormElement
-    >,
+    Omit<
+      React.DetailedHTMLProps<
+        React.FormHTMLAttributes<HTMLFormElement>,
+        HTMLFormElement
+      >,
+      "children"
+    > & {
+      children: ReactNode;
+    },
 ) => {
   const { setFieldsValue, resetFields } = useExtraProps({
     defaultValues: props.defaultValues,
@@ -111,7 +115,6 @@ const FormWithoutFormProp = <
 
   return (
     <FormRoot<TFieldValues, TContext, TTransformedValues>
-      children={undefined}
       {...props}
       setFieldsValue={setFieldsValue}
       resetFields={resetFields}

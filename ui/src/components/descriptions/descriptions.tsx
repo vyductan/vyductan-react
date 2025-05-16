@@ -3,10 +3,10 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Fragment } from "react";
 
+import type { Screens } from "@acme/ui/types";
 import { useResponsive } from "@acme/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Screens } from "../../theme";
 import { Skeleton } from "../skeleton";
 
 export type DescriptionsItem = {

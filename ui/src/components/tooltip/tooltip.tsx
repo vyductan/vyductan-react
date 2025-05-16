@@ -17,7 +17,7 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
   /**
    * The text shown in the tooltip
    */
-  title: React.ReactNode;
+  title?: React.ReactNode;
   placement?: TooltipContentProps["side"];
   hidden?: boolean;
   classNames?: {
@@ -25,20 +25,18 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
     arrow?: string;
   };
 };
-const Tooltip = ({
-  children,
-  title,
-  placement,
-  hidden,
-  classNames,
-  ...rest
-}: TooltipProps) => {
+const Tooltip = (props: TooltipProps) => {
+  const { children, title, placement, hidden, classNames, ...restProps } =
+    props;
   const triggerRef = React.useRef(null);
+
+  const isShadcnTooltip = !title;
+  if (isShadcnTooltip) return <TooltipRoot {...props} />;
 
   return (
     <>
       <TooltipProvider delayDuration={100}>
-        <TooltipRoot {...rest}>
+        <TooltipRoot {...restProps}>
           <TooltipTrigger
             ref={triggerRef}
             asChild

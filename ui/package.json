@@ -6,10 +6,11 @@
   "license": "MIT",
   "type": "module",
   "exports": {
+    "./types": "./src/types.ts",
     "./lib/*": "./src/lib/*.ts",
     "./shadcn/*": "./src/shadcn/*.tsx",
     "./components/*": "./src/components/*/index.ts",
-    "./layout/*": "./src/layout/*.tsx",
+    "./layout/*": "./src/layout/*/index.ts",
     "./icons": "./src/icons/index.ts",
     "./icons/*": "./src/icons/*.tsx"
   },
@@ -17,9 +18,10 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "registry:build": "shadcn build ./registry.json -c ./src -o ./registry",
+    "registry:build": "pnpm dlx shadcn build ./registry.json -c ./src -o ./registry",
     "trace": "tsc --generateTrace .",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
@@ -65,11 +67,12 @@
     "react-resizable-panels": "^3.0.1",
     "react-syntax-highlighter": "^15.6.1",
     "react-textarea-autosize": "^8.5.9",
-    "shadcn": "2.5.0",
+    "recharts": "^2.15.3",
     "sonner": "^2.0.3",
     "swiper": "^11.2.6",
     "tailwind-merge": "^3.2.0",
     "tailwind-variants": "^1.0.0",
+    "tailwindcss": "catalog:",
     "type-fest": "^4.40.1",
     "usehooks-ts": "^3.1.1",
     "uuid": "^11.1.0",
