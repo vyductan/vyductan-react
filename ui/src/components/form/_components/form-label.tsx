@@ -23,7 +23,7 @@ const FormLabel = ({
     <ShadFormLabel
       className={cn(
         // layout === "vertical" ? "pb-2" : "",
-        layout === "horizontal" ? "w-6/24" : "",
+        layout === "horizontal" ? "h-control w-6/24" : "",
         className,
       )}
       asChild

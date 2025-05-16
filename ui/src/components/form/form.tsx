@@ -6,7 +6,6 @@ import type { FieldValues } from "react-hook-form";
 import type { FormRootProps } from "./_components/form-root";
 // import type { FormBaseProps, FormContextValue } from "./context";
 import type { FormInstance } from "./hooks/use-form";
-import { FormErrorsNotification } from "./_components/form-errors-notification";
 import { FormRoot } from "./_components/form-root";
 import { useExtraProps } from "./hooks/use-extra-props";
 
@@ -79,13 +78,14 @@ const Form = <
         classNames={classNames}
       >
         <form onSubmit={form.submit} {...props} />
-        <FormErrorsNotification />
       </FormRoot>
     );
   }
-  return <FormWithoutFormProp {...props} />;
+  if ("formState" in props) {
+    return <FormWithoutFormProp {...props} />;
+  }
 
-  // return null;
+  return null;
 };
 
 const FormWithoutFormProp = <
