@@ -5,8 +5,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ButtonProps } from "../components/button";
-import { Button, buttonVariants } from "../components/button";
+import { buttonVariants } from "./button";
 
 function AlertDialog({
   ...props
@@ -122,30 +121,13 @@ function AlertDialogDescription({
 
 function AlertDialogAction({
   className,
-  asChild,
-  isControlled,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
-  ButtonProps & {
-    isControlled?: boolean;
-  }) {
+}: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
   return (
     <AlertDialogPrimitive.Action
-      asChild
-      // className={cn(
-      //   buttonVariants({
-      //     color: !asChild || isControlled ? "danger" : "default",
-      //   }),
-      //   className,
-      // )}
-    >
-      <Button
-        asChild={asChild}
-        color={!asChild || !isControlled ? "danger" : "default"}
-        className={cn(className)}
-        {...props}
-      ></Button>
-    </AlertDialogPrimitive.Action>
+      className={cn(buttonVariants(), className)}
+      {...props}
+    />
   );
 }
 
