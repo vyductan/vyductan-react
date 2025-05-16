@@ -4,37 +4,28 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 
+import type { TextareaProps as ShadcnTextareaProps } from "@acme/ui/shadcn/textarea";
 import { cn } from "@acme/ui/lib/utils";
+import { Textarea as TextareaShadcn } from "@acme/ui/shadcn/textarea";
 
 import { inputVariants } from "../input";
 
-const textareaVariants = cva(
-  [
-    "placeholder:text-muted-foreground field-sizing-content min-h-16 disabled:cursor-not-allowed disabled:opacity-50 ",
-    // "border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] md:text-sm",
-    // own
-    "text-sm",
-  ],
-  {
-    variants: {
-      // can we move to use input size varirant
-      size: {
-        xs: "",
-        sm: "",
-        default: "px-[11px] py-[5px]",
-        lg: "",
-        xl: "p-4 text-md",
-      },
-    },
-    defaultVariants: {
-      size: "default",
+const textareaVariants = cva(["text-sm"], {
+  variants: {
+    // can we move to use input size varirant
+    size: {
+      xs: "",
+      sm: "",
+      default: "px-[11px] py-[5px]",
+      lg: "",
+      xl: "p-4 text-md",
     },
   },
-);
-export type TextareaProps = Omit<
-  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  "style"
-> &
+  defaultVariants: {
+    size: "default",
+  },
+});
+export type TextareaProps = Omit<ShadcnTextareaProps, "style"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof textareaVariants> &
   Pick<
@@ -44,22 +35,28 @@ export type TextareaProps = Omit<
     autoSize?: boolean;
   };
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ autoSize, className, size, status, variant, ...props }, ref) => {
-    const Comp = autoSize ? TextareaAutosize : "textarea";
-    return (
-      <Comp
-        className={cn(
-          inputVariants({ variant, status }),
-          textareaVariants({ className, size }),
-        )}
-        ref={ref}
-        {...(typeof autoSize === "object" ? autoSize : {})}
-        {...props}
-      />
-    );
-  },
-);
-Textarea.displayName = "Textarea";
+const Textarea = ({
+  ref,
+  autoSize,
+  className,
+  size,
+  status,
+  variant,
+  ...props
+}: TextareaProps) => {
+  const Comp = autoSize ? TextareaAutosize : TextareaShadcn;
+  return (
+    <Comp
+      className={cn(
+        "field-sizing-fixed",
+        inputVariants({ variant, status }),
+        textareaVariants({ className, size }),
+      )}
+      ref={ref}
+      {...(typeof autoSize === "object" ? autoSize : {})}
+      {...props}
+    />
+  );
+};
 
 export { Textarea };
