@@ -60,15 +60,22 @@ const Tabs = ({
   listProps,
   ...props
 }: TabsProps) => {
+  const isShadcnTabs = props.children;
+  if (isShadcnTabs) {
+    return <TabsRoot {...props}>{props.children}</TabsRoot>;
+  }
+
   // Parse extra
   let assertExtra: TabBarExtraMap = {};
-  if (
-    typeof tabBarExtraContent === "object" &&
-    !React.isValidElement(tabBarExtraContent)
-  ) {
-    assertExtra = tabBarExtraContent as TabBarExtraMap;
-  } else {
-    assertExtra.right = tabBarExtraContent;
+  if (tabBarExtraContent) {
+    if (
+      typeof tabBarExtraContent === "object" &&
+      ("left" in tabBarExtraContent || "right" in tabBarExtraContent)
+    ) {
+      assertExtra = tabBarExtraContent;
+    } else {
+      assertExtra.right = tabBarExtraContent as React.ReactNode;
+    }
   }
 
   return (
