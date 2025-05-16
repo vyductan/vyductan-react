@@ -1,3 +1,5 @@
+import { Children, isValidElement } from "react";
+
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DrawerRootProps } from "../../shadcn/drawer";
@@ -11,7 +13,7 @@ import {
 } from "../../shadcn/drawer";
 
 type DrawerProps = DrawerRootProps & {
-  title: React.ReactNode;
+  title?: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
   extra?: React.ReactNode;
@@ -40,6 +42,16 @@ const Drawer = ({
   // closeIcon,
   ...props
 }: DrawerProps) => {
+  const isShadcn = Children.toArray(children).some((child) => {
+    if (isValidElement(child)) {
+      const type =
+        typeof child.type === "string" ? child.type : child.type.name;
+      return type === "DrawerContent";
+    }
+    return false;
+  });
+  if (isShadcn) return <DrawerRoot {...props}>{children}</DrawerRoot>;
+
   return (
     <DrawerRoot direction={placement} {...props}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}

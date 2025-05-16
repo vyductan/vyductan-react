@@ -6,4 +6,5 @@ export {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
+  DrawerPortal,
 } from "../../shadcn/drawer";
