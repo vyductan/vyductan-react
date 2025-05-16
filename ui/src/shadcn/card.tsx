@@ -2,18 +2,12 @@ import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { SizeType } from "../types";
-
-type CardRootProps = React.ComponentProps<"div"> & {
-  size?: SizeType;
-};
-function CardRoot({ className, size, ...props }: CardRootProps) {
+function CardRoot({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card"
       className={cn(
         "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
-        size === "sm" && "gap-3 py-3",
         className,
       )}
       {...props}
@@ -21,20 +15,12 @@ function CardRoot({ className, size, ...props }: CardRootProps) {
   );
 }
 
-function CardHeader({
-  className,
-  size,
-  ...props
-}: React.ComponentProps<"div"> & {
-  size?: SizeType;
-}) {
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-header"
       className={cn(
         "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
-        // own
-        size === "sm" && "px-3",
         className,
       )}
       {...props}
@@ -46,11 +32,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn(
-        "leading-none font-semibold",
-        "flex-1", // fix if not has extra the title width not full
-        className,
-      )}
+      className={cn("leading-none font-semibold", className)}
       {...props}
     />
   );
@@ -79,43 +61,26 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardContent({
-  className,
-  size,
-  ...props
-}: React.ComponentProps<"div"> & {
-  size?: SizeType;
-}) {
+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6", size === "sm" && "px-3", className)}
+      className={cn("px-6", className)}
       {...props}
     />
   );
 }
 
-function CardFooter({
-  className,
-  size,
-  ...props
-}: React.ComponentProps<"div"> & {
-  size?: SizeType;
-}) {
+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn(
-        "flex items-center px-6 [.border-t]:pt-6",
-        size === "sm" && "px-3",
-        className,
-      )}
+      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
       {...props}
     />
   );
 }
 
-export type { CardRootProps };
 export {
   CardRoot as Card,
   CardRoot,
