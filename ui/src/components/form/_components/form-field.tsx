@@ -3,10 +3,15 @@
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
 import React, { cloneElement, isValidElement } from "react";
 
+import { cn } from "@acme/ui/lib/utils";
+import { FormField as ShadFormField } from "@acme/ui/shadcn/form";
+
 import { useFormContext } from "../context";
 import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
 import { FormControl } from "./form-control";
 import { FormItem } from "./form-item";
+import { FieldLabel } from "./form-label";
+import { FieldMessage } from "./form-message";
 
 // type FormFieldContextValue<
 //   TFieldValues extends FieldValues = FieldValues,
@@ -33,21 +38,13 @@ type FieldProps<
   className?: string;
   layout?: "horizontal" | "vertical";
   required?: boolean;
+
   /*
-   * Custome output for input component (like DatePicker, Upload)
-   * */
-  onChange?: (...event: any[]) => any;
-  children?:
-    | React.ReactElement<any>
-    | (({
-        field,
-        fieldState,
-        formState,
-      }: {
-        field: FieldControllerRenderProps<TFieldValues, TName>;
-        fieldState: ControllerFieldState;
-        formState: UseFormStateReturn<TFieldValues>;
-      }) => React.ReactElement<any>);
+  /* Normalize value from component value before passing to Form instance. Do not support async
+  /* */
+  normalize?: (value: any, prevValue: any) => any;
+
+  children?: React.ReactElement;
 
   render?: ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
 };
@@ -58,12 +55,19 @@ const FormField = <
 >({
   control,
   name,
+
   children,
   render,
-  required,
-  onChange,
+
+  label: labelProp,
+
+  className,
+
+  required: requiredProp,
 
   layout: layoutProp,
+
+  normalize,
 
   ...props
 }: FieldProps<TFieldValues, TName, TTransformedValues>) => {
@@ -71,64 +75,114 @@ const FormField = <
   const layout = layoutProp ?? form?.layout;
   const classNames = form?.classNames;
 
-  const isOptional = useFieldOptionalityCheck(name, form?.schema);
-  const isRequired =
-    required ?? (isOptional === undefined ? false : !isOptional);
+  const optional = useFieldOptionalityCheck(name, form?.schema);
+  const required = requiredProp ?? (optional === undefined ? false : !optional);
 
-  if (render && name) {
-    return (
-      <FormFieldContext.Provider value={{ name: name }}>
-        <Controller name={name} render={render} {...props} />
-      </FormFieldContext.Provider>
-    );
+  // if (render && name) {
+  //   return (
+  //     <FormFieldContext.Provider value={{ name: name }}>
+  //       <Controller name={name} render={render} {...props} />
+  //     </FormFieldContext.Provider>
+  //   );
+  // }
+  // if (form && name) {
+  //   return (
+  //     <FieldController
+  //       control={form.control}
+  //       name={name}
+  //       children={children}
+  //       onChange={onChange}
+  //       required={isRequired}
+  //       layout={layout}
+  //       classNames={classNames}
+  //       {...props}
+  //     />
+  //   );
+  // }
+
+  // Based on shadcn
+  if (render && control && name) {
+    return <ShadFormField control={control} name={name} render={render} />;
   }
-  if (form && name) {
+
+  const label = labelProp && (
+    <FieldLabel className={cn(classNames?.label)} required={required}>
+      {labelProp}
+    </FieldLabel>
+  );
+  if (
+    !render &&
+    form &&
+    name &&
+    isValidElement<{
+      onBlur?: (event: any) => void;
+      onChange?: (event: any) => void;
+    }>(children)
+  ) {
     return (
-      <FieldController
+      <ShadFormField
         control={form.control}
         name={name}
-        children={children}
-        onChange={onChange}
-        required={isRequired}
-        layout={layout}
-        classNames={classNames}
-        {...props}
+        render={({ field }) => (
+          <FormItem layout={layout} className={className} {...props}>
+            {label}
+            <div className="w-full">
+              <FormControl>
+                {cloneElement(children, {
+                  ...field,
+                  // value: watchedValue,
+                  onBlur: (event) => {
+                    children.props.onBlur?.(event);
+                    field.onBlur();
+                  },
+                  onChange: (event: any) => {
+                    children.props.onChange?.(event);
+                    field.onChange(
+                      normalize ? normalize(event, field.value) : event,
+                    );
+                  },
+                })}
+              </FormControl>
+              <FieldMessage />
+            </div>
+          </FormItem>
+        )}
       />
     );
   }
-  if (name && typeof children !== "function") {
-    return (
-      <FormFieldContext.Provider
-        value={{
-          name,
-        }}
-      >
-        <FormItem>
-          <FieldRender
-            children={children}
-            ref={ref}
-            required={required}
-            layout={layout}
-            classNames={classNames}
-            {...props}
-          />
-        </FormItem>
-      </FormFieldContext.Provider>
-    );
-  }
+  // if (nadme) {
+  //   return (
+  //     <FormFieldContext.Provider
+  //       value={{
+  //         name,
+  //       }}
+  //     >
+  //       <FormItem {...props}>
+  //         {ContentComp}
+  //         {/* <FieldRender
+  //           children={children}
+  //           ref={ref}
+  //           required={required}
+  //           layout={layout}
+  //           classNames={classNames}
+  //           {...props}
+  //         /> */}
+  //       </FormItem>
+  //     </FormFieldContext.Provider>
+  //   );
+  // }
 
-  if (typeof children !== "function") {
-    return (
-      <FieldRender
-        children={children}
-        required={required}
-        layout={layout}
-        classNames={classNames}
-        {...props}
-      />
-    );
-  }
-  return;
+  // No control and name
+  return (
+    <FormItem
+      layout={layout}
+      className={cn(!label && "grid-cols-1", className)}
+      {...props}
+    >
+      {label}
+      {children}
+    </FormItem>
+  );
 };
 
 // type FieldControllerProps<
