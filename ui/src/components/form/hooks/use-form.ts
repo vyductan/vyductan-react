@@ -126,12 +126,6 @@ const useForm = <
     [methods, onSubmit],
   );
 
-  useEffect(() => {
-    if (_formControl.current) {
-      _formControl.current.submit = submit;
-    }
-  }, [submit]);
-
   _formControl.current ??= {
     ...methods,
     schema,
@@ -164,6 +158,9 @@ const useForm = <
       );
     }
   }, [w, _formControl.current.formState.defaultValues, props]);
+
+  _formControl.current.submit = submit;
+  _formControl.current.formState = methods.formState;
 
   return _formControl.current;
 };

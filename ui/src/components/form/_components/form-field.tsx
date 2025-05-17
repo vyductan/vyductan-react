@@ -121,7 +121,7 @@ const FormField = <
   ) {
     return (
       <ShadFormField
-        control={form.control}
+        control={control}
         name={name}
         render={({ field }) => (
           <FormItem layout={layout} className={className} {...props}>
@@ -136,9 +136,15 @@ const FormField = <
                     field.onBlur();
                   },
                   onChange: (event: any) => {
-                    children.props.onChange?.(event);
+                    const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
+
+                    const normalizedValue = normalize?.(value, field.value);
                     field.onChange(
-                      normalize ? normalize(event, field.value) : event,
+                      normalize
+                        ? normalizedValue === undefined
+                          ? null
+                          : normalizedValue
+                        : value,
                     );
                   },
                 })}
