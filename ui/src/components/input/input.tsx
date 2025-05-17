@@ -191,10 +191,11 @@ const Input = React.forwardRef<InputRef, InputProps>(
       <button
         type="button"
         className={cn("ml-1 flex opacity-30 hover:opacity-50")}
-        onClick={() => {
+        onClick={(event) => {
+          event.stopPropagation();
           triggerNativeEventFor(document.querySelector(`[id='${id}']`), {
             event: "input",
-            value: "",
+            value: undefined,
           });
         }}
       >
