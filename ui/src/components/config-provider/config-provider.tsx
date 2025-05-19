@@ -12,7 +12,7 @@ import type { DatePickerProps } from "../date-picker";
 import type { PaginationProps } from "../pagination";
 import type { TableProps } from "../table";
 import type { TagProps } from "../tag";
-import { Link } from "../../link";
+import { Link } from "../link";
 
 // type TDateFormat = {
 //   date: string;
