@@ -110,8 +110,8 @@ const Select = <
     size,
     status,
     dropdownRender,
-    optionRender,
-    optionsRender,
+    // optionRender,
+    // optionsRender,
 
     mode, // NOTE: do not set default (for typescript work)
     value,
@@ -282,7 +282,7 @@ const Select = <
       //     onChange?.(o.value, o);
       //   }
       // }}
-      {...props}
+      {...restProps}
     >
       <SelectTrigger
         id={id}
