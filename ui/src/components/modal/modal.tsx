@@ -6,20 +6,19 @@ import type { ButtonProps } from "@acme/ui/components/button";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { DialogProps } from "./_components";
 import { ScrollArea } from "../scroll-area";
 import {
+  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogRoot,
   DialogTitle,
   DialogTrigger,
 } from "./_components";
 
-type ModalProps = DialogProps & {
+type ModalProps = React.ComponentProps<typeof Dialog> & {
   className?: string;
   classNames?: {
     header?: string;
@@ -73,7 +72,7 @@ const Modal = ({
     return false;
   });
   if (isShadcnDialog) {
-    return <DialogRoot {...rest}>{children}</DialogRoot>;
+    return <Dialog {...rest}>{children}</Dialog>;
   }
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
@@ -124,7 +123,7 @@ const Modal = ({
   // const ref = React.useRef<HTMLDivElement>(null);
   // ref.current?.scrollTo(0, ref.current.scrollHeight);
   return (
-    <DialogRoot
+    <Dialog
       {...rest}
       onOpenChange={(isOpen) => {
         rest.onOpenChange?.(isOpen);
@@ -143,7 +142,7 @@ const Modal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
+        <ScrollArea className="*:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block! max-h-[80vh] px-5">
           {children}
         </ScrollArea>
 
@@ -151,7 +150,7 @@ const Modal = ({
           {footerToRender}
         </DialogFooter>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 };
 export { Modal };
