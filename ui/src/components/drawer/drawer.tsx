@@ -6,11 +6,11 @@ import type { DrawerRootProps } from "../../shadcn/drawer";
 import {
   DrawerContent,
   DrawerDescription,
-  DrawerHeader,
   Drawer as DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
 } from "../../shadcn/drawer";
+import { DrawerHeader } from "./_component";
 
 type DrawerProps = DrawerRootProps & {
   title?: React.ReactNode;
