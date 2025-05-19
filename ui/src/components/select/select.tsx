@@ -101,13 +101,13 @@ const Select = <
     allowClear,
     loading,
 
-  className,
-  variant,
-  size,
-  status,
-  dropdownRender,
-  optionRender,
-  optionsRender,
+    className,
+    variant,
+    size,
+    status,
+    dropdownRender,
+    optionRender,
+    optionsRender,
 
     mode, // NOTE: do not set default (for typescript work)
     value,
@@ -279,7 +279,6 @@ const Select = <
       //     onChange?.(o.value, o);
       //   }
       // }}
-      {...restProps}
     >
       <SelectTrigger
         id={id}
@@ -304,7 +303,7 @@ const Select = <
           }
           setKey(+Date.now());
         }}
-        {...props} // for form-control
+        {...restProps} // for form-control
       >
         {isMultiple ? (
           <div className="flex flex-wrap">
