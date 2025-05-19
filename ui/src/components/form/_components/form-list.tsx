@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import type {
   Control,
+  FieldArray,
   FieldArrayPath,
   FieldValues,
   UseFieldArrayReturn,
@@ -24,14 +25,23 @@ type FieldListProps<
   description?: string;
   required?: boolean;
   children?: (
+    fields: {
+      id: string;
+      key: string;
+      name: string;
+    }[],
     ctx: Omit<
       UseFieldArrayReturn<TFieldValues, TFieldArrayName, "id">,
-      "fields"
+      "fields" | "remove"
     > & {
-      fields: {
-        id: string;
-        name: string;
-      }[];
+      add: (
+        defaultValue?:
+          | FieldArray<TFieldValues, TFieldArrayName>
+          | FieldArray<TFieldValues, TFieldArrayName>[],
+        insertIndex?: number,
+      ) => void;
+      remove: (fieldName: string) => void;
+      move: (from: number, to: number) => void;
     },
   ) => ReactElement<any>;
 };
@@ -57,12 +67,41 @@ const FieldList = <
   const fields = defaultValues.map((value, index) => {
     return {
       id: value.id,
+      key: value.id,
       name: `${name}.${index}`,
     };
   });
+
+  const add = (
+    defaultValue?:
+      | FieldArray<TFieldValues, TFieldArrayName>
+      | FieldArray<TFieldValues, TFieldArrayName>[],
+    insertIndex?: number,
+  ) => {
+    if (typeof insertIndex === "number") {
+      helper.insert(insertIndex, defaultValue ?? ({} as any));
+    } else {
+      helper.append(defaultValue ?? ({} as any));
+    }
+  };
+
+  const remove = (fieldName: string) => {
+    const index = fields.findIndex((field) => field.name === fieldName);
+    if (index === -1) return;
+    helper.remove(index);
+  };
+  const move = (from: number, to: number) => {
+    if (from < 0 || from >= fields.length || to < 0 || to >= fields.length) {
+      return;
+    }
+    helper.move(from, to);
+  };
+
   const ctx = {
-    fields,
     ...helper,
+    add,
+    remove,
+    move,
     errors: control?._formState.errors[name],
   };
 
@@ -75,7 +114,7 @@ const FieldList = <
       description={description}
       required={required ?? (isOptional === undefined ? false : !isOptional)}
     >
-      {children?.(ctx)}
+      {children?.(fields, ctx)}
     </Field>
   );
 };
