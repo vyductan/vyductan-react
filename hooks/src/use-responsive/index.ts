@@ -15,7 +15,14 @@ const subscribers = new Set<Subscriber>();
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 export type ResponsiveInfo = Record<Breakpoint, boolean>;
 
-let info: ResponsiveInfo;
+let info: ResponsiveInfo = {
+  xs: false,
+  sm: false,
+  md: false,
+  lg: false,
+  xl: false,
+  "2xl": false,
+};
 
 const tailwindScreensConfig = {
   xs: "480px",
