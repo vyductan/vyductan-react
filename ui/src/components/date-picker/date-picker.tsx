@@ -101,8 +101,8 @@ const DatePicker = <T extends DatePickerValueType = "date">({
     value: props.value,
     onChange: (value) => {
       props.onChange?.(
-        getDestinationValue(value as Date),
-        formatDate(value as Date, format),
+        value ? getDestinationValue(value as Date) : undefined,
+        value ? formatDate(value, format) : "",
       );
     },
   });
@@ -110,7 +110,13 @@ const DatePicker = <T extends DatePickerValueType = "date">({
   const [inputValue, setInputValue] = useMergedState(preInputValue, {
     value: preInputValue,
   });
-  const handleChange = (input: string | Date) => {
+
+  const handleChange = (input: string | Date | undefined) => {
+    if (!input) {
+      setValue(undefined);
+      return;
+    }
+
     const date = toDate(input);
     let result;
     if (valueType === "string") {
@@ -222,6 +228,9 @@ const DatePicker = <T extends DatePickerValueType = "date">({
             setInputValue(event.currentTarget.value);
             if (isValidDateStringExact(event.currentTarget.value, format)) {
               handleChange(event.currentTarget.value);
+            } else {
+              // eslint-disable-next-line unicorn/no-useless-undefined
+              handleChange(undefined);
             }
           }}
         />

@@ -8,7 +8,7 @@ export function triggerNativeEventFor<T>(
   {
     event,
     ...valueObject
-  }: { event: keyof HTMLElementEventMap; [key: string]: string },
+  }: { event: keyof HTMLElementEventMap; [key: string]: string | undefined },
 ) {
   if (!(element instanceof Element)) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
