@@ -5,7 +5,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "@rc-component/util";
 import { useHover } from "ahooks";
-import { cva } from "class-variance-authority";
+import { tv } from "tailwind-variants";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -13,9 +13,9 @@ import type { InputRef } from "./types";
 import { Icon } from "../../icons";
 import { triggerNativeEventFor } from "../../lib/event";
 
-export const inputVariants = cva(
-  [
-    "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+export const inputVariants = tv({
+  base: [
+    "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input shadow-xs flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     // "h-9 text-base md:text-sm",
     // "placeholder:text-muted-foreground", // moved to <input>
@@ -28,51 +28,49 @@ export const inputVariants = cva(
     // "focus-within:outline-hidden",
 
     // own
-    "text-sm h-auto",
+    "h-auto text-sm",
     "[&_input]:w-full",
   ],
-  {
-    variants: {
-      disabled: {
-        true: [
-          "cursor-not-allowed bg-background-active opacity-50 hover:border-input!",
-        ],
-      },
-      // readOnly: {
-      //   true: ["pointer-events-none cursor-not-allowed"],
-      // },
-      status: {
-        default: [
-          "hover:border-primary-500",
-          "focus-within:border-primary-600 focus-within:ring-primary-100",
-        ],
-        error: [
-          "border-error text-error",
-          "hover:border-error-hover",
-          "focus-within:border-error focus-within:ring-error-muted",
-        ],
-        warning: [],
-      },
-      variant: {
-        default: [
-          "border",
-          "rounded-md",
-          "focus-within:ring-2",
-          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        ],
-        outline: [],
-        filled: ["border-none bg-accent focus-within:ring-0 shadow-none"],
-        borderless: ["border-0", "focus-within:outline-hidden", "shadow-none"],
-      },
+  variants: {
+    disabled: {
+      true: [
+        "bg-background-active hover:border-input! cursor-not-allowed opacity-50",
+      ],
     },
-    defaultVariants: {
-      variant: "default",
-      status: "default",
-      disabled: false,
+    // readOnly: {
+    //   true: ["pointer-events-none cursor-not-allowed"],
+    // },
+    status: {
+      default: [
+        "hover:border-primary-500",
+        "focus-within:border-primary-600 focus-within:ring-primary-100",
+      ],
+      error: [
+        "border-error text-error",
+        "hover:border-error-hover",
+        "focus-within:border-error focus-within:ring-error-muted",
+      ],
+      warning: [],
+    },
+    variant: {
+      default: [
+        "border",
+        "rounded-md",
+        "focus-within:ring-2",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+      ],
+      outline: [],
+      filled: ["bg-accent border-none shadow-none focus-within:ring-0"],
+      borderless: ["border-0", "focus-within:outline-hidden", "shadow-none"],
     },
   },
-);
-export const inputSizeVariants = cva([], {
+  defaultVariants: {
+    variant: "default",
+    status: "default",
+    disabled: false,
+  },
+});
+export const inputSizeVariants = tv({
   variants: {
     size: {
       sm: "",
@@ -88,6 +86,7 @@ export const inputSizeVariants = cva([], {
 type InputVariants = Omit<VariantProps<typeof inputVariants>, "disabled"> & {
   disabled?: boolean;
 };
+
 type InputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
@@ -270,7 +269,7 @@ const Input = React.forwardRef<InputRef, InputProps>(
             "bg-transparent",
             "placeholder:text-muted-foreground",
             // "placeholder:text-placeholder",
-            "border-none outline-hidden",
+            "outline-hidden border-none",
           )}
           disabled={disabled}
           readOnly={readOnly}
