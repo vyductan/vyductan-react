@@ -709,7 +709,7 @@ readOnly={readOnly}
   );
 };
 
-const InputNumber = ((props: InputNumberProps) => {
+const InputNumber = (({ ref, ...props }: InputNumberProps) => {
   const {
     disabled,
     style,

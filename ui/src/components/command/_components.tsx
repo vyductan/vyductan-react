@@ -9,10 +9,10 @@ import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { Icon } from "../../icons";
 import {
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogRoot,
   DialogTitle,
 } from "../modal/_components";
 
@@ -35,12 +35,12 @@ function CommandDialog({
   description = "Search for a command to run...",
   children,
   ...props
-}: React.ComponentProps<typeof DialogRoot> & {
+}: React.ComponentProps<typeof Dialog> & {
   title?: string;
   description?: string;
 }) {
   return (
-    <DialogRoot {...props}>
+    <Dialog {...props}>
       <DialogHeader className="sr-only">
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{description}</DialogDescription>
@@ -60,7 +60,7 @@ function CommandDialog({
           {children}
         </CommandRoot>
       </DialogContent>
-    </DialogRoot>
+    </Dialog>
   );
 }
 

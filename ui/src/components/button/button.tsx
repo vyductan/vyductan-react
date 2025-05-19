@@ -7,12 +7,12 @@ import { Slot } from "@radix-ui/react-slot";
 import { tv } from "tailwind-variants";
 
 import type { IconProps } from "@acme/ui/icons";
-import { useUiConfig } from "@acme/ui/components/config-provider/config-provider";
+import { useUiConfig } from "@acme/ui/components/config-provider";
 import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
-import Wave from "@acme/ui/lib/wave";
-import { Link } from "@acme/ui/link";
 
+import Wave from "../../lib/wave";
+import { Link } from "../link";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({

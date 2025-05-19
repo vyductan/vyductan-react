@@ -1,31 +1,9 @@
 "use client";
 
 import { cn } from "@acme/ui/lib/utils";
-
-import { useFormField } from "../hooks/use-form-field";
+import { FormMessage as ShadFormMessage } from "@acme/ui/shadcn/form";
 
 function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
-  const { error, formMessageId } = useFormField();
-  const body = error ? String(error.message ?? "") : props.children;
-
-  if (!body) {
-    return <></>;
-  }
-
-  return (
-    <p
-      data-slot="form-message"
-      id={formMessageId}
-      className={cn(
-        "text-destructive text-sm font-medium",
-        // own
-        "mb-1",
-        className,
-      )}
-      {...props}
-    >
-      {body}
-    </p>
-  );
+  return <ShadFormMessage className={cn("mb-1", className)} {...props} />;
 }
 export { FormMessage, FormMessage as FieldMessage };
