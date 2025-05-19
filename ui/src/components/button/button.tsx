@@ -12,19 +12,19 @@ import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
 import Wave from "../../lib/wave";
-import { Link } from "../../link";
+import { Link } from "../link";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
   base: [
-    "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap border text-sm font-medium outline-none ring-offset-white transition-all",
+    "inline-flex shrink-0 items-center justify-center gap-2 border text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
     // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", // moved to &_span
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
     // own
     // "shrink-0", // disable flex box sizing - added by shadcn
-    "[&_span[role='img']:not([class*='size-'])]:size-4 [&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0",
+    "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
     primary: {
@@ -71,10 +71,10 @@ const buttonVariants = tv({
         "active:ring-primary",
       ],
       destructive:
-        "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-xs text-white",
+        "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white shadow-xs",
       solid: ["text-white"],
       outline: [
-        "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 shadow-xs border",
+        "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
       dashed: [
         "border-border border border-dashed",

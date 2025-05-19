@@ -8,7 +8,6 @@ import React, { cloneElement, Fragment } from "react";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Placement } from "../../types";
-import { Link } from "../../link";
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,6 +17,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../../shadcn/dropdown";
+import { Link } from "../link";
 import { GenericSlot } from "../slot";
 
 type MenuItem = {

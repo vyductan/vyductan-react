@@ -6,7 +6,7 @@ import { buttonVariants } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import { Link } from "../../link";
+import { Link } from "../link";
 
 function PaginationRoot({ className, ...props }: React.ComponentProps<"nav">) {
   return (
