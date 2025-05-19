@@ -3,12 +3,11 @@
 import * as React from "react";
 import { useMergedState } from "@rc-component/util";
 
-import type { ButtonProps } from "@acme/ui/components/button";
 import { tagColors } from "@acme/ui/components/tag";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject } from "../..";
+import type { AnyObject, SizeType } from "../..";
 import type { CommandProps, CommandValueType } from "../command";
 // import type { ValueType } from "../form";
 import type { Option } from "../select/types";
@@ -38,7 +37,7 @@ export type AutocompleteProps<
   optionsToSearch?: { value: string; label: string }[];
 
   className?: string;
-  size?: ButtonProps["size"];
+  size?: SizeType;
   disabled?: boolean;
 
   open?: boolean;
@@ -151,7 +150,7 @@ const Autocomplete = <
         "p-0",
         //w-(--radix-popover-trigger-width)
         // own
-        "w-full min-w-(--radix-popover-trigger-width)", // make same select width
+        "min-w-(--radix-popover-trigger-width) w-full", // make same select width
       )}
       arrow={false}
       content={
@@ -178,7 +177,7 @@ const Autocomplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "text-start text-sm whitespace-normal",
+          "whitespace-normal text-start text-sm",
           !value && "text-muted-foreground hover:text-muted-foreground",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
