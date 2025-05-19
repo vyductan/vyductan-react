@@ -4,11 +4,7 @@
   "compilerOptions": {
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "paths": {
-      "@acme/ui/*": ["./src/*"]
-    }
+    "rootDir": "."
   },
   "include": ["src"],
   "exclude": ["node_modules"]
