@@ -30,10 +30,12 @@ export const useFieldOptionalityCheck = (
     if (!fieldName || !schema) {
       return;
     }
+
+    // If it's a ZodObject, use its shape, otherwise assume it's already the shape
+    const shape = "shape" in schema ? schema.shape : schema;
     const zodFieldPath = generateZodFieldPath(fieldName);
 
-    // @ts-expect-error - form schema is always object
-    const zodField = _.get(schema.shape, zodFieldPath);
+    const zodField = _.get(shape, zodFieldPath);
     if (!zodField) handleNotFoundField(fieldName);
     return zodField instanceof ZodOptional;
   }, [fieldName, schema]);
