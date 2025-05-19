@@ -269,7 +269,7 @@ const UploadZone = ({
           accept="image/*"
           className="sr-only"
           onChange={async (event) => {
-            console.log("eeeeeeee", event.currentTarget);
+            // console.log("eeeeeeee", event.currentTarget);
             const file = event.currentTarget.files?.[0];
             if (file) {
               await upload(file);
