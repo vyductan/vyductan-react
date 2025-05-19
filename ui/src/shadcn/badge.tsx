@@ -31,7 +31,6 @@ type BadgeProps = React.ComponentProps<"span"> &
 
 function Badge({ className, variant, asChild = false, ...props }: BadgeProps) {
   const Comp = asChild ? Slot : "span";
-
   return (
     <Comp
       data-slot="badge"
