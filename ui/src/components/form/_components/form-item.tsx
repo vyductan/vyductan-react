@@ -17,17 +17,17 @@ function FormItem({
 
   // check child has form-message component
   const hasFormMessage = React.Children.toArray(props.children).some(
-    (child) => 
-      React.isValidElement(child) && 
-      typeof child.type === 'string' && 
-      child.type === "FormMessage"
+    (child) =>
+      React.isValidElement(child) &&
+      typeof child.type === "string" &&
+      child.type === "FormMessage",
   );
 
   return (
     <FormItemContext.Provider value={{ id }}>
       <ShadFormItem
         className={cn(
-          layout === "horizontal" ? "grid-cols-2" : "",
+          layout === "horizontal" ? "flex" : "",
           hasFormMessage ? "" : "mb-6",
           className,
         )}

@@ -38,9 +38,9 @@ interface InputNumberProps<T extends ValueType = ValueType>
 }
 
 const InputNumber = ({ ref, ...props }: InputNumberProps) => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  // const inputRef = React.useRef<HTMLInputElement>(null);
 
-  React.useImperativeHandle(ref, () => inputRef.current!);
+  // React.useImperativeHandle(ref, () => inputRef.current!);
 
   const {
     className,
@@ -108,9 +108,10 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
+  console.log("tttt", others.value);
   return (
     <RcInputNumber
-      ref={inputRef}
+      ref={ref}
       upHandler={upIcon}
       downHandler={downIcon}
       // prefixCls={prefixCls}

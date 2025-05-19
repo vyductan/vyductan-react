@@ -75,11 +75,7 @@ export type SelectProps<
     className?: string;
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
-    optionRender?: (option: Option<TValue, TRecord>) => {
-      checked?: boolean;
-      icon?: React.ReactNode;
-      label?: React.ReactNode;
-    };
+    optionRender?: (option: Option<TValue, TRecord>) => React.ReactNode;
     optionsRender?: (options: Option<TValue, TRecord>[]) => React.ReactNode;
     onSearchChange?: (search: string) => void;
     // onChange?: (
@@ -105,13 +101,13 @@ const Select = <
     allowClear,
     loading,
 
-    className,
-    variant,
-    size,
-    status,
-    dropdownRender,
-    // optionRender,
-    // optionsRender,
+  className,
+  variant,
+  size,
+  status,
+  dropdownRender,
+  optionRender,
+  optionsRender,
 
     mode, // NOTE: do not set default (for typescript work)
     value,
@@ -213,38 +209,39 @@ const Select = <
           Add "{inputValue}"
         </SelectItem>
       )}
-      {options.length > 0 ? (
-        options.map((o) => (
-          <SelectItem
-            key={String(o.value)}
-            value={o.value as string}
-            className={
-              selectedValues.includes(o.value)
-                ? "bg-accent text-accent-foreground"
-                : ""
-            }
-            onMouseDown={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              handleSelect(o.value);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSelect(o.value);
+      {optionsRender ? (
+        optionsRender(options)
+      ) : options.length > 0 ? (
+        options.map((o) => {
+          const optionContent = optionRender ? optionRender(o) : o.label;
+
+          return (
+            <SelectItem
+              key={String(o.value)}
+              value={o.value as string}
+              className={
+                selectedValues.includes(o.value)
+                  ? "bg-accent text-accent-foreground"
+                  : ""
               }
-            }}
-            // onKeyDown={(e) => {
-            //   e.stopPropagation();
-            //   e.preventDefault();
-            //   handleSelect(o.value);
-            // }}
-            isActive={selectedValues.includes(o.value)}
-          >
-            {o.label}
-          </SelectItem>
-        ))
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                handleSelect(o.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelect(o.value);
+                }
+              }}
+              isActive={selectedValues.includes(o.value)}
+            >
+              {optionContent}
+            </SelectItem>
+          );
+        })
       ) : (
         <Empty />
       )}
@@ -307,7 +304,7 @@ const Select = <
           }
           setKey(+Date.now());
         }}
-        {...restProps} // for form-control
+        {...props} // for form-control
       >
         {isMultiple ? (
           <div className="flex flex-wrap">

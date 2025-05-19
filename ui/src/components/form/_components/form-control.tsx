@@ -1,24 +1,18 @@
 import React from "react";
 
+import { FormControl as ShadFormControl } from "@acme/ui/shadcn/form";
+
 import type { GenericSlotProps } from "../../slot";
 import { GenericSlot } from "../../slot";
 import { useFormField } from "../hooks/use-form-field";
 
 const FormControl = ({ ...props }: GenericSlotProps) => {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const { error } = useFormField();
 
   return (
-    <GenericSlot
-      data-slot="form-control"
-      id={formItemId}
-      aria-describedby={
-        error ? `${formDescriptionId} ${formMessageId}` : `${formDescriptionId}`
-      }
-      aria-invalid={!!error}
-      status={error ? "error" : "default"}
-      {...props}
-    />
+    <GenericSlot status={error ? "error" : "default"} {...props}>
+      <ShadFormControl {...props} />
+    </GenericSlot>
   );
 };
 
