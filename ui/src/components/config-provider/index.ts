@@ -1,1 +1,1 @@
-export { UiConfigProvider } from "./config-provider";
+export { useUiConfig, UiConfigProvider } from "./config-provider";
