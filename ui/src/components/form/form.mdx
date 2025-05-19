@@ -6,7 +6,10 @@ Basic Form data control. Includes layout, initial values, validation and submit.
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { Field, Form, useForm } from "@/components/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
+
+import { InsertExampleSchema } from "~/api/example/validators";
 
 type Props = {
   initialValues?: {
@@ -15,15 +18,27 @@ type Props = {
   };
 };
 const FormExample = ({ initialValues }: Props) => {
-  const Schema = z.object({
-    username: z.string(),
-    password: z.string(),
-  });
+  const queryClient = useQueryClient();
+
+  const insertMutation = useMutation(
+    orpc.example.insert.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: orpc.example.list.key(),
+        });
+        message.success("Successfully!");
+      },
+      onError: (error) => {
+        apiErrorHandling({ error });
+      },
+    }),
+  );
+
   const form = useForm({
-    schema: Schema,
+    schema: InsertExampleSchema,
     values: initialValues,
     onSubmit: (values) => {
-      console.log(values);
+      insertMutation.mutate(values);
     },
   });
 
@@ -35,8 +50,16 @@ const FormExample = ({ initialValues }: Props) => {
       <Field control={form.control} name="password" label="Password">
         <Input type="password" />
       </Field>
+      <Field control={form.control} name="remember" label="Remember">
+        <Checkbox />
+      </Field>
+      <Field control={form.control} name="role" label="Role">
+        <Select options={[{ label: "Admin", value: "admin" }]} />
+      </Field>
       <Field>
-        <Button type="submit">Submit</Button>
+        <Button type="submit" loading={insertMutation.isPending}>
+          Submit
+        </Button>
       </Field>
     </Form>
   );
