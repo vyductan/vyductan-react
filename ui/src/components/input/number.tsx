@@ -108,7 +108,6 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
-  console.log("tttt", others.value);
   return (
     <RcInputNumber
       ref={ref}
