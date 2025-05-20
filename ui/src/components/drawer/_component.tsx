@@ -14,16 +14,7 @@ const DrawerContent = ({
   ...props
 }: React.ComponentProps<typeof ShadcnDrawerContent>) => {
   return (
-    <ShadcnDrawerContent
-      className={cn(
-        "data-[vaul-drawer-direction=right]:sm:max-w-auto data-[vaul-drawer-direction=right]:w-auto",
-        className?.includes("w-")
-          ? ""
-          : "data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:sm:max-w-sm",
-        className,
-      )}
-      {...props}
-    >
+    <ShadcnDrawerContent className={cn(className)} {...props}>
       {children}
     </ShadcnDrawerContent>
   );
