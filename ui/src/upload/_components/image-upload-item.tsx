@@ -1,8 +1,8 @@
 import { cn } from "@acme/ui/lib/utils";
 
 import type { UploadFileItem } from "../types";
-import { Checkbox } from "../../checkbox";
 import { Card } from "../../components/card";
+import { Checkbox } from "../../components/checkbox";
 import { Progress } from "../../components/progress";
 import MyImage from "./image";
 

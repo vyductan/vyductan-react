@@ -5,7 +5,7 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { Icon } from "../icons";
+import { Icon } from "../../icons";
 
 type AccordionRootProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
 function AccordionRoot({ ...props }: AccordionRootProps) {

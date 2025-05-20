@@ -5,7 +5,7 @@ import { useMergedState } from "@rc-component/util";
 
 import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import type { UploadZoneProps } from "./upload-zone";
-import { Button } from "../button";
+import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
 import { UploadZone } from "./upload-zone";
