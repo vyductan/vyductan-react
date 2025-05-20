@@ -142,7 +142,7 @@ const Modal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="*:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block! max-h-[80vh] px-5">
+        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
           {children}
         </ScrollArea>
 

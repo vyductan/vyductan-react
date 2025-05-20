@@ -5,7 +5,7 @@ import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { MenuItemDef } from "./types";
+import type { MenuItemDef, MenuItemType } from "./types";
 // import { Collapse } from "../collapse";
 import { Divider } from "../divider";
 import { MenuItem } from "./_components";
@@ -49,34 +49,46 @@ export const Menu = ({
 
   const renderItem = (menu: MenuItemDef[]) => {
     return menu.map((item, index) => {
+      // Handle divider type
       if (item.type === "divider") {
         return (
-          <Divider key={index} role="separator" className="border-t" asChild>
+          <Divider
+            key={`divider-${index}`}
+            role="separator"
+            className="border-t"
+            asChild
+          >
             <li />
           </Divider>
         );
       }
 
+      // Handle group type
       if (item.type === "group") {
         return (
-          <li key={index} role="presentation" className="my-1 text-left">
-            <div
-              role="presentation"
-              title={typeof item.label === "string" ? item.label : ""}
-              className="py-2"
-            >
-              {item.label}
-            </div>
+          <li
+            key={`group-${item.key || index}`}
+            role="presentation"
+            className="my-1 text-left"
+          >
+            {item.label && (
+              <div
+                role="presentation"
+                title={typeof item.label === "string" ? item.label : ""}
+                className="text-muted-foreground px-4 py-2 text-xs font-medium"
+              >
+                {item.label}
+              </div>
+            )}
             {item.children.some((c) => !c.hidden) && (
-              <ul role="group">
-                {item.children
+              <ul role="group" className="mt-1">
+                {(item.children as MenuItemType[])
                   .filter((c) => !c.hidden)
-                  .map(({ key, ...x }) => {
-                    // const isActive = mergedSelectKeys.some((x) =>
-                    //   x.endsWith(key.toString()),
-                    // );
-                    const isActive = mergedSelectKeys.some((x) =>
-                      key.toString().startsWith(x),
+                  .map((child) => {
+                    // Destructure the key and other props we need
+                    const { key, hidden: _, ...rest } = child;
+                    const isActive = mergedSelectKeys.some((k) =>
+                      key.toString().startsWith(k.toString()),
                     );
                     return (
                       <MenuItem
@@ -84,7 +96,7 @@ export const Menu = ({
                         keyProp={key}
                         isActive={isActive}
                         onSelect={onSelect}
-                        {...x}
+                        {...(rest as Omit<MenuItemType, "key">)}
                       />
                     );
                   })}
@@ -94,8 +106,21 @@ export const Menu = ({
         );
       }
 
+      // Handle regular menu item
       const { key, ...rest } = item;
-      return <MenuItem key={key} keyProp={key} onSelect={onSelect} {...rest} />;
+      const isActive = mergedSelectKeys.some((k) =>
+        key.toString().startsWith(k.toString()),
+      );
+
+      return (
+        <MenuItem
+          key={key}
+          keyProp={key}
+          isActive={isActive}
+          onSelect={onSelect}
+          {...rest}
+        />
+      );
 
       // if (!item.children) {
       //   const isActive = mergedSelectKeys.some((x) => x.endsWith(key));
@@ -162,8 +187,11 @@ export const Menu = ({
 
   return (
     <ul
+      role="menu"
       className={cn(
-        mode === "inline" && "space-y-1 space-x-2 overflow-y-auto",
+        "flex flex-col space-y-1 text-sm",
+        mode === "inline" && "w-full overflow-y-auto",
+        mode === "horizontal" && "flex-row space-y-0 space-x-2",
         className,
       )}
     >
