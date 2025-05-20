@@ -3,6 +3,7 @@ interface ItemSharedProps {
   ref?: React.Ref<HTMLLIElement | null>;
   style?: React.CSSProperties;
   className?: string;
+  hidden?: boolean;
 }
 
 export type MenuItemType = ItemSharedProps & {
@@ -19,8 +20,6 @@ export type MenuItemType = ItemSharedProps & {
   icon?: React.ReactNode;
 
   children?: MenuItemDef[];
-
-  hidden?: boolean;
 
   // // >>>>> Active
   // onMouseEnter?: MenuHoverEventHandler;

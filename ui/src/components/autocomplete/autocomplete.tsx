@@ -150,7 +150,7 @@ const Autocomplete = <
         "p-0",
         //w-(--radix-popover-trigger-width)
         // own
-        "min-w-(--radix-popover-trigger-width) w-full", // make same select width
+        "w-full min-w-(--radix-popover-trigger-width)", // make same select width
       )}
       arrow={false}
       content={
@@ -177,7 +177,7 @@ const Autocomplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "whitespace-normal text-start text-sm",
+          "text-start text-sm whitespace-normal",
           !value && "text-muted-foreground hover:text-muted-foreground",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +

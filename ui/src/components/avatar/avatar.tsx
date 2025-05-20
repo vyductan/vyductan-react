@@ -15,6 +15,9 @@ export type AvatarProps = AvatarRootProps &
     className?: string;
   };
 export const Avatar = ({ fallback, size, src, alt, ...rest }: AvatarProps) => {
+  const isShadcnAvatar = !src;
+  if (isShadcnAvatar) return <AvatarRoot size={size} {...rest} />;
+
   return (
     <AvatarRoot size={size} {...rest}>
       <AvatarImage src={src} alt={alt} />

@@ -1,7 +1,6 @@
 import type { Key } from "react";
 import { Fragment } from "react";
 
-import { Icon } from "@acme/ui/icons";
 import {
   BreadcrumbItem,
   BreadcrumbLink,
@@ -10,7 +9,9 @@ import {
   BreadcrumbRoot,
   BreadcrumbSeparator,
 } from "@acme/ui/shadcn/breadcrumb";
-import { Skeleton } from "@acme/ui/shadcn/skeleton";
+
+import { Icon } from "../../icons";
+import { Skeleton } from "../skeleton";
 
 type BreadcrumbItemDef = {
   key?: Key;
@@ -64,7 +65,9 @@ const Breadcrumb = ({
           return (
             <Fragment key={key}>
               {skeleton ? (
-                <Skeleton as="li" className="w-20" />
+                <Skeleton asChild className="w-20">
+                  <li />
+                </Skeleton>
               ) : x.href || x.icon || x.onClick ? (
                 index < items.length - 1 ? (
                   <>

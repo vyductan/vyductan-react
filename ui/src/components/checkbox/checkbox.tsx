@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
-import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
+import { Icon } from "../../icons";
 import { LoadingIcon } from "../button";
 
 type CheckboxProps = Omit<

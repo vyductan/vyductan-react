@@ -1,9 +1,9 @@
 export * from "./drawer";
+export * from "./_component";
+
 export {
   Drawer as DrawerRoot,
-  DrawerContent,
   DrawerDescription,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
   DrawerPortal,

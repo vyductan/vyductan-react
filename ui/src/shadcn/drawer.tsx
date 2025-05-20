@@ -3,10 +3,7 @@
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
-import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
-
-import { Icon } from "../icons";
 
 type DrawerRootProps = React.ComponentProps<typeof DrawerPrimitive.Root>;
 function Drawer({ ...props }: DrawerRootProps) {
@@ -48,8 +45,11 @@ function DrawerOverlay({
   );
 }
 
-type DrawerContentProps = React.ComponentProps<typeof DrawerPrimitive.Content>;
-function DrawerContent({ className, children, ...props }: DrawerContentProps) {
+function DrawerContent({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof DrawerPrimitive.Content>) {
   return (
     <DrawerPortal data-slot="drawer-portal">
       <DrawerOverlay />
@@ -59,14 +59,8 @@ function DrawerContent({ className, children, ...props }: DrawerContentProps) {
           "group/drawer-content bg-background fixed z-50 flex h-auto flex-col",
           "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",
           "data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t",
-          "data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:border-l",
+          "data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm",
           "data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm",
-          // data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:sm:max-w-sm
-
-          // own
-          className?.includes("w-")
-            ? ""
-            : "data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:sm:max-w-sm",
           className,
         )}
         {...props}
@@ -78,45 +72,43 @@ function DrawerContent({ className, children, ...props }: DrawerContentProps) {
   );
 }
 
-function DrawerHeader({
-  className,
-  children,
-  extra,
-  ...props
-}: React.ComponentProps<"div"> & {
-  extra?: React.ReactNode;
-}) {
+// type DrawerContentProps = React.ComponentProps<typeof DrawerPrimitive.Content>;
+// function DrawerContent({ className, children, ...props }: DrawerContentProps) {
+//   return (
+//     <DrawerPortal data-slot="drawer-portal">
+//       <DrawerOverlay />
+//       <DrawerPrimitive.Content
+//         data-slot="drawer-content"
+//         className={cn(
+//           "group/drawer-content bg-background fixed z-50 flex h-auto flex-col",
+//           "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",
+//           "data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t",
+//           "data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:border-l",
+//           "data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm",
+//           // data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:sm:max-w-sm
+
+//           // own
+//           className?.includes("w-")
+//             ? ""
+//             : "data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:sm:max-w-sm",
+//           className,
+//         )}
+//         {...props}
+//       >
+//         <div className="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+//         {children}
+//       </DrawerPrimitive.Content>
+//     </DrawerPortal>
+//   );
+// }
+
+function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="drawer-header"
-      className={cn(
-        "flex p-4",
-        // "flex-col gap-1.5"
-        // own
-        "items-center gap-2 border-b px-6",
-        className,
-      )}
+      className={cn("flex flex-col gap-1.5 p-4", className)}
       {...props}
-    >
-      <Button size="sm" variant="ghost" shape="icon" asChild>
-        <DrawerClose
-          className={cn(
-            // "absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-gray-100 data-[state=open]:text-gray-500 dark:ring-offset-gray-950 dark:focus:ring-gray-300 dark:data-[state=open]:bg-gray-800 dark:data-[state=open]:text-gray-400",
-            "rounded-xs opacity-70 transition-opacity",
-            "ring-offset-background focus:ring-ring",
-            "hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none",
-            "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-            "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-            // "absolute top-4 right-4"
-          )}
-        >
-          <Icon icon="icon-[lucide--x]" className="size-5" />
-          <span className="sr-only">Close</span>
-        </DrawerClose>
-      </Button>
-      <div className="flex flex-1 flex-col gap-1.5">{children}</div>
-      {extra}
-    </div>
+    />
   );
 }
 
@@ -161,7 +153,7 @@ function DrawerDescription({
   );
 }
 
-export type { DrawerRootProps, DrawerContentProps };
+export type { DrawerRootProps };
 export {
   Drawer,
   DrawerPortal,

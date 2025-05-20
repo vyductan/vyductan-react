@@ -15,7 +15,8 @@ export const Badge = ({
   ...restProps
 }: BadgeProps) => {
   const isBadgeShadcn = !count;
-  if (isBadgeShadcn) return <ShadcnBadge {...restProps} />;
+  if (isBadgeShadcn)
+    return <ShadcnBadge {...restProps}>{children}</ShadcnBadge>;
 
   return (
     <span className="relative">
