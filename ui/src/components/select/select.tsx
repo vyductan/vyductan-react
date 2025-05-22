@@ -1,6 +1,7 @@
 "use client";
 
 import type { VariantProps } from "class-variance-authority";
+import type { XOR } from "ts-xor";
 import React from "react";
 
 import { Tag, tagColors } from "@acme/ui/components/tag";
@@ -8,7 +9,6 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../..";
 import type { SelectRootProps } from "../../shadcn/select";
-import type { ValueType } from "../form";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
 import {
@@ -20,30 +20,25 @@ import {
 } from "../../shadcn/select";
 import { Empty } from "../empty";
 
-export type SelectMode = "default" | "multiple" | "tags";
+// export type SelectValue = React.ComponentProps<"select">["value"];
+// export type SelectSingleValue = string | number;
+// export type SelectMultipleValue = string[] | number[];
+// export type SelectMode = "default" | "multiple" | "tags";
+
+type SelectValue = string | number;
+type SelectShadcnProps = SelectRootProps;
 
 type SelectDefaultProps<
-  TValue extends ValueType = string,
+  TValue extends SelectValue = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode?: "default";
   value?: TValue;
   onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
 };
-// type SelectMultipleProps<
-//   TValue extends ValueType = string,
-//   TRecord extends AnyObject = AnyObject,
-// > = {
-//   mode: "multiple";
-//   value?: Array<TValue>;
-//   onChange?: (
-//     value?: Array<TValue>,
-//     option?: Array<Option<TValue, TRecord>>,
-//   ) => void;
-// };
 
 type SelectMultipleOrTagsProps<
-  TValue extends ValueType = string,
+  TValue extends SelectValue = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode: "multiple" | "tags";
@@ -54,19 +49,18 @@ type SelectMultipleOrTagsProps<
   ) => void;
 };
 
-export type SelectProps<
-  TValue extends ValueType = string,
+export type SelectInternalProps<
+  TValue extends SelectValue = string,
   TRecord extends AnyObject = AnyObject,
-> = Pick<SelectRootProps, "children" | "onValueChange"> &
-  (
-    | SelectDefaultProps<TValue, TRecord>
-    | SelectMultipleOrTagsProps<TValue, TRecord>
-  ) &
+> = XOR<
+  SelectDefaultProps<TValue, TRecord>,
+  SelectMultipleOrTagsProps<TValue, TRecord>
+> &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     id?: string;
     // value?: TValue;
-    options?: Option<TValue, TRecord>[];
+    options: Option<TValue, TRecord>[];
     placeholder?: string;
 
     allowClear?: boolean;
@@ -87,12 +81,40 @@ export type SelectProps<
     // mode?: SelectMode;
   };
 
+type SelectProps<
+  TValue extends SelectValue = number,
+  TRecord extends AnyObject = AnyObject,
+> = XOR<SelectInternalProps<TValue, TRecord>, SelectShadcnProps>;
+
 const Select = <
-  TValue extends ValueType = string,
+  TValue extends SelectValue = number,
   TRecord extends AnyObject = AnyObject,
 >(
   props: SelectProps<TValue, TRecord>,
 ) => {
+  // const { mode, value, onChange } = props;
+
+  // if (mode === "default") {
+  //   value;
+  //   onChange;
+  // }
+
+  const [open, setOpen] = React.useState(false);
+
+  // fix placeholder did not back when set value to undefined
+  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-1434801848
+  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-2166384619
+  const [key, setKey] = React.useState<number>(+Date.now());
+
+  const [inputValue, setInputValue] = React.useState("");
+
+  // ======================= SHADCN SELECT =======================
+  const isShadcnSelect = props.children;
+  if (isShadcnSelect) return <SelectRoot {...props} />;
+
+  // ======================= CUSTOM SELECT =======================
+  if (!props.options) throw new Error("options is required");
+
   const {
     id,
     options = [],
@@ -114,35 +136,20 @@ const Select = <
     onChange,
     ...restProps
   } = props;
-  // const { mode, value, onChange } = props;
-
-  // if (mode === "default") {
-  //   value;
-  //   onChange;
-  // }
-
-  const [open, setOpen] = React.useState(false);
-
-  // fix placeholder did not back when set value to undefined
-  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-1434801848
-  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-2166384619
-  const [key, setKey] = React.useState<number>(+Date.now());
 
   // ======================= TAGS/MULTIPLE MODE =======================
   const isDefault = !mode || mode === "default";
   const isTags = mode === "tags";
   const isMultiple = mode === "multiple" || isTags;
-  const [inputValue, setInputValue] = React.useState("");
 
   // Normalize value for multi/tags mode
   const selectedValues: TValue[] = isMultiple
     ? (value ?? [])
-    : Array.isArray(value)
+    : isDefault
       ? value
-      : value
         ? [value]
-        : [];
-  // const selectedValues: TValue[] = mode==="default" ?value ? [value] : [] : value ?? []
+        : []
+      : [];
 
   // Add custom tag in tags mode
   const addTag = (tag: TValue) => {
@@ -193,9 +200,6 @@ const Select = <
       removeTag(selectedValues.at(-1)!);
     }
   };
-
-  const isShadcnSelect = !props.options;
-  if (isShadcnSelect) return <SelectRoot {...restProps} />;
 
   // Content for dropdown
   const content = (
