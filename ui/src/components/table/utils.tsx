@@ -112,13 +112,29 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
       columnDefMerged.cell = ({ column, row, getValue, table }) => (
         <>
           {/* Tree Data */}
-          {row.depth > 0 && column.getIndex() === 1 && (
-            <span
-              style={{
-                paddingLeft: `${row.depth * 2}rem`,
-              }}
-            />
+          {row.depth > 0 && column.getIndex() === 0 && (
+            <>
+              <span
+                style={{
+                  paddingLeft: `${row.depth * 2}rem`,
+                }}
+              />
+            </>
           )}
+          {props.expandable?.childrenColumnName &&
+            props.expandable.childrenColumnName in row.original &&
+            row.getCanExpand() &&
+            column.getIndex() === 0 && (
+              <>
+                {props.expandable.expandIcon?.({
+                  record: row.original,
+                  expanded: row.getIsExpanded(),
+                  expandable: row.getCanExpand(),
+                  onExpand: row.getToggleExpandedHandler(),
+                  className: "mb-0.5 mr-2",
+                })}
+              </>
+            )}
           {/* {props.childrenColumnName &&
             row.original[props.childrenColumnName] && (
               <>

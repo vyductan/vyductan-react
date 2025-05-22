@@ -11,7 +11,11 @@ export function renderExpandIcon<RecordType>({
   onExpand,
   expanded,
   expandable,
-}: RenderExpandIconProps<RecordType>) {
+
+  ...props
+}: RenderExpandIconProps<RecordType> & {
+  className?: string;
+}) {
   if (!expandable) {
     return <span className={cn("")} />;
   }
@@ -24,6 +28,7 @@ export function renderExpandIcon<RecordType>({
   return (
     <Button
       variant="text"
+      size="sm"
       // {...(expandable.expandedRowKeys
       //   ? {
       //       onClick: () => {
@@ -49,6 +54,7 @@ export function renderExpandIcon<RecordType>({
           <Icon icon="icon-[lucide--chevron-right]" />
         )
       }
+      {...props}
     />
   );
 
