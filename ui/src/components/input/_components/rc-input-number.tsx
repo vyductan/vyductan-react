@@ -59,7 +59,7 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
 > & {
-  ref?: React.ForwardedRef<HTMLInputElement>;
+  ref?: React.ForwardedRef<InputNumberRef>;
 
   /** value will show as string */
   stringMode?: boolean;
@@ -118,7 +118,10 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   addonAfter?: React.ReactNode;
 };
 
-type InternalInputNumberProps = Omit<InputNumberProps, "prefix" | "suffix"> & {
+type InternalInputNumberProps = Omit<
+  InputNumberProps,
+  "prefix" | "suffix" | "ref"
+> & {
   ref: React.Ref<HTMLInputElement>;
   domRef: React.Ref<HTMLDivElement>;
 };
@@ -733,11 +736,25 @@ const InputNumber = (({ ref, ...props }: InputNumberProps) => {
     }
   };
 
+  React.useImperativeHandle(ref, () => {
+    const target = inputFocusRef.current;
+    if (!target) {
+      return {} as InputNumberRef;
+    }
+
+    return proxyObject(target, {
+      focus,
+      blur: () => target.blur(),
+      nativeElement:
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        holderRef.current?.nativeElement || inputNumberDomRef.current || target,
+    });
+  });
   // React.useImperativeHandle(ref, () =>
-  //   proxyObject(inputFocusRef.current!, {
+  //   proxyObject(inputFocusRef.current, {
   //     focus,
   //     nativeElement:
-  //       holderRef.current?.nativeElement ?? inputNumberDomRef.current,
+  //       holderRef.current?.nativeElement || inputNumberDomRef.current,
   //   }),
   // );
 
