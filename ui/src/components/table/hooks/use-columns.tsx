@@ -477,7 +477,12 @@ export const useColumns = <TRecord extends AnyObject>(
     {
       // rowKey,
       // rowSelection: rowSelectionProp,
-      // expandable,
+      expandable: mergedChildrenColumnName
+        ? {
+            childrenColumnName: mergedChildrenColumnName,
+            expandIcon,
+          }
+        : undefined,
     },
   );
 

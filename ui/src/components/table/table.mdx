@@ -95,6 +95,42 @@ You can control the indent width by setting `indentSize`.
 />
 ```
 
+### Drag sorting with handler
+
+Alternatively you can implement drag sorting with handler using dnd-kit.
+
+```tsx
+import { TableSortableRow } from "@acme/ui/components/table";
+import { DndContext, restrictToVerticalAxis } from "@dnd-kit/core";
+import { verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+return (
+  <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+    <SortableContext
+      items={dataSource.map((i) => i.key)}
+      strategy={verticalListSortingStrategy}
+    >
+      <Table
+        components={{
+          body: {
+            row: TableSortableRow,
+          },
+        }}
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            sorter: true,
+            sortDirections: ["ascend", "descend"],
+            defaultSortOrder: "ascend",
+          },
+        ]}
+      />
+    </SortableContext>
+  </DndContext>
+);
+```
+
 ### Row hover (group)
 
 ```tsx
