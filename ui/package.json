@@ -73,6 +73,7 @@
     "tailwind-merge": "^3.3.0",
     "tailwind-variants": "^1.0.0",
     "tailwindcss": "catalog:",
+    "ts-xor": "^1.3.0",
     "type-fest": "^4.41.0",
     "usehooks-ts": "^3.1.1",
     "uuid": "^11.1.0",
