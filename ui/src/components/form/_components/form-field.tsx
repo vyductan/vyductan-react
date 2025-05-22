@@ -129,7 +129,7 @@ const FormField = <
         render={({ field }) => (
           <FormItem layout={layout} className={className} {...props}>
             {label}
-            <div className="w-full">
+            <div className="w-full" data-slot="form-item-control">
               <FormControl>
                 {cloneElement(children, {
                   ...field,
@@ -185,7 +185,7 @@ const FormField = <
   return (
     <FormItem
       layout={layout}
-      className={cn(!label && "grid-cols-1", className)}
+      className={cn(!label && "justify-end", className)}
       {...props}
     >
       {label}
