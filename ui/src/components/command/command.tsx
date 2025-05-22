@@ -16,25 +16,27 @@ import {
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
-export type CommandValueType = string;
-type CommandSingleValue<T extends CommandValueType = string> = {
-  mode?: never;
-  value?: T;
-  defaultValue?: T;
-  onChange?: (value?: T, option?: Option<T>) => void;
+type CommandValueType = string | number;
+
+type CommandSingleValue<TValue extends CommandValueType = string> = {
+  mode?: "default";
+  value?: TValue;
+  defaultValue?: TValue;
+  onChange?: (value?: TValue, option?: Option<TValue>) => void;
 };
-type CommandMultipleValue<T extends CommandValueType = string> = {
-  mode: "multiple";
-  value?: T[];
-  defaultValue?: T[];
-  onChange?: (value: T[], options?: Option<T>[]) => void;
+type CommandMultipleValue<TValue extends CommandValueType = string> = {
+  mode: "multiple" | "tags";
+  value?: TValue[];
+  defaultValue?: TValue[];
+  onChange?: (value: TValue[], options?: Option<TValue>[]) => void;
 };
-export type CommandProps<T extends CommandValueType = string> = Omit<
+
+export type CommandProps<TValue extends CommandValueType = string> = Omit<
   CommandRootProps,
   "defaultValue" | "value" | "onChange"
 > &
-  (CommandSingleValue<T> | CommandMultipleValue<T>) & {
-    options: Option<T>[];
+  (CommandSingleValue<TValue> | CommandMultipleValue<TValue>) & {
+    options: Option<TValue>[];
 
     empty?: React.ReactNode;
     placeholder?: string;
@@ -44,16 +46,16 @@ export type CommandProps<T extends CommandValueType = string> = Omit<
     groupClassName?: string;
     optionRender?: {
       checked?: boolean;
-      icon?: (option: Option<T>) => React.ReactNode;
-      label?: (option: Option<T>) => React.ReactNode;
+      icon?: (option: Option<TValue>) => React.ReactNode;
+      label?: (option: Option<TValue>) => React.ReactNode;
     };
-    optionsRender?: (options: Option<T>[]) => React.ReactNode;
+    optionsRender?: (options: Option<TValue>[]) => React.ReactNode;
 
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     dropdownFooter?: React.ReactNode;
   };
 
-export const Command = <T extends CommandValueType = string>({
+export const Command = <TValue extends CommandValueType = string>({
   mode,
   options,
   defaultValue: defaultValueProp,
@@ -71,15 +73,18 @@ export const Command = <T extends CommandValueType = string>({
   filter,
 
   dropdownFooter,
-}: CommandProps<T>) => {
+}: CommandProps<TValue>) => {
+  // ======================= TAGS/MULTIPLE MODE =======================
+  // const isDefault = !mode || mode === "default";
+  // const isTags = mode === "tags";
+  // const isMultiple = mode === "multiple" || isTags;
+
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
     onChange: (value) => {
       if (mode === undefined && !Array.isArray(value)) {
-        onChange?.(
-          value,
-          options.find((o) => o.value === value),
-        );
+        const option = options.find((o) => o.value === value);
+        onChange?.(option?.value, option);
         return;
       } else if (mode === "multiple" && Array.isArray(value)) {
         onChange?.(
@@ -110,16 +115,16 @@ export const Command = <T extends CommandValueType = string>({
             options.map((o) => (
               <CommandItem
                 key={o.value.toString()}
-                value={o.value as string}
-                onSelect={(selected) => {
+                value={o.value.toString()}
+                onSelect={() => {
                   if (mode === "multiple" && Array.isArray(value)) {
                     if (value.includes(o.value)) {
                       setValue(value.filter((x) => x !== o.value));
                     } else {
-                      setValue([...value, selected as T]);
+                      setValue([...value, o.value]);
                     }
                   } else {
-                    setValue(selected as T);
+                    setValue(o.value);
                   }
                   o.onSelect?.();
                 }}
