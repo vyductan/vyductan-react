@@ -385,6 +385,7 @@ const Table = <TRecord extends AnyObject>({
   const wrapperScrollRight =
     (scroll?.x ?? 0) - (wrapperWidth + wrapperScrollLeft);
 
+  const TableComp = components?.table ? components.table : TableRoot;
   const TableRowComp =
     components?.body && "row" in components.body && components.body.row
       ? components.body.row
@@ -478,7 +479,7 @@ const Table = <TRecord extends AnyObject>({
             </div>
           )}
           {TableAlertSection}
-          <TableRoot
+          <TableComp
             ref={ref}
             className={cn(
               !scroll?.x && "w-full",
@@ -737,7 +738,7 @@ const Table = <TRecord extends AnyObject>({
                 {summary(dataSource)}
               </TableFooter>
             )}
-          </TableRoot>
+          </TableComp>
           {pagination && (
             <Pagination className="my-4 justify-end" {...pagination} />
           )}
