@@ -59,6 +59,7 @@ const Modal = ({
   trigger,
   onOk,
   onCancel,
+  cancelText,
   // onOpenChange,
   //
   ...rest
@@ -99,7 +100,7 @@ const Modal = ({
           ),
           CancelBtn: (
             <DialogClose asChild onClick={onCancel}>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{cancelText ?? "Cancel"}</Button>
             </DialogClose>
           ),
         },
@@ -111,7 +112,7 @@ const Modal = ({
     <>
       {/* <CancelBtn /> */}
       <DialogClose asChild onClick={onCancel}>
-        <Button variant="outline">Cancel</Button>
+        <Button variant="outline">{cancelText ?? "Cancel"}</Button>
       </DialogClose>
       <Button loading={okLoading} onClick={onOk} {...okButtonProps}>
         {okText ?? "Ok"}

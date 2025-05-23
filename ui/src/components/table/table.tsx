@@ -326,8 +326,11 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
       ...props,
       ...expandableConfig,
       expandable:
-        !!expandableConfig.expandedRowRender ||
-        !!expandableConfig.childrenColumnName,
+        !!expandableConfig.expandedRowRender &&
+        (!mergedChildrenColumnName ||
+          mergedChildrenColumnName in (dataSource?.[0] ?? {})),
+      // expandable: !!expandableConfig.expandedRowRender ||
+      //   !!expandableConfig.childrenColumnName,
       expandColumnTitle: expandableConfig.columnTitle,
       expandedKeys: mergedExpandedKeys,
       getRowKey,

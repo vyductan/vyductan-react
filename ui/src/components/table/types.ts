@@ -319,6 +319,7 @@ export interface RenderExpandIconProps<TRecord> {
   record: TRecord;
   expandable: boolean;
   onExpand: TriggerEventHandler<TRecord>;
+  className?: string;
 }
 
 export type RenderExpandIcon<TRecord> = (

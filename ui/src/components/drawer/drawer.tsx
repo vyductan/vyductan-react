@@ -50,7 +50,12 @@ const Drawer = ({
     }
     return false;
   });
-  if (isShadcn) return <DrawerRoot {...props}>{children}</DrawerRoot>;
+  if (isShadcn)
+    return (
+      <DrawerRoot direction={placement} {...props}>
+        {children}
+      </DrawerRoot>
+    );
 
   return (
     <DrawerRoot direction={placement} {...props}>

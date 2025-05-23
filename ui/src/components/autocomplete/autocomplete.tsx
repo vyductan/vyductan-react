@@ -8,7 +8,7 @@ import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject, SizeType } from "../..";
-import type { CommandProps, CommandValueType } from "../command";
+import type { CommandProps } from "../command";
 // import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { Button, LoadingIcon } from "../button";
@@ -16,11 +16,12 @@ import { Command } from "../command";
 import { inputSizeVariants } from "../input";
 import { Popover } from "../popover";
 
+type AutocompleteValueType = string | number;
 export type AutocompleteProps<
-  T extends CommandValueType = string,
+  TValue extends AutocompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = Pick<
-  CommandProps<T>,
+  CommandProps<TValue>,
   | "filter"
   | "placeholder"
   | "empty"
@@ -30,10 +31,10 @@ export type AutocompleteProps<
   | "dropdownRender"
   | "dropdownFooter"
 > & {
-  value?: T;
-  defaultValue?: T;
-  onChange?: (value?: T, option?: Option<T, TRecord>) => void;
-  options: Option<T, TRecord>[];
+  value?: TValue;
+  defaultValue?: TValue;
+  onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
+  options: Option<TValue, TRecord>[];
   optionsToSearch?: { value: string; label: string }[];
 
   className?: string;
@@ -50,7 +51,7 @@ export type AutocompleteProps<
 };
 
 const Autocomplete = <
-  T extends CommandValueType = string,
+  TValue extends AutocompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
 >({
   defaultValue: defaultValueProp,
@@ -76,10 +77,7 @@ const Autocomplete = <
   onSearchChange,
 
   ...props
-}: AutocompleteProps<T, TRecord>) => {
-  /* Remove duplicate options */
-  // const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
-
+}: AutocompleteProps<TValue, TRecord>) => {
   /* Filter Detault*/
   const filter =
     filterProp ??
@@ -137,6 +135,7 @@ const Autocomplete = <
         </>
       );
     }
+
     return <span className="truncate">{value}</span>;
   })();
 
