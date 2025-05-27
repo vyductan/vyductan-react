@@ -20,11 +20,18 @@ type TabItemDef = {
   className?: string;
   triggerProps?: Omit<TabsTriggerProps, "value">;
 };
-type TabsProps = Omit<
-  TabsRootProps,
-  "defaultValue" | "onValueChange" | "onChange"
-> & {
+type TabsShadcnProps = {
+  type?: never;
+  items?: never;
+} & TabsRootProps;
+
+type TabsOwnProps = {
+  defaultValue?: never;
+  onValueChange?: never;
+  children?: never;
+} & {
   type?: TabsType;
+  className?: string;
   classNames?: {
     root?: string;
     list?: string;
@@ -47,26 +54,31 @@ type TabsProps = Omit<
   // list
   listProps?: TabsListProps;
 };
-const Tabs = ({
-  type = "line",
-  className,
-  classNames,
 
-  defaultActiveKey,
-  activeKey,
-  items,
-  onChange,
-  tabBarExtraContent,
-  listProps,
-  ...props
-}: TabsProps) => {
-  const isShadcnTabs = props.children;
+type TabsProps = TabsShadcnProps | TabsOwnProps;
+const Tabs = (props: TabsProps) => {
+  const isShadcnTabs = !!props.children && !props.items;
   if (isShadcnTabs) {
     return <TabsRoot {...props}>{props.children}</TabsRoot>;
   }
 
+  const {
+    type = "line",
+    className,
+    classNames,
+
+    defaultActiveKey,
+    activeKey,
+    items,
+    onChange,
+    tabBarExtraContent,
+    listProps,
+    ...restProps
+  } = props as TabsOwnProps;
+
   // Parse extra
   let assertExtra: TabBarExtraMap = {};
+
   if (tabBarExtraContent) {
     if (
       typeof tabBarExtraContent === "object" &&
@@ -85,7 +97,7 @@ const Tabs = ({
         value={activeKey}
         onValueChange={onChange}
         className={cn("w-full", className)}
-        {...props}
+        {...restProps}
       >
         {items.length > 0 && (
           <TabsList type={type} className={classNames?.list} {...listProps}>
