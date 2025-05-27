@@ -1,0 +1,194 @@
+### Basic Usage
+
+Basic Form data control. Includes layout, initial values, validation and submit.
+
+```tsx
+import { Button } from "@/components/button";
+import { Input } from "@/components/input";
+import { Field, Form, useForm } from "@/components/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { z } from "zod";
+
+import { InsertExampleSchema } from "~/api/example/validators";
+
+type Props = {
+  initialValues?: {
+    username: string;
+    password: string;
+  };
+};
+const FormExample = ({ initialValues }: Props) => {
+  const queryClient = useQueryClient();
+
+  const insertMutation = useMutation(
+    orpc.example.insert.mutationOptions({
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: orpc.example.list.key(),
+        });
+        message.success("Successfully!");
+      },
+      onError: (error) => {
+        apiErrorHandling({ error });
+      },
+    }),
+  );
+
+  const form = useForm({
+    schema: InsertExampleSchema,
+    values: initialValues,
+    onSubmit: (values) => {
+      insertMutation.mutate(values);
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <Field control={form.control} name="username" label="Username">
+        <Input />
+      </Field>
+      <Field control={form.control} name="password" label="Password">
+        <Input type="password" />
+      </Field>
+      <Field control={form.control} name="remember" label="Remember">
+        <Checkbox />
+      </Field>
+      <Field control={form.control} name="role" label="Role">
+        <Select options={[{ label: "Admin", value: "admin" }]} />
+      </Field>
+      <Field>
+        <Button type="submit" loading={insertMutation.isPending}>
+          Submit
+        </Button>
+      </Field>
+    </Form>
+  );
+};
+```
+
+### Dynamic Form Item (FieldList)
+
+Add or remove form items dynamically. add function support config initial value.
+
+```tsx
+<Form>
+  <FieldList control={form.control} name="names">
+    {(fields, { add, remove }, { errors }) => (
+      <>
+        {fields.map((field, index) => (
+          <Field
+            label={`Passenger ${index + 1}`}
+            required={false}
+            key={field.key}
+          >
+            <Field {...field}>
+              <Input placeholder="passenger name" style={{ width: "60%" }} />
+            </Field>
+            {fields.length > 1 ? (
+              <Icon
+                icon="icon-[lucide--minus-circle]"
+                onClick={() => remove(field.name)}
+              />
+            ) : null}
+          </Field>
+        ))}
+        <Field>
+          <Button
+            type="dashed"
+            onClick={() => add()}
+            style={{ width: "60%" }}
+            icon={<Icon icon="icon-[lucide--plus]" />}
+          >
+            Add field
+          </Button>
+          <Button
+            type="dashed"
+            onClick={() => {
+              add("The head item", 0);
+            }}
+            style={{ width: "60%", marginTop: "20px" }}
+            icon={<Icon icon="icon-[lucide--plus]" />}
+          >
+            Add field at head
+          </Button>
+        </Field>
+      </>
+    )}
+  </FieldList>
+  <Field>
+    <Button type="primary" htmlType="submit">
+      Submit
+    </Button>
+  </Field>
+</Form>
+```
+
+### Form Modal
+
+```tsx
+type Props = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+
+  initialValues: { id: string; name: string } | undefined;
+  onSuccess?: (data: { id: string; name: string }) => void;
+};
+export const InvoicePeriodFormModal = ({
+  open,
+  onOpenChange,
+  initialValues,
+  onSuccess,
+}: Props) => {
+  const queryClient = useQueryClient();
+  const insertMutation = useMutation({
+    onSettled: async (data, error) => {
+      if (data) {
+        message.success("Successfully!");
+        await queryClient.invalidateQueries({
+          queryKey: "",
+        });
+        onOpenChange(false);
+        onSuccess?.(data.data);
+      } else {
+        message.error("Failed!");
+      }
+    },
+  });
+
+  const form = useForm({
+    schema: InsertSchema,
+    values: initialValues,
+    onSubmit: (values) => {
+      insertMutation.mutate({
+        ...values,
+      });
+    },
+  });
+
+  return (
+    <>
+      <Modal
+        title="Form Modal"
+        open={open}
+        onOpenChange={onOpenChange}
+        onOk={async () => {
+          await form.submit();
+        }}
+        okText="Submit"
+        okLoading={insertMutation.isPending}
+      >
+        <Form form={form}>
+          <div className="grid grid-cols-1 gap-x-6 md:grid-cols-2">
+            <Field control={form.control} name="id" label="ID">
+              <Input />
+            </Field>
+            <Field control={form.control} name="name" label="Name">
+              <Input />
+            </Field>
+          </div>
+        </Form>
+      </Modal>
+    </>
+  );
+};
+```

@@ -1,6 +1,6 @@
 import type { VariantProps } from "tailwind-variants";
 
-import type { inputSizeVariants } from "./input";
+import type { inputSizeVariants } from "./components/input";
 
 export type AnyObject = Record<PropertyKey, any>;
 
@@ -93,3 +93,5 @@ export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
 // export const Variants = ["outlined", "borderless", "filled"] as const;
 
 // export type Variant = (typeof Variants)[number];
+
+export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
