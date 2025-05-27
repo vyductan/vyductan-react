@@ -3,9 +3,20 @@
 
 ### Custom dropdown
 
-Customize the dropdown menu via dropdownRender. If you want to close the dropdown after clicking the custom content, you need to control open prop
+Customize the dropdown menu via `dropdownRender`. If you want to close the dropdown after clicking the custom content, you need to control `open` prop
 
 ```tsx
+const fieldFormValue = form.watch("field");
+
+// hide select after create new service and selected
+useEffect(() => {
+  document.body.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "Escape",
+    }),
+  );
+}, [fieldFormValue]);
+
 <Select
   dropdownRender={(menu) => {
     return (
@@ -26,5 +37,5 @@ Customize the dropdown menu via dropdownRender. If you want to close the dropdow
       </>
     );
   }}
-/>
+/>;
 ```
