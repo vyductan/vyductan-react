@@ -1,16 +1,19 @@
+import { cn } from "..";
+
 export type BadgeProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   count?: React.ReactNode;
 
   /** Set offset of the badge dot [left, top] */
   offset?: [number, number];
+  className?: string;
 };
-export const Badge = ({ count, children, offset }: BadgeProps) => {
+export const Badge = ({ count, children, offset, className }: BadgeProps) => {
   return (
-    <span className="relative">
+    <span className={cn("relative", className)}>
       {children}
       <span
-        className="absolute end-0 top-0 origin-[100%_0%] -translate-y-1/2 translate-x-1/2"
+        className="bg-accent absolute end-0 top-0 size-4 origin-[100%_0%] translate-x-1/2 -translate-y-1/2 rounded-full p-1"
         style={
           offset
             ? {
