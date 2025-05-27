@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { cn } from "@acme/ui/lib/utils";
+
 import type { UploadFileItem, UploadService } from "./types";
-import { cn } from "..";
-import { Card } from "../card";
+import { Card } from "../components/card";
 // import { Icon } from "../icons";
-import { message } from "../toast";
+import { message } from "../components/toast";
 import ProgressBar from "./_components/progress-bar";
 
 type UploadZoneProps = Omit<
@@ -269,7 +270,7 @@ const UploadZone = ({
           accept="image/*"
           className="sr-only"
           onChange={async (event) => {
-            console.log("eeeeeeee", event.currentTarget);
+            // console.log("eeeeeeee", event.currentTarget);
             const file = event.currentTarget.files?.[0];
             if (file) {
               await upload(file);

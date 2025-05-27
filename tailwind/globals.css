@@ -7,7 +7,7 @@
 @import "./token.css" layer(base);
 @import "./utilities.css";
 
-@config "./plugins.ts";
+@plugin "@iconify/tailwind4";
 
 @layer base {
   * {

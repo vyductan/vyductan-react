@@ -1,0 +1,41 @@
+/_ Remove duplicate options _/
+// const options = [...new Map(optionsProp.map((o) => [o.value, o])).values()];
+
+### Custom dropdown
+
+Customize the dropdown menu via `dropdownRender`. If you want to close the dropdown after clicking the custom content, you need to control `open` prop
+
+```tsx
+const fieldFormValue = form.watch("field");
+
+// hide select after create new service and selected
+useEffect(() => {
+  document.body.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "Escape",
+    }),
+  );
+}, [fieldFormValue]);
+
+<Select
+  dropdownRender={(menu) => {
+    return (
+      <>
+        {menu}
+        <Divider className="my-2" />
+        <ButtonAdd
+          className="w-full pl-6"
+          variant="ghost"
+          primary={false}
+          srOnly={false}
+          onClick={() => {
+            setChooseEarningTypeToIndex(index);
+          }}
+        >
+          {`${t("add")} ${t("salary.earning.type")}`}
+        </ButtonAdd>
+      </>
+    );
+  }}
+/>;
+```

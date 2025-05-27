@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { cn } from "..";
+import { cn } from "@acme/ui/lib/utils";
 
 type TimelineProps = {
   items: {
