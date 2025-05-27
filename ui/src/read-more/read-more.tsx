@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { cn } from "..";
+import { cn } from "@acme/ui/lib/utils";
 
 type ReadMoreProps = {
   children: string;

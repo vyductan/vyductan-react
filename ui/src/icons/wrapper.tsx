@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactElement } from "react";
 import { cloneElement } from "react";
 
-import { cn } from "@acme/ui";
+import { cn } from "@acme/ui/lib/utils";
 
 type IconWrapperProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
   children: ReactElement<any>;

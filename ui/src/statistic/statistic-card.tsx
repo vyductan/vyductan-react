@@ -1,5 +1,5 @@
-import type { CardProps } from "../card";
-import { Card } from "../card";
+import type { CardProps } from "../components/card";
+import { Card } from "../components/card";
 
 type StatisticCardProps = CardProps & {
   icon: React.ReactNode;
