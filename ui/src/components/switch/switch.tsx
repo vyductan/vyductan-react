@@ -1,39 +1,52 @@
 "use client";
 
+import type { XOR } from "ts-xor";
 import * as React from "react";
-import * as SwitchPrimitives from "@radix-ui/react-switch";
 
 import { cn } from "@acme/ui/lib/utils";
 
-type SwitchProps = Omit<
-  React.ComponentProps<typeof SwitchPrimitives.Root>,
+import { Switch as ShadcnSwitch } from "../../shadcn/switch";
+
+type ShadcnSwitchProps = React.ComponentProps<typeof ShadcnSwitch>;
+type OwnSwitchProps = Omit<
+  ShadcnSwitchProps,
   "onChange" | "onCheckedChange"
 > & {
   onChange?: (checked: boolean) => void;
 };
-const Switch = ({ className, onChange, ...props }: SwitchProps) => (
-  <SwitchPrimitives.Root
-    data-slot="switch"
-    className={cn(
-      "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-      // own
-      "h-[22px] w-11",
-      className,
-    )}
-    onCheckedChange={(checked) => {
-      onChange?.(checked);
-    }}
-    {...props}
-  >
-    <SwitchPrimitives.Thumb
-      data-slot="switch-thumb"
+type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
+const Switch = (props: SwitchProps) => {
+  const isShadcnSwitchProps = props.onCheckedChange;
+
+  if (isShadcnSwitchProps) {
+    const { className, ...restProps } = props;
+    return (
+      <ShadcnSwitch
+        className={cn(
+          "h-[22px] w-11",
+          "data-[slot=switch-thumb]:size-[18px]",
+          className,
+        )}
+        {...restProps}
+      />
+    );
+  }
+
+  const { className, onChange, ...restProps } = props as OwnSwitchProps;
+
+  return (
+    <ShadcnSwitch
       className={cn(
-        "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0",
-        // own
-        "size-[18px]",
+        "h-[22px] w-11",
+        "data-[slot=switch-thumb]:size-[18px]",
+        className,
       )}
+      onCheckedChange={(checked) => {
+        onChange?.(checked);
+      }}
+      {...restProps}
     />
-  </SwitchPrimitives.Root>
-);
+  );
+};
 
 export { Switch };
