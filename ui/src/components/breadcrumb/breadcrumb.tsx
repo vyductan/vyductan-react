@@ -1,4 +1,5 @@
 import type { Key } from "react";
+import type { XOR } from "ts-xor";
 import { Fragment } from "react";
 
 import {
@@ -6,12 +7,14 @@ import {
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbRoot,
   BreadcrumbSeparator,
+  Breadcrumb as ShadcnBreadcrumb,
 } from "@acme/ui/shadcn/breadcrumb";
 
 import { Icon } from "../../icons";
 import { Skeleton } from "../skeleton";
+
+type ShadcnBreadcrumbProps = React.ComponentProps<typeof ShadcnBreadcrumb>;
 
 type BreadcrumbItemDef = {
   key?: Key;
@@ -21,7 +24,7 @@ type BreadcrumbItemDef = {
   className?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
-type BreadcrumbProps<
+type OwnBreadcrumbProps<
   TParams extends Record<string, string> = Record<string, string>,
 > = {
   items?: BreadcrumbItemDef[];
@@ -35,15 +38,24 @@ type BreadcrumbProps<
   className?: string;
   skeleton?: boolean;
 };
-const Breadcrumb = ({
-  items = [],
-  className,
-  skeleton,
-  params,
-  itemRender: itemRenderProp,
-}: BreadcrumbProps) => {
+type BreadcrumbProps<
+  TParams extends Record<string, string> = Record<string, string>,
+> = XOR<ShadcnBreadcrumbProps, OwnBreadcrumbProps<TParams>>;
+const Breadcrumb = (props: BreadcrumbProps) => {
+  const isShadcnBreadcrumb = !props.items;
+  if (isShadcnBreadcrumb) {
+    return <ShadcnBreadcrumb className="hidden" {...props} />;
+  }
+
+  const {
+    items = [],
+    className,
+    skeleton,
+    params,
+    itemRender: itemRenderProp,
+  } = props;
   return (
-    <BreadcrumbRoot className={items.length === 1 ? "hidden" : className}>
+    <ShadcnBreadcrumb className={items.length === 1 ? "hidden" : className}>
       <BreadcrumbList>
         {items.map((x, index) => {
           const key = x.key ?? index;
@@ -88,9 +100,17 @@ const Breadcrumb = ({
           );
         })}
       </BreadcrumbList>
-    </BreadcrumbRoot>
+    </ShadcnBreadcrumb>
   );
 };
 
-export type { BreadcrumbItemDef, BreadcrumbProps };
+export type { BreadcrumbItemDef, BreadcrumbProps, OwnBreadcrumbProps };
 export { Breadcrumb };
+
+export {
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbItem,
+} from "@acme/ui/shadcn/breadcrumb";
