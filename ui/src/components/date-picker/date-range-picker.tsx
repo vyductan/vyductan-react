@@ -129,49 +129,27 @@ const DateRangePicker = <T extends DatePickerValueType = "date">({
               getDestinationValue(dateRange.from!),
               getDestinationValue(dateRange.to),
             ]);
-            // setOpen(false);
+            setOpen(false);
+            onChange?.([
+              getDestinationValue(dateRange.from!),
+              getDestinationValue(dateRange.to),
+            ]);
+            // if (
+            //   value &&
+            //   value[0] !== defaultValue?.[0] &&
+            //   value[1] !== defaultValue?.[1]
+            // ) {
+            //   const start = value?.[0];
+            //   const end = value?.[1];
+            //   if (start !== undefined && end !== undefined) {
+            //     onChange?.([start, end]);
+            //   }
+            // }
           }
         }}
       />
     );
   }, [value, setValue, getDestinationValue, onChange]);
-
-  const valueCompRef = React.useRef<HTMLDivElement>(null);
-  const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
-  const isHovering = useHover(ref as React.RefObject<HTMLDivElement | null>);
-  const ClearButton = useMemo(
-    () => (
-      <button
-        type="button"
-        className={cn(
-          "flex opacity-30 transition-opacity duration-300 hover:opacity-50",
-        )}
-        onClick={() => {
-          setValue(undefined);
-          onChange?.([null, null]);
-        }}
-      >
-        <Icon
-          icon="icon-[ant-design--close-circle-filled]"
-          className="pointer-events-none size-3.5"
-        />
-      </button>
-    ),
-    [setValue, onChange],
-  );
-  const SuffixComp = useMemo(() => {
-    if (allowClear && value?.[0] && (!suffix || (isHovering && suffix))) {
-      return ClearButton;
-    } else if (suffix) {
-      return (
-        <Slot className={cn("flex shrink-0 items-center")}>
-          {typeof suffix === "string" ? <span>{suffix}</span> : suffix}
-        </Slot>
-      );
-    } else {
-      return null;
-    }
-  }, [allowClear, value, suffix, isHovering, ClearButton]);
 
   const valueCompRef = React.useRef<HTMLDivElement>(null);
   const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
