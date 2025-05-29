@@ -646,7 +646,7 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
             </div>
           )}
           {TableAlertSection}
-          <TableComp
+          <TableRoot
             ref={ref}
             className={cn(
               !scroll?.x && "w-full",
@@ -913,7 +913,7 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
                 {summary(mergedData)}
               </TableFooter>
             )}
-          </TableComp>
+          </TableRoot>
           {pagination && (
             <Pagination className="my-4 justify-end" {...pagination} />
           )}
