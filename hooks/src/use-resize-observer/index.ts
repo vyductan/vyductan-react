@@ -1,4 +1,3 @@
-/* eslint-disable react-compiler/react-compiler */
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type ObserverRect = Omit<DOMRectReadOnly, "toJSON">;
