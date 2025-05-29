@@ -136,7 +136,7 @@ const Modal = ({
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent className={cn("px-0", className)}>
-        <DialogHeader className={classNames?.header}>
+        <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
           <DialogDescription className={classNames?.description}>
             {description}
@@ -147,7 +147,7 @@ const Modal = ({
           {children}
         </ScrollArea>
 
-        <DialogFooter className={classNames?.footer}>
+        <DialogFooter className={cn("px-6", classNames?.footer)}>
           {footerToRender}
         </DialogFooter>
       </DialogContent>
