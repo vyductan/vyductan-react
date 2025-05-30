@@ -4,6 +4,9 @@ import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
+import type { MenuItemDef, MenuItemType } from "../menu";
+import { Icon } from "../../icons";
+import { Divider } from "../divider";
 import {
   SidebarContent,
   SidebarGroup,
@@ -12,12 +15,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  Sidebar as SidebarRoot,
-} from "@acme/ui/shadcn/sidebar";
-
-import type { MenuItemDef, MenuItemType } from "../menu";
-import { Icon } from "../../icons";
-import { Divider } from "../divider";
+  SidebarRoot,
+} from "./_component";
 
 type ShadcnSidebarProps = React.ComponentProps<typeof SidebarRoot>;
 
@@ -218,30 +217,3 @@ const Sidebar = (props: SidebarProps) => {
 };
 
 export { Sidebar };
-
-export {
-  Sidebar as SidebarRoot,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarInput,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuAction,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSkeleton,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarSeparator,
-  SidebarTrigger,
-  useSidebar,
-} from "@acme/ui/shadcn/sidebar";
