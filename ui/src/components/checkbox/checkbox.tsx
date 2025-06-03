@@ -1,13 +1,17 @@
+import type { XOR } from "ts-xor";
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 import { cn } from "@acme/ui/lib/utils";
+import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
 import { Icon } from "../../icons";
 import { LoadingIcon } from "../button";
 
-type CheckboxProps = Omit<
-  React.ComponentProps<typeof CheckboxPrimitive.Root>,
+type ShadcnCheckboxProps = React.ComponentProps<typeof ShadcnCheckbox>;
+
+type OwnCheckboxProps = Omit<
+  ShadcnCheckboxProps,
   "checked" | "defaultChecked" | "onChange" | "onCheckedChange"
 > & {
   loading?: boolean;
@@ -17,21 +21,31 @@ type CheckboxProps = Omit<
   indeterminate?: boolean;
   onChange?: (checked: boolean) => void;
 };
-const Checkbox = ({
-  id,
-  "aria-describedby": ariaDescribedBy,
-  "aria-invalid": ariaInvalid,
 
-  loading,
+type CheckboxProps = XOR<OwnCheckboxProps, ShadcnCheckboxProps>;
 
-  children,
-  checked,
-  defaultChecked,
-  className,
-  indeterminate,
-  onChange,
-  ...props
-}: CheckboxProps) => {
+const Checkbox = (props: CheckboxProps) => {
+  const isShadcnCheckbox = !!props.onCheckedChange;
+  if (isShadcnCheckbox) {
+    return <ShadcnCheckbox {...props} />;
+  }
+
+  const {
+    id,
+    "aria-describedby": ariaDescribedBy,
+    "aria-invalid": ariaInvalid,
+
+    loading,
+
+    children,
+    checked,
+    defaultChecked,
+    className,
+    indeterminate,
+    onChange,
+    ...restProps
+  } = props as OwnCheckboxProps;
+
   return (
     <label
       id={id}
@@ -63,7 +77,7 @@ const Checkbox = ({
             "data-[state=indeterminate]:text-primary-600 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600",
           )}
           onCheckedChange={onChange}
-          {...props}
+          {...restProps}
         >
           <CheckboxPrimitive.Indicator
             data-slot="checkbox-indicator"
