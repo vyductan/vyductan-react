@@ -143,7 +143,7 @@ export type SelectionSelectFn<T = AnyObject> = (
   nativeEvent: Event,
 ) => void;
 
-export type GetRowKey<RecordType> = (record: RecordType, index?: number) => Key;
+export type GetRowKey<RecordType> = (record: RecordType, index: number) => Key;
 
 // type DefWithOutDataIndex<TRecord> = ColumnSharedDef<TRecord> & {
 //   dataIndex?: never;
