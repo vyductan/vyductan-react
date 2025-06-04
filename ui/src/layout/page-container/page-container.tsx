@@ -9,7 +9,7 @@ import { Result } from "../../components/result/result";
 import { PageHeader } from "../page-header";
 
 export type PageContainerProps = {
-  children: ReactNode;
+  children?: ReactNode;
   header?: PageHeaderProps;
   className?: string;
   classNames?: {

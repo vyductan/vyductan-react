@@ -1,3 +1,4 @@
+import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
 import { tagColors } from "@acme/ui/components/tag";
@@ -16,6 +17,8 @@ import {
 } from "./_components";
 import { defaultEmpty, defaultPlaceholder } from "./config";
 
+type ShadcnCommandProps = React.ComponentProps<typeof CommandRoot>;
+
 type CommandValueType = string | number;
 
 type CommandSingleValue<TValue extends CommandValueType = string> = {
@@ -31,7 +34,7 @@ type CommandMultipleValue<TValue extends CommandValueType = string> = {
   onChange?: (value: TValue[], options?: Option<TValue>[]) => void;
 };
 
-export type CommandProps<TValue extends CommandValueType = string> = Omit<
+export type OwnCommandProps<TValue extends CommandValueType = string> = Omit<
   CommandRootProps,
   "defaultValue" | "value" | "onChange"
 > &
@@ -55,34 +58,18 @@ export type CommandProps<TValue extends CommandValueType = string> = Omit<
     dropdownFooter?: React.ReactNode;
   };
 
-export const Command = <TValue extends CommandValueType = string>({
-  mode,
-  options,
-  defaultValue: defaultValueProp,
-  value: valueProp,
-  empty,
-  placeholder,
-  onSearchChange,
+type CommandProps<TValue extends CommandValueType = string> = XOR<
+  OwnCommandProps<TValue>,
+  ShadcnCommandProps
+>;
 
-  groupClassName,
-  optionRender,
-  optionsRender,
-  dropdownRender,
-  onChange,
-
-  filter,
-
-  dropdownFooter,
-}: CommandProps<TValue>) => {
-  // ======================= TAGS/MULTIPLE MODE =======================
-  // const isDefault = !mode || mode === "default";
-  // const isTags = mode === "tags";
-  // const isMultiple = mode === "multiple" || isTags;
-
-  const [value, setValue] = useMergedState(defaultValueProp, {
-    value: valueProp,
+const Command = <TValue extends CommandValueType = string>(
+  props: CommandProps<TValue>,
+) => {
+  const [value, setValue] = useMergedState(props.defaultValue, {
+    value: props.value,
     onChange: (value) => {
-      if (mode === undefined && !Array.isArray(value)) {
+      if ((mode === undefined || mode === "default") && !Array.isArray(value)) {
         const option = options.find((o) => o.value === value);
         onChange?.(option?.value, option);
         return;
@@ -95,6 +82,42 @@ export const Command = <TValue extends CommandValueType = string>({
       }
     },
   });
+
+  const isShadcnCommand = !props.options;
+  if (isShadcnCommand) {
+    return (
+      <CommandRoot
+        {...props}
+        defaultValue={props.defaultValue?.toString()}
+        value={props.value?.toString()}
+        onChange={props.onChange}
+      />
+    );
+  }
+  const {
+    mode,
+    options,
+    defaultValue: _defaultValue,
+    value: _value,
+    empty,
+    placeholder,
+    onSearchChange,
+
+    groupClassName,
+    optionRender,
+    optionsRender,
+    dropdownRender,
+    onChange,
+
+    filter,
+
+    dropdownFooter,
+  } = props;
+  // ======================= TAGS/MULTIPLE MODE =======================
+  // const isDefault = !mode || mode === "default";
+  // const isTags = mode === "tags";
+  // const isMultiple = mode === "multiple" || isTags;
+
   const panel = (
     <CommandList>
       <CommandEmpty>{empty ?? defaultEmpty}</CommandEmpty>
@@ -173,3 +196,7 @@ export const Command = <TValue extends CommandValueType = string>({
     </CommandRoot>
   );
 };
+
+export type { CommandProps };
+
+export { Command };
