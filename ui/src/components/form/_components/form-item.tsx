@@ -25,7 +25,7 @@ function FormItem({
   const [hasFormMessage, setHasFormMessage] = React.useState(false);
   useEffect(() => {
     const formMessageElement = document.querySelector(
-      `#${id}-form-item-message`,
+      CSS.escape(`#${id}-form-item-message`),
     );
     if (formMessageElement) {
       setHasFormMessage(true);
