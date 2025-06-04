@@ -259,34 +259,9 @@ const Select = <
       value={isMultiple ? undefined : (value as string)}
       open={open}
       onOpenChange={setOpen}
-      // onValueChange={(changedValue) => {
-      //   console.log("vvvvvv", changedValue);
-      //   const o = options.find((x) => String(x.value) === String(changedValue));
-      //   // to allow user set value that not in options
-      //   if (!changedValue || !o) return;
-      //   if (isMultiple) {
-      //     const newValue = value?.some((v) => v === changedValue)
-      //       ? value.filter((v) => v !== changedValue)
-      //       : ([...(value ?? []), changedValue] as TValue[]);
-      //     console.log(
-      //       "nnnnnn",
-      //       value,
-      //       changedValue,
-      //       newValue,
-      //       value?.filter((v) => v !== changedValue),
-      //     );
-      //     onChange?.(
-      //       newValue,
-      //       options.filter((o) => o.value === changedValue),
-      //     );
-      //   } else if (isDefault) {
-      //     onChange?.(o.value, o);
-      //   }
-      // }}
     >
       <SelectTrigger
         id={id}
-        // value={value}
         loading={loading}
         className={cn(
           "w-full",
