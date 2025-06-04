@@ -84,74 +84,9 @@ const Sidebar = (props: SidebarProps) => {
 
       if (item.type === "group") {
         return (
-          <SidebarGroup
-            key={index}
-            // className="group-data-[collapsible=icon]:hidden"
-          >
+          <SidebarGroup key={index}>
             {item.label && <SidebarGroupLabel>{item.label}</SidebarGroupLabel>}
             <SidebarMenu>{renderItems(item.children)}</SidebarMenu>
-            {/* {item.children.some((c) => !c.hiddenInNav) && ( */}
-            {/*   <SidebarMenu> */}
-            {/*     {item.children */}
-            {/*       .filter((c) => !c.hiddenInNav) */}
-            {/*       .map(({ key, children, label, icon, path }) => { */}
-            {/*         // const isActive = mergedSelectKeys.some((x) => */}
-            {/*         //   x.endsWith(key.toString()), */}
-            {/*         // ); */}
-            {/*         const isActive = selectKeys.some((x) => */}
-            {/*           key.toString().startsWith(x), */}
-            {/*         ); */}
-            {/*         if (children) { */}
-            {/*           console.log("cccccc", item); */}
-            {/*           return renderItems(children); */}
-            {/*         } */}
-            {/*         // const labelToRender = */}
-            {/*         //   typeof label === "object" ? ( */}
-            {/*         //     label */}
-            {/*         //   ) : ( */}
-            {/*         //     <div> */}
-            {/*         //       {typeof icon === "string" ? ( */}
-            {/*         //         <Icon icon={icon} /> */}
-            {/*         //       ) : ( */}
-            {/*         //         icon */}
-            {/*         //       )} */}
-            {/*         //       {typeof label === "string" ? ( */}
-            {/*         //         <span>{label}</span> */}
-            {/*         //       ) : ( */}
-            {/*         //         label */}
-            {/*         //       )} */}
-            {/*         //     </div> */}
-            {/*         //   ); */}
-            {/*         const labelToRender = path ? ( */}
-            {/*           <Link href={`${path}`}> */}
-            {/*             {typeof icon === "string" ? <Icon icon={icon} /> : icon} */}
-            {/*             <span>{label}</span> */}
-            {/*           </Link> */}
-            {/*         ) : ( */}
-            {/*           label */}
-            {/*         ); */}
-            {/*         return ( */}
-            {/*           <SidebarMenuItem */}
-            {/*             key={key} */}
-            {/*             onClick={(event) => { */}
-            {/*               onSelect?.({ item: { key, label }, key, event }); */}
-            {/*             }} */}
-            {/*             onKeyUp={(event) => { */}
-            {/*               onSelect?.({ item: { key, label }, key, event }); */}
-            {/*             }} */}
-            {/*           > */}
-            {/*             <SidebarMenuButton */}
-            {/*               asChild */}
-            {/*               isActive={isActive} */}
-            {/*               tooltip={label} */}
-            {/*             > */}
-            {/*               {labelToRender} */}
-            {/*             </SidebarMenuButton> */}
-            {/*           </SidebarMenuItem> */}
-            {/*         ); */}
-            {/*       })} */}
-            {/*   </SidebarMenu> */}
-            {/* )} */}
           </SidebarGroup>
         );
       }

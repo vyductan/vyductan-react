@@ -86,7 +86,6 @@ const Upload = ({
           : [{ uid: props.fileList, url: props.fileList, name: props.fileList }]
         : [],
       onChange: (value) => {
-        console.log("vvv", value);
         if (props.multiple) {
           props.onChange?.(value);
         } else {
@@ -177,7 +176,6 @@ const Upload = ({
                   setFiles([...files, file]);
                 }}
                 onChange={(file) => {
-                  console.log("changexxx", file, files);
                   if (file) {
                     setFiles([...files, file]);
                   }
@@ -240,11 +238,9 @@ const Upload = ({
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                console.log("success");
                 setFiles([...files, file]);
               }}
               onChange={(file) => {
-                console.log("change", file);
                 if (file) {
                   setFiles([...files, file]);
                 }
@@ -272,12 +268,10 @@ const Upload = ({
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                console.log("success");
                 setFiles([...files, file]);
               }}
-              onChange={(file) => {
-                console.log("change", file);
-              }}
+              // onChange={(file) => {
+              // }}
             >
               {files.length === 0
                 ? children
