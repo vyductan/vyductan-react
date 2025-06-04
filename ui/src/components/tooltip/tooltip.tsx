@@ -21,7 +21,7 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
   placement?: TooltipContentProps["side"];
   hidden?: boolean;
   classNames?: {
-    content?: string;
+    title?: string;
     arrow?: string;
   };
 };
@@ -52,7 +52,7 @@ const Tooltip = (props: TooltipProps) => {
             onPointerDownOutside={(event) => {
               if (event.target === triggerRef.current) event.preventDefault();
             }}
-            className={classNames?.content}
+            className={classNames?.title}
             classNames={{
               arrow: classNames?.arrow,
             }}
