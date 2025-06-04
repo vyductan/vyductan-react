@@ -229,7 +229,7 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
     if (typeof rowKey === "function") {
       return rowKey;
     }
-    return (record: TRecord) => {
+    return (record: TRecord, index: number) => {
       let key = record[rowKey];
       // "id" as other default key
       key ??= record.id;
@@ -241,7 +241,7 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
         );
       }
 
-      return key;
+      return key ?? index;
     };
   }, [rowKey]);
 

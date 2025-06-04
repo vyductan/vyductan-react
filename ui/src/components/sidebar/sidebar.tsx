@@ -1,8 +1,12 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
+import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
+import type { MenuItemDef, MenuItemType } from "../menu";
+import { Icon } from "../../icons";
+import { Divider } from "../divider";
 import {
   SidebarContent,
   SidebarGroup,
@@ -11,14 +15,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  Sidebar as SidebarRoot,
-} from "@acme/ui/shadcn/sidebar";
+  SidebarRoot,
+} from "./_component";
 
-import type { MenuItemDef, MenuItemType } from "../menu";
-import { Icon } from "../../icons";
-import { Divider } from "../divider";
+type ShadcnSidebarProps = React.ComponentProps<typeof SidebarRoot>;
 
-type SidebarProps = {
+type OwnSidebarProps = {
   className?: string;
   classNames?: {
     header?: string;
@@ -28,7 +30,7 @@ type SidebarProps = {
 
   itemRender?: (
     item: MenuItemType,
-    classNames: SidebarProps["classNames"],
+    classNames: OwnSidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
   contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
@@ -43,22 +45,32 @@ type SidebarProps = {
     event: MouseEvent<HTMLLIElement> | KeyboardEvent<HTMLLIElement>;
   }) => void;
 };
-const Sidebar = ({
-  className,
-  classNames,
 
-  itemRender,
-  contentRender,
+type SidebarProps = XOR<ShadcnSidebarProps, OwnSidebarProps>;
 
-  header,
-  items = [],
-  defaultSelectedKeys: defaultSelectedKeysProp,
-  selectedKeys: selectedKeysProp,
-  onSelect,
-}: SidebarProps) => {
-  const [selectKeys] = useMergedState(defaultSelectedKeysProp ?? [], {
-    value: selectedKeysProp,
+const Sidebar = (props: SidebarProps) => {
+  const [selectKeys] = useMergedState(props.defaultSelectedKeys ?? [], {
+    value: props.selectedKeys,
   });
+
+  const isShadcnSidebar = !props.items || !props.itemRender;
+  if (isShadcnSidebar) {
+    return <SidebarRoot {...(props as ShadcnSidebarProps)} />;
+  }
+
+  const {
+    className,
+    classNames,
+
+    itemRender,
+    contentRender,
+
+    header,
+    items = [],
+    defaultSelectedKeys: _defaultSelectedKeys,
+    selectedKeys: _selectedKeys,
+    onSelect,
+  } = props;
 
   const renderItems = (items: MenuItemDef[]) => {
     return items.map((item, index) => {
