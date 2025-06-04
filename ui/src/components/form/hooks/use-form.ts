@@ -27,7 +27,7 @@ import type { ResetAction } from "../types";
 type FormInstance<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues = TFieldValues,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
   schema?: ZodSchema | undefined;
   defaultValues?: UseFormProps<
@@ -45,7 +45,7 @@ type FormInstance<
 type UseFormProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues = TFieldValues,
 > = {
   schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
   onSubmit?: SubmitHandler<TTransformedValues>;
@@ -57,7 +57,7 @@ type UseFormProps<
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues = TFieldValues,
 >(
   props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
@@ -142,7 +142,6 @@ const useForm = <
 
     // Use watch to detect changes
     const subscription = methods.watch((value, info) => {
-      // if (info.name === "description") console.log("iiiiiii", info);
       if (info.type === "change") {
         onValuesChange(info.name ? value[info.name] : {}, value);
       }

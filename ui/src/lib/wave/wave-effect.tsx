@@ -63,7 +63,6 @@ const WaveEffect: React.FC<WaveEffectProps> = (props) => {
   function syncPos() {
     const nodeStyle = getComputedStyle(target);
 
-    // console.log("cccc", getTargetWaveColor(target));
     // Get wave color from target
     setWaveColor(getTargetWaveColor(target));
 

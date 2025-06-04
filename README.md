@@ -9,8 +9,8 @@
 
 https://github.com/shadcn-ui/ui
 
-Apr 23, 2025, 7:45 PM GMT+7
-<https://github.com/shadcn-ui/ui/commit/c41c6ece86b5de472668729ed336ee4aac96ee16>
+May 31, 2025, 5:42 PM GMT+7
+<https://github.com/shadcn-ui/ui/commit/9cbc6641d91901600b553a63ae5a9ce9ccb5105a>
 
 ## Antd
 

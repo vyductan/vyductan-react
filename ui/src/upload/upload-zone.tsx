@@ -91,7 +91,6 @@ const UploadZone = ({
     );
     setIsUploading(false);
     if (blob?.success) {
-      console.log("onSuccess");
       reset();
       onUploadSuccess?.({
         uid: file.name,
@@ -102,13 +101,6 @@ const UploadZone = ({
 
     // const reader = new FileReader();
     // reader.onload = async () => {
-    //   console.log(
-    //     "aaaa",
-    //     file,
-    //     typeof reader.result,
-    //     reader.result instanceof ArrayBuffer,
-    //     reader.result,
-    //   );
     //   // if (reader.result instanceof ArrayBuffer) {
     //   if (typeof reader.result === "string") {
     //     const blob = await apiUpload({
@@ -270,7 +262,6 @@ const UploadZone = ({
           accept="image/*"
           className="sr-only"
           onChange={async (event) => {
-            // console.log("eeeeeeee", event.currentTarget);
             const file = event.currentTarget.files?.[0];
             if (file) {
               await upload(file);
