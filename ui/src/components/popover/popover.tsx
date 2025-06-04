@@ -26,19 +26,43 @@ export type PopoverProps = PopoverRootProps &
 
     arrow?: boolean;
   };
-export const Popover = ({
-  children,
-  trigger = "hover",
-  content,
-  open: openProp,
+export const Popover = (props: PopoverProps) => {
+  const [open, setOpen] = useMergedState(false, {
+    value: props.open,
+    onChange: (value) => props.onOpenChange?.(value),
+  });
+  const debouncedOpen = useDebounce(open, {
+    wait: 100,
+  });
 
-  align: domAlign,
-  placement,
-  className,
-  arrow = true,
-  onOpenChange,
-  ...props
-}: PopoverProps) => {
+  const isShadcnPopover = React.Children.toArray(props.children).some(
+    (child) => {
+      if (React.isValidElement(child)) {
+        const type =
+          typeof child.type === "string" ? child.type : child.type.name;
+        return type === "PopoverContent";
+      }
+      return false;
+    },
+  );
+  if (isShadcnPopover) {
+    return <PopoverRoot {...props} />;
+  }
+
+  const {
+    children,
+    trigger = "hover",
+    content,
+    open: _open,
+    onOpenChange: _onOpenChange,
+
+    align: domAlign,
+    placement,
+    className,
+    arrow = true,
+    ...restProps
+  } = props;
+
   const side = placement?.includes("top")
     ? "top"
     : placement?.includes("right")
@@ -57,30 +81,6 @@ export const Popover = ({
 
   const alignOffset = domAlign?.offset?.[0];
   const sideOffset = domAlign?.offset?.[1];
-
-  const [open, setOpen] = useMergedState(false, {
-    value: openProp,
-    onChange: (value) => onOpenChange?.(value),
-  });
-  const debouncedOpen = useDebounce(open, {
-    wait: 100,
-  });
-
-  const isShadcnPopover = React.Children.toArray(children).some((child) => {
-    if (React.isValidElement(child)) {
-      const type =
-        typeof child.type === "string" ? child.type : child.type.name;
-      return type === "PopoverContent";
-    }
-    return false;
-  });
-  if (isShadcnPopover) {
-    return (
-      <PopoverRoot open={open} onOpenChange={onOpenChange}>
-        {children}
-      </PopoverRoot>
-    );
-  }
 
   return (
     <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
@@ -116,7 +116,7 @@ export const Popover = ({
               },
             }
           : {})}
-        {...props}
+        {...restProps}
       >
         {arrow && <PopoverArrow className="fill-white" />}
         {content}
