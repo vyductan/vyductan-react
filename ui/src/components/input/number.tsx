@@ -2,7 +2,6 @@
 // Dec 30, 2024
 // https://github.com/ant-design/ant-design/commit/39d9c1c6bfb3f2b40eaff9d4c12ba6532139f96f
 
-import type { Ref } from "react";
 import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -19,7 +18,6 @@ import { inputSizeVariants, inputVariants } from "./input";
 
 interface InputNumberProps<T extends ValueType = ValueType>
   extends Omit<RcInputNumberProps<T>, "prefix" | "size" | "controls"> {
-  ref?: Ref<HTMLInputElement>;
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
   prefix?: React.ReactNode;
@@ -184,9 +182,39 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
       }}
       // prevent user enter non-numeric characters || https://stackoverflow.com/a/74850574
       onKeyDown={(e) => {
-        if (!/[0-9]|Delete|Backspace/.test(e.key)) {
-          e.preventDefault();
+        // Allow: backspace, delete, tab, escape, enter, arrows, home, end, ctrl/cmd+a, ctrl/cmd+c, ctrl/cmd+v, ctrl/cmd+x
+        if (
+          // Navigation and control keys
+          [
+            "Backspace",
+            "Delete",
+            "Tab",
+            "Escape",
+            "Enter",
+            "ArrowLeft",
+            "ArrowRight",
+            "ArrowUp",
+            "ArrowDown",
+            "Home",
+            "End",
+            "a",
+            "c",
+            "v",
+            "x", // For ctrl/cmd+a/c/v/x
+          ].includes(e.key) ||
+          // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          (e.ctrlKey && ["a", "c", "v", "x"].includes(e.key)) ||
+          // Allow: numbers, numpad numbers
+          /^[0-9]$/.test(e.key) ||
+          // Allow: decimal point
+          e.key === "."
+        ) {
+          // Let it happen, don't do anything
+          return;
         }
+
+        // Block the key press if it's a letter or other character
+        e.preventDefault();
         onKeyDown?.(e);
       }}
       onChange={(value) => {

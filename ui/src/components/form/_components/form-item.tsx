@@ -22,38 +22,10 @@ function FormItem({
   // get child id (from shadcn FormItem id)
   const id = internalRef.current?.id;
 
-  // check child has form-message component
-  // const divChild = React.Children.toArray(children).find(
-  //   (child) =>
-  //     React.isValidElement<{ "data-slot": string; children: React.ReactNode }>(
-  //       child,
-  //     ) && child.props["data-slot"] === "form-item-control",
-  // );
-
-  // const hasFormMessage =
-  //   divChild &&
-  //   React.isValidElement<{ children: React.ReactNode }>(divChild) &&
-  //   React.Children.toArray(divChild.props.children).some((child) => {
-  //     if (React.isValidElement<{ children?: React.ReactNode }>(child)) {
-  //       const type =
-  //         typeof child.type === "string" ? child.type : child.type.name;
-  //       // console.log("child", child, index, child);
-  //       if (type === "FormMessage") {
-  //         console.log(
-  //           "child - form message",
-  //           child,
-  //           React.Children.toArray(child.props.children),
-  //         );
-  //       }
-  //       return type === "FormMessage" && !!child.props.children;
-  //     }
-  //     return false;
-  //   });
-
   const [hasFormMessage, setHasFormMessage] = React.useState(false);
   useEffect(() => {
     const formMessageElement = document.querySelector(
-      `#${id}-form-item-message`,
+      CSS.escape(`#${id}-form-item-message`),
     );
     if (formMessageElement) {
       setHasFormMessage(true);

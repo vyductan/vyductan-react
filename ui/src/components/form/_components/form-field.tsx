@@ -42,12 +42,12 @@ type FieldProps<
   layout?: "horizontal" | "vertical";
   required?: boolean;
 
-  /*
-  /* Normalize value from component value before passing to Form instance. Do not support async
-  /* */
+  /* Normalize value from component value before passing to Form instance. Do not support async */
   normalize?: (value: any, prevValue: any) => any;
 
-  children?: React.ReactElement;
+  children?:
+    | React.ReactElement
+    | ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
 
   render?: ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
 };
@@ -181,6 +181,46 @@ const FormField = <
   //   );
   // }
 
+  if (name && typeof children === "function") {
+    return (
+      <ShadFormField
+        control={control}
+        name={name}
+        render={({ field, fieldState, formState }) => (
+          <FormItem layout={layout} className={className} {...props}>
+            {label}
+            <div className="w-full" data-slot="form-item-control">
+              <FormControl>
+                {children({ field, fieldState, formState })}
+                {/* {cloneElement(children, {
+              ...field,
+              // value: watchedValue,
+              onBlur: (event) => {
+                children.props.onBlur?.(event);
+                field.onBlur();
+              },
+              onChange: (event: any) => {
+                const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
+
+                const normalizedValue = normalize?.(value, field.value);
+                field.onChange(
+                  normalize
+                    ? normalizedValue === undefined
+                      ? null
+                      : normalizedValue
+                    : value,
+                );
+              },
+            })} */}
+              </FormControl>
+              <FieldMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+    );
+  }
+
   // No control and name
   return (
     <FormItem
@@ -189,7 +229,11 @@ const FormField = <
       {...props}
     >
       {label}
-      {children}
+      {typeof children === "function" ? (
+        <>You should pass name into {"<Field>"}</>
+      ) : (
+        children
+      )}
     </FormItem>
   );
 };

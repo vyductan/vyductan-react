@@ -120,7 +120,7 @@ const DatePicker = <T extends DatePickerValueType = "date">({
     const date = toDate(input);
     let result;
     if (valueType === "string") {
-      result = date.toISOString();
+      result = formatDate(date, format);
     } else if (valueType === "format") {
       result = formatDate(date, format);
     } else if (typeof valueType === "number") {

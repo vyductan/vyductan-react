@@ -42,6 +42,7 @@ export type AutocompleteProps<
   disabled?: boolean;
 
   open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 
   allowClear?: boolean;
   loading?: boolean;
@@ -63,6 +64,7 @@ const Autocomplete = <
   size,
   disabled,
   open: openProp,
+  onOpenChange,
 
   filter: filterProp,
 
@@ -99,6 +101,7 @@ const Autocomplete = <
 
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
+    onChange: onOpenChange,
   });
   const [value, setValue] = useMergedState(defaultValueProp, {
     value: valueProp,
@@ -154,6 +157,7 @@ const Autocomplete = <
       arrow={false}
       content={
         <Command
+          mode="default"
           placeholder={searchPlaceholder}
           options={options}
           value={value}
