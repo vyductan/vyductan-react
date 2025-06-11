@@ -290,7 +290,7 @@ const Select = <
               <Tag
                 key={index}
                 className="mr-1 py-0 leading-[22px]"
-                closeable
+                closeIcon
                 onClose={() => removeTag(tag)}
               >
                 {tag}
