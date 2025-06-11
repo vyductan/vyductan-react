@@ -20,6 +20,32 @@ declare module "@tanstack/react-table" {
 
 export type SelectionItemSelectFn = (currentRowKeys: Key[]) => void;
 
+export type ExpandType = null | "row" | "nest";
+
+export interface TableLocale {
+  filterTitle?: string;
+  filterConfirm?: React.ReactNode;
+  filterReset?: React.ReactNode;
+  filterEmptyText?: React.ReactNode;
+  /**
+   * @deprecated Please use `filterCheckAll` instead.
+   */
+  filterCheckall?: React.ReactNode;
+  filterCheckAll?: React.ReactNode;
+  filterSearchPlaceholder?: string;
+  emptyText?: React.ReactNode | (() => React.ReactNode);
+  selectAll?: React.ReactNode;
+  selectNone?: React.ReactNode;
+  selectInvert?: React.ReactNode;
+  selectionAll?: React.ReactNode;
+  sortTitle?: string;
+  expand?: string;
+  collapse?: string;
+  triggerDesc?: string;
+  triggerAsc?: string;
+  cancelSort?: string;
+}
+
 export interface CellType<RecordType> {
   key?: Key;
   className?: string;
@@ -415,6 +441,8 @@ export type DeepNamePath<
                       [...ParentNamePath, FieldKey]
                     >; // If `Store[FieldKey]` is object
           }[keyof Store];
+
+export type GetPopupContainer = (triggerNode: HTMLElement) => HTMLElement;
 
 // ================= Own =================
 type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
