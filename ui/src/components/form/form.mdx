@@ -29,7 +29,7 @@ const FormExample = ({ initialValues }: Props) => {
         message.success("Successfully!");
       },
       onError: (error) => {
-        apiErrorHandling({ error });
+        apiErrorHandling(error);
       },
     }),
   );

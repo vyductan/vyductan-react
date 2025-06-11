@@ -5,7 +5,9 @@ import { ZodOptional } from "zod";
 
 const TEMPORARY_REPLACEMENT_PLACEHOLDER = "__PLACEHOLDER__";
 const ZOD_OBJECT_FIELD_PATH = ".shape.";
-const ZOD_ARRAY_FIELD_PATH = "._def.type";
+// const ZOD_ARRAY_FIELD_PATH_1 = "._def.type";
+// maybe for refine()
+const ZOD_ARRAY_FIELD_PATH = "._def.type._def.schema";
 
 export const generateZodFieldPath = (fieldName: string) => {
   return fieldName
