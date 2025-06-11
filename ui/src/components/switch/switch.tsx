@@ -23,8 +23,8 @@ const Switch = (props: SwitchProps) => {
     return (
       <ShadcnSwitch
         className={cn(
-          "h-[22px] w-11",
-          "data-[slot=switch-thumb]:size-[18px]",
+          // "h-[22px] w-11",
+          // "data-[slot=switch-thumb]:size-[18px]",
           className,
         )}
         {...restProps}
