@@ -13,12 +13,10 @@ const Empty = ({ className, image, description, children }: EmptyProps) => {
   const ImageToRender = image ?? <EmptyIcon className="size-16" />;
   const DescriptionToRender = description ?? "No data";
   return (
-    <div
-      className={cn("flex flex-col items-center px-4 py-2 text-sm", className)}
-    >
+    <div className={cn("mx-2 flex flex-col items-center text-sm", className)}>
       <div className="mb-2">{ImageToRender}</div>
       <div className="text-muted-foreground">{DescriptionToRender}</div>
-      <div className="mt-4">{children}</div>
+      {children && <div className="mt-4">{children}</div>}
     </div>
   );
 };
