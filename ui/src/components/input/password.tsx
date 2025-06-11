@@ -2,11 +2,11 @@
 
 import React from "react";
 
-import type { InputProps } from "./input";
+import type { InputTextProps } from "./text";
 import { Icon } from "../../icons";
-import { Input } from "./input";
+import { InputText } from "./text";
 
-export type InputPasswordProps = Omit<InputProps, "type">;
+export type InputPasswordProps = Omit<InputTextProps, "type">;
 export const InputPassword = React.forwardRef<
   HTMLInputElement,
   InputPasswordProps
@@ -15,7 +15,7 @@ export const InputPassword = React.forwardRef<
   const toggle = () => setType(type === "password" ? "text" : "password");
 
   return (
-    <Input
+    <InputText
       ref={ref}
       type={type}
       suffix={

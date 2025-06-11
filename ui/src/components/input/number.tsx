@@ -13,11 +13,16 @@ import type {
 } from "./_components/rc-input-number";
 import type { InputStatus, InputVariant } from "./types";
 import { Icon } from "../../icons";
-import { InputNumber as RcInputNumber } from "./_components/rc-input-number";
-import { inputSizeVariants, inputVariants } from "./input";
+import RcInputNumber from "./_components/rc-input-number";
+import { inputSizeVariants, inputVariants } from "./text";
 
-interface InputNumberProps<T extends ValueType = ValueType>
-  extends Omit<RcInputNumberProps<T>, "prefix" | "size" | "controls"> {
+interface InputNumberProps<TNumberValue extends ValueType = ValueType>
+  extends Omit<
+    RcInputNumberProps<TNumberValue>,
+    "ref" | "prefix" | "size" | "controls"
+  > {
+  ref?: React.Ref<HTMLInputElement>;
+
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
   prefix?: React.ReactNode;
@@ -31,14 +36,15 @@ interface InputNumberProps<T extends ValueType = ValueType>
    * @default "outlined"
    */
   variant?: InputVariant;
-
-  forFormItem?: boolean;
 }
 
-const InputNumber = ({ ref, ...props }: InputNumberProps) => {
-  // const inputRef = React.useRef<HTMLInputElement>(null);
+const InputNumber = <TNumberValue extends ValueType = ValueType>({
+  ref,
+  ...props
+}: InputNumberProps<TNumberValue>) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // React.useImperativeHandle(ref, () => inputRef.current!);
+  React.useImperativeHandle(ref, () => inputRef.current!);
 
   const {
     className,
@@ -54,7 +60,6 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
     variant: customVariant,
 
     onKeyDown,
-    forFormItem,
     onChange,
 
     ...others
@@ -108,7 +113,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   return (
     <RcInputNumber
-      ref={ref}
+      ref={inputRef}
       upHandler={upIcon}
       downHandler={downIcon}
       // prefixCls={prefixCls}
@@ -217,13 +222,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
         e.preventDefault();
         onKeyDown?.(e);
       }}
-      onChange={(value) => {
-        if (forFormItem) {
-          onChange?.(value ? value.toString() : null);
-        } else {
-          onChange?.(value);
-        }
-      }}
+      onChange={onChange}
       {...others}
     />
   );
