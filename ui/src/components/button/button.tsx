@@ -27,6 +27,16 @@ const buttonVariants = tv({
     "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
+    type: {
+      default: [],
+      primary: ["border-primary", "hover:border-primary-hover"],
+      dashed: ["border-dashed"],
+      link: ["border-transparent"],
+      text: ["border-0"],
+    },
+    danger: {
+      true: [],
+    },
     primary: {
       true: ["border-primary", "hover:border-primary-hover"],
     },
@@ -58,6 +68,7 @@ const buttonVariants = tv({
       rose: [],
     },
     size: {
+      small: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
       sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
       default: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
       lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
@@ -273,7 +284,7 @@ const buttonVariants = tv({
     },
     // Size
     {
-      size: "sm",
+      size: "small",
       shape: ["icon", "circle"],
       className: "w-6",
     },
@@ -312,9 +323,14 @@ type TVButtonOptions = PartialDeep<Partial<ExtractedTVButtonOptions>>;
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
+type HtmlType = React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
+type ButtonType = ButtonVariants["type"];
+
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
-    Omit<ButtonVariants, "color" | "disabled" | "variant"> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "color">,
+    Omit<ButtonVariants, "type" | "color" | "disabled" | "variant"> {
+  type?: HtmlType | ButtonType;
+  htmlType?: HtmlType;
   asChild?: boolean;
   href?: string;
   loading?: boolean;
@@ -342,6 +358,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       srOnly,
       variant,
       icon,
+      type,
+      htmlType,
       ...props
     },
     ref,
@@ -356,7 +374,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <GenericSlot<Partial<IconProps>>
             className={cn(
               "size-4",
-              size === "sm" && "size-4",
+              size === "small" && "size-4",
               size === "lg" && "size-4",
               size === "xl" && "size-[18px]",
               // children ? "mr-2" : "",
@@ -379,6 +397,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </>
     );
+
+    const isHtmlType =
+      type === "submit" || type === "reset" || type === "button";
+    const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
     return (
       <Wave component="Button" disabled={loading}>
@@ -411,7 +433,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )}
           disabled={loading ?? disabled}
           aria-disabled={loading ?? disabled}
-          type="button"
+          type={htmlTypeToPass}
           {...props}
         >
           {asChild ? (
