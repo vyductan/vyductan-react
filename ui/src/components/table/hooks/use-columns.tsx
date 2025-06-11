@@ -194,14 +194,15 @@ export const useColumns = <TRecord extends AnyObject>(
   columnsForTTTable: TTColumnDef<TRecord>[],
   flattenColumns: readonly ColumnDef<TRecord>[],
 ] => {
-  const baseColumns = React.useMemo<ColumnsDef<TRecord>>(() => {
+  let baseColumns = React.useMemo<ColumnsDef<TRecord>>(() => {
     const newColumns = columns || convertChildrenToColumns(children) || [];
 
     return filterHiddenColumns(newColumns.slice());
   }, [columns, children]);
 
   // ========================== Selections ==========================
-  const selectionColumn = React.useMemo<ColumnDef<TRecord> | undefined>(() => {
+  const withSelectionColumn = React.useMemo<ColumnsDef<TRecord>>(() => {
+    const cloneColumns = baseColumns.slice();
     if (rowSelection) {
       let lastSelectedId = "";
       const width = rowSelection.columnWidth ?? 32;
@@ -225,7 +226,7 @@ export const useColumns = <TRecord extends AnyObject>(
             : originNode;
         });
 
-      return {
+      const selectionColumn: ColumnDef<TRecord> = {
         key: "selection",
         width,
         minWidth: width,
@@ -269,10 +270,16 @@ export const useColumns = <TRecord extends AnyObject>(
             : originNode;
         },
         // ...rowSelection,
-      } satisfies ColumnDef<TRecord>;
+      };
+
+      if (!cloneColumns.some((col) => col.key === "selection")) {
+        cloneColumns.unshift(selectionColumn);
+      }
     }
-  }, [rowSelection]);
-  if (selectionColumn) baseColumns.unshift(selectionColumn);
+    return cloneColumns;
+  }, [rowSelection, baseColumns]);
+
+  baseColumns = withSelectionColumn;
 
   // ========================== Expand ==========================
   const withExpandColumns = React.useMemo<ColumnsDef<TRecord>>(() => {
