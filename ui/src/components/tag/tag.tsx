@@ -10,7 +10,7 @@ import { useUiConfig } from "../config-provider/config-provider";
 
 // Based on Vercel
 const color: Record<string, string> = {
-  default: "bg-gray-100 text-gray-600 border-gray-300",
+  default: "bg-gray-100 text-foreground border-gray-300",
   primary: "bg-primary-300 text-primary-700 border-primary-300",
   success: "bg-green-100 text-green-700 border-green-300",
   processing: "bg-blue-100 text-blue-700 border-blue-300",
@@ -111,7 +111,7 @@ const tagVariants = tv({
 
 type TagProps = BadgeProps &
   VariantProps<typeof tagVariants> & {
-    closeable?: boolean;
+    closeIcon?: boolean | React.ReactNode;
     onClose?: () => void;
   };
 
@@ -120,7 +120,7 @@ const Tag = ({
   variant,
   color,
   bordered: borderedProp,
-  closeable,
+  closeIcon,
   onClose,
   ...props
 }: TagProps) => {
@@ -135,20 +135,22 @@ const Tag = ({
           color,
           bordered,
         }),
-        closeable && "pr-1",
+        closeIcon && "pr-1",
         tagConfig?.className,
         className,
       )}
       {...props}
     >
       {props.children}
-      {closeable && (
+      {typeof closeIcon === "boolean" && closeIcon ? (
         <Icon
           icon="icon-[lucide--x]"
           className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
           onClick={onClose}
           tabIndex={-1}
         />
+      ) : (
+        closeIcon
       )}
     </Badge>
   );
