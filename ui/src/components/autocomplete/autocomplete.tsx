@@ -9,6 +9,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject, SizeType } from "../..";
 import type { CommandProps } from "../command";
+import type { PopoverContentProps } from "../popover";
 // import type { ValueType } from "../form";
 import type { Option } from "../select/types";
 import { Button, LoadingIcon } from "../button";
@@ -20,36 +21,37 @@ type AutocompleteValueType = string | number;
 export type AutocompleteProps<
   TValue extends AutocompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
-> = Pick<
-  CommandProps<TValue>,
-  | "filter"
-  | "placeholder"
-  | "empty"
-  | "groupClassName"
-  | "optionRender"
-  | "optionsRender"
-  | "dropdownRender"
-  | "dropdownFooter"
-> & {
-  value?: TValue;
-  defaultValue?: TValue;
-  onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
-  options: Option<TValue, TRecord>[];
-  optionsToSearch?: { value: string; label: string }[];
+> = Pick<PopoverContentProps, "onFocusOutside"> &
+  Pick<
+    CommandProps<TValue>,
+    | "filter"
+    | "placeholder"
+    | "empty"
+    | "groupClassName"
+    | "optionRender"
+    | "optionsRender"
+    | "dropdownRender"
+    | "dropdownFooter"
+  > & {
+    value?: TValue;
+    defaultValue?: TValue;
+    onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
+    options: Option<TValue, TRecord>[];
+    optionsToSearch?: { value: string; label: string }[];
 
-  className?: string;
-  size?: SizeType;
-  disabled?: boolean;
+    className?: string;
+    size?: SizeType;
+    disabled?: boolean;
 
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 
-  allowClear?: boolean;
-  loading?: boolean;
+    allowClear?: boolean;
+    loading?: boolean;
 
-  searchPlaceholder?: string;
-  onSearchChange?: (search: string) => void;
-};
+    searchPlaceholder?: string;
+    onSearchChange?: (search: string) => void;
+  };
 
 const Autocomplete = <
   TValue extends AutocompleteValueType = string,
@@ -78,6 +80,8 @@ const Autocomplete = <
   searchPlaceholder,
   onSearchChange,
 
+  // Popover
+  onFocusOutside,
   ...props
 }: AutocompleteProps<TValue, TRecord>) => {
   /* Filter Detault*/
@@ -169,6 +173,7 @@ const Autocomplete = <
           {...props}
         />
       }
+      onFocusOutside={onFocusOutside}
     >
       <Button
         variant="outline"
