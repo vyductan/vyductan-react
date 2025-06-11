@@ -113,7 +113,7 @@ const InputNumber = <TNumberValue extends ValueType = ValueType>({
 
   return (
     <RcInputNumber
-      ref={inputRef}
+      // ref={ref}
       upHandler={upIcon}
       downHandler={downIcon}
       // prefixCls={prefixCls}

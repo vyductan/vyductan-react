@@ -745,7 +745,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
 
       return proxyObject(target, {
         focus,
-        blur: () => target.blur(),
+        // blur: () => target.blur(),
         nativeElement:
           holderRef.current?.nativeElement ||
           inputNumberDomRef.current ||
@@ -753,10 +753,16 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
       });
     });
     // React.useImperativeHandle(ref, () =>
-    //   proxyObject(inputFocusRef.current, {
-    //     focus,
+    //   proxyObject(inputFocusRef.current ?? {} as InputNumberRef, {
+    //     focus: () => void 0,
+    //     blur: () => void 0,
     //     nativeElement:
-    //       holderRef.current?.nativeElement || inputNumberDomRef.current,
+    //       holderRef.current?.nativeElement ||
+    //       inputNumberDomRef.current ||
+    //       {} as HTMLInputElement,
+    //     // focus: (option) => focus(option),
+    //     // nativeElement:
+    //     //   holderRef.current?.nativeElement || inputNumberDomRef.current,
     //   }),
     // );
 
