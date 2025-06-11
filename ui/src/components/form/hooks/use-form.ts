@@ -61,7 +61,7 @@ const useForm = <
 >(
   props?: UseFormProps<TFieldValues, TContext, TTransformedValues>,
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
-  const { schema, defaultValues, onSubmit, ...restProps } = props ?? {};
+  const { schema, onSubmit, ...restProps } = props ?? {};
 
   const methods = __useForm<TFieldValues, TContext, TTransformedValues>(
     props
@@ -130,7 +130,7 @@ const useForm = <
   _formControl.current ??= {
     ...methods,
     schema,
-    defaultValues,
+    defaultValues: props?.defaultValues,
     submit,
     resetFields,
     setFieldsValue,
