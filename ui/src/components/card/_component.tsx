@@ -4,7 +4,6 @@ import type { SizeType } from "@acme/ui/types";
 import { cn } from "@acme/ui/lib/utils";
 import {
   CardContent as ShadcnCardContent,
-  CardDescription as ShadcnCardDescription,
   CardFooter as ShadcnCardFooter,
   CardHeader as ShadcnCardHeader,
   CardRoot as ShadcnCardRoot,
@@ -67,12 +66,6 @@ const CardTitle = ({
   );
 };
 
-const CardDescription = (
-  props: React.ComponentProps<typeof ShadcnCardDescription>,
-) => {
-  return <ShadcnCardDescription {...props} />;
-};
-
 const CardContent = ({
   size: sizeProp,
   className,
@@ -109,11 +102,6 @@ const CardFooter = ({
 
 export type { CardRootProps };
 
-export {
-  CardRoot,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-};
+export { CardRoot, CardHeader, CardTitle, CardContent, CardFooter };
+
+export { CardAction, CardDescription } from "@acme/ui/shadcn/card";

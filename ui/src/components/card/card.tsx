@@ -6,6 +6,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { CardRootProps } from "./_component";
 import { Skeleton } from "../skeleton";
 import {
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -61,7 +62,13 @@ const Card = ({
     if (isValidElement(child)) {
       const type =
         typeof child.type === "string" ? child.type : child.type.name;
-      return type === "CardContent";
+      return (
+        type === "CardContent" ||
+        type === "CardHeader" ||
+        type === "CardFooter" ||
+        type === "CardTitle" ||
+        type === "CardDescription"
+      );
     }
     return false;
   });
@@ -75,15 +82,13 @@ const Card = ({
       <CardRoot {...props}>
         {(!!title || !!description || !!extra) && (
           <CardHeader className={cn(classNames?.header)}>
-            <div className="flex items-center">
-              <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
-              {extra && <div className="ml-auto">{extra}</div>}
-            </div>
+            <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {description && (
               <CardDescription className={cn(classNames?.description)}>
                 {description}
               </CardDescription>
             )}
+            {extra && <CardAction>{extra}</CardAction>}
           </CardHeader>
         )}
         <CardContent className={classNames?.content}>{children}</CardContent>
