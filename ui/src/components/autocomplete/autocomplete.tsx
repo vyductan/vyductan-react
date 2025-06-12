@@ -38,6 +38,7 @@ export type AutocompleteProps<
     onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
     options: Option<TValue, TRecord>[];
     optionsToSearch?: { value: string; label: string }[];
+    optionLabelProp?: string;
 
     className?: string;
     size?: SizeType;
@@ -61,6 +62,8 @@ const Autocomplete = <
   value: valueProp,
   options,
   optionsToSearch,
+  optionLabelProp,
+  optionRender,
 
   className,
   size,
@@ -118,19 +121,26 @@ const Autocomplete = <
     },
   });
 
+  const getOptionLabel = (option: Option<TValue, TRecord>) => {
+    if (optionLabelProp && option[optionLabelProp as keyof typeof option]) {
+      return option[optionLabelProp as keyof typeof option];
+    }
+    return option.label;
+  };
+
   const buttonText = (() => {
     if (!value) {
       return placeholder ?? <span className="opacity-0"></span>;
     }
     const o = options.find((o) => o.value === value);
     if (o) {
-      const label = props.optionRender?.label
-        ? props.optionRender.label(o)
-        : o.label;
+      const label = optionRender?.label
+        ? optionRender.label(o)
+        : getOptionLabel(o);
       return (
         <>
-          {props.optionRender?.icon ? (
-            <span className="mr-2">{props.optionRender.icon(o)}</span>
+          {optionRender?.icon ? (
+            <span className="mr-2">{optionRender.icon(o)}</span>
           ) : (
             o.icon && <Icon icon={o.icon} />
           )}
@@ -170,6 +180,7 @@ const Autocomplete = <
           }}
           filter={filter}
           onSearchChange={onSearchChange}
+          optionRender={optionRender}
           {...props}
         />
       }
