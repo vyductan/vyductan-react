@@ -31,6 +31,7 @@ import type {
   ColumnsDef,
   ExpandableConfig,
   FilterValue,
+  GetComponentProps,
   // GetComponent,
   GetRowKey,
   Key,
@@ -114,10 +115,14 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
     //   expandRowByClick?: boolean;
     //   columnWidth?: number;
     // };
+
+    /** Row's className */
+    rowClassName?: string | ((record: TRecord, index: number) => string);
     /** Row key config */
     rowKey?: string | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
     rowSelection?: TableRowSelection<TRecord>;
+
     pagination?: PaginationProps;
     loading?: boolean;
     skeleton?: boolean;
@@ -152,12 +157,7 @@ type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
       extra: TableCurrentDataSource<TRecord>,
     ) => void;
 
-    onRow?: (ctx: {
-      record: TRecord;
-      row: Row<TRecord>;
-      table: TableDef<TRecord>;
-      event: React.MouseEvent;
-    }) => void;
+    onRow?: GetComponentProps<TRecord>;
 
     // =================================== Internal ===================================
     /**
@@ -189,6 +189,7 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
     pagination,
     expandable,
 
+    rowClassName,
     rowKey,
     rowSelection: rowSelectionProp,
 
@@ -574,11 +575,19 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
   const bordered = borderedProp ?? tableConfig?.bordered ?? false;
   // ---- classes ----//
   const getRowClassName = (row: Row<TRecord>, index: number) => {
-    return classNames?.row
+    const classFromClassNames = classNames?.row
       ? typeof classNames.row === "string"
         ? classNames.row
         : classNames.row(row.original, index)
       : "";
+
+    const classFromRowClassName = rowClassName
+      ? typeof rowClassName === "string"
+        ? rowClassName
+        : rowClassName(row.original, index)
+      : "";
+
+    return cn(classFromClassNames, classFromRowClassName);
   };
 
   // ========================================================================
@@ -805,12 +814,13 @@ const Table = <TRecord extends AnyObject>(tableProps: TableProps<TRecord>) => {
                             getRowClassName(row, rowIndex),
                           )}
                           onClick={(e: React.MouseEvent) => {
-                            onRow?.({
-                              record: row.original,
-                              row,
-                              table,
-                              event: e,
-                            });
+                            onRow?.(row.original).onClick?.(e);
+                            // onRow?.({
+                            //   record: row.original,
+                            //   row,
+                            //   table,
+                            //   event: e,
+                            // });
 
                             if (expandable?.expandRowByClick) {
                               const selection = globalThis.getSelection();
