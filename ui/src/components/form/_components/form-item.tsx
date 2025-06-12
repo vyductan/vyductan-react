@@ -20,17 +20,33 @@ function FormItem({
     ...(__ref ? [__ref] : []),
   );
   // get child id (from shadcn FormItem id)
-  const id = internalRef.current?.id;
+  // const id = internalRef.current?.id;
+
+  // const [hasFormMessage, setHasFormMessage] = React.useState(false);
+  // useEffect(() => {
+  //   const formMessageElement = document.querySelector(
+  //     CSS.escape(`#${id}-form-item-message`),
+  //   );
+  //   if (formMessageElement) {
+  //     setHasFormMessage(true);
+  //   }
+  // }, [children, id]);
+  // const targetElement = composedRef?.current?.querySelector(
+  //   '[data-slot="form-message"]',
+  // );
+  // console.log("rrrrrr", composedRef, targetElement);
 
   const [hasFormMessage, setHasFormMessage] = React.useState(false);
   useEffect(() => {
-    const formMessageElement = document.querySelector(
-      CSS.escape(`#${id}-form-item-message`),
+    setHasFormMessage(
+      !!(
+        composedRef &&
+        "current" in composedRef &&
+        composedRef.current?.querySelector('[data-slot="form-message"]')
+      ),
     );
-    if (formMessageElement) {
-      setHasFormMessage(true);
-    }
-  }, [children, id]);
+  }, [children, composedRef]);
+  // const hasFormMessage =
 
   return (
     <ShadFormItem
@@ -44,6 +60,7 @@ function FormItem({
       ref={composedRef}
       {...props}
     >
+      {/* {String(hasFormMessage)} */}
       {children}
       {hasFormMessage && <div className="-mb-6" />}
     </ShadFormItem>
