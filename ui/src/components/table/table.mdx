@@ -18,7 +18,7 @@ import {Table} from "@/components/ui/table"
       title: "Name",
       dataIndex: "name",
       align: "center",
-      render: ({ record }) => <div>{record.name}</div>,
+      render: (_, record) => <div>{record.name}</div>,
     },
   ]}
 />
@@ -30,7 +30,7 @@ import {Table} from "@/components/ui/table"
 <Table
   columns={[
     {
-      render: ({ record }) => (
+      render: (_, record) => (
         <div className="group-hover:bg-red-500">{record.name}</div>
       ),
       sorter: {
@@ -140,7 +140,7 @@ return (
   }}
   columns={[
     {
-      render: ({ record }) => (
+      render: (_, record) => (
         <div className="group-hover:bg-red-500">{record.name}</div>
       ),
     },
