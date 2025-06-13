@@ -64,14 +64,9 @@ const Modal = ({
   //
   ...rest
 }: ModalProps) => {
-  const isShadcnDialog = React.Children.toArray(children).some((child) => {
-    if (React.isValidElement(child)) {
-      const type =
-        typeof child.type === "string" ? child.type : child.type.name;
-      return type === "DialogContent";
-    }
-    return false;
-  });
+  const isShadcnDialog = React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === DialogContent,
+  );
   if (isShadcnDialog) {
     return <Dialog {...rest}>{children}</Dialog>;
   }

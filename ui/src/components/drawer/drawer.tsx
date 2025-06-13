@@ -42,15 +42,10 @@ const Drawer = ({
   // closeIcon,
   ...props
 }: DrawerProps) => {
-  const isShadcn = Children.toArray(children).some((child) => {
-    if (isValidElement(child)) {
-      const type =
-        typeof child.type === "string" ? child.type : child.type.name;
-      return type === "DrawerContent";
-    }
-    return false;
-  });
-  if (isShadcn)
+  const isShadcnDrawer = Children.toArray(children).some(
+    (child) => isValidElement(child) && child.type === DrawerContent,
+  );
+  if (isShadcnDrawer)
     return (
       <DrawerRoot direction={placement} {...props}>
         {children}
