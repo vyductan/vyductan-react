@@ -1,3 +1,5 @@
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+
 import type { Popover as ShadcnPopover } from "../../shadcn/popover";
 import { PopoverContent as ShadcnPopoverContent } from "../../shadcn/popover";
 
@@ -32,6 +34,8 @@ const PopoverContent = ({
   );
 };
 
+const PopoverClose = PopoverPrimitive.Close;
+
 export type { PopoverRootProps, PopoverContentProps };
 export { Popover as PopoverRoot, PopoverTrigger } from "../../shadcn/popover";
-export { PopoverContent };
+export { PopoverContent, PopoverClose };
