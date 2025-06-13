@@ -29,15 +29,11 @@ export const Popover = (props: PopoverProps) => {
   });
 
   const isShadcnPopover = React.Children.toArray(props.children).some(
-    (child) => {
-      if (React.isValidElement(child)) {
-        const type =
-          typeof child.type === "string" ? child.type : child.type.name;
-        return type === "PopoverContent";
-      }
-      return false;
-    },
+    (child) =>
+      React.isValidElement(child) &&
+      (child.type === PopoverContent || child.type === PopoverTrigger),
   );
+
   if (isShadcnPopover) {
     return <PopoverRoot {...props} />;
   }
