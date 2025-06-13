@@ -6,16 +6,19 @@ import type {
   RowData,
   Table,
 } from "@tanstack/react-table";
+import type { XOR } from "ts-xor";
 
 import type { Breakpoint } from "@acme/hooks/use-responsive";
 
 import type { AnyObject } from "../../types";
+import type { CheckboxProps } from "../checkbox";
 import type { PaginationProps } from "../pagination";
+import type { INTERNAL_SELECTION_ITEM } from "./hooks/use-selection";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
   interface ColumnMeta<TData extends RowData, TValue>
-    extends ColumnDef<TData> {}
+    extends ColumnType<TData> {}
 }
 
 export type SelectionItemSelectFn = (currentRowKeys: Key[]) => void;
@@ -51,7 +54,7 @@ export interface CellType<RecordType> {
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
-  column?: ColumnDef<RecordType>;
+  column?: ColumnType<RecordType>;
   colSpan?: number;
   rowSpan?: number;
 
@@ -126,7 +129,7 @@ type ColumnSharedDef<TRecord> = {
 };
 
 export interface ColumnGroupDef<TRecord> extends ColumnSharedDef<TRecord> {
-  children: ColumnsDef<TRecord>;
+  children: ColumnsType<TRecord>;
 }
 
 export type AlignType =
@@ -138,22 +141,72 @@ export type AlignType =
   | "justify"
   | "match-parent";
 
-export type ColumnDef<TRecord> = ColumnSharedDef<TRecord> & {
-  colSpan?: number;
-  dataIndex?: DataIndex<TRecord>;
-  render?: (
-    ctx: RenderContext<TRecord>,
-  ) => React.ReactNode | RenderedCell<TRecord>;
-  shouldCellUpdate?: (record: TRecord, prevRecord: TRecord) => boolean;
-  rowSpan?: number;
-  width?: number | string;
-  minWidth?: number;
-  onCell?: GetComponentProps<TRecord>;
+export interface ColumnFilterItem {
+  text: React.ReactNode;
+  value: React.Key | boolean;
+  children?: ColumnFilterItem[];
+}
+
+export interface ColumnTitleProps<RecordType = AnyObject> {
+  /** @deprecated Please use `sorterColumns` instead. */
+  sortOrder?: SortOrder;
+  /** @deprecated Please use `sorterColumns` instead. */
+  sortColumn?: ColumnType<RecordType>;
+  sortColumns?: { column: ColumnType<RecordType>; order: SortOrder }[];
+
+  filters?: Record<string, FilterValue>;
+
+  table: Table<RecordType>;
+}
+
+export type ColumnTitle<RecordType = AnyObject> =
+  | React.ReactNode
+  | ((props: ColumnTitleProps<RecordType>) => React.ReactNode);
+
+type RenderCellContext<TRecord> = {
+  table: Table<TRecord>;
+  row: Row<TRecord>;
+  column: Column<TRecord>;
 };
 
-export type ColumnsDef<TRecord = AnyObject> = (
+export type ColumnType<TRecord> = ColumnSharedDef<TRecord> &
+  XOR<
+    {
+      dataIndex?: never;
+      render?: (
+        value: null,
+        record: TRecord,
+        index: number,
+        // cellContext: RenderCellContext<TRecord>,
+      ) => React.ReactNode;
+    },
+    {
+      [K in keyof TRecord]-?: {
+        dataIndex: K;
+        render?: (
+          value: TRecord[K],
+          record: TRecord,
+          index: number,
+          // cellContext: RenderCellContext<TRecord>,
+        ) => React.ReactNode;
+      };
+    }[keyof TRecord]
+  > & {
+    title?: ColumnTitle<TRecord>;
+
+    colSpan?: number;
+    dataIndex?: DataIndex<TRecord>;
+    shouldCellUpdate?: (record: TRecord, prevRecord: TRecord) => boolean;
+    rowSpan?: number;
+    width?: number | string;
+    /** Min width of this column, only works when `tableLayout="auto"` */
+    minWidth?: number;
+    onCell?: GetComponentProps<TRecord>;
+  };
+
+export type ColumnsType<TRecord = AnyObject> = (
   | ColumnGroupDef<TRecord>
-  | ColumnDef<TRecord>
+  | ColumnType<TRecord>
 )[];
 
 export interface SelectionItem {
@@ -197,33 +250,81 @@ export type GetRowKey<RecordType> = (record: RecordType, index: number) => Key;
 export type RowSelectionType = "checkbox" | "radio";
 
 export type TableRowSelection<TRecord> = {
+  /** Keep the selection keys in list even the key not exist in `dataSource` anymore */
+  preserveSelectedRowKeys?: boolean;
   type?: RowSelectionType;
   /** Controlled selected row keys */
   selectedRowKeys?: Key[];
+  defaultSelectedRowKeys?: Key[];
   /** Callback executed when selected rows change */
   onChange?: (
     selectedRowKeys: Key[],
     // selectedRowKeys: TRecord[keyof TRecord][],
     selectedRows: TRecord[],
   ) => void;
+  getCheckboxProps?: (
+    record: TRecord,
+  ) => Partial<Omit<CheckboxProps, "checked" | "defaultChecked">>;
+  onSelect?: SelectionSelectFn<TRecord>;
+  /** @deprecated This function is deprecated and should use `onChange` instead */
+  onSelectMultiple?: (
+    selected: boolean,
+    selectedRows: TRecord[],
+    changeRows: TRecord[],
+  ) => void;
+  /** @deprecated This function is deprecated and should use `onChange` instead */
+  onSelectAll?: (
+    selected: boolean,
+    selectedRows: TRecord[],
+    changeRows: TRecord[],
+  ) => void;
+  /** @deprecated This function is deprecated and should use `onChange` instead */
+  onSelectInvert?: (selectedRowKeys: Key[]) => void;
+  /** @deprecated This function is deprecated and should use `onChange` instead */
+  onSelectNone?: () => void;
+  selections?: INTERNAL_SELECTION_ITEM[] | boolean;
+  /** Hide the selectAll checkbox and custom selection */
+  hideSelectAll?: boolean;
+  fixed?: FixedType;
+  columnWidth?: string | number;
+  columnTitle?:
+    | React.ReactNode
+    | ((checkboxNode: React.ReactNode) => React.ReactNode);
+  checkStrictly?: boolean;
+  /** Set the alignment of the selection column */
+  align?: "left" | "center" | "right";
+  /** Renderer of the `table` cell. Same as render in column */
+  renderCell?: (
+    value: boolean,
+    record: TRecord,
+    index: number,
+    originNode: React.ReactNode,
+  ) => React.ReactNode;
+  onCell?: GetComponentProps<TRecord>;
+
+  /// OWN
   /** Renderer of the `table` header */
   renderHeader?: (args: {
     checked: boolean;
     originNode: React.ReactNode;
   }) => React.ReactNode;
   /** Renderer of the `table` cell. Same as render in column */
-  renderCell?: (args: {
-    value: boolean;
-    record: TRecord;
-    index: number;
-    originNode: React.ReactNode;
-  }) => React.ReactNode;
+  // renderCell?: (args: {
+  //   value: boolean;
+  //   record: TRecord;
+  //   index: number;
+  //   originNode: React.ReactNode;
+  // }) => React.ReactNode;
 
-  columnTitle?: React.ReactNode;
-  columnWidth?: number;
+  // columnTitle?: React.ReactNode;
+  // columnWidth?: number;
   /** Hide the selectAll checkbox and custom selection */
-  hideSelectAll?: boolean;
+  // hideSelectAll?: boolean;
 };
+
+export type TransformColumns<RecordType = AnyObject> = (
+  columns: ColumnsType<RecordType>,
+) => ColumnsType<RecordType>;
 
 export type TableSize = "sm" | "default";
 
@@ -314,7 +415,7 @@ export type FilterValue = (Key | boolean)[];
 
 export type SortOrder = "descend" | "ascend" | null;
 export interface SorterResult<RecordType = AnyObject> {
-  column?: ColumnDef<RecordType>;
+  column?: ColumnType<RecordType>;
   order?: SortOrder;
   // field?: Key | readonly Key[];
   field?: Key;
@@ -443,13 +544,3 @@ export type DeepNamePath<
           }[keyof Store];
 
 export type GetPopupContainer = (triggerNode: HTMLElement) => HTMLElement;
-
-// ================= Own =================
-type RenderContext<TRecord, TKey extends keyof TRecord | null = null> = {
-  record: TRecord;
-  index: number;
-  table: Table<TRecord>;
-  row: Row<TRecord>;
-  column: Column<TRecord>;
-  value: TKey extends keyof TRecord ? TRecord[TKey] : null;
-};

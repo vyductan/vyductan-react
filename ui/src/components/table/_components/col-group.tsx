@@ -2,12 +2,12 @@
 // Jun 6, 2024
 
 import type { AnyObject } from "../../../types";
-import type { ColumnDef } from "../types";
+import type { ColumnType } from "../types";
 import { useTableStore } from "../hooks/use-table";
 
 interface ColGroupProps<TRecord> {
   colWidths: readonly (number | string | undefined)[];
-  columns?: readonly ColumnDef<TRecord>[];
+  columns?: readonly ColumnType<TRecord>[];
   columCount?: number;
 }
 const ColGroup = <TRecord extends AnyObject>({

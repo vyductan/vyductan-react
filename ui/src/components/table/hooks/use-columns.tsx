@@ -15,9 +15,10 @@ import { Checkbox } from "@acme/ui/components/checkbox";
 import type { AnyObject, Direction } from "../../../types";
 import type { TableProps } from "../table";
 import type {
-  ColumnDef,
   ColumnGroupDef,
-  ColumnsDef,
+  ColumnsType,
+  ColumnTitleProps,
+  ColumnType,
   FixedType,
   GetRowKey,
   Key,
@@ -26,13 +27,14 @@ import type {
   // Key,
   // RenderExpandIcon,
 } from "../types";
+import { TimeSelectProps } from "../../time-picker/_components/time-select";
 import { EXPAND_COLUMN } from "../constant";
 import { getRowRange, transformColumnDefs } from "../utils";
 import { INTERNAL_COL_DEFINE } from "../utils/legacy-util";
 
 export function convertChildrenToColumns<RecordType>(
   children: React.ReactNode,
-): ColumnsDef<RecordType> {
+): ColumnsType<RecordType> {
   return toArray(children)
     .filter((node) => React.isValidElement(node))
     .map(({ key, props }: React.ReactElement) => {
@@ -51,8 +53,8 @@ export function convertChildrenToColumns<RecordType>(
 }
 
 function filterHiddenColumns<RecordType>(
-  columns: ColumnsDef<RecordType>,
-): ColumnsDef<RecordType> {
+  columns: ColumnsType<RecordType>,
+): ColumnsType<RecordType> {
   return columns
     .filter((column) => column && typeof column === "object" && !column.hidden)
     .map((column) => {
@@ -70,13 +72,13 @@ function filterHiddenColumns<RecordType>(
 }
 
 function flatColumns<TRecord extends AnyObject>(
-  columns: ColumnsDef<TRecord>,
+  columns: ColumnsType<TRecord>,
   parentKey = "key",
 ): {
-  flattenColumns: ColumnDef<TRecord>[];
+  flattenColumns: ColumnType<TRecord>[];
   // flattenColumnsForTTTable: TTColumnDef<TRecord>[];
 } {
-  const flattenColumns: ColumnDef<TRecord>[] = [];
+  const flattenColumns: ColumnType<TRecord>[] = [];
   // const flattenColumnsForTTTable: TTColumnDef<TRecord>[] = [];
   for (const [index, column] of columns.entries()) {
     const { fixed } = column;
@@ -88,44 +90,21 @@ function flatColumns<TRecord extends AnyObject>(
           : fixed;
     const mergedKey = `${parentKey}-${index}`;
 
-    const subColumns = (column as ColumnGroupDef<TRecord>).children;
-    // const subColumnsForTTTable =transformColumnDefs<TRecord>((column as ColumnGroupDef<TRecord>).children, {})
-
-    if (subColumns && subColumns.length > 0) {
+    if ("children" in column) {
       flattenColumns.push(
-        ...flatColumns(subColumns, mergedKey).flattenColumns.map(
+        ...flatColumns(column.children, mergedKey).flattenColumns.map(
           (subColum) => ({
             fixed: parsedFixed,
             ...subColum,
           }),
         ),
       );
-      // flattenColumnsForTTTable.push(
-      //   ...flatColumns(subColumns, mergedKey).flattenColumnsForTTTable.map(
-      //     (subColum) => ({
-      //       ...subColum,
-      //       meta: {
-      //         ...subColum.meta,
-      //         fixed: parsedFixed,
-      //       },
-      //     }),
-      //   ),
-      // );
     } else {
       flattenColumns.push({
         key: mergedKey,
         ...column,
         fixed: parsedFixed,
       });
-      // const columnsForTTTable = transformColumnDefs<TRecord>([column], {});
-      // flattenColumnsForTTTable.push({
-      //   id: mergedKey,
-      //   ...columnsForTTTable[0],
-      //   meta: {
-      //     ...columnsForTTTable[0]?.meta,
-      //     fixed: parsedFixed,
-      //   },
-      // });
     }
   }
   return {
@@ -188,53 +167,52 @@ export const useColumns = <TRecord extends AnyObject>(
   },
   transformColumns:
     | null
-    | ((columns: ColumnsDef<TRecord>) => ColumnsDef<TRecord>),
+    | ((columns: ColumnsType<TRecord>) => ColumnsType<TRecord>),
 ): [
-  columns: ColumnsDef<TRecord>,
+  columns: ColumnsType<TRecord>,
   columnsForTTTable: TTColumnDef<TRecord>[],
-  flattenColumns: readonly ColumnDef<TRecord>[],
+  flattenColumns: readonly ColumnType<TRecord>[],
 ] => {
-  let baseColumns = React.useMemo<ColumnsDef<TRecord>>(() => {
+  let baseColumns = React.useMemo<ColumnsType<TRecord>>(() => {
     const newColumns = columns || convertChildrenToColumns(children) || [];
 
     return filterHiddenColumns(newColumns.slice());
   }, [columns, children]);
 
   // ========================== Selections ==========================
-  const withSelectionColumn = React.useMemo<ColumnsDef<TRecord>>(() => {
+  const withSelectionColumn = React.useMemo<ColumnsType<TRecord>>(() => {
     const cloneColumns = baseColumns.slice();
     if (rowSelection) {
       let lastSelectedId = "";
       const width = rowSelection.columnWidth ?? 32;
-      const columnTitle =
-        rowSelection.columnTitle ??
-        (({ table }: { table: Table<TRecord> }) => {
-          const originNode = (
-            <Checkbox
-              aria-label="Select all"
-              className="flex items-center justify-center"
-              checked={table.getIsAllPageRowsSelected()}
-              indeterminate={table.getIsSomePageRowsSelected()}
-              onChange={table.toggleAllPageRowsSelected}
-            />
-          );
-          return rowSelection?.renderHeader
-            ? rowSelection.renderHeader({
-                checked: table.getIsAllPageRowsSelected(),
-                originNode,
-              })
-            : originNode;
-        });
 
-      const selectionColumn: ColumnDef<TRecord> = {
+      const selectionColumn: ColumnType<TRecord> = {
         key: "selection",
         width,
-        minWidth: width,
+        // minWidth: width,
         align: "center",
         //   enableSorting: false,
         // enableHiding: false,
-        title: columnTitle,
-        render: ({ table, row }) => {
+        title:
+          rowSelection.columnTitle ??
+          (({ table }: ColumnTitleProps<TRecord>) => {
+            const originNode = (
+              <Checkbox
+                aria-label="Select all"
+                className="flex items-center justify-center"
+                checked={table.getIsAllPageRowsSelected()}
+                indeterminate={table.getIsSomePageRowsSelected()}
+                onChange={table.toggleAllPageRowsSelected}
+              />
+            );
+            return rowSelection?.renderHeader
+              ? rowSelection.renderHeader({
+                  checked: table.getIsAllPageRowsSelected(),
+                  originNode,
+                })
+              : originNode;
+          }),
+        render: (_, __, ___, { table, row }) => {
           const originNode = (
             <Checkbox
               aria-label="Select row"
@@ -261,12 +239,12 @@ export const useColumns = <TRecord extends AnyObject>(
             />
           );
           return rowSelection?.renderCell
-            ? rowSelection.renderCell({
-                value: row.getIsSelected(),
-                record: row.original,
-                index: row.index,
+            ? rowSelection.renderCell(
+                row.getIsSelected(),
+                row.original,
+                row.index,
                 originNode,
-              })
+              )
             : originNode;
         },
         // ...rowSelection,
@@ -282,7 +260,7 @@ export const useColumns = <TRecord extends AnyObject>(
   baseColumns = withSelectionColumn;
 
   // ========================== Expand ==========================
-  const withExpandColumns = React.useMemo<ColumnsDef<TRecord>>(() => {
+  const withExpandColumns = React.useMemo<ColumnsType<TRecord>>(() => {
     if (expandable) {
       let cloneColumns = baseColumns.slice();
 
@@ -340,7 +318,7 @@ export const useColumns = <TRecord extends AnyObject>(
       }
 
       // >>> Create expandable column
-      const expandColumn: ColumnDef<TRecord> & {
+      const expandColumn: ColumnType<TRecord> & {
         [INTERNAL_COL_DEFINE]: { columnType: "EXPAND_COLUMN" };
       } = {
         [INTERNAL_COL_DEFINE]: {
@@ -349,7 +327,7 @@ export const useColumns = <TRecord extends AnyObject>(
         title: expandColumnTitle,
         fixed: fixedColumn ?? undefined,
         width: expandColumnWidth ?? 50,
-        render: ({ record, row, index }) => {
+        render: (_, record, index, { row }) => {
           // const record = row.original;
           // return row.getCanExpand() && row.original.children ? (
           //   <button
