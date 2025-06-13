@@ -28,7 +28,7 @@ import { Skeleton } from "@acme/ui/shadcn/skeleton";
 import type { AnyObject } from "../../types";
 import type { PaginationProps } from "../pagination";
 import type {
-  ColumnsDef,
+  ColumnsType,
   ExpandableConfig,
   FilterValue,
   GetComponentProps,
@@ -81,7 +81,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
     });
 type TableProps<TRecord extends RecordWithCustomRow = RecordWithCustomRow> =
   Omit<React.ComponentProps<"table">, "title" | "onChange" | "summary"> & {
-    columns?: ColumnsDef<TRecord>;
+    columns?: ColumnsType<TRecord>;
     dataSource?: TRecord[] | undefined;
 
     title?: React.ReactNode;

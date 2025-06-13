@@ -3,17 +3,17 @@ import type { ReactNode } from "react";
 
 import type { AnyObject } from "../../types";
 import type { TableProps } from "./table";
-import type { ColumnDef, ColumnsDef } from "./types";
+import type { ColumnsType, ColumnType } from "./types";
 
 export const transformColumnDefs = <TRecord extends AnyObject>(
-  columns: ColumnsDef<TRecord>,
+  columns: ColumnsType<TRecord>,
   props: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
   _isNotFirstDeepColumn = true,
 ): TTColumnDef<TRecord>[] => {
   const columnsDef: TTColumnDef<TRecord>[] = columns.map(
     (columnProp, columnIndex) => {
-      const column = columnProp as ColumnDef<TRecord> & {
-        children?: ColumnsDef<TRecord>;
+      const column = columnProp as ColumnType<TRecord> & {
+        children?: ColumnsType<TRecord>;
       };
       const {
         key,
@@ -153,18 +153,12 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           {/* render value*/}
           {render
             ? typeof dataIndex === "string"
-              ? render({
-                  value: getValue() as never,
-                  record: row.original,
-                  index: row.index,
+              ? render(getValue() as never, row.original, row.index, {
                   table,
                   column,
                   row,
                 })
-              : render({
-                  value: undefined as never,
-                  record: row.original,
-                  index: row.index,
+              : render(undefined as never, row.original, row.index, {
                   table,
                   column,
                   row,
