@@ -105,4 +105,5 @@ const Checkbox = (props: CheckboxProps) => {
   );
 };
 
+export type { CheckboxProps };
 export { Checkbox };
