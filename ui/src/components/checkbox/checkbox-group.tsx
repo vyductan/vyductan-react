@@ -1,20 +1,31 @@
 import type { ValueType } from "../form";
+import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
 
 type CheckboxGroupProps<T extends ValueType> = {
   name?: string;
   value?: T[];
   options?: { label: string; value: T }[];
-  onChange?: (checkedValue: T[]) => void;
+  onChange?: (checkedValues: T[]) => void;
+
+  className?: string;
+  classNames?: {
+    item: string;
+  };
 };
 const CheckboxGroup = <T extends ValueType = string>({
   name,
   value,
   options = [],
   onChange,
+  className,
+  classNames,
 }: CheckboxGroupProps<T>) => {
   return (
-    <div data-slot="checkbox-group">
+    <div
+      data-slot="checkbox-group"
+      className={cn("inline-flex flex-wrap gap-2", className)}
+    >
       {options.map((o) => {
         return (
           <Checkbox
@@ -29,6 +40,7 @@ const CheckboxGroup = <T extends ValueType = string>({
                   : (value ?? []).filter((x) => x !== o.value),
               );
             }}
+            className={classNames?.item}
           >
             {o.label}
           </Checkbox>
