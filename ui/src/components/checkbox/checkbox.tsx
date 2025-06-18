@@ -52,7 +52,7 @@ const Checkbox = (props: CheckboxProps) => {
       aria-describedby={ariaDescribedBy}
       aria-invalid={ariaInvalid}
       className={cn(
-        "inline-flex items-center",
+        "inline-flex shrink-0 items-center",
         "text-sm",
         loading && "items-center",
         className,
