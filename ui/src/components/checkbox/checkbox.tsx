@@ -8,18 +8,29 @@ import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 import { Icon } from "../../icons";
 import { LoadingIcon } from "../button";
 
-type ShadcnCheckboxProps = React.ComponentProps<typeof ShadcnCheckbox>;
+type ShadcnCheckboxProps = Omit<
+  React.ComponentProps<typeof ShadcnCheckbox>,
+  "children" | "onChange"
+>;
 
-type OwnCheckboxProps = Omit<
-  ShadcnCheckboxProps,
-  "checked" | "defaultChecked" | "onChange" | "onCheckedChange"
-> & {
+type OwnCheckboxProps = {
+  key?: React.Key;
+  id?: string;
+  name?: string;
+  value?: string;
+  children?: React.ReactNode;
+
   loading?: boolean;
 
   checked?: boolean;
   defaultChecked?: boolean;
   indeterminate?: boolean;
+  // onChange?: (checked: boolean) => void;
+
+  className?: string;
   onChange?: (checked: boolean) => void;
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean;
 };
 
 type CheckboxProps = XOR<OwnCheckboxProps, ShadcnCheckboxProps>;
@@ -52,7 +63,7 @@ const Checkbox = (props: CheckboxProps) => {
       aria-describedby={ariaDescribedBy}
       aria-invalid={ariaInvalid}
       className={cn(
-        "inline-flex shrink-0 items-center",
+        "inline-flex shrink-0 cursor-pointer items-center",
         "text-sm",
         loading && "items-center",
         className,
@@ -100,7 +111,7 @@ const Checkbox = (props: CheckboxProps) => {
           </CheckboxPrimitive.Indicator>
         </CheckboxPrimitive.Root>
       )}
-      {children && <span className="cursor-pointer px-2">{children}</span>}
+      {children && <span className="px-2">{children}</span>}
     </label>
   );
 };
