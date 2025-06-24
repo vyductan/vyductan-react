@@ -116,7 +116,7 @@ export const Descriptions = ({
     labelClassName,
   );
   const tdClassName = cn(
-    "break-all",
+    "break-all text-sm",
     layout === "horizontal" && [
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
