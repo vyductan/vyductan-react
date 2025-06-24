@@ -53,6 +53,7 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
+    "h-fit",
     "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
