@@ -14,7 +14,14 @@ const DrawerContent = ({
   ...props
 }: React.ComponentProps<typeof ShadcnDrawerContent>) => {
   return (
-    <ShadcnDrawerContent className={cn(className)} {...props}>
+    <ShadcnDrawerContent
+      className={cn(
+        "flex flex-col [&>div]:flex-1",
+        "!touch-auto !select-text",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </ShadcnDrawerContent>
   );
@@ -80,4 +87,28 @@ const DrawerHeader = ({
 //     );
 //   }
 
-export { DrawerContent, DrawerHeader };
+const DrawerFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      "bg-muted/10 border-t p-4",
+      className,
+    )}
+    {...props}
+  />
+);
+DrawerFooter.displayName = "DrawerFooter";
+
+export { DrawerContent, DrawerHeader, DrawerFooter };
+export {
+  Drawer as DrawerRoot,
+  DrawerDescription,
+  DrawerOverlay,
+  DrawerTitle,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerPortal,
+} from "../../shadcn/drawer";
