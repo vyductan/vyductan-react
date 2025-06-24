@@ -6,6 +6,7 @@ import type {
 } from "@radix-ui/react-tooltip";
 import * as React from "react";
 
+import type { AlignType } from "../../types";
 import {
   TooltipContent,
   TooltipProvider,
@@ -24,14 +25,26 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
     title?: string;
     arrow?: string;
   };
+  align?: AlignType;
 };
 const Tooltip = (props: TooltipProps) => {
-  const { children, title, placement, hidden, classNames, ...restProps } =
-    props;
   const triggerRef = React.useRef(null);
 
-  const isShadcnTooltip = !title;
+  const isShadcnTooltip = !props.title;
   if (isShadcnTooltip) return <TooltipRoot {...props} />;
+
+  const {
+    children,
+    title,
+    placement,
+    hidden,
+    classNames,
+    align: domAlign,
+    ...restProps
+  } = props;
+
+  const alignOffset = domAlign?.offset?.[0];
+  const sideOffset = domAlign?.offset?.[1];
 
   return (
     <>
@@ -47,6 +60,9 @@ const Tooltip = (props: TooltipProps) => {
           </TooltipTrigger>
           <TooltipContent
             side={placement}
+            // align={align}
+            alignOffset={alignOffset}
+            sideOffset={sideOffset}
             hidden={hidden}
             // keep tooltip open when trigger is clicked
             onPointerDownOutside={(event) => {
