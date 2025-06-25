@@ -79,7 +79,7 @@ const Card = ({
 
   if (!isShadcnCard) {
     CardRender = (
-      <CardRoot {...props}>
+      <CardRoot className={className} {...props}>
         {(!!title || !!description || !!extra) && (
           <CardHeader className={cn(classNames?.header)}>
             <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
@@ -91,7 +91,7 @@ const Card = ({
             {extra && <CardAction>{extra}</CardAction>}
           </CardHeader>
         )}
-        <CardContent className={cn(className, classNames?.content)}>
+        <CardContent className={cn(classNames?.content)}>
           {children}
         </CardContent>
         {footer && (
