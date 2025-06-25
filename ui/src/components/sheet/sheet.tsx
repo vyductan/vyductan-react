@@ -1,4 +1,5 @@
 import type { XOR } from "ts-xor";
+import { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -40,7 +41,9 @@ type OwnSheetProps = {
 
 type SheetProps = XOR<ShadcnSheetProps, OwnSheetProps>;
 const Sheet = (props: SheetProps) => {
-  const isShadcnSheet = !props.title;
+  const isShadcnSheet = Children.toArray(props.children).some(
+    (child) => isValidElement(child) && child.type === SheetContent,
+  );
   if (isShadcnSheet) {
     return <SheetRoot {...props} />;
   }
