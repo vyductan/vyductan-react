@@ -6,7 +6,7 @@ import type {
 } from "@radix-ui/react-tooltip";
 import * as React from "react";
 
-import type { AlignType } from "../../types";
+import type { AlignType, Placement } from "../../types";
 import {
   TooltipContent,
   TooltipProvider,
@@ -19,7 +19,7 @@ type TooltipProps = Omit<RduTooltipProps, "side"> & {
    * The text shown in the tooltip
    */
   title?: React.ReactNode;
-  placement?: TooltipContentProps["side"];
+  placement?: Placement;
   hidden?: boolean;
   classNames?: {
     title?: string;
@@ -43,6 +43,22 @@ const Tooltip = (props: TooltipProps) => {
     ...restProps
   } = props;
 
+  const side = placement?.includes("top")
+    ? "top"
+    : placement?.includes("right")
+      ? "right"
+      : !placement || placement.includes("bottom")
+        ? "bottom"
+        : "left";
+  const align = placement?.includes("Top")
+    ? "start"
+    : !placement ||
+        (!placement.includes("Left") && !placement.includes("Right"))
+      ? "center"
+      : placement.includes("Left")
+        ? "start"
+        : "end";
+
   const alignOffset = domAlign?.offset?.[0];
   const sideOffset = domAlign?.offset?.[1];
 
@@ -59,8 +75,8 @@ const Tooltip = (props: TooltipProps) => {
             {children}
           </TooltipTrigger>
           <TooltipContent
-            side={placement}
-            // align={align}
+            side={side}
+            align={align}
             alignOffset={alignOffset}
             sideOffset={sideOffset}
             hidden={hidden}
