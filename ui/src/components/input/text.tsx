@@ -56,7 +56,7 @@ export const inputVariants = tv({
         "border",
         "rounded-md",
         "focus-within:ring-2",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "focus-visible:border-primary-500 focus-visible:ring-ring/50 focus-visible:ring-[3px]",
       ],
       outline: [],
       filled: ["bg-accent border-none shadow-none focus-within:ring-0"],
