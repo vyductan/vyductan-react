@@ -14,10 +14,11 @@ export type AvatarProps = AvatarRootProps &
     fallback?: ReactNode;
     className?: string;
   };
-export const Avatar = ({ fallback, size, src, alt, ...rest }: AvatarProps) => {
-  const isShadcnAvatar = !src;
-  if (isShadcnAvatar) return <AvatarRoot size={size} {...rest} />;
+export const Avatar = (props: AvatarProps) => {
+  const isShadcnAvatar = props.children;
+  if (isShadcnAvatar) return <AvatarRoot {...props} />;
 
+  const { fallback, size, src, alt, ...rest } = props;
   return (
     <AvatarRoot size={size} {...rest}>
       <AvatarImage src={src} alt={alt} />
