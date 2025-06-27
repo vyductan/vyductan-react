@@ -1,4 +1,7 @@
 :root {
+  --primary: var(--color-primary-600);
+  --ring: var(--color-primary-100);
+
   --breakpoint-xs: 480px;
   --control-height: 32px;
   --control-height-lg: 40px;

@@ -4,7 +4,8 @@
 @import "./shadcn.css";
 
 @import "./colors.css" layer(base);
-@import "./token.css" layer(base);
+@import "./token.css";
+/* @import "./token.css" layer(base); */
 @import "./utilities.css";
 
 @plugin "@iconify/tailwind4";
