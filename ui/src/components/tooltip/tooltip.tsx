@@ -1,9 +1,6 @@
 "use client";
 
-import type {
-  TooltipProps as RduTooltipProps,
-  TooltipContentProps,
-} from "@radix-ui/react-tooltip";
+import type { TooltipProps as RduTooltipProps } from "@radix-ui/react-tooltip";
 import * as React from "react";
 
 import type { AlignType, Placement } from "../../types";
