@@ -4,27 +4,29 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { AlertRootProps } from "./_components";
 import { Icon } from "../../icons";
-import { AlertDescription, AlertRoot, AlertTitle } from "./_components";
+import {
+  AlertContent,
+  AlertDescription,
+  AlertMessage,
+  AlertRoot,
+} from "./_components";
 
 type AlertProps = Omit<AlertRootProps, "title"> & {
-  title?: ReactNode;
   message?: ReactNode;
+  description?: ReactNode;
   showIcon?: boolean;
 
   bordered?: boolean;
-  classNames?: {
-    title?: string;
-  };
 };
 const Alert = ({
-  title,
   message,
+  description,
+
   className,
   showIcon,
   type,
 
   bordered = true,
-  classNames,
 }: AlertProps) => {
   const icon =
     type === "warning" ? (
@@ -33,8 +35,10 @@ const Alert = ({
   return (
     <AlertRoot type={type} bordered={bordered} className={cn(className)}>
       {showIcon && <span className="me-2">{icon}</span>}
-      {title && <AlertTitle className={classNames?.title}>{title}</AlertTitle>}
-      {message && <AlertDescription>{message}</AlertDescription>}
+      <AlertContent>
+        {message && <AlertMessage>{message}</AlertMessage>}
+        {description && <AlertDescription>{description}</AlertDescription>}
+      </AlertContent>
     </AlertRoot>
   );
 };
