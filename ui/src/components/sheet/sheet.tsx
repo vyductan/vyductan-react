@@ -85,7 +85,7 @@ const Sheet = (props: SheetProps) => {
           </SheetDescription>
         </SheetHeader>
 
-        <div className={cn("flex-1 overflow-auto p-6 pt-0")}>{children}</div>
+        <div className={cn("flex-1 overflow-auto p-6 py-0")}>{children}</div>
 
         {footer && (
           <div
