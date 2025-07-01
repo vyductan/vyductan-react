@@ -5,7 +5,12 @@ import { cva } from "class-variance-authority";
 import { cn } from "@acme/ui/lib/utils";
 
 export const alertVariants = cva(
-  "relative w-full rounded-lg border px-4 py-3 text-sm grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
+  [
+    "relative w-full rounded-lg border leading-line-height px-3 py-2 text-sm   has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
+    // "grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr]",
+    "flex",
+  ],
+
   {
     variants: {
       type: {
@@ -44,12 +49,22 @@ function AlertRoot({
   );
 }
 
-function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
+function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      data-slot="alert-title"
+      data-slot="alert-content"
+      className={cn("min-w-0 flex-1", className)}
+      {...props}
+    />
+  );
+}
+
+function AlertMessage({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="alert-message"
       className={cn(
-        "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
+        // "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
         className,
       )}
       {...props}
@@ -74,4 +89,4 @@ function AlertDescription({
 }
 
 export type { AlertRootProps };
-export { AlertRoot, AlertTitle, AlertDescription };
+export { AlertRoot, AlertContent, AlertMessage, AlertDescription };
