@@ -1,118 +1,162 @@
-import type { XOR } from "ts-xor";
 import * as React from "react";
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 
 import { cn } from "@acme/ui/lib/utils";
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
-import { Icon } from "../../icons";
+import { devUseWarning } from "../_util/warning";
+import Wave from "../../lib/wave";
 import { LoadingIcon } from "../button";
+import { ConfigContext } from "../config-provider/context";
+import DisabledContext from "../config-provider/disabled-context";
+import GroupContext from "./group-context";
+import useBubbleLock from "./use-bubble-lock";
 
-type ShadcnCheckboxProps = Omit<
-  React.ComponentProps<typeof ShadcnCheckbox>,
-  "children" | "onChange"
->;
-
-type OwnCheckboxProps = {
-  key?: React.Key;
+type AbstractCheckboxProps<T> = {
   id?: string;
   name?: string;
+
+  // value
   value?: string;
-  children?: React.ReactNode;
-
-  loading?: boolean;
-
   checked?: boolean;
   defaultChecked?: boolean;
-  indeterminate?: boolean;
-  // onChange?: (checked: boolean) => void;
+  onChange?: (e: T) => void;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+  onMouseEnter?: React.MouseEventHandler<HTMLElement>;
+  onMouseLeave?: React.MouseEventHandler<HTMLElement>;
 
+  // state
+  disabled?: boolean;
+  loading?: boolean;
+
+  // styles
   className?: string;
-  onChange?: (checked: boolean) => void;
-  "aria-describedby"?: string;
-  "aria-invalid"?: boolean;
+  style?: React.CSSProperties;
+
+  // render
+  children?: React.ReactNode;
+
+  // config
+  skipGroup?: boolean;
 };
+export interface CheckboxChangeEventTarget extends OwnCheckboxProps {
+  checked: boolean;
+}
 
-type CheckboxProps = XOR<OwnCheckboxProps, ShadcnCheckboxProps>;
+export interface CheckboxChangeEvent {
+  target: CheckboxChangeEventTarget;
+  stopPropagation: () => void;
+  preventDefault: () => void;
+  nativeEvent: MouseEvent;
+}
 
-const Checkbox = (props: CheckboxProps) => {
-  const isShadcnCheckbox = !!props.onCheckedChange;
-  if (isShadcnCheckbox) {
-    return <ShadcnCheckbox {...props} />;
-  }
+type OwnCheckboxProps = AbstractCheckboxProps<CheckboxChangeEvent> &
+  React.AriaAttributes & {
+    indeterminate?: boolean;
+  };
 
+const Checkbox = (props: OwnCheckboxProps) => {
   const {
-    id,
-    "aria-describedby": ariaDescribedBy,
-    "aria-invalid": ariaInvalid,
+    // id,
+    // "aria-describedby": ariaDescribedBy,
+    // "aria-invalid": ariaInvalid,
 
     loading,
+    disabled,
 
-    children,
+    indeterminate = false,
     checked,
-    defaultChecked,
+    // defaultChecked,
+
+    // styles
     className,
-    indeterminate,
+    style,
+    // render
+    children,
+
+    skipGroup,
+
+    // on
+    // onClick,
     onChange,
+    onMouseEnter,
+    onMouseLeave,
     ...restProps
-  } = props as OwnCheckboxProps;
+  } = props;
+
+  const { direction, checkbox } = React.useContext(ConfigContext);
+  const checkboxGroup = React.useContext(GroupContext);
+  const contextDisabled = React.useContext(DisabledContext);
+  const mergedDisabled = checkboxGroup?.disabled ?? disabled ?? contextDisabled;
+
+  if (process.env.NODE_ENV !== "production") {
+    const warning = devUseWarning("Checkbox");
+
+    warning(
+      "checked" in restProps || !!checkboxGroup || !("value" in restProps),
+      "usage",
+      "`value` is not a valid prop, do you mean `checked`?",
+    );
+  }
+
+  const checkboxProps: OwnCheckboxProps = { ...restProps };
+  if (checkboxGroup && !skipGroup) {
+    checkboxProps.onChange = (...args) => {
+      if (onChange) {
+        onChange(...args);
+      }
+      if (checkboxGroup.toggleOption) {
+        checkboxGroup.toggleOption({ label: children, value: restProps.value });
+      }
+    };
+    checkboxProps.name = checkboxGroup.name;
+    checkboxProps.checked = restProps.value
+      ? checkboxGroup.value?.includes(restProps.value)
+      : false;
+  }
+
+  // ============================ Event Lock ============================
+  const [onLabelClick, onInputClick] = useBubbleLock(checkboxProps.onClick);
 
   return (
-    <label
-      id={id}
-      aria-describedby={ariaDescribedBy}
-      aria-invalid={ariaInvalid}
-      className={cn(
-        "inline-flex shrink-0 cursor-pointer items-center",
-        "text-sm",
-        loading && "items-center",
-        className,
-      )}
-    >
-      {loading ? (
-        <LoadingIcon />
-      ) : (
-        <CheckboxPrimitive.Root
-          data-slot="checkbox"
-          checked={
-            indeterminate
-              ? "indeterminate"
-              : typeof props.value === "boolean"
-                ? props.value
-                : checked
-          }
-          defaultChecked={indeterminate ? "indeterminate" : defaultChecked}
-          className={cn(
-            "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-            // own
-            "data-[state=indeterminate]:text-primary-600 data-[state=checked]:bg-primary-600 data-[state=checked]:border-primary-600",
-          )}
-          onCheckedChange={onChange}
+    <Wave component="Checkbox" disabled={mergedDisabled}>
+      <label
+        className={cn(
+          "inline-flex items-center space-x-2",
+          direction === "rtl" ? "flex-row-reverse" : "flex-row",
+        )}
+        style={{ ...checkbox?.style, ...style }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={onLabelClick}
+      >
+        <ShadcnCheckbox
+          checked={indeterminate ? "indeterminate" : checked}
+          onClick={onInputClick}
+          className={cn("data-[state=indeterminate]:bg-muted", className)}
+          onCheckedChange={(checked) => {
+            onChange?.({
+              target: {
+                checked: checked === "indeterminate" ? false : checked,
+                indeterminate,
+                // "aria-describedby": ariaDescribedBy,
+                // "aria-invalid": ariaInvalid,
+              },
+              nativeEvent: new MouseEvent("change"),
+              preventDefault: () => {
+                //
+              },
+              stopPropagation: () => {
+                //
+              },
+            });
+          }}
           {...restProps}
-        >
-          <CheckboxPrimitive.Indicator
-            data-slot="checkbox-indicator"
-            className={cn(
-              "flex items-center justify-center text-current transition-none",
-              // own
-              "size-full",
-            )}
-          >
-            {indeterminate ? (
-              <Icon
-                icon="icon-[ant-design--x-filled]"
-                className="size-[10px]"
-              />
-            ) : (
-              <Icon icon="icon-[lucide--check]" className="size-3.5" />
-            )}
-          </CheckboxPrimitive.Indicator>
-        </CheckboxPrimitive.Root>
-      )}
-      {children && <span className="px-2">{children}</span>}
-    </label>
+        />
+        {loading ? <LoadingIcon /> : children}
+      </label>
+    </Wave>
   );
 };
 
-export type { CheckboxProps };
+export type { OwnCheckboxProps, AbstractCheckboxProps };
 export { Checkbox };
