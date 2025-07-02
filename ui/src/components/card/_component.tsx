@@ -3,6 +3,7 @@ import { useContext } from "react";
 import type { SizeType } from "@acme/ui/types";
 import { cn } from "@acme/ui/lib/utils";
 import {
+  CardAction as ShadcnCardAction,
   CardContent as ShadcnCardContent,
   CardFooter as ShadcnCardFooter,
   CardHeader as ShadcnCardHeader,
@@ -66,6 +67,21 @@ const CardTitle = ({
   );
 };
 
+const CardAction = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof ShadcnCardAction>) => {
+  return (
+    <ShadcnCardAction
+      className={cn(
+        "row-span-1", // title and extra should same height
+        className,
+      )}
+      {...props}
+    />
+  );
+};
+
 const CardContent = ({
   size: sizeProp,
   className,
@@ -102,6 +118,6 @@ const CardFooter = ({
 
 export type { CardRootProps };
 
-export { CardRoot, CardHeader, CardTitle, CardContent, CardFooter };
+export { CardRoot, CardHeader, CardTitle, CardAction, CardContent, CardFooter };
 
-export { CardAction, CardDescription } from "@acme/ui/shadcn/card";
+export { CardDescription } from "@acme/ui/shadcn/card";
