@@ -72,7 +72,7 @@ export const inputVariants = tv({
 export const inputSizeVariants = tv({
   variants: {
     size: {
-      sm: "",
+      sm: "px-[7px] py-px",
       default: "h-8 px-[11px] py-[5px]",
       lg: "px-[11px] py-[9px]",
       xl: "px-[11px] py-[13px]",
