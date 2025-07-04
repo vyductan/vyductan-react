@@ -2,8 +2,6 @@ import type { VariantProps } from "tailwind-variants";
 
 import type { inputSizeVariants } from "./components/input";
 
-export type AnyObject = Record<PropertyKey, any>;
-
 export type Direction = "ltr" | "rtl";
 
 export type Placement =
@@ -88,7 +86,7 @@ export interface AlignType {
 }
 
 // export type SizeType = "sm" | "md" | "lg" | undefined;
-export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
+export type SizeType = VariantProps<typeof inputSizeVariants>["size"] | "small";
 
 // export const Variants = ["outlined", "borderless", "filled"] as const;
 
