@@ -11,7 +11,7 @@ import {
   CardTitle as ShadcnCardTitle,
 } from "@acme/ui/shadcn/card";
 
-import { CardContext } from "./context";
+import { CardContext } from "../context";
 
 type CardRootProps = React.ComponentProps<typeof ShadcnCardRoot> & {
   size?: SizeType;
