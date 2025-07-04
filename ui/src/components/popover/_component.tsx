@@ -20,10 +20,14 @@ const PopoverContent = ({
         onFocusOutside?.(e);
       }}
       // to allow scrollable
-      onWheel={(e) => {
-        e.preventDefault();
-        onWheel?.(e);
-      }}
+      onWheel={
+        onWheel
+          ? (e) => {
+              e.preventDefault();
+              onWheel(e);
+            }
+          : undefined
+      }
       style={{
         boxShadow: `var(--box-shadow-secondary)`,
       }}
