@@ -402,6 +402,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       type === "submit" || type === "reset" || type === "button";
     const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
+    let variantToPass = variant;
+    if (!isHtmlType && type === "text") {
+      variantToPass = "ghost";
+    }
     return (
       <Wave component="Button" disabled={loading}>
         <Comp
@@ -414,7 +418,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               primary: !primary && !!variant ? undefined : (primary ?? true),
               size,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-              variant,
+              variant: variantToPass,
             }),
             buttonConfig?.classNames?.variants &&
               tv(
