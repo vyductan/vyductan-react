@@ -6,7 +6,10 @@
   --control-height: 32px;
   --control-height-lg: 40px;
   --control-height-sm: 24px;
+  --line-height: 22px;
   --margin-xs: 8px;
+
+  --progress-default-color: var(--color-blue-600);
 }
 
 @theme inline {
@@ -22,6 +25,7 @@
   --spacing-control: var(--control-height);
   --spacing-control-sm: var(--control-height-sm);
   --spacing-control-lg: var(--control-height-lg);
+  --spacing-line-height: var(--line-height);
 
   --box-shadow-secondary:
     0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
