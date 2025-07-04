@@ -3,7 +3,7 @@ import React, { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { CardRootProps } from "./_component";
+import type { CardRootProps } from "./_components";
 import { Skeleton } from "../skeleton";
 import {
   CardAction,
@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardRoot,
   CardTitle,
-} from "./_component";
+} from "./_components";
 import { CardContext } from "./context";
 
 type CardProps = Omit<CardRootProps, "title"> & {
@@ -83,10 +83,14 @@ const Card = ({
   }
 
   if (!isShadcnCard) {
+    const hasExtra = !!extra;
+
     CardRender = (
       <CardRoot className={className} {...props}>
         {(!!title || !!description || !!extra) && (
-          <CardHeader className={cn(classNames?.header)}>
+          <CardHeader
+            className={cn(hasExtra && "items-center", classNames?.header)}
+          >
             <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {description && (
               <CardDescription className={cn(classNames?.description)}>
