@@ -4,6 +4,11 @@ import type { WarningContextProps } from "../_util/warning";
 import type { ShowWaveEffect } from "../../lib/wave/interface";
 import type { Locale } from "../locale";
 import type { TableProps } from "../table";
+import type {
+  AliasToken,
+  MappingAlgorithm,
+  OverrideToken,
+} from "../theme/interface";
 import type { RenderEmptyHandler } from "./default-render-empty";
 
 export interface CSPConfig {
@@ -11,6 +16,27 @@ export interface CSPConfig {
 }
 
 export type DirectionType = "ltr" | "rtl" | undefined;
+
+type ComponentsConfig = {
+  [key in keyof OverrideToken]?: OverrideToken[key] & {
+    algorithm?: boolean | MappingAlgorithm | MappingAlgorithm[];
+  };
+};
+
+export interface ThemeConfig {
+  /**
+   * @descEN Modify Design Token.
+   */
+  token?: Partial<AliasToken>;
+  /**
+   * @descEN Modify Component Token and Alias Token applied to components.
+   */
+  components?: ComponentsConfig;
+}
+export interface ComponentStyleConfig {
+  className?: string;
+  style?: React.CSSProperties;
+}
 
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
@@ -20,11 +46,6 @@ export interface TableConfig extends ComponentStyleConfig {
 }
 
 export type PopupOverflow = "viewport" | "scroll";
-
-export interface ComponentStyleConfig {
-  className?: string;
-  style?: React.CSSProperties;
-}
 
 export const Variants = [
   "outlined",
@@ -68,7 +89,7 @@ export interface ConfigComponentProps {
   // collapse?: CollapseConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;
   // typography?: ComponentStyleConfig;
-  // skeleton?: ComponentStyleConfig;
+  skeleton?: ComponentStyleConfig;
   // spin?: SpinConfig;
   // segmented?: ComponentStyleConfig;
   // steps?: ComponentStyleConfig;
@@ -78,7 +99,7 @@ export interface ConfigComponentProps {
   // list?: ListConfig;
   // mentions?: MentionsConfig;
   // modal?: ModalConfig;
-  // progress?: ComponentStyleConfig;
+  progress?: ComponentStyleConfig;
   // result?: ComponentStyleConfig;
   // slider?: SliderConfig;
   // breadcrumb?: ComponentStyleConfig;
@@ -143,3 +164,54 @@ export const ConfigContext = React.createContext<ConfigConsumerProps>({
   // getPrefixCls: defaultGetPrefixCls,
   // iconPrefixCls: defaultIconPrefixCls,
 });
+
+export const { Consumer: ConfigConsumer } = ConfigContext;
+
+const EMPTY_OBJECT = {};
+
+type GetClassNamesOrEmptyObject<Config extends { classNames?: any }> =
+  Config extends {
+    classNames?: infer ClassNames;
+  }
+    ? ClassNames
+    : object;
+
+type GetStylesOrEmptyObject<Config extends { styles?: any }> = Config extends {
+  styles?: infer Styles;
+}
+  ? Styles
+  : object;
+
+type ComponentReturnType<T extends keyof ConfigComponentProps> = Omit<
+  NonNullable<ConfigComponentProps[T]>,
+  "classNames" | "styles"
+> & {
+  classNames: GetClassNamesOrEmptyObject<NonNullable<ConfigComponentProps[T]>>;
+  styles: GetStylesOrEmptyObject<NonNullable<ConfigComponentProps[T]>>;
+  direction: ConfigConsumerProps["direction"];
+  getPopupContainer: ConfigConsumerProps["getPopupContainer"];
+};
+
+/**
+ * Get ConfigProvider configured component props.
+ * This help to reduce bundle size for saving `?.` operator.
+ * Do not use as `useMemo` deps since we do not cache the object here.
+ *
+ * NOTE: not refactor this with `useMemo` since memo will cost another memory space,
+ * which will waste both compare calculation & memory.
+ */
+export function useComponentConfig<T extends keyof ConfigComponentProps>(
+  propName: T,
+) {
+  const context = React.useContext(ConfigContext);
+  const { direction, getPopupContainer } = context;
+
+  const propValue = context[propName];
+  return {
+    classNames: EMPTY_OBJECT,
+    styles: EMPTY_OBJECT,
+    ...propValue,
+    direction,
+    getPopupContainer,
+  } as ComponentReturnType<T>;
+}
