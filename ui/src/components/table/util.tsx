@@ -1,9 +1,16 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { Row, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
-import type { AnyObject } from "../../types";
+import type { AnyObject } from "../_util/type";
 import type { TableProps } from "./table";
-import type { ColumnsType, ColumnType } from "./types";
+import type {
+  ColumnsType,
+  ColumnTitle,
+  ColumnTitleProps,
+  ColumnType,
+  Key,
+} from "./types";
 
 export const transformColumnDefs = <TRecord extends AnyObject>(
   columns: ColumnsType<TRecord>,
@@ -27,15 +34,16 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         render,
 
         // meta props
-        align,
+        // align,
         fixed,
-        className,
-        classNames,
-        styles,
-        defaultSortOrder,
+        // className,
+        // classNames,
+        // styles,
+        // defaultSortOrder,
         sorter,
-        attributes,
-        headAttributes,
+        // attributes,
+        // headAttributes,
+        // onHeaderCell,
 
         ...restProps
       } = column;
@@ -69,18 +77,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         enableHiding,
         size: typeof width === "number" ? width : undefined,
         minSize: minWidth,
-        meta: {
-          title,
-          align,
-          fixed,
-          defaultSortOrder,
-          sorter,
-          className,
-          classNames,
-          styles,
-          attributes,
-          headAttributes,
-        },
+        meta: column,
         // sorting
         ...(sorter
           ? {
@@ -304,4 +301,51 @@ export const transformedTanstackTableRowSelection = (
     rowSelectionTst[x] = true;
   }
   return rowSelectionTst;
+};
+
+export const getColumnKey = <RecordType extends AnyObject = AnyObject>(
+  column: ColumnType<RecordType>,
+  defaultKey: string,
+): Key => {
+  if ("key" in column && column.key !== undefined && column.key !== null) {
+    return column.key;
+  }
+  if (column.dataIndex) {
+    return Array.isArray(column.dataIndex)
+      ? column.dataIndex.join(".")
+      : (column.dataIndex as Key);
+  }
+  return defaultKey;
+};
+
+export function getColumnPos(index: number, pos?: string) {
+  return pos ? `${pos}-${index}` : `${index}`;
+}
+
+export const renderColumnTitle = <RecordType extends AnyObject = AnyObject>(
+  title: ColumnTitle<RecordType>,
+  props: ColumnTitleProps<RecordType>,
+) => {
+  if (typeof title === "function") {
+    return title(props);
+  }
+  return title;
+};
+
+/**
+ * Safe get column title
+ *
+ * Should filter [object Object]
+ *
+ * @param title
+ */
+export const safeColumnTitle = <RecordType extends AnyObject = AnyObject>(
+  title: ColumnTitle<RecordType>,
+  props: ColumnTitleProps<RecordType>,
+) => {
+  const res = renderColumnTitle<RecordType>(title, props);
+  if (Object.prototype.toString.call(res) === "[object Object]") {
+    return "";
+  }
+  return res;
 };
