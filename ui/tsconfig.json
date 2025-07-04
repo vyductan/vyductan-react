@@ -4,7 +4,10 @@
   "compilerOptions": {
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@/lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]
