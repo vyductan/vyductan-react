@@ -13,6 +13,12 @@ type OwnSwitchProps = Omit<
   "onChange" | "onCheckedChange"
 > & {
   onChange?: (checked: boolean) => void;
+  /** Content to show when the state is checked */
+  checkedChildren?: React.ReactNode;
+  /** Content to show when the state is unchecked */
+  unCheckedChildren?: React.ReactNode;
+  /** Additional class name for the switch container */
+  className?: string;
 };
 type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
 const Switch = (props: SwitchProps) => {
@@ -32,20 +38,44 @@ const Switch = (props: SwitchProps) => {
     );
   }
 
-  const { className, onChange, ...restProps } = props as OwnSwitchProps;
+  const {
+    className,
+    onChange,
+    checkedChildren,
+    unCheckedChildren,
+    checked,
+    ...restProps
+  } = props as OwnSwitchProps;
+
+  const hasChildren = checkedChildren ?? unCheckedChildren;
 
   return (
     <ShadcnSwitch
       className={cn(
-        "h-[22px] w-11",
-        "data-[slot=switch-thumb]:size-[18px]",
+        !hasChildren && "h-[22px] w-11",
+        !hasChildren && "data-[slot=switch-thumb]:size-[18px]",
+        hasChildren && "h-6 min-w-11",
+        hasChildren && "data-[slot=switch-thumb]:size-5",
         className,
       )}
+      checked={checked}
       onCheckedChange={(checked) => {
         onChange?.(checked);
       }}
       {...restProps}
-    />
+    >
+      {hasChildren && (
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center text-xs font-medium whitespace-nowrap",
+            "transition-all duration-200 ease-in-out",
+            checked ? "right-5 left-1.5" : "right-1.5 left-5",
+          )}
+        >
+          {checked ? checkedChildren : unCheckedChildren}
+        </div>
+      )}
+    </ShadcnSwitch>
   );
 };
 
