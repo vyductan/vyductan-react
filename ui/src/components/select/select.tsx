@@ -7,7 +7,7 @@ import React from "react";
 import { Tag, tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject } from "../..";
+import type { AnyObject } from "../_util/type";
 import type { SelectRootProps } from "../../shadcn/select";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
