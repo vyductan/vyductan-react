@@ -1,4 +1,13 @@
-# dashboard-react
+# Custom React Components: Shadcn + AntD Style
+
+A modern UI component set built with [Shadcn UI](https://ui.shadcn.com/) and [Tailwind CSS], exposing an API similar to [Ant Design](https://ant.design/) for ease of use and consistency.
+
+- 🌀 Styled with Tailwind CSS and Shadcn components
+- ⚙️ Compatible props with AntD components
+- 🧩 Reusable & customizable
+- 🧠 Some internal logic adapted from AntD
+
+Ideal for teams transitioning from AntD or looking for AntD-like usage with a modern Tailwind-based design system.
 
 ## Colors
 
