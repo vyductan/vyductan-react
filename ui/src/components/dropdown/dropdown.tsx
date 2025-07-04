@@ -39,6 +39,9 @@ type Menu = {
   itemsClassName?: string;
 };
 export type DropdownProps = DropdownMenuTriggerProps & {
+  onOpenChange?: (open: boolean, info: { source: "trigger" | "menu" }) => void;
+  open?: boolean;
+
   className?: string;
   children: ReactNode;
   menu: Menu;
