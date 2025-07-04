@@ -16,11 +16,16 @@ function AvatarRoot({ className, size, ...props }: AvatarRootProps) {
       data-slot="avatar"
       className={cn(
         "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        size === "sm" && "size-6 text-xs",
-        size === "lg" && "size-10 text-lg",
-        size === "xl" && "size-16 text-[1.25rem] leading-[4rem]",
+        typeof size === "string" && size === "sm" && "size-6 text-xs",
+        typeof size === "string" && size === "lg" && "size-10 text-lg",
+        typeof size === "string" &&
+          size === "xl" &&
+          "size-16 text-[1.25rem] leading-[4rem]",
         className,
       )}
+      style={
+        typeof size === "number" ? { width: size, height: size } : undefined
+      }
       {...props}
     />
   );
