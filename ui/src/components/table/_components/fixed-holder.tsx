@@ -8,7 +8,8 @@ import { fillRef } from "@rc-component/util/lib/ref";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject, Direction } from "../../..";
+import type { AnyObject } from "../../_util/type";
+import type { Direction } from "../../../types";
 import type { ColumnType } from "../types";
 import type { HeaderProps } from "./table-header";
 import { useTableStore } from "../hooks/use-table";

@@ -5,14 +5,14 @@ import type { Column } from "@tanstack/react-table";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { TableHeadProps } from ".";
-import type { tableLocale_en } from "../locale/en-us";
+import type { TableLocale } from "../types";
 import { TableHead } from ".";
 import { Icon } from "../../../icons";
 import { Tooltip } from "../../tooltip";
 
 interface TableHeadAdvancedProps<TData, TValue> extends TableHeadProps {
   column: Column<TData, TValue>;
-  locale: Partial<Record<keyof typeof tableLocale_en.Table, React.ReactNode>>;
+  locale: TableLocale;
 }
 
 export function TableHeadAdvanced<TData, TValue>({
@@ -24,6 +24,8 @@ export function TableHeadAdvanced<TData, TValue>({
   className,
 
   locale,
+
+  onClick: originOnClick,
   ...props
 }: TableHeadAdvancedProps<TData, TValue>) {
   if (!column.getCanSort()) {
@@ -33,6 +35,18 @@ export function TableHeadAdvanced<TData, TValue>({
       </TableHead>
     );
   }
+  // const originOnClick = cell.onClick;
+
+  const onClick = (event: React.MouseEvent<HTMLTableHeaderCellElement>) => {
+    console.log(
+      "ccccc",
+      // column.columnDef.meta?.onHeaderCell,
+      column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta),
+      column.columnDef.meta,
+    );
+    column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta);
+    originOnClick?.(event);
+  };
 
   return (
     <TableHead
@@ -45,7 +59,9 @@ export function TableHeadAdvanced<TData, TValue>({
             ? "Sorted ascending. Click to sort descending."
             : "Not sorted. Click to sort ascending."
       }
+      onClick={onClick}
       {...props}
+      {...column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta)}
     >
       <Tooltip
         title={

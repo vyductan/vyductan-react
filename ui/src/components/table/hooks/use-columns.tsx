@@ -1,23 +1,21 @@
+/* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 /* eslint-disable react-hooks/react-compiler */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import type { Table, ColumnDef as TTColumnDef } from "@tanstack/react-table";
+import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
 import warning from "@rc-component/util/lib/warning";
 
-import { useResponsive } from "@acme/hooks/use-responsive";
-import { Checkbox } from "@acme/ui/components/checkbox";
-
-import type { AnyObject, Direction } from "../../../types";
-import type { TableProps } from "../table";
+import type { Breakpoint } from "../../_util/responsive-observer";
+import type { AnyObject } from "../../_util/type";
+import type { Direction } from "../../../types";
 import type {
-  ColumnGroupDef,
+  ColumnGroupType,
   ColumnsType,
-  ColumnTitleProps,
   ColumnType,
   FixedType,
   GetRowKey,
@@ -27,9 +25,9 @@ import type {
   // Key,
   // RenderExpandIcon,
 } from "../types";
-import { TimeSelectProps } from "../../time-picker/_components/time-select";
+import useBreakpoint from "../../grid/hooks/use-breakpoint";
 import { EXPAND_COLUMN } from "../constant";
-import { getRowRange, transformColumnDefs } from "../utils";
+import { getColumnKey, transformColumnDefs } from "../util";
 import { INTERNAL_COL_DEFINE } from "../utils/legacy-util";
 
 export function convertChildrenToColumns<RecordType>(
@@ -58,7 +56,7 @@ function filterHiddenColumns<RecordType>(
   return columns
     .filter((column) => column && typeof column === "object" && !column.hidden)
     .map((column) => {
-      const subColumns = (column as ColumnGroupDef<RecordType>).children;
+      const subColumns = (column as ColumnGroupType<RecordType>).children;
 
       if (subColumns && subColumns.length > 0) {
         return {
@@ -119,7 +117,7 @@ function flatColumns<TRecord extends AnyObject>(
 export const useColumns = <TRecord extends AnyObject>(
   {
     columns,
-    rowSelection,
+    // rowSelection,
 
     children,
 
@@ -127,25 +125,25 @@ export const useColumns = <TRecord extends AnyObject>(
     // rowKey,
     // rowSelection: rowSelectionProp,
     // rowSelection,
+    childrenColumnName,
 
     expandable,
     expandedKeys,
     expandColumnTitle,
     expandColumnWidth,
     expandIcon,
-    // expandIconColumnIndex,
+    expandIconColumnIndex,
+    expandedRowOffset = 0,
     expandRowByClick,
     rowExpandable,
     onTriggerExpand,
-
-    mergedChildrenColumnName,
 
     direction,
     fixed,
     getRowKey,
     scrollWidth,
-  }: Pick<TableProps<TRecord>, "columns" | "rowSelection"> & {
-    // columns: ColumnsDef<TRecord>;
+  }: {
+    columns?: ColumnsType<TRecord>;
     children?: React.ReactNode;
 
     expandable: boolean;
@@ -158,12 +156,13 @@ export const useColumns = <TRecord extends AnyObject>(
     rowExpandable?: (record: TRecord) => boolean;
     onTriggerExpand: TriggerEventHandler<TRecord>;
 
-    mergedChildrenColumnName?: string;
-
     direction?: Direction;
     fixed?: FixedType;
     getRowKey: GetRowKey<TRecord>;
     scrollWidth?: number;
+    expandedRowOffset?: number;
+
+    childrenColumnName?: string;
   },
   transformColumns:
     | null
@@ -173,113 +172,49 @@ export const useColumns = <TRecord extends AnyObject>(
   columnsForTTTable: TTColumnDef<TRecord>[],
   flattenColumns: readonly ColumnType<TRecord>[],
 ] => {
-  let baseColumns = React.useMemo<ColumnsType<TRecord>>(() => {
+  const baseColumns = React.useMemo<ColumnsType<TRecord>>(() => {
     const newColumns = columns || convertChildrenToColumns(children) || [];
 
     return filterHiddenColumns(newColumns.slice());
   }, [columns, children]);
 
-  // ========================== Selections ==========================
-  const withSelectionColumn = React.useMemo<ColumnsType<TRecord>>(() => {
-    const cloneColumns = baseColumns.slice();
-    if (rowSelection) {
-      let lastSelectedId = "";
-      const width = rowSelection.columnWidth ?? 32;
+  // ========================== Responsive ==========================
+  const needResponsive = React.useMemo(
+    () => baseColumns.some((col) => col.responsive),
+    [baseColumns],
+  );
+  const screens = useBreakpoint(needResponsive);
 
-      const selectionColumn: ColumnType<TRecord> = {
-        key: "selection",
-        width,
-        // minWidth: width,
-        align: "center",
-        //   enableSorting: false,
-        // enableHiding: false,
-        title:
-          rowSelection.columnTitle ??
-          (({ table }: ColumnTitleProps<TRecord>) => {
-            const originNode = (
-              <Checkbox
-                aria-label="Select all"
-                className="flex items-center justify-center"
-                checked={table.getIsAllPageRowsSelected()}
-                indeterminate={table.getIsSomePageRowsSelected()}
-                onChange={table.toggleAllPageRowsSelected}
-              />
-            );
-            return rowSelection?.renderHeader
-              ? rowSelection.renderHeader({
-                  checked: table.getIsAllPageRowsSelected(),
-                  originNode,
-                })
-              : originNode;
-          }),
-        render: (_, __, ___, { table, row }) => {
-          const originNode = (
-            <Checkbox
-              aria-label="Select row"
-              className="flex items-center justify-center"
-              checked={row.getIsSelected()}
-              disabled={!row.getCanSelect()}
-              onChange={row.getToggleSelectedHandler()}
-              onClick={(event) => {
-                if (event.shiftKey) {
-                  const { rows, rowsById } = table.getRowModel();
-                  const rowsToToggle = getRowRange(
-                    rows,
-                    row.id,
-                    lastSelectedId,
-                  );
-                  const isLastSelected =
-                    rowsById[lastSelectedId]?.getIsSelected();
-                  for (const row of rowsToToggle)
-                    row.toggleSelected(isLastSelected);
-                }
+  const responsiveColumns = React.useMemo(() => {
+    const matched = new Set(
+      Object.keys(screens).filter((m) => screens[m as Breakpoint]),
+    );
 
-                lastSelectedId = row.id;
-              }}
-            />
-          );
-          return rowSelection?.renderCell
-            ? rowSelection.renderCell(
-                row.getIsSelected(),
-                row.original,
-                row.index,
-                originNode,
-              )
-            : originNode;
-        },
-        // ...rowSelection,
-      };
-
-      if (!cloneColumns.some((col) => col.key === "selection")) {
-        cloneColumns.unshift(selectionColumn);
-      }
-    }
-    return cloneColumns;
-  }, [rowSelection, baseColumns]);
-
-  baseColumns = withSelectionColumn;
+    return baseColumns.filter(
+      (c) => !c.responsive || c.responsive.some((r) => matched.has(r)),
+    );
+  }, [baseColumns, screens]);
 
   // ========================== Expand ==========================
   const withExpandColumns = React.useMemo<ColumnsType<TRecord>>(() => {
     if (expandable) {
-      let cloneColumns = baseColumns.slice();
+      let cloneColumns = responsiveColumns.slice();
 
-      // // >>> Warning if use `expandIconColumnIndex`
-      // if (
-      //   process.env.NODE_ENV !== "production" &&
-      //   expandIconColumnIndex !== undefined &&
-      //   expandIconColumnIndex >= 0
-      // ) {
-      //   warning(
-      //     false,
-      //     "`expandIconColumnIndex` is deprecated. Please use `Table.EXPAND_COLUMN` in `columns` instead.",
-      //   );
-      // }
+      // >>> Warning if use `expandIconColumnIndex`
+      if (
+        process.env.NODE_ENV !== "production" &&
+        expandIconColumnIndex !== undefined &&
+        expandIconColumnIndex >= 0
+      ) {
+        warning(
+          false,
+          "`expandIconColumnIndex` is deprecated. Please use `Table.EXPAND_COLUMN` in `columns` instead.",
+        );
+      }
 
       // >>> Insert expand column if not exist
       if (!cloneColumns.includes(EXPAND_COLUMN)) {
-        const expandColIndex = 0;
-        // const expandColIndex = expandIconColumnIndex || 0;
+        const expandColIndex = expandIconColumnIndex || 0;
         if (
           expandColIndex >= 0 &&
           (expandColIndex || fixed === "left" || fixed === "start" || !fixed)
@@ -314,7 +249,7 @@ export const useColumns = <TRecord extends AnyObject>(
       if (fixed) {
         fixedColumn = fixed;
       } else {
-        fixedColumn = prevColumn && prevColumn.fixed ? prevColumn.fixed : null;
+        fixedColumn = prevColumn?.fixed ? prevColumn.fixed : null;
       }
 
       // >>> Create expandable column
@@ -361,12 +296,11 @@ export const useColumns = <TRecord extends AnyObject>(
           const expanded = expandedKeys.has(rowKey);
           // const expanded = row.getIsExpanded();
 
-          const recordExpandable = rowExpandable
-            ? rowExpandable(record)
-            : (row.getCanExpand() ??
-              (mergedChildrenColumnName &&
-                !!record[mergedChildrenColumnName]) ??
-              true);
+          const recordExpandable = rowExpandable ? rowExpandable(record) : true;
+          //  (row.getCanExpand() ??
+          //   (mergedChildrenColumnName &&
+          //     !!record[mergedChildrenColumnName]) ??
+          //   true);
 
           const icon = expandIcon?.({
             // prefixCls,
@@ -386,9 +320,16 @@ export const useColumns = <TRecord extends AnyObject>(
         },
       };
 
-      return cloneColumns.map((col) =>
-        col === EXPAND_COLUMN ? expandColumn : col,
-      );
+      return cloneColumns.map((col, index) => {
+        const column = col === EXPAND_COLUMN ? expandColumn : col;
+        if (index < expandedRowOffset) {
+          return {
+            ...column,
+            fixed: column.fixed || "start",
+          };
+        }
+        return column;
+      });
     }
 
     if (
@@ -402,6 +343,7 @@ export const useColumns = <TRecord extends AnyObject>(
     }
 
     return baseColumns.filter((col) => col !== EXPAND_COLUMN);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     expandable,
@@ -409,6 +351,8 @@ export const useColumns = <TRecord extends AnyObject>(
     getRowKey,
     expandedKeys,
     expandIcon,
+    direction,
+    expandedRowOffset,
 
     // expandColumnTitle,
     // expandColumnWidth,
@@ -435,17 +379,16 @@ export const useColumns = <TRecord extends AnyObject>(
         },
       ];
     }
-    return finalColumns;
+
+    // Set key for tanstaack table id
+    return finalColumns.map((col, colIndex) => {
+      return {
+        ...col,
+        key: getColumnKey(col, colIndex.toString()).toString(),
+      };
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transformColumns, withExpandColumns, direction]);
-
-  // ========================== Responsive ==========================
-  const responsive = useResponsive();
-  const breakpoints = new Set(
-    Object.entries(responsive)
-      .filter(([, value]) => value)
-      .map(([key]) => key),
-  );
 
   // ========================== Flatten =========================
   const { flattenColumns } = React.useMemo(
@@ -455,21 +398,16 @@ export const useColumns = <TRecord extends AnyObject>(
   );
 
   // ========================== For TT Table =========================
-  const columnsForTTTable = transformColumnDefs(
-    mergedColumns.filter(
-      (c) => !c.responsive || c.responsive.some((r) => breakpoints.has(r)),
-    ),
-    {
-      // rowKey,
-      // rowSelection: rowSelectionProp,
-      expandable: mergedChildrenColumnName
-        ? {
-            childrenColumnName: mergedChildrenColumnName,
-            expandIcon,
-          }
-        : undefined,
-    },
-  );
+  const columnsForTTTable = transformColumnDefs(mergedColumns, {
+    // rowKey,
+    // rowSelection: rowSelectionProp,
+    expandable: childrenColumnName
+      ? {
+          childrenColumnName,
+          expandIcon,
+        }
+      : undefined,
+  });
 
   return [mergedColumns, columnsForTTTable, flattenColumns];
 };
