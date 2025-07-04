@@ -31,6 +31,7 @@ type TabsOwnProps = {
   children?: never;
 } & {
   type?: TabsType;
+  style?: React.CSSProperties;
   className?: string;
   classNames?: {
     root?: string;
@@ -49,6 +50,7 @@ type TabsOwnProps = {
    * Extras content (left|right)
    */
   tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
+  tabBarStyle?: React.CSSProperties;
 
   // styles
   // list
@@ -72,6 +74,7 @@ const Tabs = (props: TabsProps) => {
     items,
     onChange,
     tabBarExtraContent,
+    tabBarStyle,
     listProps,
     ...restProps
   } = props as TabsOwnProps;
@@ -97,10 +100,16 @@ const Tabs = (props: TabsProps) => {
         value={activeKey}
         onValueChange={onChange}
         className={cn("w-full", className)}
+        type={type}
         {...restProps}
       >
         {items.length > 0 && (
-          <TabsList type={type} className={classNames?.list} {...listProps}>
+          <TabsList
+            type={type}
+            className={classNames?.list}
+            style={tabBarStyle}
+            {...listProps}
+          >
             {assertExtra.left && <div className="mr-4">{assertExtra.left}</div>}
             {items.map((x) => (
               <TabsTrigger
