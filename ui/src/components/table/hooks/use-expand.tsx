@@ -4,11 +4,12 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";
 import * as React from "react";
+import { useMergedState } from "@rc-component/util";
 import warning from "@rc-component/util/lib/warning";
 
-import type { AnyObject } from "@acme/ui/types";
-
+import type { AnyObject } from "../../_util/type";
 import type { TableProps } from "../table";
 import type {
   ExpandableConfig,
@@ -30,15 +31,15 @@ export default function useExpand<TRecord extends AnyObject>(
   mergedData: readonly TRecord[],
   getRowKey: GetRowKey<TRecord>,
 ): [
-  expandableConfig: ExpandableConfig<TRecord>,
+  ExpandedState,
+  OnChangeFn<ExpandedState>,
+
+  ExpandableConfig<TRecord>,
   expandableType: ExpandableType,
   expandedKeys: Set<Key>,
   expandIcon: RenderExpandIcon<TRecord>,
   childrenColumnName: string,
   onTriggerExpand: TriggerEventHandler<TRecord>,
-
-  // expanded: ExpandedState,
-  // setExpanded: React.Dispatch<React.SetStateAction<ExpandedState>>,
 ] {
   const expandableConfig = props.expandable ?? {};
 
@@ -52,6 +53,28 @@ export default function useExpand<TRecord extends AnyObject>(
     onExpandedRowsChange,
     childrenColumnName,
   } = expandableConfig;
+
+  // ========================= Tanstack Table State =========================
+  const [expandedState, setExpandedState] = useMergedState<ExpandedState>(
+    defaultExpandAllRows ? true : {},
+    // expandable?.expandedRowKeys.
+    // expandable?.expandedRowKeys
+    //   ? expandable.expandedRowKeys.reduce((acc, key) => {
+    //       acc[key.toString()] = true;
+    //       return acc;
+    //     }, {} as ExpandedStateList)
+    //   : {},
+    // {
+    //   value: mergedExpandedKeysToExpandedState(
+    //     expandable?.expandedRowKeys ?? [],
+    //   ),
+    //   // onChange: (value) => {
+    //   //   // if (typeof value === "boolean") return;
+    //   //   // const expandedRowKeys = Object.keys(value).filter((key) => value[key]);
+    //   //   // expandable?.onExpand?.(expandedRowKeys, {});
+    //   // },
+    // },
+  );
 
   const mergedExpandIcon = expandIcon || renderExpandIcon;
   const mergedChildrenColumnName = childrenColumnName || "children";
@@ -139,6 +162,9 @@ export default function useExpand<TRecord extends AnyObject>(
   }
 
   return [
+    expandedState,
+    setExpandedState,
+
     expandableConfig,
     expandableType,
     mergedExpandedKeys,
