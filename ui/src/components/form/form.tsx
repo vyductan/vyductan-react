@@ -10,9 +10,9 @@ import { FormRoot } from "./_components/form-root";
 import { useExtraProps } from "./hooks/use-extra-props";
 
 type WithoutFormProp<
-  TFieldValues extends FieldValues,
-  TContext,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TFieldValues extends FieldValues = FieldValues,
+  TContext = any,
+  TTransformedValues = TFieldValues,
 > = Omit<
   FormInstance<TFieldValues, TContext, TTransformedValues>,
   "resetFields" | "setFieldsValue" | "submit"
@@ -21,9 +21,9 @@ type WithoutFormProp<
 };
 
 type WithFormProp<
-  TFieldValues extends FieldValues,
+  TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues = TFieldValues,
 > = {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
 } & Omit<
@@ -35,9 +35,9 @@ type WithFormProp<
 >;
 
 type FormProps<
-  TFieldValues extends FieldValues,
-  TContext,
-  TTransformedValues extends FieldValues = TFieldValues,
+  TFieldValues extends FieldValues = FieldValues,
+  TContext = any,
+  TTransformedValues = TFieldValues,
 > = Pick<
   FormRootProps<TFieldValues, TContext, TTransformedValues>,
   "layout" | "classNames"
