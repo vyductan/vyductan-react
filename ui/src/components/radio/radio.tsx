@@ -3,7 +3,9 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { AbstractCheckboxProps } from "../checkbox";
 import type { ValueType } from "../form";
+import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
 import { Label } from "../label";
 import {
@@ -12,10 +14,7 @@ import {
   radioColors,
 } from "./colors";
 
-type RadioProps = Omit<
-  React.ComponentProps<typeof RadioGroupPrimitive.Item>,
-  "value"
-> & {
+type RadioProps = AbstractCheckboxProps<RadioChangeEvent> & {
   label?: React.ReactNode;
   value?: ValueType;
   color?: string;
@@ -24,6 +23,7 @@ type RadioProps = Omit<
   isActive?: boolean;
   preColor?: string;
 };
+
 const Radio = ({
   value,
   label,
