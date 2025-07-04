@@ -111,7 +111,8 @@ const tagVariants = tv({
 
 type TagProps = BadgeProps &
   VariantProps<typeof tagVariants> & {
-    closeIcon?: boolean | React.ReactNode;
+    icon?: React.ReactNode;
+    closeIcon?: React.ReactNode;
     onClose?: () => void;
   };
 
@@ -120,6 +121,7 @@ const Tag = ({
   variant,
   color,
   bordered: borderedProp,
+  icon,
   closeIcon,
   onClose,
   ...props
@@ -141,6 +143,7 @@ const Tag = ({
       )}
       {...props}
     >
+      {icon}
       {props.children}
       {typeof closeIcon === "boolean" && closeIcon ? (
         <Icon
