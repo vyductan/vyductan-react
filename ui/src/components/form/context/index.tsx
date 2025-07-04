@@ -33,12 +33,13 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 type FormProviderProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues | undefined = undefined,
+  TTransformedValues = FieldValues,
 > = RHFormProviderProps<TFieldValues, TContext, TTransformedValues> &
   Pick<
     FormInstance<TFieldValues, TContext, TTransformedValues>,
     "resetFields" | "setFieldsValue" | "schema" | "submit"
   > & {
+    form?: FormInstance<TFieldValues, TContext, TTransformedValues>;
     layout?: "vertical" | "horizontal";
     classNames?: {
       label?: string;
@@ -46,6 +47,7 @@ type FormProviderProps<
   };
 
 const FormContext = createContext<FormProviderProps>({} as FormProviderProps);
+const Provider = FormContext.Provider;
 
 const useFormContext = <
   TFieldValues extends FieldValues,
@@ -58,4 +60,10 @@ const useFormContext = <
 };
 
 export type { FormProviderProps };
-export { FormFieldContext, FormItemContext, FormContext, useFormContext };
+export {
+  Provider,
+  FormFieldContext,
+  FormItemContext,
+  FormContext,
+  useFormContext,
+};

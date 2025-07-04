@@ -16,7 +16,7 @@ import type {
   UseFormReset,
   UseFormReturn,
 } from "react-hook-form";
-import type { z, ZodSchema } from "zod";
+import type { ZodType } from "zod/v4";
 import { useCallback, useEffect, useRef } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";
@@ -29,7 +29,7 @@ type FormInstance<
   TContext = any,
   TTransformedValues = TFieldValues,
 > = UseFormReturn<TFieldValues, TContext, TTransformedValues> & {
-  schema?: ZodSchema | undefined;
+  schema?: ZodType | undefined;
   defaultValues?: UseFormProps<
     TFieldValues,
     TContext,
@@ -47,7 +47,7 @@ type UseFormProps<
   TContext = any,
   TTransformedValues = TFieldValues,
 > = {
-  schema?: z.ZodSchema<TTransformedValues, any, TFieldValues>;
+  schema?: ZodType<TTransformedValues, TFieldValues>;
   onSubmit?: SubmitHandler<TTransformedValues>;
   onValuesChange?: (
     changedValues: Partial<TFieldValues>,
