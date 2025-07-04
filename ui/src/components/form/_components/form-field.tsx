@@ -48,6 +48,9 @@ type FieldProps<
   layout?: "horizontal" | "vertical";
   required?: boolean;
 
+  /* Props of children node, for example, the prop of Switch or Checkbox is `checked`. This prop is an encapsulation of `getValueProps`, which will be invalid after customizing getValueProps */
+  valuePropName?: string;
+
   /* Normalize value from component value before passing to Form instance. Do not support async */
   normalize?: (value: any, prevValue: any) => any;
 
@@ -123,6 +126,9 @@ const FormField = <
       {labelProp}
     </FieldLabel>
   );
+
+  const valuePropName = props.valuePropName ?? "value";
+
   if (
     !render &&
     form &&
@@ -130,6 +136,7 @@ const FormField = <
     isValidElement<{
       onBlur?: (event: any) => void;
       onChange?: (event: any) => void;
+      [key: string]: any;
     }>(children)
   ) {
     return (
@@ -143,15 +150,26 @@ const FormField = <
               <FormControl>
                 {cloneElement(children, {
                   ...ctx.field,
-                  // value: watchedValue,
-                  onBlur: (event) => {
+                  [valuePropName]: ctx.field.value,
+                  onBlur: (event: any) => {
                     children.props.onBlur?.(event);
                     ctx.field.onBlur();
                   },
                   onChange: (event: any) => {
                     const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
 
+                    // const value = event?.target
+                    //   ? event.target[valuePropName] === undefined
+                    //     ? event.target.value
+                    //     : event.target[valuePropName]
+                    //   : event;
+                    // const finalValue = value === undefined ? null : value; // fix react-hook-form doesn't support undefined value
+                    // const normalizedValue = normalize?.(
+                    //   finalValue,
+                    //   ctx.field.value,
+                    // );
                     const normalizedValue = normalize?.(value, ctx.field.value);
+
                     ctx.field.onChange(
                       normalize
                         ? normalizedValue === undefined
