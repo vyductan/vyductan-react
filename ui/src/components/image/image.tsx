@@ -1,8 +1,8 @@
 import { memo, useState } from "react";
 
-import { Skeleton } from "@acme/ui/components/skeleton";
 import { cn } from "@acme/ui/lib/utils";
 
+import { Skeleton } from "../skeleton";
 import { ImagePlaceholderSrc } from "./placeholder";
 
 type ImageProps = React.DetailedHTMLProps<
