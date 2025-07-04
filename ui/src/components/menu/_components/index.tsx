@@ -1,10 +1,13 @@
 import type { KeyboardEvent, MouseEvent } from "react";
+import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { MenuItemType } from "./types";
-import { Icon } from "../../icons";
+import type { MenuItemType } from "../types";
+import { Icon } from "../../../icons";
+
+export * from "./submenu";
 
 type MenuItemProps = Omit<MenuItemType, "key"> & {
   keyProp: React.Key;
