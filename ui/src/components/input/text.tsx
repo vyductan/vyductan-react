@@ -99,6 +99,7 @@ type InputTextProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
     //   wrapper?: string;
     // };
     "data-state"?: boolean;
+    htmlSize?: number;
   };
 
 const InputText = (props: InputTextProps) => {
@@ -136,6 +137,7 @@ const InputText = (props: InputTextProps) => {
     readOnly,
     tabIndex,
     placeholder,
+    htmlSize,
     // Wrapper Props
     onClick,
     ...restProps
@@ -260,8 +262,14 @@ const InputText = (props: InputTextProps) => {
         ref={inputRef}
         id={id}
         name={name}
+        type={type}
         value={value}
+        defaultValue={defaultValueProp}
+        readOnly={readOnly}
+        tabIndex={tabIndex}
         placeholder={placeholder}
+        disabled={disabled}
+        size={htmlSize}
         className={cn(
           "flex-1",
           "text-left",
@@ -270,9 +278,6 @@ const InputText = (props: InputTextProps) => {
           // "placeholder:text-placeholder",
           "border-none outline-hidden",
         )}
-        disabled={disabled}
-        readOnly={readOnly}
-        tabIndex={tabIndex}
         onChange={(event) => {
           setValue(event.currentTarget.value);
           onChange?.(event);

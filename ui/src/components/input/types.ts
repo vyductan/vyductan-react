@@ -23,7 +23,7 @@ import type {
 } from "react";
 import type { VariantProps } from "tailwind-variants";
 
-import type { inputVariants } from "./input";
+import type { inputVariants } from "./text";
 
 export type InputRef = HTMLInputElement;
 
@@ -52,10 +52,10 @@ export interface CommonInputProps {
 
 type DataAttribute = Record<`data-${string}`, string>;
 
-export type ValueType = InputHTMLAttributes<HTMLInputElement>["value"] | bigint;
+type InputValueType = InputHTMLAttributes<HTMLInputElement>["value"] | bigint;
 
 export type BaseInputProps = CommonInputProps & {
-  value?: ValueType | null;
+  value?: InputValueType | null;
   className?: string;
   style?: CSSProperties;
   disabled?: boolean;
