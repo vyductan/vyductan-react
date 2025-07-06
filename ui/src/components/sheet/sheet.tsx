@@ -79,7 +79,11 @@ const Sheet = (props: SheetProps) => {
         <SheetHeader className={cn(classNames?.header)} extra={extra}>
           <SheetTitle className={classNames?.title}>{title}</SheetTitle>
           <SheetDescription
-            className={cn(description ? "" : "hidden", classNames?.description)}
+            className={cn(
+              description ? "" : "hidden",
+              "ml-7",
+              classNames?.description,
+            )}
           >
             {description}
           </SheetDescription>
