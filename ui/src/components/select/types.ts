@@ -1,4 +1,4 @@
-import type { AnyObject } from "../../types";
+import type { AnyObject } from "../_util/type";
 
 export type Option<TValue = any, TRecord extends AnyObject = AnyObject> = {
   label: React.ReactNode;
@@ -9,3 +9,7 @@ export type Option<TValue = any, TRecord extends AnyObject = AnyObject> = {
   className?: string;
   onSelect?: () => void;
 } & TRecord;
+
+export type RenderNode = React.ReactNode | ((props: any) => React.ReactNode);
+
+export type Mode = "multiple" | "tags";
