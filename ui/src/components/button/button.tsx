@@ -374,7 +374,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <GenericSlot<Partial<IconProps>>
             className={cn(
               "size-4",
-              size === "small" && "size-4",
+              (size === "sm" || size === "small") && "size-4",
               size === "lg" && "size-4",
               size === "xl" && "size-[18px]",
               // children ? "mr-2" : "",
