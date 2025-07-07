@@ -18,7 +18,7 @@ export const Badge = ({
     return <ShadcnBadge {...restProps}>{children}</ShadcnBadge>;
 
   return (
-    <span className="relative">
+    <span className="relative" {...restProps}>
       {children}
       <span
         className="absolute end-0 top-0 origin-[100%_0%] translate-x-1/2 -translate-y-1/2"
