@@ -283,8 +283,9 @@ const buttonVariants = tv({
       className: ["", "hover:text-primary"],
     },
     // Size
+
     {
-      size: "small",
+      size: ["sm", "small"],
       shape: ["icon", "circle"],
       className: "w-6",
     },
