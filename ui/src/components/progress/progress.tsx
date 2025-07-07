@@ -187,13 +187,13 @@ function Progress(props: ProgressProps) {
       text = isLineType ? (
         <Icon icon="icon-[ant-design--close-circle-filled]" />
       ) : (
-        <Icon icon="icon-[lucide-x]" />
+        <Icon icon="icon-[lucide--x]" />
       );
     } else if (progressStatus === "success") {
       text = isLineType ? (
         <Icon icon="icon-[ant-design--check-circle-filled]" />
       ) : (
-        <Icon icon="icon-[lucide-check]" />
+        <Icon icon="icon-[lucide--check]" />
       );
     }
 
