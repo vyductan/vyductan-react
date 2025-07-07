@@ -1,12 +1,9 @@
-import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
+import { ChevronDownIcon } from "lucide-react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ValueType } from "../components/form";
-import type { inputSizeVariants } from "../components/input";
-import { inputVariants } from "../components/input";
 import { Icon } from "../icons";
 
 type SelectRootProps = React.ComponentProps<typeof SelectPrimitive.Root>;
@@ -29,27 +26,14 @@ function SelectValue({
 type SelectTriggerProps = Omit<
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>,
   "value"
-> &
-  VariantProps<typeof inputVariants> &
-  VariantProps<typeof inputSizeVariants> & {
-    allowClear?: boolean | undefined;
-    onClear?: () => void;
-    loading?: boolean;
-    /* For clear */
-    value?: ValueType | undefined;
-  };
+> & {
+  size?: "sm" | "default";
+};
 
 const SelectTrigger = ({
   className,
-  children,
   size = "default",
-  status,
-  variant,
-  allowClear,
-  onClear,
-  loading,
-  value,
-
+  children,
   ...props
 }: SelectTriggerProps) => {
   return (
@@ -57,57 +41,15 @@ const SelectTrigger = ({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        // data-[size=default]:h-9 data-[size=sm]:h-8
-        // own
-        "group relative",
-        inputVariants({ variant, status }),
-        // inputSizeVariants({ size }),
-        // controlHeightVariants({ size }),
-        "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
+        "border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
       {children}
-      {allowClear && (
-        <button
-          data-slot="select-trigger-clear"
-          className={cn(
-            "z-10",
-            "absolute right-[11px]",
-            "flex size-5 items-center justify-center transition-opacity",
-            "opacity-0",
-            "hover:opacity-50!",
-            value && "group-hover:opacity-30",
-          )}
-          onPointerDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onClear?.();
-          }}
-        >
-          <Icon
-            icon="icon-[ant-design--close-circle-filled]"
-            className="pointer-events-none size-3.5"
-          />
-        </button>
-      )}
-      {loading && (
-        <Icon
-          icon="icon-[lucide--loader]"
-          className="flex size-5 items-center justify-center pl-1 opacity-50 transition-opacity"
-        />
-      )}
-      <SelectPrimitive.Icon
-        className={cn(
-          "flex size-5 items-center justify-center opacity-50 transition-opacity",
-          allowClear && value && "group-hover:opacity-0",
-          loading && "opacity-0",
-          // variant === "borderless" && "opacity-0",
-        )}
-      >
-        <Icon icon="icon-[lucide--chevron-down]" />
+
+      <SelectPrimitive.Icon asChild>
+        <ChevronDownIcon className="size-4 opacity-50" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
