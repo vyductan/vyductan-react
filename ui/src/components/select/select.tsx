@@ -11,25 +11,20 @@ import type { AnyObject } from "../_util/type";
 import type { SelectRootProps } from "../../shadcn/select";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
-import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-} from "../../shadcn/select";
+import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
 import { Empty } from "../empty";
+import { SelectTrigger, SelectValue } from "./_components";
 
 // export type SelectValue = React.ComponentProps<"select">["value"];
 // export type SelectSingleValue = string | number;
 // export type SelectMultipleValue = string[] | number[];
 // export type SelectMode = "default" | "multiple" | "tags";
 
-type SelectValue = string | number;
+type SelectValueType = string | number;
 type SelectShadcnProps = SelectRootProps;
 
 type SelectDefaultProps<
-  TValue extends SelectValue = string,
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode?: "default";
@@ -38,7 +33,7 @@ type SelectDefaultProps<
 };
 
 type SelectMultipleOrTagsProps<
-  TValue extends SelectValue = string,
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode: "multiple" | "tags";
@@ -50,7 +45,7 @@ type SelectMultipleOrTagsProps<
 };
 
 export type SelectInternalProps<
-  TValue extends SelectValue = string,
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = XOR<
   SelectDefaultProps<TValue, TRecord>,
@@ -82,12 +77,12 @@ export type SelectInternalProps<
   };
 
 type SelectProps<
-  TValue extends SelectValue = number,
+  TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
 > = XOR<SelectInternalProps<TValue, TRecord>, SelectShadcnProps>;
 
 const Select = <
-  TValue extends SelectValue = number,
+  TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
 >(
   props: SelectProps<TValue, TRecord>,
@@ -282,6 +277,7 @@ const Select = <
           }
           setKey(+Date.now());
         }}
+        value={value as string}
         {...restProps} // for form-control
       >
         {isMultiple ? (
