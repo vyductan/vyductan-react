@@ -97,7 +97,11 @@ const Card = ({
                 {description}
               </CardDescription>
             )}
-            {extra && <CardAction>{extra}</CardAction>}
+            {extra && (
+              <CardAction className={cn(hasExtra && "self-center")}>
+                {extra}
+              </CardAction>
+            )}
           </CardHeader>
         )}
         <CardContent className={cn(classNames?.content)}>
