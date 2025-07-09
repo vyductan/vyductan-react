@@ -168,7 +168,8 @@ export const Descriptions = ({
               >
                 {cols.map((col, index) =>
                   // horizontal
-                  typeof col === "object" && "label" in col ? (
+                  typeof col === "object" &&
+                  ("label" in col || "children" in col) ? (
                     bordered ? (
                       <Fragment key={col.key ?? index}>
                         <th
@@ -198,7 +199,9 @@ export const Descriptions = ({
                     ) : (
                       <td key={col.key ?? index} className={cn(tdClassName)}>
                         <DescriptionsItemContainer>
-                          <span className={labelClassName}>{col.label}</span>
+                          {col.label && (
+                            <span className={labelClassName}>{col.label}</span>
+                          )}
                           {skeleton ? (
                             <Skeleton />
                           ) : (
