@@ -8,13 +8,14 @@ import { useResponsive } from "@acme/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
 import { Skeleton } from "../skeleton";
+import { DescriptionsItemContainer } from "./_components";
 
 export type DescriptionsItem = {
   key?: React.Key;
   span?: number;
   classNames?: {
     label?: string;
-    value?: string;
+    content?: string;
   };
   label?: React.ReactNode;
   children?: React.ReactNode;
@@ -31,13 +32,14 @@ type DescriptionProps = {
   layout?: "horizontal" | "vertical";
   size?: "sm" | "default";
   classNames?: {
+    root?: string;
     header?: string;
     title?: string;
+    extra?: string;
+    label?: string;
+    content?: string;
 
     view?: string;
-    label?: string;
-    value?: string;
-
     tr?: string;
     th?: string;
     td?: string;
@@ -93,8 +95,18 @@ export const Descriptions = ({
     bordered && "overflow-hidden rounded-md border",
     classNames?.view,
   );
-  const labelClassName = cn("text-muted-foreground", classNames?.label);
-  const valueClassName = cn(classNames?.value);
+  const labelClassName = cn(
+    "text-muted-foreground inline-flex items-baseline",
+    [
+      "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
+      colon === false && "after:content-['']",
+    ],
+    classNames?.label,
+  );
+  const contentClassName = cn(
+    "inline-flex items-baseline min-w-[1em]",
+    classNames?.content,
+  );
   const tbodyClassName = cn(
     layout === "horizontal" && [
       bordered &&
@@ -113,7 +125,6 @@ export const Descriptions = ({
       bordered && "px-6",
     ],
     classNames?.th,
-    labelClassName,
   );
   const tdClassName = cn(
     "break-all text-sm",
@@ -129,7 +140,6 @@ export const Descriptions = ({
       bordered && "px-6",
     ],
     classNames?.td,
-    valueClassName,
   );
 
   return (
@@ -174,7 +184,7 @@ export const Descriptions = ({
                         <td
                           className={cn(
                             tdClassName,
-                            col.classNames?.value,
+                            col.classNames?.content,
                             "last:border-r-0",
                           )}
                         >
@@ -186,19 +196,17 @@ export const Descriptions = ({
                         </td>
                       </Fragment>
                     ) : (
-                      <td
-                        key={col.key ?? index}
-                        className={cn(tdClassName, col.classNames?.value)}
-                      >
-                        <span className={labelClassName}>
-                          {col.label}
-                          {colon ? ": " : ""}
-                        </span>
-                        {skeleton ? (
-                          <Skeleton />
-                        ) : (
-                          <span className={valueClassName}>{col.children}</span>
-                        )}
+                      <td key={col.key ?? index} className={cn(tdClassName)}>
+                        <DescriptionsItemContainer>
+                          <span className={labelClassName}>{col.label}</span>
+                          {skeleton ? (
+                            <Skeleton />
+                          ) : (
+                            <span className={contentClassName}>
+                              {col.children}
+                            </span>
+                          )}
+                        </DescriptionsItemContainer>
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
@@ -210,22 +218,27 @@ export const Descriptions = ({
                       )}
                       colSpan={col.span}
                     >
-                      {(col as VerticalCell).content}
+                      <DescriptionsItemContainer>
+                        <span className={labelClassName}>
+                          {(col as VerticalCell).content}
+                        </span>
+                      </DescriptionsItemContainer>
                     </th>
                   ) : (
                     <td
                       key={index}
-                      className={cn(
-                        tdClassName,
-                        (col as VerticalCell).className,
-                      )}
+                      className={cn(tdClassName)}
                       colSpan={col.span}
                     >
-                      {skeleton ? (
-                        <Skeleton className="h-6" />
-                      ) : (
-                        (col as VerticalCell).content
-                      )}
+                      <DescriptionsItemContainer>
+                        {skeleton ? (
+                          <Skeleton className="h-6" />
+                        ) : (
+                          <span className={contentClassName}>
+                            {(col as VerticalCell).content}
+                          </span>
+                        )}
+                      </DescriptionsItemContainer>
                     </td>
                   ),
                 )}
@@ -266,7 +279,7 @@ function createVerticalRows(
     const childrens = data.slice(index, index + columns).map((item) => ({
       span: item.span,
       content: item.children,
-      className: item.classNames?.value,
+      className: item.classNames?.content,
     }));
     rows.push(labels, childrens);
   }
