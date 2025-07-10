@@ -113,7 +113,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customCellClassName?: string;
       _customRowStyle?: React.CSSProperties;
     });
-type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
+type OwnTableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
   React.ComponentProps<"table">,
   "title" | "onChange" | "summary"
 > &
@@ -214,7 +214,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     internalHooks?: string;
   };
 
-const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
+const OwnTable = <TRecord extends AnyObject>(props: OwnTableProps<TRecord>) => {
   const {
     ref,
     style,
@@ -755,8 +755,6 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     // pageCount: dataQuery.data?.totalPages ?? -1,
   });
 
-  console.log("tttt", table);
-
   // ====================== Scroll ======================
   // const [colsWidths, _updateColsWidths] = useLayoutState(
   //   new Map<React.Key, number>(),
@@ -852,9 +850,6 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     />
   );
 
-  const isShadcnTable = !props.columns;
-  if (isShadcnTable) return <TableRoot {...restProps} />;
-
   return (
     <TableStoreProvider>
       <Spin spinning={loading} className={className}>
@@ -923,7 +918,6 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             {...restProps}
           >
             {bodyColGroup}
-
             {showHeader !== false && (
               <TableHeaderComp
                 style={{
@@ -1000,10 +994,8 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                 ))}
               </TableHeaderComp>
             )}
-
             {/* padding with header [disable if bordered]*/}
             {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
-
             {skeleton ? (
               <TableBody>
                 {Array.from({ length: mergedPagination?.pageSize ?? 5 })
@@ -1169,7 +1161,6 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                 )}
               </TableBodyComp>
             )}
-
             {summary && (
               <TableFooter className={classNames?.footer}>
                 {summary(mergedData)}
@@ -1185,6 +1176,6 @@ const Table = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   );
 };
 
-export { Table };
+export { OwnTable };
 
-export type { TableProps, RecordWithCustomRow };
+export type { OwnTableProps, RecordWithCustomRow };
