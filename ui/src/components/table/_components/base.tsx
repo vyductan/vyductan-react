@@ -2,14 +2,14 @@ import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { TableProps } from "../table";
+import type { OwnTableProps } from "../table";
 import type { TableSize } from "../types";
 
 function TableRoot({
   className,
   bordered,
   ...props
-}: React.ComponentProps<"table"> & { bordered?: TableProps["bordered"] }) {
+}: React.ComponentProps<"table"> & { bordered?: OwnTableProps["bordered"] }) {
   return (
     <div className="relative w-full overflow-auto">
       <table
