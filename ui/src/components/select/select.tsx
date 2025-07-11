@@ -20,6 +20,9 @@ import { SelectTrigger, SelectValue } from "./_components";
 // export type SelectMultipleValue = string[] | number[];
 // export type SelectMode = "default" | "multiple" | "tags";
 
+type SemanticName = "root";
+type PopupSemantic = "root";
+
 type SelectValueType = string | number;
 type SelectShadcnProps = SelectRootProps;
 
@@ -44,7 +47,7 @@ type SelectMultipleOrTagsProps<
   ) => void;
 };
 
-export type SelectInternalProps<
+type SelectProps<
   TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = XOR<
@@ -62,6 +65,12 @@ export type SelectInternalProps<
     loading?: boolean;
 
     className?: string;
+    styles?: Partial<Record<SemanticName, React.CSSProperties>> & {
+      popup?: Partial<Record<PopupSemantic, React.CSSProperties>>;
+    };
+    classNames?: Partial<Record<SemanticName, string>> & {
+      popup?: Partial<Record<PopupSemantic, string>>;
+    };
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     optionRender?: (option: Option<TValue, TRecord>) => React.ReactNode;
@@ -74,18 +83,21 @@ export type SelectInternalProps<
     //     : Option<TValue, TRecord>,
     // ) => void;
     // mode?: SelectMode;
+
+    // Base
+    showSearch?: boolean;
   };
 
-type SelectProps<
+type XorSelectProps<
   TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
-> = XOR<SelectInternalProps<TValue, TRecord>, SelectShadcnProps>;
+> = XOR<SelectProps<TValue, TRecord>, SelectShadcnProps>;
 
 const Select = <
   TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
 >(
-  props: SelectProps<TValue, TRecord>,
+  props: XorSelectProps<TValue, TRecord>,
 ) => {
   // const { mode, value, onChange } = props;
 
@@ -321,4 +333,5 @@ const Select = <
   );
 };
 
+export type { SelectProps, XorSelectProps };
 export { Select };
