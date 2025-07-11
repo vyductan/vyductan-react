@@ -23,7 +23,7 @@ const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
   return (
     <Button
       variant="ghost"
-      size="sm"
+      size="small"
       icon={<Icon icon="icon-[octicon--grabber-16]" />}
       {...(readOnly ? {} : listeners)}
       ref={readOnly ? undefined : setActivatorNodeRef}

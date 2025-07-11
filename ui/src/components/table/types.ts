@@ -432,8 +432,6 @@ export type TransformColumns<RecordType = AnyObject> = (
   columns: ColumnsType<RecordType>,
 ) => ColumnsType<RecordType>;
 
-export type TableSize = "sm" | "default";
-
 export type Key = React.Key;
 
 /**

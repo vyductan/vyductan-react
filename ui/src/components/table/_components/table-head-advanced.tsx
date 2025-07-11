@@ -38,12 +38,6 @@ export function TableHeadAdvanced<TData, TValue>({
   // const originOnClick = cell.onClick;
 
   const onClick = (event: React.MouseEvent<HTMLTableHeaderCellElement>) => {
-    console.log(
-      "ccccc",
-      // column.columnDef.meta?.onHeaderCell,
-      column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta),
-      column.columnDef.meta,
-    );
     column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta);
     originOnClick?.(event);
   };
@@ -78,7 +72,7 @@ export function TableHeadAdvanced<TData, TValue>({
         <div
           className={cn(
             "-my-2 p-2",
-            size === "sm" && "p-1",
+            size === "small" && "p-1",
             "flex w-full items-center justify-between",
             "hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md border-none",
           )}
