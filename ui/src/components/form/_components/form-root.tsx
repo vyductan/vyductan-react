@@ -16,7 +16,9 @@ const FormProvider = <
 }: FormProviderProps<TFieldValues, TContext, TTransformedValues>) => {
   return (
     <FormContext.Provider
-      value={props as unknown as FormProviderProps<FieldValues, any, undefined>}
+      value={
+        props as unknown as FormProviderProps<FieldValues, any, FieldValues>
+      }
     >
       <RHFormProvider {...props}>{children}</RHFormProvider>
       <FormErrorsNotification />
