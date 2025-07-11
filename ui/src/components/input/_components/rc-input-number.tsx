@@ -638,7 +638,7 @@ const InternalInputNumber = ({
   return (
     <div
       ref={domRef}
-      className={cn("group", className)}
+      className={cn("group relative text-sm", className)}
       style={style}
       onFocus={() => {
         setFocus(true);
@@ -697,7 +697,7 @@ readOnly={readOnly}
         disabled={disabled}
         readOnly={readOnly}
         // className={inputClassName}
-        className={classNames?.input}
+        className={cn("leading-line-height", classNames?.input)}
       />
       {controls && (
         <StepHandler
