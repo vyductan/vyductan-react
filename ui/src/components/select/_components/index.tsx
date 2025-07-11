@@ -42,11 +42,15 @@ const SelectTrigger = ({
     }
     return false;
   }, [allowClear, disabled]);
+
+  const mergedSize =
+    size === "small" ? "sm" : size === "large" ? "lg" : "default";
   return (
     <ShacnSelectTrigger
-      data-size={size}
+      data-size={mergedSize}
       className={cn(
         "group relative",
+        "w-full",
         inputVariants({ variant, status }),
         // inputSizeVariants({ size }),
         // controlHeightVariants({ size }),
