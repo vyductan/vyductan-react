@@ -41,7 +41,7 @@ export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
   children?: never;
 }
 
-export type MenuItemDef = MenuItemType | MenuItemGroupType | MenuDividerType;
+// export type MenuItemDef = MenuItemType | MenuItemGroupType | MenuDividerType;
 
 interface ItemSharedProps {
   ref?: React.Ref<HTMLLIElement | null>;
@@ -54,7 +54,7 @@ export interface SubMenuType<T extends MenuItemType = MenuItemType>
   icon?: React.ReactNode;
   theme?: "dark" | "light";
   children: ItemType<T>[];
-  type?: "submenu";
+  type: "submenu";
   label?: React.ReactNode;
   disabled?: boolean;
   key: string;
