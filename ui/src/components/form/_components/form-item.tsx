@@ -19,23 +19,6 @@ function FormItem({
     internalRef,
     ...(__ref ? [__ref] : []),
   );
-  // get child id (from shadcn FormItem id)
-  // const id = internalRef.current?.id;
-
-  // const [hasFormMessage, setHasFormMessage] = React.useState(false);
-  // useEffect(() => {
-  //   const formMessageElement = document.querySelector(
-  //     CSS.escape(`#${id}-form-item-message`),
-  //   );
-  //   if (formMessageElement) {
-  //     setHasFormMessage(true);
-  //   }
-  // }, [children, id]);
-  // const targetElement = composedRef?.current?.querySelector(
-  //   '[data-slot="form-message"]',
-  // );
-  // console.log("rrrrrr", composedRef, targetElement);
-
   const [hasFormMessage, setHasFormMessage] = React.useState(false);
   useEffect(() => {
     setHasFormMessage(

@@ -8,6 +8,7 @@ import type {
 import * as React from "react";
 import { createContext, useContext } from "react";
 
+import type { Variant } from "../../config-provider";
 import type { FormInstance } from "../hooks/use-form";
 
 /* FormField */
@@ -59,6 +60,8 @@ const useFormContext = <
     | undefined;
 };
 
+const VariantContext = React.createContext<Variant | undefined>(undefined);
+
 export type { FormProviderProps };
 export {
   Provider,
@@ -66,4 +69,5 @@ export {
   FormItemContext,
   FormContext,
   useFormContext,
+  VariantContext,
 };

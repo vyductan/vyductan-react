@@ -1,4 +1,4 @@
-import type { ZodSchema } from "zod";
+import type { ZodType } from "zod/v4";
 import { useMemo } from "react";
 import _ from "lodash";
 import { ZodOptional } from "zod";
@@ -26,7 +26,7 @@ const handleNotFoundField = (fieldName: string) => {
 };
 export const useFieldOptionalityCheck = (
   fieldName: string | undefined,
-  schema?: ZodSchema,
+  schema?: ZodType,
 ) => {
   return useMemo(() => {
     if (!fieldName || !schema) {
