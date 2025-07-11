@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-lonely-if */
 // Jun 6, 2024
 
-import type { AnyObject } from "../../../types";
+import type { AnyObject } from "../../_util/type";
 import type { ColumnType } from "../types";
 import { useTableStore } from "../hooks/use-table";
 

@@ -1,6 +1,6 @@
+import type { AnyObject } from "@/components/ui/_util/type";
 import * as React from "react";
 
-import type { AnyObject } from "../../../../types";
 import type { FilterSearchType, TableLocale } from "../../types";
 import { Icon } from "../../../../icons";
 import { Input } from "../../../input";

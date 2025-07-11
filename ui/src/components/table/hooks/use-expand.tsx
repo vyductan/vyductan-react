@@ -10,7 +10,7 @@ import { useMergedState } from "@rc-component/util";
 import warning from "@rc-component/util/lib/warning";
 
 import type { AnyObject } from "../../_util/type";
-import type { TableProps } from "../table";
+import type { OwnTableProps } from "../table";
 import type {
   ExpandableConfig,
   ExpandableType,
@@ -27,7 +27,7 @@ import {
 } from "../utils/expand-util";
 
 export default function useExpand<TRecord extends AnyObject>(
-  props: TableProps<TRecord>,
+  props: OwnTableProps<TRecord>,
   mergedData: readonly TRecord[],
   getRowKey: GetRowKey<TRecord>,
 ): [

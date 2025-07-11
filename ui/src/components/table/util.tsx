@@ -3,7 +3,7 @@ import type { Row, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
 import type { AnyObject } from "../_util/type";
-import type { TableProps } from "./table";
+import type { OwnTableProps } from "./table";
 import type {
   ColumnsType,
   ColumnTitle,
@@ -14,7 +14,7 @@ import type {
 
 export const transformColumnDefs = <TRecord extends AnyObject>(
   columns: ColumnsType<TRecord>,
-  props: Pick<TableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
+  props: Pick<OwnTableProps<TRecord>, "rowKey" | "rowSelection" | "expandable">,
   _isNotFirstDeepColumn = true,
 ): TTColumnDef<TRecord>[] => {
   const columnsDef: TTColumnDef<TRecord>[] = columns.map(
