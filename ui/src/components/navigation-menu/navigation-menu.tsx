@@ -1,7 +1,7 @@
 import React from "react";
 import { cva } from "class-variance-authority";
 
-import type { MenuItemDef } from "../menu/types";
+import type { MenuProps } from "../menu";
 import {
   NavigationMenuItem,
   NavigationMenuLink,
@@ -24,7 +24,7 @@ const navigationMenuTriggerVariants = cva("", {
 
 type NavMenuProps = React.ComponentProps<typeof ShadcnNavigationMenu> & {
   mode?: React.ComponentProps<typeof ShadcnNavigationMenu>["orientation"];
-  items: MenuItemDef[];
+  items: MenuProps["items"];
   selectedKeys?: React.Key[];
 };
 const NavigationMenu = ({
@@ -38,9 +38,9 @@ const NavigationMenu = ({
     return <ShadcnNavigationMenu {...props} />;
   }
 
-  const transform = (items: MenuItemDef[]) => {
+  const transform = (items: MenuProps["items"]) => {
     const components = items.map((item) => {
-      if (item.type === "item") {
+      if (item?.type === "item") {
         const key = item.key;
         return (
           <NavigationMenuItem key={key}>

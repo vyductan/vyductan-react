@@ -1,28 +1,20 @@
 "use client";
 
-import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
+import type { KeyboardEvent, MouseEvent } from "react";
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type {
-  MenuItemDef,
-  MenuItemType,
-  SelectEventHandler,
-  SubMenuType,
-} from "./types";
+import type { ItemType, MenuItemType, SelectEventHandler } from "./types";
 import { Divider } from "../divider";
-import { MenuItem } from "./_components";
-import { SubMenu } from "./_components/submenu";
-import MenuContext from "./menu-context";
+import { MenuItem, SubMenu } from "./_components";
 
 type MenuProps = {
   className?: string;
   defaultOpenKeys?: string[];
   defaultSelectedKeys?: string[];
-  items: MenuItemDef[];
+  items: ItemType[];
   mode?: "vertical" | "horizontal" | "inline";
   openKeys?: string[];
 
@@ -31,7 +23,7 @@ type MenuProps = {
 
   selectedKeys?: string[];
   onSelect?: (args: {
-    item: MenuItemDef;
+    item: ItemType;
     key: React.Key;
     selectedKeys: string[];
     event: MouseEvent<HTMLLIElement> | KeyboardEvent<HTMLLIElement>;
@@ -56,9 +48,9 @@ const Menu = ({
   mode = "inline",
   selectedKeys,
   onSelect,
-  getPopupContainer,
-  subMenuOpenDelay = 0.1,
-  subMenuCloseDelay = 0.1,
+  // getPopupContainer,
+  // subMenuOpenDelay = 0.1,
+  // subMenuCloseDelay = 0.1,
 }: MenuProps) => {
   // const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
   //   defaultOpenKeys ?? [],
@@ -73,8 +65,9 @@ const Menu = ({
     },
   );
 
-  const renderItem = (menu: MenuItemDef[], level = 0) => {
+  const renderItem = (menu: ItemType[]) => {
     return menu.map((item, index) => {
+      if (!item) return <></>;
       // Handle divider type
       if (item.type === "divider") {
         return (
@@ -136,43 +129,47 @@ const Menu = ({
       }
 
       // Handle submenu
-      if (item.type === "submenu" || (item as SubMenuType).children) {
-        const subMenuProps = item as SubMenuType;
+      if (item.type === "submenu") {
+        const subMenuProps = item;
         return (
           <SubMenu
-            key={item.key}
-            label={item.label}
-            icon={item.icon}
+            type="submenu"
+            key={subMenuProps.key}
+            icon={subMenuProps.icon}
             popupClassName={subMenuProps.popupClassName}
             popupOffset={subMenuProps.popupOffset}
             popupStyle={subMenuProps.popupStyle}
           >
-            {subMenuProps.children &&
-              renderItem(subMenuProps.children, level + 1)}
+            {renderItem(subMenuProps.children)}
           </SubMenu>
         );
       }
 
       // Handle regular menu item
-      const { key, ...rest } = item;
-      const isActive = mergedSelectKeys.some((k) =>
-        key.toString().startsWith(k.toString()),
-      );
+      if (item.type === "item") {
+        const { key, ...rest } = item;
+        const isActive = mergedSelectKeys.some((k) =>
+          key.toString().startsWith(k.toString()),
+        );
 
-      return (
-        <MenuItem
-          key={key}
-          keyProp={key}
-          isActive={isActive}
-          onSelect={(info) =>
-            onSelect?.({
-              ...info,
-              selectedKeys: mergedSelectKeys,
-            })
-          }
-          {...rest}
-        />
-      );
+        return (
+          <MenuItem
+            key={key}
+            keyProp={key}
+            isActive={isActive}
+            onSelect={(info) =>
+              onSelect?.({
+                ...info,
+                selectedKeys: mergedSelectKeys,
+              })
+            }
+            {...(rest as Omit<MenuItemType, "key">)}
+          />
+        );
+      }
+
+      // Optionally handle other types (e.g., divider) or return null
+      return null;
 
       // if (!item.children) {
       //   const isActive = mergedSelectKeys.some((x) => x.endsWith(key));
@@ -237,29 +234,27 @@ const Menu = ({
     });
   };
 
-  const contextValue = React.useMemo(
-    () => ({
-      getPopupContainer,
-      subMenuOpenDelay,
-      subMenuCloseDelay,
-    }),
-    [getPopupContainer, subMenuOpenDelay, subMenuCloseDelay],
-  );
+  // const contextValue = React.useMemo(
+  //   () => ({
+  //     getPopupContainer,
+  //     subMenuOpenDelay,
+  //     subMenuCloseDelay,
+  //   }),
+  //   [getPopupContainer, subMenuOpenDelay, subMenuCloseDelay],
+  // );
 
   return (
-    <MenuContextProvider value={contextValue}>
-      <ul
-        role="menu"
-        className={cn(
-          "flex flex-col space-y-1 text-sm",
-          mode === "inline" && "w-full overflow-y-auto",
-          mode === "horizontal" && "flex-row space-y-0 space-x-2",
-          className,
-        )}
-      >
-        {renderItem(items)}
-      </ul>
-    </MenuContextProvider>
+    <ul
+      role="menu"
+      className={cn(
+        "flex flex-col space-y-1 text-sm",
+        mode === "inline" && "w-full overflow-y-auto",
+        mode === "horizontal" && "flex-row space-y-0 space-x-2",
+        className,
+      )}
+    >
+      {renderItem(items)}
+    </ul>
   );
 };
 
