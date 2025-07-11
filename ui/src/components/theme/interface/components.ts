@@ -1,1 +1,3 @@
-export interface ComponentTokenMap {}
+export interface ComponentTokenMap {
+  _?: "";
+}

@@ -86,7 +86,7 @@ export interface AlignType {
 }
 
 // export type SizeType = "sm" | "md" | "lg" | undefined;
-export type SizeType = VariantProps<typeof inputSizeVariants>["size"] | "small";
+export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
 
 // export const Variants = ["outlined", "borderless", "filled"] as const;
 

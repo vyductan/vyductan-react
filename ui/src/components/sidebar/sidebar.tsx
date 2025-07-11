@@ -4,8 +4,7 @@ import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
-import type { MenuItemDef, MenuItemType } from "../menu";
-import { Icon } from "../../icons";
+import type { MenuItemType, MenuProps } from "../menu";
 import { Divider } from "../divider";
 import {
   SidebarContent,
@@ -36,11 +35,11 @@ type OwnSidebarProps = {
   contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
-  items?: MenuItemDef[];
+  items?: MenuProps["items"];
   defaultSelectedKeys?: string[];
   selectedKeys?: string[];
   onSelect?: (args: {
-    item: MenuItemDef;
+    item: MenuItemType;
     key: React.Key;
     event: MouseEvent<HTMLLIElement> | KeyboardEvent<HTMLLIElement>;
   }) => void;
@@ -72,8 +71,9 @@ const Sidebar = (props: SidebarProps) => {
     onSelect,
   } = props;
 
-  const renderItems = (items: MenuItemDef[]) => {
+  const renderItems = (items: MenuProps["items"]) => {
     return items.map((item, index) => {
+      if (!item) return <></>;
       if (item.type === "divider") {
         return (
           <Divider key={index} role="separator" className="border-t" asChild>
@@ -86,30 +86,22 @@ const Sidebar = (props: SidebarProps) => {
         return (
           <SidebarGroup key={index}>
             {item.label && <SidebarGroupLabel>{item.label}</SidebarGroupLabel>}
-            <SidebarMenu>{renderItems(item.children)}</SidebarMenu>
+            <SidebarMenu>{renderItems(item.children ?? [])}</SidebarMenu>
           </SidebarGroup>
         );
       }
+      if (item.type === "submenu") {
+        return <></>;
+      }
 
       /* Item type Render */
-      if (item.hidden) {
-        return;
-      }
-      const { key, children: _, label, title, icon, path } = item;
+      // if (item.hidden) {
+      //   return;
+      // }
+      const { key, label, title } = item;
       const mergedLabel = label ?? title;
       const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      let labelToRender: ReactNode = path ? (
-        <a href={`${path}`}>
-          {typeof icon === "string" ? (
-            <Icon icon={icon} className={classNames?.icon} />
-          ) : (
-            icon
-          )}
-          <span>{mergedLabel}</span>
-        </a>
-      ) : (
-        mergedLabel
-      );
+      let labelToRender: ReactNode = mergedLabel;
       labelToRender = itemRender
         ? itemRender(item, classNames, labelToRender)
         : labelToRender;

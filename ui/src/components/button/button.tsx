@@ -69,10 +69,12 @@ const buttonVariants = tv({
     },
     size: {
       small: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
-      sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
+      middle: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
+      large: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
+      // sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
+      // lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
+      // xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
       default: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
-      lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
-      xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
       icon: "size-9",
     },
     variant: {
@@ -285,30 +287,25 @@ const buttonVariants = tv({
     // Size
 
     {
-      size: ["sm", "small"],
+      size: "small",
       shape: ["icon", "circle"],
       className: "w-6",
     },
     {
-      size: "default",
+      size: "middle",
       shape: ["icon", "circle"],
       className: "size-8",
     },
     {
-      size: "lg",
+      size: "large",
       shape: ["icon", "circle"],
       className: "w-10",
-    },
-    {
-      size: "xl",
-      shape: ["icon", "circle"],
-      className: "w-12",
     },
   ],
   defaultVariants: {
     variant: "default",
     color: "default",
-    size: "default",
+    size: "middle",
     shape: "default",
   },
 });
@@ -373,13 +370,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={cn(
-              "size-4",
-              (size === "sm" || size === "small") && "size-4",
-              size === "lg" && "size-4",
-              size === "xl" && "size-[18px]",
-              // children ? "mr-2" : "",
-            )}
+            className={cn("size-4")}
             // srOnly={
             //   srOnly && typeof children === "string"
             //     ? children

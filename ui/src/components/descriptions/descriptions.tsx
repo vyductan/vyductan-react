@@ -7,6 +7,7 @@ import type { Screens } from "@acme/ui/types";
 import { useResponsive } from "@acme/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../config-provider/size-context";
 import { Skeleton } from "../skeleton";
 import { DescriptionsItemContainer } from "./_components";
 
@@ -30,7 +31,7 @@ type DescriptionProps = {
   bordered?: boolean;
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
-  size?: "sm" | "default";
+  size?: SizeType;
   classNames?: {
     root?: string;
     header?: string;
@@ -117,8 +118,8 @@ export const Descriptions = ({
     "text-start text-sm font-normal",
     layout === "horizontal" && [
       bordered && ["px-6", "border-b border-e bg-surface-secondary"],
-      size === "sm" && "py-2",
-      size === "default" || (!size && "py-3"),
+      size === "small" && "py-2",
+      size === "middle" || (!size && "py-3"),
     ],
     layout === "vertical" && [
       "pb-1 pl-3 font-medium first:pl-0 last:pr-0",
@@ -132,8 +133,8 @@ export const Descriptions = ({
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
       bordered && ["px-6", "border-b border-e"],
-      size === "sm" && "py-2",
-      size === "default" || (!size && "py-3"),
+      size === "small" && "py-2",
+      size === "middle" || (!size && "py-3"),
     ],
     layout === "vertical" && [
       "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",

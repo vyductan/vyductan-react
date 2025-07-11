@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { AnyObject } from "../../types";
+import type { AnyObject } from "../_util/type";
 import type { BreadcrumbProps } from "./breadcrumb";
 
 type BreadcrumbState<

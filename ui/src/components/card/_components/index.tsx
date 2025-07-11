@@ -26,7 +26,7 @@ const CardRoot = ({
   return (
     <ShadcnCardRoot
       className={cn(
-        size === "sm" && "gap-3 py-3",
+        size === "small" && "gap-3 py-3",
         bordered ? "" : "border-none",
         className,
       )}
@@ -46,7 +46,7 @@ const CardHeader = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardHeader
-      className={cn(size === "sm" && "px-3", className)}
+      className={cn(size === "small" && "px-3", className)}
       {...props}
     />
   );
@@ -93,7 +93,7 @@ const CardContent = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardContent
-      className={cn(size === "sm" && "px-3", className)}
+      className={cn(size === "small" && "px-3", className)}
       {...props}
     />
   );
@@ -110,7 +110,7 @@ const CardFooter = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardFooter
-      className={cn(size === "sm" && "px-3", className)}
+      className={cn(size === "small" && "px-3", className)}
       {...props}
     />
   );

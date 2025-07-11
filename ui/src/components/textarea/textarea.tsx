@@ -8,7 +8,8 @@ import type { TextareaProps as ShadcnTextareaProps } from "@acme/ui/shadcn/texta
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea as TextareaShadcn } from "@acme/ui/shadcn/textarea";
 
-import { inputVariants } from "../input";
+import type { BaseInputProps, CommonInputProps, InputProps } from "../input";
+import { inputVariants } from "../input/variants";
 
 const textareaVariants = cva(["text-sm"], {
   variants: {
@@ -25,7 +26,7 @@ const textareaVariants = cva(["text-sm"], {
     size: "default",
   },
 });
-export type TextareaProps = Omit<ShadcnTextareaProps, "style"> &
+type TextAreaProps = Omit<ShadcnTextareaProps, "style"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof textareaVariants> &
   Pick<
@@ -33,7 +34,16 @@ export type TextareaProps = Omit<ShadcnTextareaProps, "style"> &
     "maxRows" | "minRows" | "onHeightChange" | "cacheMeasurements"
   > & {
     autoSize?: boolean;
-  };
+    classNames?: CommonInputProps["classNames"] & {
+      textarea?: string;
+      count?: string;
+    };
+    styles?: {
+      textarea?: React.CSSProperties;
+      count?: React.CSSProperties;
+    };
+  } & Pick<BaseInputProps, "allowClear" | "suffix"> &
+  Pick<InputProps, "showCount" | "count" | "onClear">;
 
 const Textarea = ({
   ref,
@@ -43,7 +53,7 @@ const Textarea = ({
   status,
   variant,
   ...props
-}: TextareaProps) => {
+}: TextAreaProps) => {
   const Comp = autoSize ? TextareaAutosize : TextareaShadcn;
   return (
     <Comp
@@ -59,4 +69,5 @@ const Textarea = ({
   );
 };
 
+export type { TextAreaProps };
 export { Textarea };

@@ -6,6 +6,7 @@
     "jsx": "preserve",
     "rootDir": ".",
     "paths": {
+      "@/components/ui/*": ["./src/components/*"],
       "@/lib/*": ["./src/lib/*"]
     }
   },

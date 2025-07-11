@@ -38,7 +38,7 @@ type AbstractCheckboxProps<T> = {
   // config
   skipGroup?: boolean;
 };
-export interface CheckboxChangeEventTarget extends OwnCheckboxProps {
+export interface CheckboxChangeEventTarget extends CheckboxProps {
   checked: boolean;
 }
 
@@ -49,12 +49,12 @@ export interface CheckboxChangeEvent {
   nativeEvent: MouseEvent;
 }
 
-type OwnCheckboxProps = AbstractCheckboxProps<CheckboxChangeEvent> &
+type CheckboxProps = AbstractCheckboxProps<CheckboxChangeEvent> &
   React.AriaAttributes & {
     indeterminate?: boolean;
   };
 
-const Checkbox = (props: OwnCheckboxProps) => {
+const Checkbox = (props: CheckboxProps) => {
   const {
     // id,
     // "aria-describedby": ariaDescribedBy,
@@ -98,7 +98,7 @@ const Checkbox = (props: OwnCheckboxProps) => {
     );
   }
 
-  const checkboxProps: OwnCheckboxProps = { ...restProps };
+  const checkboxProps: CheckboxProps = { ...restProps };
   if (checkboxGroup && !skipGroup) {
     checkboxProps.onChange = (...args) => {
       if (onChange) {
@@ -158,5 +158,5 @@ const Checkbox = (props: OwnCheckboxProps) => {
   );
 };
 
-export type { OwnCheckboxProps, AbstractCheckboxProps };
+export type { CheckboxProps, AbstractCheckboxProps };
 export { Checkbox };
