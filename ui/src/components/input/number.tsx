@@ -8,16 +8,17 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../types";
 import type {
+  ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProps,
-  ValueType,
 } from "./_components/rc-input-number";
-import type { InputStatus, InputVariant } from "./types";
+import type { InputStatus, InputVariant } from "./variants";
 import { Icon } from "../../icons";
 import RcInputNumber from "./_components/rc-input-number";
-import { inputSizeVariants, inputVariants } from "./text";
+import { inputSizeVariants, inputVariants } from "./variants";
 
-interface InputNumberProps<TNumberValue extends ValueType = ValueType>
-  extends Omit<
+interface InputNumberProps<
+  TNumberValue extends NumberValueType = NumberValueType,
+> extends Omit<
     RcInputNumberProps<TNumberValue>,
     "ref" | "prefix" | "size" | "controls"
   > {
@@ -38,7 +39,7 @@ interface InputNumberProps<TNumberValue extends ValueType = ValueType>
   variant?: InputVariant;
 }
 
-const InputNumber = <TNumberValue extends ValueType = ValueType>({
+const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
   ref,
   ...props
 }: InputNumberProps<TNumberValue>) => {
@@ -230,3 +231,5 @@ const InputNumber = <TNumberValue extends ValueType = ValueType>({
 
 export { InputNumber };
 export type { InputNumberProps };
+
+export { type ValueType as NumberValueType } from "./_components/rc-input-number";

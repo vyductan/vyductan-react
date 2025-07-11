@@ -2,10 +2,13 @@
 
 import type { CSSProperties, ReactElement, ReactNode, Ref } from "react";
 import { cloneElement, useImperativeHandle, useRef } from "react";
+import { useHover } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import type { BaseInputProps } from "../types";
+import { Icon } from "../../../icons";
+import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
 
 export interface HolderRef {
@@ -73,15 +76,21 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   }));
 
   // ================== Prefix & Suffix ================== //
+  const isHovering = useHover(containerRef);
   if (hasAffix) {
     // ================== Clear Icon ================== //
     let clearIcon: ReactNode = null;
     if (allowClear) {
       const needClear = !disabled && !readOnly && value;
       const iconNode =
-        typeof allowClear === "object" && allowClear.clearIcon
-          ? allowClear.clearIcon
-          : "✖";
+        typeof allowClear === "object" && allowClear.clearIcon ? (
+          allowClear.clearIcon
+        ) : (
+          <Icon
+            icon="icon-[ant-design--close-circle-filled]"
+            className="pointer-events-none size-4"
+          />
+        );
 
       clearIcon = (
         <button
@@ -93,9 +102,9 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
           // Do not trigger onBlur when clear input
           // https://github.com/ant-design/ant-design/issues/31200
           onMouseDown={(e) => e.preventDefault()}
-          className={cn("ml-1 flex opacity-30 hover:opacity-50", {
+          className={cn("size-4 opacity-30 hover:opacity-50", {
             [`hidden`]: !needClear,
-            [`has-suffix`]: !!suffix,
+            // [`mx-1`]: !!suffix,
           })}
         >
           {iconNode}
@@ -103,23 +112,31 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       );
     }
 
-    const suffixNode = (suffix ?? allowClear) && (
+    const suffixNode = (!!suffix || allowClear) && (
       <span
-        className={cn(
-          // `${prefixCls}-suffix`,
-          "ml-1 flex items-center",
-          classNames?.suffix,
-        )}
+        className={cn("ml-1 flex items-center", classNames?.suffix)}
         style={styles?.suffix}
       >
-        {clearIcon}
-        {suffix}
+        {!suffix || (isHovering && suffix) ? (
+          clearIcon
+        ) : typeof suffix === "string" ? (
+          <span>{suffix}</span>
+        ) : (
+          suffix
+        )}
       </span>
     );
 
     element = (
       <AffixWrapperComponent
-        className={cn(classNames?.affixWrapper, classNames?.variant)}
+        className={cn(
+          "text-sm",
+          "relative inline-flex w-full transition-all",
+          "[&_input]:h-auto [&_input]:border-none [&_input]:p-0 [&_input]:outline-none",
+          // "cursor-text",
+          classNames?.affixWrapper,
+          classNames?.variant,
+        )}
         style={styles?.affixWrapper}
         onClick={onInputClick}
         {...dataAttrs?.affixWrapper}
@@ -127,10 +144,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       >
         {prefix && (
           <span
-            className={cn(
-              // `${prefixCls}-prefix`,
-              classNames?.prefix,
-            )}
+            className={cn("mr-1", classNames?.prefix)}
             style={styles?.prefix}
           >
             {prefix}
@@ -184,21 +198,23 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
     );
   }
 
-  // `className` and `style` are always on the root element
-  return cloneElement(element as ReactElement<any>, {
-    className:
-      cn(
+  return (
+    <GenericSlot
+      className={cn(
         (element as ReactElement<{ className?: string } | undefined>).props
           ?.className,
         className,
-      ) || null,
-    style: {
-      ...(element as ReactElement<{ style?: CSSProperties } | undefined>).props
-        ?.style,
-      ...style,
-    },
-    hidden,
-  });
+      )}
+      style={{
+        ...(element as ReactElement<{ style?: CSSProperties } | undefined>)
+          .props?.style,
+        ...style,
+      }}
+      hidden={hidden}
+    >
+      {element}
+    </GenericSlot>
+  );
 };
 
 export { BaseInput };

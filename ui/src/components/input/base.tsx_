@@ -86,7 +86,7 @@ type InputVariants = Omit<VariantProps<typeof inputVariants>, "disabled"> & {
   disabled?: boolean;
 };
 
-type InputTextProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
+type BaseInputProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     /** If allow to remove input content with clear icon */
@@ -102,7 +102,7 @@ type InputTextProps = Omit<React.ComponentProps<"input">, "size" | "prefix"> &
     htmlSize?: number;
   };
 
-const InputText = (props: InputTextProps) => {
+const BaseInput = (props: BaseInputProps) => {
   const {
     ref,
 
@@ -306,5 +306,5 @@ const InputText = (props: InputTextProps) => {
   );
 };
 
-export type { InputTextProps, InputVariants };
-export { InputText };
+export type { BaseInputProps, InputVariants };
+export { BaseInput };
