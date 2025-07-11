@@ -1,5 +1,7 @@
-import * as React from 'react';
-import { createPortal } from 'react-dom';
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import * as React from "react";
+import { createPortal } from "react-dom";
 
 type PortalProps = {
   children: React.ReactNode;
@@ -17,7 +19,7 @@ export function Portal({ children, container }: PortalProps) {
   if (!mounted) return null;
 
   const getContainer = () => {
-    if (typeof container === 'function') {
+    if (typeof container === "function") {
       return container();
     }
     return container || document.body;
