@@ -14,6 +14,7 @@ import { SkeletonTitle } from "./_components/skeleton-title";
 
 interface SkeletonProps {
   asChild?: boolean;
+  children?: React.ReactNode;
   className?: string;
   rootClassName?: string;
   style?: React.CSSProperties;
@@ -37,13 +38,13 @@ function Skeleton(props: SkeletonProps) {
     className,
     rootClassName,
     style,
-    active,
     loading,
     round,
 
-    avatar,
-    title,
-    paragraph,
+    active,
+    avatar = false,
+    title = true,
+    paragraph = true,
     ...restProps
   } = props;
   const {
@@ -66,7 +67,11 @@ function Skeleton(props: SkeletonProps) {
         ...getComponentProps(avatar),
       };
       // We direct use SkeletonElement as avatar in skeleton internal.
-      avatarNode = <SkeletonElement {...avatarProps} />;
+      avatarNode = (
+        <div data-slot="skeleton-header" className="table-cell pe-4 align-top">
+          <SkeletonElement active={active} {...avatarProps} />
+        </div>
+      );
     }
 
     let contentNode: React.ReactNode;
@@ -75,11 +80,12 @@ function Skeleton(props: SkeletonProps) {
       let $title: React.ReactNode;
       if (hasTitle) {
         const titleProps: SkeletonTitleProps = {
+          active,
           ...getTitleBasicProps(hasAvatar, hasParagraph),
           ...getComponentProps(title),
         };
 
-        $title = <SkeletonTitle {...titleProps} />;
+        $title = <SkeletonTitle className="mt-3" {...titleProps} />;
       }
 
       // Paragraph
@@ -90,11 +96,20 @@ function Skeleton(props: SkeletonProps) {
           ...getComponentProps(paragraph),
         };
 
-        paragraphNode = <SkeletonParagraph {...paragraphProps} />;
+        paragraphNode = (
+          <SkeletonParagraph
+            active={active}
+            {...paragraphProps}
+            className="mt-7"
+          />
+        );
       }
 
       contentNode = (
-        <div>
+        <div
+          data-slot="skeleton-content"
+          className="table-cell w-full align-top"
+        >
           {$title}
           {paragraphNode}
         </div>
@@ -104,7 +119,7 @@ function Skeleton(props: SkeletonProps) {
     const cls = cn(
       {
         [`with-avatar`]: hasAvatar,
-        [`active`]: active,
+        // [`active`]: active,
         [`rtl`]: direction === "rtl",
         [`round`]: round,
       },
@@ -126,9 +141,7 @@ function Skeleton(props: SkeletonProps) {
   //   return <SkeletonAvatar {...avatarProps} />;
   // }
 
-  return (
-    <SkeletonComp className={cn("h-4 w-full", className)} {...restProps} />
-  );
+  return <SkeletonComp className={cn(className)} {...restProps} />;
 }
 
 export { Skeleton };
