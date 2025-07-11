@@ -1,14 +1,17 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import * as React from "react";
+import { cn } from "@/lib/utils";
+
+import { SkeletonElement } from "./element";
 
 type widthUnit = number | string;
 
 export interface SkeletonParagraphProps {
-  prefixCls?: string;
   className?: string;
   style?: React.CSSProperties;
   width?: widthUnit | Array<widthUnit>;
   rows?: number;
+  active?: boolean;
 }
 
 const getWidth = (index: number, props: SkeletonParagraphProps) => {
@@ -23,13 +26,27 @@ const getWidth = (index: number, props: SkeletonParagraphProps) => {
   return undefined;
 };
 
-const SkeletonParagraph: React.FC<SkeletonParagraphProps> = (props) => {
+const SkeletonParagraph: React.FC<SkeletonParagraphProps> = ({
+  active,
+  ...props
+}) => {
   const { className, style, rows = 0 } = props;
   const rowList = Array.from({ length: rows }).map((_, index) => (
-    <li key={index} style={{ width: getWidth(index, props) }} />
+    <SkeletonElement
+      active={active}
+      asChild
+      key={index}
+      style={{ width: getWidth(index, props) }}
+    >
+      <li />
+    </SkeletonElement>
   ));
   return (
-    <ul className={className} style={style}>
+    <ul
+      data-slot="skeleton-paragraph"
+      className={cn("space-y-4", className)}
+      style={style}
+    >
       {rowList}
     </ul>
   );
