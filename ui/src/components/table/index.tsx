@@ -13,13 +13,13 @@ export * from "./_components";
 
 type ShadcnTableProps = React.ComponentProps<typeof TableRoot>;
 
-type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = XOR<
+type XORTableProps<TRecord extends RecordWithCustomRow = AnyObject> = XOR<
   ShadcnTableProps,
   OwnTableProps<TRecord>
 >;
 
 const Table = <TRecord extends RecordWithCustomRow = AnyObject>(
-  props: TableProps<TRecord>,
+  props: XORTableProps<TRecord>,
 ) => {
   const isShadcnTable = !props.columns;
   if (isShadcnTable) {
@@ -28,5 +28,5 @@ const Table = <TRecord extends RecordWithCustomRow = AnyObject>(
   return <OwnTable {...props} />;
 };
 
-export type { TableProps };
+export type { XORTableProps as TableProps };
 export { Table };

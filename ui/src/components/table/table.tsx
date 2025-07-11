@@ -30,6 +30,7 @@ import { Skeleton } from "@acme/ui/shadcn/skeleton";
 
 import type { AnyObject } from "../_util/type";
 import type { ConfigConsumerProps } from "../config-provider/context";
+import type { SizeType } from "../config-provider/size-context";
 import type { FilterConfig, FilterState } from "./hooks/use-filter";
 import type { SortState } from "./hooks/use-sorter";
 import type {
@@ -113,7 +114,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customCellClassName?: string;
       _customRowStyle?: React.CSSProperties;
     });
-type OwnTableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
+type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
   React.ComponentProps<"table">,
   "title" | "onChange" | "summary"
 > &
@@ -175,7 +176,7 @@ type OwnTableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
           offsetScroll?: number;
           getContainer?: () => HTMLElement;
         };
-    size?: "sm" | "default";
+    size?: SizeType;
     /** Whether the table can be scrollable */
     scroll?: {
       x: number;
@@ -214,7 +215,7 @@ type OwnTableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     internalHooks?: string;
   };
 
-const OwnTable = <TRecord extends AnyObject>(props: OwnTableProps<TRecord>) => {
+const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   const {
     ref,
     style,
@@ -898,7 +899,7 @@ const OwnTable = <TRecord extends AnyObject>(props: OwnTableProps<TRecord>) => {
               // bordered
               // bordered &&
               //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              size === "sm" ? "[&_th]:" : "",
+              size === "small" ? "[&_th]:" : "",
 
               classNames?.table,
             )}
@@ -1175,4 +1176,4 @@ const OwnTable = <TRecord extends AnyObject>(props: OwnTableProps<TRecord>) => {
 
 export { OwnTable };
 
-export type { OwnTableProps, RecordWithCustomRow };
+export type { TableProps as OwnTableProps, RecordWithCustomRow };

@@ -135,7 +135,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
   tableShowSorterTooltip?: boolean | SorterTooltipProps,
   pos?: string,
 ): ColumnsType<RecordType> => {
-  const finalColumns = (columns || []).map((column, index) => {
+  const _finalColumns = (columns || []).map((column, index) => {
     const columnPos = getColumnPos(index, pos);
     let newColumn: ColumnsType<RecordType>[number] = column;
     if (newColumn.sorter) {
@@ -241,7 +241,6 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
           const originOnClick = cell.onClick;
           const originOKeyDown = cell.onKeyDown;
           cell.onClick = (event: React.MouseEvent<HTMLElement>) => {
-            console.log("onClick");
             triggerSorter({
               column,
               key: columnKey,
@@ -387,7 +386,6 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
       const sortStates: SortState<RecordType>[] = [];
       const sorterResults: SorterResult<RecordType>[] = [];
       for (const [_index, sort] of value.entries()) {
-        console.log("???", sort, mergedColumns);
         const column = mergedColumns.find((col) => col.key === sort.id);
         if (!column) continue;
         const order = sort.desc ? "descend" : "ascend";

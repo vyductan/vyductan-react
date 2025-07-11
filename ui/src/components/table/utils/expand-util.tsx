@@ -28,7 +28,7 @@ export function renderExpandIcon<RecordType>({
   return (
     <Button
       variant="text"
-      size="sm"
+      size="small"
       // {...(expandable.expandedRowKeys
       //   ? {
       //       onClick: () => {

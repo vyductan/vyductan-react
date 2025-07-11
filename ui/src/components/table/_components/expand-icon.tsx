@@ -26,7 +26,7 @@ function renderExpandIcon(locale: TableLocale) {
     return (
       <Button
         variant="text"
-        size="sm"
+        size="small"
         onClick={(e) => {
           onExpand(record, e!);
           e.stopPropagation();
