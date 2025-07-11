@@ -117,7 +117,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
         className={cn("ml-1 flex items-center", classNames?.suffix)}
         style={styles?.suffix}
       >
-        {!suffix || (isHovering && suffix) ? (
+        {allowClear && value && (!suffix || (isHovering && suffix)) ? (
           clearIcon
         ) : typeof suffix === "string" ? (
           <span>{suffix}</span>
