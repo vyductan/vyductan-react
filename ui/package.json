@@ -63,7 +63,7 @@
     "lucide-react": "catalog:",
     "motion": "^12.23.0",
     "next-themes": "catalog:",
-    "react-day-picker": "^8.7.1",
+    "react-day-picker": "^9.7.0",
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.59.0",
     "react-markdown": "^10.0.1",
