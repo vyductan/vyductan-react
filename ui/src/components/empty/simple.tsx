@@ -12,7 +12,7 @@ const Simple: React.FC = () => {
       viewBox="0 0 64 41"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>{locale?.description ?? "Empty"}</title>
+      <title>{locale.description}</title>
       <g transform="translate(0 1)" fill="none" fillRule="evenodd">
         <ellipse fill={"#f5f5f5"} cx="32" cy="33" rx="32" ry="7" />
         <g fillRule="nonzero" stroke={"#d9d9d9"}>

@@ -2,8 +2,13 @@ import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
 import type { ShowWaveEffect } from "../../lib/wave/interface";
+import type { DatePickerProps } from "../date-picker";
+import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
+import type { MentionsProps } from "../mentions";
+import type { XorSelectProps } from "../select";
 import type { TableProps } from "../table";
+import type { TextAreaProps } from "../textarea";
 import type {
   AliasToken,
   MappingAlgorithm,
@@ -38,12 +43,36 @@ export interface ComponentStyleConfig {
   style?: React.CSSProperties;
 }
 
+export type DatePickerConfig = ComponentStyleConfig &
+  Pick<DatePickerProps, "variant" | "styles" | "classNames" | "format">;
+
+export type InputConfig = ComponentStyleConfig &
+  Pick<
+    InputProps,
+    "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
+  >;
+
+export type InputNumberConfig = ComponentStyleConfig &
+  Pick<InputNumberProps, "variant">;
+
+export type MentionsConfig = ComponentStyleConfig &
+  Pick<MentionsProps, "variant">;
+
+export type SelectConfig = ComponentStyleConfig &
+  Pick<XorSelectProps, "showSearch" | "variant" | "classNames" | "styles">;
+
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {
     expandIcon?: NonNullable<TableProps["expandable"]>["expandIcon"];
   };
 }
+
+export type TextAreaConfig = ComponentStyleConfig &
+  Pick<
+    TextAreaProps,
+    "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
+  >;
 
 export type PopupOverflow = "viewport" | "scroll";
 
@@ -69,14 +98,16 @@ export interface WaveConfig {
 }
 
 export interface ConfigComponentProps {
-  // input?: InputConfig;
-  // textArea?: TextAreaConfig;
-  // inputNumber?: InputNumberConfig;
+  avatar?: ComponentStyleConfig;
+  checkbox?: ComponentStyleConfig;
+  input?: InputConfig;
+  inputNumber?: InputNumberConfig;
+  mentions?: MentionsConfig;
   // pagination?: PaginationConfig;
   // space?: SpaceConfig;
   // splitter?: ComponentStyleConfig;
   // form?: FormConfig;
-  // select?: SelectConfig;
+  select?: SelectConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;
   // button?: ButtonConfig;
@@ -97,14 +128,12 @@ export interface ConfigComponentProps {
   // image?: ImageConfig;
   // layout?: ComponentStyleConfig;
   // list?: ListConfig;
-  // mentions?: MentionsConfig;
   // modal?: ModalConfig;
   progress?: ComponentStyleConfig;
   // result?: ComponentStyleConfig;
   // slider?: SliderConfig;
   // breadcrumb?: ComponentStyleConfig;
   // menu?: MenuConfig;
-  checkbox?: ComponentStyleConfig;
   // descriptions?: DescriptionsConfig;
   // empty?: EmptyConfig;
   // badge?: BadgeConfig;
@@ -112,10 +141,10 @@ export interface ConfigComponentProps {
   // rate?: ComponentStyleConfig;
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
-  // avatar?: ComponentStyleConfig;
   // message?: ComponentStyleConfig;
   // tag?: TagConfig;
   table?: TableConfig;
+  textArea?: TextAreaConfig;
   // card?: CardConfig;
   // tabs?: TabsConfig;
   // timeline?: ComponentStyleConfig;
@@ -128,7 +157,7 @@ export interface ConfigComponentProps {
   // notification?: NotificationConfig;
   // tree?: ComponentStyleConfig;
   // colorPicker?: ComponentStyleConfig;
-  // datePicker?: DatePickerConfig;
+  datePicker?: DatePickerConfig;
   // rangePicker?: RangePickerConfig;
   // dropdown?: ComponentStyleConfig;
   // flex?: FlexConfig;

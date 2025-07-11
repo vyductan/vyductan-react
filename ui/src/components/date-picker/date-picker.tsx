@@ -5,7 +5,6 @@
 // https://github.com/shadcn-ui/ui/pull/4421
 "use client";
 
-import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 import { useEffect } from "react";
 import { useMergedState } from "@rc-component/util";
@@ -14,10 +13,12 @@ import { format as formatDate, isValid, parse, toDate } from "date-fns";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { InputRef, inputSizeVariants, InputVariants } from "../input";
+import type { InputRef } from "../input";
+import type { InputSizeVariants, InputVariants } from "../input/variants";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { useUiConfig } from "../config-provider/config-provider";
+import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input";
 import { Popover } from "../popover";
 
@@ -30,7 +31,7 @@ type DateType<T extends DatePickerValueType> = T extends "date"
     : string;
 
 type DatePickerBaseProps = InputVariants &
-  VariantProps<typeof inputSizeVariants> & {
+  InputSizeVariants & {
     id?: string;
     format?: string;
     /** To provide an additional time selection **/
@@ -50,34 +51,53 @@ type DatePickerProps<T extends DatePickerValueType = "date"> =
     /** Callback function, can be executed when the selected time is changing */
     onChange?: (date: DateType<T> | undefined, dateString: string) => void;
     placeholder?: string;
+
+    styles?: {
+      root?: React.CSSProperties;
+    };
+    classNames?: {
+      root?: string;
+    };
   };
-const DatePicker = <T extends DatePickerValueType = "date">({
-  valueType,
-  ref,
-  id,
+const DatePicker = <T extends DatePickerValueType = "date">(
+  props: DatePickerProps<T>,
+) => {
+  const {
+    valueType,
+    ref,
+    id,
 
-  placeholder,
-  format: formatProp = "dd/MM/yyyy",
-  showTime,
+    value: valueProp,
+    defaultValue: defaultValueProp,
+    onChange,
 
-  disabled,
-  allowClear = false,
-  variant,
-  size,
-  status,
+    placeholder,
+    format: formatProp,
+    showTime,
 
-  className,
-  ...props
-}: DatePickerProps<T>) => {
+    classNames: _,
+    styles: __,
+    disabled,
+    allowClear = false,
+    variant,
+    size,
+    status,
+
+    className,
+    ...rest
+  } = props;
+
   const [open, setOpen] = React.useState(false);
+
+  const { format: formatConfig } = useComponentConfig("datePicker");
 
   // ====================== Format Date =======================
   const datePickerConfig = useUiConfig((state) => state.components.datePicker);
-  let format = formatProp;
-  if (datePickerConfig?.format) {
-    format = datePickerConfig.format;
-  }
-  format = showTime ? `${format} HH:mm` : format;
+  const format =
+    formatProp ??
+    (showTime
+      ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
+      : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
   const getDestinationValue = React.useCallback(
     (date: Date) => {
@@ -97,19 +117,17 @@ const DatePicker = <T extends DatePickerValueType = "date">({
   );
 
   // ====================== Value =======================
-  const [value, setValue] = useMergedState(props.defaultValue, {
-    value: props.value,
+  const [value, setValue] = useMergedState(defaultValueProp, {
+    value: valueProp,
     onChange: (value) => {
-      props.onChange?.(
+      onChange?.(
         value ? getDestinationValue(value as Date) : undefined,
         value ? formatDate(value, format) : "",
       );
     },
   });
   const preInputValue = value ? formatDate(toDate(value), format) : "";
-  const [inputValue, setInputValue] = useMergedState(preInputValue, {
-    value: preInputValue,
-  });
+  const [inputValue, setInputValue] = useMergedState(preInputValue, {});
 
   const handleChange = (input: string | Date | undefined) => {
     if (!input) {
@@ -140,6 +158,7 @@ const DatePicker = <T extends DatePickerValueType = "date">({
     } else {
       setInputValue(preInputValue);
     }
+    setOpen(false);
   };
 
   // prevent click label to focus input (open popover)
@@ -189,51 +208,53 @@ const DatePicker = <T extends DatePickerValueType = "date">({
           </div>
         }
       >
-        <Input
-          ref={composedRef}
-          id={id}
-          value={inputValue}
-          placeholder={placeholder}
-          status={status}
-          allowClear={allowClear}
-          variant={variant}
-          size={size}
-          disabled={disabled}
-          className={cn(
-            "items-center",
-            "justify-start text-left",
-            "[&>input]:w-full", // fix width of input is not fit with parent width
-            className,
-          )}
-          suffix={
-            <Icon
-              icon="icon-[mingcute--calendar-2-line]"
-              className="ml-auto size-4 opacity-50"
-            />
-          }
-          onClick={(e) => {
-            if (open) {
-              // prevent close when click into input if popover openning
-              e.preventDefault();
+        <div data-slot="picker-input">
+          <Input
+            ref={composedRef}
+            id={id}
+            value={inputValue}
+            placeholder={placeholder}
+            status={status}
+            allowClear={allowClear}
+            variant={variant}
+            size={size}
+            disabled={disabled}
+            className={cn(
+              "items-center",
+              "justify-start text-left",
+              "[&>input]:w-full", // fix width of input is not fit with parent width
+              className,
+            )}
+            suffix={
+              <Icon
+                icon="icon-[mingcute--calendar-2-line]"
+                className="ml-auto size-4 opacity-50"
+              />
             }
-          }}
-          onKeyUp={(event) => {
-            event.stopPropagation();
-            if (event.key === "Enter" || event.key === "Escape") {
-              handleChangeInput(event.currentTarget.value);
-              setOpen(false);
-            }
-          }}
-          onChange={(event) => {
-            setInputValue(event.currentTarget.value);
-            if (isValidDateStringExact(event.currentTarget.value, format)) {
-              handleChange(event.currentTarget.value);
-            } else {
-              // eslint-disable-next-line unicorn/no-useless-undefined
-              handleChange(undefined);
-            }
-          }}
-        />
+            onClick={(e) => {
+              if (open) {
+                // prevent close when click into input if popover openning
+                e.preventDefault();
+              }
+            }}
+            onKeyUp={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter" || event.key === "Escape") {
+                handleChangeInput(event.currentTarget.value);
+              }
+            }}
+            onChange={(event) => {
+              setInputValue(event.currentTarget.value);
+              // if (isValidDateStringExact(event.currentTarget.value, format)) {
+              //   handleChange(event.currentTarget.value);
+              // } else {
+              //   // eslint-disable-next-line unicorn/no-useless-undefined
+              //   handleChange(undefined);
+              // }
+            }}
+            {...rest}
+          />
+        </div>
       </Popover>
     </>
   );
@@ -244,7 +265,6 @@ function isValidDateStringExact(
   formatString: string,
 ): boolean {
   const parsedDate = parse(dateString, formatString, new Date());
-
   // Validation:
   // 1. The date must be valid (`isValid(parsedDate)`).
   // 2. The reformatted string (`format(parsedDate, formatString)`) must match `dateString`.

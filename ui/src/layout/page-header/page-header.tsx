@@ -1,7 +1,8 @@
-import type { AvatarProps } from "@acme/ui/components/avatar";
+import type { AvatarProps } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
+
 import type { BreadcrumbProps } from "@acme/ui/components/breadcrumb";
 import type { TagProps } from "@acme/ui/components/tag";
-import { Avatar } from "@acme/ui/components/avatar";
 import { Breadcrumb } from "@acme/ui/components/breadcrumb";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";

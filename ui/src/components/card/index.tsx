@@ -12,3 +12,5 @@ Card.Meta = CardMeta;
 
 export { Card };
 export * from "./_components";
+
+export { type CardProps } from "./card";
