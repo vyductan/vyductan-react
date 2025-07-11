@@ -88,7 +88,6 @@ const DatePicker = <T extends DatePickerValueType = "date">(
   } = props;
 
   const [open, setOpen] = React.useState(false);
-
   const { format: formatConfig } = useComponentConfig("datePicker");
 
   // ====================== Format Date =======================
@@ -173,6 +172,10 @@ const DatePicker = <T extends DatePickerValueType = "date">(
     };
   }, [id]);
 
+  const [month, setMonth] = React.useState<Date | undefined>(
+    value && toDate(value),
+  );
+
   return (
     <>
       <Popover
@@ -194,8 +197,11 @@ const DatePicker = <T extends DatePickerValueType = "date">(
           <div className="flex">
             <Calendar
               mode="single"
+              captionLayout="dropdown"
               // initialFocus // disable default focus (in shadcn default is true)
-              defaultMonth={value && toDate(value)}
+              // defaultMonth={value && toDate(value)}
+              month={month}
+              onMonthChange={setMonth}
               selected={value ? toDate(value) : undefined}
               onSelect={(date) => {
                 if (date) {
