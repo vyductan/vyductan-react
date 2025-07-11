@@ -42,11 +42,11 @@ const Typography = ({
   className,
   children,
   code = false,
-  copyable,
+  // copyable,
   delete: del = false,
   disabled = false,
-  editable,
-  ellipsis = false,
+  // editable,
+  // ellipsis = false,
   mark = false,
   onClick,
   strong = false,
@@ -91,19 +91,17 @@ const Typography = ({
   );
 
   if (asChild) {
-    const child = React.Children.only(children) as React.ReactElement<React.HTMLAttributes<HTMLElement>>;
+    const child = React.Children.only(children) as React.ReactElement<
+      React.HTMLAttributes<HTMLElement>
+    >;
     return React.cloneElement(child, {
-      className: cn(classes, child.props?.className),
+      className: cn(classes, child.props.className),
       ...props,
     });
   }
 
   return (
-    <Tag
-      className={classes}
-      onClick={onClick}
-      {...props}
-    >
+    <Tag className={classes} onClick={onClick} {...props}>
       {children}
     </Tag>
   );

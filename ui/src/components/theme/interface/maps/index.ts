@@ -3,4 +3,6 @@
 // ======================================================================
 // 🔥🔥🔥🔥🔥🔥🔥 DO NOT MODIFY THIS. PLEASE CONTACT DESIGNER. 🔥🔥🔥🔥🔥🔥🔥
 
-export interface MapToken {}
+export interface MapToken {
+  _?: "";
+}
