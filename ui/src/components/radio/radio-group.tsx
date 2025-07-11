@@ -3,26 +3,25 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ValueType } from "../form";
 import type { RadioProps } from "./radio";
 import { Radio } from "./radio";
 
-type RadioOption<TValue extends string | number | boolean = string> = {
+type RadioOption = {
   label: React.ReactNode;
-  value: TValue;
+  value: any;
   color?: string;
   disabled?: boolean;
 };
-type RadioGroupProps<TValue extends string | number | boolean = string> = Omit<
+type RadioGroupProps = Omit<
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
   "defaultValue" | "onChange"
 > &
   Pick<RadioProps, "optionType" | "buttonStyle"> & {
     defaultValue?: HTMLInputElement["defaultValue"];
-    options: RadioOption<TValue>[];
+    options: RadioOption[];
     onChange?: RadioGroupPrimitive.RadioGroupProps["onValueChange"];
   };
-const RadioGroupInner = <T extends ValueType = string>(
+const RadioGroupInner = (
   {
     className,
     options,
@@ -31,7 +30,7 @@ const RadioGroupInner = <T extends ValueType = string>(
     buttonStyle,
     disabled,
     ...props
-  }: RadioGroupProps<T>,
+  }: RadioGroupProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   return (
@@ -60,10 +59,8 @@ RadioGroupInner.displayName = RadioGroupPrimitive.Root.displayName;
 
 export type { RadioGroupProps, RadioOption };
 
-export const RadioGroup = React.forwardRef(RadioGroupInner) as <
-  T extends ValueType,
->(
-  props: RadioGroupProps<T> & {
+export const RadioGroup = React.forwardRef(RadioGroupInner) as (
+  props: RadioGroupProps & {
     ref?: React.ForwardedRef<HTMLUListElement>;
   },
 ) => ReturnType<typeof RadioGroupInner>;
