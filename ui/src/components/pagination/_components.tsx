@@ -6,8 +6,6 @@ import { buttonVariants } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import { Link } from "../link";
-
 function PaginationRoot({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
@@ -41,7 +39,7 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean;
 } & Pick<ButtonProps, "disabled" | "size" | "shape"> &
-  React.ComponentProps<typeof Link> & {
+  React.ComponentProps<"a"> & {
     asChild?: boolean;
   };
 
@@ -55,7 +53,7 @@ function PaginationLink({
   asChild,
   ...props
 }: PaginationLinkProps) {
-  const LinkComp = asChild ? Slot : Link;
+  const LinkComp = asChild ? Slot : "a";
   return (
     <LinkComp
       rel="nofollow"
