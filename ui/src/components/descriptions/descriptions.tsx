@@ -258,18 +258,47 @@ function createVerticalRows(
   columns: number,
 ): VerticalRow[] {
   const rows: VerticalRow[] = [];
-  for (let index = 0; index < data.length; index += columns) {
-    const labels = data.slice(index, index + columns).map((item) => ({
-      span: item.span,
+  let currentRowLabels: VerticalCell[] = [];
+  let currentRowValues: VerticalCell[] = [];
+  let currentRowSpan = 0;
+
+  // Process each item and create rows based on column spans
+  for (const item of data) {
+    const itemSpan = item.span ?? 1;
+
+    // If adding this item would exceed the column limit, start new rows
+    if (currentRowSpan + itemSpan > columns) {
+      // Add the current rows if they have content
+      if (currentRowLabels.length > 0) {
+        rows.push([...currentRowLabels], [...currentRowValues]);
+      }
+
+      // Reset for new rows
+      currentRowLabels = [];
+      currentRowValues = [];
+      currentRowSpan = 0;
+    }
+
+    // Add item to current rows
+    currentRowLabels.push({
+      span: itemSpan,
       content: item.label,
       className: item.classNames?.label,
-    }));
-    const childrens = data.slice(index, index + columns).map((item) => ({
-      span: item.span,
+    });
+
+    currentRowValues.push({
+      span: itemSpan,
       content: item.children,
-      className: item.classNames?.value,
-    }));
-    rows.push(labels, childrens);
+      className: item.classNames?.content,
+    });
+
+    currentRowSpan += itemSpan;
   }
+
+  // Add the last rows if they have content
+  if (currentRowLabels.length > 0) {
+    rows.push(currentRowLabels, currentRowValues);
+  }
+
   return rows;
 }
