@@ -23,7 +23,7 @@ export const AlertModal = ({
   description,
   okText = "Confirm",
   cancelText = "Cancel",
-  okLoading = false,
+  confirmLoading = false,
   title,
   trigger,
   onConfirm,
@@ -72,7 +72,7 @@ export const AlertModal = ({
             }}
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
           >
-            {okLoading && <LoadingIcon />}
+            {confirmLoading && <LoadingIcon />}
             {okText}
           </AlertDialogAction>
         </AlertDialogFooter>
