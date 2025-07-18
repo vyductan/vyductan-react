@@ -6,6 +6,7 @@ import type { ButtonProps } from "@acme/ui/components/button";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { Breakpoint } from "../_util/responsive-observer";
 import { ScrollArea } from "../scroll-area";
 import {
   Dialog,
@@ -19,6 +20,8 @@ import {
 } from "./_components";
 
 type ModalProps = React.ComponentProps<typeof Dialog> & {
+  /** Width of the modal dialog */
+  width?: string | number | Partial<Record<Breakpoint, string | number>>;
   className?: string;
   classNames?: {
     header?: string;
@@ -38,7 +41,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
       }) => React.ReactNode)
     | React.ReactNode;
   okText?: string;
-  okLoading?: boolean;
+  confirmLoading?: boolean;
   okButtonProps?: ButtonProps;
   cancelText?: string;
   title: React.ReactNode;
@@ -47,13 +50,14 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
+  width,
   className,
   classNames,
   children,
   description,
   footer,
   okText,
-  okLoading,
+  confirmLoading,
   okButtonProps,
   title,
   trigger,
@@ -64,17 +68,35 @@ const Modal = ({
   //
   ...rest
 }: ModalProps) => {
-  const isShadcnDialog = React.Children.toArray(children).some((child) => {
-    if (React.isValidElement(child)) {
-      const type =
-        typeof child.type === "string" ? child.type : child.type.name;
-      return type === "DialogContent";
+  // =========================== Width ============================
+  const [numWidth, responsiveWidth] = React.useMemo<
+    [
+      string | number | undefined,
+      Partial<Record<Breakpoint, string | number>> | undefined,
+    ]
+  >(() => {
+    if (width && typeof width === "object") {
+      return [undefined, width];
     }
-    return false;
-  });
-  if (isShadcnDialog) {
-    return <Dialog {...rest}>{children}</Dialog>;
-  }
+    return [width, undefined];
+  }, [width]);
+
+  const responsiveWidthVars = React.useMemo(() => {
+    const vars: Record<string, string> = {};
+    if (responsiveWidth) {
+      for (const breakpoint of Object.keys(responsiveWidth)) {
+        const breakpointWidth = responsiveWidth[breakpoint as Breakpoint];
+        if (breakpointWidth !== undefined) {
+          vars[`--modal-${breakpoint}-width`] =
+            typeof breakpointWidth === "number"
+              ? `${breakpointWidth}px`
+              : breakpointWidth;
+        }
+      }
+    }
+    return vars;
+  }, [responsiveWidth]);
+
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
   //     <Button variant="outline">Cancel</Button>
@@ -82,11 +104,11 @@ const Modal = ({
   // );
   // const OkBtn = useMemo(
   //   () => () => (
-  //     <Button loading={okLoading} onClick={onOk}>
+  //     <Button loading={confirmLoading} onClick={onOk}>
   //       {okText ?? "Ok"}
   //     </Button>
   //   ),
-  //   [okLoading, okText, onOk],
+  //   [confirmLoading, okText, onOk],
   // );
   const footerToRender = footer ? (
     typeof footer === "function" ? (
@@ -94,7 +116,7 @@ const Modal = ({
         originNode: undefined,
         extra: {
           OkBtn: (
-            <Button loading={okLoading} onClick={onOk} {...okButtonProps}>
+            <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
               {okText ?? "Ok"}
             </Button>
           ),
@@ -114,7 +136,7 @@ const Modal = ({
       <DialogClose asChild onClick={onCancel}>
         <Button variant="outline">{cancelText ?? "Cancel"}</Button>
       </DialogClose>
-      <Button loading={okLoading} onClick={onOk} {...okButtonProps}>
+      <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
         {okText ?? "Ok"}
       </Button>
     </>
@@ -135,7 +157,17 @@ const Modal = ({
     >
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
-      <DialogContent className={cn("px-0", className)}>
+      <DialogContent
+        className={cn("px-0", className)}
+        style={{
+          ...(numWidth &&
+            ({
+              "--modal-width":
+                typeof numWidth === "number" ? `${numWidth}px` : numWidth,
+            } as React.CSSProperties)),
+          ...responsiveWidthVars,
+        }}
+      >
         <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
           <DialogDescription className={classNames?.description}>
