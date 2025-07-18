@@ -1,6 +1,6 @@
 import React from "react";
 import { useMergedState } from "@rc-component/util";
-import { format as formatDate, parse } from "date-fns";
+import { format as formatDate, isValid, parse } from "date-fns";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -10,47 +10,69 @@ import { Input } from "../input";
 import { Popover } from "../popover";
 import { TimeSelect } from "./_components/time-select";
 
-type TimePickerProps = Omit<InputProps, "defaultValue" | "value"> & {
+type DateType = Date | null | undefined;
+
+type TimePickerProps = Omit<InputProps, "onChange" | "onSelect"> & {
   ref?: React.Ref<InputRef>;
   id?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-
   format?: string;
-
-  defaultValue?: string;
-  value?: string;
-  onChange?: (time: string | undefined) => void;
+  showNow?: boolean;
+  defaultValue?: DateType;
+  value?: DateType;
+  onChange?: (time: DateType) => void;
 };
 const TimePicker = (props: TimePickerProps) => {
   const {
     id: inputId,
     open: openProp,
     onOpenChange,
-
     className,
     placeholder = "Select time",
-
     format = "HH:mm",
-
-    defaultValue,
+    defaultValue = null,
     value,
     onChange,
     ...inputProps
   } = props;
+
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
     onChange: onOpenChange,
   });
 
   // ====================== Value =======================
-  const [inputValue, setInputValue] = useMergedState(defaultValue, {
+  const [localValue, setLocalValue] = useMergedState<DateType>(defaultValue, {
     value,
   });
 
-  const onInputChangeHandler = (input: string | undefined) => {
-    onChange?.(input);
-    setInputValue(input);
+  // Format the date for display
+  const formatDateValue = (date: DateType): string => {
+    if (!date || !isValid(date)) return "";
+    return formatDate(date, format);
+  };
+
+  const handleChange = (newValue: DateType) => {
+    setLocalValue(newValue);
+    onChange?.(newValue);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (!value) {
+      handleChange(null);
+      return;
+    }
+
+    try {
+      const parsedDate = parse(value, format, new Date());
+      if (isValid(parsedDate)) {
+        handleChange(parsedDate);
+      }
+    } catch {
+      // Invalid date format, keep the input but don't update the value
+    }
   };
   return (
     <>
@@ -74,69 +96,42 @@ const TimePicker = (props: TimePickerProps) => {
         content={
           <div className="flex">
             <TimeSelect
-              value={
-                inputValue ? parse(inputValue, format, new Date()) : undefined
-              }
+              value={localValue ?? undefined}
               format={format}
               onChange={(value) => {
-                onInputChangeHandler(formatDate(value, format));
-                // setOpen(false);
+                handleChange(value);
+                setOpen(false);
               }}
             />
           </div>
         }
       >
-        <Input
-          id={inputId}
-          autoComplete="off"
-          {...inputProps}
-          // allowClear={allowClear}
-          // borderless={borderless}
-          // size={size}
-          // status={status}
-          placeholder={placeholder}
-          className={cn(
-            "items-center",
-            "justify-start text-left",
-            "w-[128px]",
-            className,
-          )}
-          suffix={
-            <Icon
-              icon="icon-[mingcute--time-line]"
-              className="ml-auto size-4 opacity-50"
-            />
-          }
-          value={inputValue}
-          onClick={() => {
-            if (!open) setOpen(true);
-          }}
-          onKeyUp={(event) => {
-            event.stopPropagation();
-            if (event.key === "Enter" || event.key === "Escape") {
-              if (event.currentTarget.value.length === 10) {
-                onInputChangeHandler(event.currentTarget.value);
-              } else {
-                setInputValue(value);
-              }
-              setOpen(false);
+        <div>
+          <Input
+            id={inputId}
+            autoComplete="off"
+            value={formatDateValue(localValue)}
+            onChange={handleInputChange}
+            placeholder={placeholder}
+            {...inputProps}
+            className={cn("w-[120px]", className)}
+            suffix={
+              <Icon
+                icon="icon-[lucide--clock]"
+                className="text-muted-foreground h-4 w-4"
+              />
             }
-          }}
-          onChange={(event) => {
-            setInputValue(event.currentTarget.value);
-            if (event.currentTarget.value === "") {
-              // eslint-disable-next-line unicorn/no-useless-undefined
-              onInputChangeHandler(undefined);
-            } else {
-              try {
-                parse(event.currentTarget.value, format, new Date());
-                onInputChangeHandler(event.currentTarget.value);
-              } catch {
-                //
+            onClick={() => {
+              if (!open) setOpen(true);
+            }}
+            onKeyUp={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter" || event.key === "Escape") {
+                setOpen(false);
               }
-            }
-          }}
-        />
+            }}
+          />
+        </div>
       </Popover>
     </>
   );
