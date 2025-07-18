@@ -13,8 +13,10 @@ import { format as formatDate, isValid, parse, toDate } from "date-fns";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { AnyObject } from "../_util/type";
 import type { InputRef } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
+import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { useUiConfig } from "../config-provider/config-provider";
@@ -22,13 +24,13 @@ import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input";
 import { Popover } from "../popover";
 
-type DatePickerValueType = "date" | "string" | "number" | "format";
+// type DatePickerValueType = "date" | "string" | "number" | "format";
 
-type DateType<T extends DatePickerValueType> = T extends "date"
-  ? Date
-  : T extends "number"
-    ? number
-    : string;
+// type DateType<T extends DatePickerValueType> = T extends "date"
+//   ? Date
+//   : T extends "number"
+//     ? number
+//     : string;
 
 type DatePickerBaseProps = InputVariants &
   InputSizeVariants & {
@@ -42,14 +44,19 @@ type DatePickerBaseProps = InputVariants &
     suffix?: React.ReactNode;
   };
 
-type DatePickerProps<T extends DatePickerValueType = "date"> =
+type DatePickerProps<DateType extends AnyObject = Date> =
   DatePickerBaseProps & {
     ref?: React.Ref<InputRef>;
-    valueType?: T;
-    defaultValue?: DateType<T>;
-    value?: DateType<T>;
+    defaultValue?: DateType;
+    value?: DateType;
     /** Callback function, can be executed when the selected time is changing */
-    onChange?: (date: DateType<T> | undefined, dateString: string) => void;
+    onChange?: (date: DateType | undefined, dateString: string) => void;
+    /**
+     * Function that determines whether a date should be disabled
+     * @param current The current date to check
+     * @returns boolean indicating if the date should be disabled
+     */
+    disabledDate?: DisabledDate<DateType>;
     placeholder?: string;
 
     styles?: {
@@ -59,11 +66,10 @@ type DatePickerProps<T extends DatePickerValueType = "date"> =
       root?: string;
     };
   };
-const DatePicker = <T extends DatePickerValueType = "date">(
-  props: DatePickerProps<T>,
+const DatePicker = <DateType extends AnyObject = Date>(
+  props: DatePickerProps<DateType>,
 ) => {
   const {
-    valueType,
     ref,
     id,
 
@@ -74,6 +80,7 @@ const DatePicker = <T extends DatePickerValueType = "date">(
     placeholder,
     format: formatProp,
     showTime,
+    disabledDate,
 
     classNames: _,
     styles: __,
@@ -98,6 +105,18 @@ const DatePicker = <T extends DatePickerValueType = "date">(
       ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
       : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
+  const valueType = React.useMemo(() => {
+    let result = "format";
+    if (typeof valueProp === "string") {
+      result = "format";
+    } else if (typeof valueProp === "number") {
+      result = "number";
+    } else if (typeof valueProp === "object") {
+      result = "object";
+    }
+    return result;
+  }, [valueProp]);
+
   const getDestinationValue = React.useCallback(
     (date: Date) => {
       let result;
@@ -110,7 +129,7 @@ const DatePicker = <T extends DatePickerValueType = "date">(
       } else {
         result = date;
       }
-      return result as DateType<T>;
+      return result as unknown as DateType;
     },
     [format, valueType],
   );
@@ -120,12 +139,14 @@ const DatePicker = <T extends DatePickerValueType = "date">(
     value: valueProp,
     onChange: (value) => {
       onChange?.(
-        value ? getDestinationValue(value as Date) : undefined,
-        value ? formatDate(value, format) : "",
+        value ? getDestinationValue(value as unknown as Date) : undefined,
+        value ? formatDate(value as unknown as Date, format) : "",
       );
     },
   });
-  const preInputValue = value ? formatDate(toDate(value), format) : "";
+  const preInputValue = value
+    ? formatDate(toDate(value as unknown as Date), format)
+    : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue, {});
 
   const handleChange = (input: string | Date | undefined) => {
@@ -145,7 +166,7 @@ const DatePicker = <T extends DatePickerValueType = "date">(
     } else {
       result = date;
     }
-    setValue(result as DateType<T>);
+    setValue(result as unknown as DateType);
   };
 
   const inputRef = React.useRef<InputRef>(null);
@@ -173,7 +194,7 @@ const DatePicker = <T extends DatePickerValueType = "date">(
   }, [id]);
 
   const [month, setMonth] = React.useState<Date | undefined>(
-    value && toDate(value),
+    value && toDate(value as unknown as Date),
   );
 
   return (
@@ -202,13 +223,22 @@ const DatePicker = <T extends DatePickerValueType = "date">(
               // defaultMonth={value && toDate(value)}
               month={month}
               onMonthChange={setMonth}
-              selected={value ? toDate(value) : undefined}
+              selected={value ? toDate(value as unknown as Date) : undefined}
               onSelect={(date) => {
                 if (date) {
                   setValue(getDestinationValue(date));
                   setInputValue(formatDate(date, format));
                 }
                 setOpen(false);
+              }}
+              disabled={(date) => {
+                if (disabledDate) {
+                  // Pass both the date and the required info object
+                  return disabledDate(getDestinationValue(date), {
+                    type: "date",
+                  });
+                }
+                return false;
               }}
             />
           </div>
@@ -279,10 +309,5 @@ function isValidDateStringExact(
   );
 }
 
-export type {
-  DatePickerProps,
-  DatePickerBaseProps,
-  DatePickerValueType,
-  DateType,
-};
+export type { DatePickerProps, DatePickerBaseProps };
 export { DatePicker };
