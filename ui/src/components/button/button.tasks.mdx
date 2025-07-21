@@ -1,0 +1,77 @@
+# Button Component - Tasks & Planning
+
+## Overview
+Button component với API tương tự Ant Design, hỗ trợ nhiều variants, sizes, và states khác nhau.
+
+> 📚 **Documentation**: Xem examples và API chi tiết tại `button.docs.mdx`
+
+## Current Implementation Status
+
+### ✅ Completed Features
+- [x] Basic button rendering with variants (default, primary, ghost, outline, etc.)
+- [x] Size variants (small, middle, large, icon, sm mapping)
+- [x] Loading state with spinner
+- [x] Disabled state support
+- [x] Icon support (prefix/suffix)
+- [x] Link integration (href prop)
+- [x] AsChild pattern for composition
+- [x] Wave effect animation
+- [x] Color variants (default, danger, success, link)
+- [x] Shape variants (default, circle, round)
+- [x] Screen reader only text (srOnly)
+- [x] HTML type support (submit, reset, button)
+- [x] Tailwind variants configuration
+- [x] Custom classNames support
+- [x] TypeScript type safety
+
+### 🚧 Pending Tasks
+
+#### High Priority
+- [ ] **Accessibility improvements**
+  - [ ] Better ARIA labels and descriptions
+  - [ ] Keyboard navigation enhancements
+  - [ ] Focus management for loading states
+  - [ ] Screen reader announcements for state changes
+
+- [ ] **Testing coverage**
+  - [ ] Unit tests for all variants and props
+  - [ ] Integration tests with forms
+  - [ ] Accessibility testing
+  - [ ] Visual regression tests
+
+#### Medium Priority
+- [ ] **Enhanced features**
+  - [ ] Button group component
+  - [ ] Dropdown button variant
+  - [ ] Split button implementation
+  - [ ] Tooltip integration
+  - [ ] Badge/notification dot support
+
+- [ ] **Performance optimizations**
+  - [ ] Memoization for expensive computations
+  - [ ] Lazy loading for icons
+  - [ ] Bundle size optimization
+
+#### Low Priority
+- [ ] **Advanced styling**
+  - [ ] Gradient variants
+  - [ ] Animation presets
+  - [ ] Custom theme support
+  - [ ] Dark mode optimizations
+
+## Known Issues
+- [x] ~~TypeScript error with "sm" size variant~~ ✅ Fixed
+- [ ] Wave animation performance on mobile devices
+- [ ] Focus outline inconsistency across browsers
+
+## API Compatibility
+- ✅ Ant Design Button API compatibility
+- ✅ Shadcn UI styling system
+- ✅ Radix UI Slot pattern support
+
+## Dependencies
+- `@radix-ui/react-slot` - Composition pattern
+- `tailwind-variants` - Styling variants
+- `@acme/ui/icons` - Icon system
+- `@acme/ui/components/link` - Link integration
+- `@acme/ui/lib/wave` - Animation effects
