@@ -1,0 +1,653 @@
+# Tree Component Documentation
+
+## Overview
+Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ liệu phân cấp với khả năng mở rộng/thu gọn.
+
+## Installation
+
+```tsx
+import { Tree } from '@/components/ui/tree';
+```
+
+## Basic Usage
+
+### Simple Tree
+```tsx
+import { Tree } from '@/components/ui/tree';
+
+const treeData = [
+  {
+    key: '1',
+    title: 'Parent Node',
+    children: [
+      {
+        key: '1-1',
+        title: 'Child Node 1',
+        isLeaf: true,
+      },
+      {
+        key: '1-2',
+        title: 'Child Node 2',
+        isLeaf: true,
+      },
+    ],
+  },
+  {
+    key: '2',
+    title: 'Another Parent',
+    children: [
+      {
+        key: '2-1',
+        title: 'Child Node 3',
+        isLeaf: true,
+      },
+    ],
+  },
+];
+
+export function BasicTreeExample() {
+  return <Tree treeData={treeData} />;
+}
+```
+
+### Tree with Connecting Lines
+```tsx
+import { Tree } from '@/components/ui/tree';
+
+export function TreeWithLinesExample() {
+  return (
+    <Tree 
+      treeData={treeData} 
+      showLine 
+    />
+  );
+}
+```
+
+**Visual Result:**
+```
+├─ Parent Node
+│  ├─ Child Node 1
+│  └─ Child Node 2
+└─ Another Parent
+   └─ Child Node 3
+```
+
+### Tree with Custom Icons
+```tsx
+import { Tree } from '@/components/ui/tree';
+import { FolderIcon, FileIcon, ImageIcon, VideoIcon } from 'lucide-react';
+
+const treeDataWithIcons = [
+  {
+    key: 'documents',
+    title: 'Documents',
+    icon: <FolderIcon className="h-4 w-4" />,
+    children: [
+      {
+        key: 'doc1',
+        title: 'report.pdf',
+        icon: <FileIcon className="h-4 w-4" />,
+        isLeaf: true,
+      },
+      {
+        key: 'doc2',
+        title: 'presentation.pptx',
+        icon: <FileIcon className="h-4 w-4" />,
+        isLeaf: true,
+      },
+    ],
+  },
+  {
+    key: 'media',
+    title: 'Media Files',
+    icon: <FolderIcon className="h-4 w-4" />,
+    children: [
+      {
+        key: 'img1',
+        title: 'photo.jpg',
+        icon: <ImageIcon className="h-4 w-4" />,
+        isLeaf: true,
+      },
+      {
+        key: 'vid1',
+        title: 'video.mp4',
+        icon: <VideoIcon className="h-4 w-4" />,
+        isLeaf: true,
+      },
+    ],
+  },
+];
+
+export function TreeWithIconsExample() {
+  return (
+    <Tree 
+      treeData={treeDataWithIcons} 
+      showLine 
+    />
+  );
+}
+```
+
+### Tree with Disabled Nodes
+```tsx
+import { Tree } from '@/components/ui/tree';
+
+const treeDataWithDisabled = [
+  {
+    key: '1',
+    title: 'Available Node',
+    children: [
+      {
+        key: '1-1',
+        title: 'Active Child',
+        isLeaf: true,
+      },
+      {
+        key: '1-2',
+        title: 'Disabled Child',
+        disabled: true,
+        isLeaf: true,
+      },
+    ],
+  },
+  {
+    key: '2',
+    title: 'Disabled Parent',
+    disabled: true,
+    children: [
+      {
+        key: '2-1',
+        title: 'Child of Disabled Parent',
+        isLeaf: true,
+      },
+    ],
+  },
+];
+
+export function TreeWithDisabledExample() {
+  return (
+    <Tree 
+      treeData={treeDataWithDisabled} 
+      showLine 
+    />
+  );
+}
+```
+
+### Tree with Selection
+```tsx
+import { useState } from 'react';
+import { Tree } from '@/components/ui/tree';
+
+export function TreeWithSelectionExample() {
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  
+  const handleSelect = (keys: string[], info: any) => {
+    console.log('Selected keys:', keys);
+    setSelectedKeys(keys);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <p className="text-sm text-muted-foreground">
+          Selected: {selectedKeys.join(', ') || 'None'}
+        </p>
+      </div>
+      <Tree
+        treeData={treeData}
+        selectedKeys={selectedKeys}
+        onSelect={handleSelect}
+        showLine
+      />
+    </div>
+  );
+}
+```
+
+## Advanced Examples (Coming Soon)
+
+### Controlled Selection
+```tsx
+import { useState } from 'react';
+import { Tree } from '@/components/ui/tree';
+
+export function ControlledSelectionExample() {
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  
+  const handleSelect = (keys: string[], info: any) => {
+    console.log('Selected keys:', keys);
+    console.log('Selection info:', info);
+    setSelectedKeys(keys);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <p>Selected: {selectedKeys.join(', ')}</p>
+      </div>
+      <Tree
+        treeData={treeData}
+        selectedKeys={selectedKeys}
+        onSelect={handleSelect}
+      />
+    </div>
+  );
+}
+```
+
+### Controlled Expansion
+```tsx
+import { useState } from 'react';
+import { Tree } from '@/components/ui/tree';
+
+export function ControlledExpansionExample() {
+  const [expandedKeys, setExpandedKeys] = useState<string[]>(['1']);
+  
+  const handleExpand = (keys: string[], info: any) => {
+    console.log('Expanded keys:', keys);
+    console.log('Expansion info:', info);
+    setExpandedKeys(keys);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <p>Expanded: {expandedKeys.join(', ')}</p>
+        <button 
+          onClick={() => setExpandedKeys([])}
+          className="mr-2 px-2 py-1 bg-gray-200 rounded"
+        >
+          Collapse All
+        </button>
+        <button 
+          onClick={() => setExpandedKeys(['1', '2'])}
+          className="px-2 py-1 bg-gray-200 rounded"
+        >
+          Expand All
+        </button>
+      </div>
+      <Tree
+        treeData={treeData}
+        expandedKeys={expandedKeys}
+        onExpand={handleExpand}
+      />
+    </div>
+  );
+}
+```
+
+### Tree with Checkboxes
+```tsx
+import { useState } from 'react';
+import { Tree } from '@/components/ui/tree';
+
+export function CheckableTreeExample() {
+  const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
+  
+  const handleCheck = (keys: string[], info: any) => {
+    console.log('Checked keys:', keys);
+    console.log('Check info:', info);
+    setCheckedKeys(keys);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <p>Checked: {checkedKeys.join(', ')}</p>
+      </div>
+      <Tree
+        treeData={treeData}
+        checkable
+        checkedKeys={checkedKeys}
+        onCheck={handleCheck}
+      />
+    </div>
+  );
+}
+```
+
+### File Explorer Example
+```tsx
+import { Tree } from '@/components/ui/tree';
+import { 
+  FolderIcon, 
+  FileIcon, 
+  FileTextIcon, 
+  ImageIcon, 
+  VideoIcon,
+  MusicIcon,
+  ArchiveIcon 
+} from 'lucide-react';
+
+const getFileIcon = (fileName: string) => {
+  const ext = fileName.split('.').pop()?.toLowerCase();
+  
+  switch (ext) {
+    case 'txt':
+    case 'md':
+    case 'doc':
+    case 'docx':
+      return <FileTextIcon className="h-4 w-4" />;
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+    case 'gif':
+      return <ImageIcon className="h-4 w-4" />;
+    case 'mp4':
+    case 'avi':
+    case 'mov':
+      return <VideoIcon className="h-4 w-4" />;
+    case 'mp3':
+    case 'wav':
+    case 'flac':
+      return <MusicIcon className="h-4 w-4" />;
+    case 'zip':
+    case 'rar':
+    case '7z':
+      return <ArchiveIcon className="h-4 w-4" />;
+    default:
+      return <FileIcon className="h-4 w-4" />;
+  }
+};
+
+const fileSystemData = [
+  {
+    key: 'root',
+    title: 'My Computer',
+    icon: <FolderIcon className="h-4 w-4" />,
+    children: [
+      {
+        key: 'documents',
+        title: 'Documents',
+        icon: <FolderIcon className="h-4 w-4" />,
+        children: [
+          {
+            key: 'resume.pdf',
+            title: 'resume.pdf',
+            icon: getFileIcon('resume.pdf'),
+            isLeaf: true,
+          },
+          {
+            key: 'notes.txt',
+            title: 'notes.txt',
+            icon: getFileIcon('notes.txt'),
+            isLeaf: true,
+          },
+        ],
+      },
+      {
+        key: 'pictures',
+        title: 'Pictures',
+        icon: <FolderIcon className="h-4 w-4" />,
+        children: [
+          {
+            key: 'vacation.jpg',
+            title: 'vacation.jpg',
+            icon: getFileIcon('vacation.jpg'),
+            isLeaf: true,
+          },
+          {
+            key: 'family.png',
+            title: 'family.png',
+            icon: getFileIcon('family.png'),
+            isLeaf: true,
+          },
+        ],
+      },
+      {
+        key: 'music',
+        title: 'Music',
+        icon: <FolderIcon className="h-4 w-4" />,
+        children: [
+          {
+            key: 'song1.mp3',
+            title: 'favorite_song.mp3',
+            icon: getFileIcon('song1.mp3'),
+            isLeaf: true,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export function FileExplorerExample() {
+  return <Tree treeData={fileSystemData} />;
+}
+```
+
+### Organization Chart Example
+```tsx
+import { Tree } from '@/components/ui/tree';
+import { UserIcon, UsersIcon } from 'lucide-react';
+
+const orgChartData = [
+  {
+    key: 'ceo',
+    title: 'CEO - John Smith',
+    icon: <UserIcon className="h-4 w-4" />,
+    children: [
+      {
+        key: 'cto',
+        title: 'CTO - Jane Doe',
+        icon: <UserIcon className="h-4 w-4" />,
+        children: [
+          {
+            key: 'dev-team',
+            title: 'Development Team',
+            icon: <UsersIcon className="h-4 w-4" />,
+            children: [
+              {
+                key: 'dev1',
+                title: 'Senior Developer - Alice Johnson',
+                icon: <UserIcon className="h-4 w-4" />,
+                isLeaf: true,
+              },
+              {
+                key: 'dev2',
+                title: 'Junior Developer - Bob Wilson',
+                icon: <UserIcon className="h-4 w-4" />,
+                isLeaf: true,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        key: 'cmo',
+        title: 'CMO - Mike Brown',
+        icon: <UserIcon className="h-4 w-4" />,
+        children: [
+          {
+            key: 'marketing-team',
+            title: 'Marketing Team',
+            icon: <UsersIcon className="h-4 w-4" />,
+            children: [
+              {
+                key: 'marketer1',
+                title: 'Marketing Specialist - Sarah Davis',
+                icon: <UserIcon className="h-4 w-4" />,
+                isLeaf: true,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export function OrganizationChartExample() {
+  return <Tree treeData={orgChartData} />;
+}
+```
+
+## Props API Reference
+
+### TreeProps
+```tsx
+interface TreeProps<TreeDataType extends BasicDataNode = DataNode> {
+  /** The treeNodes data Array */
+  treeData?: TreeDataType[];
+  
+  /** Tree node children (alternative to treeData) */
+  children?: React.ReactNode;
+  
+  /** Default expanded keys */
+  defaultExpandedKeys?: Key[];
+  
+  /** Expanded keys (controlled) */
+  expandedKeys?: Key[];
+  
+  /** Callback for expand/collapse */
+  onExpand?: (
+    expandedKeys: Key[], 
+    info: { expanded: boolean; node: TreeDataType }
+  ) => void;
+  
+  /** Callback for selection */
+  onSelect?: (
+    selectedKeys: Key[], 
+    info: { selected: boolean; node: TreeDataType }
+  ) => void;
+  
+  /** Selected keys */
+  selectedKeys?: Key[];
+  
+  /** Show connecting lines */
+  showLine?: boolean;
+  
+  /** Show icons */
+  showIcon?: boolean;
+  
+  /** Custom icon */
+  icon?: IconType;
+  
+  /** Custom switcher icon */
+  switcherIcon?: IconType;
+  
+  // Future props
+  /** Enable checkbox */
+  checkable?: boolean;
+  
+  /** Checked keys */
+  checkedKeys?: Key[];
+  
+  /** Callback for check */
+  onCheck?: (checkedKeys: Key[], info: any) => void;
+  
+  /** Enable drag and drop */
+  draggable?: boolean;
+  
+  /** Multiple selection */
+  multiple?: boolean;
+}
+```
+
+### TreeNodeData
+```tsx
+interface TreeNodeData {
+  /** Unique key */
+  key: Key;
+  
+  /** Node title */
+  title: React.ReactNode;
+  
+  /** Child nodes */
+  children?: TreeNodeData[];
+  
+  /** Custom icon */
+  icon?: React.ReactNode;
+  
+  /** Is leaf node */
+  isLeaf?: boolean;
+  
+  /** Disabled state */
+  disabled?: boolean;
+  
+  /** Checkable */
+  checkable?: boolean;
+  
+  /** Selectable */
+  selectable?: boolean;
+  
+  /** Custom class name */
+  className?: string;
+  
+  /** Custom style */
+  style?: React.CSSProperties;
+}
+```
+
+## Styling
+
+The Tree component uses Tailwind CSS classes and can be customized through:
+
+- **Custom icons** for different node types
+- **CSS classes** for styling states (hover, selected, disabled)
+- **Tailwind utility classes** for spacing and colors
+- **Connecting lines** with `showLine` prop using `bg-border` class
+- **Dynamic indentation** based on tree depth (24px per level)
+- **Text alignment** with expand icon column reserved
+
+### Styling Features
+- ✅ **Hover effects**: `hover:bg-accent hover:text-accent-foreground`
+- ✅ **Selected states**: `bg-accent text-accent-foreground`
+- ✅ **Disabled states**: `opacity-50 cursor-not-allowed`
+- ✅ **Connecting lines**: Precise positioning with CSS borders
+- ✅ **Responsive design**: Proper text truncation and flexible layouts
+
+## Accessibility
+
+The Tree component follows accessibility best practices:
+
+- Proper ARIA attributes for tree structure
+- Keyboard navigation support
+- Screen reader compatibility
+- Focus management
+
+## Performance Tips
+
+- **Use `isLeaf: true`** for leaf nodes to avoid unnecessary rendering
+- **Provide unique `key` props** for all nodes (required for React)
+- **Consider virtualization** for large datasets (1000+ nodes)
+- **Use memoization** for expensive tree transformations
+- **Enable `showLine` selectively** - only when visual hierarchy is needed
+- **Optimize selection handling** - avoid unnecessary re-renders on selection changes
+
+## Current Limitations
+
+- **No built-in virtualization** - performance may degrade with 1000+ nodes
+- **No drag and drop** - feature not yet implemented
+- **No checkboxes** - checkbox functionality pending
+- **No search/filter** - built-in search not available
+- **No keyboard navigation** - accessibility feature pending
+
+## Migration from Other Libraries
+
+### From Ant Design Tree
+```tsx
+// Ant Design
+<Tree
+  treeData={treeData}
+  showLine
+  onSelect={onSelect}
+  selectedKeys={selectedKeys}
+/>
+
+// Our Tree Component (same API!)
+<Tree
+  treeData={treeData}
+  showLine
+  onSelect={onSelect}
+  selectedKeys={selectedKeys}
+/>
+```
+
+### Key Differences
+- **Styling**: Uses Shadcn UI design system instead of Ant Design
+- **Icons**: No default icons (cleaner look)
+- **Performance**: Optimized for smaller datasets
+- **Customization**: More flexible with Tailwind CSS

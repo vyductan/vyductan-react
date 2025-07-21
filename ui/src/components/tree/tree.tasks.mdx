@@ -1,0 +1,132 @@
+# Tree Component - Tasks & Planning
+
+## Overview
+Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ liệu phân cấp với khả năng mở rộng/thu gọn.
+
+> 📚 **Documentation**: Xem examples và API chi tiết tại `tree.docs.mdx`
+
+## Current Implementation Status
+
+### ✅ Completed Features
+- [x] Basic tree structure rendering
+- [x] Recursive node rendering
+- [x] Collapsible/expandable nodes
+- [x] Custom icons support
+- [x] Disabled state support
+- [x] Registry.json integration
+- [x] TreeNodeData interface
+- [x] InternalTreeProps for recursive calls
+- [x] TreeNode component separation
+- [x] Shadcn UI components integration
+- [x] Dynamic indentation based on tree depth
+- [x] Text alignment with expand icon column
+- [x] Connecting lines (showLine prop)
+- [x] Selection functionality with visual feedback
+- [x] Clean UI without default icons
+
+### 🚧 Pending Tasks
+
+#### High Priority
+- [ ] **Selection functionality**
+  - [ ] Single selection implementation
+  - [ ] Multiple selection support
+  - [ ] Controlled selection (selectedKeys prop)
+  - [ ] onSelect callback with proper info object
+  - [ ] Visual selection states
+
+- [ ] **Expansion control**
+  - [ ] Controlled expansion (expandedKeys prop)
+  - [ ] Default expansion (defaultExpandedKeys)
+  - [ ] onExpand callback implementation
+  - [ ] Expand/collapse all functionality
+
+- [ ] **Checkbox support**
+  - [ ] Checkable nodes rendering
+  - [ ] Check all/uncheck all logic
+  - [ ] Half-checked state for parent nodes
+  - [ ] onCheck callback with proper info
+  - [ ] Controlled checked state
+
+#### Medium Priority
+- [ ] **Styling improvements**
+  - [x] Show connecting lines (showLine prop) ✅
+  - [x] Better icon positioning and sizing ✅
+  - [x] Hover states styling ✅
+  - [ ] Focus states for accessibility
+  - [x] Active/selected visual feedback ✅
+  - [ ] Loading state styling
+
+- [ ] **Advanced features**
+  - [ ] Drag and drop support
+  - [ ] Search/filter functionality
+  - [ ] Virtual scrolling for large datasets
+  - [ ] Loading state for async data
+  - [ ] Right-click context menu
+
+#### Low Priority
+- [ ] **Performance optimizations**
+  - [ ] Memoization for large trees
+  - [ ] Lazy loading of child nodes
+  - [ ] Tree shaking unused features
+  - [ ] Virtual rendering for 1000+ nodes
+
+- [ ] **Developer Experience**
+  - [x] Better TypeScript types ✅
+  - [ ] Error boundaries
+  - [ ] Dev warnings for common mistakes
+  - [ ] Storybook stories
+  - [x] Comprehensive documentation ✅
+
+## Testing Scenarios
+
+### Unit Tests Needed
+- [ ] Renders basic tree structure
+- [ ] Handles empty treeData
+- [ ] Renders custom icons
+- [ ] Handles disabled nodes
+- [ ] Recursive rendering works correctly
+- [ ] Key prop uniqueness
+
+### Integration Tests Needed
+- [ ] Selection functionality
+- [ ] Expansion/collapse
+- [ ] Checkbox interactions
+- [ ] Event callbacks
+- [ ] Keyboard navigation
+
+## Design Considerations
+
+### Accessibility
+- [ ] ARIA attributes for tree structure
+- [ ] Keyboard navigation support
+- [ ] Screen reader compatibility
+- [ ] Focus management
+
+### Performance
+- [ ] Large dataset handling
+- [ ] Virtual scrolling for 1000+ nodes
+- [ ] Memoization strategies
+- [ ] Lazy loading implementation
+
+### Styling
+- [ ] Consistent with design system
+- [ ] Dark mode support
+- [ ] Responsive design
+- [ ] Animation transitions
+
+## Migration Notes
+
+### From Current Implementation
+- Current implementation uses Sidebar components internally
+- Need to abstract away from Sidebar dependency for general use
+- Consider creating separate TreeSidebar variant
+
+### Breaking Changes to Consider
+- API alignment with Ant Design Tree
+- Event handler signature changes
+- Props restructuring
+
+## References
+- [Ant Design Tree](https://ant.design/components/tree)
+- [React Aria TreeView](https://react-spectrum.adobe.com/react-aria/useTreeView.html)
+- [Accessibility Tree Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/)
