@@ -326,7 +326,7 @@ type ButtonType = ButtonVariants["type"];
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "color">,
-    Omit<ButtonVariants, "type" | "color" | "disabled" | "variant"> {
+    Omit<ButtonVariants, "type" | "color" | "disabled" | "variant" | "size"> {
   type?: HtmlType | ButtonType;
   htmlType?: HtmlType;
   asChild?: boolean;
@@ -338,6 +338,7 @@ export interface ButtonProps
   classNames?: {
     variants?: TVButtonOptions;
   };
+  size?: ButtonVariants["size"] | "sm";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -398,6 +399,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     if (!isHtmlType && type === "text") {
       variantToPass = "ghost";
     }
+
+    let sizeToPass = size as ButtonVariants["size"];
+    if (size === "sm") {
+      sizeToPass = "small";
+    }
+
     return (
       <Wave component="Button" disabled={loading}>
         <Comp
@@ -408,7 +415,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               color,
               disabled,
               primary: !primary && !!variant ? undefined : (primary ?? true),
-              size,
+              size: sizeToPass,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
               variant: variantToPass,
             }),
@@ -420,7 +427,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 color,
                 disabled,
                 primary: !primary && !!variant ? undefined : (primary ?? true),
-                size,
+                size: sizeToPass,
                 shape:
                   (icon && !children) || srOnly ? (shape ?? "icon") : shape,
                 variant,
