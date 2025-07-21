@@ -9,6 +9,50 @@ import {
   CollapsibleTrigger,
 } from "../collapsible";
 
+// Unified TreeTitle component for both leaf and parent nodes
+interface TreeTitleProps {
+  title: React.ReactNode;
+  icon?: React.ReactNode;
+  isSelected?: boolean;
+  isDisabled?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLSpanElement>;
+  style?: React.CSSProperties;
+  showIcon?: boolean;
+}
+
+function TreeTitle({
+  title,
+  icon,
+  isSelected,
+  isDisabled,
+  onClick,
+  style,
+  showIcon,
+}: TreeTitleProps) {
+  return (
+    <Button
+      type="text"
+      tabIndex={0}
+      className={cn(
+        "flex min-w-0 flex-1 items-center gap-2 truncate rounded px-2 py-1 pl-1 text-sm font-normal transition outline-none",
+        "justify-start",
+        isSelected && "bg-accent text-accent-foreground",
+        isDisabled && "cursor-not-allowed opacity-50",
+        !isDisabled && "hover:bg-accent hover:text-accent-foreground",
+      )}
+      style={style}
+      disabled={isDisabled}
+      onClick={isDisabled ? undefined : onClick}
+      data-slot="tree-node-content"
+    >
+      {showIcon && icon && (
+        <span className="flex h-4 w-4 items-center justify-center">{icon}</span>
+      )}
+      <span className="truncate">{title}</span>
+    </Button>
+  );
+}
+
 /** Provide a wrap type define for developer to wrap with customize fieldNames data type */
 export type FieldDataNode<
   T,
@@ -101,6 +145,8 @@ type TreeProps<TreeDataType extends BasicDataNode = DataNode> = {
   icon?: IconType;
   /** Custom switcher icon */
   switcherIcon?: IconType;
+
+  className?: string;
 };
 
 type TreeNodeData = {
@@ -121,6 +167,11 @@ type InternalTreeProps = TreeProps & {
   isLast?: boolean;
   /** Internal prop for tracking parent line states */
   parentLines?: boolean[];
+  parentIsLast?: boolean;
+  _parent?: {
+    depth: number;
+    isLast: boolean;
+  };
 };
 
 function Tree(props: InternalTreeProps) {
@@ -133,13 +184,15 @@ function Tree(props: InternalTreeProps) {
     depth = 0,
     isLast = false,
     parentLines = [],
+    parentIsLast = false,
+    className,
     ...restProps
   } = props;
 
   // If treeData is provided, render the tree structure
   if (treeData && treeData.length > 0) {
     return (
-      <div className="tree-root space-y-1">
+      <div className={cn("tree-root", depth === 0 ? className : undefined)}>
         {treeData.map((node, index) => (
           <TreeNode
             key={node.key}
@@ -149,6 +202,7 @@ function Tree(props: InternalTreeProps) {
             depth={depth}
             isLast={index === treeData.length - 1}
             parentLines={parentLines}
+            parentIsLast={parentIsLast}
             {...restProps}
           />
         ))}
@@ -166,6 +220,7 @@ function Tree(props: InternalTreeProps) {
         depth={depth}
         isLast={isLast}
         parentLines={parentLines}
+        parentIsLast={parentIsLast}
         {...restProps}
       />
     );
@@ -181,8 +236,11 @@ function TreeNode({
   onSelect,
   depth = 0,
   isLast = false,
+  parentIsLast = false,
   parentLines = [],
+  showIcon = false,
   showLine = false,
+  _parent,
   ...props
 }: {
   item: TreeNodeData;
@@ -190,7 +248,12 @@ function TreeNode({
   onSelect?: TreeProps["onSelect"];
   depth?: number;
   isLast?: boolean;
+  parentIsLast?: boolean;
   parentLines?: boolean[];
+  _parent?: {
+    depth: number;
+    isLast: boolean;
+  };
   showLine?: boolean;
 } & Omit<TreeProps, "selectedKeys" | "onSelect" | "showLine">) {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -204,7 +267,8 @@ function TreeNode({
     if (onSelect) {
       const newSelectedKeys = isSelected
         ? selectedKeys?.filter((key) => key !== item.key) || []
-        : [...(selectedKeys || []), item.key];
+        : // : [...(selectedKeys || []), item.key];
+          [item.key];
       onSelect(newSelectedKeys, { selected: !isSelected, node: item as any });
     }
   };
@@ -213,118 +277,151 @@ function TreeNode({
     setIsExpanded(!isExpanded);
   };
 
-  const indentationStyle = {
+  // Add indentation for child nodes based on depth
+  const indentationStyle: React.CSSProperties = {
     paddingLeft: `${depth * 24}px`,
+    position: "relative", // Ensure proper stacking context for lines
   };
 
-  // Generate connecting lines (Focus on expand icon lines first)
-  const renderConnectingLines = () => {
-    if (!showLine || depth === 0) return null;
-
-    const lines = [];
-    const expandIconOffset = 11; // Center of expand icon position
-    const nodeHeight = 32;
-    const nodeCenter = nodeHeight / 2;
-
-    // Vertical lines connecting expand icons (SOLID)
-    for (let i = 0; i < depth; i++) {
-      // Show line if:
-      // 1. For parent levels (i < depth - 1): check if parent has more siblings
-      // 2. For current level (i === depth - 1): always show unless it's the very last node in tree
-      const shouldShowExpandLine = i < depth - 1 ? parentLines[i] : true; // Always show for current level
-
-      if (shouldShowExpandLine) {
-        lines.push(
-          <div
-            key={`expand-line-${i}`}
-            className="absolute"
-            data-slot="expand-line"
-            data-depth={depth}
-            data-level={i}
-            data-is-last={isLast}
-            data-parent-line={i < depth - 1 ? parentLines[i] : 'current'}
-            style={{
-              left: `${i * 24 + expandIconOffset}px`,
-              top: 0,
-              height: "100%", // Always full height to prevent broken lines
-              width: "1px",
-              borderLeft: "1px solid #d9d9d9",
-            }}
-          />,
-        );
-      }
-    }
-
-    return (
-      <div 
-        className="pointer-events-none absolute inset-0 z-0" 
-        data-slot="tree-lines-container"
-        data-depth={depth}
-        data-node-title={item.title}
-        data-is-last={isLast}
-      >
-        {lines}
-      </div>
-    );
-  };
+  // Add additional margin for nodes with lines to prevent text overlap
+  const nodeContentStyle: React.CSSProperties =
+    showLine && depth > 0
+      ? {
+          marginLeft: "6px", // Add margin to account for the horizontal line
+        }
+      : {};
 
   if (!hasChildren) {
     return (
-      <div 
-        className="tree-node relative h-8" 
+      <div
+        className="tree-node relative flex h-8 items-center"
+        role="treeitem"
         data-slot="tree-leaf-node"
         data-title={item.title}
         data-depth={depth}
         data-is-last={isLast}
       >
-        {renderConnectingLines()}
-        <div
-          className="relative z-10 flex items-center"
-          style={indentationStyle}
+        {/* Indent */}
+        <span
+          className="inline-flex"
+          aria-hidden="true"
+          data-slot="tree-indent"
         >
-          {/* Invisible spacer to align with expand icon */}
-          <div className="h-6 w-6 flex-shrink-0" />
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "ml-1 h-8 flex-1 justify-start px-2 py-1 font-normal",
-              "hover:bg-accent hover:text-accent-foreground",
-              isSelected && "bg-accent text-accent-foreground",
-              item.disabled && "cursor-not-allowed opacity-50",
-            )}
-            disabled={item.disabled}
-            onClick={handleClick}
-          >
-            <div className="flex items-center gap-2">
-              {item.icon && (
-                <div className="flex h-4 w-4 items-center justify-center">
-                  {item.icon}
-                </div>
-              )}
-              <span className="truncate">{item.title}</span>
-            </div>
-          </Button>
-        </div>
+          {Array.from({ length: depth }).map((_, i) => (
+            <span
+              key={i}
+              className="relative inline-block h-8 w-6"
+              data-slot="tree-indent-unit"
+              data-indent-level={i}
+            >
+              {/* {_parent?.depth}.{i} */}
+              <span
+                className={cn(
+                  "absolute top-0 left-1/2 h-full w-px",
+                  _parent?.isLast && _parent.depth === i ? "hidden" : "",
+                )}
+                style={{
+                  background: "#d9d9d9",
+                  transform: "translateX(-50%)",
+                }}
+                data-slot="tree-indent-vertical"
+              />
+            </span>
+          ))}
+        </span>
+        {/* Switcher (noop for leaf, with leaf-line) */}
+        <span
+          className="relative flex h-full w-6 flex-shrink-0 items-center justify-center"
+          data-slot="switcher-leaf-noop"
+          data-depth={depth}
+        >
+          {showLine && (
+            <span
+              data-slot="switcher-leaf-line"
+              className="absolute inset-0 block"
+            >
+              {/* Horizontal line */}
+              <span
+                className={cn("absolute top-1/2 left-1/2", "w-1/2")}
+                style={{
+                  // width: "20px",
+                  height: "1px",
+                  background: "#d9d9d9",
+                  transform: "translateY(-50%)",
+                  zIndex: 2,
+                }}
+              />
+              {/* Vertical line */}
+              <span
+                className={cn(
+                  "absolute left-1/2",
+                  "h-full",
+                  isLast && "h-[calc(100%/2)]",
+                )}
+                style={{
+                  width: "1px",
+                  // height: "24px",
+                  background: "#d9d9d9",
+                  top: 0,
+                  transform: "translateX(-50%)",
+                  zIndex: 2,
+                }}
+              />
+            </span>
+          )}
+        </span>
+        {/* Content */}
+        <TreeTitle
+          title={item.title}
+          isSelected={isSelected}
+          isDisabled={item.disabled}
+          onClick={handleClick}
+          icon={item.icon}
+          showIcon={showIcon}
+        />
       </div>
     );
   }
 
   return (
-    <div 
-      className="tree-node relative" 
+    <div
+      className={cn(
+        "tree-node relative",
+        // isLast && '[&_span[data-slot="tree-indent-vertical"]]:hidden',
+      )}
+      data-indent-level
       data-slot="tree-parent-node"
       data-title={item.title}
       data-depth={depth}
       data-is-last={isLast}
       data-expanded={isExpanded}
     >
-      {renderConnectingLines()}
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-        <div
-          className="relative z-10 flex h-8 items-center"
-          style={indentationStyle}
-        >
+        <div className="relative z-10 flex h-8 items-center">
+          {/* Indent */}
+          <span
+            className="inline-flex"
+            aria-hidden="true"
+            data-slot="tree-indent"
+          >
+            {Array.from({ length: depth }).map((_, i) => (
+              <span
+                key={i}
+                className="relative inline-block h-8 w-6"
+                data-slot="tree-indent-unit"
+                data-indent-level={i}
+              >
+                <span
+                  className="absolute top-0 left-1/2 h-full w-px"
+                  style={{
+                    background: "#d9d9d9",
+                    transform: "translateX(-50%)",
+                  }}
+                  data-slot="tree-indent-vertical"
+                />
+              </span>
+            ))}
+          </span>
           <CollapsibleTrigger asChild>
             <Button
               variant="ghost"
@@ -340,34 +437,40 @@ function TreeNode({
               />
             </Button>
           </CollapsibleTrigger>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "ml-1 h-8 flex-1 justify-start px-2 py-1 font-normal",
-              "hover:bg-accent hover:text-accent-foreground",
-              isSelected && "bg-accent text-accent-foreground",
-              item.disabled && "cursor-not-allowed opacity-50",
-            )}
-            disabled={item.disabled}
+          <TreeTitle
+            title={item.title}
+            icon={item.icon}
+            isSelected={isSelected}
+            isDisabled={item.disabled}
             onClick={handleClick}
-          >
-            <div className="flex items-center gap-2">
-              {item.icon && (
-                <div className="flex h-4 w-4 items-center justify-center">
-                  {item.icon}
-                </div>
-              )}
-              <span className="truncate">{item.title}</span>
-            </div>
-          </Button>
+            style={nodeContentStyle}
+            showIcon={showIcon}
+          />
+          {/* Horizontal connector line from parent title to child title */}
+          {/* {showLine &&
+            Array.isArray(item.children) &&
+            item.children.length > 0 && (
+              <div
+                className="absolute"
+                data-slot="horizontal-parent-connector"
+                style={{
+                  left: `${48 + depth * 24}px`, // 24px (indent) + 24px (expand+gap+icon)
+                  top: "50%",
+                  width: "24px", // distance to next level indent
+                  height: "1px",
+                  background: "#d9d9d9",
+                  transform: "translateY(-50%)",
+                  zIndex: 1,
+                }}
+              />
+            )} */}
         </div>
         <CollapsibleContent>
-          <div className="mt-1">
+          <div>
             {item.children?.map((subItem, index) => {
-              const newParentLines = [...parentLines];
-              // Add current level to parent lines tracking
-              newParentLines[depth] = !isLast;
+              const childCount = item.children ? item.children.length : 0;
+              const newParentLines = parentLines.slice(0, depth);
+              newParentLines[depth] = index !== childCount - 1;
 
               return (
                 <Tree
@@ -376,9 +479,15 @@ function TreeNode({
                   selectedKeys={selectedKeys}
                   onSelect={onSelect}
                   depth={depth + 1}
-                  isLast={index === (item.children?.length || 0) - 1}
+                  isLast={index === childCount - 1}
+                  parentIsLast={isLast}
                   parentLines={newParentLines}
+                  _parent={{
+                    depth,
+                    isLast,
+                  }}
                   showLine={showLine}
+                  showIcon={showIcon}
                   {...props}
                 />
               );
