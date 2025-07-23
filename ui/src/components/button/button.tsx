@@ -45,6 +45,7 @@ const buttonVariants = tv({
     },
     color: {
       default: [],
+      primary: ["text-primary", "hover:text-primary-700"],
       danger: [],
       link: [],
       success: [],
@@ -98,8 +99,8 @@ const buttonVariants = tv({
         "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: [],
-      text: "border-0 px-0",
+      link: ["border-0"],
+      text: "border-0",
     },
     shape: {
       default: "",
@@ -285,7 +286,6 @@ const buttonVariants = tv({
       className: ["", "hover:text-primary"],
     },
     // Size
-
     {
       size: "small",
       shape: ["icon", "circle"],
