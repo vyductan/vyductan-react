@@ -111,7 +111,7 @@ type TitleProps = BaseTypographyProps & {
   level?: 1 | 2 | 3 | 4 | 5;
 };
 
-const Title = ({ level = 1, className, ...props }: TitleProps) => {
+const Title = ({ level = 1, className, children, ...props }: TitleProps) => {
   const Component = `h${level}` as keyof React.JSX.IntrinsicElements;
 
   const sizeClasses = {
@@ -128,7 +128,7 @@ const Title = ({ level = 1, className, ...props }: TitleProps) => {
       className={cn(sizeClasses, "mt-0 mb-4", className)}
       {...props}
     >
-      <Component />
+      <Component>{children}</Component>
     </Typography>
   );
 };
