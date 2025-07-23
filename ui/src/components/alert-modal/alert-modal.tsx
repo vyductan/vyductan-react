@@ -20,6 +20,7 @@ export type AlertModalProps = Omit<ModalProps, "onOk"> & {
 
 export const AlertModal = ({
   className,
+  classNames,
   description,
   okText = "Confirm",
   cancelText = "Cancel",
@@ -57,12 +58,18 @@ export const AlertModal = ({
     <AlertDialogRoot onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
-        <AlertDialogHeader>
-          {title && <AlertDialogTitle>{title}</AlertDialogTitle>}
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+        <AlertDialogHeader className={classNames?.header}>
+          {title && (
+            <AlertDialogTitle className={classNames?.title}>
+              {title}
+            </AlertDialogTitle>
+          )}
+          <AlertDialogDescription className={classNames?.description}>
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <AlertDialogFooter>
+        <AlertDialogFooter className={classNames?.footer}>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
             isOpenControlled={rest.open !== undefined}
