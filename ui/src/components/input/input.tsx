@@ -11,12 +11,12 @@ import omit from "@rc-component/util/lib/omit";
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";
 import type { HolderRef } from "./_components/base-input";
-import type { ValueType } from "./_components/rc-input-number";
 import type {
   ChangeEventInfo,
   CommonInputProps,
   CountConfig,
   InputRef,
+  InputValueType,
   ShowCountFormatter,
 } from "./types";
 import type { InputFocusOptions } from "./utils/common-utils";
@@ -55,7 +55,7 @@ type InputProps = Omit<
     variant?: Variant;
 
     // RC
-    value?: ValueType;
+    value?: InputValueType;
     count?: CountConfig;
     showCount?:
       | boolean
@@ -76,7 +76,7 @@ const Input = (props: InputProps) => {
     size: customSize,
     variant: customVariant,
 
-    // TODO: handle: status
+    status,
 
     autoComplete,
     onChange,
@@ -127,6 +127,7 @@ const Input = (props: InputProps) => {
 
   const focus = (option?: InputFocusOptions) => {
     if (inputRef.current) {
+      console.log("iiiii", inputRef.current);
       triggerFocus(inputRef.current, option);
     }
   };
@@ -176,6 +177,8 @@ const Input = (props: InputProps) => {
     select: () => {
       inputRef.current?.select();
     },
+    setCustomValidity: (msg) => inputRef.current?.setCustomValidity?.(msg),
+    reportValidity: () => inputRef.current?.reportValidity?.(),
     input: inputRef.current,
     nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
   }));
@@ -391,7 +394,7 @@ const Input = (props: InputProps) => {
       styles={styles}
       ref={holderRef}
       classNames={{
-        variant: cn(inputVariants({ variant }), classNames?.variant),
+        variant: cn(inputVariants({ variant, status }), classNames?.variant),
         affixWrapper: cn(
           inputSizeVariants({ size: mergedSize }),
           classNames?.affixWrapper,

@@ -16,6 +16,7 @@ export interface HolderRef {
   nativeElement: HTMLElement | null;
 }
 
+/** To wrap input by div or not */
 const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   const {
     ref,
@@ -133,9 +134,9 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
           "text-sm",
           "relative inline-flex w-full transition-all",
           "[&_input]:h-auto [&_input]:border-none [&_input]:p-0 [&_input]:outline-none",
-          // "cursor-text",
-          classNames?.affixWrapper,
-          classNames?.variant,
+          cn(classNames?.affixWrapper, classNames?.variant),
+          // fix cannot merge className by GenericSlot
+          className,
         )}
         style={styles?.affixWrapper}
         onClick={onInputClick}
