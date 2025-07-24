@@ -1,0 +1,347 @@
+# App Component
+
+The App component provides a global context for imperative UI operations like modals, messages, and notifications. It follows the Ant Design App component pattern, allowing you to use imperative APIs anywhere in your component tree.
+
+## Features
+
+- 🎯 **Global Context** - Access modal, message, and notification APIs from anywhere
+- 🚀 **Imperative APIs** - Use `App.useApp()` for imperative operations
+- 🎨 **Ant Design Compatible** - Same API as Ant Design App component
+- ♿ **Context Safe** - Proper error handling when used outside App wrapper
+- 📦 **Lightweight** - Minimal overhead, only renders what's needed
+
+## Basic Usage
+
+### 1. Wrap Your App
+
+First, wrap your entire application with the App component:
+
+```tsx
+import { App, UiConfigProvider } from '@acme/ui';
+
+function Root() {
+  return (
+    <UiConfigProvider componentConfig={{}}>
+      <App>
+        <YourAppContent />
+      </App>
+    </UiConfigProvider>
+  );
+}
+```
+
+### 2. Use App APIs in Components
+
+Then use `App.useApp()` in any component to access the APIs:
+
+```tsx
+import { App } from '@acme/ui';
+
+function MyComponent() {
+  const { modal, message, notification } = App.useApp();
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: 'Delete Item',
+      content: 'Are you sure you want to delete this item?',
+      onOk: () => {
+        // Delete logic here
+        message.success('Item deleted successfully!');
+      },
+    });
+  };
+
+  const showNotification = () => {
+    notification.success({
+      message: 'Success',
+      description: 'Operation completed successfully!',
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={handleDelete}>Delete Item</button>
+      <button onClick={showNotification}>Show Notification</button>
+    </div>
+  );
+}
+```
+
+## API Reference
+
+### App.useApp()
+
+Returns an object with the following APIs:
+
+```tsx
+const { modal, message, notification } = App.useApp();
+```
+
+### Modal API
+
+| Method | Description | Parameters |
+|--------|-------------|------------|
+| `modal.confirm(config)` | Show a confirm dialog | `ConfirmConfig` |
+
+#### ConfirmConfig
+
+```tsx
+interface ConfirmConfig {
+  title?: ReactNode;           // Dialog title
+  content?: ReactNode;         // Dialog content
+  onOk?: () => void | Promise<void>;  // OK callback (supports async)
+  onCancel?: () => void;       // Cancel callback
+  okText?: string;             // OK button text (default: "OK")
+  cancelText?: string;         // Cancel button text (default: "Cancel")
+  okType?: "default" | "primary" | "danger";  // OK button type
+  confirmLoading?: boolean;    // Show loading on OK button
+}
+```
+
+### Message API (Placeholder)
+
+| Method | Description | Parameters |
+|--------|-------------|------------|
+| `message.success(content)` | Show success message | `string` |
+| `message.error(content)` | Show error message | `string` |
+| `message.warning(content)` | Show warning message | `string` |
+| `message.info(content)` | Show info message | `string` |
+
+> **Note**: Message API is currently a placeholder that logs to console. Implementation coming soon.
+
+### Notification API (Placeholder)
+
+| Method | Description | Parameters |
+|--------|-------------|------------|
+| `notification.success(config)` | Show success notification | `NotificationConfig` |
+| `notification.error(config)` | Show error notification | `NotificationConfig` |
+| `notification.warning(config)` | Show warning notification | `NotificationConfig` |
+| `notification.info(config)` | Show info notification | `NotificationConfig` |
+
+#### NotificationConfig
+
+```tsx
+interface NotificationConfig {
+  message: string;        // Notification title
+  description?: string;   // Notification description
+}
+```
+
+> **Note**: Notification API is currently a placeholder that logs to console. Implementation coming soon.
+
+## Examples
+
+### Basic Confirm Dialog
+
+```tsx
+function DeleteButton({ itemId }) {
+  const { modal } = App.useApp();
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: 'Delete Item',
+      content: 'This action cannot be undone.',
+      onOk: () => {
+        deleteItem(itemId);
+      },
+    });
+  };
+
+  return <button onClick={handleDelete}>Delete</button>;
+}
+```
+
+### Async Confirm Dialog
+
+```tsx
+function AsyncDeleteButton({ itemId }) {
+  const { modal, message } = App.useApp();
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: 'Delete Item',
+      content: 'This will permanently delete the item.',
+      onOk: async () => {
+        try {
+          await deleteItemAsync(itemId);
+          message.success('Item deleted successfully!');
+        } catch (error) {
+          message.error('Failed to delete item');
+          throw error; // Re-throw to keep modal open
+        }
+      },
+    });
+  };
+
+  return <button onClick={handleDelete}>Delete</button>;
+}
+```
+
+### Custom Button Text
+
+```tsx
+function CustomConfirm() {
+  const { modal } = App.useApp();
+
+  const showConfirm = () => {
+    modal.confirm({
+      title: 'Proceed with Action?',
+      content: 'This will make changes to your data.',
+      okText: 'Yes, Proceed',
+      cancelText: 'No, Cancel',
+      onOk: () => {
+        console.log('User proceeded');
+      },
+      onCancel: () => {
+        console.log('User cancelled');
+      },
+    });
+  };
+
+  return <button onClick={showConfirm}>Show Custom Confirm</button>;
+}
+```
+
+### Multiple App APIs
+
+```tsx
+function ComplexOperation() {
+  const { modal, message, notification } = App.useApp();
+
+  const handleComplexOperation = () => {
+    modal.confirm({
+      title: 'Complex Operation',
+      content: 'This will perform multiple steps.',
+      onOk: async () => {
+        try {
+          // Step 1
+          message.info('Starting operation...');
+          await step1();
+          
+          // Step 2
+          message.info('Processing...');
+          await step2();
+          
+          // Success
+          notification.success({
+            message: 'Operation Complete',
+            description: 'All steps completed successfully!',
+          });
+        } catch (error) {
+          notification.error({
+            message: 'Operation Failed',
+            description: error.message,
+          });
+          throw error;
+        }
+      },
+    });
+  };
+
+  return <button onClick={handleComplexOperation}>Start Operation</button>;
+}
+```
+
+## Error Handling
+
+If you try to use `App.useApp()` outside of an App component, you'll get a helpful error:
+
+```tsx
+// ❌ This will throw an error
+function ComponentOutsideApp() {
+  const { modal } = App.useApp(); // Error: App.useApp() must be used within App component
+  return <div>...</div>;
+}
+
+// ✅ This works correctly
+function Root() {
+  return (
+    <App>
+      <ComponentInsideApp />
+    </App>
+  );
+}
+
+function ComponentInsideApp() {
+  const { modal } = App.useApp(); // ✅ Works fine
+  return <div>...</div>;
+}
+```
+
+## TypeScript Support
+
+The App component provides full TypeScript support:
+
+```tsx
+import { App, type ConfirmConfig } from '@acme/ui';
+
+function TypedComponent() {
+  const { modal } = App.useApp();
+
+  // TypeScript will provide full intellisense
+  const config: ConfirmConfig = {
+    title: 'Typed Confirm',
+    content: 'This is fully typed',
+    onOk: async () => {
+      // Async support with proper typing
+    },
+  };
+
+  modal.confirm(config);
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Always wrap your root app with `<App>`
+- Use `App.useApp()` for imperative operations
+- Handle errors in async `onOk` callbacks
+- Use meaningful titles and content for confirm dialogs
+
+### ❌ Don't
+
+- Don't use `Modal.confirm()` directly (it will throw an error)
+- Don't forget to wrap your app with `<App>`
+- Don't ignore errors in async operations
+- Don't use App APIs outside of React components
+
+## Migration from Other Patterns
+
+### From Modal.confirm()
+
+```tsx
+// ❌ Old way (will throw error)
+Modal.confirm({
+  title: 'Delete',
+  content: 'Are you sure?',
+  onOk: () => {},
+});
+
+// ✅ New way
+const { modal } = App.useApp();
+modal.confirm({
+  title: 'Delete',
+  content: 'Are you sure?',
+  onOk: () => {},
+});
+```
+
+### From Global State
+
+```tsx
+// ❌ Old way with global state
+import { showGlobalModal } from './globalModal';
+showGlobalModal({ ... });
+
+// ✅ New way with App context
+const { modal } = App.useApp();
+modal.confirm({ ... });
+```
+
+## Requirements
+
+- React 18+
+- Your app must be wrapped with `<App>` component
+- UiConfigProvider should wrap App for proper styling context
