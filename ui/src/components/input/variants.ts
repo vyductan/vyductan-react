@@ -3,6 +3,8 @@ import { tv } from "tailwind-variants";
 
 const inputVariants = tv({
   base: [
+    // disable shadcn focus-visible classes
+    "outline-0",
     // "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
     // "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     // own
@@ -29,26 +31,52 @@ const inputVariants = tv({
     // },
     status: {
       default: [
+        "border-input",
         "hover:border-primary-500",
-        "focus-within:border-primary-600 focus-within:ring-primary-100",
+        "focus-within:border-primary-500 focus-within:ring-primary-500/20",
+        "focus-visible:border-primary-500 focus-visible:ring-primary-500/20",
       ],
       error: [
-        "border-error text-error",
+        "border-error",
         "hover:border-error-hover",
-        "focus-within:border-error focus-within:ring-error-muted",
+        "focus-within:border-error focus-within:ring-error/20",
+        "focus-visible:border-error focus-visible:ring-error/20",
       ],
-      warning: [],
+      warning: [
+        "border-warning",
+        "hover:border-warning-hover",
+        "focus-within:border-warning focus-within:ring-warning/20",
+        "focus-visible:border-warning focus-visible:ring-warning/20",
+      ],
+      success: [
+        "border-success",
+        "hover:border-success-hover",
+        "focus-within:border-success focus-within:ring-success/20",
+        "focus-visible:border-success focus-visible:ring-success/20",
+      ],
     },
     variant: {
       outlined: [
         "border",
         "rounded-md",
+        "transition-colors",
         "focus-within:ring-2",
-        "focus-visible:border-primary-500 focus-visible:ring-ring/50 focus-visible:ring-[3px]",
       ],
-      filled: ["bg-accent border-none shadow-none focus-within:ring-0"],
-      borderless: ["border-0", "focus-within:outline-hidden", "shadow-none"],
-      underlined: [],
+      filled: [
+        "bg-accent rounded-md border-none shadow-none",
+        "transition-colors",
+      ],
+      borderless: [
+        "border-0",
+        "focus-within:outline-none",
+        "transition-colors",
+      ],
+      underlined: [
+        "border-b",
+        "border-t-0 border-r-0 border-l-0",
+        "rounded-none",
+        "transition-colors",
+      ],
     },
   },
   defaultVariants: {
