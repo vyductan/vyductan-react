@@ -23,6 +23,7 @@ import type {
 } from "react";
 
 import type { InputFocusOptions } from "./utils/common-utils";
+import type { InputStatus, InputVariant } from "./variants";
 
 export interface CommonInputProps {
   prefix?: ReactNode;
@@ -49,19 +50,26 @@ export interface CommonInputProps {
 
 type DataAttribute = Record<`data-${string}`, string>;
 
-type InputValueType = InputHTMLAttributes<HTMLInputElement>["value"] | bigint;
+export type InputValueType =
+  | InputHTMLAttributes<HTMLInputElement>["value"]
+  | bigint;
 
 export type BaseInputProps = CommonInputProps & {
   value?: InputValueType | null;
-  className?: string;
-  style?: CSSProperties;
+
   disabled?: boolean;
+  hidden?: boolean;
+  status?: InputStatus;
+  variant?: InputVariant;
+  style?: CSSProperties;
+  className?: string;
+
   focused?: boolean;
   triggerFocus?: () => void;
   readOnly?: boolean;
   handleReset?: MouseEventHandler;
   onClear?: () => void;
-  hidden?: boolean;
+
   dataAttrs?: {
     affixWrapper?: DataAttribute;
   };
@@ -104,6 +112,10 @@ export interface InputRef {
   select: () => void;
   input: HTMLInputElement | null;
   nativeElement: HTMLElement | null;
+
+  // extends react-hook-form
+  setCustomValidity: (msg: string) => void;
+  reportValidity: () => boolean | undefined;
 }
 
 export interface ChangeEventInfo {
