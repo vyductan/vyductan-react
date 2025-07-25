@@ -123,6 +123,7 @@ const Checkbox = (props: CheckboxProps) => {
         className={cn(
           "inline-flex items-center space-x-2",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
+          className,
         )}
         style={{ ...checkbox?.style, ...style }}
         onMouseEnter={onMouseEnter}
@@ -132,7 +133,7 @@ const Checkbox = (props: CheckboxProps) => {
         <ShadcnCheckbox
           checked={indeterminate ? "indeterminate" : checked}
           onClick={onInputClick}
-          className={cn("data-[state=indeterminate]:bg-muted", className)}
+          className={cn("data-[state=indeterminate]:bg-muted")}
           onCheckedChange={(checked) => {
             onChange?.({
               target: {
