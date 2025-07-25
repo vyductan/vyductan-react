@@ -1,6 +1,7 @@
 import type { XOR } from "ts-xor";
 import React from "react";
 
+import type { ButtonProps } from "../button";
 import type { ModalProps } from "./modal";
 import { Dialog, DialogContent } from "./_components";
 import { Modal as InternalModal } from "./modal";
@@ -14,7 +15,7 @@ type ShadcnModalProps = React.ComponentProps<typeof Dialog>;
 type XORModalProps = XOR<ModalProps, ShadcnModalProps>;
 
 // Confirm modal configuration interface (for reference)
-interface ConfirmConfig {
+export interface ConfirmConfig {
   title?: React.ReactNode;
   content?: React.ReactNode;
   onOk?: () => void | Promise<void>;
@@ -22,6 +23,7 @@ interface ConfirmConfig {
   okText?: string;
   cancelText?: string;
   okType?: "default" | "primary" | "danger";
+  okButtonProps?: ButtonProps;
   confirmLoading?: boolean;
 }
 
