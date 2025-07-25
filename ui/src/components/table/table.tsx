@@ -9,6 +9,7 @@
 "use client";
 
 import type {
+  ColumnDef,
   ExpandedState,
   OnChangeFn,
   Row,
@@ -31,11 +32,10 @@ import { Skeleton } from "@acme/ui/shadcn/skeleton";
 import type { AnyObject } from "../_util/type";
 import type { ConfigConsumerProps } from "../config-provider/context";
 import type { SizeType } from "../config-provider/size-context";
-import type { FilterConfig, FilterState } from "./hooks/use-filter";
+import type { FilterState } from "./hooks/use-filter";
 import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
-  ColumnTitleProps,
   ExpandableConfig,
   ExpandType,
   FilterValue,
@@ -57,6 +57,7 @@ import type {
 } from "./types";
 import scrollTo from "../_util/scroll-to";
 import { devUseWarning } from "../_util/warning";
+import { Checkbox } from "../checkbox";
 import { ConfigContext } from "../config-provider/context";
 import defaultLocale from "../locale/en-us";
 import { Pagination } from "../pagination";
@@ -74,16 +75,11 @@ import renderExpandIcon from "./_components/expand-icon";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
 import useExpand from "./hooks/use-expand";
-import useFilter, { getFilterData } from "./hooks/use-filter";
+import { getFilterData } from "./hooks/use-filter";
 import useLazyKVMap from "./hooks/use-lazy-kv-map";
-import usePagination, {
-  DEFAULT_PAGE_SIZE,
-  getPaginationParam,
-} from "./hooks/use-pagination";
-import useSelection from "./hooks/use-selection";
+import usePagination, { getPaginationParam } from "./hooks/use-pagination";
 import useSorter from "./hooks/use-sorter";
 import { TableStoreProvider } from "./hooks/use-table";
-import useTitleColumns from "./hooks/use-title-columns";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 
 const EMPTY_LIST: AnyObject[] = [];
@@ -264,7 +260,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     expandIconColumnIndex,
     indentSize,
 
-    getPopupContainer,
+    // getPopupContainer,
 
     // Internal
     //  internalHooks,
@@ -287,7 +283,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     // direction,
     table: tableConfig,
     // renderEmpty,
-    getPopupContainer: getContextPopupContainer,
+    // getPopupContainer: getContextPopupContainer,
   } = React.useContext<ConfigConsumerProps>(ConfigContext);
 
   // const mergedData = dataSource ?? EMPTY_DATA;
@@ -511,9 +507,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   const [
     sortingState,
     setSortingState,
-    transformSorterColumns,
+    _transformSorterColumns,
     sortStates,
-    sorterTitleProps,
+    _sorterTitleProps,
     getSorters,
   ] = useSorter<TRecord>({
     mergedColumns: baseColumns,
@@ -532,19 +528,19 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   changeEventInfo.sorterStates = sortStates;
 
   // ============================ Filter ============================
-  const onFilterChange: FilterConfig<TRecord>["onFilterChange"] = (
-    filters,
-    filterStates,
-  ) => {
-    triggerOnChange({ filters, filterStates }, "filter", true);
-  };
+  // const onFilterChange: FilterConfig<TRecord>["onFilterChange"] = (
+  //   filters,
+  //   filterStates,
+  // ) => {
+  //   triggerOnChange({ filters, filterStates }, "filter", true);
+  // };
 
-  const [transformFilterColumns, _filterStates, filters] = useFilter<TRecord>({
-    locale: tableLocale,
-    mergedColumns: baseColumns,
-    onFilterChange,
-    getPopupContainer: getPopupContainer || getContextPopupContainer,
-  });
+  // const [transformFilterColumns, _filterStates, filters] = useFilter<TRecord>({
+  //   locale: tableLocale,
+  //   mergedColumns: baseColumns,
+  //   onFilterChange,
+  //   getPopupContainer: getPopupContainer || getContextPopupContainer,
+  // });
 
   const mergedData = getFilterData(
     sortedData,
@@ -552,19 +548,19 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     childrenColumnName,
   );
 
-  const columnTitleProps = React.useMemo<ColumnTitleProps<TRecord>>(() => {
-    const mergedFilters: Record<string, FilterValue> = {};
-    for (const filterKey of Object.keys(filters)) {
-      if (filters[filterKey] !== null) {
-        mergedFilters[filterKey] = filters[filterKey]!;
-      }
-    }
-    return {
-      ...sorterTitleProps,
-      filters: mergedFilters,
-    };
-  }, [sorterTitleProps, filters]);
-  const [transformTitleColumns] = useTitleColumns(columnTitleProps);
+  // const columnTitleProps = React.useMemo<ColumnTitleProps<TRecord>>(() => {
+  //   const mergedFilters: Record<string, FilterValue> = {};
+  //   for (const filterKey of Object.keys(filters)) {
+  //     if (filters[filterKey] !== null) {
+  //       mergedFilters[filterKey] = filters[filterKey]!;
+  //     }
+  //   }
+  //   return {
+  //     ...sorterTitleProps,
+  //     filters: mergedFilters,
+  //   };
+  // }, [sorterTitleProps, filters]);
+  // const [transformTitleColumns] = useTitleColumns(columnTitleProps);
 
   // ====================== Pinnings ======================
 
@@ -592,61 +588,64 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   changeEventInfo.resetPagination = resetPagination;
 
   // ============================= Data =============================
-  const pageData = React.useMemo<TRecord[]>(() => {
-    if (pagination === false || !mergedPagination.pageSize) {
-      return mergedData;
-    }
+  // const pageData = React.useMemo<TRecord[]>(() => {
+  //   if (pagination === false || !mergedPagination.pageSize) {
+  //     return mergedData;
+  //   }
 
-    const {
-      current = 1,
-      total,
-      pageSize = DEFAULT_PAGE_SIZE,
-    } = mergedPagination;
-    warning(current > 0, "usage", "`current` should be positive number.");
+  //   const {
+  //     current = 1,
+  //     total,
+  //     pageSize = DEFAULT_PAGE_SIZE,
+  //   } = mergedPagination;
+  //   warning(current > 0, "usage", "`current` should be positive number.");
 
-    // Dynamic table data
-    if (mergedData.length < total!) {
-      if (mergedData.length > pageSize) {
-        warning(
-          false,
-          "usage",
-          "`dataSource` length is less than `pagination.total` but large than `pagination.pageSize`. Please make sure your config correct data with async mode.",
-        );
-        return mergedData.slice((current - 1) * pageSize, current * pageSize);
-      }
-      return mergedData;
-    }
+  //   // Dynamic table data
+  //   if (mergedData.length < total!) {
+  //     if (mergedData.length > pageSize) {
+  //       warning(
+  //         false,
+  //         "usage",
+  //         "`dataSource` length is less than `pagination.total` but large than `pagination.pageSize`. Please make sure your config correct data with async mode.",
+  //       );
+  //       return mergedData.slice((current - 1) * pageSize, current * pageSize);
+  //     }
+  //     return mergedData;
+  //   }
 
-    return mergedData.slice((current - 1) * pageSize, current * pageSize);
-  }, [
-    !!pagination,
-    mergedData,
-    mergedPagination?.current,
-    mergedPagination?.pageSize,
-    mergedPagination?.total,
-  ]);
+  //   return mergedData.slice((current - 1) * pageSize, current * pageSize);
+  // }, [
+  //   !!pagination,
+  //   mergedData,
+  //   mergedPagination?.current,
+  //   mergedPagination?.pageSize,
+  //   mergedPagination?.total,
+  // ]);
 
   // ========================== Selections ==========================
-  const [
-    rowSelectionState,
-    setRowSelection,
-    transformSelectionColumns,
-    // selectedKeySet,
-  ] = useSelection<TRecord>(
-    {
-      data: mergedData,
-      pageData,
-      getRowKey,
-      getRecordByKey,
-      expandType,
-      childrenColumnName,
-      locale: tableLocale,
-      getPopupContainer: getPopupContainer || getContextPopupContainer,
-    },
-    rowSelection,
-  );
+  // const [
+  //   rowSelectionState,
+  //   setRowSelection,
+  //   transformSelectionColumns,
+  //   // selectedKeySet,
+  // ] = useSelection<TRecord>(
+  //   {
+  //     data: mergedData,
+  //     pageData,
+  //     getRowKey,
+  //     getRecordByKey,
+  //     expandType,
+  //     childrenColumnName,
+  //     locale: tableLocale,
+  //     getPopupContainer: getPopupContainer || getContextPopupContainer,
+  //   },
+  //   rowSelection,
+  // );
 
-  const selectedRowKeys = Object.keys(rowSelectionState);
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
+    rowSelection?.selectedRowKeys || [],
+  );
+  // const selectedRowKeys = Object.keys(rowSelectionState);
   const selectedRows = selectedRowKeys.map((key) => getRecordByKey(key));
 
   // ====================== Table Instance ======================
@@ -676,15 +675,15 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   );
 
   // ============================ Render ============================
-  const transformColumns = React.useCallback(
-    (innerColumns: ColumnsType<TRecord>): ColumnsType<TRecord> =>
-      transformTitleColumns(
-        transformSelectionColumns(
-          transformFilterColumns(transformSorterColumns(innerColumns)),
-        ),
-      ),
-    [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
-  );
+  // const transformColumns = React.useCallback(
+  //   (innerColumns: ColumnsType<TRecord>): ColumnsType<TRecord> =>
+  //     transformTitleColumns(
+  //       transformSelectionColumns(
+  //         transformFilterColumns(transformSorterColumns(innerColumns)),
+  //       ),
+  //     ),
+  //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
+  // );
 
   // ====================== Column ======================
   const [mergedColumns, columnsForTTTable, flattenColumns] =
@@ -718,16 +717,47 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
         // rowSelection: rowSelection,
       },
-      transformColumns,
+      // transformColumns,
+      null,
     );
 
   // Create table instance with memoized values and required properties
   const table = useReactTable({
     data: mergedData,
-    columns: columnsForTTTable,
+    columns: [
+      ...(rowSelection
+        ? [
+            {
+              id: "__select__",
+              header: ({ table }) => (
+                <Checkbox
+                  checked={table.getIsAllPageRowsSelected()}
+                  onChange={(e) =>
+                    table.toggleAllPageRowsSelected(!!e.target.checked)
+                  }
+                  aria-label="Select all"
+                  skipGroup
+                />
+              ),
+              cell: ({ row }) => (
+                <Checkbox
+                  checked={row.getIsSelected()}
+                  onCheckedChange={(value) => row.toggleSelected(!!value)}
+                  aria-label="Select row"
+                />
+              ),
+              enableSorting: false,
+              enableHiding: false,
+            } as ColumnDef<TRecord, unknown>,
+          ]
+        : []),
+      ...columnsForTTTable,
+    ],
     state: {
       sorting: sortingState,
-      rowSelection: rowSelectionState,
+      rowSelection: Object.fromEntries(
+        selectedRowKeys.map((key) => [key.toString(), true]),
+      ),
       expanded: expandedState,
     },
     // Core functionality
@@ -740,7 +770,59 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     onExpandedChange: handleExpandedChange,
     // Row selection
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: (updater) => {
+      const newRowSelection =
+        typeof updater === "function"
+          ? updater(table.getState().rowSelection)
+          : updater;
+
+      const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection).map(
+        (stringKey) => {
+          const originalKey = selectedRowKeys.find(
+            (key) => key.toString() === stringKey,
+          );
+          if (originalKey) {
+            return originalKey;
+          }
+          const numKey = Number(stringKey);
+          return Number.isNaN(numKey) ? stringKey : numKey;
+        },
+      );
+      // Convert string keys back to React.Key[] by finding the original keys
+      // const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection)
+      //   .map((stringKey) => {
+      //     // Find the original row that matches this string key
+      //     const rowIndex = mergedData.findIndex((item, index) =>
+      //       getRowKey(item, index).toString() === stringKey
+      //     );
+      //     if (rowIndex !== -1) {
+      //       return getRowKey(mergedData[rowIndex]!, rowIndex);
+      //     }
+      //     // Fallback: try to parse as number if possible, otherwise keep as string
+      //     const numKey = Number(stringKey);
+      //     return isNaN(numKey) ? stringKey : numKey;
+      //   })
+      //   .filter((key): key is React.Key => key !== undefined);
+
+      setSelectedRowKeys(newSelectedRowKeys);
+
+      const selectedRows = mergedData.filter((item, index) =>
+        newSelectedRowKeys.includes(getRowKey(item, index)?.toString()),
+      );
+      console.log(
+        "newRowSelection",
+        newRowSelection,
+        newSelectedRowKeys,
+        selectedRows,
+      );
+
+      const info = {
+        type: "all" as const,
+      };
+
+      rowSelection?.onChange?.(newSelectedRowKeys, selectedRows, info);
+    },
+    // onRowSelectionChange: setRowSelection,
     // Sorting
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSortingState,
