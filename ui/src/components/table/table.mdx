@@ -213,3 +213,11 @@ Loading will be: `query.isLoading || query.isPlaceholderData`
 ```
 
 ```
+
+### Fix loses input focus
+
+use `useMemo` for columns def variable
+
+```tsx
+const columns = useMemo(() => [], []);
+```

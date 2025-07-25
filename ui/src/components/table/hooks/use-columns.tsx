@@ -6,7 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
-import React from "react";
+import React, { useMemo } from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
 import warning from "@rc-component/util/lib/warning";
 
@@ -398,16 +398,29 @@ export const useColumns = <TRecord extends AnyObject>(
   );
 
   // ========================== For TT Table =========================
-  const columnsForTTTable = transformColumnDefs(mergedColumns, {
-    // rowKey,
-    // rowSelection: rowSelectionProp,
-    expandable: childrenColumnName
-      ? {
-          childrenColumnName,
-          expandIcon,
-        }
-      : undefined,
-  });
+  // const columnsForTTTable = transformColumnDefs(mergedColumns, {
+  //   // rowKey,
+  //   // rowSelection: rowSelectionProp,
+  //   expandable: childrenColumnName
+  //     ? {
+  //         childrenColumnName,
+  //         expandIcon,
+  //       }
+  //     : undefined,
+  // });
+
+  const columnsForTTTable = useMemo(() => {
+    return transformColumnDefs(mergedColumns, {
+      // rowKey,
+      // rowSelection: rowSelectionProp,
+      expandable: childrenColumnName
+        ? {
+            childrenColumnName,
+            expandIcon,
+          }
+        : undefined,
+    });
+  }, [childrenColumnName, expandIcon, mergedColumns]);
 
   return [mergedColumns, columnsForTTTable, flattenColumns];
 };

@@ -14,7 +14,8 @@ import { useMergedState } from "@rc-component/util";
 
 import type { AnyObject } from "../../_util/type";
 import type { CheckboxProps } from "../../checkbox";
-import type { DataNode, GetCheckDisabled } from "../../tree";
+import type { DataNode } from "../../tree";
+import type { GetCheckDisabled } from "../../tree/types";
 import type {
   ColumnsType,
   ColumnType,
