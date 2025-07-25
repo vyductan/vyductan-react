@@ -167,7 +167,6 @@ type InternalTreeProps = TreeProps & {
   isLast?: boolean;
   /** Internal prop for tracking parent line states */
   parentLines?: boolean[];
-  parentIsLast?: boolean;
   _parent?: {
     depth: number;
     isLast: boolean;
@@ -184,7 +183,6 @@ function Tree(props: InternalTreeProps) {
     depth = 0,
     isLast = false,
     parentLines = [],
-    parentIsLast = false,
     className,
     ...restProps
   } = props;
@@ -202,7 +200,6 @@ function Tree(props: InternalTreeProps) {
             depth={depth}
             isLast={index === treeData.length - 1}
             parentLines={parentLines}
-            parentIsLast={parentIsLast}
             {...restProps}
           />
         ))}
@@ -220,7 +217,6 @@ function Tree(props: InternalTreeProps) {
         depth={depth}
         isLast={isLast}
         parentLines={parentLines}
-        parentIsLast={parentIsLast}
         {...restProps}
       />
     );
@@ -236,7 +232,6 @@ function TreeNode({
   onSelect,
   depth = 0,
   isLast = false,
-  parentIsLast = false,
   parentLines = [],
   showIcon = false,
   showLine = false,
@@ -248,7 +243,6 @@ function TreeNode({
   onSelect?: TreeProps["onSelect"];
   depth?: number;
   isLast?: boolean;
-  parentIsLast?: boolean;
   parentLines?: boolean[];
   _parent?: {
     depth: number;
@@ -258,15 +252,13 @@ function TreeNode({
 } & Omit<TreeProps, "selectedKeys" | "onSelect" | "showLine">) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  if (!item) return null;
-
   const hasChildren = item.children && item.children.length > 0;
   const isSelected = selectedKeys?.includes(item.key);
 
   const handleClick = () => {
     if (onSelect) {
       const newSelectedKeys = isSelected
-        ? selectedKeys?.filter((key) => key !== item.key) || []
+        ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
         : // : [...(selectedKeys || []), item.key];
           [item.key];
       onSelect(newSelectedKeys, { selected: !isSelected, node: item as any });
@@ -275,12 +267,6 @@ function TreeNode({
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
-  };
-
-  // Add indentation for child nodes based on depth
-  const indentationStyle: React.CSSProperties = {
-    paddingLeft: `${depth * 24}px`,
-    position: "relative", // Ensure proper stacking context for lines
   };
 
   // Add additional margin for nodes with lines to prevent text overlap
@@ -480,7 +466,6 @@ function TreeNode({
                   onSelect={onSelect}
                   depth={depth + 1}
                   isLast={index === childCount - 1}
-                  parentIsLast={isLast}
                   parentLines={newParentLines}
                   _parent={{
                     depth,
