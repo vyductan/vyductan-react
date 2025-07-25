@@ -145,16 +145,12 @@ const Autocomplete = <
           ) : (
             o.icon && <Icon icon={o.icon} />
           )}
-          {typeof label === "string" ? (
-            <span className="truncate">{label}</span>
-          ) : (
-            label
-          )}
+          {label}
         </>
       );
     }
 
-    return <span className="truncate">{value}</span>;
+    return value;
   })();
 
   return (
@@ -213,7 +209,10 @@ const Autocomplete = <
           className,
         )}
       >
-        {buttonText}
+        <span data-slot="select-selection-item" className="truncate">
+          {buttonText}
+        </span>
+
         <Icon
           icon="icon-[lucide--chevrons-up-down]"
           className={cn(
