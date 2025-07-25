@@ -1,5 +1,6 @@
 import React from "react";
 
+import type { ConfirmConfig } from "../modal";
 import { Modal as InternalModal } from "../modal";
 
 // App context interface
@@ -21,18 +22,6 @@ interface AppContextType {
     warning: (config: { message: string; description?: string }) => void;
     info: (config: { message: string; description?: string }) => void;
   };
-}
-
-// Confirm modal configuration
-export interface ConfirmConfig {
-  title?: React.ReactNode;
-  content?: React.ReactNode;
-  onOk?: () => void | Promise<void>;
-  onCancel?: () => void;
-  okText?: string;
-  cancelText?: string;
-  okType?: "default" | "primary" | "danger";
-  confirmLoading?: boolean;
 }
 
 // Modal state for the app context
@@ -164,6 +153,7 @@ export const App: React.FC<AppProps> & {
     title = "Confirm",
     content,
     okText = "OK",
+    okButtonProps,
     cancelText = "Cancel",
   } = modalState.config;
 
@@ -178,6 +168,7 @@ export const App: React.FC<AppProps> & {
         onOk={handleOk}
         onCancel={handleCancel}
         okText={okText}
+        okButtonProps={okButtonProps}
         cancelText={cancelText}
         confirmLoading={modalState.loading}
         onOpenChange={(open) => {
