@@ -18,7 +18,10 @@ type TimePickerProps = Omit<
   React.ComponentProps<"div">,
   "onBlur" | "onChange"
 > &
-  Pick<InputProps, "name" | "size" | "status" | "placeholder" | "onBlur"> & {
+  Pick<
+    InputProps,
+    "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
+  > & {
     ref?: React.Ref<PickerRef>;
     id?: string;
     open?: boolean;
@@ -48,6 +51,7 @@ const TimePicker = (props: TimePickerProps) => {
     placeholder = "Select time",
     size,
     status,
+    disabled,
     onBlur,
     "aria-invalid": ariaInvalid,
     "aria-describedby": ariaDescribedBy,
@@ -178,6 +182,7 @@ const TimePicker = (props: TimePickerProps) => {
             }}
             placeholder={placeholder}
             size={size}
+            disabled={disabled}
             status={status}
             className={cn(
               "w-[120px]",
