@@ -9,27 +9,28 @@ type PopoverContentProps = React.ComponentProps<typeof ShadcnPopoverContent>;
 const PopoverContent = ({
   onFocusOutside,
   onWheel,
+  onTouchMove,
   ...props
 }: PopoverContentProps) => {
   return (
     <ShadcnPopoverContent
+      style={{
+        boxShadow: `var(--box-shadow-secondary)`,
+      }}
       // prevent close panel if open any modal
       onFocusOutside={(e) => {
         e.preventDefault();
         e.stopPropagation();
         onFocusOutside?.(e);
       }}
-      // to allow scrollable
-      onWheel={
-        onWheel
-          ? (e) => {
-              e.preventDefault();
-              onWheel(e);
-            }
-          : undefined
-      }
-      style={{
-        boxShadow: `var(--box-shadow-secondary)`,
+      // Fix scrollable https://github.com/shadcn-ui/ui/issues/542#issuecomment-3077844347
+      onWheel={(e) => {
+        e.stopPropagation();
+        onWheel?.(e);
+      }}
+      onTouchMove={(e) => {
+        e.stopPropagation();
+        onTouchMove?.(e);
       }}
       {...props}
     />
