@@ -1,0 +1,296 @@
+# DatePicker Component Documentation
+
+## Overview
+
+A React DatePicker component that provides **complete antd DatePicker behavior** with Dayjs integration. This component offers sophisticated date handling, validation, and user experience patterns.
+
+## Features
+
+### ✅ Core Features
+- **Dayjs Integration**: Full Dayjs support for date manipulation
+- **Antd Behavior Parity**: Exact matching of antd DatePicker UX patterns
+- **Type Safety**: Full TypeScript support with generic types
+- **Real-time Sync**: Input and calendar stay synchronized
+- **Validation**: Comprehensive date validation and error handling
+- **Accessibility**: Keyboard navigation and screen reader support
+
+### ✅ User Experience
+- **Input Typing**: Real-time calendar updates without triggering onChange
+- **Calendar Selection**: Immediate date selection with onChange
+- **Keyboard Navigation**: Complete keyboard support (Enter, Escape, Tab)
+- **Blur Handling**: Smart validation and reversion logic
+- **Visual Feedback**: Clear visual states and transitions
+
+## API Reference
+
+### Props
+
+```typescript
+interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
+  // Value management
+  value?: DateValueType;
+  defaultValue?: DateValueType;
+  onChange?: (date: DateValueType | null | undefined, dateString: string) => void;
+
+  // Display
+  format?: string;
+  placeholder?: string;
+  showTime?: boolean;
+
+  // Validation
+  disabledDate?: (date: DateValueType, info: { type: string }) => boolean;
+
+  // State
+  disabled?: boolean;
+  allowClear?: boolean;
+  variant?: string;
+  size?: string;
+  status?: string;
+
+  // Styling
+  className?: string;
+  classNames?: Record<string, string>;
+  styles?: Record<string, React.CSSProperties>;
+}
+```
+
+### Behavior Matrix
+
+| Action | Input Valid | Input Invalid | Empty Input |
+|--------|-------------|---------------|-------------|
+| **Enter** | ✅ onChange(parsed) | ❌ no action | ✅ onChange(undefined) |
+| **Escape** | ✅ onChange(parsed) | ❌ just close | ❌ just close |
+| **Blur** | ✅ onChange(parsed) | ✅ revert value | ✅ onChange(undefined) |
+| **Calendar Select** | ✅ onChange(selected) | ✅ onChange(selected) | ✅ onChange(selected) |
+
+## Usage Examples
+
+### Basic Usage
+
+```typescript
+import { DatePicker } from '@acme/ui';
+import dayjs from 'dayjs';
+
+function App() {
+  const [date, setDate] = useState<dayjs.Dayjs | null>(null);
+
+  return (
+    <DatePicker
+      value={date}
+      onChange={(date) => setDate(date)}
+      placeholder="Select date"
+    />
+  );
+}
+```
+
+### With Format
+
+```typescript
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+  format="DD/MM/YYYY"
+  placeholder="DD/MM/YYYY"
+/>
+```
+
+### With Validation
+
+```typescript
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+  disabledDate={(date) => date.isBefore(dayjs())}
+  placeholder="Future dates only"
+/>
+```
+
+### With Time
+
+```typescript
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+  showTime
+  format="YYYY-MM-DD HH:mm"
+  placeholder="Select date and time"
+/>
+```
+
+## Implementation Details
+
+### State Management
+
+```typescript
+// Main state variables
+const [value, setValue] = useState<DateValueType | null>(null);
+const [inputValue, setInputValue] = useState<string>("");
+const [typedDate, setTypedDate] = useState<Date | undefined>(undefined);
+const [month, setMonth] = useState<Date | undefined>(undefined);
+```
+
+### Validation Logic
+
+```typescript
+// Input validation
+const validateInput = (input: string) => {
+  const parsed = dayjs(input, format);
+  return parsed.isValid() ? parsed : null;
+};
+
+// Date validation
+const isValidDate = (date: dayjs.Dayjs) => {
+  return date.isValid();
+};
+```
+
+### Event Flow
+
+1. **Input Typing** → Update calendar display only
+2. **Enter/Escape** → Validate and trigger onChange
+3. **Blur** → Validate and trigger onChange or revert
+4. **Calendar Selection** → Always trigger onChange
+
+## Styling
+
+### CSS Classes
+
+```css
+/* Container */
+[data-slot="picker-input"] {
+  /* Input container styles */
+}
+
+/* Calendar */
+[data-slot="picker-calendar"] {
+  /* Calendar styles */
+}
+
+/* Selected date */
+[data-selected="true"] {
+  /* Selected date styles */
+}
+```
+
+### Custom Styling
+
+```typescript
+<DatePicker
+  className="my-custom-datepicker"
+  classNames={{
+    input: 'custom-input',
+    calendar: 'custom-calendar',
+    selected: 'custom-selected',
+  }}
+/>
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Calendar not updating**: Ensure `format` prop matches input format
+2. **Validation not working**: Check `disabledDate` function implementation
+3. **Type errors**: Ensure proper generic type usage
+
+### Debug Mode
+
+```typescript
+// Enable debug logging
+<DatePicker
+  debug
+  onChange={(date, dateString) => {
+    console.log('DatePicker changed:', date, dateString);
+  }}
+/>
+```
+
+## Migration Guide
+
+### From Antd DatePicker
+
+```typescript
+// Before (antd)
+<DatePicker
+  value={date}
+  onChange={setDate}
+  format="YYYY-MM-DD"
+/>
+
+// After (our component)
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+  format="YYYY-MM-DD"
+/>
+```
+
+### From Date Objects
+
+```typescript
+// Before (Date objects)
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+/>
+
+// After (Dayjs objects)
+<DatePicker
+  value={date}
+  onChange={(date) => setDate(date)}
+/>
+```
+
+## Performance Considerations
+
+- **Debounced validation**: Input validation is optimized
+- **Memoized calculations**: Date parsing is memoized
+- **Efficient re-renders**: State updates are batched
+- **Lazy loading**: Calendar is lazy-loaded when opened
+
+## Accessibility
+
+### ARIA Attributes
+
+```html
+<input
+  role="combobox"
+  aria-expanded={open}
+  aria-controls="calendar-popup"
+  aria-haspopup="dialog"
+/>
+```
+
+### Keyboard Support
+
+- **Tab**: Navigate between elements
+- **Enter**: Confirm selection
+- **Escape**: Close popup
+- **Arrow keys**: Navigate calendar
+- **Space**: Select date
+
+## Testing
+
+### Unit Tests
+
+```typescript
+// Test validation
+test('should validate input correctly', () => {
+  const { getByRole } = render(<DatePicker />);
+  // ... test implementation
+});
+
+// Test onChange behavior
+test('should trigger onChange on Enter with valid date', () => {
+  // ... test implementation
+});
+```
+
+### Integration Tests
+
+```typescript
+test('should sync input and calendar', () => {
+  // ... test implementation
+});
+```

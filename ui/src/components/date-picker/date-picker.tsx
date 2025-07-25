@@ -5,15 +5,15 @@
 // https://github.com/shadcn-ui/ui/pull/4421
 "use client";
 
+import type { Dayjs } from "dayjs";
 import * as React from "react";
 import { useEffect } from "react";
 import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
-import { format as formatDate, isValid, parse, toDate } from "date-fns";
+import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject } from "../_util/type";
 import type { InputRef } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
@@ -21,7 +21,7 @@ import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { useUiConfig } from "../config-provider/config-provider";
 import { useComponentConfig } from "../config-provider/context";
-import { Input } from "../input";
+import { Input } from "../input/input";
 import { Popover } from "../popover";
 
 // type DatePickerValueType = "date" | "string" | "number" | "format";
@@ -44,19 +44,22 @@ type DatePickerBaseProps = InputVariants &
     suffix?: React.ReactNode;
   };
 
-type DatePickerProps<DateType extends AnyObject = Date> =
+type DatePickerProps<DateValueType extends Dayjs = Dayjs> =
   DatePickerBaseProps & {
     ref?: React.Ref<InputRef>;
-    defaultValue?: DateType;
-    value?: DateType;
+    defaultValue?: DateValueType | null;
+    value?: DateValueType | null;
     /** Callback function, can be executed when the selected time is changing */
-    onChange?: (date: DateType | undefined, dateString: string) => void;
+    onChange?: (
+      date: DateValueType | null | undefined,
+      dateString: string,
+    ) => void;
     /**
      * Function that determines whether a date should be disabled
      * @param current The current date to check
      * @returns boolean indicating if the date should be disabled
      */
-    disabledDate?: DisabledDate<DateType>;
+    disabledDate?: DisabledDate<DateValueType>;
     placeholder?: string;
 
     styles?: {
@@ -66,15 +69,15 @@ type DatePickerProps<DateType extends AnyObject = Date> =
       root?: string;
     };
   };
-const DatePicker = <DateType extends AnyObject = Date>(
-  props: DatePickerProps<DateType>,
+const DatePicker = <DateValueType extends Dayjs = Dayjs>(
+  props: DatePickerProps<DateValueType>,
 ) => {
   const {
     ref,
     id,
 
     value: valueProp,
-    defaultValue: defaultValueProp,
+    defaultValue,
     onChange,
 
     placeholder,
@@ -105,80 +108,38 @@ const DatePicker = <DateType extends AnyObject = Date>(
       ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
       : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
-  const valueType = React.useMemo(() => {
-    let result = "format";
-    if (typeof valueProp === "string") {
-      result = "format";
-    } else if (typeof valueProp === "number") {
-      result = "number";
-    } else if (typeof valueProp === "object") {
-      result = "object";
-    }
-    return result;
-  }, [valueProp]);
-
-  const getDestinationValue = React.useCallback(
-    (date: Date) => {
-      let result;
-      if (valueType === "string") {
-        result = formatDate(date, "yyyy-MM-dd'T'HH:mm:ss");
-      } else if (valueType === "format") {
-        result = formatDate(date, format);
-      } else if (typeof valueType === "number") {
-        result = date.getTime();
-      } else {
-        result = date;
-      }
-      return result as unknown as DateType;
-    },
-    [format, valueType],
-  );
-
   // ====================== Value =======================
-  const [value, setValue] = useMergedState(defaultValueProp, {
+  const [value, setValue] = useMergedState(defaultValue, {
     value: valueProp,
     onChange: (value) => {
-      onChange?.(
-        value ? getDestinationValue(value as unknown as Date) : undefined,
-        value ? formatDate(value as unknown as Date, format) : "",
-      );
+      onChange?.(value, value ? value.format(format) : "");
     },
   });
-  const preInputValue = value
-    ? formatDate(toDate(value as unknown as Date), format)
-    : "";
+  const preInputValue = value ? (value as Dayjs).format(format) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue, {});
 
-  const handleChange = (input: string | Date | undefined) => {
-    if (!input) {
-      setValue(undefined);
-      return;
-    }
-
-    const date = toDate(input);
-    let result;
-    if (valueType === "string") {
-      result = formatDate(date, format);
-    } else if (valueType === "format") {
-      result = formatDate(date, format);
-    } else if (typeof valueType === "number") {
-      result = date.getTime();
-    } else {
-      result = date;
-    }
-    setValue(result as unknown as DateType);
+  const getDestinationValue = (date: Date): DateValueType => {
+    const dayjsDate = dayjs(date);
+    return dayjsDate as DateValueType;
   };
 
   const inputRef = React.useRef<InputRef>(null);
 
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
-    if (isValidDateStringExact(value, format)) {
-      handleChange(inputValue);
+    if (value.trim()) {
+      const parsed = dayjs(value, format);
+      if (parsed.isValid()) {
+        setValue(parsed as DateValueType);
+        setInputValue(parsed.format(format));
+        setMonth(parsed.toDate());
+      } else {
+        setInputValue(value);
+      }
     } else {
-      setInputValue(preInputValue);
+      setValue(undefined);
+      setInputValue("");
     }
-    setOpen(false);
   };
 
   // prevent click label to focus input (open popover)
@@ -194,8 +155,28 @@ const DatePicker = <DateType extends AnyObject = Date>(
   }, [id]);
 
   const [month, setMonth] = React.useState<Date | undefined>(
-    value && toDate(value as unknown as Date),
+    value ? (value as Dayjs).toDate() : undefined,
   );
+  const [typedDate, setTypedDate] = React.useState<Date | undefined>(
+    value ? (value as Dayjs).toDate() : undefined,
+  );
+
+  // Sync calendar month and selected date when input value changes
+  React.useEffect(() => {
+    if (inputValue.trim()) {
+      const parsed = dayjs(inputValue, format);
+      if (parsed.isValid()) {
+        setMonth(parsed.toDate());
+        setTypedDate(parsed.toDate());
+      }
+    } else if (value) {
+      // If there's a selected value, use it for month
+      setMonth((value as Dayjs).toDate());
+      setTypedDate((value as Dayjs).toDate());
+    } else {
+      setTypedDate(undefined);
+    }
+  }, [inputValue, value, format]);
 
   return (
     <>
@@ -223,11 +204,15 @@ const DatePicker = <DateType extends AnyObject = Date>(
               // defaultMonth={value && toDate(value)}
               month={month}
               onMonthChange={setMonth}
-              selected={value ? toDate(value as unknown as Date) : undefined}
+              selected={
+                typedDate ?? (value ? (value as Dayjs).toDate() : undefined)
+              }
               onSelect={(date) => {
                 if (date) {
-                  setValue(getDestinationValue(date));
-                  setInputValue(formatDate(date, format));
+                  const dayjsDate = getDestinationValue(date);
+                  setValue(dayjsDate);
+                  setInputValue((dayjsDate as Dayjs).format(format));
+                  setMonth(date);
                 }
                 setOpen(false);
               }}
@@ -275,18 +260,54 @@ const DatePicker = <DateType extends AnyObject = Date>(
             }}
             onKeyUp={(event) => {
               event.stopPropagation();
-              if (event.key === "Enter" || event.key === "Escape") {
+              if (event.key === "Enter") {
                 handleChangeInput(event.currentTarget.value);
+                setOpen(false);
+              } else if (event.key === "Escape") {
+                // Only trigger onChange if input is valid, otherwise just close
+                if (inputValue.trim()) {
+                  const parsed = dayjs(inputValue, format);
+                  if (parsed.isValid()) {
+                    setValue(parsed as DateValueType);
+                    setInputValue(parsed.format(format));
+                    setTypedDate(parsed.toDate());
+                  }
+                }
+                setOpen(false);
               }
             }}
             onChange={(event) => {
-              setInputValue(event.currentTarget.value);
-              // if (isValidDateStringExact(event.currentTarget.value, format)) {
-              //   handleChange(event.currentTarget.value);
-              // } else {
-              //   // eslint-disable-next-line unicorn/no-useless-undefined
-              //   handleChange(undefined);
-              // }
+              const newValue = event.currentTarget.value;
+              setInputValue(newValue);
+
+              // Update calendar month and selected date when typing
+              if (newValue.trim()) {
+                const parsed = dayjs(newValue, format);
+                if (parsed.isValid()) {
+                  setMonth(parsed.toDate());
+                }
+              }
+            }}
+            onBlur={() => {
+              // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
+              if (inputValue.trim()) {
+                const parsed = dayjs(inputValue, format);
+                if (parsed.isValid()) {
+                  setValue(parsed as DateValueType);
+                  setInputValue(parsed.format(format));
+                  setTypedDate(parsed.toDate());
+                } else {
+                  // Invalid input - revert to previous value
+                  setInputValue(value ? (value as Dayjs).format(format) : "");
+                  setTypedDate(value ? (value as Dayjs).toDate() : undefined);
+                }
+              } else {
+                // Empty input - trigger onChange with undefined
+                setValue(undefined);
+                setInputValue("");
+                setTypedDate(undefined);
+              }
+              setOpen(false);
             }}
             {...rest}
           />
@@ -295,19 +316,6 @@ const DatePicker = <DateType extends AnyObject = Date>(
     </>
   );
 };
-
-function isValidDateStringExact(
-  dateString: string,
-  formatString: string,
-): boolean {
-  const parsedDate = parse(dateString, formatString, new Date());
-  // Validation:
-  // 1. The date must be valid (`isValid(parsedDate)`).
-  // 2. The reformatted string (`format(parsedDate, formatString)`) must match `dateString`.
-  return (
-    isValid(parsedDate) && formatDate(parsedDate, formatString) === dateString
-  );
-}
 
 export type { DatePickerProps, DatePickerBaseProps };
 export { DatePicker };
