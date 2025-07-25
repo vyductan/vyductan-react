@@ -732,11 +732,13 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               header: ({ table }) => (
                 <Checkbox
                   checked={table.getIsAllPageRowsSelected()}
+                  indeterminate={table.getIsSomePageRowsSelected()}
                   onChange={(e) =>
                     table.toggleAllPageRowsSelected(!!e.target.checked)
                   }
                   aria-label="Select all"
                   skipGroup
+                  className="align-middle"
                 />
               ),
               cell: ({ row }) => (
