@@ -1,3 +1,5 @@
+import type { InputRef } from "../input";
+
 export type PanelMode =
   | "time"
   | "date"
@@ -18,3 +20,12 @@ export type DisabledDate<DateType = any> = (
     from?: DateType;
   },
 ) => boolean;
+
+export type PickerRef = Pick<
+  InputRef,
+  "select" | "setCustomValidity" | "reportValidity"
+> & {
+  nativeElement: HTMLDivElement;
+  focus: (options?: FocusOptions) => void;
+  blur: VoidFunction;
+};
