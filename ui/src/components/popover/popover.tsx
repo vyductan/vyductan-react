@@ -109,10 +109,6 @@ export const Popover = (props: PopoverProps) => {
               },
             }
           : {})}
-        // Fix scrollable https://github.com/shadcn-ui/ui/issues/542#issuecomment-3077844347
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
-        // End fix scrollable
         {...restProps}
       >
         {arrow && <PopoverArrow className="fill-white" />}
