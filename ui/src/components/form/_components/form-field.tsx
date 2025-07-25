@@ -51,7 +51,10 @@ type FieldProps<
   /* Props of children node, for example, the prop of Switch or Checkbox is `checked`. This prop is an encapsulation of `getValueProps`, which will be invalid after customizing getValueProps */
   valuePropName?: string;
 
-  /* Normalize value from component value before passing to Form instance. Do not support async */
+  /** Additional props with sub component (It's not recommended to generate dynamic function prop by `getValueProps`. Please pass it to child component directly) */
+  getValueProps?: (value: any) => Record<string, any>;
+
+  /** Normalize value from component value before passing to Form instance. Do not support async */
   normalize?: (value: any, prevValue: any) => any;
 
   children?:
@@ -84,6 +87,9 @@ const FormField = <
   layout: layoutProp,
 
   normalize,
+
+  getValueProps,
+  valuePropName,
 
   ...props
 }: FieldProps<TFieldValues, TName, TTransformedValues>) => {
@@ -127,7 +133,7 @@ const FormField = <
     </FieldLabel>
   );
 
-  const valuePropName = props.valuePropName ?? "value";
+  const finalValuePropName = valuePropName ?? "value";
 
   if (
     !render &&
@@ -150,7 +156,9 @@ const FormField = <
               <FormControl>
                 {cloneElement(children, {
                   ...ctx.field,
-                  [valuePropName]: ctx.field.value,
+                  [finalValuePropName]: ctx.field.value,
+                  // Apply getValueProps if provided
+                  ...(getValueProps ? getValueProps(ctx.field.value) : {}),
                   onBlur: (event: any) => {
                     children.props.onBlur?.(event);
                     ctx.field.onBlur();
@@ -158,16 +166,6 @@ const FormField = <
                   onChange: (event: any) => {
                     const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
 
-                    // const value = event?.target
-                    //   ? event.target[valuePropName] === undefined
-                    //     ? event.target.value
-                    //     : event.target[valuePropName]
-                    //   : event;
-                    // const finalValue = value === undefined ? null : value; // fix react-hook-form doesn't support undefined value
-                    // const normalizedValue = normalize?.(
-                    //   finalValue,
-                    //   ctx.field.value,
-                    // );
                     const normalizedValue = normalize?.(value, ctx.field.value);
 
                     ctx.field.onChange(
