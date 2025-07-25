@@ -34,9 +34,6 @@ const buttonVariants = tv({
       link: ["border-transparent"],
       text: ["border-0"],
     },
-    danger: {
-      true: [],
-    },
     primary: {
       true: ["border-primary", "hover:border-primary-hover"],
     },
@@ -85,7 +82,7 @@ const buttonVariants = tv({
         "active:ring-primary",
       ],
       destructive:
-        "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white shadow-xs",
+        "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
       solid: ["text-white"],
       outline: [
         "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
@@ -125,11 +122,11 @@ const buttonVariants = tv({
     // primary
     {
       primary: true,
-      // danger: true,
       color: "danger",
       className: [
-        "border-red-500 bg-red-500",
-        "hover:border-red-600 hover:bg-red-600",
+        "border-red-600 bg-red-600 text-white",
+        "hover:border-red-700 hover:bg-red-700",
+        "active:border-red-800 active:bg-red-800",
       ],
     },
     {
@@ -182,12 +179,43 @@ const buttonVariants = tv({
     },
     // outline
     {
+      variant: "default",
+      color: "default",
+      className: [
+        "border-primary-500 bg-primary-500 text-primary-foreground shadow-xs",
+        "hover:border-primary-600 hover:bg-primary-600",
+        "active:ring-primary",
+      ],
+    },
+    {
+      variant: "default",
+      color: "danger",
+      className: [
+        "border-red-600 bg-red-600 text-white shadow-xs",
+        "hover:border-red-700 hover:bg-red-700",
+        "active:border-red-800 active:bg-red-800",
+      ],
+    },
+    {
+      variant: "default",
+      color: "link",
+      className: ["border-link bg-link text-white", "hover:bg-link-hover"],
+    },
+    {
+      variant: "default",
+      color: "success",
+      className: [
+        "border-green-600 bg-green-600",
+        "hover:border-green-700 hover:bg-green-700",
+      ],
+    },
+    {
       variant: "outline",
       color: "danger",
       className: [
-        "border-error",
-        "hover:border-error-hover hover:text-error-hover",
-        "hover:bg-red-100 dark:hover:bg-red-300",
+        "border-red-600 bg-white text-red-600",
+        "hover:border-red-500 hover:bg-red-50 hover:text-red-500",
+        "active:border-red-700 active:text-red-700",
       ],
     },
     {
@@ -238,8 +266,9 @@ const buttonVariants = tv({
       variant: "light",
       color: "danger",
       className: [
-        "bg-error-muted text-error",
-        "hover:bg-error-hover hover:text-white",
+        "bg-red-50 text-red-600",
+        "hover:bg-red-100 hover:text-red-700",
+        "active:bg-red-200 active:text-red-800",
       ],
     },
     {
@@ -339,6 +368,7 @@ export interface ButtonProps
     variants?: TVButtonOptions;
   };
   size?: ButtonVariants["size"] | "sm";
+  danger?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -359,6 +389,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       type,
       htmlType,
+      danger,
       ...props
     },
     ref,
@@ -412,7 +443,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className={cn(
             "relative",
             buttonVariants({
-              color,
+              color: danger ? "danger" : color,
               disabled,
               primary: !primary && !!variant ? undefined : (primary ?? true),
               size: sizeToPass,
@@ -424,7 +455,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
                 buttonConfig.classNames
                   .variants as unknown as ExtractedTVButtonOptions,
               )({
-                color,
+                color: danger ? "danger" : color,
                 disabled,
                 primary: !primary && !!variant ? undefined : (primary ?? true),
                 size: sizeToPass,
