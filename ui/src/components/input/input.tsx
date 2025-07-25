@@ -127,7 +127,6 @@ const Input = (props: InputProps) => {
 
   const focus = (option?: InputFocusOptions) => {
     if (inputRef.current) {
-      console.log("iiiii", inputRef.current);
       triggerFocus(inputRef.current, option);
     }
   };
