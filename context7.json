@@ -47,7 +47,8 @@
       "LICENSE.md",
       "license.md",
       "CODE_OF_CONDUCT.md",
-      "code_of_conduct.md"
+      "code_of_conduct.md",
+      "*.tasks.mdx"
     ],
     "branch": "main",
     "stars": 0,
