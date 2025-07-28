@@ -131,6 +131,30 @@ const [typedDate, setTypedDate] = useState<Date | undefined>(undefined);
 const [month, setMonth] = useState<Date | undefined>(undefined);
 ```
 
+### Value Synchronization
+
+The component uses `useMergedState` for controlled/uncontrolled mode handling:
+
+```typescript
+const [value, setValue] = useMergedState(defaultValue, {
+  value: valueProp,
+  onChange: (value) => {
+    onChange?.(value, value ? value.format(format) : "");
+  },
+});
+```
+
+Input value is synchronized using `useEffect`:
+
+```typescript
+useEffect(() => {
+  const newInputValue = value ? value.format(format) : "";
+  setInputValue(newInputValue);
+}, [value, format, setInputValue]);
+```
+
+This approach avoids the performance issues of using `value` prop in `useMergedState` while ensuring proper synchronization when external values change.
+
 ### Validation Logic
 
 ```typescript
