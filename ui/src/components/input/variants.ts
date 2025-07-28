@@ -66,11 +66,7 @@ const inputVariants = tv({
         "bg-accent rounded-md border-none shadow-none",
         "transition-colors",
       ],
-      borderless: [
-        "border-0",
-        "focus-within:outline-none",
-        "transition-colors",
-      ],
+      borderless: ["border-none", "transition-colors"],
       underlined: [
         "border-b",
         "border-t-0 border-r-0 border-l-0",
