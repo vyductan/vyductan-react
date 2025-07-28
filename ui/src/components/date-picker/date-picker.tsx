@@ -116,7 +116,13 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     },
   });
   const preInputValue = value ? (value as Dayjs).format(format) : "";
-  const [inputValue, setInputValue] = useMergedState(preInputValue, {});
+  const [inputValue, setInputValue] = useMergedState(preInputValue);
+
+  // Sync input value when value changes
+  useEffect(() => {
+    const newInputValue = value ? (value as Dayjs).format(format) : "";
+    setInputValue(newInputValue);
+  }, [value, format, setInputValue]);
 
   const getDestinationValue = (date: Date): DateValueType => {
     const dayjsDate = dayjs(date);
