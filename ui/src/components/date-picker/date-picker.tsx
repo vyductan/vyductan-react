@@ -61,6 +61,8 @@ type DatePickerProps<DateValueType extends Dayjs = Dayjs> =
      */
     disabledDate?: DisabledDate<DateValueType>;
     placeholder?: string;
+    minDate?: DateValueType;
+    maxDate?: DateValueType;
 
     styles?: {
       root?: React.CSSProperties;
@@ -84,6 +86,8 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     format: formatProp,
     showTime,
     disabledDate,
+    minDate,
+    maxDate,
 
     classNames: _,
     styles: __,
@@ -212,6 +216,16 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
               onMonthChange={setMonth}
               selected={
                 typedDate ?? (value ? (value as Dayjs).toDate() : undefined)
+              }
+              startMonth={
+                minDate
+                  ? (minDate as Dayjs).toDate()
+                  : dayjs().subtract(50, "year").startOf("year").toDate()
+              }
+              endMonth={
+                maxDate
+                  ? (maxDate as Dayjs).toDate()
+                  : dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
                 if (date) {
