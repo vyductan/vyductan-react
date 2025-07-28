@@ -62,6 +62,7 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
 | **Escape** | ✅ onChange(parsed) | ❌ just close | ❌ just close |
 | **Blur** | ✅ onChange(parsed) | ✅ revert value | ✅ onChange(undefined) |
 | **Calendar Select** | ✅ onChange(selected) | ✅ onChange(selected) | ✅ onChange(selected) |
+| **Calendar Click Fix** | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar |
 
 ## Usage Examples
 
@@ -193,6 +194,8 @@ const isValidDate = (date: dayjs.Dayjs) => {
 1. **Calendar not updating**: Ensure `format` prop matches input format
 2. **Validation not working**: Check `disabledDate` function implementation
 3. **Type errors**: Ensure proper generic type usage
+4. **Calendar click not working**: Blur handling now prevents calendar from closing when clicking calendar days
+5. **Blur event issues**: Enhanced blur handling with focus target detection
 
 ### Debug Mode
 

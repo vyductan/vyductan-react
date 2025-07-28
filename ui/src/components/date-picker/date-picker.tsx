@@ -288,7 +288,27 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                 }
               }
             }}
-            onBlur={() => {
+            onBlur={(e) => {
+              // Check if the focus is moving to an element within the calendar/popover
+              const relatedTarget = e.relatedTarget as HTMLElement | undefined;
+              const calendarContainer = document.querySelector(
+                '[data-slot="calendar"]',
+              );
+              const popoverContainer = document.querySelector(
+                '[data-slot="popover-content"]',
+              );
+
+              // If focus is moving to calendar or popover, don't close
+              if (
+                relatedTarget &&
+                (calendarContainer?.contains(relatedTarget) ||
+                  popoverContainer?.contains(relatedTarget) ||
+                  relatedTarget.closest('[data-slot="calendar"]') ||
+                  relatedTarget.closest('[data-slot="popover-content"]'))
+              ) {
+                return;
+              }
+
               // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
               if (inputValue.trim()) {
                 const parsed = dayjs(inputValue, format);
