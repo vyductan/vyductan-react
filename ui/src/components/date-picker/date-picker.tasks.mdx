@@ -8,6 +8,20 @@
 - [x] **Generic Type Safety**: Fixed `DateValueType` generic type constraints
 - [x] **State Management**: Updated all state variables to use Dayjs objects
 
+### Props
+- [x] **value**: Controlled value (Dayjs)
+- [x] **defaultValue**: Uncontrolled initial value (Dayjs)
+- [x] **onChange**: Change callback (function)
+- [x] **format**: Date format string
+- [x] **showTime**: Show time picker
+- [x] **disabledDate**: Disable specific dates
+- [x] **minDate**: Minimum selectable date (Dayjs)
+- [x] **maxDate**: Maximum selectable date (Dayjs)
+- [x] **placeholder**: Input placeholder
+- [x] **className**: CSS classes
+- [x] **styles**: CSS styles
+- [x] **suffix**: Custom suffix content
+
 ### Input Handling Fixes
 - [x] **Real-time Sync**: Input typing updates calendar month and selected date
 - [x] **Calendar Highlight**: Typed dates are visually highlighted in calendar
@@ -33,6 +47,7 @@
 - [x] **Month Synchronization**: Automatic calendar month navigation
 - [x] **Value Reversion**: Proper rollback to previous value on invalid input
 - [x] **State Cleanup**: Proper cleanup when clearing values
+- [x] **Value Synchronization**: useEffect for syncing input value when external value changes
 
 ## 🎯 Key Implementation Details
 
@@ -70,6 +85,7 @@ if (inputValue.trim()) {
 - `onKeyUp`: Handles Enter/Escape with validation
 - `onBlur`: Handles blur with validation and reversion
 - `onSelect`: Calendar selection always triggers onChange
+- `useEffect`: Synchronizes input value when external value changes
 
 ## 🔄 Migration Notes
 
