@@ -5,11 +5,9 @@
 /* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import React from "react";
-import { useMergedState } from "@rc-component/util";
 import KeyCode from "@rc-component/util/lib/KeyCode";
 
 import type { AnyObject } from "../../_util/type";
@@ -108,6 +106,7 @@ const collectSortStates = <RecordType extends AnyObject = AnyObject>(
         ),
       ];
     } else if (column.sorter) {
+      console.log("???", column, init);
       if ("sortOrder" in column) {
         // Controlled
         pushState(column, columnPos);
@@ -371,21 +370,60 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
     () => collectSortStates<RecordType>(mergedColumns, true),
   );
 
-  const collectedSorting: SortingState = mergedColumns
-    .filter((c) => c.defaultSortOrder && c.key)
-    .map((c) => {
-      return {
-        id: c.key!,
-        desc: c.defaultSortOrder === "ascend" ? false : true,
-      };
-    });
-  const [sortingState, setSortingState] = useMergedState(collectedSorting, {
-    onChange: (value) => {
-      //   if (!onSorterChange) return;
-      // Map sorting state to Ant Design's SorterResult format
-      const sortStates: SortState<RecordType>[] = [];
+  // Calculate initial sorting state from columns with defaultSortOrder
+  const initialSortingState: SortingState = React.useMemo(() => {
+    const sortingColumns: SortingState = [];
+
+    // Use collectSortStates to properly extract columns with defaultSortOrder
+    const sortStates = collectSortStates<RecordType>(mergedColumns, true);
+
+    for (const sortState of sortStates) {
+      if (sortState.sortOrder) {
+        sortingColumns.push({
+          id: sortState.key as string,
+          desc: sortState.sortOrder === "descend",
+        });
+      }
+    }
+
+    return sortingColumns;
+  }, [mergedColumns]);
+
+  const [sortingState, setSortingState] =
+    React.useState<SortingState>(initialSortingState);
+
+  // Update sortingState when columns change with defaultSortOrder
+  React.useEffect(() => {
+    const sortingColumns: SortingState = [];
+
+    // Use collectSortStates to properly extract columns with defaultSortOrder
+    const sortStates = collectSortStates<RecordType>(mergedColumns, true);
+
+    for (const sortState of sortStates) {
+      if (sortState.sortOrder) {
+        sortingColumns.push({
+          id: sortState.key as string,
+          desc: sortState.sortOrder === "descend",
+        });
+      }
+    }
+
+    setSortingState(sortingColumns);
+  }, [mergedColumns]);
+
+  const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
+    (updaterOrValue) => {
+      const newSorting =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(sortingState)
+          : updaterOrValue;
+
+      setSortingState(newSorting);
+
+      const updatedSortStates: SortState<RecordType>[] = [];
       const sorterResults: SorterResult<RecordType>[] = [];
-      for (const [_index, sort] of value.entries()) {
+
+      for (const [_index, sort] of newSorting.entries()) {
         const column = mergedColumns.find((col) => col.key === sort.id);
         if (!column) continue;
         const order = sort.desc ? "descend" : "ascend";
@@ -394,12 +432,9 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
           columnKey: column.key as Key,
           field: (column as ColumnType<RecordType>).dataIndex as Key,
           order,
-          //   multiplePriority:
-          //     typeof column.sorter === "object"
-          //       ? column.sorter.multiple
-          //       : undefined,
         };
-        sortStates.push({
+
+        updatedSortStates.push({
           column,
           key: sort.id,
           sortOrder: order,
@@ -410,98 +445,43 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
         });
         sorterResults.push(sorterResult);
       }
-      // Call onSorterChange with the appropriate format
+
+      setSortStates(updatedSortStates);
+
       if (sorterResults.length <= 1) {
-        onSorterChange(sorterResults[0]!, sortStates);
+        onSorterChange(sorterResults[0]!, updatedSortStates);
       } else {
-        onSorterChange(sorterResults, sortStates);
+        onSorterChange(sorterResults, updatedSortStates);
       }
-      setSortStates(sortStates);
     },
-    // postState: (value) => {
-    //   // Sort by priority similar to antd
-    //   if (!value) return value;
-    //   return [...value].sort((a, b) => {
-    //     const columnA = mergedColumns.find((col) => col.key === a.id);
-    //     const columnB = mergedColumns.find((col) => col.key === b.id);
-    //     const priorityA =
-    //       typeof columnA?.sorter === "object" ? columnA.sorter.multiple : 0;
-    //     const priorityB =
-    //       typeof columnB?.sorter === "object" ? columnB.sorter.multiple : 0;
-    //     return priorityB - priorityA; // Higher priority comes first
-    //   });
-    // },
-  });
+    [mergedColumns, sortingState, onSorterChange],
+  );
 
-  const getColumnKeys = (
-    columns: ColumnsType<RecordType>,
-    pos?: string,
-  ): Key[] => {
-    const newKeys: Key[] = [];
-    columns.forEach((item, index) => {
-      const columnPos = getColumnPos(index, pos);
-      newKeys.push(getColumnKey<RecordType>(item, columnPos));
-      if (Array.isArray((item as ColumnGroupType<RecordType>).children)) {
-        const childKeys = getColumnKeys(
-          (item as ColumnGroupType<RecordType>).children,
-          columnPos,
-        );
-        newKeys.push(...childKeys);
-      }
-    });
-    return newKeys;
-  };
-  const mergedSorterStates = React.useMemo<SortState<RecordType>[]>(() => {
-    let validate = true;
-    const collectedStates = collectSortStates<RecordType>(mergedColumns, false);
-
-    // Return if not controlled
-    if (!collectedStates.length) {
-      const mergedColumnsKeys = getColumnKeys(mergedColumns);
-      return sortStates.filter(({ key }) => mergedColumnsKeys.includes(key));
-    }
-
-    const validateStates: SortState<RecordType>[] = [];
-
-    function patchStates(state: SortState<RecordType>) {
-      if (validate) {
-        validateStates.push(state);
+  const triggerSorter = React.useCallback(
+    (sortState: SortState<RecordType>) => {
+      let newSorterStates: SortState<RecordType>[];
+      if (
+        sortState.multiplePriority === false ||
+        !sortStates.length ||
+        sortStates[0]?.multiplePriority === false
+      ) {
+        newSorterStates = [sortState];
       } else {
-        validateStates.push({
-          ...state,
-          sortOrder: null,
-        });
+        newSorterStates = [
+          ...sortStates.filter(({ key }) => key !== sortState.key),
+          sortState,
+        ];
       }
-    }
+      setSortStates(newSorterStates);
+      onSorterChange(generateSorterInfo(newSorterStates), newSorterStates);
+    },
+    [sortStates, onSorterChange],
+  );
 
-    let multipleMode: boolean | null = null;
-    collectedStates.forEach((state) => {
-      if (multipleMode === null) {
-        patchStates(state);
-
-        if (state.sortOrder) {
-          if (state.multiplePriority === false) {
-            validate = false;
-          } else {
-            multipleMode = true;
-          }
-        }
-      } else if (multipleMode && state.multiplePriority !== false) {
-        patchStates(state);
-      } else {
-        validate = false;
-        patchStates(state);
-      }
-    });
-
-    return validateStates;
-  }, [mergedColumns, sortStates]);
-
-  // Get render columns title required props
   const columnTitleSorterProps = React.useMemo<
     ColumnTitleProps<RecordType>
   >(() => {
-    const sortColumns = mergedSorterStates.map(({ column, sortOrder }) => ({
+    const sortColumns = sortStates.map(({ column, sortOrder }) => ({
       column,
       order: sortOrder,
     }));
@@ -512,54 +492,31 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
       sortColumn: sortColumns[0]?.column,
       sortOrder: sortColumns[0]?.order,
     };
-  }, [mergedSorterStates]);
+  }, [sortStates]);
 
-  const triggerSorter = (sortState: SortState<RecordType>) => {
-    let newSorterStates: SortState<RecordType>[];
-    if (
-      sortState.multiplePriority === false ||
-      !mergedSorterStates.length ||
-      mergedSorterStates[0]?.multiplePriority === false
-    ) {
-      newSorterStates = [sortState];
-    } else {
-      newSorterStates = [
-        ...mergedSorterStates.filter(({ key }) => key !== sortState.key),
-        sortState,
-      ];
-    }
-    setSortStates(newSorterStates);
-    onSorterChange(generateSorterInfo(newSorterStates), newSorterStates);
-  };
+  const transformColumns = React.useCallback(
+    (innerColumns: ColumnsType<RecordType>) =>
+      injectSorter<RecordType>(
+        innerColumns,
+        sortStates,
+        triggerSorter,
+        sortDirections,
+        tableLocale,
+        showSorterTooltip,
+      ),
+    [sortStates, sortDirections, tableLocale, showSorterTooltip],
+  );
 
-  const transformColumns = (innerColumns: ColumnsType<RecordType>) =>
-    injectSorter(
-      innerColumns,
-      mergedSorterStates,
-      triggerSorter,
-      sortDirections,
-      tableLocale,
-      showSorterTooltip,
-    );
-
-  const getSorters = () => generateSorterInfo(mergedSorterStates);
-
-  // const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
-  //   (updaterOrValue) => {
-  //     const newSorting =
-  //       typeof updaterOrValue === "function"
-  //         ? updaterOrValue(collectedSorting)
-  //         : updaterOrValue;
-  //     setSorting(newSorting);
-  //   },
-  //   [collectedSorting, setSorting],
-  // );
+  const getSorters = React.useCallback(
+    () => generateSorterInfo<RecordType>(sortStates),
+    [sortStates],
+  );
 
   return [
     sortingState,
-    setSortingState,
+    handleSortingChange,
     transformColumns,
-    mergedSorterStates,
+    sortStates,
     columnTitleSorterProps,
     getSorters,
   ];
