@@ -249,7 +249,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
           </div>
         }
       >
-        <div data-slot="picker-input">
+        <div data-slot="picker-input" className="inline-flex">
           <Input
             ref={composedRef}
             id={id}
@@ -259,13 +259,9 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
             allowClear={allowClear}
             variant={variant}
             size={size}
+            htmlSize={12}
             disabled={disabled}
-            className={cn(
-              "items-center",
-              "justify-start text-left",
-              "[&>input]:w-full", // fix width of input is not fit with parent width
-              className,
-            )}
+            className={cn(className)}
             suffix={
               <Icon
                 icon="icon-[mingcute--calendar-2-line]"
