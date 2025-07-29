@@ -504,6 +504,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       false,
     );
   };
+
   const [
     sortingState,
     setSortingState,
@@ -934,6 +935,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       columns={flattenColumns}
     />
   );
+
+  console.log("aaaa", sortingState);
 
   return (
     <TableStoreProvider>
