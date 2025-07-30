@@ -144,6 +144,7 @@ function Skeleton(props: SkeletonProps) {
   return <SkeletonComp className={cn(className)} {...restProps} />;
 }
 
+export type { SkeletonProps };
 export { Skeleton };
 
 function getComponentProps<T>(prop?: T | boolean): T | Record<string, string> {
