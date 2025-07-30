@@ -247,7 +247,7 @@ const buttonVariants = tv({
     },
     {
       variant: "light",
-      primary: true,
+      color: "primary",
       className: [
         "bg-primary-200 text-primary-500",
         "hover:bg-primary-600 hover:text-white",
