@@ -94,8 +94,19 @@ export const Descriptions = ({
     bordered && "overflow-hidden rounded-md border",
     classNames?.view,
   );
-  const labelClassName = cn("text-muted-foreground", classNames?.label);
-  const valueClassName = cn(classNames?.value);
+  const labelClassName = cn(
+    "text-muted-foreground inline-flex items-baseline font-medium",
+    [
+      "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
+      layout === "horizontal" && "after:mr-2",
+      colon === false && "after:content-['']",
+    ],
+    classNames?.label,
+  );
+  const contentClassName = cn(
+    "inline-flex items-baseline min-w-[1em]",
+    classNames?.content,
+  );
   const tbodyClassName = cn(
     layout === "horizontal" && [
       bordered &&
@@ -110,7 +121,7 @@ export const Descriptions = ({
       size === "middle" || (!size && "py-3"),
     ],
     layout === "vertical" && [
-      "pb-1 pl-3 font-medium first:pl-0 last:pr-0",
+      "pb-1 pl-3 first:pl-0 last:pr-0",
       bordered && "px-6",
     ],
     classNames?.th,
