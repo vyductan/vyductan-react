@@ -638,7 +638,8 @@ const InternalInputNumber = ({
   return (
     <div
       ref={domRef}
-      className={cn("group relative text-sm", className)}
+      data-slot="input-number"
+      className={cn("group relative w-[100px] text-sm", className)}
       style={style}
       onFocus={() => {
         setFocus(true);

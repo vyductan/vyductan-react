@@ -130,6 +130,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
 
     element = (
       <AffixWrapperComponent
+        data-slot="affix-wrapper"
         className={cn(
           "text-sm",
           "relative inline-flex w-full transition-all",
@@ -181,16 +182,29 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
     // Need another wrapper for changing display:table to display:inline-block
     // and put style prop in wrapper
     element = (
-      <GroupWrapperComponent className={mergedGroupClassName} ref={groupRef}>
-        <WrapperComponent className={mergedWrapperClassName}>
+      <GroupWrapperComponent
+        data-slot="input-group-wrapper"
+        className={mergedGroupClassName}
+        ref={groupRef}
+      >
+        <WrapperComponent
+          data-slot="input-wrapper"
+          className={mergedWrapperClassName}
+        >
           {addonBefore && (
-            <GroupAddonComponent className={addonCls}>
+            <GroupAddonComponent
+              data-slot="input-group-addon"
+              className={addonCls}
+            >
               {addonBefore}
             </GroupAddonComponent>
           )}
           {element}
           {addonAfter && (
-            <GroupAddonComponent className={addonCls}>
+            <GroupAddonComponent
+              data-slot="input-group-addon"
+              className={addonCls}
+            >
               {addonAfter}
             </GroupAddonComponent>
           )}
