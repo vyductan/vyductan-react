@@ -698,7 +698,8 @@ readOnly={readOnly}
         disabled={disabled}
         readOnly={readOnly}
         // className={inputClassName}
-        className={cn("leading-line-height", classNames?.input)}
+        // className={cn("leading-line-height", classNames?.input)}
+        className={cn(classNames?.input)}
       />
       {controls && (
         <StepHandler
