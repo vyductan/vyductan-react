@@ -203,17 +203,16 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
             "ArrowDown",
             "Home",
             "End",
-            "a",
-            "c",
-            "v",
-            "x", // For ctrl/cmd+a/c/v/x
           ].includes(e.key) ||
           // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (e.ctrlKey && ["a", "c", "v", "x"].includes(e.key)) ||
+          ((e.metaKey || e.ctrlKey) && ["a", "c", "v", "x"].includes(e.key)) ||
           // Allow: numbers, numpad numbers
           /^[0-9]$/.test(e.key) ||
           // Allow: decimal point
-          e.key === "."
+          e.key === "." ||
+          // Allow: minus sign only at the start of input
+          (e.key === "-" &&
+            (!e.currentTarget.value || e.currentTarget.selectionStart === 0))
         ) {
           // Let it happen, don't do anything
           return;
