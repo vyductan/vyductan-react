@@ -8,6 +8,7 @@ import type { MenuItemType, MenuProps } from "../menu";
 import { Divider } from "../divider";
 import {
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -23,6 +24,7 @@ type OwnSidebarProps = {
   className?: string;
   classNames?: {
     header?: string;
+    footer?: string;
     menuButton?: string;
     icon?: string;
   };
@@ -35,6 +37,7 @@ type OwnSidebarProps = {
   contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
+  footer?: ReactNode;
   items?: MenuProps["items"];
   defaultSelectedKeys?: string[];
   selectedKeys?: string[];
@@ -65,6 +68,7 @@ const Sidebar = (props: SidebarProps) => {
     contentRender,
 
     header,
+    footer,
     items = [],
     defaultSelectedKeys: _defaultSelectedKeys,
     selectedKeys: _selectedKeys,
@@ -139,6 +143,7 @@ const Sidebar = (props: SidebarProps) => {
           ? contentRender({ itemNodes: renderItems(items) })
           : renderItems(items)}
       </SidebarContent>
+      <SidebarFooter className={classNames?.footer}>{footer}</SidebarFooter>
     </SidebarRoot>
   );
 };
