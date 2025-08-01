@@ -106,7 +106,6 @@ const collectSortStates = <RecordType extends AnyObject = AnyObject>(
         ),
       ];
     } else if (column.sorter) {
-      console.log("???", column, init);
       if ("sortOrder" in column) {
         // Controlled
         pushState(column, columnPos);
