@@ -72,7 +72,6 @@ export const AlertModal = ({
         <AlertDialogFooter className={classNames?.footer}>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
           <AlertDialogAction
-            isOpenControlled={rest.open !== undefined}
             onClick={(e) => {
               e.preventDefault();
               onConfirm?.();

@@ -23,16 +23,14 @@ const AlertDialogTitle = ShadcnAlertDialogTitle;
 const AlertDialogTrigger = ShadcnAlertDialogTrigger;
 
 const AlertDialogAction = (
-  props: React.ComponentProps<typeof ShadcnAlertDialogAction> & {
-    isOpenControlled?: boolean;
-  },
+  props: React.ComponentProps<typeof ShadcnAlertDialogAction>,
 ) => {
-  const { isOpenControlled, className, ...restProps } = props;
+  const { className, ...restProps } = props;
   return (
     <ShadcnAlertDialogAction
       className={cn(
         buttonVariants({
-          color: isOpenControlled ? "danger" : "default",
+          color: "danger",
         }),
         className,
       )}
@@ -52,6 +50,7 @@ export {
   AlertDialogTitle,
   AlertDialogTrigger,
 };
+export { AlertDialog } from "@acme/ui/shadcn/alert-dialog";
 
 // function AlertDialogAction({
 //     className,
