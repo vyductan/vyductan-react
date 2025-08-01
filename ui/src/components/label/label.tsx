@@ -5,10 +5,18 @@ const Label = ({
   className,
   children,
   required,
+  asChild,
   ...props
 }: React.ComponentProps<typeof ShadLabel> & {
   required?: boolean;
 }) => {
+  if (asChild) {
+    return (
+      <ShadLabel asChild className={className} {...props}>
+        {children}
+      </ShadLabel>
+    );
+  }
   return (
     <ShadLabel className={cn("", className)} {...props}>
       {children}
