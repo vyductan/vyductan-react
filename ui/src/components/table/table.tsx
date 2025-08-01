@@ -936,8 +936,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     />
   );
 
-  console.log("aaaa", sortingState);
-
   return (
     <TableStoreProvider>
       <Spin spinning={loading} className={className}>
