@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 import {
   FormControl as ShadFormControl,
@@ -10,12 +11,12 @@ import { GenericSlot } from "../../slot";
 
 // import { useFormField } from "../hooks/use-form-field";
 
-const FormControl = ({ ...props }: GenericSlotProps) => {
+const FormControl = ({ className, ...props }: GenericSlotProps) => {
   const { error } = useFormField();
 
   return (
     <GenericSlot status={error ? "error" : "default"}>
-      <ShadFormControl {...props} />
+      <ShadFormControl className={cn("w-full", className)} {...props} />
     </GenericSlot>
   );
 };
