@@ -4,17 +4,20 @@ import dayjs from "dayjs";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DateType } from "../time-picker";
+import { Button } from "../../button";
 
 type TimeSelectProps = {
   value?: DateType;
   onChange?: (value: DateType) => void;
 
   format?: string;
+  onOk?: () => void;
 };
 export const TimeSelect = ({
   value,
   format = "HH:mm",
   onChange,
+  onOk,
 }: TimeSelectProps) => {
   const hourType = format.split(":")[0];
   const hourOptions = Array.from(
@@ -113,6 +116,11 @@ export const TimeSelect = ({
             </li>
           ))}
         </ul>
+      </div>
+      <div className="flex justify-end border-t pt-3">
+        <Button size="sm" className="ml-auto" onClick={() => onOk?.()}>
+          Ok
+        </Button>
       </div>
     </div>
   );

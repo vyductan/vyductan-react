@@ -8,6 +8,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { PickerRef } from "../date-picker/types";
 import type { InputProps, InputRef } from "../input";
 import { Icon } from "../../icons";
+import { Button } from "../button";
 import { Input } from "../input";
 import { Popover } from "../popover";
 import { TimeSelect } from "./_components/time-select";
@@ -144,14 +145,15 @@ const TimePicker = (props: TimePickerProps) => {
           event.preventDefault();
         }}
         content={
-          <div className="flex">
+          <div className="flex flex-col">
             <TimeSelect
               value={localValue}
               format={format}
               onChange={(value) => {
                 handleChange(value);
-                setOpen(false);
+                // setOpen(false);
               }}
+              onOk={() => setOpen(false)}
             />
           </div>
         }
@@ -176,10 +178,11 @@ const TimePicker = (props: TimePickerProps) => {
               // Select all text on focus for better UX
               e.target.select();
             }}
-            onClick={(e) => {
-              // Prevent event bubbling to avoid closing the popover
-              e.stopPropagation();
-            }}
+            // onClick={(e) => {
+            //   // Prevent event bubbling to avoid closing the popover
+            //   e.stopPropagation();
+            //   if (!open) setOpen(true);
+            // }}
             placeholder={placeholder}
             size={size}
             disabled={disabled}
