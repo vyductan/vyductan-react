@@ -165,6 +165,8 @@ const TimePicker = (props: TimePickerProps) => {
             if (!open) setOpen(true);
           }}
           {...restProps}
+          data-slot="time-picker"
+          className={cn("inline-flex", "w-[120px]", className)}
         >
           <Input
             ref={inputRef}
@@ -188,10 +190,8 @@ const TimePicker = (props: TimePickerProps) => {
             disabled={disabled}
             status={status}
             className={cn(
-              "w-[120px]",
               // Hide native time picker icon
               "[&>input::-webkit-calendar-picker-indicator]:hidden [&>input::-webkit-inner-spin-button]:hidden [&>input::-webkit-outer-spin-button]:hidden",
-              className,
             )}
             suffix={
               <Icon
