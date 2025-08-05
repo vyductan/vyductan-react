@@ -99,7 +99,7 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
 
   const gutters = useGutter(gutter, screens);
   const classes = cn(
-    "flex flex-wrap",
+    "flex flex-wrap w-full",
     {
       "items-start": mergedAlign === "top",
       "items-center": mergedAlign === "middle",
