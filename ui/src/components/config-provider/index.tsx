@@ -1,10 +1,16 @@
+import React from "react";
+import useMemo from "rc-util/lib/hooks/useMemo";
+
 import type {
+  ConfigConsumerProps,
+  DatePickerConfig,
   InputConfig,
   InputNumberConfig,
   MentionsConfig,
   SelectConfig,
   TextAreaConfig,
 } from "./context";
+import { ConfigContext } from "./context";
 
 export { useUiConfig, UiConfigProvider } from "./config-provider";
 export type { Variant } from "./context";
@@ -99,7 +105,7 @@ export interface ConfigProviderProps {
   // upload?: ComponentStyleConfig;
   // notification?: NotificationConfig;
   // colorPicker?: ComponentStyleConfig;
-  // datePicker?: DatePickerConfig;
+  datePicker?: DatePickerConfig;
   // rangePicker?: RangePickerConfig;
   // dropdown?: ComponentStyleConfig;
   // flex?: FlexConfig;
@@ -112,3 +118,88 @@ export interface ConfigProviderProps {
   // popover?: PopoverConfig;
   // popconfirm?: PopconfirmConfig;
 }
+
+interface ProviderChildrenProps extends ConfigProviderProps {
+  parentContext: ConfigConsumerProps;
+  children: React.ReactNode;
+}
+
+const ProviderChildren: React.FC<ProviderChildrenProps> = ({
+  parentContext,
+  children,
+
+  datePicker,
+}) => {
+  // const context = React.useMemo(() => {
+  //   return {
+  //     ...parentContext,
+  //     locale: legacyLocale,
+  //   };
+  // }, [parentContext, legacyLocale]);
+
+  const baseConfig = {
+    datePicker,
+  };
+  const config: ConfigConsumerProps = {
+    ...parentContext,
+  };
+
+  for (const key of Object.keys(baseConfig) as (keyof typeof baseConfig)[]) {
+    if (baseConfig[key] !== undefined) {
+      (config as any)[key] = baseConfig[key];
+    }
+  }
+
+  // https://github.com/ant-design/ant-design/issues/27617
+  const memoedConfig = useMemo(
+    () => config,
+    config,
+    (prevConfig, currentConfig) => {
+      const prevKeys = Object.keys(prevConfig) as Array<keyof typeof config>;
+      const currentKeys = Object.keys(currentConfig) as Array<
+        keyof typeof config
+      >;
+      return (
+        prevKeys.length !== currentKeys.length ||
+        prevKeys.some((key) => prevConfig[key] !== currentConfig[key])
+      );
+    },
+  );
+
+  return (
+    <ConfigContext.Provider value={memoedConfig}>
+      {children}
+    </ConfigContext.Provider>
+  );
+};
+
+export const ConfigProvider: React.FC<
+  ConfigProviderProps & { children: React.ReactNode }
+> & {
+  /** @private internal Usage. do not use in your production */
+  // ConfigContext: typeof ConfigContext;
+  /** @deprecated Please use `ConfigProvider.useConfig().componentSize` instead */
+  // SizeContext: typeof SizeContext;
+  // config: typeof setGlobalConfig;
+  // useConfig: typeof useConfig;
+} = (props) => {
+  const context = React.useContext<ConfigConsumerProps>(ConfigContext);
+
+  return <ProviderChildren parentContext={context} {...props} />;
+};
+
+// ConfigProvider.ConfigContext = ConfigContext;
+// ConfigProvider.SizeContext = SizeContext;
+// ConfigProvider.config = setGlobalConfig;
+// ConfigProvider.useConfig = useConfig;
+
+// Object.defineProperty(ConfigProvider, 'SizeContext', {
+//   get: () => {
+//     warning(
+//       false,
+//       'ConfigProvider',
+//       'ConfigProvider.SizeContext is deprecated. Please use `ConfigProvider.useConfig().componentSize` instead.',
+//     );
+//     return SizeContext;
+//   },
+// });
