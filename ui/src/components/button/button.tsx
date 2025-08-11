@@ -3,11 +3,11 @@
 import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
 import * as React from "react";
+import { useUiConfig } from "@/components/ui/config-provider";
 import { Slot } from "@radix-ui/react-slot";
 import { tv } from "tailwind-variants";
 
 import type { IconProps } from "@acme/ui/icons";
-import { useUiConfig } from "@acme/ui/components/config-provider";
 import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
