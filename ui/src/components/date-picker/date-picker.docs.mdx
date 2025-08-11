@@ -4,9 +4,14 @@
 
 A React DatePicker component that provides **complete antd DatePicker behavior** with Dayjs integration. This component offers sophisticated date handling, validation, and user experience patterns.
 
+## When To Use
+
+By clicking the input box, you can select a date from a popup calendar.
+
 ## Features
 
 ### ✅ Core Features
+
 - **Dayjs Integration**: Full Dayjs support for date manipulation
 - **Antd Behavior Parity**: Exact matching of antd DatePicker UX patterns
 - **Type Safety**: Full TypeScript support with generic types
@@ -15,6 +20,7 @@ A React DatePicker component that provides **complete antd DatePicker behavior**
 - **Accessibility**: Keyboard navigation and screen reader support
 
 ### ✅ User Experience
+
 - **Input Typing**: Real-time calendar updates without triggering onChange
 - **Calendar Selection**: Immediate date selection with onChange
 - **Keyboard Navigation**: Complete keyboard support (Enter, Escape, Tab)
@@ -30,7 +36,10 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
   // Value management
   value?: DateValueType;
   defaultValue?: DateValueType;
-  onChange?: (date: DateValueType | null | undefined, dateString: string) => void;
+  onChange?: (
+    date: DateValueType | null | undefined,
+    dateString: string,
+  ) => void;
 
   // Display
   format?: string;
@@ -56,17 +65,19 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
 
 ### Behavior Matrix
 
-| Action | Input Valid | Input Invalid | Empty Input |
-|--------|-------------|---------------|-------------|
-| **Enter** | ✅ onChange(parsed) | ❌ no action | ✅ onChange(undefined) |
-| **Escape** | ✅ onChange(parsed) | ❌ just close | ❌ just close |
-| **Blur** | ✅ onChange(parsed) | ✅ revert value | ✅ onChange(undefined) |
-| **Calendar Select** | ✅ onChange(selected) | ✅ onChange(selected) | ✅ onChange(selected) |
+| Action                 | Input Valid                           | Input Invalid                         | Empty Input                           |
+| ---------------------- | ------------------------------------- | ------------------------------------- | ------------------------------------- |
+| **Enter**              | ✅ onChange(parsed)                   | ❌ no action                          | ✅ onChange(undefined)                |
+| **Escape**             | ✅ onChange(parsed)                   | ❌ just close                         | ❌ just close                         |
+| **Blur**               | ✅ onChange(parsed)                   | ✅ revert value                       | ✅ onChange(undefined)                |
+| **Calendar Select**    | ✅ onChange(selected)                 | ✅ onChange(selected)                 | ✅ onChange(selected)                 |
 | **Calendar Click Fix** | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar |
 
 ## Usage Examples
 
 ### Basic Usage
+
+Basic use case. Users can select or input a date in a panel.
 
 ```typescript
 import { DatePicker } from '@acme/ui';
@@ -76,11 +87,14 @@ function App() {
   const [date, setDate] = useState<dayjs.Dayjs | null>(null);
 
   return (
+    <>
     <DatePicker
       value={date}
       onChange={(date) => setDate(date)}
       placeholder="Select date"
     />
+    <DatePicker onChange={onChange} picker="year" />
+    </>
   );
 }
 ```
@@ -283,7 +297,7 @@ const isValidDate = (date: dayjs.Dayjs) => {
 ```html
 <input
   role="combobox"
-  aria-expanded={open}
+  aria-expanded="{open}"
   aria-controls="calendar-popup"
   aria-haspopup="dialog"
 />
@@ -317,7 +331,7 @@ test('should trigger onChange on Enter with valid date', () => {
 ### Integration Tests
 
 ```typescript
-test('should sync input and calendar', () => {
+test("should sync input and calendar", () => {
   // ... test implementation
 });
 ```
