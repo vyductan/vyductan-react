@@ -7,7 +7,7 @@
 
 import type { Dayjs } from "dayjs";
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
 import dayjs from "dayjs";
@@ -18,11 +18,13 @@ import type { InputRef } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
+import { Button } from "../button";
 import { Calendar } from "../calendar";
 import { useUiConfig } from "../config-provider/config-provider";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { YearSelect } from "./year-select";
 
 // type DatePickerValueType = "date" | "string" | "number" | "format";
 
@@ -31,6 +33,16 @@ import { Popover } from "../popover";
 //   : T extends "number"
 //     ? number
 //     : string;
+
+export type PanelMode =
+  | "time"
+  | "date"
+  | "week"
+  | "month"
+  | "quarter"
+  | "year"
+  | "decade";
+export type PickerMode = Exclude<PanelMode, "datetime" | "decade">;
 
 type DatePickerBaseProps = InputVariants &
   InputSizeVariants & {
@@ -63,6 +75,7 @@ type DatePickerProps<DateValueType extends Dayjs = Dayjs> =
     placeholder?: string;
     minDate?: DateValueType;
     maxDate?: DateValueType;
+    picker?: PickerMode;
 
     styles?: {
       root?: React.CSSProperties;
@@ -85,6 +98,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     placeholder,
     format: formatProp,
     showTime,
+    picker,
     disabledDate,
     minDate,
     maxDate,
@@ -101,16 +115,20 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     ...rest
   } = props;
 
-  const [open, setOpen] = React.useState(false);
+  const [pickerMode, setPickerMode] = useState(picker || "date");
+
+  const [open, setOpen] = useState(false);
   const { format: formatConfig } = useComponentConfig("datePicker");
 
   // ====================== Format Date =======================
   const datePickerConfig = useUiConfig((state) => state.components.datePicker);
   const format =
     formatProp ??
-    (showTime
-      ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
-      : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
+    (picker === "year"
+      ? "YYYY"
+      : showTime
+        ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
+        : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
   // ====================== Value =======================
   const [value, setValue] = useMergedState(defaultValue, {
@@ -188,6 +206,24 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     }
   }, [inputValue, value, format]);
 
+  const currentYear = useMemo(() => value ?? dayjs(), [value]);
+
+  const [currentDecadeRange, setCurrentDecadeRange] = useState<Dayjs[]>(() =>
+    Array.from({ length: 10 }, (_, i) => {
+      const yearValue = currentYear.year();
+      const startYear = Math.floor(yearValue / 10) * 10;
+      return dayjs((startYear + i).toString());
+    }),
+  );
+
+  const computedDecadeRange = useMemo(() => {
+    return {
+      start: currentDecadeRange[0]!.year(),
+      end: currentDecadeRange.at(-1)!.year(),
+      years: currentDecadeRange,
+    };
+  }, [currentDecadeRange]);
+
   return (
     <>
       <Popover
@@ -245,11 +281,114 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                 }
                 return false;
               }}
+              components={{
+                CaptionLabel: ({ className, ...props }) => {
+                  const d = month ?? new Date();
+                  const m = dayjs(d);
+                  const monthText = m.format("MMM");
+                  const yearText = m.format("YYYY");
+                  return (
+                    <span className={cn("space-x-2", className)} {...props}>
+                      <Button
+                        variant="outline"
+                        tabIndex={-1}
+                        aria-hidden="true"
+                      >
+                        {monthText}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setPickerMode("year");
+                        }}
+                        aria-label="Select year"
+                      >
+                        {yearText}
+                      </Button>
+                    </span>
+                  );
+                },
+                ...(pickerMode === "year"
+                  ? {
+                      MonthGrid: () => {
+                        return (
+                          <YearSelect
+                            value={value}
+                            onChange={(year) => {
+                              if (!year) {
+                                setPickerMode("date");
+                                return;
+                              }
+
+                              // If DatePicker acts as a pure year picker, commit the selection
+                              if (picker === "year") {
+                                const y = year.startOf("year");
+                                setValue(y as DateValueType);
+                                setInputValue(y.format(format));
+                                setMonth(y.toDate());
+                                setOpen(false);
+                                return;
+                              }
+
+                              // Otherwise, only navigate calendar to selected year (do not change value)
+                              const base = dayjs(month ?? new Date());
+                              const newMonth = base
+                                .year(year.year())
+                                .startOf("month")
+                                .toDate();
+                              setMonth(newMonth);
+                              setPickerMode("date");
+                            }}
+                          />
+                        );
+                      },
+                      CaptionLabel: (props) => {
+                        return (
+                          <span {...props}>
+                            {computedDecadeRange.start}-
+                            {computedDecadeRange.end}
+                          </span>
+                        );
+                      },
+                    }
+                  : {}),
+
+                YearsDropdown: ({
+                  value,
+                  className,
+                  classNames,
+                  components,
+                  ...selectProps
+                }) => {
+                  return (
+                    <span
+                      data-disabled={selectProps.disabled}
+                      className={cn(classNames.dropdown_root)}
+                    >
+                      <Button
+                        variant="text"
+                        onClick={() => {
+                          console.log("click");
+                          setPickerMode("year");
+                        }}
+                        className={cn(
+                          // "hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md px-2 py-1 transition-colors",
+                          className,
+                          // classNames.dropdown,
+                          // classNames.years_dropdown,
+                        )}
+                      >
+                        {value}
+                      </Button>
+                    </span>
+                  );
+                },
+              }}
             />
           </div>
         }
       >
-        <div data-slot="picker-input" className="inline-flex">
+        <div data-slot="picker-input" className={cn("inline-flex", className)}>
           <Input
             ref={composedRef}
             id={id}
@@ -261,7 +400,6 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
             size={size}
             htmlSize={12}
             disabled={disabled}
-            className={cn(className)}
             suffix={
               <Icon
                 icon="icon-[mingcute--calendar-2-line]"
