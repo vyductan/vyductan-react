@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/prefer-ternary */
+import type { Key } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -13,8 +14,9 @@ import { SkeletonParagraph } from "./_components/skeleton-paragraph";
 import { SkeletonTitle } from "./_components/skeleton-title";
 
 interface SkeletonProps {
+  key?: Key;
   asChild?: boolean;
-  children?: React.ReactNode;
+  // children?: React.ReactNode;
   className?: string;
   rootClassName?: string;
   style?: React.CSSProperties;
