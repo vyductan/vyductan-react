@@ -7,11 +7,13 @@ import { cn } from "@acme/ui/lib/utils";
 type YearSelectProps<DateValueType extends Dayjs = Dayjs> = {
   value?: DateValueType | null;
   onChange?: (value?: DateValueType | null, yearString?: string) => void;
+  onHoverChange?: (value?: DateValueType | null, yearString?: string) => void;
 };
 
 const YearSelect = <DateValueType extends Dayjs = Dayjs>({
   value,
   onChange,
+  onHoverChange,
 }: YearSelectProps<DateValueType>) => {
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
   const [currentDecadeRange, setCurrentDecadeRange] = useState<Dayjs[]>(() =>
@@ -62,7 +64,10 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
   const currentSystemYear = new Date().getFullYear();
 
   return (
-    <div className="grid grid-cols-3 gap-1 p-3">
+    <div
+      className="grid grid-cols-3 gap-1 p-3"
+      onMouseLeave={() => onHoverChange?.()}
+    >
       {yearGrid.map((year, index) => {
         const yearNumber = year.year();
         const isSelected = year.year() === currentYearValue;
@@ -82,7 +87,25 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
                 !isSelected &&
                 "bg-accent text-accent-foreground",
             )}
-            onClick={() => handleYearSelect(year)}
+            onMouseEnter={() =>
+              onHoverChange?.(year as DateValueType, year.format("YYYY"))
+            }
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // Clear hover preview so input color returns to normal immediately
+              onHoverChange?.();
+              handleYearSelect(year);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                handleYearSelect(year);
+              }
+            }}
+            role="button"
+            tabIndex={0}
           >
             <span className="text-sm font-medium">{yearNumber}</span>
           </div>
