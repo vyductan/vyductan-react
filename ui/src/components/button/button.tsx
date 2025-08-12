@@ -358,6 +358,7 @@ export interface ButtonProps
     Omit<ButtonVariants, "type" | "color" | "disabled" | "variant" | "size"> {
   type?: HtmlType | ButtonType;
   htmlType?: HtmlType;
+  htmlColor?: React.CSSProperties["color"];
   asChild?: boolean;
   href?: string;
   loading?: boolean;
@@ -389,6 +390,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       icon,
       type,
       htmlType,
+      htmlColor,
       danger,
       ...props
     },
@@ -468,7 +470,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           disabled={loading ?? disabled}
           aria-disabled={loading ?? disabled}
           type={htmlTypeToPass}
+          color={htmlColor}
           {...props}
+          style={{ ...props.style }}
         >
           {asChild ? (
             children
