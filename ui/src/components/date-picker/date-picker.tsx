@@ -120,15 +120,20 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     status,
 
     className,
-    commitYearOnClose,
+    commitYearOnClose: commitYearOnCloseProp,
     ...rest
   } = props;
 
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
   const [open, setOpen] = useState(false);
-  const { format: formatConfig, captionLayout: captionLayoutConfig } =
-    useComponentConfig("datePicker");
+  const {
+    format: formatConfig,
+    captionLayout: captionLayoutConfig,
+    commitYearOnClose: commitYearOnCloseConfig,
+  } = useComponentConfig("datePicker");
+
+  const commitYearOnClose = commitYearOnCloseProp ?? commitYearOnCloseConfig;
 
   // ====================== Format Date =======================
   const datePickerConfig = useUiConfig((state) => state.components.datePicker);
