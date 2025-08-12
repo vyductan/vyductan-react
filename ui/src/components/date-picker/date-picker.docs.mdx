@@ -46,6 +46,23 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
   placeholder?: string;
   showTime?: boolean;
 
+  // Modes
+  picker?: 'date' | 'year';
+
+  // Calendar UI
+  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years';
+
+  // Range
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
+
+  // Custom behaviors
+  /**
+   * When a year is selected in overlay mode (picker="date"), commit that year on popover close
+   * without requiring the user to pick a day. The committed value follows the current sticky preview.
+   */
+  commitYearOnClose?: boolean;
+
   // Validation
   disabledDate?: (date: DateValueType, info: { type: string }) => boolean;
 
@@ -72,6 +89,19 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
 | **Blur**               | ✅ onChange(parsed)                   | ✅ revert value                       | ✅ onChange(undefined)                |
 | **Calendar Select**    | ✅ onChange(selected)                 | ✅ onChange(selected)                 | ✅ onChange(selected)                 |
 | **Calendar Click Fix** | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar | ✅ Prevent blur from closing calendar |
+
+### Year Selection Behavior
+
+- __picker="year"__
+  - Selecting a year commits immediately and closes the popover.
+  - Input updates to the start of the selected year.
+- __picker="date"__ (overlay year selection)
+  - Selecting a year navigates the calendar to that year and applies a sticky preview to the input.
+  - The input text is dimmed while previewing (popover open) if preview differs from the committed value at the day level.
+  - Commit occurs when:
+    - A day is selected, or
+    - The popover closes and `commitYearOnClose` is true and a year change is pending.
+  - When `captionLayout="dropdown"`, changing the year via dropdown also marks a pending year selection, enabling commit-on-close if configured.
 
 ## Usage Examples
 
@@ -131,6 +161,32 @@ function App() {
   format="YYYY-MM-DD HH:mm"
   placeholder="Select date and time"
 />
+```
+
+### Commit Year On Close (overlay)
+
+Commit the selected year when closing the popover without choosing a day.
+
+```tsx
+import { DatePicker } from '@acme/ui';
+import dayjs from 'dayjs';
+
+function Example() {
+  const [date, setDate] = useState<dayjs.Dayjs | null>(null);
+  return (
+    <DatePicker
+      picker="date"
+      value={date}
+      onChange={(d) => setDate(d)}
+      format="YYYY-MM-DD"
+      placeholder="Select date"
+      minDate={dayjs().subtract(3, 'year').startOf('year')}
+      maxDate={dayjs().add(3, 'year').endOf('year')}
+      captionLayout="dropdown"
+      commitYearOnClose
+    />
+  );
+}
 ```
 
 ## Implementation Details

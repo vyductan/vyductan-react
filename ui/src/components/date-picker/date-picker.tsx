@@ -59,6 +59,9 @@ type DatePickerBaseProps = InputVariants &
 
     // to use default month and year dropdown
     captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years";
+
+    // Custom: when selecting a year in overlay, commit that year on close without needing to pick a day
+    commitYearOnClose?: boolean;
   };
 
 type DatePickerProps<DateValueType extends Dayjs = Dayjs> =
@@ -117,10 +120,11 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     status,
 
     className,
+    commitYearOnClose,
     ...rest
   } = props;
 
-  const [pickerMode, setPickerMode] = useState(picker || "date");
+  const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
   const [open, setOpen] = useState(false);
   const { format: formatConfig, captionLayout: captionLayoutConfig } =
@@ -234,6 +238,8 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
   const [hoverPreview, setHoverPreview] = useState<Dayjs | undefined>();
   // Persist preview after picking a year (overlay) until final commit/close
   const [stickyPreview, setStickyPreview] = useState<Dayjs | undefined>();
+  // Remember if a year was selected in overlay and is pending commit on close
+  const [pendingYearCommit, setPendingYearCommit] = useState(false);
 
   // Memoized components to prevent remounts during hover (which broke clicks)
   const YearModeMonthGrid = React.useCallback(
@@ -251,7 +257,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
               return;
             }
             // Overlay year picker: preview keeping month/day
-            const base = (value as Dayjs) ?? dayjs(month ?? new Date());
+            const base = value ?? dayjs(month ?? new Date());
             let next = base.year(hoveredYear.year());
             if (!next.isValid()) {
               next = dayjs().year(hoveredYear.year()).startOf("year");
@@ -276,7 +282,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
             }
 
             // Otherwise, only navigate calendar to selected year (do not change value)
-            const base = (value as Dayjs) ?? dayjs(month ?? new Date());
+            const base = value ?? dayjs(month ?? new Date());
             const next = base.year(year.year());
             const newMonth = next.startOf("month").toDate();
             setMonth(newMonth);
@@ -284,6 +290,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
             // Keep a preview so input stays dimmed with the selected year until final commit
             setStickyPreview(next);
             setHoverPreview(next);
+            setPendingYearCommit(true);
           }}
         />
       );
@@ -343,6 +350,19 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
         onOpenChange={(open) => {
           setOpen(open);
           if (!open) {
+            // If requested, commit the selected year when panel closes
+            if (commitYearOnClose && pendingYearCommit && stickyPreview) {
+              const commit = stickyPreview.isValid()
+                ? stickyPreview
+                : dayjs(stickyPreview).isValid()
+                  ? dayjs(stickyPreview)
+                  : dayjs();
+              setValue(commit as DateValueType);
+              setInputValue(commit.format(format));
+              setTypedDate(commit.toDate());
+              setMonth(commit.toDate());
+            }
+            setPendingYearCommit(false);
             setHoverPreview(undefined);
             setStickyPreview(undefined);
           }
@@ -363,14 +383,22 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                 const next = dayjs(m).startOf("month");
                 setStickyPreview(next);
                 setHoverPreview(next);
-              }}
-              onDayMouseEnter={(date, modifiers, _e) => {
-                if (!modifiers?.disabled && date) {
-                  setHoverPreview(dayjs(date));
+
+                if (captionLayoutConfig === "dropdown") {
+                  setPendingYearCommit(true);
                 }
               }}
-              onDayMouseLeave={(_date, _modifiers, _e) => {
-                setHoverPreview(stickyPreview ?? undefined);
+              onDayMouseEnter={(date, modifiers) => {
+                if (!modifiers.disabled) {
+                  setHoverPreview((prev) =>
+                    prev?.isSame(date, "day") ? prev : dayjs(date),
+                  );
+                }
+              }}
+              onDayMouseLeave={(_, modifiers) => {
+                if (!modifiers.disabled) {
+                  setHoverPreview(stickyPreview ?? undefined);
+                }
               }}
               selected={
                 typedDate ?? (value ? (value as Dayjs).toDate() : undefined)
@@ -392,6 +420,8 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                   setInputValue((dayjsDate as Dayjs).format(format));
                   setMonth(date);
                 }
+                // Selecting a day commits selection; clear any pending year commit
+                setPendingYearCommit(false);
                 setOpen(false);
               }}
               disabled={(date) => {

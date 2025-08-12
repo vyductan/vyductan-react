@@ -36,6 +36,14 @@
 - [x] **Input Typing**: Updates calendar display without triggering onChange
 - [x] **Calendar Click Fix**: Prevent blur from closing calendar when clicking calendar days
 
+### Year Selection & Preview
+- [x] **Hover Preview (year/day)**: Input shows dimmed preview while hovering years/days in the popover
+- [x] **Sticky Preview after Year Select**: After picking a year in overlay, keep a sticky preview until commit/close
+- [x] **Commit-on-Close (overlay)**: New prop `commitYearOnClose` commits the selected year when popover closes
+- [x] **Caption Dropdown Support**: When `captionLayout="dropdown"`, changing year sets pending commit so closing will commit when enabled
+- [x] **Pure Year Picker**: With `picker="year"`, selecting year commits immediately and closes
+- [x] **Keyboard**: Year cells are focusable with Enter/Space select
+
 ### Type Safety & Error Handling
 - [x] **TypeScript Compilation**: All code compiles without errors
 - [x] **Generic Type Constraints**: Proper handling of `DateValueType` generic
@@ -87,6 +95,12 @@ if (inputValue.trim()) {
 - `onSelect`: Calendar selection always triggers onChange
 - `useEffect`: Synchronizes input value when external value changes
 
+### Commit-on-Close Flow (overlay)
+1. User selects a year (or changes via caption year dropdown) → set sticky preview and mark pending commit
+2. If a day is selected → commit immediately and clear pending
+3. If popover closes and `commitYearOnClose` is true and pending is set → commit sticky preview
+4. Clear hover/sticky preview and pending flag after close
+
 ## 🔄 Migration Notes
 
 ### Before (Date objects)
@@ -109,6 +123,18 @@ const handleChange = (date: DateValueType | null) => setValue(date);
 - [x] Validation logic works
 - [x] Error handling works
 - [x] Edge cases handled
+- [x] Year hover/selection updates preview text with dimmed style
+- [x] Commit-on-close commits sticky preview when enabled
+- [x] Caption year dropdown marks pending and commits on close
+- [x] Day selection clears pending and commits immediately
+
+## 🔜 TODO / Future Enhancements
+- [ ] Configurable commit strategy when committing a year:
+  - `preserve-day` (current overlay behavior)
+  - `start-of-month`
+  - `start-of-year`
+- [ ] Consider adding an opt-in ref-backed pending flag if more race conditions appear with rapid close flows
+- [ ] Expand keyboard navigation for year grid (arrow navigation)
 
 ## 📋 Usage Examples
 

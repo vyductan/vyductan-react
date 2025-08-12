@@ -44,7 +44,15 @@ export interface ComponentStyleConfig {
 }
 
 export type DatePickerConfig = ComponentStyleConfig &
-  Pick<DatePickerProps, "variant" | "styles" | "classNames" | "format">;
+  Pick<
+    DatePickerProps,
+    | "variant"
+    | "styles"
+    | "classNames"
+    | "format"
+    | "captionLayout"
+    | "commitYearOnClose"
+  >;
 
 export type InputConfig = ComponentStyleConfig &
   Pick<
