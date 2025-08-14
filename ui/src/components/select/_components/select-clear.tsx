@@ -44,10 +44,14 @@ const SelectClear = ({
         "absolute right-[11px]",
         "flex size-5 items-center justify-center transition-opacity",
         "opacity-0",
+        // When there is no value, make the clear icon non-interactive so it doesn't block the trigger/arrow
+        !value && "pointer-events-none",
         value && "hover:opacity-50!",
         value && "group-hover:opacity-30",
       )}
       onPointerDown={(e) => {
+        // If there's no value, don't intercept the click
+        if (!value) return;
         e.preventDefault();
         e.stopPropagation();
         onPointerDown?.(e);

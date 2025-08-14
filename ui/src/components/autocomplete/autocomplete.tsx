@@ -231,6 +231,8 @@ const Autocomplete = <
               "z-10",
               "absolute right-3",
               "opacity-0 transition-opacity duration-300",
+              // When no value, make the clear icon non-interactive so it doesn't block arrow clicks
+              !value && "pointer-events-none",
               value && "group-hover:opacity-30",
               value && "hover:opacity-50",
             )}
@@ -238,6 +240,7 @@ const Autocomplete = <
               e.preventDefault();
             }}
             onPointerDown={(e) => {
+              if (!value) return; // don't intercept when nothing to clear
               e.preventDefault();
               e.stopPropagation();
               // onChange?.();
