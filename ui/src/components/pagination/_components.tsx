@@ -63,7 +63,7 @@ function PaginationLink({
       className={cn(
         buttonVariants({
           variant: isActive ? "outline" : "ghost",
-          size,
+          size: size === "sm" ? "small" : size,
           shape,
           disabled,
         }),
