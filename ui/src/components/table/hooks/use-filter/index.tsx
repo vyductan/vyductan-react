@@ -10,7 +10,7 @@
 import React from "react";
 
 import type { AnyObject } from "../../../_util/type";
-import type { SafeKey } from "../../../tree";
+import type { SafeKey } from "../../../tree/types";
 import type {
   ColumnsType,
   ColumnTitleProps,
