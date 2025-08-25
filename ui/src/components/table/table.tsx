@@ -770,6 +770,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     getExpandedRowModel: getExpandedRowModel(),
     getSubRows: (row) =>
       row[expandable?.childrenColumnName ?? "children"] ?? [],
+    // Allow expanding detail rows even when there are no subrows
+    getRowCanExpand: () => !!expandable?.expandedRowRender,
     onExpandedChange: handleExpandedChange,
     // Row selection
     enableRowSelection: true,
