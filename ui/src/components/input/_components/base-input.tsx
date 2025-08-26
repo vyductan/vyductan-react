@@ -146,7 +146,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       >
         {prefix && (
           <span
-            className={cn("mr-1", classNames?.prefix)}
+            className={cn("mr-1 flex items-center", classNames?.prefix)}
             style={styles?.prefix}
           >
             {prefix}
