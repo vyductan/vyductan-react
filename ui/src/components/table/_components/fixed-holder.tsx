@@ -8,8 +8,9 @@ import { fillRef } from "@rc-component/util/lib/ref";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject, Direction } from "../../..";
-import type { ColumnDef } from "../types";
+import type { AnyObject } from "../../_util/type";
+import type { Direction } from "../../../types";
+import type { ColumnType } from "../types";
 import type { HeaderProps } from "./table-header";
 import { useTableStore } from "../hooks/use-table";
 import { ColGroup } from "./col-group";
@@ -127,7 +128,7 @@ export const FixedHolder = <TRecord extends AnyObject>({
 
   // Add scrollbar column
   const lastColumn = flattenColumns[flattenColumns.length - 1];
-  const ScrollBarColumn: ColumnDef<TRecord> & { scrollbar: true } = {
+  const ScrollBarColumn: ColumnType<TRecord> & { scrollbar: true } = {
     fixed: lastColumn ? lastColumn.fixed : undefined,
     scrollbar: true,
     // onHeaderCell: () => ({
@@ -135,7 +136,7 @@ export const FixedHolder = <TRecord extends AnyObject>({
     // }),
   };
 
-  const columnsWithScrollbar = useMemo<ColumnDef<TRecord>[]>(
+  const columnsWithScrollbar = useMemo<ColumnType<TRecord>[]>(
     () => (combinationScrollBarSize ? [...columns, ScrollBarColumn] : columns),
     [combinationScrollBarSize, columns],
   );

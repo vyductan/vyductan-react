@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
@@ -60,8 +61,6 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
 > & {
-  ref?: React.ForwardedRef<InputNumberRef>;
-
   /** value will show as string */
   stringMode?: boolean;
 
@@ -639,7 +638,8 @@ const InternalInputNumber = ({
   return (
     <div
       ref={domRef}
-      className={cn("group", className)}
+      data-slot="input-number"
+      className={cn("group relative w-[100px] text-sm", className)}
       style={style}
       onFocus={() => {
         setFocus(true);
@@ -698,7 +698,8 @@ readOnly={readOnly}
         disabled={disabled}
         readOnly={readOnly}
         // className={inputClassName}
-        className={classNames?.input}
+        // className={cn("leading-line-height", classNames?.input)}
+        className={cn(classNames?.input)}
       />
       {controls && (
         <StepHandler
@@ -713,90 +714,99 @@ readOnly={readOnly}
   );
 };
 
-const InputNumber = (({ ref, ...props }: InputNumberProps) => {
-  const {
-    disabled,
-    style,
-    value,
-    prefix,
-    suffix,
-    addonBefore,
-    addonAfter,
-    className,
-    classNames,
-    ...rest
-  } = props;
+const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
+  (props, ref) => {
+    const {
+      disabled,
+      style,
+      value,
+      prefix,
+      suffix,
+      addonBefore,
+      addonAfter,
+      className,
+      classNames,
+      ...rest
+    } = props;
 
-  const holderRef = React.useRef<HolderRef>(null);
-  const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
-  const inputFocusRef = React.useRef<HTMLInputElement>(null);
+    const holderRef = React.useRef<HolderRef>(null);
+    const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
+    const inputFocusRef = React.useRef<HTMLInputElement>(null);
 
-  const focus = (option?: InputFocusOptions) => {
-    if (inputFocusRef.current) {
-      triggerFocus(inputFocusRef.current, option);
-    }
-  };
+    const focus = (option?: InputFocusOptions) => {
+      if (inputFocusRef.current) {
+        triggerFocus(inputFocusRef.current, option);
+      }
+    };
 
-  React.useImperativeHandle(ref, () => {
-    const target = inputFocusRef.current;
-    if (!target) {
-      return {} as InputNumberRef;
-    }
+    React.useImperativeHandle(ref, () => {
+      const target = inputFocusRef.current;
+      if (!target) {
+        return {} as InputNumberRef;
+      }
 
-    return proxyObject(target, {
-      focus,
-      blur: () => target.blur(),
-      nativeElement:
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        holderRef.current?.nativeElement || inputNumberDomRef.current || target,
+      return proxyObject(target, {
+        focus,
+        // blur: () => target.blur(),
+        nativeElement:
+          holderRef.current?.nativeElement ||
+          inputNumberDomRef.current ||
+          target,
+      });
     });
-  });
-  // React.useImperativeHandle(ref, () =>
-  //   proxyObject(inputFocusRef.current, {
-  //     focus,
-  //     nativeElement:
-  //       holderRef.current?.nativeElement || inputNumberDomRef.current,
-  //   }),
-  // );
+    // React.useImperativeHandle(ref, () =>
+    //   proxyObject(inputFocusRef.current ?? {} as InputNumberRef, {
+    //     focus: () => void 0,
+    //     blur: () => void 0,
+    //     nativeElement:
+    //       holderRef.current?.nativeElement ||
+    //       inputNumberDomRef.current ||
+    //       {} as HTMLInputElement,
+    //     // focus: (option) => focus(option),
+    //     // nativeElement:
+    //     //   holderRef.current?.nativeElement || inputNumberDomRef.current,
+    //   }),
+    // );
 
-  return (
-    <BaseInput
-      className={className}
-      triggerFocus={focus}
-      value={value}
-      disabled={disabled}
-      style={style}
-      prefix={prefix}
-      suffix={suffix}
-      addonAfter={addonAfter}
-      addonBefore={addonBefore}
-      classNames={classNames}
-      components={{
-        affixWrapper: "div",
-        groupWrapper: "div",
-        wrapper: "div",
-        groupAddon: "div",
-      }}
-      ref={holderRef}
-    >
-      <InternalInputNumber
+    return (
+      <BaseInput
+        className={className}
+        triggerFocus={focus}
+        value={value}
         disabled={disabled}
-        ref={inputFocusRef}
-        domRef={inputNumberDomRef}
-        // className={classNames?.input}
-        classNames={{
-          input: classNames?.input,
+        style={style}
+        prefix={prefix}
+        suffix={suffix}
+        addonAfter={addonAfter}
+        addonBefore={addonBefore}
+        classNames={classNames}
+        components={{
+          affixWrapper: "div",
+          groupWrapper: "div",
+          wrapper: "div",
+          groupAddon: "div",
         }}
-        {...rest}
-      />
-    </BaseInput>
-  );
-}) as <T extends ValueType = ValueType>(
+        ref={holderRef}
+      >
+        <InternalInputNumber
+          disabled={disabled}
+          ref={inputFocusRef}
+          domRef={inputNumberDomRef}
+          // className={classNames?.input}
+          classNames={{
+            input: classNames?.input,
+          }}
+          {...rest}
+        />
+      </BaseInput>
+    );
+  },
+) as <T extends ValueType = ValueType>(
   props: React.PropsWithChildren<InputNumberProps<T>> & {
     ref?: React.Ref<HTMLInputElement>;
   },
 ) => React.ReactElement;
-export { InputNumber };
+export default InputNumber;
 export type { InputNumberProps };
 
 export { type ValueType } from "@rc-component/mini-decimal";

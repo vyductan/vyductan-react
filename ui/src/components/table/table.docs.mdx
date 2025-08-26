@@ -1,0 +1,246 @@
+# Table
+
+Build a Table component with an API compatible with Ant Design, but use @tanstack/react-table internally for processing and rendering.
+
+### Basic Usage
+
+Simple table with actions.
+
+```tsx
+import {Table} from "@/components/ui/table"
+
+<Table
+  rowKey="id"
+  dataSource={[
+    {
+      id: "1"
+      name: "John Doe",
+    },
+  ]}
+  columns={[
+    {
+      title: "Name",
+      dataIndex: "name",
+      align: "center",
+      render: (_, record) => <div>{record.name}</div>,
+    },
+  ]}
+/>
+```
+
+### sorter
+
+Use `sorter` to make a column sortable. sorter can be a function of the type sorter: function(rowA, rowB) { ... } for sorting data locally.
+
+`sortDirections: ['ascend', 'descend']` defines available sort methods for each columns, effective for all columns when set on table props. You can set as ['ascend', 'descend', 'ascend'] to prevent sorter back to default status.
+
+Use `defaultSortOrder` to make a column sorted by default.
+
+If a `sortOrder` or `defaultSortOrder` is specified with the value ascend or descend, you can access this value from within the function passed to the sorter as explained above. Such a function can take the form: function(a, b, sortOrder) { ... }.
+
+```tsx
+<Table
+  columns={[
+    {
+      title: "Name",
+      dataIndex: "name",
+      sorter: (a, b) => a.name.length - b.name.length,
+      sortDirections: ["descend"],
+    },
+  ]}
+/>
+```
+
+### Multiple Sorter
+
+```tsx
+<Table
+  columns={[
+    {
+      render: (_, record) => (
+        <div className="group-hover:bg-red-500">{record.name}</div>
+      ),
+      sorter: {
+        multiple: 1,
+      },
+    },
+  ]}
+/>
+```
+
+### Multiple Sorter
+
+`Column.sorter` support multiple to config the priority of sort columns. Though `sorter.compare` to customize compare function. You can also leave it empty to use the interactive only.
+
+```tsx
+<Table
+  columns={[
+    {
+      sorter: {
+        compare: (a, b) => a.last - b.last,
+        multiple: 1,
+      },
+    },
+    {
+      sorter: {
+        compare: (a, b) => a.first - b.first,
+        multiple: 2,
+      },
+    },
+  ]}
+/>
+```
+
+### Tree Data
+
+Display tree structure data in Table when there is field key `children` in dataSource, try to customize `childrenColumnName` property to avoid tree table structure.
+
+You can control the indent width by setting `indentSize`.
+
+```tsx
+<Table
+  indentSize={20}
+  childrenColumnName="children"
+  dataSource={[
+    {
+      id: "1"
+      name: "John Doe",
+      children: [
+        {
+          id: "1-1"
+          name: "John Doe 1",
+        },
+      ],
+    },
+  ]}
+  columns={[
+    {
+      title: "Name",
+      dataIndex: "name",
+    },
+  ]}
+/>
+```
+
+### Drag sorting with handler
+
+Alternatively you can implement drag sorting with handler using dnd-kit.
+
+```tsx
+import { TableSortableRow } from "@acme/ui/components/table";
+import { DndContext, restrictToVerticalAxis } from "@dnd-kit/core";
+import { verticalListSortingStrategy } from "@dnd-kit/sortable";
+
+return (
+  <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
+    <SortableContext
+      items={dataSource.map((i) => i.key)}
+      strategy={verticalListSortingStrategy}
+    >
+      <Table
+        components={{
+          body: {
+            row: TableSortableRow,
+          },
+        }}
+        columns={[
+          {
+            title: "Name",
+            dataIndex: "name",
+            sorter: true,
+            sortDirections: ["ascend", "descend"],
+            defaultSortOrder: "ascend",
+          },
+        ]}
+      />
+    </SortableContext>
+  </DndContext>
+);
+```
+
+### Row hover (group)
+
+```tsx
+<Table
+  classNames={{
+    row: "group",
+  }}
+  columns={[
+    {
+      render: (_, record) => (
+        <div className="group-hover:bg-red-500">{record.name}</div>
+      ),
+    },
+  ]}
+/>
+```
+
+### Title collapsible
+
+```tsx
+const BodyWrapper = (props: TableBodyProps) => {
+  return (
+    <CollapsibleContent asChild>
+      <tbody {...props} />
+    </CollapsibleContent>
+  );
+};
+
+const columns = [
+  {
+        title: (
+          <>
+            <CollapsibleTrigger
+              onClick={() => {
+                setCollapsed(
+                  `${id}_${forCompleted ? "completed" : "active"}`,
+                );
+              }}
+            >
+              {(forCompleted ? isCompletedCollapsed : isActiveCollapsed) ? (
+                <Icon icon="icon-[lucide--chevron-down]" />
+              ) : (
+                <Icon icon="icon-[lucide--chevron-right]" />
+              )}
+            </CollapsibleTrigger>
+            <span>{forCompleted ? "Completed" : "Active"} tasks</span>{" "}
+            <Badge
+              count={forCompleted ? completedTasks.length : activeTasks.length}
+            />
+          </>
+        ),
+]
+
+return       <CollapsibleRoot open={isActiveCollapsed}>
+        <Table
+          rowKey="key"
+          dataSource={groupedTasks}
+          columns={getColumns(false)}
+          components={{
+            body: {
+              wrapper: BodyWrapper,
+            },
+          }}
+        />
+      </CollapsibleRoot>
+```
+
+## isPlaceholderData
+
+```tsx
+isPlaceholderData: keepPreviousData
+
+Loading will be: `query.isLoading || query.isPlaceholderData`
+```
+
+```
+
+```
+
+### Fix loses input focus
+
+use `useMemo` for columns def variable
+
+```tsx
+const columns = useMemo(() => [], []);
+```

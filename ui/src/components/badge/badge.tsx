@@ -1,24 +1,17 @@
-import type { BadgeProps as ShadcnBadgeProps } from "@acme/ui/shadcn/badge";
-import { Badge as ShadcnBadge } from "@acme/ui/shadcn/badge";
-
-export type BadgeProps = ShadcnBadgeProps & {
+export type BadgeProps = React.ComponentProps<"span"> & {
   count?: React.ReactNode;
 
   /** Set offset of the badge dot [left, top] */
   offset?: [number, number];
 };
-export const Badge = ({
+export const InternalBadge = ({
   count,
   children,
   offset,
   ...restProps
 }: BadgeProps) => {
-  const isBadgeShadcn = !count;
-  if (isBadgeShadcn)
-    return <ShadcnBadge {...restProps}>{children}</ShadcnBadge>;
-
   return (
-    <span className="relative">
+    <span className="relative" {...restProps}>
       {children}
       <span
         className="absolute end-0 top-0 origin-[100%_0%] translate-x-1/2 -translate-y-1/2"

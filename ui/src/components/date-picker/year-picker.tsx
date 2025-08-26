@@ -1,145 +1,46 @@
-import type { ForwardedRef } from "react";
-import React from "react";
-import { useMergedState } from "@rc-component/util";
+"use client";
 
-import { cn } from "@acme/ui/lib/utils";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
+import * as React from "react";
 
-import { Icon } from "../../icons";
-import { inputSizeVariants, inputVariants } from "../input";
-import { Popover } from "../popover";
-import { Panel } from "./_components/panel";
+import type { DatePickerProps } from "./date-picker";
+import { DatePicker } from "./date-picker";
 
-type YearPickerProps = {
-  id?: string;
-  open?: boolean;
-
-  value?: number;
-  onChange?: (value?: number) => void;
+export type YearPickerProps = Omit<
+  DatePickerProps<Dayjs>,
+  "picker" | "value" | "onChange" | "showTime"
+> & {
+  value?: number | Dayjs;
+  onChange?: (value?: number | Dayjs) => void;
+  format?: string;
 };
-const YearPickerInternal = (
-  {
-    id: inputId,
-    open: openProp,
 
-    value,
-    onChange,
-  }: YearPickerProps,
-  ref: ForwardedRef<HTMLDivElement>,
-) => {
-  const [open, setOpen] = useMergedState(false, {
-    value: openProp,
-  });
+function toDayjsYear(value?: number | Dayjs): Dayjs | undefined {
+  if (typeof value === "number") {
+    return dayjs().year(value).startOf("year");
+  }
+  if (value && dayjs.isDayjs(value)) {
+    return value.startOf("year");
+  }
+  return undefined;
+}
 
-  // const [currentYear, setCurrentYear] = React.useState(
-  //   new Date().getFullYear(),
-  // );
-  const [currentDecadeRange, setCurrentDecadeRange] = React.useState<number[]>(
-    getCurrentDecadeRange(new Date().getFullYear()),
-  );
+export function YearPicker({ value, onChange, format = "YYYY", ...rest }: YearPickerProps) {
+  const djValue = React.useMemo(() => toDayjsYear(value), [value]);
 
   return (
-    <Popover
-      open={open}
-      className="w-auto p-0"
-      trigger="click"
-      placement="bottomLeft"
-      onInteractOutside={(event) => {
-        if (
-          event.target &&
-          "id" in event.target &&
-          event.target.id !== inputId
-        ) {
-          setOpen(false);
-        }
+    <DatePicker
+      {...rest}
+      picker="year"
+      // Commit immediately when picking a year
+      commitYearOnClose
+      value={djValue}
+      format={format}
+      onChange={(d) => {
+        // Always emit Dayjs at start of year (demo and docs handle either number or Dayjs)
+        onChange?.(d ? d.startOf("year") : undefined);
       }}
-      onOpenAutoFocus={(event) => {
-        event.preventDefault();
-      }}
-      content={
-        <Panel
-          title={currentDecadeRange[0] + " - " + currentDecadeRange[9]}
-          onNavigationLeftClick={() => {
-            setCurrentDecadeRange(
-              getCurrentDecadeRange(currentDecadeRange[0]! - 10),
-            );
-          }}
-          onNavigationRightClick={() => {
-            setCurrentDecadeRange(
-              getCurrentDecadeRange(currentDecadeRange[0]! + 10),
-            );
-          }}
-          classNames={{
-            content: "grid grid-cols-3",
-          }}
-        >
-          {[
-            currentDecadeRange.at(0)! - 1,
-            ...currentDecadeRange,
-            currentDecadeRange.at(-1)! + 1,
-          ].map((number_, index) => {
-            // const monthString = format(new Date(currentYear, index, 1), "MMM");
-            return (
-              <div
-                key={index}
-                className="cursor-pointer p-4"
-                onClick={() => {
-                  onChange?.(number_);
-                  setOpen(false);
-                }}
-              >
-                <div
-                  className={cn(
-                    "hover:bg-background-hover rounded-md px-4 py-0.5",
-                    number_ === new Date().getFullYear() && "bg-background",
-                    value === index &&
-                      "bg-primary-600 hover:bg-primary-600 text-white",
-                  )}
-                >
-                  {number_}
-                </div>
-              </div>
-            );
-          })}
-        </Panel>
-      }
-    >
-      <div
-        ref={ref}
-        className={cn(
-          inputVariants(),
-          inputSizeVariants(),
-          "gap-2",
-          // "grid grid-cols-[1fr_16px_1fr] items-center gap-2",
-        )}
-        onClick={() => {
-          if (!open) setOpen(true);
-        }}
-      >
-        <div>
-          <span>{value}</span>
-        </div>
-        <Icon
-          icon="icon-[mingcute--calendar-2-line]"
-          className="my-0.5 ml-auto size-4 opacity-50"
-        />
-      </div>
-    </Popover>
+    />
   );
-};
-export const YearPicker = React.forwardRef(YearPickerInternal) as (
-  props: YearPickerProps & {
-    ref?: React.ForwardedRef<HTMLInputElement>;
-  },
-) => ReturnType<typeof YearPickerInternal>;
-
-function getCurrentDecadeRange(currentYear: number): number[] {
-  const startYear = Math.floor(currentYear / 10) * 10; // Get the start year of the decade
-  const endYear = startYear + 9; // Get the end year of the decade
-  const years: number[] = [];
-
-  for (let year = startYear; year <= endYear; year++) {
-    years.push(year);
-  }
-
-  return years;
 }

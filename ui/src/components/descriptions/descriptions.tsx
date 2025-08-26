@@ -7,6 +7,7 @@ import type { Screens } from "@acme/ui/types";
 import { useResponsive } from "@acme/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../config-provider/size-context";
 import { Skeleton } from "../skeleton";
 
 export type DescriptionsItem = {
@@ -29,7 +30,7 @@ type DescriptionProps = {
   bordered?: boolean;
   column?: number | Partial<Record<Screens, number>>;
   layout?: "horizontal" | "vertical";
-  size?: "sm" | "default";
+  size?: SizeType;
   classNames?: {
     header?: string;
     title?: string;
@@ -93,8 +94,19 @@ export const Descriptions = ({
     bordered && "overflow-hidden rounded-md border",
     classNames?.view,
   );
-  const labelClassName = cn("text-muted-foreground", classNames?.label);
-  const valueClassName = cn(classNames?.value);
+  const labelClassName = cn(
+    "text-muted-foreground inline-flex items-baseline font-medium",
+    [
+      "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
+      layout === "horizontal" && "after:mr-2",
+      colon === false && "after:content-['']",
+    ],
+    classNames?.label,
+  );
+  const contentClassName = cn(
+    "inline-flex items-baseline min-w-[1em]",
+    classNames?.content,
+  );
   const tbodyClassName = cn(
     layout === "horizontal" && [
       bordered &&
@@ -105,24 +117,24 @@ export const Descriptions = ({
     "text-start text-sm font-normal",
     layout === "horizontal" && [
       bordered && ["px-6", "border-b border-e bg-surface-secondary"],
-      size === "sm" && "py-2",
-      size === "default" || (!size && "py-3"),
+      size === "small" && "py-2",
+      size === "middle" || (!size && "py-3"),
     ],
     layout === "vertical" && [
-      "pb-1 pl-3 font-medium first:pl-0 last:pr-0",
+      "pb-1 pl-3 first:pl-0 last:pr-0",
       bordered && "px-6",
     ],
     classNames?.th,
     labelClassName,
   );
   const tdClassName = cn(
-    "break-all",
+    "break-all text-sm",
     layout === "horizontal" && [
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
       bordered && ["px-6", "border-b border-e"],
-      size === "sm" && "py-2",
-      size === "default" || (!size && "py-3"),
+      size === "small" && "py-2",
+      size === "middle" || (!size && "py-3"),
     ],
     layout === "vertical" && [
       "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
@@ -257,18 +269,47 @@ function createVerticalRows(
   columns: number,
 ): VerticalRow[] {
   const rows: VerticalRow[] = [];
-  for (let index = 0; index < data.length; index += columns) {
-    const labels = data.slice(index, index + columns).map((item) => ({
-      span: item.span,
+  let currentRowLabels: VerticalCell[] = [];
+  let currentRowValues: VerticalCell[] = [];
+  let currentRowSpan = 0;
+
+  // Process each item and create rows based on column spans
+  for (const item of data) {
+    const itemSpan = item.span ?? 1;
+
+    // If adding this item would exceed the column limit, start new rows
+    if (currentRowSpan + itemSpan > columns) {
+      // Add the current rows if they have content
+      if (currentRowLabels.length > 0) {
+        rows.push([...currentRowLabels], [...currentRowValues]);
+      }
+
+      // Reset for new rows
+      currentRowLabels = [];
+      currentRowValues = [];
+      currentRowSpan = 0;
+    }
+
+    // Add item to current rows
+    currentRowLabels.push({
+      span: itemSpan,
       content: item.label,
       className: item.classNames?.label,
-    }));
-    const childrens = data.slice(index, index + columns).map((item) => ({
-      span: item.span,
+    });
+
+    currentRowValues.push({
+      span: itemSpan,
       content: item.children,
-      className: item.classNames?.value,
-    }));
-    rows.push(labels, childrens);
+      className: item.classNames?.content,
+    });
+
+    currentRowSpan += itemSpan;
   }
+
+  // Add the last rows if they have content
+  if (currentRowLabels.length > 0) {
+    rows.push(currentRowLabels, currentRowValues);
+  }
+
   return rows;
 }

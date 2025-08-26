@@ -1,0 +1,241 @@
+# Button Component Documentation
+
+## Overview
+A versatile button component that combines Ant Design's API with Shadcn UI's styling system. Supports multiple variants, sizes, states, and composition patterns.
+
+## Import
+
+```tsx
+import { Button } from "@acme/ui/components/button";
+```
+
+## Basic Usage
+
+```tsx
+<Button>Default Button</Button>
+<Button variant="primary">Primary Button</Button>
+<Button variant="outline">Outline Button</Button>
+<Button variant="ghost">Ghost Button</Button>
+```
+
+## API Reference
+
+### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `"default" \| "outline" \| "ghost" \| "link" \| "destructive"` | `"default"` | Button visual variant |
+| `size` | `"default" \| "small" \| "large" \| "icon" \| "middle" \| "sm"` | `"middle"` | Button size |
+| `color` | `"default" \| "danger" \| "success" \| "link"` | `"default"` | Button color theme |
+| `shape` | `"default" \| "circle" \| "round"` | `"default"` | Button shape |
+| `type` | `HtmlType \| ButtonType` | `"default"` | Button type (HTML or custom) |
+| `htmlType` | `"button" \| "submit" \| "reset"` | `"button"` | HTML button type |
+| `loading` | `boolean` | `false` | Show loading spinner |
+| `disabled` | `boolean` | `false` | Disable button |
+| `icon` | `React.ReactNode` | - | Icon element |
+| `href` | `string` | - | Make button act as link |
+| `asChild` | `boolean` | `false` | Use Slot for composition |
+| `primary` | `boolean` | - | Primary styling (legacy) |
+| `srOnly` | `boolean` | `false` | Screen reader only text |
+| `classNames` | `object` | - | Custom class names |
+
+## Examples
+
+### Variants
+
+```tsx
+<Button variant="default">Default</Button>
+<Button variant="primary">Primary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+<Button variant="destructive">Destructive</Button>
+```
+
+### Sizes
+
+```tsx
+<Button size="small">Small</Button>
+<Button size="sm">Small (alias)</Button>
+<Button size="middle">Middle</Button>
+<Button size="default">Default</Button>
+<Button size="large">Large</Button>
+<Button size="icon">
+  <Icon icon="icon-[lucide--plus]" />
+</Button>
+```
+
+### Colors
+
+```tsx
+<Button color="default">Default</Button>
+<Button color="danger">Danger</Button>
+<Button color="success">Success</Button>
+<Button color="link">Link</Button>
+```
+
+### Shapes
+
+```tsx
+<Button shape="default">Default</Button>
+<Button shape="round">Round</Button>
+<Button shape="circle" size="icon">
+  <Icon icon="icon-[lucide--plus]" />
+</Button>
+```
+
+### With Icons
+
+```tsx
+import { Icon } from "@acme/ui/icons";
+
+<Button icon={<Icon icon="icon-[lucide--plus]" />}>
+  Add Item
+</Button>
+
+<Button size="icon">
+  <Icon icon="icon-[lucide--settings]" />
+</Button>
+```
+
+### Loading State
+
+```tsx
+<Button loading>Loading...</Button>
+<Button loading disabled>
+  Processing
+</Button>
+```
+
+### As Link
+
+```tsx
+<Button href="/dashboard">Go to Dashboard</Button>
+<Button href="https://example.com" variant="link">
+  External Link
+</Button>
+```
+
+### Composition with asChild
+
+```tsx
+<Button asChild>
+  <a href="/profile">
+    <Icon icon="icon-[lucide--user]" />
+    Profile
+  </a>
+</Button>
+```
+
+### Form Integration
+
+```tsx
+<form>
+  <Button htmlType="submit" variant="primary">
+    Submit Form
+  </Button>
+  <Button htmlType="reset" variant="outline">
+    Reset
+  </Button>
+</form>
+```
+
+### Screen Reader Only Text
+
+```tsx
+<Button srOnly size="icon">
+  Settings
+  <Icon icon="icon-[lucide--settings]" />
+</Button>
+```
+
+### Custom Styling
+
+```tsx
+<Button 
+  classNames={{
+    variants: {
+      // Custom Tailwind Variants configuration
+    }
+  }}
+  className="custom-button-class"
+>
+  Custom Button
+</Button>
+```
+
+## Advanced Usage
+
+### Button Groups (Future)
+
+```tsx
+// Coming soon
+<Button.Group>
+  <Button>Left</Button>
+  <Button>Middle</Button>
+  <Button>Right</Button>
+</Button.Group>
+```
+
+### With Tooltips
+
+```tsx
+import { Tooltip } from "@acme/ui/components/tooltip";
+
+<Tooltip content="Click to save">
+  <Button size="icon">
+    <Icon icon="icon-[lucide--save]" />
+  </Button>
+</Tooltip>
+```
+
+## Accessibility
+
+- Supports all standard button ARIA attributes
+- Proper focus management and keyboard navigation
+- Screen reader friendly with `srOnly` prop
+- Loading state announcements
+- Disabled state handling
+
+## Styling System
+
+The button uses Tailwind Variants for consistent styling:
+
+- Base styles for common properties
+- Variant-based conditional styling
+- Responsive design support
+- Dark mode compatibility
+- Custom theme integration
+
+## Type Safety
+
+Full TypeScript support with:
+- Strict prop typing
+- Variant inference
+- Composition pattern types
+- HTML attribute inheritance
+
+## Performance
+
+- Optimized re-renders with React.forwardRef
+- Lazy icon loading support
+- Minimal bundle impact
+- Efficient class name generation
+
+## Browser Support
+
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile browsers
+- Accessibility tools compatibility
+
+## Migration Notes
+
+### From Ant Design Button
+- Most props are compatible
+- `type` prop behavior slightly different
+- Custom styling approach changed
+
+### From Shadcn Button  
+- Enhanced API with more variants
+- Additional size options
+- Better composition support

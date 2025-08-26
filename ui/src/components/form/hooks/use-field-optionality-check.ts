@@ -1,11 +1,13 @@
-import type { ZodSchema } from "zod";
+import type { ZodType } from "zod/v4";
 import { useMemo } from "react";
 import _ from "lodash";
 import { ZodOptional } from "zod";
 
 const TEMPORARY_REPLACEMENT_PLACEHOLDER = "__PLACEHOLDER__";
 const ZOD_OBJECT_FIELD_PATH = ".shape.";
-const ZOD_ARRAY_FIELD_PATH = "._def.type";
+// const ZOD_ARRAY_FIELD_PATH_1 = "._def.type";
+// maybe for refine()
+const ZOD_ARRAY_FIELD_PATH = "._def.type._def.schema";
 
 export const generateZodFieldPath = (fieldName: string) => {
   return fieldName
@@ -24,7 +26,7 @@ const handleNotFoundField = (fieldName: string) => {
 };
 export const useFieldOptionalityCheck = (
   fieldName: string | undefined,
-  schema?: ZodSchema,
+  schema?: ZodType,
 ) => {
   return useMemo(() => {
     if (!fieldName || !schema) {

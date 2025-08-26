@@ -12,8 +12,12 @@ import {
 
 import type { TabsType } from "./types";
 
-type TabsRootProps = React.ComponentProps<typeof Tabs>;
-const TabsRoot = Tabs;
+type TabsRootProps = React.ComponentProps<typeof Tabs> & {
+  type?: TabsType;
+};
+const TabsRoot = ({ className, type = "line", ...props }: TabsRootProps) => (
+  <Tabs {...props} className={cn(type === "line" && "gap-4", className)} />
+);
 
 type TabsListProps = React.ComponentProps<typeof ShadcnTabsList> & {
   type?: TabsType;

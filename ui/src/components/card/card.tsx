@@ -3,16 +3,17 @@ import React, { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { CardRootProps } from "./_component";
+import type { CardRootProps } from "./_components";
 import { Skeleton } from "../skeleton";
 import {
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardRoot,
   CardTitle,
-} from "./_component";
+} from "./_components";
 import { CardContext } from "./context";
 
 type CardProps = Omit<CardRootProps, "title"> & {
@@ -40,6 +41,7 @@ const Card = ({
   children,
   extra,
   footer,
+  className,
 
   ...props
 }: CardProps) => {
@@ -61,32 +63,50 @@ const Card = ({
     if (isValidElement(child)) {
       const type =
         typeof child.type === "string" ? child.type : child.type.name;
-      return type === "CardContent";
+      return (
+        type === "CardContent" ||
+        type === "CardHeader" ||
+        type === "CardFooter" ||
+        type === "CardTitle" ||
+        type === "CardDescription"
+      );
     }
     return false;
   });
 
   if (isShadcnCard) {
-    CardRender = <CardRoot {...props}>{children}</CardRoot>;
+    CardRender = (
+      <CardRoot className={className} {...props}>
+        {children}
+      </CardRoot>
+    );
   }
 
   if (!isShadcnCard) {
+    const hasExtra = !!extra;
+
     CardRender = (
-      <CardRoot {...props}>
+      <CardRoot className={className} {...props}>
         {(!!title || !!description || !!extra) && (
-          <CardHeader className={cn(classNames?.header)}>
-            <div className="flex items-center">
-              <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
-              {extra && <div className="ml-auto">{extra}</div>}
-            </div>
+          <CardHeader
+            className={cn(hasExtra && "items-center", classNames?.header)}
+          >
+            <CardTitle className={cn(classNames?.title)}>{title}</CardTitle>
             {description && (
               <CardDescription className={cn(classNames?.description)}>
                 {description}
               </CardDescription>
             )}
+            {extra && (
+              <CardAction className={cn(hasExtra && "self-center")}>
+                {extra}
+              </CardAction>
+            )}
           </CardHeader>
         )}
-        <CardContent className={classNames?.content}>{children}</CardContent>
+        <CardContent className={cn(classNames?.content)}>
+          {children}
+        </CardContent>
         {footer && (
           <CardFooter className={classNames?.footer}>{footer}</CardFooter>
         )}

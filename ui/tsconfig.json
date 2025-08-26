@@ -4,7 +4,11 @@
   "compilerOptions": {
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "@/components/ui/*": ["./src/components/*"],
+      "@/lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]

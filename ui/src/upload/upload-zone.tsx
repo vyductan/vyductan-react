@@ -6,7 +6,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { UploadFileItem, UploadService } from "./types";
 import { Card } from "../components/card";
 // import { Icon } from "../icons";
-import { message } from "../components/toast";
+import { message } from "../components/message";
 import ProgressBar from "./_components/progress-bar";
 
 type UploadZoneProps = Omit<

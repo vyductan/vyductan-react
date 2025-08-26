@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { z } from "zod";
+import { z } from "zod/v4";
 
-import { notification } from "../../toast";
+import { notification } from "../../notification";
 import { useFormContext } from "../context";
 
 export const FormErrorsNotification = () => {
@@ -18,7 +18,7 @@ export const FormErrorsNotification = () => {
     ) {
       // Get the required fields from Zod schema
       const requiredFields = Object.keys(formSchema.shape).filter((key) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const field = formSchema.shape[key as keyof typeof formSchema.shape];
         return !(field instanceof z.ZodOptional);
       });
