@@ -76,7 +76,10 @@ export const Popover = (props: PopoverProps) => {
   const sideOffset = domAlign?.offset?.[1];
 
   return (
-    <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
+    <PopoverRoot
+      open={trigger === "hover" ? debouncedOpen : open}
+      onOpenChange={setOpen}
+    >
       <PopoverTrigger
         asChild
         {...(trigger === "hover"
