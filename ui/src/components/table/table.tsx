@@ -1150,6 +1150,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                               if (selection?.type === "Range") {
                                 return;
                               }
+                              // Keep internal expandedKeys and TanStack row state in sync
+                              onTriggerExpand(row.original, e as any);
                               row.getToggleExpandedHandler()();
                               // row.getToggleExpandedHandler()();
                             }
