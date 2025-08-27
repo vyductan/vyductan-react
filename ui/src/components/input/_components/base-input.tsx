@@ -65,7 +65,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       cn(
         (inputElement as ReactElement<{ className?: string } | undefined>).props
           ?.className,
-        !hasAffix && classNames?.variant,
+        !hasAffix && [className, classNames?.variant],
       ) || null,
   });
 
