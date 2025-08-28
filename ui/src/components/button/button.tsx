@@ -312,7 +312,7 @@ const buttonVariants = tv({
     {
       variant: "link",
       color: "default",
-      className: ["", "hover:text-primary"],
+      className: ["text-primary", "hover:text-primary-hover"],
     },
     // Size
     {
