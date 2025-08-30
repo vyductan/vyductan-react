@@ -63,6 +63,7 @@ type SelectProps<
 
     allowClear?: boolean;
     loading?: boolean;
+    suffixIcon?: React.ReactNode;
 
     className?: string;
     styles?: Partial<Record<SemanticName, React.CSSProperties>> & {
