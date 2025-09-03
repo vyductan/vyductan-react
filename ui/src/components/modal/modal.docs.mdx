@@ -1,0 +1,219 @@
+# Modal Component
+
+The Modal component provides a flexible dialog interface for displaying content in an overlay. It supports both declarative usage and imperative confirm dialogs through the App context.
+
+## Features
+
+- 🎯 **Declarative Modal** - Use as a regular React component
+- 🚀 **Imperative Confirm** - Use `App.useApp().modal.confirm()` for quick confirmations
+- 🎨 **Customizable** - Support for custom width, classNames, and styling
+- ♿ **Accessible** - Built with accessibility in mind
+- 📱 **Responsive** - Works on all screen sizes
+
+## Basic Usage
+
+### Declarative Modal
+
+```tsx
+import { Modal, Button } from '@acme/ui';
+
+function MyComponent() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Modal</Button>
+      
+      <Modal
+        open={open}
+        title="My Modal"
+        onOk={() => {
+          // Handle OK action
+          setOpen(false);
+        }}
+        onCancel={() => setOpen(false)}
+        onOpenChange={setOpen}
+      >
+        <p>Modal content goes here</p>
+      </Modal>
+    </>
+  );
+}
+```
+
+### Imperative Confirm Dialog
+
+```tsx
+import { App } from '@acme/ui';
+
+function MyComponent() {
+  const { modal } = App.useApp();
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: 'Delete Item',
+      content: 'Are you sure you want to delete this item?',
+      onOk: () => {
+        // Handle delete action
+        console.log('Item deleted');
+      },
+      onCancel: () => {
+        console.log('Delete cancelled');
+      },
+    });
+  };
+
+  return (
+    <Button onClick={handleDelete} danger>
+      Delete Item
+    </Button>
+  );
+}
+```
+
+## API Reference
+
+### Modal Props
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `open` | `boolean` | `false` | Whether the modal is visible |
+| `title` | `ReactNode` | - | The modal title |
+| `width` | `string \| number \| ResponsiveWidth` | `520` | Width of the modal |
+| `onOk` | `() => void` | - | Callback when OK button is clicked |
+| `onCancel` | `() => void` | - | Callback when Cancel button is clicked |
+| `onOpenChange` | `(open: boolean) => void` | - | Callback when modal visibility changes |
+| `okText` | `string` | `"OK"` | Text of the OK button |
+| `cancelText` | `string` | `"Cancel"` | Text of the Cancel button |
+| `confirmLoading` | `boolean` | `false` | Whether OK button is in loading state |
+| `footer` | `ReactNode \| null` | - | Custom footer content |
+| `className` | `string` | - | Additional CSS class for modal |
+| `classNames` | `ModalClassNames` | - | CSS classes for different parts |
+
+### ConfirmConfig (for modal.confirm)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `title` | `ReactNode` | `"Confirm"` | The confirm dialog title |
+| `content` | `ReactNode` | - | The confirm dialog content |
+| `onOk` | `() => void \| Promise<void>` | - | Callback when OK is clicked |
+| `onCancel` | `() => void` | - | Callback when Cancel is clicked |
+| `okText` | `string` | `"OK"` | Text of the OK button |
+| `cancelText` | `string` | `"Cancel"` | Text of the Cancel button |
+| `okType` | `"default" \| "primary" \| "danger"` | `"primary"` | Type of OK button |
+| `confirmLoading` | `boolean` | `false` | Whether OK button shows loading |
+
+## Examples
+
+### Custom Width
+
+```tsx
+<Modal
+  open={open}
+  title="Wide Modal"
+  width={800}
+  onOpenChange={setOpen}
+>
+  <p>This modal is 800px wide</p>
+</Modal>
+```
+
+### Responsive Width
+
+```tsx
+<Modal
+  open={open}
+  title="Responsive Modal"
+  width={{
+    xs: "90%",
+    sm: 600,
+    md: 800,
+    lg: 1000
+  }}
+  onOpenChange={setOpen}
+>
+  <p>This modal adapts to screen size</p>
+</Modal>
+```
+
+### Custom Footer
+
+```tsx
+<Modal
+  open={open}
+  title="Custom Footer"
+  footer={
+    <div className="flex justify-end gap-2">
+      <Button onClick={() => setOpen(false)}>
+        Custom Cancel
+      </Button>
+      <Button type="primary" onClick={handleSave}>
+        Save Changes
+      </Button>
+    </div>
+  }
+  onOpenChange={setOpen}
+>
+  <p>Modal with custom footer</p>
+</Modal>
+```
+
+### Async Confirm
+
+```tsx
+const { modal } = App.useApp();
+
+const handleAsyncAction = () => {
+  modal.confirm({
+    title: 'Async Action',
+    content: 'This will perform an async operation.',
+    onOk: async () => {
+      // This will show loading state automatically
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Async operation completed');
+    },
+  });
+};
+```
+
+## Requirements
+
+⚠️ **Important**: To use `modal.confirm()`, your app must be wrapped with the `App` component:
+
+```tsx
+import { App } from '@acme/ui';
+
+function Root() {
+  return (
+    <App>
+      <YourAppContent />
+    </App>
+  );
+}
+```
+
+## Styling
+
+The Modal component uses CSS classes that can be customized:
+
+```tsx
+<Modal
+  className="my-modal"
+  classNames={{
+    header: "my-modal-header",
+    title: "my-modal-title", 
+    description: "my-modal-description",
+    footer: "my-modal-footer"
+  }}
+>
+  {/* content */}
+</Modal>
+```
+
+## Accessibility
+
+- Modal traps focus within the dialog
+- Pressing Escape closes the modal
+- Clicking the backdrop closes the modal
+- Proper ARIA attributes are applied
+- Screen reader announcements are supported

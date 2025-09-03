@@ -2,8 +2,6 @@ import type { VariantProps } from "tailwind-variants";
 
 import type { inputSizeVariants } from "./components/input";
 
-export type AnyObject = Record<PropertyKey, any>;
-
 export type Direction = "ltr" | "rtl";
 
 export type Placement =

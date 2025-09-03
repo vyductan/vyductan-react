@@ -21,14 +21,10 @@ import type {
   ReactElement,
   ReactNode,
 } from "react";
-import type { VariantProps } from "tailwind-variants";
 
-import type { inputVariants } from "./input";
+import type { InputFocusOptions } from "./utils/common-utils";
+import type { InputStatus, InputVariant } from "./variants";
 
-export type InputRef = HTMLInputElement;
-
-// https://github.com/react-component/input/blob/master/src/interface.ts
-// Jul 16, 2024
 export interface CommonInputProps {
   prefix?: ReactNode;
   suffix?: ReactNode;
@@ -41,6 +37,8 @@ export interface CommonInputProps {
     groupWrapper?: string;
     wrapper?: string;
     variant?: string;
+
+    input?: string;
   };
   styles?: {
     affixWrapper?: CSSProperties;
@@ -52,19 +50,26 @@ export interface CommonInputProps {
 
 type DataAttribute = Record<`data-${string}`, string>;
 
-export type ValueType = InputHTMLAttributes<HTMLInputElement>["value"] | bigint;
+export type InputValueType =
+  | InputHTMLAttributes<HTMLInputElement>["value"]
+  | bigint;
 
 export type BaseInputProps = CommonInputProps & {
-  value?: ValueType | null;
-  className?: string;
-  style?: CSSProperties;
+  value?: InputValueType | null;
+
   disabled?: boolean;
+  hidden?: boolean;
+  status?: InputStatus;
+  variant?: InputVariant;
+  style?: CSSProperties;
+  className?: string;
+
   focused?: boolean;
   triggerFocus?: () => void;
   readOnly?: boolean;
   handleReset?: MouseEventHandler;
   onClear?: () => void;
-  hidden?: boolean;
+
   dataAttrs?: {
     affixWrapper?: DataAttribute;
   };
@@ -77,8 +82,42 @@ export type BaseInputProps = CommonInputProps & {
   children: ReactElement;
 };
 
-// const _InputStatuses = ["warning", "error", ""] as const;
-// export type InputStatus = (typeof _InputStatuses)[number];
-export type InputStatus = VariantProps<typeof inputVariants>["status"];
+export type ShowCountFormatter = (args: {
+  value: string;
+  count: number;
+  maxLength?: number;
+}) => ReactNode;
+export type ExceedFormatter = (
+  value: string,
+  config: {
+    max: number;
+  },
+) => string;
+export interface CountConfig {
+  max?: number;
+  strategy?: (value: string) => number;
+  show?: boolean | ShowCountFormatter;
+  /** Trigger when content larger than the `max` limitation */
+  exceedFormatter?: ExceedFormatter;
+}
 
-export type InputVariant = VariantProps<typeof inputVariants>["variant"];
+export interface InputRef {
+  focus: (options?: InputFocusOptions) => void;
+  blur: () => void;
+  setSelectionRange: (
+    start: number,
+    end: number,
+    direction?: "forward" | "backward" | "none",
+  ) => void;
+  select: () => void;
+  input: HTMLInputElement | null;
+  nativeElement: HTMLElement | null;
+
+  // extends react-hook-form
+  setCustomValidity: (msg: string) => void;
+  reportValidity: () => boolean | undefined;
+}
+
+export interface ChangeEventInfo {
+  source: "compositionEnd" | "change";
+}

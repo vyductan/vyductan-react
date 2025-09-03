@@ -27,9 +27,9 @@ export type PaginationProps = {
   className?: string;
 
   // control
-  defaultPage?: number;
+  defaultCurrent?: number;
+  current?: number;
   defaultPageSize?: number;
-  page?: number;
   pageSize?: number;
   total?: number;
   onChange?: (page: number, pageSize: number) => void;
@@ -62,8 +62,8 @@ export const Pagination = (props: PaginationProps) => {
     className,
 
     // control
-    page: pageProp,
-    defaultPage = 1,
+    current: currentProp,
+    defaultCurrent = 1,
     total = 0,
     pageSize: pageSizeProp = 10,
     defaultPageSize = 10,
@@ -94,8 +94,8 @@ export const Pagination = (props: PaginationProps) => {
   });
 
   const [current, setCurrent] = useMergedState<number>(1, {
-    value: pageProp,
-    defaultValue: defaultPage,
+    value: currentProp,
+    defaultValue: defaultCurrent,
     postState: (c) =>
       Math.max(1, Math.min(c, calculatePage(undefined, pageSize, total))),
   });

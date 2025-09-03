@@ -7,29 +7,27 @@ import React from "react";
 import { Tag, tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject } from "../..";
+import type { AnyObject } from "../_util/type";
 import type { SelectRootProps } from "../../shadcn/select";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { Option } from "./types";
-import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-  SelectValue,
-} from "../../shadcn/select";
+import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
 import { Empty } from "../empty";
+import { SelectTrigger, SelectValue } from "./_components";
 
 // export type SelectValue = React.ComponentProps<"select">["value"];
 // export type SelectSingleValue = string | number;
 // export type SelectMultipleValue = string[] | number[];
 // export type SelectMode = "default" | "multiple" | "tags";
 
-type SelectValue = string | number;
+type SemanticName = "root";
+type PopupSemantic = "root";
+
+type SelectValueType = string | number;
 type SelectShadcnProps = SelectRootProps;
 
 type SelectDefaultProps<
-  TValue extends SelectValue = string,
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode?: "default";
@@ -38,7 +36,7 @@ type SelectDefaultProps<
 };
 
 type SelectMultipleOrTagsProps<
-  TValue extends SelectValue = string,
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode: "multiple" | "tags";
@@ -49,8 +47,8 @@ type SelectMultipleOrTagsProps<
   ) => void;
 };
 
-export type SelectInternalProps<
-  TValue extends SelectValue = string,
+type SelectProps<
+  TValue extends SelectValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = XOR<
   SelectDefaultProps<TValue, TRecord>,
@@ -67,6 +65,12 @@ export type SelectInternalProps<
     loading?: boolean;
 
     className?: string;
+    styles?: Partial<Record<SemanticName, React.CSSProperties>> & {
+      popup?: Partial<Record<PopupSemantic, React.CSSProperties>>;
+    };
+    classNames?: Partial<Record<SemanticName, string>> & {
+      popup?: Partial<Record<PopupSemantic, string>>;
+    };
     empty?: React.ReactNode;
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     optionRender?: (option: Option<TValue, TRecord>) => React.ReactNode;
@@ -79,18 +83,21 @@ export type SelectInternalProps<
     //     : Option<TValue, TRecord>,
     // ) => void;
     // mode?: SelectMode;
+
+    // Base
+    showSearch?: boolean;
   };
 
-type SelectProps<
-  TValue extends SelectValue = number,
+type XorSelectProps<
+  TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
-> = XOR<SelectInternalProps<TValue, TRecord>, SelectShadcnProps>;
+> = XOR<SelectProps<TValue, TRecord>, SelectShadcnProps>;
 
 const Select = <
-  TValue extends SelectValue = number,
+  TValue extends SelectValueType = number,
   TRecord extends AnyObject = AnyObject,
 >(
-  props: SelectProps<TValue, TRecord>,
+  props: XorSelectProps<TValue, TRecord>,
 ) => {
   // const { mode, value, onChange } = props;
 
@@ -282,6 +289,7 @@ const Select = <
           }
           setKey(+Date.now());
         }}
+        value={value as string}
         {...restProps} // for form-control
       >
         {isMultiple ? (
@@ -290,7 +298,7 @@ const Select = <
               <Tag
                 key={index}
                 className="mr-1 py-0 leading-[22px]"
-                closeable
+                closeIcon
                 onClose={() => removeTag(tag)}
               >
                 {tag}
@@ -325,4 +333,5 @@ const Select = <
   );
 };
 
+export type { SelectProps, XorSelectProps };
 export { Select };

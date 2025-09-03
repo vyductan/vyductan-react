@@ -7,7 +7,7 @@ import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { Field, Form, useForm } from "@/components/ui/form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 import { InsertExampleSchema } from "~/api/example/validators";
 
@@ -29,7 +29,7 @@ const FormExample = ({ initialValues }: Props) => {
         message.success("Successfully!");
       },
       onError: (error) => {
-        apiErrorHandling({ error });
+        apiErrorHandling(error);
       },
     }),
   );
@@ -175,7 +175,7 @@ export const InvoicePeriodFormModal = ({
           await form.submit();
         }}
         okText="Submit"
-        okLoading={insertMutation.isPending}
+        confirmLoading={insertMutation.isPending}
       >
         <Form form={form}>
           <div className="grid grid-cols-1 gap-x-6 md:grid-cols-2">

@@ -3,7 +3,8 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ValueType } from "../form";
+import type { AbstractCheckboxProps } from "../checkbox";
+import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
 import { Label } from "../label";
 import {
@@ -12,18 +13,16 @@ import {
   radioColors,
 } from "./colors";
 
-type RadioProps = Omit<
-  React.ComponentProps<typeof RadioGroupPrimitive.Item>,
-  "value"
-> & {
+type RadioProps = AbstractCheckboxProps<RadioChangeEvent> & {
   label?: React.ReactNode;
-  value?: ValueType;
+  value?: any;
   color?: string;
   optionType?: "button";
   buttonStyle?: "solid";
   isActive?: boolean;
   preColor?: string;
 };
+
 const Radio = ({
   value,
   label,
@@ -34,6 +33,7 @@ const Radio = ({
   buttonStyle,
   isActive,
   preColor,
+  onChange,
   ...props
 }: RadioProps) => {
   if (optionType === "button" && buttonStyle) {
@@ -54,9 +54,31 @@ const Radio = ({
         )}
       >
         <RadioGroupPrimitive.Item
-          value={value as string}
+          value={value}
           disabled={disabled}
           {...props}
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            if (disabled) return;
+            const event = {
+              target: {
+                ...props,
+                value,
+                label,
+                disabled,
+                color,
+                optionType,
+                buttonStyle,
+                isActive,
+                preColor,
+                checked: true,
+              },
+              stopPropagation: () => e.stopPropagation(),
+              preventDefault: () => e.preventDefault(),
+              nativeEvent: e.nativeEvent,
+            };
+            onChange?.(event);
+            props.onClick?.(e);
+          }}
         >
           <Label asChild>
             <span>{label}</span>
@@ -80,12 +102,34 @@ const Radio = ({
     >
       <RadioGroupPrimitive.Item
         data-slot="radio-group-item"
-        value={value as string}
+        value={value}
         className={cn(
           "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
         )}
         disabled={disabled}
         {...props}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+          if (disabled) return;
+          const event = {
+            target: {
+              ...props,
+              value,
+              label,
+              disabled,
+              color,
+              optionType,
+              buttonStyle,
+              isActive,
+              preColor,
+              checked: true,
+            },
+            stopPropagation: () => e.stopPropagation(),
+            preventDefault: () => e.preventDefault(),
+            nativeEvent: e.nativeEvent,
+          };
+          onChange?.(event);
+          props.onClick?.(e);
+        }}
       >
         <RadioGroupPrimitive.Indicator
           data-slot="radio-group-indicator"

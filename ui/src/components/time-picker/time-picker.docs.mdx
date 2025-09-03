@@ -1,0 +1,341 @@
+# TimePicker Component Documentation
+
+## Overview
+
+The TimePicker component is a time input control that combines native HTML time input functionality with a custom visual time picker. It uses Dayjs for date/time handling and provides an Ant Design-compatible API.
+
+## Features
+
+- 🕐 **Native Time Input**: Uses `type="time"` for browser compatibility and accessibility
+- 📅 **Dayjs Integration**: Full Dayjs support for consistent date/time handling
+- 🎨 **Custom Visual Picker**: Beautiful popover with hour/minute selection
+- 🔄 **Auto-scroll**: Automatically scrolls to selected time in visual picker
+- 📱 **Mobile Friendly**: Works seamlessly on mobile devices
+- ♿ **Accessible**: Proper ARIA labels and keyboard navigation
+- 🎯 **Form Compatible**: Works with react-hook-form and custom form components
+
+## Installation
+
+```bash
+# The component is part of the @acme/ui package
+import { TimePicker } from "@/components/ui";
+```
+
+## Basic Usage
+
+### Simple Time Picker
+
+```tsx
+import { TimePicker } from "@/components/ui";
+import { useState } from "react";
+import dayjs from "dayjs";
+
+function BasicExample() {
+  const [time, setTime] = useState<dayjs.Dayjs | null>(null);
+
+  return (
+    <TimePicker
+      value={time}
+      onChange={(value) => setTime(value)}
+      placeholder="Select time"
+    />
+  );
+}
+```
+
+### With String State
+
+```tsx
+import { TimePicker } from "@/components/ui";
+import { useState } from "react";
+import dayjs from "dayjs";
+
+function StringStateExample() {
+  const [time, setTime] = useState("11:00:00");
+
+  return (
+    <TimePicker
+      value={dayjs(time, "HH:mm:ss")}
+      onChange={(value) => setTime(value?.format("HH:mm:ss") || "")}
+    />
+  );
+}
+```
+
+### Form Integration
+
+```tsx
+import { TimePicker } from "@/components/ui";
+import { Field, Form, useForm } from "@/components/ui/form";
+import dayjs from "dayjs";
+
+function FormExample() {
+  const form = useForm({
+    defaultValues: {
+      startTime: "09:00:00",
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <Field
+        control={form.control}
+        name="startTime"
+        normalize={(value: dayjs.Dayjs) => value.format("HH:mm:ss")}
+        getValueProps={(value: string | undefined) => ({
+          value: value ? dayjs(value, "HH:mm:ss") : undefined,
+        })}
+      >
+        <TimePicker placeholder="Select start time" />
+      </Field>
+    </Form>
+  );
+}
+```
+
+## API Reference
+
+### TimePicker Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `Dayjs \| null \| undefined` | - | Current time value |
+| `defaultValue` | `Dayjs \| null \| undefined` | `null` | Default time value |
+| `onChange` | `(time: Dayjs \| null, timeString: string \| undefined) => void` | - | Callback when time changes |
+| `format` | `string` | `"HH:mm"` | Time format (e.g., "HH:mm", "HH:mm:ss") |
+| `placeholder` | `string` | `"Select time"` | Input placeholder text |
+| `open` | `boolean` | - | Whether the picker is open (controlled) |
+| `onOpenChange` | `(open: boolean) => void` | - | Callback when open state changes |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Input size |
+| `className` | `string` | - | Additional CSS classes |
+| `id` | `string` | - | Input element ID |
+| `onBlur` | `(e: FocusEvent) => void` | - | Blur event handler |
+
+### DateType
+
+```tsx
+type DateType = Dayjs | null | undefined;
+```
+
+## Examples
+
+### Different Formats
+
+```tsx
+// 24-hour format (default)
+<TimePicker format="HH:mm" />
+
+// With seconds
+<TimePicker format="HH:mm:ss" />
+
+// 12-hour format (if supported)
+<TimePicker format="hh:mm A" />
+```
+
+### Controlled vs Uncontrolled
+
+```tsx
+// Controlled
+const [time, setTime] = useState(dayjs("14:30", "HH:mm"));
+<TimePicker value={time} onChange={setTime} />
+
+// Uncontrolled with default value
+<TimePicker defaultValue={dayjs("09:00", "HH:mm")} />
+```
+
+### Custom Styling
+
+```tsx
+<TimePicker
+  className="w-32"
+  size="lg"
+  placeholder="Pick a time"
+/>
+```
+
+## Advanced Usage
+
+### With Validation
+
+```tsx
+function ValidatedTimePicker() {
+  const [time, setTime] = useState<dayjs.Dayjs | null>(null);
+  const [error, setError] = useState<string>("");
+
+  const handleChange = (value: dayjs.Dayjs | null) => {
+    setTime(value);
+    
+    if (value && value.hour() < 9) {
+      setError("Time must be after 9:00 AM");
+    } else {
+      setError("");
+    }
+  };
+
+  return (
+    <div>
+      <TimePicker value={time} onChange={handleChange} />
+      {error && <span className="text-red-500">{error}</span>}
+    </div>
+  );
+}
+```
+
+### Time Range Picker
+
+```tsx
+function TimeRangePicker() {
+  const [startTime, setStartTime] = useState<dayjs.Dayjs | null>(null);
+  const [endTime, setEndTime] = useState<dayjs.Dayjs | null>(null);
+
+  return (
+    <div className="flex gap-2 items-center">
+      <TimePicker
+        value={startTime}
+        onChange={setStartTime}
+        placeholder="Start time"
+      />
+      <span>to</span>
+      <TimePicker
+        value={endTime}
+        onChange={setEndTime}
+        placeholder="End time"
+      />
+    </div>
+  );
+}
+```
+
+## Styling
+
+### CSS Classes
+
+The TimePicker uses the following CSS classes that can be customized:
+
+```css
+/* Main container */
+.time-picker-container {
+  /* Custom styles */
+}
+
+/* Input field */
+.time-picker-input {
+  /* Hide native time picker icon */
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    display: none;
+  }
+}
+
+/* Popover content */
+.time-picker-popover {
+  /* Custom popover styles */
+}
+```
+
+### Tailwind Classes
+
+```tsx
+<TimePicker
+  className="w-24 text-sm border-gray-300 focus:border-blue-500"
+/>
+```
+
+## Accessibility
+
+The TimePicker component follows accessibility best practices:
+
+- ✅ **Keyboard Navigation**: Full keyboard support with Tab, Enter, Escape
+- ✅ **ARIA Labels**: Proper ARIA attributes for screen readers
+- ✅ **Focus Management**: Logical focus flow and visual indicators
+- ✅ **Native Support**: Leverages native `type="time"` for accessibility
+
+### ARIA Attributes
+
+```tsx
+<TimePicker
+  aria-label="Select appointment time"
+  aria-describedby="time-help-text"
+/>
+```
+
+## Browser Support
+
+| Browser | Support | Notes |
+|---------|---------|-------|
+| Chrome | ✅ Full | Native time input supported |
+| Firefox | ✅ Full | Native time input supported |
+| Safari | ✅ Full | Native time input supported |
+| Edge | ✅ Full | Native time input supported |
+| IE 11 | ⚠️ Partial | Fallback to text input |
+
+## Troubleshooting
+
+### Common Issues
+
+**Q: Time picker shows "Invalid Date"**
+A: Ensure you're passing a valid Dayjs object or null/undefined. Check that dayjs plugins are properly loaded.
+
+**Q: Form integration not working**
+A: Make sure to use `normalize` and `getValueProps` for proper form value transformation.
+
+**Q: Visual picker not scrolling to selected time**
+A: This should work automatically. If not, check that the value prop is a valid Dayjs object.
+
+**Q: Typing behavior is unexpected**
+A: This is a known issue being investigated. The native time input behavior may conflict with custom handling.
+
+### Debug Mode
+
+Add debugging to see internal state:
+
+```tsx
+<TimePicker
+  value={time}
+  onChange={(value, timeString) => {
+    console.log("Time changed:", value, timeString);
+    setTime(value);
+  }}
+/>
+```
+
+## Migration Guide
+
+### From Ant Design TimePicker
+
+```tsx
+// Ant Design
+import { TimePicker } from 'antd';
+<TimePicker value={moment('12:08', 'HH:mm')} format="HH:mm" />
+
+// @acme/ui TimePicker
+import { TimePicker } from '@/components/ui';
+<TimePicker value={dayjs('12:08', 'HH:mm')} format="HH:mm" />
+```
+
+### Key Differences
+
+- Uses **Dayjs** instead of Moment.js
+- **Native input** behavior by default
+- **Custom visual picker** with auto-scroll
+- **Form integration** optimized for react-hook-form
+
+## Contributing
+
+When contributing to the TimePicker component:
+
+1. **Test across browsers** - Ensure compatibility with all supported browsers
+2. **Check accessibility** - Verify keyboard navigation and screen reader support
+3. **Update documentation** - Keep this file and examples up to date
+4. **Add tests** - Include unit tests for new features
+5. **Follow patterns** - Maintain consistency with other UI components
+
+## Related Components
+
+- **DatePicker** - For date selection
+- **DateTimePicker** - For combined date and time selection
+- **Input** - Base input component
+- **Popover** - Popover container component

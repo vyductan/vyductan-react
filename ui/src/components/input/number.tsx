@@ -8,16 +8,22 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../types";
 import type {
+  ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProps,
-  ValueType,
 } from "./_components/rc-input-number";
-import type { InputStatus, InputVariant } from "./types";
+import type { InputStatus, InputVariant } from "./variants";
 import { Icon } from "../../icons";
-import { InputNumber as RcInputNumber } from "./_components/rc-input-number";
-import { inputSizeVariants, inputVariants } from "./input";
+import RcInputNumber from "./_components/rc-input-number";
+import { inputSizeVariants, inputVariants } from "./variants";
 
-interface InputNumberProps<T extends ValueType = ValueType>
-  extends Omit<RcInputNumberProps<T>, "prefix" | "size" | "controls"> {
+interface InputNumberProps<
+  TNumberValue extends NumberValueType = NumberValueType,
+> extends Omit<
+    RcInputNumberProps<TNumberValue>,
+    "ref" | "prefix" | "size" | "controls"
+  > {
+  ref?: React.Ref<HTMLInputElement>;
+
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
   prefix?: React.ReactNode;
@@ -31,14 +37,15 @@ interface InputNumberProps<T extends ValueType = ValueType>
    * @default "outlined"
    */
   variant?: InputVariant;
-
-  forFormItem?: boolean;
 }
 
-const InputNumber = ({ ref, ...props }: InputNumberProps) => {
-  // const inputRef = React.useRef<HTMLInputElement>(null);
+const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
+  ref,
+  ...props
+}: InputNumberProps<TNumberValue>) => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
-  // React.useImperativeHandle(ref, () => inputRef.current!);
+  React.useImperativeHandle(ref, () => inputRef.current!);
 
   const {
     className,
@@ -54,7 +61,6 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
     variant: customVariant,
 
     onKeyDown,
-    forFormItem,
     onChange,
 
     ...others
@@ -108,7 +114,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
   return (
     <RcInputNumber
-      ref={ref}
+      // ref={ref}
       upHandler={upIcon}
       downHandler={downIcon}
       // prefixCls={prefixCls}
@@ -197,17 +203,16 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
             "ArrowDown",
             "Home",
             "End",
-            "a",
-            "c",
-            "v",
-            "x", // For ctrl/cmd+a/c/v/x
           ].includes(e.key) ||
           // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (e.ctrlKey && ["a", "c", "v", "x"].includes(e.key)) ||
+          ((e.metaKey || e.ctrlKey) && ["a", "c", "v", "x"].includes(e.key)) ||
           // Allow: numbers, numpad numbers
           /^[0-9]$/.test(e.key) ||
           // Allow: decimal point
-          e.key === "."
+          e.key === "." ||
+          // Allow: minus sign only at the start of input
+          (e.key === "-" &&
+            (!e.currentTarget.value || e.currentTarget.selectionStart === 0))
         ) {
           // Let it happen, don't do anything
           return;
@@ -217,13 +222,7 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
         e.preventDefault();
         onKeyDown?.(e);
       }}
-      onChange={(value) => {
-        if (forFormItem) {
-          onChange?.(value ? value.toString() : null);
-        } else {
-          onChange?.(value);
-        }
-      }}
+      onChange={onChange}
       {...others}
     />
   );
@@ -231,3 +230,5 @@ const InputNumber = ({ ref, ...props }: InputNumberProps) => {
 
 export { InputNumber };
 export type { InputNumberProps };
+
+export { type ValueType as NumberValueType } from "./_components/rc-input-number";

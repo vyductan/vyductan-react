@@ -89,7 +89,10 @@ export default function StepHandler({
 
   return (
     <div
-      className={cn("flex flex-col justify-center", "group-hover:opacity-100")}
+      className={cn(
+        "absolute top-0 right-2 flex h-full w-4 flex-col justify-center",
+        "group-hover:opacity-100",
+      )}
     >
       <span
         {...sharedHandlerProps}

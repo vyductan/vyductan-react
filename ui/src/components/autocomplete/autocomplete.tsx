@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 "use client";
 
 import * as React from "react";
@@ -7,49 +8,52 @@ import { tagColors } from "@acme/ui/components/tag";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject, SizeType } from "../..";
+import type { AnyObject } from "../_util/type";
+import type { SizeType } from "../..";
 import type { CommandProps } from "../command";
-// import type { ValueType } from "../form";
+import type { PopoverContentProps } from "../popover";
 import type { Option } from "../select/types";
 import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
-import { inputSizeVariants } from "../input";
+import { inputSizeVariants } from "../input/variants";
 import { Popover } from "../popover";
 
 type AutocompleteValueType = string | number;
 export type AutocompleteProps<
   TValue extends AutocompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
-> = Pick<
-  CommandProps<TValue>,
-  | "filter"
-  | "placeholder"
-  | "empty"
-  | "groupClassName"
-  | "optionRender"
-  | "optionsRender"
-  | "dropdownRender"
-  | "dropdownFooter"
-> & {
-  value?: TValue;
-  defaultValue?: TValue;
-  onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
-  options: Option<TValue, TRecord>[];
-  optionsToSearch?: { value: string; label: string }[];
+> = Pick<PopoverContentProps, "onFocusOutside"> &
+  Pick<
+    CommandProps<TValue>,
+    | "filter"
+    | "placeholder"
+    | "empty"
+    | "groupClassName"
+    | "optionRender"
+    | "optionsRender"
+    | "dropdownRender"
+    | "dropdownFooter"
+  > & {
+    value?: TValue;
+    defaultValue?: TValue;
+    onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
+    options: Option<TValue, TRecord>[];
+    optionsToSearch?: { value: string; label: string }[];
+    optionLabelProp?: string;
 
-  className?: string;
-  size?: SizeType;
-  disabled?: boolean;
+    className?: string;
+    size?: SizeType;
+    disabled?: boolean;
 
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 
-  allowClear?: boolean;
-  loading?: boolean;
+    allowClear?: boolean;
+    loading?: boolean;
 
-  searchPlaceholder?: string;
-  onSearchChange?: (search: string) => void;
-};
+    searchPlaceholder?: string;
+    onSearchChange?: (search: string) => void;
+  };
 
 const Autocomplete = <
   TValue extends AutocompleteValueType = string,
@@ -59,6 +63,8 @@ const Autocomplete = <
   value: valueProp,
   options,
   optionsToSearch,
+  optionLabelProp,
+  optionRender,
 
   className,
   size,
@@ -78,6 +84,8 @@ const Autocomplete = <
   searchPlaceholder,
   onSearchChange,
 
+  // Popover
+  onFocusOutside,
   ...props
 }: AutocompleteProps<TValue, TRecord>) => {
   /* Filter Detault*/
@@ -114,32 +122,35 @@ const Autocomplete = <
     },
   });
 
+  const getOptionLabel = (option: Option<TValue, TRecord>) => {
+    if (optionLabelProp && option[optionLabelProp as keyof typeof option]) {
+      return option[optionLabelProp as keyof typeof option];
+    }
+    return option.label;
+  };
+
   const buttonText = (() => {
     if (!value) {
       return placeholder ?? <span className="opacity-0"></span>;
     }
     const o = options.find((o) => o.value === value);
     if (o) {
-      const label = props.optionRender?.label
-        ? props.optionRender.label(o)
-        : o.label;
+      const label = optionRender?.label
+        ? optionRender.label(o)
+        : getOptionLabel(o);
       return (
         <>
-          {props.optionRender?.icon ? (
-            <span className="mr-2">{props.optionRender.icon(o)}</span>
+          {optionRender?.icon ? (
+            <span className="mr-2">{optionRender.icon(o)}</span>
           ) : (
             o.icon && <Icon icon={o.icon} />
           )}
-          {typeof label === "string" ? (
-            <span className="truncate">{label}</span>
-          ) : (
-            label
-          )}
+          {label}
         </>
       );
     }
 
-    return <span className="truncate">{value}</span>;
+    return value;
   })();
 
   return (
@@ -166,9 +177,11 @@ const Autocomplete = <
           }}
           filter={filter}
           onSearchChange={onSearchChange}
+          optionRender={optionRender}
           {...props}
         />
       }
+      onFocusOutside={onFocusOutside}
     >
       <Button
         variant="outline"
@@ -196,7 +209,10 @@ const Autocomplete = <
           className,
         )}
       >
-        {buttonText}
+        <span data-slot="select-selection-item" className="truncate">
+          {buttonText}
+        </span>
+
         <Icon
           icon="icon-[lucide--chevrons-up-down]"
           className={cn(
@@ -215,6 +231,8 @@ const Autocomplete = <
               "z-10",
               "absolute right-3",
               "opacity-0 transition-opacity duration-300",
+              // When no value, make the clear icon non-interactive so it doesn't block arrow clicks
+              !value && "pointer-events-none",
               value && "group-hover:opacity-30",
               value && "hover:opacity-50",
             )}
@@ -222,6 +240,7 @@ const Autocomplete = <
               e.preventDefault();
             }}
             onPointerDown={(e) => {
+              if (!value) return; // don't intercept when nothing to clear
               e.preventDefault();
               e.stopPropagation();
               // onChange?.();

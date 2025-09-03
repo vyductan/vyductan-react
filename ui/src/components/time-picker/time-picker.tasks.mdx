@@ -1,0 +1,176 @@
+# TimePicker Component - Tasks & Issues
+
+## Current Issues
+
+### 🐛 Input Formatting Bug
+
+**Priority: High**
+
+- **Issue**: When typing "1" then "2", the result becomes "02" instead of "12"
+- **Reproduction**:
+  ```tsx
+  const [time, setTime] = useState("11:00:00");
+  <TimePicker
+    value={dayjs(time, "HH:mm:ss")}
+    onChange={(v) => setTime(v?.format("HH:mm:ss"))}
+  />;
+  ```
+- **Expected**: Typing "1" then "2" should result in "12"
+- **Actual**: Results in "02"
+- **Status**: 🔍 Under Investigation
+- **Root Cause**: Likely conflict between native `type="time"` input behavior and custom input handling
+
+## Completed Tasks ✅
+
+### Core Implementation
+
+- ✅ **Dayjs Integration**: Updated DateType from `Date` to `Dayjs | null | undefined`
+- ✅ **Native Input Behavior**: Implemented `type="time"` for native browser functionality
+- ✅ **Custom Icon**: Hidden native browser clock icon, kept custom Lucide clock icon
+- ✅ **API Compatibility**: Added Ant Design-like API with `onChange(time: Dayjs, timeString: string)`
+
+### UX Improvements
+
+- ✅ **Input-TimeSelect Sync**: Fixed synchronization between input and TimeSelect popover
+- ✅ **Auto-scroll**: TimeSelect automatically scrolls to selected value when opened
+- ✅ **Controlled Input**: Proper state management for input value display
+- ✅ **Code Cleanup**: Removed unnecessary handlers and helper functions
+
+### Technical Fixes
+
+- ✅ **Dayjs Parsing**: Fixed time-only string parsing using date base approach
+- ✅ **Custom Parse Format**: Added dayjs `customParseFormat` plugin support
+- ✅ **Form Integration**: Added support for `getValueProps` and `valuePropName` in forms
+
+## Future Enhancements
+
+### 🚀 Potential Improvements
+
+- [ ] **Keyboard Shortcuts**: Add arrow key support for time increment/decrement
+- [ ] **Time Validation**: Add min/max time constraints
+- [ ] **12-hour Format**: Support for AM/PM time format
+- [ ] **Seconds Support**: Optional seconds input (HH:mm:ss format)
+- [ ] **Accessibility**: Enhanced ARIA labels and keyboard navigation
+- [ ] **Internationalization**: Support for different locale time formats
+
+### 🔧 Technical Debt
+
+- [ ] **Type Safety**: Improve TypeScript types for better developer experience
+- [ ] **Performance**: Optimize re-renders and scroll behavior
+- [ ] **Testing**: Add comprehensive unit and integration tests
+- [ ] **Documentation**: Create Storybook stories and usage examples
+
+## Development Notes
+
+### Architecture Decisions
+
+- **Native Input**: Uses `type="time"` for browser compatibility and accessibility
+- **Dayjs Integration**: Consistent with project's date handling approach
+- **Dual Interface**: Combines native input with custom visual picker
+- **Form Compatible**: Works seamlessly with react-hook-form and custom form components
+
+### Known Limitations
+
+- **Browser Support**: `type="time"` input support varies across browsers
+- **Mobile UX**: Native time picker behavior differs on mobile devices
+- **Parsing Edge Cases**: Some time format edge cases may need additional handling
+
+### Dependencies
+
+- `dayjs` - Date/time manipulation
+- `dayjs/plugin/customParseFormat` - Custom parsing support
+- `@rc-component/util` - Utility hooks (useMergedState)
+- Custom UI components: Input, Popover, Icon
+
+## Testing Checklist
+
+### Manual Testing
+
+- [ ] Basic time input and selection
+- [ ] Form integration with validation
+- [ ] Keyboard navigation
+- [ ] Mobile device compatibility
+- [ ] Browser compatibility (Chrome, Firefox, Safari, Edge)
+- [ ] Accessibility with screen readers
+
+### Edge Cases
+
+- [ ] Empty/null values
+- [ ] Invalid time formats
+- [ ] Boundary values (00:00, 23:59)
+- [ ] Rapid input changes
+- [ ] Form reset and validation states
+
+### Test focus
+
+````
+<Modal title="Test focus" open={o} onOpenChange={setO}>
+          <input />
+          <input type="time" />
+          <TimePicker />
+
+          <div>Form</div>
+          <Form form={form}>
+            <Field>
+              <input type="time" />
+            </Field>
+            <Field name="time2">
+              <input type="time" />
+            </Field>
+          </Form>
+
+          <div>React Hook Form</div>
+          <input type="time" {...register("time")} />
+
+          <div>React Hook Form + Controller</div>
+          <Controller
+            control={form.control}
+            name="time"
+            render={({ field }) => {
+              return <input type="time" {...field} />;
+            }}
+          />
+
+          <div>React Hook Form + Controller + not pass onBlur</div>
+          <Controller
+            control={form.control}
+            name="time"
+            render={({ field: { onBlur, ...rest } }) => {
+              return <input type="time" {...rest} />;
+            }}
+          />
+
+          <Table
+            dataSource={[{ id: "1" }]}
+            columns={[
+              {
+                title: "Z",
+                render: () => {
+                  return (
+                    <>
+                      <TimePicker />
+                    </>
+                  );
+                },
+              },
+            ]}
+          />
+        </Modal>
+        ```
+
+- [pass] modal -> time picker
+- [pass] modal -> table -> time picker
+- [not pass] modal -> form -> time picker (click to minute select ok, but click other minute select outsiding form, it just focus to hour select)
+- [pass] modal -> react-hook-form -> time picker -> other timepicker (not use form)
+- [not pass] modal -> react-hook-form + controller -> time picker -> other timepicker (not use form)
+  - [not pass] modal -> <Form> + <react-hook-form + controller>
+  - [pass] modal -> without <Form> + <react-hook-form + controller>
+    - [not pass] Form -> Field + name
+      - [not pass] Form -> Field + name different name
+      - [not pass] Form -> Field + name same name
+        - [pass] Field -> without FormControl
+        - [not pass] Field -> FormControl
+          - [not pass] FormControl -> const { error } = useFormField();
+    - [pass] Form -> Field + without name
+- [ ] modal -> form -> table -> time picker
+````

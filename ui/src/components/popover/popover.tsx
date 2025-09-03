@@ -3,18 +3,11 @@ import { PopoverArrow } from "@radix-ui/react-popover";
 import { useMergedState } from "@rc-component/util";
 import { useDebounce } from "ahooks";
 
-import type {
-  PopoverContentProps,
-  PopoverRootProps,
-} from "@acme/ui/shadcn/popover";
 import { cn } from "@acme/ui/lib/utils";
-import {
-  PopoverContent,
-  PopoverRoot,
-  PopoverTrigger,
-} from "@acme/ui/shadcn/popover";
 
 import type { AlignType, Placement } from "../../types";
+import type { PopoverContentProps, PopoverRootProps } from "./_component";
+import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_component";
 
 export type PopoverProps = PopoverRootProps &
   Omit<PopoverContentProps, "content" | "sideOffset" | "align"> & {
@@ -83,7 +76,10 @@ export const Popover = (props: PopoverProps) => {
   const sideOffset = domAlign?.offset?.[1];
 
   return (
-    <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
+    <PopoverRoot
+      open={trigger === "hover" ? debouncedOpen : open}
+      onOpenChange={setOpen}
+    >
       <PopoverTrigger
         asChild
         {...(trigger === "hover"

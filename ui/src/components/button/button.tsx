@@ -3,11 +3,11 @@
 import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
 import * as React from "react";
+import { useUiConfig } from "@/components/ui/config-provider";
 import { Slot } from "@radix-ui/react-slot";
 import { tv } from "tailwind-variants";
 
 import type { IconProps } from "@acme/ui/icons";
-import { useUiConfig } from "@acme/ui/components/config-provider";
 import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -27,6 +27,13 @@ const buttonVariants = tv({
     "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
+    type: {
+      default: [],
+      primary: ["border-primary", "hover:border-primary-hover"],
+      dashed: ["border-dashed"],
+      link: ["border-transparent"],
+      text: ["border-0"],
+    },
     primary: {
       true: ["border-primary", "hover:border-primary-hover"],
     },
@@ -35,6 +42,7 @@ const buttonVariants = tv({
     },
     color: {
       default: [],
+      primary: ["text-primary", "hover:text-primary-700"],
       danger: [],
       link: [],
       success: [],
@@ -58,10 +66,13 @@ const buttonVariants = tv({
       rose: [],
     },
     size: {
-      sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
+      small: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
+      middle: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
+      large: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
+      // sm: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
+      // lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
+      // xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
       default: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
-      lg: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
-      xl: "h-12 rounded-lg px-4 py-2.5 text-lg",
       icon: "size-9",
     },
     variant: {
@@ -71,7 +82,7 @@ const buttonVariants = tv({
         "active:ring-primary",
       ],
       destructive:
-        "bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white shadow-xs",
+        "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
       solid: ["text-white"],
       outline: [
         "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
@@ -85,8 +96,8 @@ const buttonVariants = tv({
         "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
-      link: [],
-      text: "border-0 px-0",
+      link: ["border-0"],
+      text: "border-0",
     },
     shape: {
       default: "",
@@ -111,11 +122,11 @@ const buttonVariants = tv({
     // primary
     {
       primary: true,
-      // danger: true,
       color: "danger",
       className: [
-        "border-red-500 bg-red-500",
-        "hover:border-red-600 hover:bg-red-600",
+        "border-red-600 bg-red-600 text-white",
+        "hover:border-red-700 hover:bg-red-700",
+        "active:border-red-800 active:bg-red-800",
       ],
     },
     {
@@ -168,12 +179,43 @@ const buttonVariants = tv({
     },
     // outline
     {
+      variant: "default",
+      color: "default",
+      className: [
+        "border-primary-500 bg-primary-500 text-primary-foreground shadow-xs",
+        "hover:border-primary-600 hover:bg-primary-600",
+        "active:ring-primary",
+      ],
+    },
+    {
+      variant: "default",
+      color: "danger",
+      className: [
+        "border-red-600 bg-red-600 text-white shadow-xs",
+        "hover:border-red-700 hover:bg-red-700",
+        "active:border-red-800 active:bg-red-800",
+      ],
+    },
+    {
+      variant: "default",
+      color: "link",
+      className: ["border-link bg-link text-white", "hover:bg-link-hover"],
+    },
+    {
+      variant: "default",
+      color: "success",
+      className: [
+        "border-green-600 bg-green-600",
+        "hover:border-green-700 hover:bg-green-700",
+      ],
+    },
+    {
       variant: "outline",
       color: "danger",
       className: [
-        "border-error",
-        "hover:border-error-hover hover:text-error-hover",
-        "hover:bg-red-100 dark:hover:bg-red-300",
+        "border-red-600 bg-white text-red-600",
+        "hover:border-red-500 hover:bg-red-50 hover:text-red-500",
+        "active:border-red-700 active:text-red-700",
       ],
     },
     {
@@ -205,7 +247,7 @@ const buttonVariants = tv({
     },
     {
       variant: "light",
-      primary: true,
+      color: "primary",
       className: [
         "bg-primary-200 text-primary-500",
         "hover:bg-primary-600 hover:text-white",
@@ -224,8 +266,9 @@ const buttonVariants = tv({
       variant: "light",
       color: "danger",
       className: [
-        "bg-error-muted text-error",
-        "hover:bg-error-hover hover:text-white",
+        "bg-red-50 text-red-600",
+        "hover:bg-red-100 hover:text-red-700",
+        "active:bg-red-200 active:text-red-800",
       ],
     },
     {
@@ -273,30 +316,25 @@ const buttonVariants = tv({
     },
     // Size
     {
-      size: "sm",
+      size: "small",
       shape: ["icon", "circle"],
       className: "w-6",
     },
     {
-      size: "default",
+      size: "middle",
       shape: ["icon", "circle"],
       className: "size-8",
     },
     {
-      size: "lg",
+      size: "large",
       shape: ["icon", "circle"],
       className: "w-10",
-    },
-    {
-      size: "xl",
-      shape: ["icon", "circle"],
-      className: "w-12",
     },
   ],
   defaultVariants: {
     variant: "default",
     color: "default",
-    size: "default",
+    size: "middle",
     shape: "default",
   },
 });
@@ -312,9 +350,15 @@ type TVButtonOptions = PartialDeep<Partial<ExtractedTVButtonOptions>>;
 
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
+type HtmlType = React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
+type ButtonType = ButtonVariants["type"];
+
 export interface ButtonProps
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "color">,
-    Omit<ButtonVariants, "color" | "disabled" | "variant"> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "color">,
+    Omit<ButtonVariants, "type" | "color" | "disabled" | "variant" | "size"> {
+  type?: HtmlType | ButtonType;
+  htmlType?: HtmlType;
+  htmlColor?: React.CSSProperties["color"];
   asChild?: boolean;
   href?: string;
   loading?: boolean;
@@ -324,6 +368,8 @@ export interface ButtonProps
   classNames?: {
     variants?: TVButtonOptions;
   };
+  size?: ButtonVariants["size"] | "sm";
+  danger?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -342,6 +388,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       srOnly,
       variant,
       icon,
+      type,
+      htmlType,
+      htmlColor,
+      danger,
       ...props
     },
     ref,
@@ -354,13 +404,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={cn(
-              "size-4",
-              size === "sm" && "size-4",
-              size === "lg" && "size-4",
-              size === "xl" && "size-[18px]",
-              // children ? "mr-2" : "",
-            )}
+            className={cn("size-4")}
             // srOnly={
             //   srOnly && typeof children === "string"
             //     ? children
@@ -380,6 +424,20 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </>
     );
 
+    const isHtmlType =
+      type === "submit" || type === "reset" || type === "button";
+    const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
+
+    let variantToPass = variant;
+    if (!isHtmlType && type === "text") {
+      variantToPass = "ghost";
+    }
+
+    let sizeToPass = size as ButtonVariants["size"];
+    if (size === "sm") {
+      sizeToPass = "small";
+    }
+
     return (
       <Wave component="Button" disabled={loading}>
         <Comp
@@ -387,22 +445,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           className={cn(
             "relative",
             buttonVariants({
-              color,
+              color: danger ? "danger" : color,
               disabled,
               primary: !primary && !!variant ? undefined : (primary ?? true),
-              size,
+              size: sizeToPass,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-              variant,
+              variant: variantToPass,
             }),
             buttonConfig?.classNames?.variants &&
               tv(
                 buttonConfig.classNames
                   .variants as unknown as ExtractedTVButtonOptions,
               )({
-                color,
+                color: danger ? "danger" : color,
                 disabled,
                 primary: !primary && !!variant ? undefined : (primary ?? true),
-                size,
+                size: sizeToPass,
                 shape:
                   (icon && !children) || srOnly ? (shape ?? "icon") : shape,
                 variant,
@@ -411,8 +469,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )}
           disabled={loading ?? disabled}
           aria-disabled={loading ?? disabled}
-          type="button"
+          type={htmlTypeToPass}
+          color={htmlColor}
           {...props}
+          style={{ ...props.style }}
         >
           {asChild ? (
             children

@@ -1,57 +1,130 @@
+import type { Dayjs } from "dayjs";
 import React from "react";
 import { useMergedState } from "@rc-component/util";
-import { format as formatDate, parse } from "date-fns";
+import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { PickerRef } from "../date-picker/types";
 import type { InputProps, InputRef } from "../input";
 import { Icon } from "../../icons";
+import { Button } from "../button";
 import { Input } from "../input";
 import { Popover } from "../popover";
 import { TimeSelect } from "./_components/time-select";
 
-type TimePickerProps = Omit<InputProps, "defaultValue" | "value"> & {
-  ref?: React.Ref<InputRef>;
-  id?: string;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
+export type DateType = Dayjs | null | undefined;
 
-  format?: string;
-
-  defaultValue?: string;
-  value?: string;
-  onChange?: (time: string | undefined) => void;
-};
+type TimePickerProps = Omit<
+  React.ComponentProps<"div">,
+  "onBlur" | "onChange"
+> &
+  Pick<
+    InputProps,
+    "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
+  > & {
+    ref?: React.Ref<PickerRef>;
+    id?: string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    format?: string;
+    showNow?: boolean;
+    defaultValue?: DateType;
+    value?: DateType;
+    onChange?: (time: DateType, timeString: string | undefined) => void;
+  };
 const TimePicker = (props: TimePickerProps) => {
   const {
     id: inputId,
     open: openProp,
     onOpenChange,
-
     className,
-    placeholder = "Select time",
 
+    // picker props
     format = "HH:mm",
-
-    defaultValue,
+    defaultValue = null,
     value,
     onChange,
-    ...inputProps
+
+    // input props
+    ref,
+    name,
+    placeholder = "Select time",
+    size,
+    status,
+    disabled,
+    onBlur,
+    "aria-invalid": ariaInvalid,
+    "aria-describedby": ariaDescribedBy,
+
+    // trigger props
+    ...restProps
   } = props;
+
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
     onChange: onOpenChange,
   });
 
   // ====================== Value =======================
-  const [inputValue, setInputValue] = useMergedState(defaultValue, {
+  const [localValue, setLocalValue] = useMergedState<DateType>(defaultValue, {
     value,
   });
 
-  const onInputChangeHandler = (input: string | undefined) => {
-    onChange?.(input);
-    setInputValue(input);
+  // console.log("lllll", localValue, restProps);
+  // Track input display value separately from parsed value
+  const [inputValue, setInputValue] = React.useState(() =>
+    formatDateValue(localValue, format),
+  );
+
+  // Update input value when localValue changes externally
+  React.useEffect(() => {
+    setInputValue(formatDateValue(localValue, format));
+  }, [localValue, format]);
+
+  const handleChange = (newValue: DateType) => {
+    setLocalValue(newValue);
+    onChange?.(newValue, formatDateValue(newValue, format));
   };
+
+  // ========================= Refs =========================
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<InputRef>(null);
+  React.useImperativeHandle(ref, () => ({
+    nativeElement: rootRef.current!,
+    focus: (options) => {
+      inputRef.current?.focus(options);
+    },
+    blur: () => {
+      inputRef.current?.blur();
+    },
+    select: () => inputRef.current?.select(),
+    setCustomValidity: (msg) => inputRef.current?.setCustomValidity(msg),
+    reportValidity: () => inputRef.current?.reportValidity(),
+  }));
+
+  // const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+
+    setInputValue(rawValue);
+
+    if (!rawValue) {
+      handleChange(null);
+      return;
+    }
+
+    // Parse the native time input value (HH:MM format)
+    // Use today's date as base and set the time
+    const today = dayjs().format("YYYY-MM-DD");
+    const parsedDate = dayjs(`${today} ${rawValue}`, `YYYY-MM-DD ${format}`);
+
+    if (parsedDate.isValid()) {
+      handleChange(parsedDate);
+    }
+  };
+
   return (
     <>
       <Popover
@@ -72,74 +145,80 @@ const TimePicker = (props: TimePickerProps) => {
           event.preventDefault();
         }}
         content={
-          <div className="flex">
+          <div className="flex flex-col">
             <TimeSelect
-              value={
-                inputValue ? parse(inputValue, format, new Date()) : undefined
-              }
+              value={localValue}
               format={format}
               onChange={(value) => {
-                onInputChangeHandler(formatDate(value, format));
+                handleChange(value);
                 // setOpen(false);
               }}
+              onOk={() => setOpen(false)}
             />
           </div>
         }
       >
-        <Input
-          id={inputId}
-          autoComplete="off"
-          {...inputProps}
-          // allowClear={allowClear}
-          // borderless={borderless}
-          // size={size}
-          // status={status}
-          placeholder={placeholder}
-          className={cn(
-            "items-center",
-            "justify-start text-left",
-            "w-[128px]",
-            className,
-          )}
-          suffix={
-            <Icon
-              icon="icon-[mingcute--time-line]"
-              className="ml-auto size-4 opacity-50"
-            />
-          }
-          value={inputValue}
-          onClick={() => {
+        <div
+          ref={rootRef}
+          onClick={(e) => {
+            e.stopPropagation();
             if (!open) setOpen(true);
           }}
-          onKeyUp={(event) => {
-            event.stopPropagation();
-            if (event.key === "Enter" || event.key === "Escape") {
-              if (event.currentTarget.value.length === 10) {
-                onInputChangeHandler(event.currentTarget.value);
-              } else {
-                setInputValue(value);
-              }
-              setOpen(false);
+          {...restProps}
+          data-slot="time-picker"
+          className={cn("inline-flex", "w-[120px]", className)}
+        >
+          <Input
+            ref={inputRef}
+            type="time"
+            id={inputId}
+            name={name}
+            autoComplete="off"
+            value={inputValue}
+            onChange={handleInputChange}
+            onFocus={(e) => {
+              // Select all text on focus for better UX
+              e.target.select();
+            }}
+            // onClick={(e) => {
+            //   // Prevent event bubbling to avoid closing the popover
+            //   e.stopPropagation();
+            //   if (!open) setOpen(true);
+            // }}
+            placeholder={placeholder}
+            size={size}
+            disabled={disabled}
+            status={status}
+            className={cn(
+              // Hide native time picker icon
+              "[&>input::-webkit-calendar-picker-indicator]:hidden [&>input::-webkit-inner-spin-button]:hidden [&>input::-webkit-outer-spin-button]:hidden",
+            )}
+            suffix={
+              <Icon
+                icon="icon-[lucide--clock]"
+                className="text-muted-foreground h-4 w-4"
+              />
             }
-          }}
-          onChange={(event) => {
-            setInputValue(event.currentTarget.value);
-            if (event.currentTarget.value === "") {
-              // eslint-disable-next-line unicorn/no-useless-undefined
-              onInputChangeHandler(undefined);
-            } else {
-              try {
-                parse(event.currentTarget.value, format, new Date());
-                onInputChangeHandler(event.currentTarget.value);
-              } catch {
-                //
+            onKeyUp={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter" || event.key === "Escape") {
+                setOpen(false);
               }
-            }
-          }}
-        />
+            }}
+            onBlur={onBlur}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedBy}
+          />
+        </div>
       </Popover>
     </>
   );
 };
 
 export { TimePicker };
+
+// Format the date for display
+const formatDateValue = (date: DateType, format: string): string => {
+  if (!date?.isValid()) return "";
+  return date.format(format);
+};

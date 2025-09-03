@@ -2,14 +2,14 @@ import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { TableProps } from "../table";
-import type { TableSize } from "../types";
+import type { SizeType } from "../../config-provider/size-context";
+import type { OwnTableProps } from "../table";
 
 function TableRoot({
   className,
   bordered,
   ...props
-}: React.ComponentProps<"table"> & { bordered?: TableProps["bordered"] }) {
+}: React.ComponentProps<"table"> & { bordered?: OwnTableProps["bordered"] }) {
   return (
     <div className="relative w-full overflow-auto">
       <table
@@ -102,7 +102,7 @@ function TableRow({ className, ...props }: TableRowProps) {
 }
 
 type TableHeadProps = React.ComponentProps<"th"> & {
-  size?: TableSize;
+  size?: SizeType;
 };
 function TableHead({ className, size, ...props }: TableHeadProps) {
   return (
@@ -112,7 +112,7 @@ function TableHead({ className, size, ...props }: TableHeadProps) {
         "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         // own
         "h-auto p-3 whitespace-normal",
-        size === "sm" && "p-2 leading-[22px]",
+        size === "small" && "p-2 leading-[22px]",
         // "break-words",
         // "first:rounded-tl-md last:rounded-tr-md",
         "border-b",
@@ -124,7 +124,7 @@ function TableHead({ className, size, ...props }: TableHeadProps) {
 }
 
 type TableCellProps = React.ComponentProps<"td"> & {
-  size?: TableSize;
+  size?: SizeType;
 };
 function TableCell({ className, size, ...props }: TableCellProps) {
   return (
@@ -136,7 +136,7 @@ function TableCell({ className, size, ...props }: TableCellProps) {
         // "p-2",
         // own
         "p-3",
-        size === "sm" && "p-2 leading-[22px]",
+        size === "small" && "p-2 leading-[22px]",
         // "break-words",
         // "group-hover:bg-background-hover",
         "border-b",

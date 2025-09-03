@@ -1,30 +1,45 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent } from "react";
+import * as React from "react";
 import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { MenuItemDef, MenuItemType } from "./types";
-// import { Collapse } from "../collapse";
+import type { ItemType, MenuItemType, SelectEventHandler } from "./types";
 import { Divider } from "../divider";
-import { MenuItem } from "./_components";
+import { MenuItem, SubMenu } from "./_components";
 
 type MenuProps = {
   className?: string;
   defaultOpenKeys?: string[];
   defaultSelectedKeys?: string[];
-  items: MenuItemDef[];
+  items: ItemType[];
   mode?: "vertical" | "horizontal" | "inline";
   openKeys?: string[];
+
+  selectable?: boolean;
+  multiple?: boolean;
+
   selectedKeys?: string[];
   onSelect?: (args: {
-    item: MenuItemDef;
+    item: ItemType;
     key: React.Key;
+    selectedKeys: string[];
     event: MouseEvent<HTMLLIElement> | KeyboardEvent<HTMLLIElement>;
   }) => void;
+  onDeselect?: SelectEventHandler;
+
+  /** Customize popup container */
+  getPopupContainer?: (node: HTMLElement) => HTMLElement;
+  /** @private Internal usage. Safe to remove. */
+  subMenuOpenDelay?: number;
+  /** @private Internal usage. Safe to remove. */
+  subMenuCloseDelay?: number;
+
+  onOpenChange?: (openKeys: string[]) => void;
 };
-export const Menu = ({
+const Menu = ({
   className,
   // defaultOpenKeys,
   defaultSelectedKeys,
@@ -33,6 +48,9 @@ export const Menu = ({
   mode = "inline",
   selectedKeys,
   onSelect,
+  // getPopupContainer,
+  // subMenuOpenDelay = 0.1,
+  // subMenuCloseDelay = 0.1,
 }: MenuProps) => {
   // const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
   //   defaultOpenKeys ?? [],
@@ -47,8 +65,9 @@ export const Menu = ({
     },
   );
 
-  const renderItem = (menu: MenuItemDef[]) => {
+  const renderItem = (menu: ItemType[]) => {
     return menu.map((item, index) => {
+      if (!item) return <></>;
       // Handle divider type
       if (item.type === "divider") {
         return (
@@ -67,7 +86,7 @@ export const Menu = ({
       if (item.type === "group") {
         return (
           <li
-            key={`group-${item.key || index}`}
+            key={`group-${item.key ?? index}`}
             role="presentation"
             className="my-1 text-left"
           >
@@ -80,47 +99,77 @@ export const Menu = ({
                 {item.label}
               </div>
             )}
-            {item.children.some((c) => !c.hidden) && (
+            {item.children && (
               <ul role="group" className="mt-1">
-                {(item.children as MenuItemType[])
-                  .filter((c) => !c.hidden)
-                  .map((child) => {
-                    // Destructure the key and other props we need
-                    const { key, hidden: _, ...rest } = child;
-                    const isActive = mergedSelectKeys.some((k) =>
-                      key.toString().startsWith(k.toString()),
-                    );
-                    return (
-                      <MenuItem
-                        key={key}
-                        keyProp={key}
-                        isActive={isActive}
-                        onSelect={onSelect}
-                        {...(rest as Omit<MenuItemType, "key">)}
-                      />
-                    );
-                  })}
+                {(item.children as MenuItemType[]).map((child) => {
+                  // Destructure the key and other props we need
+                  const { key, ...rest } = child;
+                  const isActive = mergedSelectKeys.some((k) =>
+                    key.toString().startsWith(k.toString()),
+                  );
+                  return (
+                    <MenuItem
+                      key={key}
+                      keyProp={key}
+                      isActive={isActive}
+                      onSelect={(info) =>
+                        onSelect?.({
+                          ...info,
+                          selectedKeys: mergedSelectKeys,
+                        })
+                      }
+                      {...(rest as Omit<MenuItemType, "key">)}
+                    />
+                  );
+                })}
               </ul>
             )}
           </li>
         );
       }
 
-      // Handle regular menu item
-      const { key, ...rest } = item;
-      const isActive = mergedSelectKeys.some((k) =>
-        key.toString().startsWith(k.toString()),
-      );
+      // Handle submenu
+      if (item.type === "submenu") {
+        const subMenuProps = item;
+        return (
+          <SubMenu
+            type="submenu"
+            key={subMenuProps.key}
+            icon={subMenuProps.icon}
+            popupClassName={subMenuProps.popupClassName}
+            popupOffset={subMenuProps.popupOffset}
+            popupStyle={subMenuProps.popupStyle}
+          >
+            {renderItem(subMenuProps.children)}
+          </SubMenu>
+        );
+      }
 
-      return (
-        <MenuItem
-          key={key}
-          keyProp={key}
-          isActive={isActive}
-          onSelect={onSelect}
-          {...rest}
-        />
-      );
+      // Handle regular menu item
+      if (item.type === "item") {
+        const { key, ...rest } = item;
+        const isActive = mergedSelectKeys.some((k) =>
+          key.toString().startsWith(k.toString()),
+        );
+
+        return (
+          <MenuItem
+            key={key}
+            keyProp={key}
+            isActive={isActive}
+            onSelect={(info) =>
+              onSelect?.({
+                ...info,
+                selectedKeys: mergedSelectKeys,
+              })
+            }
+            {...(rest as Omit<MenuItemType, "key">)}
+          />
+        );
+      }
+
+      // Optionally handle other types (e.g., divider) or return null
+      return null;
 
       // if (!item.children) {
       //   const isActive = mergedSelectKeys.some((x) => x.endsWith(key));
@@ -185,6 +234,15 @@ export const Menu = ({
     });
   };
 
+  // const contextValue = React.useMemo(
+  //   () => ({
+  //     getPopupContainer,
+  //     subMenuOpenDelay,
+  //     subMenuCloseDelay,
+  //   }),
+  //   [getPopupContainer, subMenuOpenDelay, subMenuCloseDelay],
+  // );
+
   return (
     <ul
       role="menu"
@@ -199,3 +257,6 @@ export const Menu = ({
     </ul>
   );
 };
+
+export type { MenuProps };
+export { Menu };
