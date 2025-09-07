@@ -30,8 +30,7 @@ function TreeTitle({
   showIcon,
 }: TreeTitleProps) {
   return (
-    <Button
-      type="text"
+    <div
       tabIndex={0}
       className={cn(
         "flex min-w-0 flex-1 items-center gap-2 truncate rounded px-2 py-1 pl-1 text-sm font-normal transition outline-none",
@@ -41,15 +40,19 @@ function TreeTitle({
         !isDisabled && "hover:bg-accent hover:text-accent-foreground",
       )}
       style={style}
-      disabled={isDisabled}
+      // disabled={isDisabled}
       onClick={isDisabled ? undefined : onClick}
       data-slot="tree-node-content"
     >
       {showIcon && icon && (
         <span className="flex h-4 w-4 items-center justify-center">{icon}</span>
       )}
-      <span className="truncate">{title}</span>
-    </Button>
+      {typeof title === "string" ? (
+        <span className="truncate">{title}</span>
+      ) : (
+        title
+      )}
+    </div>
   );
 }
 
