@@ -158,7 +158,12 @@ const Modal = ({
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent
-        className={cn("px-0", className)}
+        className={cn(
+          "px-0",
+          "sm:max-w-auto", // override sm:max-w-lg of shadcn
+          numWidth && "w-[var(--modal-width)]", // override max-w-lg of shadcn
+          className,
+        )}
         style={{
           ...(numWidth &&
             ({
