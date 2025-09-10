@@ -51,6 +51,7 @@ export interface CheckboxChangeEvent {
 
 type CheckboxProps = AbstractCheckboxProps<CheckboxChangeEvent> &
   React.AriaAttributes & {
+    key?: React.Key; // fix warning when use key (shadcn)
     indeterminate?: boolean;
   };
 
@@ -121,7 +122,7 @@ const Checkbox = (props: CheckboxProps) => {
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <label
         className={cn(
-          "inline-flex items-center space-x-2",
+          "inline-flex items-center gap-x-2 text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           className,
         )}
