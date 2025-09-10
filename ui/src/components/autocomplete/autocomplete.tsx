@@ -193,7 +193,7 @@ const Autocomplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "text-start text-sm whitespace-normal",
+          "hover:border-primary bg-transparent text-start text-sm whitespace-normal hover:bg-transparent",
           !value && "text-muted-foreground hover:text-muted-foreground",
           tagColors[options.find((o) => o.value === value)?.color ?? ""],
           "hover:" +
