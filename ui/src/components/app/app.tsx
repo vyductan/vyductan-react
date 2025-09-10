@@ -1,4 +1,5 @@
 import React from "react";
+import { WarningFilled } from "@acme/ui/icons";
 
 import type { ConfirmConfig } from "../modal";
 import { Modal as InternalModal } from "../modal";
@@ -7,6 +8,9 @@ import { Modal as InternalModal } from "../modal";
 interface AppContextType {
   modal: {
     confirm: (config: ConfirmConfig) => {
+      destroy: () => void;
+    };
+    warning: (config: ConfirmConfig) => {
       destroy: () => void;
     };
   };
@@ -66,6 +70,33 @@ export const App: React.FC<AppProps> & {
       },
     };
   }, []);
+
+  // Modal warning function (AntD-like)
+  const warning = React.useCallback(
+    (config: ConfirmConfig) => {
+      return confirm({
+        title: config.title ?? "Warning",
+        // Prepend warning icon to content like Ant Design
+        content: (
+          <div className="flex items-start gap-3">
+            <WarningFilled className="mt-0.5 size-5 text-amber-500" />
+            <div>{config.content}</div>
+          </div>
+        ),
+        okText: config.okText ?? "OK",
+        okButtonProps: {
+          primary: true,
+          color: "amber",
+          ...config.okButtonProps,
+        },
+        // Mark type to customize footer rendering (hide Cancel)
+        type: "warning",
+        onOk: config.onOk,
+        onCancel: config.onCancel,
+      });
+    },
+    [confirm],
+  );
 
   // Handle modal OK
   const handleOk = React.useCallback(async () => {
@@ -142,11 +173,12 @@ export const App: React.FC<AppProps> & {
     () => ({
       modal: {
         confirm,
+        warning,
       },
       message,
       notification,
     }),
-    [confirm, message, notification],
+    [confirm, warning, message, notification],
   );
 
   const {
@@ -171,6 +203,11 @@ export const App: React.FC<AppProps> & {
         okButtonProps={okButtonProps}
         cancelText={cancelText}
         confirmLoading={modalState.loading}
+        footer={
+          modalState.config.type === "warning"
+            ? ({ extra }) => extra.OkBtn
+            : undefined
+        }
         onOpenChange={(open) => {
           if (!open) {
             handleCancel();
