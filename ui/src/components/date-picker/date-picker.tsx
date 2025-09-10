@@ -459,7 +459,7 @@ const DatePicker = (props: DatePickerProps) => {
                   ? (maxDate as Dayjs).toDate()
                   : dayjs().add(50, "year").endOf("year").toDate()
               }
-              onSelect={(date) => {
+              onSelect={(date: Date | undefined) => {
                 if (date) {
                   const dayjsDate = getDestinationValue(date);
                   setValue(dayjsDate);
