@@ -106,63 +106,65 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
           : { enableSorting: false }),
         ...restProps,
       };
-      columnDefMerged.cell = ({ column, row, getValue, table }) => (
-        <>
-          {/* Tree Data */}
-          {row.depth > 0 && column.getIndex() === 0 && (
-            <>
-              <span
-                style={{
-                  paddingLeft: `${row.depth * 2}rem`,
-                }}
-              />
-            </>
-          )}
-          {props.expandable?.childrenColumnName &&
-            props.expandable.childrenColumnName in row.original &&
-            row.getCanExpand() &&
-            column.getIndex() === 0 && (
+      columnDefMerged.cell = ({ column, row, getValue, table }) => {
+        return (
+          <>
+            {/* Tree Data */}
+            {row.depth > 0 && column.getIndex() === 0 && (
               <>
-                {props.expandable.expandIcon?.({
-                  record: row.original,
-                  expanded: row.getIsExpanded(),
-                  expandable: row.getCanExpand(),
-                  onExpand: row.getToggleExpandedHandler(),
-                  className: "mb-0.5 mr-2",
-                })}
+                <span
+                  style={{
+                    paddingLeft: `${row.depth * 2}rem`,
+                  }}
+                />
               </>
             )}
-          {/* {props.childrenColumnName &&
-            row.original[props.childrenColumnName] && (
-              <>
-                {row.getCanExpand() && row.original.children ? (
-                <button
-                  onClick={row.getToggleExpandedHandler()}
-                  className="w-5"
-                >
-                  {row.getIsExpanded() ? "👇" : "👉"}
-                </button>
-              ) : (
-                <span className="pl-5" />
+            {props.expandable?.childrenColumnName &&
+              props.expandable.childrenColumnName in row.original &&
+              row.getCanExpand() &&
+              column.getIndex() === 0 && (
+                <>
+                  {props.expandable.expandIcon?.({
+                    record: row.original,
+                    expanded: row.getIsExpanded(),
+                    expandable: row.getCanExpand(),
+                    onExpand: row.getToggleExpandedHandler(),
+                    className: "mb-0.5 mr-2",
+                  })}
+                </>
               )}
-              </>
-            )} */}
-          {/* render value*/}
-          {render
-            ? typeof dataIndex === "string"
-              ? render(getValue() as never, row.original, row.index, {
-                  table,
-                  column,
-                  row,
-                })
-              : render(undefined as never, row.original, row.index, {
-                  table,
-                  column,
-                  row,
-                })
-            : (getValue() as ReactNode)}
-        </>
-      );
+            {/* {props.childrenColumnName &&
+              row.original[props.childrenColumnName] && (
+                <>
+                  {row.getCanExpand() && row.original.children ? (
+                  <button
+                    onClick={row.getToggleExpandedHandler()}
+                    className="w-5"
+                  >
+                    {row.getIsExpanded() ? "👇" : "👉"}
+                  </button>
+                ) : (
+                  <span className="pl-5" />
+                )}
+                </>
+              )} */}
+            {/* render value*/}
+            {render
+              ? typeof dataIndex === "string"
+                ? render(getValue() as never, row.original, row.index, {
+                    table,
+                    column,
+                    row,
+                  })
+                : render(undefined as never, row.original, row.index, {
+                    table,
+                    column,
+                    row,
+                  })
+              : (getValue() as ReactNode)}
+          </>
+        );
+      };
 
       return columnDefMerged;
     },
