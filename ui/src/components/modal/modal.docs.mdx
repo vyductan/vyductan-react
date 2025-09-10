@@ -15,7 +15,7 @@ The Modal component provides a flexible dialog interface for displaying content 
 ### Declarative Modal
 
 ```tsx
-import { Modal, Button } from '@acme/ui';
+import { Button, Modal } from "@/components/ui";
 
 function MyComponent() {
   const [open, setOpen] = useState(false);
@@ -23,7 +23,7 @@ function MyComponent() {
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Modal</Button>
-      
+
       <Modal
         open={open}
         title="My Modal"
@@ -41,24 +41,53 @@ function MyComponent() {
 }
 ```
 
+### Warning Dialog (AntD-style)
+
+`Modal.warning` is available through the App context and renders a single OK button with a warning icon.
+
+```tsx
+import { App } from "@/components/ui/app";
+
+function MyComponent() {
+  const { modal } = App.useApp();
+
+  const handleWarning = () => {
+    modal.warning({
+      title: "Unsaved changes",
+      content: "You have unsaved changes. Leaving now will discard them.",
+      onOk: () => {
+        // Handle acknowledgment
+      },
+    });
+  };
+
+  return <Button onClick={handleWarning}>Show Warning</Button>;
+}
+```
+
+Note:
+
+- This dialog hides the Cancel button and styles the OK button with an amber accent.
+- Use `App.useApp().modal.warning()` rather than `Modal.warning()` directly.
+
 ### Imperative Confirm Dialog
 
 ```tsx
-import { App } from '@acme/ui';
+import { App } from "@/components/ui/app";
 
 function MyComponent() {
   const { modal } = App.useApp();
 
   const handleDelete = () => {
     modal.confirm({
-      title: 'Delete Item',
-      content: 'Are you sure you want to delete this item?',
+      title: "Delete Item",
+      content: "Are you sure you want to delete this item?",
       onOk: () => {
         // Handle delete action
-        console.log('Item deleted');
+        console.log("Item deleted");
       },
       onCancel: () => {
-        console.log('Delete cancelled');
+        console.log("Delete cancelled");
       },
     });
   };
@@ -75,45 +104,40 @@ function MyComponent() {
 
 ### Modal Props
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `open` | `boolean` | `false` | Whether the modal is visible |
-| `title` | `ReactNode` | - | The modal title |
-| `width` | `string \| number \| ResponsiveWidth` | `520` | Width of the modal |
-| `onOk` | `() => void` | - | Callback when OK button is clicked |
-| `onCancel` | `() => void` | - | Callback when Cancel button is clicked |
-| `onOpenChange` | `(open: boolean) => void` | - | Callback when modal visibility changes |
-| `okText` | `string` | `"OK"` | Text of the OK button |
-| `cancelText` | `string` | `"Cancel"` | Text of the Cancel button |
-| `confirmLoading` | `boolean` | `false` | Whether OK button is in loading state |
-| `footer` | `ReactNode \| null` | - | Custom footer content |
-| `className` | `string` | - | Additional CSS class for modal |
-| `classNames` | `ModalClassNames` | - | CSS classes for different parts |
+| Property         | Type                                  | Default    | Description                            |
+| ---------------- | ------------------------------------- | ---------- | -------------------------------------- |
+| `open`           | `boolean`                             | `false`    | Whether the modal is visible           |
+| `title`          | `ReactNode`                           | -          | The modal title                        |
+| `width`          | `string \| number \| ResponsiveWidth` | `520`      | Width of the modal                     |
+| `onOk`           | `() => void`                          | -          | Callback when OK button is clicked     |
+| `onCancel`       | `() => void`                          | -          | Callback when Cancel button is clicked |
+| `onOpenChange`   | `(open: boolean) => void`             | -          | Callback when modal visibility changes |
+| `okText`         | `string`                              | `"OK"`     | Text of the OK button                  |
+| `cancelText`     | `string`                              | `"Cancel"` | Text of the Cancel button              |
+| `confirmLoading` | `boolean`                             | `false`    | Whether OK button is in loading state  |
+| `footer`         | `ReactNode \| null`                   | -          | Custom footer content                  |
+| `className`      | `string`                              | -          | Additional CSS class for modal         |
+| `classNames`     | `ModalClassNames`                     | -          | CSS classes for different parts        |
 
 ### ConfirmConfig (for modal.confirm)
 
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `title` | `ReactNode` | `"Confirm"` | The confirm dialog title |
-| `content` | `ReactNode` | - | The confirm dialog content |
-| `onOk` | `() => void \| Promise<void>` | - | Callback when OK is clicked |
-| `onCancel` | `() => void` | - | Callback when Cancel is clicked |
-| `okText` | `string` | `"OK"` | Text of the OK button |
-| `cancelText` | `string` | `"Cancel"` | Text of the Cancel button |
-| `okType` | `"default" \| "primary" \| "danger"` | `"primary"` | Type of OK button |
-| `confirmLoading` | `boolean` | `false` | Whether OK button shows loading |
+| Property         | Type                                 | Default     | Description                     |
+| ---------------- | ------------------------------------ | ----------- | ------------------------------- |
+| `title`          | `ReactNode`                          | `"Confirm"` | The confirm dialog title        |
+| `content`        | `ReactNode`                          | -           | The confirm dialog content      |
+| `onOk`           | `() => void \| Promise<void>`        | -           | Callback when OK is clicked     |
+| `onCancel`       | `() => void`                         | -           | Callback when Cancel is clicked |
+| `okText`         | `string`                             | `"OK"`      | Text of the OK button           |
+| `cancelText`     | `string`                             | `"Cancel"`  | Text of the Cancel button       |
+| `okType`         | `"default" \| "primary" \| "danger"` | `"primary"` | Type of OK button               |
+| `confirmLoading` | `boolean`                            | `false`     | Whether OK button shows loading |
 
 ## Examples
 
 ### Custom Width
 
 ```tsx
-<Modal
-  open={open}
-  title="Wide Modal"
-  width={800}
-  onOpenChange={setOpen}
->
+<Modal open={open} title="Wide Modal" width={800} onOpenChange={setOpen}>
   <p>This modal is 800px wide</p>
 </Modal>
 ```
@@ -128,7 +152,7 @@ function MyComponent() {
     xs: "90%",
     sm: 600,
     md: 800,
-    lg: 1000
+    lg: 1000,
   }}
   onOpenChange={setOpen}
 >
@@ -144,9 +168,7 @@ function MyComponent() {
   title="Custom Footer"
   footer={
     <div className="flex justify-end gap-2">
-      <Button onClick={() => setOpen(false)}>
-        Custom Cancel
-      </Button>
+      <Button onClick={() => setOpen(false)}>Custom Cancel</Button>
       <Button type="primary" onClick={handleSave}>
         Save Changes
       </Button>
@@ -165,12 +187,12 @@ const { modal } = App.useApp();
 
 const handleAsyncAction = () => {
   modal.confirm({
-    title: 'Async Action',
-    content: 'This will perform an async operation.',
+    title: "Async Action",
+    content: "This will perform an async operation.",
     onOk: async () => {
       // This will show loading state automatically
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Async operation completed');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Async operation completed");
     },
   });
 };
@@ -181,7 +203,7 @@ const handleAsyncAction = () => {
 ⚠️ **Important**: To use `modal.confirm()`, your app must be wrapped with the `App` component:
 
 ```tsx
-import { App } from '@acme/ui';
+import { App } from "@/components/ui/app";
 
 function Root() {
   return (
@@ -201,9 +223,9 @@ The Modal component uses CSS classes that can be customized:
   className="my-modal"
   classNames={{
     header: "my-modal-header",
-    title: "my-modal-title", 
+    title: "my-modal-title",
     description: "my-modal-description",
-    footer: "my-modal-footer"
+    footer: "my-modal-footer",
   }}
 >
   {/* content */}
