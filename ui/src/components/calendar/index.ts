@@ -1,1 +1,1 @@
-export * from "../../shadcn/calendar";
+export * from "./calendar";
