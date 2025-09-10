@@ -16,7 +16,7 @@ import { SkeletonTitle } from "./_components/skeleton-title";
 interface SkeletonProps {
   key?: Key;
   asChild?: boolean;
-  children?: React.ReactNode;
+  // children?: React.ReactNode;
   className?: string;
   rootClassName?: string;
   style?: React.CSSProperties;

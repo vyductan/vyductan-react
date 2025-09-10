@@ -2,8 +2,11 @@ import type { XOR } from "ts-xor";
 import React from "react";
 
 import type { BadgeProps as ShadcnBadgeProps } from "@acme/ui/shadcn/badge";
-import { AvatarFallback, AvatarImage } from "@acme/ui/shadcn/avatar";
-import { Badge as ShadcnBadge } from "@acme/ui/shadcn/badge";
+import {
+  AvatarFallback,
+  AvatarImage,
+  Avatar as ShadcnAvatar,
+} from "@acme/ui/shadcn/avatar";
 
 import type { OwnAvatarProps } from "./avatar";
 import { InternalAvatar } from "./avatar";
@@ -16,7 +19,7 @@ const Avatar = (props: AvatarProps) => {
       (child.type === AvatarImage || child.type === AvatarFallback),
   );
 
-  if (isAvatarShadcn) return <ShadcnBadge {...props} />;
+  if (isAvatarShadcn) return <ShadcnAvatar {...props} />;
 
   return <InternalAvatar {...props} />;
 };

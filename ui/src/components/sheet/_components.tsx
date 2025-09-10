@@ -29,7 +29,10 @@ export const SheetHeader = ({
 }: SheetHeaderProps) => {
   return (
     <ShadcnSheetHeader
-      className={cn("flex border-b px-6 py-4", className)}
+      className={cn(
+        "flex flex-row justify-between border-b px-6 py-4",
+        className,
+      )}
       {...props}
     >
       {children}
