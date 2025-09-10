@@ -31,6 +31,7 @@ type MenuItem = {
   href?: string;
   onSelect?: (event: Event) => void;
 
+  disabled?: boolean;
   asChild?: React.ReactNode;
 };
 type Menu = {
@@ -83,6 +84,7 @@ export const Dropdown = ({
           shortcut,
           onSelect,
           asChild,
+          disabled,
         },
         index,
       ) => (
@@ -96,34 +98,36 @@ export const Dropdown = ({
           ) : (
             <DropdownMenuItem
               onSelect={onSelect}
-              asChild={!!href || !!asChild}
+              disabled={disabled}
+              asChild={!disabled && (!!href || !!asChild)}
               className={cn(menu.itemsClassName, className)}
             >
-              {asChild ??
-                (href ? (
-                  <Link href={href}>
-                    {icon &&
-                      cloneElement(icon, {
-                        className: "mr-2 h-4 w-4",
-                      })}
-                    <span>{label}</span>
-                    {shortcut && (
-                      <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
-                    )}
-                  </Link>
-                ) : (
-                  <>
-                    {icon && (
-                      <GenericSlot className="text-muted-foreground">
-                        <div>{icon}</div>
-                      </GenericSlot>
-                    )}
-                    <span>{label}</span>
-                    {shortcut && (
-                      <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
-                    )}
-                  </>
-                ))}
+              {!disabled && asChild ? (
+                asChild
+              ) : !disabled && href ? (
+                <Link href={href}>
+                  {icon &&
+                    cloneElement(icon, {
+                      className: "mr-2 h-4 w-4",
+                    })}
+                  <span>{label}</span>
+                  {shortcut && (
+                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                  )}
+                </Link>
+              ) : (
+                <>
+                  {icon && (
+                    <GenericSlot className="text-muted-foreground">
+                      <div>{icon}</div>
+                    </GenericSlot>
+                  )}
+                  <span>{label}</span>
+                  {shortcut && (
+                    <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
+                  )}
+                </>
+              )}
             </DropdownMenuItem>
           )}
         </Fragment>
