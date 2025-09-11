@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react";
+import type { DateRange } from "react-day-picker";
 import { Slot } from "@radix-ui/react-slot";
 import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
@@ -125,7 +126,7 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
               }
             : undefined
         }
-        onSelect={(dateRange) => {
+        onSelect={(dateRange: DateRange | undefined) => {
           if (!dateRange) {
             setValue(undefined);
             return;

@@ -25,6 +25,7 @@ const SelectTrigger = ({
   onClear,
   loading,
   disabled,
+  suffixIcon,
 
   ...restProps
 }: Omit<React.ComponentProps<typeof ShacnSelectTrigger>, "size"> &
@@ -35,6 +36,7 @@ const SelectTrigger = ({
     loading?: boolean;
     /* For clear */
     value?: ValueType | undefined;
+    suffixIcon?: React.ReactNode;
   }) => {
   const mergedAllowClear = useMemo<boolean>(() => {
     if (!disabled && !!allowClear) {
@@ -63,11 +65,12 @@ const SelectTrigger = ({
         // for radix icon
         //           "flex size-5 items-center justify-center opacity-50 transition-opacity",
         [
-          "[&>svg:last-child]:transition-opacity",
+          "[&>svg:last-of-type]:transition-opacity",
           mergedAllowClear &&
             value &&
-            "[&>svg:last-child]:group-hover:opacity-0",
-          loading && "[&>svg:last-child]:opacity-0",
+            "[&>svg:last-of-type]:group-hover:opacity-0",
+          loading && "[&>svg:last-of-type]:hidden",
+          suffixIcon && "[&>svg:last-of-type]:hidden",
         ],
         //
         className,
@@ -83,11 +86,19 @@ const SelectTrigger = ({
         />
       )}
 
+      {suffixIcon && (
+        <span className="flex size-5 items-center justify-center pl-1 opacity-50 transition-opacity">
+          {suffixIcon}
+        </span>
+      )}
+
       {loading && (
-        <Icon
-          icon="icon-[lucide--loader]"
-          className="flex size-5 items-center justify-center pl-1 opacity-50 transition-opacity"
-        />
+        <span className="flex items-center">
+          <Icon
+            icon="icon-[lucide--loader]"
+            className="flex size-5 animate-spin items-center justify-center pl-1 opacity-50 transition-opacity"
+          />
+        </span>
       )}
     </ShacnSelectTrigger>
   );
