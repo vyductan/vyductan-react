@@ -257,7 +257,7 @@ const buttonVariants = tv({
       variant: "light",
       color: "link",
       className: [
-        "bg-link-muted text-link",
+        "text-link bg-blue-100",
         // "hover:text-white hover:bg-info",
         "hover:bg-link-hover hover:text-white",
       ],
