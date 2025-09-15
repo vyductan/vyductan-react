@@ -449,16 +449,6 @@ const DatePicker = (props: DatePickerProps) => {
                 (maxDate ? dayjs(maxDate as any) : undefined)?.toDate() ??
                 dayjs().add(50, "year").endOf("year").toDate()
               }
-              startMonth={
-                minDate
-                  ? (minDate as Dayjs).toDate()
-                  : dayjs().subtract(50, "year").startOf("year").toDate()
-              }
-              endMonth={
-                maxDate
-                  ? (maxDate as Dayjs).toDate()
-                  : dayjs().add(50, "year").endOf("year").toDate()
-              }
               onSelect={(date: Date | undefined) => {
                 if (date) {
                   const dayjsDate = getDestinationValue(date);
