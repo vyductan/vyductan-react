@@ -19,6 +19,7 @@ import { CardContext } from "./context";
 type CardProps = Omit<CardRootProps, "title"> & {
   skeleton?: boolean;
   bordered?: boolean;
+  variant?: "default" | "borderless";
   classNames?: {
     header?: string;
     title?: string;
@@ -42,6 +43,8 @@ const Card = ({
   extra,
   footer,
   className,
+  variant,
+  bordered,
 
   ...props
 }: CardProps) => {
@@ -69,9 +72,11 @@ const Card = ({
         child.type === CardDescription),
   );
 
+  const borderedToPass = variant === "borderless" ? false : bordered;
+
   if (isShadcnCard) {
     CardRender = (
-      <CardRoot className={className} {...props}>
+      <CardRoot className={className} bordered={borderedToPass} {...props}>
         {children}
       </CardRoot>
     );
@@ -81,7 +86,7 @@ const Card = ({
     const hasExtra = !!extra;
 
     CardRender = (
-      <CardRoot className={className} {...props}>
+      <CardRoot className={className} bordered={borderedToPass} {...props}>
         {(!!title || !!description || !!extra) && (
           <CardHeader
             className={cn(hasExtra && "items-center", classNames?.header)}
