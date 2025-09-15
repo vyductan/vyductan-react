@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/react-compiler */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from "react";
 import useMemo from "rc-util/lib/hooks/useMemo";
 
@@ -7,6 +10,7 @@ import type {
   InputConfig,
   InputNumberConfig,
   MentionsConfig,
+  PaginationConfig,
   SelectConfig,
   TextAreaConfig,
 } from "./context";
@@ -32,7 +36,6 @@ export interface ConfigProviderProps {
   input?: InputConfig;
   inputNumber?: InputNumberConfig;
   textArea?: TextAreaConfig;
-  // pagination?: PaginationConfig;
   // /**
   //  * @descEN Language package setting, you can find the packages in `antd/locale`.
   //  */
@@ -91,6 +94,7 @@ export interface ConfigProviderProps {
   // radio?: ComponentStyleConfig;
   // rate?: ComponentStyleConfig;
   select?: SelectConfig;
+  pagination?: PaginationConfig;
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // tree?: ComponentStyleConfig;
@@ -129,6 +133,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
   children,
 
   datePicker,
+  pagination,
 }) => {
   // const context = React.useMemo(() => {
   //   return {
@@ -139,6 +144,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
 
   const baseConfig = {
     datePicker,
+    pagination,
   };
   const config: ConfigConsumerProps = {
     ...parentContext,
