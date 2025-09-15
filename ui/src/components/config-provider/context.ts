@@ -6,6 +6,7 @@ import type { DatePickerProps } from "../date-picker";
 import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
+import type { PaginationProps } from "../pagination";
 import type { XorSelectProps } from "../select";
 import type { TableProps } from "../table";
 import type { TextAreaProps } from "../textarea";
@@ -69,6 +70,9 @@ export type MentionsConfig = ComponentStyleConfig &
 export type SelectConfig = ComponentStyleConfig &
   Pick<XorSelectProps, "showSearch" | "variant" | "classNames" | "styles">;
 
+export type PaginationConfig = ComponentStyleConfig &
+  Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
+
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {
@@ -111,7 +115,6 @@ export interface ConfigComponentProps {
   input?: InputConfig;
   inputNumber?: InputNumberConfig;
   mentions?: MentionsConfig;
-  // pagination?: PaginationConfig;
   // space?: SpaceConfig;
   // splitter?: ComponentStyleConfig;
   // form?: FormConfig;
@@ -128,6 +131,7 @@ export interface ConfigComponentProps {
   // collapse?: CollapseConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;
   // typography?: ComponentStyleConfig;
+  pagination?: PaginationConfig;
   skeleton?: ComponentStyleConfig;
   // spin?: SpinConfig;
   // segmented?: ComponentStyleConfig;
