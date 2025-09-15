@@ -27,7 +27,7 @@ const CardRoot = ({
     <ShadcnCardRoot
       className={cn(
         size === "small" && "gap-3 py-3",
-        bordered ? "" : "border-none",
+        bordered ? "" : "border-none shadow-none",
         className,
       )}
       {...props}
