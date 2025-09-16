@@ -25,7 +25,7 @@ const ColGroup = <TRecord extends AnyObject>({
   let mustInsert = false;
   for (let i = len - 1; i >= 0; i -= 1) {
     const width = colWidths[i];
-    const column = columns && columns[i];
+    const column = columns?.[i];
     // let additionalProps;
     let minWidth: number | undefined;
     if (column) {
