@@ -25,6 +25,8 @@ export interface ConfirmConfig {
   okType?: "default" | "primary" | "danger";
   okButtonProps?: ButtonProps;
   confirmLoading?: boolean;
+  /** Internal: used to customize global modal footer, e.g. hide Cancel for warning */
+  type?: "confirm" | "warning" | "info" | "success" | "error";
 }
 
 const Modal = (props: XORModalProps) => {
@@ -43,17 +45,31 @@ const Modal = (props: XORModalProps) => {
 // Note: This is a static method that requires App component to be used
 Modal.confirm = (_config: ConfirmConfig) => {
   throw new Error(
-    "Modal.confirm() can only be used within App component. " +
-      "Please wrap your app with <App> component and use useModal() hook instead.\n\n" +
+    "Modal.confirm() is not available directly. " +
+      "Wrap your app with <App> and use App.useApp().modal.confirm() instead.\n\n" +
       "Example:\n" +
-      'import { App, useModal } from "@acme/ui";\n\n' +
+      'import { App } from "@acme/ui";\n\n' +
       "// Wrap your app\n" +
       "<App>\n" +
       "  <YourApp />\n" +
       "</App>\n\n" +
       "// In your component\n" +
-      "const modal = useModal();\n" +
+      "const { modal } = App.useApp();\n" +
       "modal.confirm({ ... });",
+  );
+};
+
+// Warning function following Ant Design API
+// Note: This is a static method that requires App component to be used
+Modal.warning = (_config: ConfirmConfig) => {
+  throw new Error(
+    "Modal.warning() is not available directly. " +
+      "Wrap your app with <App> and use App.useApp().modal.warning() instead.\n\n" +
+      "Example:\n" +
+      'import { App } from "@acme/ui";\n\n' +
+      "// In your component\n" +
+      "const { modal } = App.useApp();\n" +
+      "modal.warning({ title: 'Warning', content: 'This is a warning.' });",
   );
 };
 

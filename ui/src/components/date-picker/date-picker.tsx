@@ -64,37 +64,51 @@ type DatePickerBaseProps = InputVariants &
     commitYearOnClose?: boolean;
   };
 
-type DatePickerProps<DateValueType extends Dayjs = Dayjs> =
-  DatePickerBaseProps & {
-    ref?: React.Ref<InputRef>;
-    defaultValue?: DateValueType | null;
-    value?: DateValueType | null;
-    /** Callback function, can be executed when the selected time is changing */
-    onChange?: (
-      date: DateValueType | null | undefined,
-      dateString: string,
-    ) => void;
-    /**
-     * Function that determines whether a date should be disabled
-     * @param current The current date to check
-     * @returns boolean indicating if the date should be disabled
-     */
-    disabledDate?: DisabledDate<DateValueType>;
-    placeholder?: string;
-    minDate?: DateValueType;
-    maxDate?: DateValueType;
-    picker?: PickerMode;
+type DatePickerPropsDayjs = DatePickerBaseProps & {
+  ref?: React.Ref<InputRef>;
+  /** Default behavior - uses Dayjs */
+  valueType?: "dayjs";
+  defaultValue?: Dayjs | null;
+  value?: Dayjs | null;
+  onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
+  disabledDate?: DisabledDate<Dayjs>;
+  placeholder?: string;
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
+  picker?: PickerMode;
 
-    styles?: {
-      root?: React.CSSProperties;
-    };
-    classNames?: {
-      root?: string;
-    };
+  styles?: {
+    root?: React.CSSProperties;
   };
-const DatePicker = <DateValueType extends Dayjs = Dayjs>(
-  props: DatePickerProps<DateValueType>,
-) => {
+  classNames?: {
+    root?: string;
+  };
+};
+
+type DatePickerPropsDate = DatePickerBaseProps & {
+  ref?: React.Ref<InputRef>;
+  /** Explicit Date mode - accepts and emits Date */
+  valueType: "date";
+  defaultValue?: Date | null;
+  value?: Date | null;
+  onChange?: (date: Date | null | undefined, dateString: string) => void;
+  disabledDate?: DisabledDate<Date>;
+  placeholder?: string;
+  minDate?: Date;
+  maxDate?: Date;
+  picker?: PickerMode;
+
+  styles?: {
+    root?: React.CSSProperties;
+  };
+  classNames?: {
+    root?: string;
+  };
+};
+
+type DatePickerProps = DatePickerPropsDayjs | DatePickerPropsDate;
+
+const DatePicker = (props: DatePickerProps) => {
   const {
     ref,
     id,
@@ -124,6 +138,8 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     ...rest
   } = props;
 
+  const valueType = props.valueType ?? "dayjs";
+
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
   const [open, setOpen] = useState(false);
@@ -145,25 +161,44 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
         ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
         : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
+  // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
+  const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
+    if (!v) return undefined;
+    return dayjs(v as any);
+  };
+  const fromDayjs = (v: Dayjs | undefined): Dayjs | Date | undefined => {
+    if (!v) return undefined;
+    return valueType === "date" ? v.toDate() : v;
+  };
+
+  const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
+  const defaultDayjsValue = useMemo(
+    () => toDayjs(defaultValue as any),
+    [defaultValue],
+  );
+
   // ====================== Value =======================
-  const [value, setValue] = useMergedState(defaultValue, {
-    value: valueProp,
-    onChange: (value) => {
-      onChange?.(value, value ? value.format(format) : "");
+  const [value, setValue] = useMergedState<Dayjs | undefined>(
+    defaultDayjsValue,
+    {
+      value: controlledValue,
+      onChange: (next) => {
+        onChange?.(fromDayjs(next) as any, next ? next.format(format) : "");
+      },
     },
-  });
-  const preInputValue = value ? (value as Dayjs).format(format) : "";
+  );
+  const preInputValue = value ? value.format(format) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue);
 
   // Sync input value when value changes
   useEffect(() => {
-    const newInputValue = value ? (value as Dayjs).format(format) : "";
+    const newInputValue = value ? value.format(format) : "";
     setInputValue(newInputValue);
   }, [value, format, setInputValue]);
 
-  const getDestinationValue = (date: Date): DateValueType => {
-    const dayjsDate = dayjs(date);
-    return dayjsDate as DateValueType;
+  // Convert Day (Date) from calendar to internal Dayjs
+  const getDestinationValue = (date: Date): Dayjs => {
+    return dayjs(date);
   };
 
   const inputRef = React.useRef<InputRef>(null);
@@ -173,7 +208,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
     if (value.trim()) {
       const parsed = dayjs(value, format);
       if (parsed.isValid()) {
-        setValue(parsed as DateValueType);
+        setValue(parsed);
         setInputValue(parsed.format(format));
         setMonth(parsed.toDate());
       } else {
@@ -198,10 +233,10 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
   }, [id]);
 
   const [month, setMonth] = React.useState<Date | undefined>(
-    value ? (value as Dayjs).toDate() : undefined,
+    value ? value.toDate() : undefined,
   );
   const [typedDate, setTypedDate] = React.useState<Date | undefined>(
-    value ? (value as Dayjs).toDate() : undefined,
+    value ? value.toDate() : undefined,
   );
 
   // Sync calendar month and selected date when input value changes
@@ -214,8 +249,8 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
       }
     } else if (value) {
       // If there's a selected value, use it for month
-      setMonth((value as Dayjs).toDate());
-      setTypedDate((value as Dayjs).toDate());
+      setMonth(value.toDate());
+      setTypedDate(value.toDate());
     } else {
       setTypedDate(undefined);
     }
@@ -278,7 +313,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
             // If DatePicker acts as a pure year picker, commit the selection
             if (picker === "year") {
               const y = year.startOf("year");
-              setValue(y as DateValueType);
+              setValue(y);
               setInputValue(y.format(format));
               setMonth(y.toDate());
               setOpen(false);
@@ -362,7 +397,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                 : dayjs(stickyPreview).isValid()
                   ? dayjs(stickyPreview)
                   : dayjs();
-              setValue(commit as DateValueType);
+              setValue(commit);
               setInputValue(commit.format(format));
               setTypedDate(commit.toDate());
               setMonth(commit.toDate());
@@ -405,24 +440,20 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                   setHoverPreview(stickyPreview ?? undefined);
                 }
               }}
-              selected={
-                typedDate ?? (value ? (value as Dayjs).toDate() : undefined)
-              }
+              selected={typedDate ?? (value ? value.toDate() : undefined)}
               startMonth={
-                minDate
-                  ? (minDate as Dayjs).toDate()
-                  : dayjs().subtract(50, "year").startOf("year").toDate()
+                (minDate ? dayjs(minDate as any) : undefined)?.toDate() ??
+                dayjs().subtract(50, "year").startOf("year").toDate()
               }
               endMonth={
-                maxDate
-                  ? (maxDate as Dayjs).toDate()
-                  : dayjs().add(50, "year").endOf("year").toDate()
+                (maxDate ? dayjs(maxDate as any) : undefined)?.toDate() ??
+                dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
                 if (date) {
                   const dayjsDate = getDestinationValue(date);
                   setValue(dayjsDate);
-                  setInputValue((dayjsDate as Dayjs).format(format));
+                  setInputValue(dayjsDate.format(format));
                   setMonth(date);
                 }
                 // Selecting a day commits selection; clear any pending year commit
@@ -432,7 +463,11 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
               disabled={(date) => {
                 if (disabledDate) {
                   // Pass both the date and the required info object
-                  return disabledDate(getDestinationValue(date), {
+                  const currentArg =
+                    valueType === "date"
+                      ? (getDestinationValue(date).toDate() as any)
+                      : (getDestinationValue(date) as any);
+                  return disabledDate(currentArg, {
                     type: "date",
                   });
                 }
@@ -475,7 +510,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
               input: cn(
                 open &&
                   hoverPreview &&
-                  (!value || !(value as Dayjs).isSame(hoverPreview, "day")) &&
+                  !value?.isSame(hoverPreview, "day") &&
                   "text-muted-foreground",
               ),
             }}
@@ -495,7 +530,7 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
                 if (inputValue.trim()) {
                   const parsed = dayjs(inputValue, format);
                   if (parsed.isValid()) {
-                    setValue(parsed as DateValueType);
+                    setValue(parsed);
                     setInputValue(parsed.format(format));
                     setTypedDate(parsed.toDate());
                   }
@@ -540,13 +575,13 @@ const DatePicker = <DateValueType extends Dayjs = Dayjs>(
               if (inputValue.trim()) {
                 const parsed = dayjs(inputValue, format);
                 if (parsed.isValid()) {
-                  setValue(parsed as DateValueType);
+                  setValue(parsed);
                   setInputValue(parsed.format(format));
                   setTypedDate(parsed.toDate());
                 } else {
                   // Invalid input - revert to previous value
-                  setInputValue(value ? (value as Dayjs).format(format) : "");
-                  setTypedDate(value ? (value as Dayjs).toDate() : undefined);
+                  setInputValue(value ? value.format(format) : "");
+                  setTypedDate(value ? value.toDate() : undefined);
                 }
               } else {
                 // Empty input - trigger onChange with undefined

@@ -22,6 +22,7 @@ const color: Record<string, string> = {
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
   green: "bg-green-100 text-green-700 border-green-300",
+  cyan: "bg-cyan-100 text-cyan-700 border-cyan-300",
   orange: "bg-orange-100 text-orange-700 border-orange-300",
   red: "bg-red-100 text-red-700 border-red-300",
   rose: "bg-rose-100 text-rose-700 border-rose-300",
@@ -145,22 +146,17 @@ const Tag = ({
     >
       {icon}
       {props.children}
-      {typeof closeIcon === "boolean" && closeIcon ? (
-        <button
-          type="button"
-          aria-label="Remove"
-          className="ml-1 -mr-0.5 grid place-items-center rounded p-0.5 hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-ring"
+      {(typeof closeIcon === "boolean" && closeIcon) || onClose ? (
+        <Icon
+          aria-label="Close"
+          icon="icon-[lucide--x]"
+          className="size-3 opacity-50 transition-opacity hover:opacity-100"
+          tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation();
             onClose?.();
           }}
-        >
-          <Icon
-            icon="icon-[lucide--x]"
-            className="size-3 opacity-50 transition-opacity hover:opacity-100"
-            tabIndex={-1}
-          />
-        </button>
+        />
       ) : (
         closeIcon
       )}
