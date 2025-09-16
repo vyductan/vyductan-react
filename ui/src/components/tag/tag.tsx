@@ -146,22 +146,17 @@ const Tag = ({
     >
       {icon}
       {props.children}
-      {typeof closeIcon === "boolean" && closeIcon ? (
-        <button
-          type="button"
-          aria-label="Remove"
-          className="focus:ring-ring -mr-0.5 ml-1 grid place-items-center rounded p-0.5 hover:bg-black/5 focus:ring-2 focus:outline-none"
+      {(typeof closeIcon === "boolean" && closeIcon) || onClose ? (
+        <Icon
+          aria-label="Close"
+          icon="icon-[lucide--x]"
+          className="size-3 opacity-50 transition-opacity hover:opacity-100"
+          tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation();
             onClose?.();
           }}
-        >
-          <Icon
-            icon="icon-[lucide--x]"
-            className="size-3 opacity-50 transition-opacity hover:opacity-100"
-            tabIndex={-1}
-          />
-        </button>
+        />
       ) : (
         closeIcon
       )}
