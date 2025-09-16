@@ -44,7 +44,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
   confirmLoading?: boolean;
   okButtonProps?: ButtonProps;
   cancelText?: string;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
