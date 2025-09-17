@@ -1,7 +1,8 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
 import type { ModalProps } from "../modal";
-import { LoadingIcon } from "../button";
+import { buttonVariants, LoadingIcon } from "../button";
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +33,8 @@ export const AlertModal = ({
   onOpenChange,
 
   children,
+
+  okButtonProps,
 
   ...rest
 }: AlertModalProps) => {
@@ -70,7 +73,15 @@ export const AlertModal = ({
         </AlertDialogHeader>
 
         <AlertDialogFooter className={classNames?.footer}>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+          <AlertDialogCancel
+            className={cn(
+              buttonVariants({
+                variant: "outline",
+              }),
+            )}
+          >
+            {cancelText}
+          </AlertDialogCancel>
           <AlertDialogAction
             isOpenControlled={rest.open !== undefined}
             onClick={(e) => {
@@ -78,6 +89,11 @@ export const AlertModal = ({
               onConfirm?.();
             }}
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
+            className={cn(
+              buttonVariants({
+                color: okButtonProps?.color,
+              }),
+            )}
           >
             {confirmLoading && <LoadingIcon />}
             {okText}

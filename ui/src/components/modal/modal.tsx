@@ -50,7 +50,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
-  width,
+  width = 520,
   className,
   classNames,
   children,
@@ -175,7 +175,10 @@ const Modal = ({
       >
         <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
-          <DialogDescription className={classNames?.description}>
+          <DialogDescription
+            className={classNames?.description}
+            asChild={typeof description === "object"}
+          >
             {description}
           </DialogDescription>
         </DialogHeader>
