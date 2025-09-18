@@ -145,8 +145,8 @@ const Input = (props: InputProps) => {
   const mergedSize = useSize((ctx) => customSize ?? compactSize ?? ctx);
 
   // ===================== Disabled =====================
-  const disabled = React.useContext(DisabledContext);
-  const mergedDisabled = customDisabled ?? disabled;
+  const disabledFromContext = React.useContext(DisabledContext);
+  const disabled = customDisabled ?? disabledFromContext;
 
   // =================== Select Range ===================
   const [selection, setSelection] = useState<
@@ -186,8 +186,8 @@ const Input = (props: InputProps) => {
     if (keyLockRef.current) {
       keyLockRef.current = false;
     }
-    setFocused((prev) => (prev && disabled ? false : prev));
-  }, [disabled]);
+    setFocused((prev) => (prev && disabledFromContext ? false : prev));
+  }, [disabledFromContext]);
 
   const triggerChange = (
     e:
@@ -389,11 +389,14 @@ const Input = (props: InputProps) => {
       focused={focused}
       triggerFocus={focus}
       suffix={getSuffix()}
-      disabled={mergedDisabled}
+      disabled={disabled}
       styles={styles}
       ref={holderRef}
       classNames={{
-        variant: cn(inputVariants({ variant, status }), classNames?.variant),
+        variant: cn(
+          inputVariants({ variant, status, disabled }),
+          classNames?.variant,
+        ),
         affixWrapper: cn(
           inputSizeVariants({ size: mergedSize }),
           classNames?.affixWrapper,
