@@ -1207,14 +1207,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                         </TableRowComp>
                         {row.getIsExpanded() &&
                           expandable?.expandedRowRender && (
-                            <TableRow className="bg-primary-50 hover:bg-primary-50">
+                            <TableRow className="bg-gray-50 hover:bg-gray-50">
                               {/* 2nd row is a custom 1 cell row */}
                               <TableCell
                                 colSpan={row.getVisibleCells().length}
                                 size={size}
                                 className={cn(
                                   // "px-4 text-[13px]",
-                                  bordered === false && "border-x border-b",
+                                  bordered === false ? "border-b" : "",
                                 )}
                               >
                                 {expandable.expandedRowRender(

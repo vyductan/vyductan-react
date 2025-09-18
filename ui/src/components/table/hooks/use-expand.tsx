@@ -126,6 +126,31 @@ export default function useExpand<TRecord extends AnyObject>(
     [expandedRowKeys, innerExpandedKeys],
   );
 
+  // Sync expanded keys when data arrives after initial render.
+  // Without this, when `defaultExpandAllRows` is true, TanStack's internal
+  // expanded state expands all rows but our custom expand icon (which relies
+  // on `expandedKeys`) may still think rows are collapsed. Recompute keys
+  // on data changes to keep the arrow direction correct.
+  React.useEffect(() => {
+    if (!defaultExpandAllRows) return;
+    // If consumer controls expandedRowKeys, do not override
+    if (expandedRowKeys) return;
+    setInnerExpandedKeys(
+      findAllChildrenKeys<TRecord>(
+        mergedData,
+        getRowKey,
+        mergedChildrenColumnName,
+      ),
+    );
+  }, [
+    defaultExpandAllRows,
+    // Recompute when data or key resolver changes
+    mergedData,
+    getRowKey,
+    mergedChildrenColumnName,
+    expandedRowKeys,
+  ]);
+
   const onTriggerExpand: TriggerEventHandler<TRecord> = React.useCallback(
     (record: TRecord) => {
       const key = getRowKey(record, mergedData.indexOf(record));
