@@ -258,7 +258,7 @@ const DatePicker = (props: DatePickerProps) => {
 
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
 
-  const [currentDecadeRange, setCurrentDecadeRange] = useState<Dayjs[]>(() =>
+  const [currentDecadeRange] = useState<Dayjs[]>(() =>
     Array.from({ length: 10 }, (_, i) => {
       const yearValue = currentYear.year();
       const startYear = Math.floor(yearValue / 10) * 10;
@@ -414,6 +414,7 @@ const DatePicker = (props: DatePickerProps) => {
           <div className="flex">
             <Calendar
               mode="single"
+              required={true}
               captionLayout={captionLayoutConfig}
               // initialFocus // disable default focus (in shadcn default is true)
               // defaultMonth={value && toDate(value)}
@@ -440,6 +441,7 @@ const DatePicker = (props: DatePickerProps) => {
                   setHoverPreview(stickyPreview ?? undefined);
                 }
               }}
+              // value={typedDate ? dayjs(typedDate) : (value ?? undefined)}
               selected={typedDate ?? (value ? value.toDate() : undefined)}
               startMonth={
                 (minDate ? dayjs(minDate as any) : undefined)?.toDate() ??
@@ -450,12 +452,14 @@ const DatePicker = (props: DatePickerProps) => {
                 dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
-                if (date) {
-                  const dayjsDate = getDestinationValue(date);
-                  setValue(dayjsDate);
-                  setInputValue(dayjsDate.format(format));
-                  setMonth(date);
-                }
+                const dayjsDate = getDestinationValue(date);
+                setValue(dayjsDate);
+                setInputValue(dayjsDate.format(format));
+                setMonth(date);
+
+                // setValue(date);
+                // setInputValue(date.format(format));
+                // setMonth(date.toDate());
                 // Selecting a day commits selection; clear any pending year commit
                 setPendingYearCommit(false);
                 setOpen(false);
