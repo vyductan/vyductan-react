@@ -5,18 +5,12 @@ import { Calendar as ShadcnCalendar } from "../../shadcn/calendar";
 
 type ShadcnCalendarProps = React.ComponentProps<typeof ShadcnCalendar>;
 
-type CalendarPassThroughProps = ShadcnCalendarProps & {
-  value?: never;
-  format?: string;
-  disabledDate?: (date: Dayjs) => boolean;
-};
-
 type CalendarSingleValueProps = Omit<
   ShadcnCalendarProps,
-  "selected" | "onSelect"
+  "mode" | "required" | "selected" | "onSelect"
 > & {
   mode: "single";
-  value: Dayjs;
+  value?: Dayjs;
   onSelect?: (date: Dayjs, dateString: string) => void;
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
@@ -24,19 +18,21 @@ type CalendarSingleValueProps = Omit<
 
 type CalendarMultipleValueProps = Omit<
   ShadcnCalendarProps,
-  "selected" | "onSelect" | "required"
+  "mode" | "required" | "selected" | "onSelect"
 > & {
   mode: "multiple";
-  value: Dayjs[];
+  value?: Dayjs[];
   onSelect?: (dates: Dayjs[], dateStrings: string[]) => void;
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
 };
 
 type CalendarProps =
-  | CalendarPassThroughProps
   | CalendarSingleValueProps
-  | CalendarMultipleValueProps;
+  | CalendarMultipleValueProps
+  | {
+      mode?: undefined;
+    };
 
 function composeDisabled(
   base: ShadcnCalendarProps["disabled"],
@@ -76,42 +72,25 @@ const Calendar = (props: CalendarProps) => {
     );
   }
 
-  // Multiple (Dayjs convenience)
-  if (
-    props.mode === "multiple" &&
-    "value" in props &&
-    Array.isArray(props.value)
-  ) {
-    const { value, onSelect, disabledDate, ...rest } =
-      props as CalendarMultipleValueProps;
-    const disabled = composeDisabled(rest.disabled, disabledDate);
-    return (
-      <ShadcnCalendar
-        {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
-        mode="multiple"
-        required
-        disabled={disabled}
-        selected={value.map((v) => v.toDate())}
-        onSelect={(dates) =>
-          onSelect?.(
-            dates.map((d) => dayjs(d)),
-            dates.map((d) => dayjs(d).format(format)),
-          )
-        }
-      />
-    );
-  }
-
-  // Pass-through (including range)
-  const {
-    disabledDate,
-    format: _f,
-    value: _v,
-    ...rest
-  } = props as CalendarPassThroughProps;
+  const { value, onSelect, disabledDate, ...rest } =
+    props as CalendarMultipleValueProps;
   const disabled = composeDisabled(rest.disabled, disabledDate);
   return (
-    <ShadcnCalendar {...(rest as ShadcnCalendarProps)} disabled={disabled} />
+    <ShadcnCalendar
+      // {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
+      mode="multiple"
+      required
+      disabled={disabled}
+      selected={value?.map((v) => v.toDate())}
+      onSelect={(dates) =>
+        onSelect?.(
+          dates.map((d) => dayjs(d)),
+          dates.map((d) => dayjs(d).format(format)),
+        )
+      }
+    />
   );
 };
+
+export type { CalendarProps };
 export { Calendar };
