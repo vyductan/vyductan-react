@@ -85,7 +85,8 @@ const buttonVariants = tv({
         "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
       solid: ["text-white"],
       outline: [
-        "border-input bg-background hover:text-accent-foreground hover:bg-accent dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
+        // "hover:bg-accent",
+        "border-input bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
       dashed: [
         "border-border border border-dashed",
@@ -222,6 +223,14 @@ const buttonVariants = tv({
       variant: "outline",
       color: "link",
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
+    },
+    {
+      variant: "outline",
+      color: "blue",
+      className: [
+        "border-blue-600 text-blue-600",
+        "hover:border-blue-700 hover:text-blue-700",
+      ],
     },
     {
       variant: "outline",
@@ -404,7 +413,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={cn("size-4")}
+            className={cn("size-4", size === "small" && "size-[14px]")}
             // srOnly={
             //   srOnly && typeof children === "string"
             //     ? children
