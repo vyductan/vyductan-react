@@ -150,7 +150,7 @@ const Tag = ({
         <Icon
           aria-label="Close"
           icon="icon-[lucide--x]"
-          className="size-3 opacity-50 transition-opacity hover:opacity-100"
+          className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
           tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation();
