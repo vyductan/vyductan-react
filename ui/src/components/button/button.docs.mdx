@@ -1,6 +1,7 @@
 # Button Component Documentation
 
 ## Overview
+
 A versatile button component that combines Ant Design's API with Shadcn UI's styling system. Supports multiple variants, sizes, states, and composition patterns.
 
 ## Import
@@ -18,26 +19,165 @@ import { Button } from "@acme/ui/components/button";
 <Button variant="ghost">Ghost Button</Button>
 ```
 
+### Color & Variant
+
+You can set the `color` and `variant` attributes at the same time can derive more variant buttons.
+
+```tsx
+<Flex vertical gap="small">
+  <Flex gap="small" wrap>
+    <Button color="default" variant="solid">
+      Solid
+    </Button>
+    <Button color="default" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="default" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="default" variant="filled">
+      Filled
+    </Button>
+    <Button color="default" variant="text">
+      Text
+    </Button>
+    <Button color="default" variant="link">
+      Link
+    </Button>
+  </Flex>
+  <Flex gap="small" wrap>
+    <Button color="primary" variant="solid">
+      Solid
+    </Button>
+    <Button color="primary" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="primary" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="primary" variant="filled">
+      Filled
+    </Button>
+    <Button color="primary" variant="text">
+      Text
+    </Button>
+    <Button color="primary" variant="link">
+      Link
+    </Button>
+  </Flex>
+  <Flex gap="small" wrap>
+    <Button color="danger" variant="solid">
+      Solid
+    </Button>
+    <Button color="danger" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="danger" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="danger" variant="filled">
+      Filled
+    </Button>
+    <Button color="danger" variant="text">
+      Text
+    </Button>
+    <Button color="danger" variant="link">
+      Link
+    </Button>
+  </Flex>
+  <Flex gap="small" wrap>
+    <Button color="pink" variant="solid">
+      Solid
+    </Button>
+    <Button color="pink" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="pink" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="pink" variant="filled">
+      Filled
+    </Button>
+    <Button color="pink" variant="text">
+      Text
+    </Button>
+    <Button color="pink" variant="link">
+      Link
+    </Button>
+  </Flex>
+  <Flex gap="small" wrap>
+    <Button color="purple" variant="solid">
+      Solid
+    </Button>
+    <Button color="purple" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="purple" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="purple" variant="filled">
+      Filled
+    </Button>
+    <Button color="purple" variant="text">
+      Text
+    </Button>
+    <Button color="purple" variant="link">
+      Link
+    </Button>
+  </Flex>
+  <Flex gap="small" wrap>
+    <Button color="cyan" variant="solid">
+      Solid
+    </Button>
+    <Button color="cyan" variant="outlined">
+      Outlined
+    </Button>
+    <Button color="cyan" variant="dashed">
+      Dashed
+    </Button>
+    <Button color="cyan" variant="filled">
+      Filled
+    </Button>
+    <Button color="cyan" variant="text">
+      Text
+    </Button>
+    <Button color="cyan" variant="link">
+      Link
+    </Button>
+  </Flex>
+</Flex>
+```
+
+### Icon
+
+You can add an icon using the icon property.
+
+```tsx
+import { Icon } from "@acme/ui/icons";
+
+<Button icon={<Icon icon="icon-[lucide--plus]" />}>Add Item</Button>;
+```
+
 ## API Reference
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `variant` | `"default" \| "outline" \| "ghost" \| "link" \| "destructive"` | `"default"` | Button visual variant |
-| `size` | `"default" \| "small" \| "large" \| "icon" \| "middle" \| "sm"` | `"middle"` | Button size |
-| `color` | `"default" \| "danger" \| "success" \| "link"` | `"default"` | Button color theme |
-| `shape` | `"default" \| "circle" \| "round"` | `"default"` | Button shape |
-| `type` | `HtmlType \| ButtonType` | `"default"` | Button type (HTML or custom) |
-| `htmlType` | `"button" \| "submit" \| "reset"` | `"button"` | HTML button type |
-| `loading` | `boolean` | `false` | Show loading spinner |
-| `disabled` | `boolean` | `false` | Disable button |
-| `icon` | `React.ReactNode` | - | Icon element |
-| `href` | `string` | - | Make button act as link |
-| `asChild` | `boolean` | `false` | Use Slot for composition |
-| `primary` | `boolean` | - | Primary styling (legacy) |
-| `srOnly` | `boolean` | `false` | Screen reader only text |
-| `classNames` | `object` | - | Custom class names |
+| Prop         | Type                                                            | Default     | Description                  |
+| ------------ | --------------------------------------------------------------- | ----------- | ---------------------------- |
+| `variant`    | `"default" \| "outline" \| "ghost" \| "link" \| "destructive"`  | `"default"` | Button visual variant        |
+| `size`       | `"default" \| "small" \| "large" \| "icon" \| "middle" \| "sm"` | `"middle"`  | Button size                  |
+| `color`      | `"default" \| "danger" \| "success" \| "link"`                  | `"default"` | Button color theme           |
+| `shape`      | `"default" \| "circle" \| "round"`                              | `"default"` | Button shape                 |
+| `type`       | `HtmlType \| ButtonType`                                        | `"default"` | Button type (HTML or custom) |
+| `htmlType`   | `"button" \| "submit" \| "reset"`                               | `"button"`  | HTML button type             |
+| `loading`    | `boolean`                                                       | `false`     | Show loading spinner         |
+| `disabled`   | `boolean`                                                       | `false`     | Disable button               |
+| `icon`       | `React.ReactNode`                                               | -           | Icon element                 |
+| `href`       | `string`                                                        | -           | Make button act as link      |
+| `asChild`    | `boolean`                                                       | `false`     | Use Slot for composition     |
+| `primary`    | `boolean`                                                       | -           | Primary styling (legacy)     |
+| `srOnly`     | `boolean`                                                       | `false`     | Screen reader only text      |
+| `classNames` | `object`                                                        | -           | Custom class names           |
 
 ## Examples
 
@@ -65,15 +205,6 @@ import { Button } from "@acme/ui/components/button";
 </Button>
 ```
 
-### Colors
-
-```tsx
-<Button color="default">Default</Button>
-<Button color="danger">Danger</Button>
-<Button color="success">Success</Button>
-<Button color="link">Link</Button>
-```
-
 ### Shapes
 
 ```tsx
@@ -81,20 +212,6 @@ import { Button } from "@acme/ui/components/button";
 <Button shape="round">Round</Button>
 <Button shape="circle" size="icon">
   <Icon icon="icon-[lucide--plus]" />
-</Button>
-```
-
-### With Icons
-
-```tsx
-import { Icon } from "@acme/ui/icons";
-
-<Button icon={<Icon icon="icon-[lucide--plus]" />}>
-  Add Item
-</Button>
-
-<Button size="icon">
-  <Icon icon="icon-[lucide--settings]" />
 </Button>
 ```
 
@@ -152,11 +269,11 @@ import { Icon } from "@acme/ui/icons";
 ### Custom Styling
 
 ```tsx
-<Button 
+<Button
   classNames={{
     variants: {
       // Custom Tailwind Variants configuration
-    }
+    },
   }}
   className="custom-button-class"
 >
@@ -186,7 +303,7 @@ import { Tooltip } from "@acme/ui/components/tooltip";
   <Button size="icon">
     <Icon icon="icon-[lucide--save]" />
   </Button>
-</Tooltip>
+</Tooltip>;
 ```
 
 ## Accessibility
@@ -210,6 +327,7 @@ The button uses Tailwind Variants for consistent styling:
 ## Type Safety
 
 Full TypeScript support with:
+
 - Strict prop typing
 - Variant inference
 - Composition pattern types
@@ -231,11 +349,13 @@ Full TypeScript support with:
 ## Migration Notes
 
 ### From Ant Design Button
+
 - Most props are compatible
 - `type` prop behavior slightly different
 - Custom styling approach changed
 
-### From Shadcn Button  
+### From Shadcn Button
+
 - Enhanced API with more variants
 - Additional size options
 - Better composition support
