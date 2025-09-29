@@ -83,7 +83,7 @@ const buttonVariants = tv({
       ],
       destructive:
         "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
-      solid: ["text-white"],
+      solid: ["text-white", "hover:text-white"],
       outline: [
         // "hover:bg-accent",
         "border-input bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
@@ -94,7 +94,8 @@ const buttonVariants = tv({
       ],
       filled: [],
       ghost: [
-        "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
+        "border-none",
+        // "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
       ],
       light: ["border-transparent", "hover:bg-background-hover"],
       link: ["border-0"],
@@ -121,6 +122,11 @@ const buttonVariants = tv({
   },
   compoundVariants: [
     // primary
+    {
+      primary: true,
+      color: "default",
+      className: ["text-white", "hover:text-white"],
+    },
     {
       primary: true,
       color: "danger",
@@ -180,11 +186,11 @@ const buttonVariants = tv({
     },
     // outline
     {
-      variant: "default",
+      variant: "outline",
       color: "default",
       className: [
-        "border-primary-500 bg-primary-500 text-primary-foreground shadow-xs",
-        "hover:border-primary-600 hover:bg-primary-600",
+        "border-primary-500 text-primary shadow-xs",
+        "hover:border-primary-600 hover:text-primary-600",
         "active:ring-primary",
       ],
     },
@@ -238,6 +244,22 @@ const buttonVariants = tv({
       className: [
         "border-green-600 text-green-600",
         "hover:border-green-700 hover:text-green-700",
+      ],
+    },
+    {
+      variant: "outline",
+      color: "emerald",
+      className: [
+        "border-emerald-600 text-emerald-600",
+        "hover:border-emerald-700 hover:text-emerald-700",
+      ],
+    },
+    {
+      variant: "outline",
+      color: "indigo",
+      className: [
+        "border-indigo-600 text-indigo-600",
+        "hover:border-indigo-700 hover:text-indigo-700",
       ],
     },
     // filled
@@ -298,6 +320,16 @@ const buttonVariants = tv({
       ],
     },
     // Ghost
+
+    {
+      variant: "ghost",
+      color: "default",
+      className: [
+        "text-primary",
+        "hover:text-primary-hover",
+        "hover:bg-primary-100",
+      ],
+    },
     {
       variant: "ghost",
       color: "danger",
@@ -316,6 +348,24 @@ const buttonVariants = tv({
       variant: "ghost",
       color: "link",
       className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
+    },
+    {
+      variant: "ghost",
+      color: "emerald",
+      className: [
+        "text-emerald-600",
+        "hover:text-emerald-hover",
+        "hover:bg-emerald-100",
+      ],
+    },
+    {
+      variant: "ghost",
+      color: "indigo",
+      className: [
+        "text-indigo-600",
+        "hover:text-indigo-hover",
+        "hover:bg-indigo-100",
+      ],
     },
     // Link
     {
@@ -407,13 +457,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const buttonConfig = useUiConfig((state) => state.components.button);
 
+    let sizeToPass = size as ButtonVariants["size"];
+    if (size === "sm") {
+      sizeToPass = "small";
+    }
+
     const Comp = asChild || href ? Slot : "button";
 
     const ChildrenToRender = (
       <>
         {(!!loading || icon) && (
           <GenericSlot<Partial<IconProps>>
-            className={cn("size-4", size === "small" && "size-[14px]")}
+            className={cn("size-4", sizeToPass === "small" && "size-[14px]")}
             // srOnly={
             //   srOnly && typeof children === "string"
             //     ? children
@@ -440,11 +495,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     let variantToPass = variant;
     if (!isHtmlType && type === "text") {
       variantToPass = "ghost";
-    }
-
-    let sizeToPass = size as ButtonVariants["size"];
-    if (size === "sm") {
-      sizeToPass = "small";
     }
 
     return (
