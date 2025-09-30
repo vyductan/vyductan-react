@@ -15,29 +15,10 @@ import type {
   Row,
   Table as TableDef,
 } from "@tanstack/react-table";
-import React, { Fragment, useRef } from "react";
-import {
-  flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { useScroll, useSize } from "ahooks";
-import _ from "lodash";
-
-import { cn } from "@acme/ui/lib/utils";
-import { Skeleton } from "@acme/ui/shadcn/skeleton";
-
-import type { AnyObject } from "../_util/type";
-import type { ConfigConsumerProps } from "../config-provider/context";
-import type { SizeType } from "../config-provider/size-context";
-import type { FilterState } from "./hooks/use-filter";
-import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
-  ExpandableConfig,
   ExpandType,
+  ExpandableConfig,
   FilterValue,
   GetComponentProps,
   GetPopupContainer,
@@ -45,9 +26,9 @@ import type {
   Key,
   LegacyExpandableProps,
   RcTableProps,
+  SortOrder,
   SorterResult,
   SorterTooltipProps,
-  SortOrder,
   TableAction,
   TableComponents,
   TableCurrentDataSource,
@@ -55,13 +36,7 @@ import type {
   TablePaginationConfig,
   TableRowSelection,
 } from "./types";
-import scrollTo from "../_util/scroll-to";
-import { devUseWarning } from "../_util/warning";
-import { Checkbox } from "../checkbox";
-import { ConfigContext } from "../config-provider/context";
-import defaultLocale from "../locale/en-us";
-import { Pagination } from "../pagination";
-import { Spin } from "../spin";
+import React, { Fragment, useRef } from "react";
 import {
   TableBody,
   TableCell,
@@ -70,17 +45,41 @@ import {
   TableRoot,
   TableRow,
 } from "./_components";
-import { ColGroup } from "./_components/col-group";
-import renderExpandIcon from "./_components/expand-icon";
-import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
-import useExpand from "./hooks/use-expand";
-import { getFilterData } from "./hooks/use-filter";
-import useLazyKVMap from "./hooks/use-lazy-kv-map";
-import usePagination, { getPaginationParam } from "./hooks/use-pagination";
-import useSorter from "./hooks/use-sorter";
-import { TableStoreProvider } from "./hooks/use-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
+import usePagination, { getPaginationParam } from "./hooks/use-pagination";
+import { useScroll, useSize } from "ahooks";
+
+import type { AnyObject } from "../_util/type";
+import { Checkbox } from "../checkbox";
+import { ColGroup } from "./_components/col-group";
+import type { ConfigConsumerProps } from "../config-provider/context";
+import { ConfigContext } from "../config-provider/context";
+import type { FilterState } from "./hooks/use-filter";
+import { Pagination } from "../pagination";
+import type { SizeType } from "../config-provider/size-context";
+import { Skeleton } from "@acme/ui/shadcn/skeleton";
+import type { SortState } from "./hooks/use-sorter";
+import { Spin } from "../spin";
+import { TableHeadAdvanced } from "./_components/table-head-advanced";
+import { TableStoreProvider } from "./hooks/use-table";
+import _ from "lodash";
+import { cn } from "@acme/ui/lib/utils";
+import defaultLocale from "../locale/en-us";
+import { devUseWarning } from "../_util/warning";
+import { getFilterData } from "./hooks/use-filter";
+import renderExpandIcon from "./_components/expand-icon";
+import scrollTo from "../_util/scroll-to";
+import useExpand from "./hooks/use-expand";
+import useLazyKVMap from "./hooks/use-lazy-kv-map";
+import useSorter from "./hooks/use-sorter";
 
 const EMPTY_LIST: AnyObject[] = [];
 
@@ -129,6 +128,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     bordered?: boolean | "around";
     classNames?: {
       table?: string;
+      body?: string;
       header?: string;
       footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
@@ -947,6 +947,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             "relative w-full space-y-3 overflow-x-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
+              // "border rounded-lg",
               // "[&_table]:border-separate",
               // "[&>table]:border-spacing-0 [&>table]:rounded-md [&>table]:border",
               typeof bordered === "boolean" &&
@@ -957,12 +958,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             (!bordered || bordered === "around") && [
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
-            bordered === "around" && [
+            // bordered === "around" && [
               "[&_table]:border-separate [&_table]:rounded-md",
-            ],
-            bordered === "around" && [
-              "[&_table]:border-separate [&_table]:rounded-md",
-            ],
+            // ],
             className,
           )}
           style={style}
@@ -989,7 +987,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               // bordered
               // bordered &&
               //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              size === "small" ? "[&_th]:" : "",
+              // size === "small" ? "[&_th]:" : "",
 
               classNames?.table,
             )}
@@ -1103,7 +1101,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   })}
               </TableBody>
             ) : (
-              <TableBodyComp>
+              <TableBodyComp className={classNames?.body}>
                 {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row, rowIndex) =>
                     "_customRow" in row.original ? (
