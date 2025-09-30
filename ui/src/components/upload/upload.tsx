@@ -1,24 +1,14 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import { useMergedState } from "@rc-component/util";
-
-import type {
-  DownloadService,
-  DownloadService,
-  UploadFileItem,
-  UploadFileItem,
-  UploadService,
-  UploadService,
-} from "./types";
-import type { UploadZoneProps, UploadZoneProps } from "./upload-zone";
 import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
+import type { DownloadService, UploadFileItem, UploadService } from "./types";
+
 import { Button } from "../button";
 import { Card } from "../card";
-import { Button } from "../components/button";
-import { Card } from "../components/card";
-import { DeleteIcon, DownloadIcon, Icon } from "../icons";
-import { UploadZone, UploadZone } from "./upload-zone";
+import { UploadZone } from "./upload-zone";
+import type { UploadZoneProps } from "./upload-zone";
+import { useMergedState } from "@rc-component/util";
 
 type UploadProps = Omit<UploadZoneProps, "defaultValue" | "onChange"> & {
   listType?: "picture-card";
