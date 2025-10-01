@@ -56,7 +56,7 @@ export const CodeBlock = memo(
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
             <Button
-              variant="ghost"
+              variant="text"
               className="text-xs hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
               onClick={onCopy}
             >

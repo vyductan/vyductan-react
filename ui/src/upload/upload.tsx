@@ -5,6 +5,13 @@ import { useMergedState } from "@rc-component/util";
 
 import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import type { UploadZoneProps } from "./upload-zone";
+import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
+import { Button } from "../button";
+import { Card } from "../card";
+import { UploadZone } from "./upload-zone";
+
+import type { DownloadService, UploadFileItem, UploadService } from "./types";
+import type { UploadZoneProps } from "./upload-zone";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
@@ -137,7 +144,7 @@ const Upload = ({
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
                 <Button
                   icon={<DeleteIcon />}
-                  variant="ghost"
+                  variant="text"
                   className="p-1 text-white hover:bg-black/10"
                   title="Remove file"
                   onClick={() => {
@@ -202,7 +209,7 @@ const Upload = ({
                   <span className="px-2">{item.name}</span>
                   <div className="ml-auto flex gap-2">
                     <Button
-                      variant="ghost"
+                      variant="text"
                       color="success"
                       icon={<DownloadIcon />}
                       onClick={async () => {
@@ -212,7 +219,7 @@ const Upload = ({
                       }}
                     />
                     <Button
-                      variant="ghost"
+                      variant="text"
                       color="danger"
                       icon={<DeleteIcon />}
                       onClick={() => {

@@ -52,7 +52,7 @@ interface ItemSharedProps {
 export interface SubMenuType<T extends MenuItemType = MenuItemType>
   extends ItemSharedProps {
   icon?: React.ReactNode;
-  theme?: "dark" | "light";
+  theme?: "dark" | "filled";
   children: ItemType<T>[];
   type: "submenu";
   label?: React.ReactNode;
