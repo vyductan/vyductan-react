@@ -22,7 +22,7 @@ const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
   const { setActivatorNodeRef, listeners } = useContext(RowContext);
   return (
     <Button
-      variant="ghost"
+      variant="text"
       size="small"
       icon={<Icon icon="icon-[octicon--grabber-16]" />}
       {...(readOnly ? {} : listeners)}
