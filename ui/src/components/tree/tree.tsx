@@ -413,7 +413,7 @@ function TreeNode({
           </span>
           <CollapsibleTrigger asChild>
             <Button
-              variant="ghost"
+              variant="text"
               size="sm"
               className="hover:bg-accent h-6 w-6 flex-shrink-0 p-0"
               onClick={handleToggle}

@@ -17,7 +17,7 @@ function Calendar({
   classNames,
   showOutsideDays = true,
   captionLayout = "label",
-  buttonVariant = "ghost",
+  buttonVariant = "text",
   formatters,
   components,
   ...props
@@ -190,7 +190,7 @@ function CalendarDayButton({
   return (
     <Button
       ref={ref}
-      variant="ghost"
+      variant="text"
       size="icon"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={

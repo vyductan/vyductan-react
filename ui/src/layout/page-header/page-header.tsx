@@ -52,7 +52,7 @@ const renderTitle = (props: PageHeaderProps) => {
         {onBack && (
           <Button
             shape="icon"
-            variant="ghost"
+            variant="text"
             // icon={<Icon icon="icon-[lucide--arrow-left]" />}
             asChild={typeof onBack === "object"}
           >

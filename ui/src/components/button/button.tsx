@@ -92,14 +92,14 @@ const buttonVariants = tv({
         "border-border border border-dashed",
         "hover:border-primary-600 hover:text-primary-600",
       ],
-      filled: [],
-      ghost: [
-        "border-none",
-        // "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
-      ],
-      light: ["border-transparent", "hover:bg-background-hover"],
+      // filled: [],
+      // ghost: [
+      //   "border-none",
+      //   // "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 border-none",
+      // ],
+      filled: ["border-transparent", "hover:bg-background-hover"],
       link: ["border-0"],
-      text: "border-0",
+      text: "border-none",
     },
     shape: {
       default: "",
@@ -187,7 +187,7 @@ const buttonVariants = tv({
     // outline
     {
       variant: "outline",
-      color: "default",
+      color: "primary",
       className: [
         "border-primary-500 text-primary shadow-xs",
         "hover:border-primary-600 hover:text-primary-600",
@@ -273,11 +273,11 @@ const buttonVariants = tv({
     },
     // light
     {
-      variant: "light",
+      variant: "filled",
       className: ["bg-gray-100 text-gray-950", "hover:bg-gray-200"],
     },
     {
-      variant: "light",
+      variant: "filled",
       color: "primary",
       className: [
         "bg-primary-200 text-primary-500",
@@ -285,7 +285,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "light",
+      variant: "filled",
       color: "link",
       className: [
         "text-link bg-blue-100",
@@ -294,7 +294,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "light",
+      variant: "filled",
       color: "danger",
       className: [
         "bg-red-50 text-red-600",
@@ -303,7 +303,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "light",
+      variant: "filled",
       color: "success",
       className: [
         "bg-success/10 text-success",
@@ -319,24 +319,23 @@ const buttonVariants = tv({
         "hover:bg-blue-100 dark:hover:bg-blue-300",
       ],
     },
-    // Ghost
-
+    // Text
     {
-      variant: "ghost",
-      color: "default",
+      variant: "text",
+      color: "primary",
       className: [
         "text-primary",
-        "hover:text-primary-hover",
+        "hover:text-primary-600",
         "hover:bg-primary-100",
       ],
     },
     {
-      variant: "ghost",
+      variant: "text",
       color: "danger",
       className: ["text-error", "hover:text-error-hover", "hover:bg-red-100"],
     },
     {
-      variant: "ghost",
+      variant: "text",
       color: "success",
       className: [
         "text-success",
@@ -345,12 +344,12 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "ghost",
+      variant: "text",
       color: "link",
       className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
     },
     {
-      variant: "ghost",
+      variant: "text",
       color: "emerald",
       className: [
         "text-emerald-600",
@@ -359,7 +358,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "ghost",
+      variant: "text",
       color: "indigo",
       className: [
         "text-indigo-600",
@@ -415,6 +414,7 @@ type ButtonType = ButtonVariants["type"];
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "color">,
     Omit<ButtonVariants, "type" | "color" | "disabled" | "variant" | "size"> {
+  ref?: React.Ref<HTMLButtonElement>;
   type?: HtmlType | ButtonType;
   htmlType?: HtmlType;
   htmlColor?: React.CSSProperties["color"];
@@ -431,121 +431,112 @@ export interface ButtonProps
   danger?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      asChild = false,
-      href,
-      children,
-      className,
-      color = "default",
-      disabled,
-      loading,
-      primary,
-      size,
-      shape,
-      srOnly,
-      variant,
-      icon,
-      type,
-      htmlType,
-      htmlColor,
-      danger,
-      ...props
-    },
-    ref,
-  ) => {
-    const buttonConfig = useUiConfig((state) => state.components.button);
+const Button = ({
+  asChild = false,
+  href,
+  children,
+  className,
+  color = "default",
+  disabled,
+  loading,
+  primary,
+  size,
+  shape,
+  srOnly,
+  variant,
+  icon,
+  type,
+  htmlType,
+  htmlColor,
+  danger,
+  ...props
+}: ButtonProps) => {
+  const buttonConfig = useUiConfig((state) => state.components.button);
 
-    let sizeToPass = size as ButtonVariants["size"];
-    if (size === "sm") {
-      sizeToPass = "small";
-    }
+  let sizeToPass = size as ButtonVariants["size"];
+  if (size === "sm") {
+    sizeToPass = "small";
+  }
 
-    const Comp = asChild || href ? Slot : "button";
+  const Comp = asChild || href ? Slot : "button";
 
-    const ChildrenToRender = (
-      <>
-        {(!!loading || icon) && (
-          <GenericSlot<Partial<IconProps>>
-            className={cn("size-4", sizeToPass === "small" && "size-[14px]")}
-            // srOnly={
-            //   srOnly && typeof children === "string"
-            //     ? children
-            //     : undefined
-            // }
-          >
-            {loading ? <LoadingIcon /> : icon}
-          </GenericSlot>
-        )}
-        {srOnly && typeof children === "string" ? (
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            {children}
-          </span>
-        ) : (
-          children
-        )}
-      </>
-    );
+  const ChildrenToRender = (
+    <>
+      {(!!loading || icon) && (
+        <GenericSlot<Partial<IconProps>>
+          className={cn("size-4", sizeToPass === "small" && "size-[14px]")}
+          // srOnly={
+          //   srOnly && typeof children === "string"
+          //     ? children
+          //     : undefined
+          // }
+        >
+          {loading ? <LoadingIcon /> : icon}
+        </GenericSlot>
+      )}
+      {srOnly && typeof children === "string" ? (
+        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+          {children}
+        </span>
+      ) : (
+        children
+      )}
+    </>
+  );
 
-    const isHtmlType =
-      type === "submit" || type === "reset" || type === "button";
-    const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
+  const isHtmlType = type === "submit" || type === "reset" || type === "button";
+  const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
-    let variantToPass = variant;
-    if (!isHtmlType && type === "text") {
-      variantToPass = "ghost";
-    }
+  let variantToPass = variant;
+  if (!isHtmlType && type === "text") {
+    variantToPass = "text";
+  }
 
-    return (
-      <Wave component="Button" disabled={loading}>
-        <Comp
-          ref={ref}
-          className={cn(
-            "relative",
-            buttonVariants({
+  return (
+    <Wave component="Button" disabled={loading}>
+      <Comp
+        className={cn(
+          "relative",
+          buttonVariants({
+            color: danger ? "danger" : color,
+            disabled,
+            primary: !primary && !!variant ? undefined : (primary ?? true),
+            size: sizeToPass,
+            shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
+            variant: variantToPass,
+          }),
+          buttonConfig?.classNames?.variants &&
+            tv(
+              buttonConfig.classNames
+                .variants as unknown as ExtractedTVButtonOptions,
+            )({
               color: danger ? "danger" : color,
               disabled,
               primary: !primary && !!variant ? undefined : (primary ?? true),
               size: sizeToPass,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-              variant: variantToPass,
+              variant,
             }),
-            buttonConfig?.classNames?.variants &&
-              tv(
-                buttonConfig.classNames
-                  .variants as unknown as ExtractedTVButtonOptions,
-              )({
-                color: danger ? "danger" : color,
-                disabled,
-                primary: !primary && !!variant ? undefined : (primary ?? true),
-                size: sizeToPass,
-                shape:
-                  (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-                variant,
-              }),
-            className,
-          )}
-          disabled={loading ?? disabled}
-          aria-disabled={loading ?? disabled}
-          type={htmlTypeToPass}
-          color={htmlColor}
-          {...props}
-          style={{ ...props.style }}
-        >
-          {asChild ? (
-            children
-          ) : href ? (
-            <Link href={href}>{ChildrenToRender}</Link>
-          ) : (
-            ChildrenToRender
-          )}
-        </Comp>
-      </Wave>
-    );
-  },
-);
-Button.displayName = "Button";
+          className,
+        )}
+        disabled={loading ?? disabled}
+        aria-disabled={loading ?? disabled}
+        type={htmlTypeToPass}
+        color={htmlColor}
+        {...props}
+        style={{ ...props.style }}
+      >
+        {asChild ? (
+          children
+        ) : href ? (
+          <Link href={href}>{ChildrenToRender}</Link>
+        ) : (
+          ChildrenToRender
+        )}
+      </Comp>
+    </Wave>
+  );
+};
 
 export type { ButtonVariants };
 

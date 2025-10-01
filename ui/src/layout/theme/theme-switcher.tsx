@@ -19,9 +19,9 @@ function ThemeSwitcher(props: ButtonProps) {
         menu={{
           items: [
             {
-              label: "Light",
+              label: "filled",
               onSelect: () => {
-                setTheme("light");
+                setTheme("filled");
               },
             },
             {
@@ -49,7 +49,7 @@ function ThemeSwitcher(props: ButtonProps) {
               <Icon icon="icon-[radix-icons--sun]" />
             )
           }
-          variant="ghost"
+          variant="text"
           aria-label={theme === "dark" ? "Light mode" : "Dark mode"}
           title={theme === "dark" ? "Light mode" : "Dark mode"}
           {...props}

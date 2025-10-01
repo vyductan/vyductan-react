@@ -78,7 +78,7 @@ const DrawerHeader = ({
       className={cn("flex flex-row items-center border-b p-4", className)}
       {...props}
     >
-      <Button size="small" variant="ghost" shape="icon" asChild>
+      <Button size="small" variant="text" shape="icon" asChild>
         <DrawerClose
           className={cn(
             // "absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-gray-100 data-[state=open]:text-gray-500 dark:ring-offset-gray-950 dark:focus:ring-gray-300 dark:data-[state=open]:bg-gray-800 dark:data-[state=open]:text-gray-400",
