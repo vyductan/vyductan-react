@@ -1,12 +1,13 @@
-import type { UploadFileItem, UploadService } from "./types";
-import { Card } from "../components/card";
-// import { Icon } from "../icons";
-import { message } from "../components/message";
-import ProgressBar from "./_components/progress-bar";
+import { useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 import { cn } from "@acme/ui/lib/utils";
+
+import type { UploadFileItem, UploadService } from "./types";
+import { Card } from "../card";
 // import { Icon } from "../icons";
 import { message } from "../message";
-import { v4 as uuidv4 } from "uuid";
+import ProgressBar from "./_components/progress-bar";
 
 type UploadZoneProps = Omit<
   React.ComponentProps<"div">,
