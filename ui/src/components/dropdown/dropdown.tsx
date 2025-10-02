@@ -17,7 +17,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../../shadcn/dropdown";
-import { Link } from "../link";
 import { GenericSlot } from "../slot";
 
 type MenuItem = {
@@ -105,7 +104,7 @@ export const Dropdown = ({
               {!disabled && asChild ? (
                 asChild
               ) : !disabled && href ? (
-                <Link href={href}>
+                <a href={href}>
                   {icon &&
                     cloneElement(icon, {
                       className: "mr-2 h-4 w-4",
@@ -114,7 +113,7 @@ export const Dropdown = ({
                   {shortcut && (
                     <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>
                   )}
-                </Link>
+                </a>
               ) : (
                 <>
                   {icon && (

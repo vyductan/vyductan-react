@@ -12,7 +12,6 @@ import type { IconProps } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 import Wave from "../../lib/wave";
-import { Link } from "../link";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
@@ -537,7 +536,7 @@ const Button = ({
         {asChild ? (
           children
         ) : href ? (
-          <Link href={href}>{ChildrenToRender}</Link>
+          <a href={href}>{ChildrenToRender}</a>
         ) : (
           ChildrenToRender
         )}

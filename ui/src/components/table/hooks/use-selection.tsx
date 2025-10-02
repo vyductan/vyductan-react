@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable unicorn/no-array-reduce */
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/no-array-for-each */

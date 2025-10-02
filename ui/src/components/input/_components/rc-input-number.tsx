@@ -303,13 +303,11 @@ const InternalInputNumber = ({
   // >>> Max & Min limit
   const maxDecimal = React.useMemo(
     () => getDecimalIfValidate(max ?? ""),
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [max, precision],
   );
   const minDecimal = React.useMemo(
     () => getDecimalIfValidate(min ?? ""),
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [min, precision],
   );

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -37,7 +36,6 @@ import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
   ExpandableConfig,
-  ExpandType,
   ExpandType,
   FilterValue,
   GetComponentProps,
