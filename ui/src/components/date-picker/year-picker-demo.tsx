@@ -1,7 +1,8 @@
 "use client";
 
+import type { Dayjs } from "dayjs";
 import React, { useState } from "react";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 import { YearPicker } from "./year-picker";
 

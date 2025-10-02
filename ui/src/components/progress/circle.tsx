@@ -209,7 +209,7 @@ function Circle(props: CircleProps) {
           />
         );
       })
-      .reverse();
+      .toReversed();
   };
 
   const getStepStokeList = () => {

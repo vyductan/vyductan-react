@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
