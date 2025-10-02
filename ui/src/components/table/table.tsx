@@ -15,10 +15,30 @@ import type {
   Row,
   Table as TableDef,
 } from "@tanstack/react-table";
+import React, { Fragment, useRef } from "react";
+import {
+  flexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useScroll, useSize } from "ahooks";
+import _ from "lodash";
+
+import { cn } from "@acme/ui/lib/utils";
+import { Skeleton } from "@acme/ui/shadcn/skeleton";
+
+import type { AnyObject } from "../_util/type";
+import type { ConfigConsumerProps } from "../config-provider/context";
+import type { SizeType } from "../config-provider/size-context";
+import type { FilterState } from "./hooks/use-filter";
+import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
-  ExpandType,
   ExpandableConfig,
+  ExpandType,
+  ExpandType,
   FilterValue,
   GetComponentProps,
   GetPopupContainer,
@@ -26,9 +46,9 @@ import type {
   Key,
   LegacyExpandableProps,
   RcTableProps,
-  SortOrder,
   SorterResult,
   SorterTooltipProps,
+  SortOrder,
   TableAction,
   TableComponents,
   TableCurrentDataSource,
@@ -36,7 +56,13 @@ import type {
   TablePaginationConfig,
   TableRowSelection,
 } from "./types";
-import React, { Fragment, useRef } from "react";
+import scrollTo from "../_util/scroll-to";
+import { devUseWarning } from "../_util/warning";
+import { Checkbox } from "../checkbox";
+import { ConfigContext } from "../config-provider/context";
+import defaultLocale from "../locale/en-us";
+import { Pagination } from "../pagination";
+import { Spin } from "../spin";
 import {
   TableBody,
   TableCell,
@@ -45,41 +71,17 @@ import {
   TableRoot,
   TableRow,
 } from "./_components";
-import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
-import {
-  flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
-import usePagination, { getPaginationParam } from "./hooks/use-pagination";
-import { useScroll, useSize } from "ahooks";
-
-import type { AnyObject } from "../_util/type";
-import { Checkbox } from "../checkbox";
 import { ColGroup } from "./_components/col-group";
-import type { ConfigConsumerProps } from "../config-provider/context";
-import { ConfigContext } from "../config-provider/context";
-import type { FilterState } from "./hooks/use-filter";
-import { Pagination } from "../pagination";
-import type { SizeType } from "../config-provider/size-context";
-import { Skeleton } from "@acme/ui/shadcn/skeleton";
-import type { SortState } from "./hooks/use-sorter";
-import { Spin } from "../spin";
-import { TableHeadAdvanced } from "./_components/table-head-advanced";
-import { TableStoreProvider } from "./hooks/use-table";
-import _ from "lodash";
-import { cn } from "@acme/ui/lib/utils";
-import defaultLocale from "../locale/en-us";
-import { devUseWarning } from "../_util/warning";
-import { getFilterData } from "./hooks/use-filter";
 import renderExpandIcon from "./_components/expand-icon";
-import scrollTo from "../_util/scroll-to";
+import { TableHeadAdvanced } from "./_components/table-head-advanced";
+import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
 import useExpand from "./hooks/use-expand";
+import { getFilterData } from "./hooks/use-filter";
 import useLazyKVMap from "./hooks/use-lazy-kv-map";
+import usePagination, { getPaginationParam } from "./hooks/use-pagination";
 import useSorter from "./hooks/use-sorter";
+import { TableStoreProvider } from "./hooks/use-table";
+import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 
 const EMPTY_LIST: AnyObject[] = [];
 
@@ -959,7 +961,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             // bordered === "around" && [
-              "[&_table]:border-separate [&_table]:rounded-md",
+            "[&_table]:border-separate [&_table]:rounded-md",
             // ],
             className,
           )}
@@ -1254,7 +1256,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             )}
           </TableRoot>
           {pagination && (
-            <Pagination className="my-4 justify-end" {...pagination} />
+            <Pagination
+              className="my-4 justify-end"
+              {...pagination}
+              total={pagination.total ?? dataSource?.length}
+            />
           )}
         </div>
       </Spin>
