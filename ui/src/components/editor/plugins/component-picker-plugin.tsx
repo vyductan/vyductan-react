@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -11,7 +9,6 @@
 import type { LexicalEditor, TextNode } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import {
   CommandGroup,
   CommandItem,
@@ -76,11 +73,12 @@ import { InsertLayoutDialog } from "../plugins/layout-plugin";
 import { INSERT_PAGE_BREAK } from "../plugins/page-break-plugin";
 import { InsertPollDialog } from "../plugins/poll-plugin";
 import { InsertTableDialog } from "../plugins/table-plugin";
+import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
-const LexicalTypeaheadMenuPlugin = dynamic(
-  () => import("./default/lexical-typeahead-menu-plugin"),
-  { ssr: false },
-);
+// const LexicalTypeaheadMenuPlugin = dynamic(
+//   () => import("./default/lexical-typeahead-menu-plugin"),
+//   { ssr: false },
+// );
 
 class ComponentPickerOption extends MenuOption {
   // What shows up in the editor
@@ -353,7 +351,6 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   return (
     <>
       {modal}
-      {/* @ts-expect-error */}
       <LexicalTypeaheadMenuPlugin<ComponentPickerOption>
         onQueryChange={setQueryString}
         onSelectOption={onSelectOption}

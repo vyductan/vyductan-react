@@ -2,18 +2,18 @@
 "use client";
 
 import * as React from "react";
-import { useMergedState } from "@rc-component/util";
+import { tagColors } from "@/components/ui/tag";
+import { useMergedState, useMergedState } from "@rc-component/util";
 
 import { tagColors } from "@acme/ui/components/tag";
-import { Icon } from "@acme/ui/icons";
-import { cn } from "@acme/ui/lib/utils";
+import { Icon, Icon } from "@acme/ui/icons";
+import { cn, cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
 import type { SizeType } from "../..";
 import type { CommandProps } from "../command";
 import type { PopoverContentProps } from "../popover";
 import type { Option } from "../select/types";
-import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
 import { Input } from "../input";
 import { inputSizeVariants } from "../input/variants";

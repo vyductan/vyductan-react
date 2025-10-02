@@ -1,1 +1,1 @@
-export { LexicalTypeaheadMenuPlugin as default } from "@lexical/react/LexicalTypeaheadMenuPlugin";
+export { LexicalTypeaheadMenuPlugin } from "@lexical/react/LexicalTypeaheadMenuPlugin";
