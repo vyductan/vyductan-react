@@ -59,7 +59,7 @@ const SheetTitle = ({ children, className, ...props }: SheetTitleProps) => {
       >
         <Button
           size="small"
-          variant="ghost"
+          variant="text"
           shape="icon"
           icon={<Icon icon="icon-[lucide--x]" className="size-5" />}
           className="mr-2"
