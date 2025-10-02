@@ -193,7 +193,8 @@ const useForm = <
         }
       }
 
-      const values = methods.getValues() as unknown as DeepPartial<TFieldValues>;
+      const values =
+        methods.getValues() as unknown as DeepPartial<TFieldValues>;
       throw new ValidateFieldsError<TFieldValues>(
         "Validation failed",
         values,
