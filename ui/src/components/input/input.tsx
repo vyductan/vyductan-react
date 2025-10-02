@@ -39,7 +39,7 @@ type InputProps = Omit<
   "ref" | "size" | "prefix" | "value"
 > &
   CommonInputProps & {
-    ref?: React.ForwardedRef<InputRef>;
+    ref?: React.Ref<InputRef | HTMLInputElement | null>;
 
     onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
     classNames?: Partial<Record<SemanticName, string>>;
@@ -161,26 +161,60 @@ const Input = (props: InputProps) => {
   const isOutOfRange = !!mergedMax && valueLength > mergedMax;
 
   // ======================= Ref ========================
-  useImperativeHandle(ref, () => ({
-    focus,
-    blur: () => {
-      inputRef.current?.blur();
-    },
-    setSelectionRange: (
-      start: number,
-      end: number,
-      direction?: "forward" | "backward" | "none",
-    ) => {
-      inputRef.current?.setSelectionRange(start, end, direction);
-    },
-    select: () => {
-      inputRef.current?.select();
-    },
-    setCustomValidity: (msg) => inputRef.current?.setCustomValidity?.(msg),
-    reportValidity: () => inputRef.current?.reportValidity?.(),
-    input: inputRef.current,
-    nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
-  }));
+  useImperativeHandle<
+    InputRef | HTMLInputElement | null,
+    InputRef | HTMLInputElement | null
+  >(ref, () =>
+    inputRef.current
+      ? {
+          ...inputRef.current,
+          focus,
+          blur: () => {
+            inputRef.current?.blur();
+          },
+          setSelectionRange: (
+            start: number,
+            end: number,
+            direction?: "forward" | "backward" | "none",
+          ) => {
+            inputRef.current?.setSelectionRange(start, end, direction);
+          },
+          select: () => {
+            inputRef.current?.select();
+          },
+          setCustomValidity: (msg) =>
+            inputRef.current?.setCustomValidity?.(msg),
+          reportValidity: () => inputRef.current?.reportValidity?.(),
+          input: inputRef.current,
+          nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+        }
+      : null,
+  );
+  // useImperativeHandle(ref, () =>
+  //   typeof ref === "object" && ref?.current && "current" in ref.current
+  //     ? {
+  //         focus,
+  //         blur: () => {
+  //           inputRef.current?.blur();
+  //         },
+  //         setSelectionRange: (
+  //           start: number,
+  //           end: number,
+  //           direction?: "forward" | "backward" | "none",
+  //         ) => {
+  //           inputRef.current?.setSelectionRange(start, end, direction);
+  //         },
+  //         select: () => {
+  //           inputRef.current?.select();
+  //         },
+  //         setCustomValidity: (msg) =>
+  //           inputRef.current?.setCustomValidity?.(msg),
+  //         reportValidity: () => inputRef.current?.reportValidity?.(),
+  //         input: inputRef.current,
+  //         nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+  //       }
+  //     : ref,
+  // );
 
   useEffect(() => {
     if (keyLockRef.current) {
