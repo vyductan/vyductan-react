@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -14,7 +16,6 @@ import type {
 import type { JSX, ReactElement } from "react";
 import * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -23,9 +24,7 @@ import {
 } from "@/components/ui/modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 
-const Excalidraw = dynamic(() => import("../editor-ui/excalidraw"), {
-  ssr: false,
-});
+import { Excalidraw } from "./excalidraw";
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState["elements"];
 
