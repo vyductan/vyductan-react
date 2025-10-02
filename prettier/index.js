@@ -2,13 +2,13 @@
 /** @typedef {import("prettier-plugin-tailwindcss").PluginOptions} TailwindConfig */
 /** @typedef {import("@ianvs/prettier-plugin-sort-imports").PluginConfig} SortImportsConfig */
 
-// /** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
+/** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
 const config = {
-  plugins: {
-    prettierPluginSortImports: "@ianvs/prettier-plugin-sort-imports",
-    prettierPluginPackagejson: "prettier-plugin-packagejson",
-    prettierPluginTailwindcss: "prettier-plugin-tailwindcss",
-  },
+  plugins: [
+    "@ianvs/prettier-plugin-sort-imports",
+    "prettier-plugin-packagejson",
+    "prettier-plugin-tailwindcss",
+  ],
   tailwindFunctions: ["tv"],
   importOrder: [
     "<TYPES>",
