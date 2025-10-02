@@ -1,5 +1,4 @@
 import React from "react";
-import { WarningFilled } from "@acme/ui/icons";
 
 import { WarningFilled } from "@acme/ui/icons";
 
