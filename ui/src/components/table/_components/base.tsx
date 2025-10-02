@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import type { OwnTableProps } from "../table";
-import type { SizeType } from "../../config-provider/size-context";
 import { cn } from "@acme/ui/lib/utils";
+
+import type { SizeType } from "../../config-provider/size-context";
+import type { OwnTableProps } from "../table";
 
 function TableRoot({
   className,

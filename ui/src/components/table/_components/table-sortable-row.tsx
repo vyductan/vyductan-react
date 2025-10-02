@@ -1,10 +1,10 @@
+import type { ButtonProps } from "@/components/ui/button";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import React, { useContext, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import type { ButtonProps } from "@acme/ui/components/button";
-import { Button } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 
 import { TableRow } from ".";
