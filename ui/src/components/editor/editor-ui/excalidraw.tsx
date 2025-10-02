@@ -1,1 +1,1 @@
-export { Excalidraw as default } from "@excalidraw/excalidraw";
+export { Excalidraw } from "@excalidraw/excalidraw";

@@ -1,1 +1,1 @@
-export { LexicalContextMenuPlugin as default } from "@lexical/react/LexicalContextMenuPlugin";
+export { LexicalContextMenuPlugin } from "@lexical/react/LexicalContextMenuPlugin";
