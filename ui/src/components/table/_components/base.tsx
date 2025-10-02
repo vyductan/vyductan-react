@@ -1,8 +1,9 @@
 import * as React from "react";
 
-import type { OwnTableProps } from "../table";
-import type { SizeType } from "../../config-provider/size-context";
 import { cn } from "@acme/ui/lib/utils";
+
+import type { SizeType } from "../../config-provider/size-context";
+import type { OwnTableProps } from "../table";
 
 function TableRoot({
   className,
@@ -77,6 +78,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
+        "[&_tr:last-child>td]:border-b-0",
         "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
         className,
       )}
