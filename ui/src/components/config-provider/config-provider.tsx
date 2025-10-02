@@ -1,10 +1,9 @@
 "use client";
 
+import type { ButtonProps } from "@/components/ui/button";
 import React from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
-
-import type { ButtonProps } from "@acme/ui/components/button";
 
 import type { PageContainerProps } from "../../layout/page-container";
 import type { WaveConfig } from "../../lib/wave/interface";
@@ -12,7 +11,6 @@ import type { DatePickerProps } from "../date-picker";
 import type { PaginationProps } from "../pagination";
 import type { TableProps } from "../table";
 import type { TagProps } from "../tag";
-import { Link } from "../link";
 
 // type TDateFormat = {
 //   date: string;
@@ -27,9 +25,9 @@ type UiConfigState = {
     layout?: {
       pageContainer?: Partial<Pick<PageContainerProps, "loadingRender">>;
     };
-    link?: {
-      default?: typeof Link;
-    };
+    // link?: {
+    //   default?: typeof Link;
+    // };
     result: {
       500?: {
         icon?: React.ReactNode;
@@ -47,9 +45,9 @@ type UiConfigStore = UiConfigState;
 
 const defaultInitState: UiConfigState = {
   components: {
-    link: {
-      default: Link,
-    },
+    // link: {
+    //   default: Link,
+    // },
     result: {
       500: {
         icon: <></>,
