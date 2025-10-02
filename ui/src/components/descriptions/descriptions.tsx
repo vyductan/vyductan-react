@@ -16,7 +16,7 @@ export type DescriptionsItem = {
   span?: number;
   classNames?: {
     label?: string;
-    content?: string;
+    children?: string;
   };
   label?: React.ReactNode;
   children?: React.ReactNode;
@@ -41,6 +41,9 @@ type DescriptionProps = {
     content?: string;
 
     view?: string;
+    label?: string;
+    children?: string;
+
     tr?: string;
     th?: string;
     td?: string;
@@ -105,9 +108,9 @@ export const Descriptions = ({
     ],
     classNames?.label,
   );
-  const contentClassName = cn(
+  const childrenClassName = cn(
     "inline-flex items-baseline min-w-[1em]",
-    classNames?.content,
+    classNames?.children,
   );
   const tbodyClassName = cn(
     layout === "horizontal" && [
@@ -187,7 +190,7 @@ export const Descriptions = ({
                         <td
                           className={cn(
                             tdClassName,
-                            col.classNames?.content,
+                            col.classNames?.children,
                             "last:border-r-0",
                           )}
                         >
@@ -199,19 +202,21 @@ export const Descriptions = ({
                         </td>
                       </Fragment>
                     ) : (
-                      <td key={col.key ?? index} className={cn(tdClassName)}>
-                        <DescriptionsItemContainer>
-                          {col.label && (
-                            <span className={labelClassName}>{col.label}</span>
-                          )}
-                          {skeleton ? (
-                            <Skeleton />
-                          ) : (
-                            <span className={contentClassName}>
-                              {col.children}
-                            </span>
-                          )}
-                        </DescriptionsItemContainer>
+                      <td
+                        key={col.key ?? index}
+                        className={cn(tdClassName, col.classNames?.children)}
+                      >
+                        <span className={labelClassName}>
+                          {col.label}
+                          {colon ? ": " : ""}
+                        </span>
+                        {skeleton ? (
+                          <Skeleton />
+                        ) : (
+                          <span className={childrenClassName}>
+                            {col.children}
+                          </span>
+                        )}
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
@@ -223,11 +228,12 @@ export const Descriptions = ({
                       )}
                       colSpan={col.span}
                     >
-                      <DescriptionsItemContainer>
-                        <span className={labelClassName}>
-                          {(col as VerticalCell).content}
-                        </span>
-                      </DescriptionsItemContainer>
+                      <div
+                        data-slot="descriptions-item-container"
+                        className={labelClassName}
+                      >
+                        {(col as VerticalCell).content}
+                      </div>
                     </th>
                   ) : (
                     <td
@@ -235,15 +241,16 @@ export const Descriptions = ({
                       className={cn(tdClassName)}
                       colSpan={col.span}
                     >
-                      <DescriptionsItemContainer>
+                      <div
+                        data-slot="descriptions-item-container"
+                        className={childrenClassName}
+                      >
                         {skeleton ? (
                           <Skeleton className="h-6" />
                         ) : (
-                          <span className={contentClassName}>
-                            {(col as VerticalCell).content}
-                          </span>
+                          (col as VerticalCell).content
                         )}
-                      </DescriptionsItemContainer>
+                      </div>
                     </td>
                   ),
                 )}
@@ -306,10 +313,18 @@ function createVerticalRows(
     currentRowValues.push({
       span: itemSpan,
       content: item.children,
-      className: item.classNames?.content,
+      className: item.classNames?.children,
     });
 
     currentRowSpan += itemSpan;
+
+    // // If we've reached the column limit, start new rows
+    // if (currentRowSpan >= columns) {
+    //   rows.push([...currentRowLabels], [...currentRowValues]);
+    //   currentRowLabels = [];
+    //   currentRowValues = [];
+    //   currentRowSpan = 0;
+    // }
   }
 
   // Add the last rows if they have content

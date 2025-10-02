@@ -487,4 +487,6 @@ function TreeNode({
   );
 }
 
+export type { TreeProps };
+
 export { Tree };

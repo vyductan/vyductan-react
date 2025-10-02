@@ -2,7 +2,10 @@ import { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import { Icon } from "../../icons";
+import { Button } from "../button";
 import {
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -70,16 +73,39 @@ const Drawer = ({
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       <DrawerContent className={cn(className)} style={contentStyle}>
         <div className="flex flex-1 flex-col overflow-hidden">
-          <DrawerHeader className={cn(classNames?.header)} extra={extra}>
-            <DrawerTitle className={classNames?.title}>{title}</DrawerTitle>
-            <DrawerDescription
-              className={cn(
-                description ? "" : "hidden",
-                classNames?.description,
-              )}
+          <DrawerHeader className={cn(classNames?.header)}>
+            <div
+              data-slot="drawer-header-content"
+              className="flex flex-1 flex-row items-center gap-2"
             >
-              {description}
-            </DrawerDescription>
+              <Button size="small" variant="ghost" shape="icon" asChild>
+                <DrawerClose
+                  className={cn(
+                    // "mt-1 self-start",
+                    // "absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-gray-100 data-[state=open]:text-gray-500 dark:ring-offset-gray-950 dark:focus:ring-gray-300 dark:data-[state=open]:bg-gray-800 dark:data-[state=open]:text-gray-400",
+                    "rounded-xs opacity-70 transition-opacity",
+                    "ring-offset-background focus:ring-ring",
+                    "hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none",
+                    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+                    "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
+                    // "absolute top-4 right-4"
+                  )}
+                >
+                  <Icon icon="icon-[lucide--x]" className="size-5" />
+                  <span className="sr-only">Close</span>
+                </DrawerClose>
+              </Button>
+              <DrawerTitle className={classNames?.title}>{title}</DrawerTitle>
+              <DrawerDescription
+                className={cn(
+                  description ? "" : "hidden",
+                  classNames?.description,
+                )}
+              >
+                {description}
+              </DrawerDescription>
+            </div>
+            <div data-slot="drawer-header-extra">{extra}</div>
           </DrawerHeader>
 
           <div className={cn("flex-1 overflow-auto p-6", classNames?.content)}>

@@ -17,6 +17,7 @@ export * from "./alert-dialog";
 export * from "./avatar";
 export * from "./badge";
 export * from "./col";
+export * from "./color-picker";
 export * from "./date-picker";
 export * from "./descriptions";
 export * from "./divider";

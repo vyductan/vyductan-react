@@ -47,10 +47,10 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
   showTime?: boolean;
 
   // Modes
-  picker?: 'date' | 'year';
+  picker?: "date" | "year";
 
   // Calendar UI
-  captionLayout?: 'label' | 'dropdown' | 'dropdown-months' | 'dropdown-years';
+  captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years";
 
   // Range
   minDate?: Dayjs;
@@ -92,10 +92,10 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
 
 ### Year Selection Behavior
 
-- __picker="year"__
+- **picker="year"**
   - Selecting a year commits immediately and closes the popover.
   - Input updates to the start of the selected year.
-- __picker="date"__ (overlay year selection)
+- **picker="date"** (overlay year selection)
   - Selecting a year navigates the calendar to that year and applies a sticky preview to the input.
   - The input text is dimmed while previewing (popover open) if preview differs from the committed value at the day level.
   - Commit occurs when:
@@ -168,8 +168,9 @@ function App() {
 Commit the selected year when closing the popover without choosing a day.
 
 ```tsx
-import { DatePicker } from '@acme/ui';
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
+
+import { DatePicker } from "@acme/ui";
 
 function Example() {
   const [date, setDate] = useState<dayjs.Dayjs | null>(null);
@@ -180,8 +181,8 @@ function Example() {
       onChange={(d) => setDate(d)}
       format="YYYY-MM-DD"
       placeholder="Select date"
-      minDate={dayjs().subtract(3, 'year').startOf('year')}
-      maxDate={dayjs().add(3, 'year').endOf('year')}
+      minDate={dayjs().subtract(3, "year").startOf("year")}
+      maxDate={dayjs().add(3, "year").endOf("year")}
       captionLayout="dropdown"
       commitYearOnClose
     />

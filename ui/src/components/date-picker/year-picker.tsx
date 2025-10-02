@@ -1,8 +1,8 @@
 "use client";
 
 import type { Dayjs } from "dayjs";
-import dayjs from "dayjs";
 import * as React from "react";
+import dayjs from "dayjs";
 
 import type { DatePickerProps } from "./date-picker";
 import { DatePicker } from "./date-picker";
@@ -26,7 +26,12 @@ function toDayjsYear(value?: number | Dayjs): Dayjs | undefined {
   return undefined;
 }
 
-export function YearPicker({ value, onChange, format = "YYYY", ...rest }: YearPickerProps) {
+export function YearPicker({
+  value,
+  onChange,
+  format = "YYYY",
+  ...rest
+}: YearPickerProps) {
   const djValue = React.useMemo(() => toDayjsYear(value), [value]);
 
   return (

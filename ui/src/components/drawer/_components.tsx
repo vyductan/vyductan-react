@@ -2,15 +2,12 @@ import { Content } from "vaul";
 
 import type { DrawerContent as ShadcnDrawerContent } from "@acme/ui/shadcn/drawer";
 import {
-  DrawerClose,
   DrawerOverlay,
   DrawerPortal,
   DrawerHeader as ShadcnDrawerHeader,
 } from "@acme/ui/shadcn/drawer";
 
-import { Icon } from "../../icons";
 import { cn } from "../../lib/utils";
-import { Button } from "../button";
 
 // const DrawerContent = ({
 //   className,
@@ -68,11 +65,8 @@ function DrawerContent({
 const DrawerHeader = ({
   className,
   children,
-  extra,
   ...props
-}: React.ComponentProps<typeof ShadcnDrawerHeader> & {
-  extra?: React.ReactNode;
-}) => {
+}: React.ComponentProps<typeof ShadcnDrawerHeader>) => {
   return (
     <ShadcnDrawerHeader
       className={cn("flex flex-row items-center border-b p-4", className)}

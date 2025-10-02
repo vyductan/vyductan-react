@@ -1,9 +1,9 @@
 "use client";
 
+import type { ButtonProps } from "@/components/ui/button";
 import * as React from "react";
+import { Button } from "@/components/ui/button";
 
-import type { ButtonProps } from "@acme/ui/components/button";
-import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint } from "../_util/responsive-observer";
@@ -44,7 +44,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
   confirmLoading?: boolean;
   okButtonProps?: ButtonProps;
   cancelText?: string;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;

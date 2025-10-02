@@ -37,7 +37,8 @@
       "zh-tw",
       "zh-hk",
       "zh-mo",
-      "zh-sg"
+      "zh-sg",
+      "src/**/*.tasks.mdx"
     ],
     "excludeFiles": [
       "CHANGELOG.md",
@@ -47,8 +48,7 @@
       "LICENSE.md",
       "license.md",
       "CODE_OF_CONDUCT.md",
-      "code_of_conduct.md",
-      "*.tasks.mdx"
+      "code_of_conduct.md"
     ],
     "branch": "main",
     "stars": 0,

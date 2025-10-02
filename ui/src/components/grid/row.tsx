@@ -71,7 +71,6 @@ function useMergedPropByScreen(
 
   React.useEffect(() => {
     calcMergedAlignOrJustify();
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(oriProp), screen]);
 

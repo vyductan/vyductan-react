@@ -16,7 +16,7 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
   onHoverChange,
 }: YearSelectProps<DateValueType>) => {
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
-  const [currentDecadeRange, setCurrentDecadeRange] = useState<Dayjs[]>(() =>
+  const [currentDecadeRange] = useState<Dayjs[]>(() =>
     Array.from({ length: 10 }, (_, i) => {
       const yearValue = currentYear.year();
       const startYear = Math.floor(yearValue / 10) * 10;

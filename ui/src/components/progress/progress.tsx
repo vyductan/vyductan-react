@@ -147,7 +147,6 @@ function Progress(props: ProgressProps) {
         : successPercent.toString(),
       10,
     );
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percent, props.success, props.successPercent]);
 
@@ -209,7 +208,6 @@ function Progress(props: ProgressProps) {
         {text}
       </span>
     );
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showInfo, percent, percentNumber, progressStatus, type, format]);
 

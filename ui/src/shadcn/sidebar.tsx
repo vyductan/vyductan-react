@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable unicorn/prefer-global-this */
 "use client";
 

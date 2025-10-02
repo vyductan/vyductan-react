@@ -11,24 +11,20 @@ The YearPicker component allows users to select a year from a decade-based panel
 ## Import
 
 ```tsx
-import { YearPicker } from "@acme/ui/components/date-picker";
+import { YearPicker } from "@/components/ui/date-picker";
 ```
 
 ## Basic Usage
 
 ```tsx
 import React, { useState } from "react";
-import { YearPicker } from "@acme/ui/components/date-picker";
+import { YearPicker } from "@/components/ui/date-picker";
 
 function BasicYearPicker() {
   const [year, setYear] = useState<number>();
 
   return (
-    <YearPicker
-      value={year}
-      onChange={setYear}
-      placeholder="Select year"
-    />
+    <YearPicker value={year} onChange={setYear} placeholder="Select year" />
   );
 }
 ```
@@ -40,13 +36,13 @@ function BasicYearPicker() {
 <ComponentPreview name="year-picker-basic" />
 
 ```tsx
-import { YearPicker } from "@acme/ui/components/date-picker";
+import { YearPicker } from "@/components/ui/date-picker";
 
-<YearPicker 
-  value={selectedYear} 
-  onChange={setSelectedYear} 
-  placeholder="Select year" 
-/>
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  placeholder="Select year"
+/>;
 ```
 
 ### With Clear Button
@@ -54,11 +50,11 @@ import { YearPicker } from "@acme/ui/components/date-picker";
 <ComponentPreview name="year-picker-clear" />
 
 ```tsx
-<YearPicker 
-  value={selectedYear} 
-  onChange={setSelectedYear} 
-  allowClear={true} 
-  placeholder="Select year" 
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  allowClear={true}
+  placeholder="Select year"
 />
 ```
 
@@ -67,11 +63,7 @@ import { YearPicker } from "@acme/ui/components/date-picker";
 <ComponentPreview name="year-picker-disabled" />
 
 ```tsx
-<YearPicker 
-  value={2024} 
-  disabled={true} 
-  placeholder="Select year" 
-/>
+<YearPicker value={2024} disabled={true} placeholder="Select year" />
 ```
 
 ### Custom Format
@@ -79,11 +71,11 @@ import { YearPicker } from "@acme/ui/components/date-picker";
 <ComponentPreview name="year-picker-format" />
 
 ```tsx
-<YearPicker 
-  value={selectedYear} 
-  onChange={setSelectedYear} 
-  format="YY" 
-  placeholder="Select year" 
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  format="YY"
+  placeholder="Select year"
 />
 ```
 
@@ -91,17 +83,17 @@ import { YearPicker } from "@acme/ui/components/date-picker";
 
 ### YearPicker Props
 
-| Property | Description | Type | Default |
-|----------|-------------|------|---------|
-| `value` | Current selected year | `number \| Dayjs` | - |
-| `onChange` | Callback when year is changed | `(value?: number \| Dayjs) => void` | - |
-| `placeholder` | Placeholder text | `string` | `"Select year"` |
-| `disabled` | Whether the picker is disabled | `boolean` | `false` |
-| `allowClear` | Whether to show clear button | `boolean` | `true` |
-| `format` | Format for display | `string` | `"YYYY"` |
-| `className` | Additional CSS class | `string` | - |
-| `open` | Controlled open state | `boolean` | - |
-| `onOpenChange` | Callback when open state changes | `(open: boolean) => void` | - |
+| Property       | Description                      | Type                                | Default         |
+| -------------- | -------------------------------- | ----------------------------------- | --------------- |
+| `value`        | Current selected year            | `number \| Dayjs`                   | -               |
+| `onChange`     | Callback when year is changed    | `(value?: number \| Dayjs) => void` | -               |
+| `placeholder`  | Placeholder text                 | `string`                            | `"Select year"` |
+| `disabled`     | Whether the picker is disabled   | `boolean`                           | `false`         |
+| `allowClear`   | Whether to show clear button     | `boolean`                           | `true`          |
+| `format`       | Format for display               | `string`                            | `"YYYY"`        |
+| `className`    | Additional CSS class             | `string`                            | -               |
+| `open`         | Controlled open state            | `boolean`                           | -               |
+| `onOpenChange` | Callback when open state changes | `(open: boolean) => void`           | -               |
 
 ## Features
 
@@ -130,19 +122,13 @@ The year picker adapts to different screen sizes and provides optimal user exper
 ```tsx
 const [year, setYear] = useState<number>();
 
-<YearPicker
-  value={year}
-  onChange={setYear}
-/>
+<YearPicker value={year} onChange={setYear} />;
 ```
 
 ### Uncontrolled Component
 
 ```tsx
-<YearPicker
-  defaultValue={2024}
-  onChange={(year) => console.log(year)}
-/>
+<YearPicker defaultValue={2024} onChange={(year) => console.log(year)} />
 ```
 
 ### With Form Integration
@@ -158,10 +144,7 @@ function YearForm() {
       name="birthYear"
       control={control}
       render={({ field }) => (
-        <YearPicker
-          {...field}
-          placeholder="Select birth year"
-        />
+        <YearPicker {...field} placeholder="Select birth year" />
       )}
     />
   );
@@ -189,16 +172,17 @@ The year picker uses CSS variables for theming and can be customized through cla
 
 If you're migrating from Ant Design's DatePicker.YearPicker, here are the key differences:
 
-| Ant Design | @acme/ui |
-|------------|----------|
-| `picker="year"` | Built-in year picker |
-| `format="YYYY"` | `format="YYYY"` (default) |
-| `allowClear` | `allowClear={true}` (default) |
-| `disabled` | `disabled={false}` (default) |
+| Ant Design      | @acme/ui                      |
+| --------------- | ----------------------------- |
+| `picker="year"` | Built-in year picker          |
+| `format="YYYY"` | `format="YYYY"` (default)     |
+| `allowClear`    | `allowClear={true}` (default) |
+| `disabled`      | `disabled={false}` (default)  |
 
 ### Migration Example
 
 **Ant Design:**
+
 ```tsx
 <DatePicker
   picker="year"
@@ -209,10 +193,7 @@ If you're migrating from Ant Design's DatePicker.YearPicker, here are the key di
 ```
 
 **@acme/ui:**
+
 ```tsx
-<YearPicker
-  value={value}
-  onChange={onChange}
-  placeholder="Select year"
-/>
+<YearPicker value={value} onChange={onChange} placeholder="Select year" />
 ```

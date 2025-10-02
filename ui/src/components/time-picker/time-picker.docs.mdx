@@ -26,8 +26,8 @@ import { TimePicker } from "@/components/ui";
 ### Simple Time Picker
 
 ```tsx
-import { TimePicker } from "@/components/ui";
 import { useState } from "react";
+import { TimePicker } from "@/components/ui";
 import dayjs from "dayjs";
 
 function BasicExample() {
@@ -46,8 +46,8 @@ function BasicExample() {
 ### With String State
 
 ```tsx
-import { TimePicker } from "@/components/ui";
 import { useState } from "react";
+import { TimePicker } from "@/components/ui";
 import dayjs from "dayjs";
 
 function StringStateExample() {
@@ -97,19 +97,19 @@ function FormExample() {
 
 ### TimePicker Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `value` | `Dayjs \| null \| undefined` | - | Current time value |
-| `defaultValue` | `Dayjs \| null \| undefined` | `null` | Default time value |
-| `onChange` | `(time: Dayjs \| null, timeString: string \| undefined) => void` | - | Callback when time changes |
-| `format` | `string` | `"HH:mm"` | Time format (e.g., "HH:mm", "HH:mm:ss") |
-| `placeholder` | `string` | `"Select time"` | Input placeholder text |
-| `open` | `boolean` | - | Whether the picker is open (controlled) |
-| `onOpenChange` | `(open: boolean) => void` | - | Callback when open state changes |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Input size |
-| `className` | `string` | - | Additional CSS classes |
-| `id` | `string` | - | Input element ID |
-| `onBlur` | `(e: FocusEvent) => void` | - | Blur event handler |
+| Prop           | Type                                                             | Default         | Description                             |
+| -------------- | ---------------------------------------------------------------- | --------------- | --------------------------------------- |
+| `value`        | `Dayjs \| null \| undefined`                                     | -               | Current time value                      |
+| `defaultValue` | `Dayjs \| null \| undefined`                                     | `null`          | Default time value                      |
+| `onChange`     | `(time: Dayjs \| null, timeString: string \| undefined) => void` | -               | Callback when time changes              |
+| `format`       | `string`                                                         | `"HH:mm"`       | Time format (e.g., "HH:mm", "HH:mm:ss") |
+| `placeholder`  | `string`                                                         | `"Select time"` | Input placeholder text                  |
+| `open`         | `boolean`                                                        | -               | Whether the picker is open (controlled) |
+| `onOpenChange` | `(open: boolean) => void`                                        | -               | Callback when open state changes        |
+| `size`         | `"sm" \| "md" \| "lg"`                                           | `"md"`          | Input size                              |
+| `className`    | `string`                                                         | -               | Additional CSS classes                  |
+| `id`           | `string`                                                         | -               | Input element ID                        |
+| `onBlur`       | `(e: FocusEvent) => void`                                        | -               | Blur event handler                      |
 
 ### DateType
 
@@ -146,11 +146,7 @@ const [time, setTime] = useState(dayjs("14:30", "HH:mm"));
 ### Custom Styling
 
 ```tsx
-<TimePicker
-  className="w-32"
-  size="lg"
-  placeholder="Pick a time"
-/>
+<TimePicker className="w-32" size="lg" placeholder="Pick a time" />
 ```
 
 ## Advanced Usage
@@ -164,7 +160,7 @@ function ValidatedTimePicker() {
 
   const handleChange = (value: dayjs.Dayjs | null) => {
     setTime(value);
-    
+
     if (value && value.hour() < 9) {
       setError("Time must be after 9:00 AM");
     } else {
@@ -189,7 +185,7 @@ function TimeRangePicker() {
   const [endTime, setEndTime] = useState<dayjs.Dayjs | null>(null);
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex items-center gap-2">
       <TimePicker
         value={startTime}
         onChange={setStartTime}
@@ -239,9 +235,7 @@ The TimePicker uses the following CSS classes that can be customized:
 ### Tailwind Classes
 
 ```tsx
-<TimePicker
-  className="w-24 text-sm border-gray-300 focus:border-blue-500"
-/>
+<TimePicker className="w-24 border-gray-300 text-sm focus:border-blue-500" />
 ```
 
 ## Accessibility
@@ -264,13 +258,13 @@ The TimePicker component follows accessibility best practices:
 
 ## Browser Support
 
-| Browser | Support | Notes |
-|---------|---------|-------|
-| Chrome | ✅ Full | Native time input supported |
-| Firefox | ✅ Full | Native time input supported |
-| Safari | ✅ Full | Native time input supported |
-| Edge | ✅ Full | Native time input supported |
-| IE 11 | ⚠️ Partial | Fallback to text input |
+| Browser | Support    | Notes                       |
+| ------- | ---------- | --------------------------- |
+| Chrome  | ✅ Full    | Native time input supported |
+| Firefox | ✅ Full    | Native time input supported |
+| Safari  | ✅ Full    | Native time input supported |
+| Edge    | ✅ Full    | Native time input supported |
+| IE 11   | ⚠️ Partial | Fallback to text input      |
 
 ## Troubleshooting
 

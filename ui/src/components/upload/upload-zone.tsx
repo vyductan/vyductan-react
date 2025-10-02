@@ -1,7 +1,7 @@
 import type { UploadFileItem, UploadService } from "./types";
-import { useRef, useState } from "react";
-
-import { Card } from "../card";
+import { Card } from "../components/card";
+// import { Icon } from "../icons";
+import { message } from "../components/message";
 import ProgressBar from "./_components/progress-bar";
 import { cn } from "@acme/ui/lib/utils";
 // import { Icon } from "../icons";

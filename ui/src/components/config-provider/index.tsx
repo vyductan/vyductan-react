@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from "react";

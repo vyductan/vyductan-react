@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
@@ -42,7 +41,7 @@ const getResponsiveMap = (token: GlobalToken): BreakpointMap => ({
  */
 const validateBreakpoints = (token: GlobalToken) => {
   const indexableToken: any = token;
-  const revBreakpoints = [...responsiveArray].reverse();
+  const revBreakpoints = responsiveArray.toReversed();
 
   for (const [i, breakpoint] of revBreakpoints.entries()) {
     const breakpointUpper = breakpoint.toUpperCase();

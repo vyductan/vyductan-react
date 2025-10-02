@@ -39,7 +39,7 @@ type InputProps = Omit<
   "ref" | "size" | "prefix" | "value"
 > &
   CommonInputProps & {
-    ref?: React.ForwardedRef<InputRef>;
+    ref?: React.Ref<InputRef | HTMLInputElement | null>;
 
     onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
     classNames?: Partial<Record<SemanticName, string>>;
@@ -145,8 +145,8 @@ const Input = (props: InputProps) => {
   const mergedSize = useSize((ctx) => customSize ?? compactSize ?? ctx);
 
   // ===================== Disabled =====================
-  const disabled = React.useContext(DisabledContext);
-  const mergedDisabled = customDisabled ?? disabled;
+  const disabledFromContext = React.useContext(DisabledContext);
+  const disabled = customDisabled ?? disabledFromContext;
 
   // =================== Select Range ===================
   const [selection, setSelection] = useState<
@@ -161,33 +161,67 @@ const Input = (props: InputProps) => {
   const isOutOfRange = !!mergedMax && valueLength > mergedMax;
 
   // ======================= Ref ========================
-  useImperativeHandle(ref, () => ({
-    focus,
-    blur: () => {
-      inputRef.current?.blur();
-    },
-    setSelectionRange: (
-      start: number,
-      end: number,
-      direction?: "forward" | "backward" | "none",
-    ) => {
-      inputRef.current?.setSelectionRange(start, end, direction);
-    },
-    select: () => {
-      inputRef.current?.select();
-    },
-    setCustomValidity: (msg) => inputRef.current?.setCustomValidity?.(msg),
-    reportValidity: () => inputRef.current?.reportValidity?.(),
-    input: inputRef.current,
-    nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
-  }));
+  useImperativeHandle<
+    InputRef | HTMLInputElement | null,
+    InputRef | HTMLInputElement | null
+  >(ref, () =>
+    inputRef.current
+      ? {
+          ...inputRef.current,
+          focus,
+          blur: () => {
+            inputRef.current?.blur();
+          },
+          setSelectionRange: (
+            start: number,
+            end: number,
+            direction?: "forward" | "backward" | "none",
+          ) => {
+            inputRef.current?.setSelectionRange(start, end, direction);
+          },
+          select: () => {
+            inputRef.current?.select();
+          },
+          setCustomValidity: (msg) =>
+            inputRef.current?.setCustomValidity?.(msg),
+          reportValidity: () => inputRef.current?.reportValidity?.(),
+          input: inputRef.current,
+          nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+        }
+      : null,
+  );
+  // useImperativeHandle(ref, () =>
+  //   typeof ref === "object" && ref?.current && "current" in ref.current
+  //     ? {
+  //         focus,
+  //         blur: () => {
+  //           inputRef.current?.blur();
+  //         },
+  //         setSelectionRange: (
+  //           start: number,
+  //           end: number,
+  //           direction?: "forward" | "backward" | "none",
+  //         ) => {
+  //           inputRef.current?.setSelectionRange(start, end, direction);
+  //         },
+  //         select: () => {
+  //           inputRef.current?.select();
+  //         },
+  //         setCustomValidity: (msg) =>
+  //           inputRef.current?.setCustomValidity?.(msg),
+  //         reportValidity: () => inputRef.current?.reportValidity?.(),
+  //         input: inputRef.current,
+  //         nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+  //       }
+  //     : ref,
+  // );
 
   useEffect(() => {
     if (keyLockRef.current) {
       keyLockRef.current = false;
     }
-    setFocused((prev) => (prev && disabled ? false : prev));
-  }, [disabled]);
+    setFocused((prev) => (prev && disabledFromContext ? false : prev));
+  }, [disabledFromContext]);
 
   const triggerChange = (
     e:
@@ -389,11 +423,14 @@ const Input = (props: InputProps) => {
       focused={focused}
       triggerFocus={focus}
       suffix={getSuffix()}
-      disabled={mergedDisabled}
+      disabled={disabled}
       styles={styles}
       ref={holderRef}
       classNames={{
-        variant: cn(inputVariants({ variant, status }), classNames?.variant),
+        variant: cn(
+          inputVariants({ variant, status, disabled }),
+          classNames?.variant,
+        ),
         affixWrapper: cn(
           inputSizeVariants({ size: mergedSize }),
           classNames?.affixWrapper,
