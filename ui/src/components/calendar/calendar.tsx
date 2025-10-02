@@ -32,6 +32,8 @@ type CalendarProps =
   | CalendarMultipleValueProps
   | {
       mode?: undefined;
+      onSelect?: undefined;
+      className?: string;
     };
 
 function composeDisabled(
