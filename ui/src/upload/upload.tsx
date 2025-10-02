@@ -3,19 +3,22 @@
 
 import { useMergedState } from "@rc-component/util";
 
-import type { DownloadService, UploadFileItem, UploadService } from "./types";
-import type { UploadZoneProps } from "./upload-zone";
+import type {
+  DownloadService,
+  DownloadService,
+  UploadFileItem,
+  UploadFileItem,
+  UploadService,
+  UploadService,
+} from "./types";
+import type { UploadZoneProps, UploadZoneProps } from "./upload-zone";
 import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
 import { Button } from "../button";
 import { Card } from "../card";
-import { UploadZone } from "./upload-zone";
-
-import type { DownloadService, UploadFileItem, UploadService } from "./types";
-import type { UploadZoneProps } from "./upload-zone";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
 import { DeleteIcon, DownloadIcon, Icon } from "../icons";
-import { UploadZone } from "./upload-zone";
+import { UploadZone, UploadZone } from "./upload-zone";
 
 type UploadProps = Omit<UploadZoneProps, "defaultValue" | "onChange"> & {
   listType?: "picture-card";
