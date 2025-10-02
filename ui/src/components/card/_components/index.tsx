@@ -1,3 +1,7 @@
+import { useContext } from "react";
+
+import type { SizeType } from "@acme/ui/types";
+import { cn } from "@acme/ui/lib/utils";
 import {
   CardAction as ShadcnCardAction,
   CardContent as ShadcnCardContent,
@@ -8,9 +12,6 @@ import {
 } from "@acme/ui/shadcn/card";
 
 import { CardContext } from "../context";
-import type { SizeType } from "@acme/ui/types";
-import { cn } from "@acme/ui/lib/utils";
-import { useContext } from "react";
 
 type CardRootProps = React.ComponentProps<typeof ShadcnCardRoot> & {
   size?: SizeType;
@@ -25,7 +26,7 @@ const CardRoot = ({
   return (
     <ShadcnCardRoot
       className={cn(
-        size === "small" && "gap-3 py-3 rounded-lg",
+        size === "small" && "gap-3 rounded-lg py-3",
         bordered ? "" : "border-none shadow-none",
         className,
       )}
