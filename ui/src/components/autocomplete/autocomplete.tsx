@@ -2,9 +2,9 @@
 "use client";
 
 import * as React from "react";
+import { tagColors } from "@/components/ui/tag";
 import { useMergedState } from "@rc-component/util";
 
-import { tagColors } from "@acme/ui/components/tag";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
