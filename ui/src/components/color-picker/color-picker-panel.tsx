@@ -104,7 +104,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
         </div>
         {onClear && (
           <Button
-            variant="ghost"
+            variant="text"
             size="sm"
             onClick={handleClear}
             className="text-muted-foreground hover:text-foreground"

@@ -1,51 +1,52 @@
 "use client";
 
-import type { Dayjs } from "dayjs";
 import * as React from "react";
-import dayjs from "dayjs";
 
-import type { DatePickerProps } from "./date-picker";
+import type { DatePickerPropsDayjs } from "./date-picker";
 import { DatePicker } from "./date-picker";
 
 export type YearPickerProps = Omit<
-  DatePickerProps<Dayjs>,
-  "picker" | "value" | "onChange" | "showTime"
+  DatePickerPropsDayjs,
+  "picker" | "disabledDate" | "showTime" | "valueType"
 > & {
-  value?: number | Dayjs;
-  onChange?: (value?: number | Dayjs) => void;
-  format?: string;
+  // valueType: "dayjs";
+  // defaultValue?: Dayjs;
+  // value?: Dayjs;
+  // onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
+  // format?: string;
 };
 
-function toDayjsYear(value?: number | Dayjs): Dayjs | undefined {
-  if (typeof value === "number") {
-    return dayjs().year(value).startOf("year");
-  }
-  if (value && dayjs.isDayjs(value)) {
-    return value.startOf("year");
-  }
-  return undefined;
-}
+// function toDayjsYear(value?: number | Dayjs): Dayjs | undefined {
+//   if (typeof value === "number") {
+//     return dayjs().year(value).startOf("year");
+//   }
+//   if (value && dayjs.isDayjs(value)) {
+//     return value.startOf("year");
+//   }
+//   return undefined;
+// }
 
 export function YearPicker({
-  value,
-  onChange,
-  format = "YYYY",
+  // value,
+  // onChange,
+  // format = "YYYY",
   ...rest
 }: YearPickerProps) {
-  const djValue = React.useMemo(() => toDayjsYear(value), [value]);
+  // const djValue = React.useMemo(() => toDayjsYear(value), [value]);
 
   return (
     <DatePicker
-      {...rest}
+      // valueType="dayjs"
       picker="year"
       // Commit immediately when picking a year
       commitYearOnClose
-      value={djValue}
-      format={format}
-      onChange={(d) => {
-        // Always emit Dayjs at start of year (demo and docs handle either number or Dayjs)
-        onChange?.(d ? d.startOf("year") : undefined);
-      }}
+      {...rest}
+      // value={djValue}
+      // format={format}
+      // onChange={(d) => {
+      //   // Always emit Dayjs at start of year (demo and docs handle either number or Dayjs)
+      //   onChange?.(d ? d.startOf("year") : undefined);
+      // }}
     />
   );
 }

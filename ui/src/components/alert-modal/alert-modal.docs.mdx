@@ -13,8 +13,9 @@ import { AlertModal } from "@acme/ui/alert-modal";
 ### Basic Usage
 
 ```tsx
+import { Button } from "@/components/ui/button";
+
 import { AlertModal } from "@acme/ui/alert-modal";
-import { Button } from "@acme/ui/button";
 
 export default function BasicExample() {
   const handleConfirm = () => {
@@ -40,8 +41,9 @@ export default function BasicExample() {
 ### With Custom Button Text
 
 ```tsx
+import { Button } from "@/components/ui/button";
+
 import { AlertModal } from "@acme/ui/alert-modal";
-import { Button } from "@acme/ui/button";
 
 export default function CustomButtonsExample() {
   return (
@@ -62,9 +64,9 @@ export default function CustomButtonsExample() {
 
 ```tsx
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 import { AlertModal } from "@acme/ui/alert-modal";
-import { Button } from "@acme/ui/button";
 
 export default function LoadingExample() {
   const [loading, setLoading] = useState(false);
@@ -92,9 +94,9 @@ export default function LoadingExample() {
 
 ```tsx
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 import { AlertModal } from "@acme/ui/alert-modal";
-import { Button } from "@acme/ui/button";
 
 export default function ControlledExample() {
   const [open, setOpen] = useState(false);
@@ -121,6 +123,8 @@ export default function ControlledExample() {
 ### Using as Shadcn AlertDialog (Advanced)
 
 ```tsx
+import { Button } from "@/components/ui/button";
+
 import { AlertModal } from "@acme/ui/alert-modal";
 import {
   AlertDialogAction,
@@ -132,7 +136,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@acme/ui/alert-modal/_components";
-import { Button } from "@acme/ui/button";
 
 export default function AdvancedExample() {
   return (

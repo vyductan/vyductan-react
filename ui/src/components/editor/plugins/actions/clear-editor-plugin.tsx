@@ -1,19 +1,22 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { CLEAR_EDITOR_COMMAND } from "lexical";
-import { Trash2Icon } from "lucide-react";
-
-import { Button } from "@acme/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogRoot,
+  Dialog as DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@acme/ui/modal";
-import { TooltipContent, TooltipRoot, TooltipTrigger } from "@acme/ui/tooltip";
+} from "@/components/ui/modal";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { CLEAR_EDITOR_COMMAND } from "lexical";
+import { Trash2Icon } from "lucide-react";
 
 export function ClearEditorActionPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -23,7 +26,7 @@ export function ClearEditorActionPlugin() {
       <TooltipRoot disableHoverableContent>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size={"sm"} variant={"ghost"} className="p-2">
+            <Button size={"sm"} variant="text" className="p-2">
               <Trash2Icon className="h-4 w-4" />
             </Button>
           </DialogTrigger>

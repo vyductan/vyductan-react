@@ -233,7 +233,7 @@ function FloatingLinkEditor({
             />
             <Button
               shape="icon"
-              variant="ghost"
+              variant="text"
               onClick={() => {
                 setIsLinkEditMode(false);
                 setIsLink(false);
@@ -263,7 +263,7 @@ function FloatingLinkEditor({
             <div className="flex">
               <Button
                 shape="icon"
-                variant="ghost"
+                variant="text"
                 onClick={() => {
                   setEditedLinkUrl(linkUrl);
                   setIsLinkEditMode(true);

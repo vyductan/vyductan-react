@@ -39,7 +39,6 @@ import { DragDropPastePlugin } from "../plugins/drag-drop-paste-plugin";
 import { DraggableBlockPlugin } from "../plugins/draggable-block-plugin";
 import { AutoEmbedPlugin } from "../plugins/embeds/auto-embed-plugin";
 import { FigmaPlugin } from "../plugins/embeds/figma-plugin";
-import { TwitterPlugin } from "../plugins/embeds/twitter-plugin";
 import { YouTubePlugin } from "../plugins/embeds/youtube-plugin";
 import { EmojiPickerPlugin } from "../plugins/emoji-picker-plugin";
 import { EmojisPlugin } from "../plugins/emojis-plugin";
@@ -180,7 +179,6 @@ export function Plugins({}) {
 
         <AutoEmbedPlugin />
         <FigmaPlugin />
-        <TwitterPlugin />
         <YouTubePlugin />
 
         <CodeHighlightPlugin />

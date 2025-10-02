@@ -110,11 +110,11 @@ const FloatButtonGroup: React.FC<FloatButtonGroupProps> = (props) => {
               <motion.div variants={variants}>{children}</motion.div>
             </motion.div>
             <FloatButton
-              ref={floatButtonRef}
               shape={shape}
               icon={open ? closeIcon : icon}
               aria-label={props["aria-label"]}
               {...floatButtonProps}
+              ref={floatButtonRef}
             />
           </>
         ) : (

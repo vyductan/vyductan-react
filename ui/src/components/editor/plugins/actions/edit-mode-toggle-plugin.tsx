@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LockIcon, UnlockIcon } from "lucide-react";
-
-import { Button } from "@acme/ui/button";
-import { TooltipContent, TooltipRoot, TooltipTrigger } from "@acme/ui/tooltip";
 
 export function EditModeTogglePlugin() {
   const [editor] = useLexicalComposerContext();
@@ -13,7 +16,7 @@ export function EditModeTogglePlugin() {
     <TooltipRoot>
       <TooltipTrigger asChild>
         <Button
-          variant={"ghost"}
+          variant="text"
           onClick={() => {
             editor.setEditable(!editor.isEditable());
             setIsEditable(editor.isEditable());
