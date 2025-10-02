@@ -9,7 +9,6 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../config-provider/size-context";
 import { Skeleton } from "../skeleton";
-import { DescriptionsItemContainer } from "./_components";
 
 export type DescriptionsItem = {
   key?: React.Key;
@@ -33,12 +32,8 @@ type DescriptionProps = {
   layout?: "horizontal" | "vertical";
   size?: SizeType;
   classNames?: {
-    root?: string;
     header?: string;
     title?: string;
-    extra?: string;
-    label?: string;
-    content?: string;
 
     view?: string;
     label?: string;
