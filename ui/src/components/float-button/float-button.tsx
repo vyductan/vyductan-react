@@ -1,7 +1,6 @@
+import type { ButtonProps } from "@/components/ui/button";
 import React, { useContext } from "react";
-
-import type { ButtonProps } from "@acme/ui/components/button";
-import { Button } from "@acme/ui/components/button";
+import { Button } from "@/components/ui/button";
 
 import type { BadgeProps } from "../badge";
 import type { TooltipProps } from "../tooltip";
