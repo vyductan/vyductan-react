@@ -90,7 +90,7 @@ export const FloatButtonBackToTop = React.forwardRef<
 
   return (
     <motion.div animate={visible ? "visible" : "hidden"} variants={variants}>
-      <FloatButton ref={internalRef} {...contentProps} onClick={scrollToTop} />
+      <FloatButton {...contentProps} onClick={scrollToTop} ref={internalRef} />
     </motion.div>
   );
 });

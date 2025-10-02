@@ -28,7 +28,7 @@ export function FormatCheckList() {
     if (blockType === "number") {
       formatParagraph();
     } else {
-      activeEditor.dispatchCommand(INSERT_CHECK_LIST_COMMAND);
+      activeEditor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
     }
   };
 
