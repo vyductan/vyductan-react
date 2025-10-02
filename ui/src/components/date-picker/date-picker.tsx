@@ -603,5 +603,5 @@ const DatePicker = (props: DatePickerProps) => {
   );
 };
 
-export type { DatePickerProps, DatePickerBaseProps };
+export type { DatePickerProps, DatePickerBaseProps, DatePickerPropsDayjs };
 export { DatePicker };

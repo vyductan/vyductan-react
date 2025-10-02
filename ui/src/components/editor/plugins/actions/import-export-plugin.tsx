@@ -1,9 +1,12 @@
+import { Button } from "@/components/ui/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { exportFile, importFile } from "@lexical/file";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { DownloadIcon, UploadIcon } from "lucide-react";
-
-import { Button } from "@acme/ui/button";
-import { TooltipContent, TooltipRoot, TooltipTrigger } from "@acme/ui/tooltip";
 
 export function ImportExportPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -12,7 +15,7 @@ export function ImportExportPlugin() {
       <TooltipRoot>
         <TooltipTrigger asChild>
           <Button
-            variant={"ghost"}
+            variant="text"
             onClick={() => importFile(editor)}
             title="Import"
             aria-label="Import editor state from JSON"
@@ -28,7 +31,7 @@ export function ImportExportPlugin() {
       <TooltipRoot>
         <TooltipTrigger asChild>
           <Button
-            variant={"ghost"}
+            variant="text"
             onClick={() =>
               exportFile(editor, {
                 fileName: `Playground ${new Date().toISOString()}`,

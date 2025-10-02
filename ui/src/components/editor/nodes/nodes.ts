@@ -19,7 +19,6 @@ import { EmojiNode } from "../nodes/emoji-node";
 import { EquationNode } from "../nodes/equation-node";
 import { ExcalidrawNode } from "../nodes/excalidraw-node";
 import { ImageNode } from "../nodes/image-node";
-import { InlineImageNode } from "../nodes/inline-image-node";
 import { KeywordNode } from "../nodes/keyword-node";
 import { LayoutContainerNode } from "../nodes/layout-container-node";
 import { LayoutItemNode } from "../nodes/layout-item-node";
@@ -47,7 +46,6 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     MentionNode,
     PageBreakNode,
     ImageNode,
-    InlineImageNode,
     EmojiNode,
     KeywordNode,
     ExcalidrawNode,
