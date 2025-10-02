@@ -9,7 +9,6 @@ import type { LexicalNode } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import * as React from "react";
-import dynamic from "next/dynamic";
 import { CommandItem, CommandList, CommandRoot } from "@/components/ui/command";
 import {
   Popover,
@@ -29,10 +28,7 @@ import {
   PASTE_COMMAND,
 } from "lexical";
 
-const LexicalContextMenuPlugin = dynamic(
-  () => import("./default/lexical-context-menu-plugin"),
-  { ssr: false },
-);
+import { LexicalContextMenuPlugin } from "./default/lexical-context-menu-plugin";
 
 export class ContextMenuOption extends MenuOption {
   title: string;
@@ -178,7 +174,7 @@ export function ContextMenuPlugin(): JSX.Element {
     <LexicalContextMenuPlugin
       options={options}
       onSelectOption={(option, targetNode) => {
-        onSelectOption(option as ContextMenuOption, targetNode, () => {
+        onSelectOption(option, targetNode, () => {
           setIsOpen(false);
         });
       }}

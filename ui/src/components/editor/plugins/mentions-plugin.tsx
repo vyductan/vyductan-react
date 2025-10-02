@@ -12,7 +12,6 @@ import type { TextNode } from "lexical";
 import type { JSX } from "react";
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import {
   Command,
   CommandGroup,
@@ -28,14 +27,7 @@ import { CircleUserRoundIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { $createMentionNode } from "../nodes/mention-node";
-
-const LexicalTypeaheadMenuPlugin = dynamic(
-  () =>
-    import("@lexical/react/LexicalTypeaheadMenuPlugin").then(
-      (mod) => mod.LexicalTypeaheadMenuPlugin,
-    ),
-  { ssr: false },
-);
+import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 const PUNCTUATION = String.raw`\.,\+\*\?\$\@\|#{}\(\)\^\-\[\]\\/!%'"~=<>_:;`;
 const NAME = String.raw`\b[A-Z][^\s` + PUNCTUATION + "]";
@@ -641,7 +633,6 @@ export function MentionsPlugin(): JSX.Element | null {
   );
 
   return (
-    // @ts-expect-error - Lexical typeahead plugin lacks generic typing for custom options
     <LexicalTypeaheadMenuPlugin<MentionTypeaheadOption>
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}

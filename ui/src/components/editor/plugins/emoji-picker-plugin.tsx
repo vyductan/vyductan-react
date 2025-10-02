@@ -8,7 +8,6 @@
 import type { TextNode } from "lexical";
 import * as React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import dynamic from "next/dynamic";
 import {
   CommandGroup,
   CommandItem,
@@ -23,10 +22,7 @@ import {
 import { $createTextNode, $getSelection, $isRangeSelection } from "lexical";
 import { createPortal } from "react-dom";
 
-const LexicalTypeaheadMenuPlugin = dynamic(
-  () => import("./default/lexical-typeahead-menu-plugin"),
-  { ssr: false },
-);
+import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 class EmojiOption extends MenuOption {
   title: string;
@@ -132,7 +128,6 @@ export function EmojiPickerPlugin() {
   );
 
   return (
-    // @ts-expect-error Lexical type defs omit a generic-friendly signature here
     <LexicalTypeaheadMenuPlugin<EmojiOption>
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
