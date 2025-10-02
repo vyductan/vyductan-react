@@ -78,7 +78,7 @@ const Drawer = ({
               data-slot="drawer-header-content"
               className="flex flex-1 flex-row items-center gap-2"
             >
-              <Button size="small" variant="ghost" shape="icon" asChild>
+              <Button size="small" variant="text" shape="icon" asChild>
                 <DrawerClose
                   className={cn(
                     // "mt-1 self-start",

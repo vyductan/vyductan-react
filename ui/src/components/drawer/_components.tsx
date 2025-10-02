@@ -64,33 +64,13 @@ function DrawerContent({
 
 const DrawerHeader = ({
   className,
-  children,
   ...props
 }: React.ComponentProps<typeof ShadcnDrawerHeader>) => {
   return (
     <ShadcnDrawerHeader
       className={cn("flex flex-row items-center border-b p-4", className)}
       {...props}
-    >
-      <Button size="small" variant="text" shape="icon" asChild>
-        <DrawerClose
-          className={cn(
-            // "absolute top-4 right-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-gray-100 data-[state=open]:text-gray-500 dark:ring-offset-gray-950 dark:focus:ring-gray-300 dark:data-[state=open]:bg-gray-800 dark:data-[state=open]:text-gray-400",
-            "rounded-xs opacity-70 transition-opacity",
-            "ring-offset-background focus:ring-ring",
-            "hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none",
-            "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-            "data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
-            // "absolute top-4 right-4"
-          )}
-        >
-          <Icon icon="icon-[lucide--x]" className="size-5" />
-          <span className="sr-only">Close</span>
-        </DrawerClose>
-      </Button>
-      <div className="flex flex-1 flex-col gap-1.5">{children}</div>
-      {extra}
-    </ShadcnDrawerHeader>
+    />
   );
 };
 

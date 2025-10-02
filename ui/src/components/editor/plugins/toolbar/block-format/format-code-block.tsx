@@ -1,8 +1,7 @@
+import { SelectItem } from "@/components/ui/select";
 import { $createCodeNode } from "@lexical/code";
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
-
-import { SelectItem } from "@acme/ui/select";
 
 import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";

@@ -185,7 +185,7 @@ function SpeechToTextPluginImpl() {
             editor.dispatchCommand(SPEECH_TO_TEXT_COMMAND, !isSpeechToText);
             setIsSpeechToText(!isSpeechToText);
           }}
-          variant={isSpeechToText ? "outline" : "ghost"}
+          variant={isSpeechToText ? "outline" : "text"}
           title="Speech To Text"
           aria-label={`${isSpeechToText ? "Enable" : "Disable"} speech to text`}
           className="p-2"

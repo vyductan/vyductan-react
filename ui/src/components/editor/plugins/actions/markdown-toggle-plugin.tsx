@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { $createCodeNode, $isCodeNode } from "@lexical/code";
 import {
   $convertFromMarkdownString,
@@ -7,8 +8,6 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createTextNode, $getRoot } from "lexical";
 import { FileTextIcon } from "lucide-react";
-
-import { Button } from "@acme/ui/button";
 
 import { MARKDOWN_TRANSFORMERS } from "../../transformers/markdown-transformers";
 
@@ -48,7 +47,7 @@ export function MarkdownTogglePlugin({
 
   return (
     <Button
-      variant={"ghost"}
+      variant="text"
       onClick={handleMarkdownToggle}
       title="Convert From Markdown"
       aria-label="Convert from markdown"

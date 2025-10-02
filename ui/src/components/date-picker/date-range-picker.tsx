@@ -1,4 +1,3 @@
-import type { DateRange } from "react-day-picker";
 import React, { useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { Slot } from "@radix-ui/react-slot";
@@ -111,12 +110,13 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
     return (
       <Calendar
         mode="range"
+        required
         // showYearSwitcher
-        initialFocus
-        numberOfMonths={2}
-        defaultMonth={
-          value?.[0] ? toDate(value[0] as unknown as Date) : undefined
-        }
+        // initialFocus
+        // numberOfMonths={2}
+        // defaultMonth={
+        //   value?.[0] ? toDate(value[0] as unknown as Date) : undefined
+        // }
         selected={
           value
             ? {
@@ -127,11 +127,11 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
               }
             : undefined
         }
-        onSelect={(dateRange: DateRange | undefined) => {
-          if (!dateRange) {
-            setValue(undefined);
-            return;
-          }
+        onSelect={(dateRange) => {
+          // if (!dateRange) {
+          //   setValue(undefined);
+          //   return;
+          // }
           if (dateRange.from) {
             setValue([getDestinationValue(dateRange.from), value?.[1]]);
           }
