@@ -7,6 +7,7 @@ The App component core functionality is stable with modal support. Message and n
 ## Completed Tasks
 
 ### ✅ Core App Context
+
 - [x] App component with React context provider
 - [x] `App.useApp()` static method (Ant Design compatible)
 - [x] Proper TypeScript types and interfaces
@@ -14,6 +15,7 @@ The App component core functionality is stable with modal support. Message and n
 - [x] Integration with existing UiConfigProvider
 
 ### ✅ Modal Integration
+
 - [x] `modal.confirm()` method fully functional
 - [x] Async onOk handler support with loading states
 - [x] Proper state management for modal visibility
@@ -21,6 +23,7 @@ The App component core functionality is stable with modal support. Message and n
 - [x] TypeScript support with ConfirmConfig interface
 
 ### ✅ Developer Experience
+
 - [x] Clear error messages for context usage
 - [x] Comprehensive documentation with examples
 - [x] TypeScript exports for all interfaces
@@ -31,6 +34,7 @@ The App component core functionality is stable with modal support. Message and n
 ### 🔄 Message API Implementation (High Priority)
 
 #### Core Message Features
+
 - [ ] Create Message component with different types (success, error, warning, info)
 - [ ] Implement message container/portal for global messages
 - [ ] Add message queue management for multiple messages
@@ -38,14 +42,16 @@ The App component core functionality is stable with modal support. Message and n
 - [ ] Add message positioning options (top, bottom, center)
 
 #### Message API Methods
+
 - [ ] `message.success(content, duration?)` - Show success message
-- [ ] `message.error(content, duration?)` - Show error message  
+- [ ] `message.error(content, duration?)` - Show error message
 - [ ] `message.warning(content, duration?)` - Show warning message
 - [ ] `message.info(content, duration?)` - Show info message
 - [ ] `message.loading(content)` - Show loading message
 - [ ] `message.destroy()` - Clear all messages
 
 #### Advanced Message Features
+
 - [ ] Custom icons for message types
 - [ ] Custom styling and themes
 - [ ] Animation options (slide, fade, bounce)
@@ -55,6 +61,7 @@ The App component core functionality is stable with modal support. Message and n
 ### 🔄 Notification API Implementation (High Priority)
 
 #### Core Notification Features
+
 - [ ] Create Notification component with rich content support
 - [ ] Implement notification container with stacking
 - [ ] Support for actions/buttons in notifications
@@ -62,6 +69,7 @@ The App component core functionality is stable with modal support. Message and n
 - [ ] Auto-dismiss with configurable duration
 
 #### Notification API Methods
+
 - [ ] `notification.success(config)` - Show success notification
 - [ ] `notification.error(config)` - Show error notification
 - [ ] `notification.warning(config)` - Show warning notification
@@ -71,6 +79,7 @@ The App component core functionality is stable with modal support. Message and n
 - [ ] `notification.destroy()` - Clear all notifications
 
 #### Advanced Notification Features
+
 - [ ] Custom icons and images
 - [ ] Progress indicators for long operations
 - [ ] Interactive notifications with buttons
@@ -80,18 +89,21 @@ The App component core functionality is stable with modal support. Message and n
 ### 🔄 Additional App APIs (Medium Priority)
 
 #### Drawer API
+
 - [ ] Add drawer support to App context
 - [ ] `drawer.open(config)` method
 - [ ] Support for different drawer positions
 - [ ] Custom drawer content and actions
 
 #### Loading API
+
 - [ ] Global loading state management
 - [ ] `loading.show(tip?)` method
 - [ ] `loading.hide()` method
 - [ ] Custom loading indicators
 
 #### Tour/Guide API
+
 - [ ] Product tour integration
 - [ ] `tour.start(steps)` method
 - [ ] Step-by-step guidance system
@@ -100,12 +112,14 @@ The App component core functionality is stable with modal support. Message and n
 ### 🔄 Performance & Optimization (Medium Priority)
 
 #### Rendering Optimization
+
 - [ ] Lazy loading for unused APIs
 - [ ] Virtual scrolling for large notification lists
 - [ ] Memory leak prevention for long-running apps
 - [ ] Bundle size optimization
 
 #### State Management
+
 - [ ] Optimize re-renders with proper memoization
 - [ ] State persistence options
 - [ ] Cleanup on unmount
@@ -114,18 +128,21 @@ The App component core functionality is stable with modal support. Message and n
 ### 🔄 Testing & Quality (Low Priority)
 
 #### Unit Tests
+
 - [ ] Test App context provider
 - [ ] Test all API methods
 - [ ] Test error handling scenarios
 - [ ] Test TypeScript type safety
 
 #### Integration Tests
+
 - [ ] Test with real components
 - [ ] Test modal integration
 - [ ] Test message/notification flows
 - [ ] Test accessibility compliance
 
 #### E2E Tests
+
 - [ ] Test complete user workflows
 - [ ] Test across different browsers
 - [ ] Test responsive behavior
@@ -134,18 +151,21 @@ The App component core functionality is stable with modal support. Message and n
 ## Technical Debt
 
 ### 🔧 Code Structure
+
 - [ ] Separate message/notification logic into own hooks
 - [ ] Create shared utilities for positioning and animations
 - [ ] Improve error handling and logging
 - [ ] Add performance monitoring
 
 ### 🔧 Documentation
+
 - [ ] Add Storybook stories for all APIs
 - [ ] Create interactive examples
 - [ ] Add migration guides from other libraries
 - [ ] Video tutorials for complex scenarios
 
 ### 🔧 Accessibility
+
 - [ ] ARIA announcements for messages/notifications
 - [ ] High contrast mode support
 - [ ] Reduced motion preferences
@@ -154,6 +174,7 @@ The App component core functionality is stable with modal support. Message and n
 ## Breaking Changes (Future)
 
 ### 🚨 V2.0 Considerations
+
 - [ ] Consider standardizing all config interfaces
 - [ ] Review API naming conventions
 - [ ] Evaluate performance implications of current approach
@@ -162,6 +183,7 @@ The App component core functionality is stable with modal support. Message and n
 ## Implementation Priority
 
 ### Phase 1: Message API (Next Sprint)
+
 1. Create basic Message component
 2. Implement message container and positioning
 3. Add all message methods to App context
@@ -169,6 +191,7 @@ The App component core functionality is stable with modal support. Message and n
 5. Add basic animations and styling
 
 ### Phase 2: Notification API (Following Sprint)
+
 1. Create Notification component with rich content
 2. Implement notification stacking and management
 3. Add all notification methods to App context
@@ -176,6 +199,7 @@ The App component core functionality is stable with modal support. Message and n
 5. Advanced positioning and animations
 
 ### Phase 3: Additional APIs (Future)
+
 1. Drawer API implementation
 2. Loading API implementation
 3. Tour/Guide API implementation
@@ -185,16 +209,19 @@ The App component core functionality is stable with modal support. Message and n
 ## Dependencies
 
 ### Required
+
 - React 18+
 - Existing Modal component
 - UiConfigProvider for styling context
 
 ### For Message/Notification
+
 - Animation library (Framer Motion or similar)
 - Portal/container management utilities
 - Icon library for message types
 
 ### For Advanced Features
+
 - Intersection Observer (for tour/guide)
 - Local Storage (for persistence)
 - Performance monitoring tools
