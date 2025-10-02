@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Dayjs } from "dayjs";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 import { YearPicker } from "./year-picker";
 
@@ -13,55 +12,47 @@ export function YearPickerDemo() {
   return (
     <div className="space-y-8 p-8">
       <div>
-        <h3 className="text-lg font-medium mb-4">Basic Year Picker</h3>
-        <YearPicker
-          value={year}
-          onChange={setYear}
-          placeholder="Select year"
-        />
-        <p className="text-sm text-muted-foreground mt-2">
+        <h3 className="mb-4 text-lg font-medium">Basic Year Picker</h3>
+        <YearPicker value={year} onChange={setYear} placeholder="Select year" />
+        <p className="text-muted-foreground mt-2 text-sm">
           Selected year: {year ? dayjs(year).format("YYYY") : "None"}
         </p>
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Year Picker with Clear</h3>
+        <h3 className="mb-4 text-lg font-medium">Year Picker with Clear</h3>
         <YearPicker
           value={year2}
           onChange={setYear2}
           placeholder="Select year"
           allowClear={true}
         />
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-2 text-sm">
           Selected year: {year2 ? dayjs(year2).format("YYYY") : "None"}
         </p>
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Disabled Year Picker</h3>
-        <YearPicker
-          value={2024}
-          disabled={true}
-          placeholder="Select year"
-        />
+        <h3 className="mb-4 text-lg font-medium">Disabled Year Picker</h3>
+        <YearPicker value={2024} disabled={true} placeholder="Select year" />
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Custom Format Year Picker</h3>
+        <h3 className="mb-4 text-lg font-medium">Custom Format Year Picker</h3>
         <YearPicker
           value={year}
           onChange={setYear}
           placeholder="Select year"
           format="YY"
         />
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-2 text-sm">
           Selected year (YY format): {year ? dayjs(year).format("YY") : "None"}
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <h4 className="text-sm font-medium mb-2">Small Size</h4>
+          <h4 className="mb-2 text-sm font-medium">Small Size</h4>
           <YearPicker
             value={year}
             onChange={setYear}
@@ -69,9 +60,9 @@ export function YearPickerDemo() {
             className="h-8 text-sm"
           />
         </div>
-        
+
         <div>
-          <h4 className="text-sm font-medium mb-2">Large Size</h4>
+          <h4 className="mb-2 text-sm font-medium">Large Size</h4>
           <YearPicker
             value={year}
             onChange={setYear}

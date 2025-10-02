@@ -1,6 +1,7 @@
 # Tree Component - Tasks & Planning
 
 ## Overview
+
 Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ liệu phân cấp với khả năng mở rộng/thu gọn.
 
 > 📚 **Documentation**: Xem examples và API chi tiết tại `tree.docs.mdx`
@@ -8,6 +9,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ## Current Implementation Status
 
 ### ✅ Completed Features
+
 - [x] Basic tree structure rendering
 - [x] Recursive node rendering
 - [x] Collapsible/expandable nodes
@@ -27,6 +29,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ### 🚧 Pending Tasks
 
 #### High Priority
+
 - [ ] **Selection functionality**
   - [ ] Single selection implementation
   - [ ] Multiple selection support
@@ -48,6 +51,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
   - [ ] Controlled checked state
 
 #### Medium Priority
+
 - [ ] **Styling improvements**
   - [x] Show connecting lines (showLine prop) ✅
   - [x] Better icon positioning and sizing ✅
@@ -64,6 +68,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
   - [ ] Right-click context menu
 
 #### Low Priority
+
 - [ ] **Performance optimizations**
   - [ ] Memoization for large trees
   - [ ] Lazy loading of child nodes
@@ -80,6 +85,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ## Testing Scenarios
 
 ### Unit Tests Needed
+
 - [ ] Renders basic tree structure
 - [ ] Handles empty treeData
 - [ ] Renders custom icons
@@ -88,6 +94,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 - [ ] Key prop uniqueness
 
 ### Integration Tests Needed
+
 - [ ] Selection functionality
 - [ ] Expansion/collapse
 - [ ] Checkbox interactions
@@ -97,18 +104,21 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ## Design Considerations
 
 ### Accessibility
+
 - [ ] ARIA attributes for tree structure
 - [ ] Keyboard navigation support
 - [ ] Screen reader compatibility
 - [ ] Focus management
 
 ### Performance
+
 - [ ] Large dataset handling
 - [ ] Virtual scrolling for 1000+ nodes
 - [ ] Memoization strategies
 - [ ] Lazy loading implementation
 
 ### Styling
+
 - [ ] Consistent with design system
 - [ ] Dark mode support
 - [ ] Responsive design
@@ -117,16 +127,19 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ## Migration Notes
 
 ### From Current Implementation
+
 - Current implementation uses Sidebar components internally
 - Need to abstract away from Sidebar dependency for general use
 - Consider creating separate TreeSidebar variant
 
 ### Breaking Changes to Consider
+
 - API alignment with Ant Design Tree
 - Event handler signature changes
 - Props restructuring
 
 ## References
+
 - [Ant Design Tree](https://ant.design/components/tree)
 - [React Aria TreeView](https://react-spectrum.adobe.com/react-aria/useTreeView.html)
 - [Accessibility Tree Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/)

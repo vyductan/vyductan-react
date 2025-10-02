@@ -1,10 +1,10 @@
 import type { AvatarProps } from "@/components/ui/avatar";
+import type { BreadcrumbProps } from "@/components/ui/breadcrumb";
+import type { TagProps } from "@/components/ui/tag";
 import { Avatar } from "@/components/ui/avatar";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 
-import type { BreadcrumbProps } from "@acme/ui/components/breadcrumb";
-import type { TagProps } from "@acme/ui/components/tag";
-import { Breadcrumb } from "@acme/ui/components/breadcrumb";
-import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
 
 import { PageHeading } from "./_components";
@@ -52,7 +52,7 @@ const renderTitle = (props: PageHeaderProps) => {
         {onBack && (
           <Button
             shape="icon"
-            variant="ghost"
+            variant="text"
             // icon={<Icon icon="icon-[lucide--arrow-left]" />}
             asChild={typeof onBack === "object"}
           >

@@ -2,9 +2,9 @@
 "use client";
 
 import * as React from "react";
+import { tagColors } from "@/components/ui/tag";
 import { useMergedState } from "@rc-component/util";
 
-import { tagColors } from "@acme/ui/components/tag";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -225,9 +225,11 @@ const Autocomplete = <
           )}
         />
         {allowClear && (
-          <span
+          <Icon
             role="button"
+            icon="icon-[ant-design--close-circle-filled]"
             className={cn(
+              "size-3.5",
               "z-10",
               "absolute right-3",
               "opacity-0 transition-opacity duration-300",
@@ -237,21 +239,12 @@ const Autocomplete = <
               value && "hover:opacity-50",
             )}
             onClick={(e) => {
-              e.preventDefault();
-            }}
-            onPointerDown={(e) => {
               if (!value) return; // don't intercept when nothing to clear
               e.preventDefault();
               e.stopPropagation();
-              // onChange?.();
               setValue(undefined);
             }}
-          >
-            <Icon
-              icon="icon-[ant-design--close-circle-filled]"
-              className="pointer-events-none size-3.5"
-            />
-          </span>
+          />
         )}
         {loading && (
           <LoadingIcon className={cn("absolute right-3 z-10 size-3.5")} />

@@ -38,6 +38,7 @@ import type {
   ColumnsType,
   ExpandableConfig,
   ExpandType,
+  ExpandType,
   FilterValue,
   GetComponentProps,
   GetPopupContainer,
@@ -129,6 +130,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     bordered?: boolean | "around";
     classNames?: {
       table?: string;
+      body?: string;
       header?: string;
       footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
@@ -947,6 +949,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             "relative w-full space-y-3 overflow-x-auto",
             scroll?.x && "overflow-x-auto overflow-y-hidden",
             bordered && [
+              // "border rounded-lg",
               // "[&_table]:border-separate",
               // "[&>table]:border-spacing-0 [&>table]:rounded-md [&>table]:border",
               typeof bordered === "boolean" &&
@@ -957,12 +960,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             (!bordered || bordered === "around") && [
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
-            bordered === "around" && [
-              "[&_table]:border-separate [&_table]:rounded-md",
-            ],
-            bordered === "around" && [
-              "[&_table]:border-separate [&_table]:rounded-md",
-            ],
+            // bordered === "around" && [
+            "[&_table]:border-separate [&_table]:rounded-md",
+            // ],
             className,
           )}
           style={style}
@@ -989,7 +989,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               // bordered
               // bordered &&
               //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              size === "small" ? "[&_th]:" : "",
+              // size === "small" ? "[&_th]:" : "",
 
               classNames?.table,
             )}
@@ -1103,7 +1103,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   })}
               </TableBody>
             ) : (
-              <TableBodyComp>
+              <TableBodyComp className={classNames?.body}>
                 {table.getRowModel().rows.length > 0 ? (
                   table.getRowModel().rows.map((row, rowIndex) =>
                     "_customRow" in row.original ? (
@@ -1256,7 +1256,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             )}
           </TableRoot>
           {pagination && (
-            <Pagination className="my-4 justify-end" {...pagination} />
+            <Pagination
+              className="my-4 justify-end"
+              {...pagination}
+              total={pagination.total ?? dataSource?.length}
+            />
           )}
         </div>
       </Spin>

@@ -1,7 +1,7 @@
 import type { XOR } from "ts-xor";
+import { tagColors } from "@/components/ui/tag";
 import { useMergedState } from "@rc-component/util";
 
-import { tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Option } from "../select/types";

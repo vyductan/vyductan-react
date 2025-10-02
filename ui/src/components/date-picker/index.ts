@@ -1,7 +1,6 @@
 import { DatePicker as InternalDatePicker } from "./date-picker";
 import { DateRangePicker } from "./date-range-picker";
 import { MonthPicker } from "./month-picker";
-
 import { YearPicker } from "./year-picker";
 
 export * from "./date-picker";

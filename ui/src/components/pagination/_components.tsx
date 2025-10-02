@@ -1,8 +1,8 @@
+import type { ButtonProps } from "@/components/ui/button";
 import * as React from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { Slot } from "@radix-ui/react-slot";
 
-import type { ButtonProps } from "@acme/ui/components/button";
-import { buttonVariants } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -62,7 +62,7 @@ function PaginationLink({
       data-active={isActive}
       className={cn(
         buttonVariants({
-          variant: isActive ? "outline" : "ghost",
+          variant: isActive ? "outline" : "text",
           size: size === "sm" ? "small" : size,
           shape,
           disabled,
