@@ -61,9 +61,10 @@ export default function CustomButtonsExample() {
 ### With Loading State
 
 ```tsx
+import { useState } from "react";
+
 import { AlertModal } from "@acme/ui/alert-modal";
 import { Button } from "@acme/ui/button";
-import { useState } from "react";
 
 export default function LoadingExample() {
   const [loading, setLoading] = useState(false);
@@ -71,7 +72,7 @@ export default function LoadingExample() {
   const handleConfirm = async () => {
     setLoading(true);
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     setLoading(false);
   };
 
@@ -90,9 +91,10 @@ export default function LoadingExample() {
 ### Controlled Modal
 
 ```tsx
+import { useState } from "react";
+
 import { AlertModal } from "@acme/ui/alert-modal";
 import { Button } from "@acme/ui/button";
-import { useState } from "react";
 
 export default function ControlledExample() {
   const [open, setOpen] = useState(false);
@@ -121,14 +123,14 @@ export default function ControlledExample() {
 ```tsx
 import { AlertModal } from "@acme/ui/alert-modal";
 import {
-  AlertDialogTrigger,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@acme/ui/alert-modal/_components";
 import { Button } from "@acme/ui/button";
 
@@ -142,7 +144,8 @@ export default function AdvancedExample() {
         <AlertDialogHeader>
           <AlertDialogTitle>Custom Alert Dialog</AlertDialogTitle>
           <AlertDialogDescription>
-            This uses the underlying AlertDialog components for full customization.
+            This uses the underlying AlertDialog components for full
+            customization.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="py-4">
@@ -167,31 +170,31 @@ export default function AdvancedExample() {
 
 The `AlertModal` component extends all props from the base `ModalProps` (excluding `onOk`) and includes:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `title` | `React.ReactNode` | - | The title of the alert modal |
-| `description` | `React.ReactNode` | - | The description/message content |
-| `trigger` | `React.ReactNode` | - | The element that triggers the modal |
-| `onConfirm` | `() => void` | - | Callback when confirm button is clicked |
-| `onCancel` | `(event?: React.MouseEvent) => void` | - | Callback when cancel button is clicked or modal is closed |
-| `onOpenChange` | `(open: boolean) => void` | - | Callback when modal open state changes |
-| `okText` | `string` | `"Confirm"` | Text for the confirm button |
-| `cancelText` | `string` | `"Cancel"` | Text for the cancel button |
-| `confirmLoading` | `boolean` | `false` | Shows loading spinner on confirm button |
-| `open` | `boolean` | - | Controlled open state |
-| `className` | `string` | - | Additional CSS classes for the modal content |
-| `children` | `React.ReactNode` | - | When provided, renders as a Shadcn AlertDialog wrapper |
+| Prop             | Type                                 | Default     | Description                                               |
+| ---------------- | ------------------------------------ | ----------- | --------------------------------------------------------- |
+| `title`          | `React.ReactNode`                    | -           | The title of the alert modal                              |
+| `description`    | `React.ReactNode`                    | -           | The description/message content                           |
+| `trigger`        | `React.ReactNode`                    | -           | The element that triggers the modal                       |
+| `onConfirm`      | `() => void`                         | -           | Callback when confirm button is clicked                   |
+| `onCancel`       | `(event?: React.MouseEvent) => void` | -           | Callback when cancel button is clicked or modal is closed |
+| `onOpenChange`   | `(open: boolean) => void`            | -           | Callback when modal open state changes                    |
+| `okText`         | `string`                             | `"Confirm"` | Text for the confirm button                               |
+| `cancelText`     | `string`                             | `"Cancel"`  | Text for the cancel button                                |
+| `confirmLoading` | `boolean`                            | `false`     | Shows loading spinner on confirm button                   |
+| `open`           | `boolean`                            | -           | Controlled open state                                     |
+| `className`      | `string`                             | -           | Additional CSS classes for the modal content              |
+| `children`       | `React.ReactNode`                    | -           | When provided, renders as a Shadcn AlertDialog wrapper    |
 
 ### Inherited Props
 
 From `ModalProps` (via React Dialog component):
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `width` | `string \| number \| Partial<Record<Breakpoint, string \| number>>` | Width of the modal dialog |
-| `classNames` | `{ header?: string; title?: string; description?: string; footer?: string; }` | CSS classes for specific parts |
-| `footer` | `React.ReactNode \| Function` | Custom footer content |
-| `okButtonProps` | `ButtonProps` | Props for the OK button |
+| Prop            | Type                                                                          | Description                    |
+| --------------- | ----------------------------------------------------------------------------- | ------------------------------ |
+| `width`         | `string \| number \| Partial<Record<Breakpoint, string \| number>>`           | Width of the modal dialog      |
+| `classNames`    | `{ header?: string; title?: string; description?: string; footer?: string; }` | CSS classes for specific parts |
+| `footer`        | `React.ReactNode \| Function`                                                 | Custom footer content          |
+| `okButtonProps` | `ButtonProps`                                                                 | Props for the OK button        |
 
 ## Behavior
 
@@ -223,6 +226,7 @@ When `confirmLoading` is `true`, the confirm button shows a loading spinner and 
 ## Styling
 
 The component uses Tailwind CSS classes and can be customized via:
+
 - `className` prop for the modal content
 - `classNames` object for specific parts (header, title, description, footer)
 - CSS custom properties for deeper customization

@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-base-to-string */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/no-array-callback-reference */
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/explicit-length-check */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */

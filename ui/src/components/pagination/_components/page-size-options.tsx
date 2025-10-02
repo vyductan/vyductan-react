@@ -52,7 +52,7 @@ const PageSizeOptions = ({
     ) {
       return pageSizeOptions;
     }
-    return [...pageSizeOptions, pageSize].sort((a, b) => {
+    return [...pageSizeOptions, pageSize].toSorted((a, b) => {
       const numberA = Number.isNaN(Number(a)) ? 0 : Number(a);
       const numberB = Number.isNaN(Number(b)) ? 0 : Number(b);
       return numberA - numberB;

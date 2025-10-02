@@ -1,7 +1,7 @@
 import type { XOR } from "ts-xor";
+import { tagColors } from "@/components/ui/tag";
 import { useMergedState } from "@rc-component/util";
 
-import { tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Option } from "../select/types";
@@ -45,6 +45,15 @@ export type OwnCommandProps<TValue extends CommandValueType = string> = Omit<
     placeholder?: string;
 
     onSearchChange?: (search: string) => void;
+    /**
+     * Control the search input value programmatically.
+     * Useful when you want to render your own external input but still leverage cmdk filtering.
+     */
+    searchValue?: string;
+    /**
+     * Hide the internal CommandInput UI while keeping it in the DOM to drive filtering.
+     */
+    hideSearchInput?: boolean;
 
     groupClassName?: string;
     optionRender?: {
@@ -102,6 +111,8 @@ const Command = <TValue extends CommandValueType = string>(
     empty,
     placeholder,
     onSearchChange,
+    searchValue,
+    hideSearchInput,
 
     groupClassName,
     optionRender,
@@ -186,6 +197,8 @@ const Command = <TValue extends CommandValueType = string>(
       <CommandInput
         placeholder={placeholder ?? defaultPlaceholder}
         onValueChange={onSearchChange}
+        value={searchValue}
+        className={cn(hideSearchInput ? "sr-only" : undefined)}
       />
       {PanelComp}
       {dropdownFooter && (

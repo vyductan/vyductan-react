@@ -56,6 +56,13 @@ const FormExample = ({ initialValues }: Props) => {
       <Field control={form.control} name="role" label="Role">
         <Select options={[{ label: "Admin", value: "admin" }]} />
       </Field>
+      <Autocomplete
+        allowClear
+        options={members.map((member) => ({
+          value: member.id,
+          label: member.name,
+        }))}
+      />
       <Field>
         <Button type="submit" loading={insertMutation.isPending}>
           Submit

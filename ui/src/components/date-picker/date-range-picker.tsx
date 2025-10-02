@@ -1,3 +1,4 @@
+import type { DateRange } from "react-day-picker";
 import React, { useEffect, useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 import { Slot } from "@radix-ui/react-slot";

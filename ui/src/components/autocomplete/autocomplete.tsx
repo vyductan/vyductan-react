@@ -2,19 +2,20 @@
 "use client";
 
 import * as React from "react";
-import { useMergedState } from "@rc-component/util";
+import { tagColors } from "@/components/ui/tag";
+import { useMergedState, useMergedState } from "@rc-component/util";
 
 import { tagColors } from "@acme/ui/components/tag";
-import { Icon } from "@acme/ui/icons";
-import { cn } from "@acme/ui/lib/utils";
+import { Icon, Icon } from "@acme/ui/icons";
+import { cn, cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
 import type { SizeType } from "../..";
 import type { CommandProps } from "../command";
 import type { PopoverContentProps } from "../popover";
 import type { Option } from "../select/types";
-import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
+import { Input } from "../input";
 import { inputSizeVariants } from "../input/variants";
 import { Popover } from "../popover";
 
@@ -34,6 +35,7 @@ export type AutocompleteProps<
     | "dropdownRender"
     | "dropdownFooter"
   > & {
+    mode?: "combobox" | "input";
     value?: TValue;
     defaultValue?: TValue;
     onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
@@ -59,6 +61,7 @@ const Autocomplete = <
   TValue extends AutocompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
 >({
+  mode = "combobox",
   defaultValue: defaultValueProp,
   value: valueProp,
   options,
@@ -119,15 +122,35 @@ const Autocomplete = <
         options.find((o) => o.value === value),
       );
       setOpen(false);
+      if (mode === "input") {
+        // When a value is selected, reflect its label into the input text
+        const o = options.find((o) => o.value === value);
+        if (o) {
+          setSearch(String(getOptionLabel(o)));
+        } else {
+          setSearch("");
+        }
+      }
     },
   });
 
+  // ===================== Search (input mode) =====================
+  const [search, setSearch] = React.useState<string>("");
   const getOptionLabel = (option: Option<TValue, TRecord>) => {
     if (optionLabelProp && option[optionLabelProp as keyof typeof option]) {
       return option[optionLabelProp as keyof typeof option];
     }
-    return option.label;
+    return option.label as string;
   };
+  // React.useEffect(() => {
+  //   if (mode !== "input") return;
+  //   // Initialize/sync input text from current value when it changes
+  //   const o = options.find((o) => o.value === value);
+  //   const next = o ? String(getOptionLabel(o)) : "";
+  //   if (search !== next) {
+  //     setSearch(next);
+  //   }
+  // }, [mode, value, getOptionLabel]);
 
   const buttonText = (() => {
     if (!value) {
@@ -153,11 +176,111 @@ const Autocomplete = <
     return value;
   })();
 
+  const gatedSetOpen = (next: boolean) => {
+    // Prevent redundant state updates to avoid feedback loops with Popover
+    if (next === open) return;
+    if (mode === "input") {
+      if (next) {
+        setOpen(true);
+        return;
+      }
+      // Close request
+      setOpen(false);
+      return;
+    }
+    setOpen(next);
+  };
+
+  const renderContent = (
+    <Command
+      mode="default"
+      placeholder={searchPlaceholder}
+      options={options}
+      value={value}
+      onChange={(v) => setValue(v)}
+      filter={filter}
+      onSearchChange={mode === "input" ? undefined : onSearchChange}
+      optionRender={optionRender}
+      {...props}
+      // Input mode: drive filtering by external input
+      {...(mode === "input"
+        ? { searchValue: search, hideSearchInput: true }
+        : {})}
+    />
+  );
+
+  if (mode === "input") {
+    // Input trigger mode
+    const selectFirstIfSingle = () => {
+      const matches = options.filter(
+        (o) => filter(o.value.toString(), search) > 0,
+      );
+      if (matches.length === 1) {
+        const only = matches[0]!;
+        setValue(only.value);
+        // search will be synced in setValue onChange above
+      }
+    };
+
+    return (
+      <Popover
+        trigger="click"
+        open={open}
+        placement="bottomLeft"
+        className={cn("p-0", "w-full min-w-(--radix-popover-trigger-width)")}
+        arrow={false}
+        content={renderContent}
+        onFocusOutside={(e) => {
+          setOpen(false);
+          onFocusOutside?.(e);
+        }}
+      >
+        <div>
+          <Input
+            size={size}
+            disabled={disabled}
+            value={search}
+            onChange={(e) => {
+              const next = e.target.value;
+              setSearch(next);
+              onSearchChange?.(next);
+              if (!open) {
+                setOpen(true);
+              }
+            }}
+            // onFocus={() => {
+            //   if (!open) {
+            //     setOpen(true);
+            //   }
+            // }}
+            onPressEnter={() => {
+              if (search.trim().length === 0) return;
+              selectFirstIfSingle();
+            }}
+            placeholder={placeholder}
+            allowClear={allowClear}
+            onClear={() => {
+              setValue(undefined);
+              setOpen(false);
+            }}
+            suffix={
+              loading ? (
+                <LoadingIcon className={cn("z-10 size-3.5")} />
+              ) : undefined
+            }
+            className={className}
+          />
+        </div>
+      </Popover>
+    );
+  }
+
+  // Default combobox trigger
   return (
     <Popover
       trigger="click"
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={gatedSetOpen}
       placement="bottomLeft"
       className={cn(
         "p-0",
@@ -166,21 +289,7 @@ const Autocomplete = <
         "w-full min-w-(--radix-popover-trigger-width)", // make same select width
       )}
       arrow={false}
-      content={
-        <Command
-          mode="default"
-          placeholder={searchPlaceholder}
-          options={options}
-          value={value}
-          onChange={(value) => {
-            setValue(value);
-          }}
-          filter={filter}
-          onSearchChange={onSearchChange}
-          optionRender={optionRender}
-          {...props}
-        />
-      }
+      content={renderContent}
       onFocusOutside={onFocusOutside}
     >
       <Button

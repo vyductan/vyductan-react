@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -959,7 +958,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             // bordered === "around" && [
-              "[&_table]:border-separate [&_table]:rounded-md",
+            "[&_table]:border-separate [&_table]:rounded-md",
             // ],
             className,
           )}
@@ -1205,14 +1204,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                         </TableRowComp>
                         {row.getIsExpanded() &&
                           expandable?.expandedRowRender && (
-                            <TableRow className="bg-primary-50 hover:bg-primary-50">
+                            <TableRow className="bg-gray-50 hover:bg-gray-50">
                               {/* 2nd row is a custom 1 cell row */}
                               <TableCell
                                 colSpan={row.getVisibleCells().length}
                                 size={size}
                                 className={cn(
                                   // "px-4 text-[13px]",
-                                  bordered === false && "border-x border-b",
+                                  bordered === false ? "border-b" : "",
                                 )}
                               >
                                 {expandable.expandedRowRender(
@@ -1254,7 +1253,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             )}
           </TableRoot>
           {pagination && (
-            <Pagination className="my-4 justify-end" {...pagination} />
+            <Pagination
+              className="my-4 justify-end"
+              {...pagination}
+              total={pagination.total ?? dataSource?.length}
+            />
           )}
         </div>
       </Spin>

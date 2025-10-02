@@ -3,8 +3,8 @@
 import type { VariantProps } from "class-variance-authority";
 import type { XOR } from "ts-xor";
 import React from "react";
+import { Tag, tagColors } from "@/components/ui/tag";
 
-import { Tag, tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
@@ -299,7 +299,6 @@ const Select = <
               <Tag
                 key={index}
                 className="mr-1 py-0 leading-[22px]"
-                closeIcon
                 onClose={() => removeTag(tag)}
               >
                 {tag}

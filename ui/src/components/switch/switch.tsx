@@ -19,6 +19,8 @@ type OwnSwitchProps = Omit<
   unCheckedChildren?: React.ReactNode;
   /** Additional class name for the switch container */
   className?: string;
+  /** Alias for checked prop */
+  value?: boolean;
 };
 type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
 const Switch = (props: SwitchProps) => {
@@ -44,10 +46,13 @@ const Switch = (props: SwitchProps) => {
     checkedChildren,
     unCheckedChildren,
     checked,
+    value,
     ...restProps
   } = props as OwnSwitchProps;
 
   const hasChildren = checkedChildren ?? unCheckedChildren;
+  // Use value as alias for checked, with value taking precedence
+  const isChecked = value ?? checked;
 
   return (
     <ShadcnSwitch
@@ -58,7 +63,7 @@ const Switch = (props: SwitchProps) => {
         hasChildren && "data-[slot=switch-thumb]:size-5",
         className,
       )}
-      checked={checked}
+      checked={isChecked}
       onCheckedChange={(checked) => {
         onChange?.(checked);
       }}
@@ -69,10 +74,10 @@ const Switch = (props: SwitchProps) => {
           className={cn(
             "absolute inset-0 flex items-center justify-center text-xs font-medium whitespace-nowrap",
             "transition-all duration-200 ease-in-out",
-            checked ? "right-5 left-1.5" : "right-1.5 left-5",
+            isChecked ? "right-5 left-1.5" : "right-1.5 left-5",
           )}
         >
-          {checked ? checkedChildren : unCheckedChildren}
+          {isChecked ? checkedChildren : unCheckedChildren}
         </div>
       )}
     </ShadcnSwitch>

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable unicorn/no-negated-condition */
 /* eslint-disable unicorn/prefer-at */
 /* eslint-disable react-hooks/exhaustive-deps */

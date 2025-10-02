@@ -15,7 +15,7 @@ export type DescriptionsItem = {
   span?: number;
   classNames?: {
     label?: string;
-    value?: string;
+    children?: string;
   };
   label?: React.ReactNode;
   children?: React.ReactNode;
@@ -37,7 +37,7 @@ type DescriptionProps = {
 
     view?: string;
     label?: string;
-    value?: string;
+    children?: string;
 
     tr?: string;
     th?: string;
@@ -103,9 +103,9 @@ export const Descriptions = ({
     ],
     classNames?.label,
   );
-  const contentClassName = cn(
+  const childrenClassName = cn(
     "inline-flex items-baseline min-w-[1em]",
-    classNames?.content,
+    classNames?.children,
   );
   const tbodyClassName = cn(
     layout === "horizontal" && [
@@ -125,7 +125,6 @@ export const Descriptions = ({
       bordered && "px-6",
     ],
     classNames?.th,
-    labelClassName,
   );
   const tdClassName = cn(
     "break-all text-sm",
@@ -141,7 +140,6 @@ export const Descriptions = ({
       bordered && "px-6",
     ],
     classNames?.td,
-    valueClassName,
   );
 
   return (
@@ -186,7 +184,7 @@ export const Descriptions = ({
                         <td
                           className={cn(
                             tdClassName,
-                            col.classNames?.value,
+                            col.classNames?.children,
                             "last:border-r-0",
                           )}
                         >
@@ -200,7 +198,7 @@ export const Descriptions = ({
                     ) : (
                       <td
                         key={col.key ?? index}
-                        className={cn(tdClassName, col.classNames?.value)}
+                        className={cn(tdClassName, col.classNames?.children)}
                       >
                         <span className={labelClassName}>
                           {col.label}
@@ -209,7 +207,9 @@ export const Descriptions = ({
                         {skeleton ? (
                           <Skeleton />
                         ) : (
-                          <span className={valueClassName}>{col.children}</span>
+                          <span className={childrenClassName}>
+                            {col.children}
+                          </span>
                         )}
                       </td>
                     ) //vertical
@@ -222,7 +222,12 @@ export const Descriptions = ({
                       )}
                       colSpan={col.span}
                     >
-                      {(col as VerticalCell).content}
+                      <div
+                        data-slot="descriptions-item-container"
+                        className={labelClassName}
+                      >
+                        {(col as VerticalCell).content}
+                      </div>
                     </th>
                   ) : (
                     <td
@@ -233,11 +238,16 @@ export const Descriptions = ({
                       )}
                       colSpan={col.span}
                     >
-                      {skeleton ? (
-                        <Skeleton className="h-6" />
-                      ) : (
-                        (col as VerticalCell).content
-                      )}
+                      <div
+                        data-slot="descriptions-item-container"
+                        className={childrenClassName}
+                      >
+                        {skeleton ? (
+                          <Skeleton className="h-6" />
+                        ) : (
+                          (col as VerticalCell).content
+                        )}
+                      </div>
                     </td>
                   ),
                 )}
@@ -300,10 +310,18 @@ function createVerticalRows(
     currentRowValues.push({
       span: itemSpan,
       content: item.children,
-      className: item.classNames?.content,
+      className: item.classNames?.children,
     });
 
     currentRowSpan += itemSpan;
+
+    // // If we've reached the column limit, start new rows
+    // if (currentRowSpan >= columns) {
+    //   rows.push([...currentRowLabels], [...currentRowValues]);
+    //   currentRowLabels = [];
+    //   currentRowValues = [];
+    //   currentRowSpan = 0;
+    // }
   }
 
   // Add the last rows if they have content

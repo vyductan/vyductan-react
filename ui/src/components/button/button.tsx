@@ -4,15 +4,14 @@ import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
 import * as React from "react";
 import { useUiConfig } from "@/components/ui/config-provider";
+import { GenericSlot } from "@/components/ui/slot";
 import { Slot } from "@radix-ui/react-slot";
 import { tv } from "tailwind-variants";
 
 import type { IconProps } from "@acme/ui/icons";
-import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
 import Wave from "../../lib/wave";
-import { Link } from "../link";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
@@ -263,6 +262,14 @@ const buttonVariants = tv({
       ],
     },
     // filled
+    {
+      variant: "filled",
+      color: "primary",
+      className: [
+        "bg-primary-100 text-primary-600",
+        "hover:bg-primary-200 hover:text-primary-700",
+      ],
+    },
     {
       variant: "filled",
       color: "green",
@@ -529,7 +536,7 @@ const Button = ({
         {asChild ? (
           children
         ) : href ? (
-          <Link href={href}>{ChildrenToRender}</Link>
+          <a href={href}>{ChildrenToRender}</a>
         ) : (
           ChildrenToRender
         )}
