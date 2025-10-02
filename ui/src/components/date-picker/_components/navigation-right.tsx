@@ -1,5 +1,6 @@
-import type { ButtonProps } from "@acme/ui/components/button";
-import { Button } from "@acme/ui/components/button";
+import type { ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+
 import { Icon } from "@acme/ui/icons";
 
 export const NavigationRight = (props: ButtonProps) => {
