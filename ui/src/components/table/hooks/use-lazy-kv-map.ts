@@ -33,7 +33,7 @@ const useLazyKVMap = <RecordType extends AnyObject = AnyObject>(
       function dig(records: readonly RecordType[]) {
         records.forEach((record, index) => {
           const rowKey = getRowKey(record, index);
-          kvMap.set(rowKey, record);
+          kvMap.set(rowKey.toString(), record);
 
           if (
             record &&
