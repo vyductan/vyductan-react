@@ -14,7 +14,7 @@ import type {
   Row,
   Table as TableDef,
 } from "@tanstack/react-table";
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -646,6 +646,10 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
     rowSelection?.selectedRowKeys || [],
   );
+  useEffect(() => {
+    setSelectedRowKeys(rowSelection?.selectedRowKeys || []);
+  }, [rowSelection?.selectedRowKeys]);
+
   // const selectedRowKeys = Object.keys(rowSelectionState);
   const selectedRows = selectedRowKeys.map((key) => getRecordByKey(key));
 
@@ -783,14 +787,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
       const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection).map(
         (stringKey) => {
-          const originalKey = selectedRowKeys.find(
-            (key) => key.toString() === stringKey,
-          );
-          if (originalKey) {
-            return originalKey;
-          }
-          const numKey = Number(stringKey);
-          return Number.isNaN(numKey) ? stringKey : numKey;
+          return getRowKey(getRecordByKey(stringKey), 0);
         },
       );
       // Convert string keys back to React.Key[] by finding the original keys
@@ -812,13 +809,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       setSelectedRowKeys(newSelectedRowKeys);
 
       const selectedRows = mergedData.filter((item, index) =>
-        newSelectedRowKeys.includes(getRowKey(item, index)?.toString()),
-      );
-      console.log(
-        "newRowSelection",
-        newRowSelection,
-        newSelectedRowKeys,
-        selectedRows,
+        newSelectedRowKeys.includes(getRowKey(item, index)),
       );
 
       const info = {
