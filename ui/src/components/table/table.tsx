@@ -175,7 +175,8 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     size?: SizeType;
     /** Whether the table can be scrollable */
     scroll?: {
-      x: number;
+      x?: number;
+      y?: number;
       scrollToFirstRowOnChange?: boolean;
     };
     /** Translation */
@@ -696,12 +697,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       {
         ...props,
         ...expandableConfig,
-        // expandable:
-        //   !!expandableConfig.expandedRowRender &&
-        //   (!mergedChildrenColumnName ||
-        //     mergedChildrenColumnName in (dataSource?.[0] ?? {})),
-        // expandable: !!expandableConfig.expandedRowRender ||
-        //   !!expandableConfig.childrenColumnName,
+        // Only create expand column for custom expandedRowRender (row type)
+        // For tree data (nest type), expand icon renders inline in first data column
         expandable: !!expandableConfig.expandedRowRender,
         expandColumnTitle: expandableConfig.columnTitle,
         expandedKeys: mergedExpandedKeys,
@@ -734,6 +731,12 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         ? [
             {
               id: "__select__",
+              size: 50,
+              minSize: 50,
+              enableResizing: false,
+              meta: {
+                align: "center",
+              },
               header: ({ table }) => (
                 <Checkbox
                   checked={table.getIsAllPageRowsSelected()}
@@ -749,7 +752,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               cell: ({ row }) => (
                 <Checkbox
                   checked={row.getIsSelected()}
-                  onCheckedChange={(value) => row.toggleSelected(!!value)}
+                  indeterminate={row.getIsSomeSelected()}
+                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
                 />
               ),
@@ -774,11 +778,23 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     getExpandedRowModel: getExpandedRowModel(),
     getSubRows: (row) =>
       row[expandable?.childrenColumnName ?? "children"] ?? [],
-    // Allow expanding detail rows even when there are no subrows
-    getRowCanExpand: () => !!expandable?.expandedRowRender,
+    // For tree data (nest): only expand if row has children
+    // For custom expandedRowRender: always allow expand
+    getRowCanExpand: (row) => {
+      if (expandable?.expandedRowRender) {
+        return true; // Allow expanding for custom detail rows
+      }
+      // For tree data, check if row has children
+      const children =
+        row.original[expandable?.childrenColumnName ?? "children"];
+      return Array.isArray(children) && children.length > 0;
+    },
     onExpandedChange: handleExpandedChange,
     // Row selection
     enableRowSelection: true,
+    // Enable sub-row selection for tree data (parent/child linked selection)
+    // Unless checkStrictly is true (parent/child selection independent)
+    enableSubRowSelection: rowSelection?.checkStrictly === true ? false : true,
     onRowSelectionChange: (updater) => {
       const newRowSelection =
         typeof updater === "function"
@@ -787,6 +803,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
       const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection).map(
         (stringKey) => {
+          // console.log("aa", stringKey, mergedData);
           return getRowKey(getRecordByKey(stringKey), 0);
         },
       );
@@ -922,10 +939,24 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   scroll,
   // };
 
+  // Use table.getAllLeafColumns() to include dynamically added columns (selection, etc.)
+  const allLeafColumns = table.getAllLeafColumns();
   const bodyColGroup = (
     <ColGroup
-      colWidths={flattenColumns.map(({ width }) => width)}
-      columns={flattenColumns}
+      colWidths={allLeafColumns.map((col) => {
+        // Only return size if explicitly set (not TanStack Table's default 150)
+        const colDef = col.columnDef;
+        // Check if size/minSize was explicitly set or if meta has width
+        const hasExplicitSize =
+          colDef.size !== undefined ||
+          colDef.minSize !== undefined ||
+          (colDef.meta &&
+            typeof colDef.meta === "object" &&
+            "width" in colDef.meta);
+
+        return hasExplicitSize ? col.getSize() : undefined;
+      })}
+      columCount={allLeafColumns.length}
     />
   );
 
@@ -935,8 +966,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         <div
           data-slot="table-container"
           className={cn(
-            "relative w-full space-y-3 overflow-x-auto",
-            scroll?.x && "overflow-x-auto overflow-y-hidden",
+            "relative w-full space-y-3",
+            scroll?.x && "overflow-x-auto",
+            !scroll?.y && "overflow-y-auto",
             bordered && [
               // "border rounded-lg",
               // "[&_table]:border-separate",
@@ -971,10 +1003,18 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             </div>
           )}
           {TableAlertSection}
-          <TableRoot
-            ref={ref}
+          <div
             className={cn(
-              !scroll?.x && "w-full",
+              scroll?.y && "overflow-y-auto",
+            )}
+            style={{
+              maxHeight: scroll?.y,
+            }}
+          >
+            <TableRoot
+              ref={ref}
+              className={cn(
+                !scroll?.x && "w-full",
               // bordered
               // bordered &&
               //   "border-separate border-spacing-0 rounded-md border-s border-t",
@@ -989,7 +1029,10 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                     tableLayout: "fixed",
                     minWidth: "100%",
                   }
-                : {}),
+                : // Set tableLayout="fixed" when we have fixed-width columns (selection, expand)
+                  rowSelection || expandType === "nest"
+                  ? { tableLayout: "fixed" }
+                  : {}),
             }}
             bordered={bordered}
             {...restProps}
@@ -998,13 +1041,17 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             {showHeader !== false && (
               <TableHeaderComp
                 style={{
-                  position: sticky ? "sticky" : undefined,
+                  // Auto sticky when scroll.y is set
+                  position: sticky || scroll?.y ? "sticky" : undefined,
                   top: sticky
                     ? typeof sticky === "boolean"
                       ? 0
                       : sticky.offsetHeader
-                    : undefined,
-                  zIndex: sticky ? 11 : undefined,
+                    : scroll?.y
+                      ? 0
+                      : undefined,
+                  zIndex: sticky || scroll?.y ? 11 : undefined,
+                  backgroundColor: sticky || scroll?.y ? "hsl(var(--background))" : undefined,
                 }}
                 className={classNames?.header}
               >
@@ -1244,6 +1291,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               </TableFooter>
             )}
           </TableRoot>
+          </div>
           {pagination && (
             <Pagination
               className="my-4 justify-end"
@@ -1256,7 +1304,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     </TableStoreProvider>
   );
 };
-
 export { OwnTable };
 
 export type { TableProps as OwnTableProps, RecordWithCustomRow };
