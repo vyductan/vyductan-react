@@ -40,9 +40,12 @@ type AbstractCheckboxProps<T> = {
 };
 export interface CheckboxChangeEventTarget extends CheckboxProps {
   checked: boolean;
+  name?: string;
+  type: "checkbox" | "radio";
 }
 
 export interface CheckboxChangeEvent {
+  type: "change";
   target: CheckboxChangeEventTarget;
   stopPropagation: () => void;
   preventDefault: () => void;
@@ -137,12 +140,16 @@ const Checkbox = (props: CheckboxProps) => {
           className={cn("data-[state=indeterminate]:bg-muted")}
           onCheckedChange={(checked) => {
             onChange?.({
+              type: "change",
               target: {
+                type: "checkbox",
+                name: props.name,
                 checked: checked === "indeterminate" ? false : checked,
                 indeterminate,
                 // "aria-describedby": ariaDescribedBy,
                 // "aria-invalid": ariaInvalid,
               },
+
               nativeEvent: new MouseEvent("change"),
               preventDefault: () => {
                 //
