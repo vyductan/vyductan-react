@@ -261,48 +261,19 @@ export const useColumns = <TRecord extends AnyObject>(
         title: expandColumnTitle,
         fixed: fixedColumn ?? undefined,
         width: expandColumnWidth ?? 50,
+        minWidth: typeof expandColumnWidth === "number" ? expandColumnWidth : 50,
+        align: "center",
+        enableResizing: false,
         render: (_, record, index, { row }) => {
-          // const record = row.original;
-          // return row.getCanExpand() && row.original.children ? (
-          //   <button
-          //     {...(expandedKeys
-          //       ? {
-          //           onClick: () => {
-          //             if (!expandRowByClick) {
-          //               // row.getToggleExpandedHandler()();
-          //               onTriggerExpand?.(!expanded, record);
-          //             }
-          //           },
-          //         }
-          //       : {
-          //           onClick: () => {
-          //             if (!expandRowByClick) {
-          //               row.getToggleExpandedHandler()();
-          //             }
-          //           },
-          //         })}
-          //     className="flex w-full cursor-pointer items-center justify-center"
-          //   >
-          //     {row.getIsExpanded() ? (
-          //       <Icon icon="icon-[lucide--chevron-down]" />
-          //     ) : (
-          //       <Icon icon="icon-[lucide--chevron-right]" />
-          //     )}
-          //   </button>
-          // ) : undefined;
-          // },
           const rowKey = getRowKey(record, index);
           const expanded = expandedKeys.has(rowKey);
-          // const expanded = row.getIsExpanded();
 
-          const recordExpandable = rowExpandable ? rowExpandable(record) : true;
-          //  (row.getCanExpand() ??
-          //   (mergedChildrenColumnName &&
-          //     !!record[mergedChildrenColumnName]) ??
-          //   true);
+          // Check if row can expand using TanStack Table's logic
+          const recordExpandable = rowExpandable 
+            ? rowExpandable(record) 
+            : row.getCanExpand();
 
           const icon = expandIcon?.({
-            // prefixCls,
             expanded,
             expandable: recordExpandable,
             record,
@@ -412,12 +383,10 @@ export const useColumns = <TRecord extends AnyObject>(
     return transformColumnDefs(mergedColumns, {
       // rowKey,
       // rowSelection: rowSelectionProp,
-      expandable: childrenColumnName
-        ? {
-            childrenColumnName,
-            expandIcon,
-          }
-        : undefined,
+      expandable: {
+        childrenColumnName,
+        expandIcon,
+      },
     });
   }, [childrenColumnName, expandIcon, mergedColumns]);
 
