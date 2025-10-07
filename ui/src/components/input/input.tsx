@@ -356,7 +356,8 @@ const Input = (props: InputProps) => {
         onKeyUp={handleKeyUp}
         className={cn(
           "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
-          inputSizeVariants({ size: mergedSize }),
+          !hasAffix && inputSizeVariants({ size: mergedSize }),
+          otherProps.readOnly && "cursor-default bg-muted",
           classNames?.input,
         )}
         style={styles?.input}
@@ -375,6 +376,9 @@ const Input = (props: InputProps) => {
       />
     );
   };
+
+  // Check if has affix (prefix/suffix/allowClear)
+  const hasAffix = !!(rest.prefix || suffix || rest.allowClear || countConfig.show);
 
   const getSuffix = () => {
     // Max length value
@@ -429,10 +433,12 @@ const Input = (props: InputProps) => {
       classNames={{
         variant: cn(
           inputVariants({ variant, status, disabled }),
+          rest.readOnly && "cursor-default bg-muted",
           classNames?.variant,
         ),
         affixWrapper: cn(
-          inputSizeVariants({ size: mergedSize }),
+          hasAffix && inputSizeVariants({ size: mergedSize }),
+          rest.readOnly && "cursor-default bg-muted",
           classNames?.affixWrapper,
         ),
       }}
