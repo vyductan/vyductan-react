@@ -1,16 +1,16 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
-import type { DownloadService, UploadFileItem, UploadService } from "./types";
-
-import { Button } from "../button";
-import { Card } from "../card";
-import { UploadZone } from "./upload-zone";
-import type { UploadZoneProps } from "./upload-zone";
 import { useMergedState } from "@rc-component/util";
 
-type UploadProps = Omit<UploadZoneProps, "defaultValue" | "onChange"> & {
+import type { DraggerProps } from "./dragger";
+import type { DownloadService, UploadFileItem, UploadService } from "./types";
+import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
+import { Button } from "../button";
+import { Card } from "../card";
+import { Dragger } from "./dragger";
+
+type UploadProps = Omit<DraggerProps, "defaultValue" | "onChange"> & {
   listType?: "picture-card";
   showZone?: boolean;
   /** show upload zone only (not show list or plus button) */
@@ -147,7 +147,7 @@ const Upload = ({
               </div>
             </div>
           ) : (
-            <UploadZone
+            <Dragger
               // listType={listType}
               // placeholder={placeholder}
               style={{ width, height }}
@@ -158,7 +158,7 @@ const Upload = ({
               overrideClick={overrideClick}
             >
               {children}
-            </UploadZone>
+            </Dragger>
           )}
         </>
       )}
@@ -167,7 +167,7 @@ const Upload = ({
         <>
           <div className="mt-2 flex w-full flex-col gap-2">
             {files.length === 0 ? (
-              <UploadZone
+              <Dragger
                 progress={progress}
                 // listType={listType}
                 // style={{ width, height }}
@@ -182,7 +182,7 @@ const Upload = ({
                 }}
               >
                 {children}
-              </UploadZone>
+              </Dragger>
             ) : (
               files.map((item, index) => (
                 <Card
@@ -230,7 +230,7 @@ const Upload = ({
       {props.multiple && listType === "picture-card" && (
         <div className="flex gap-2">
           {showZoneOnly && (
-            <UploadZone
+            <Dragger
               className="cursor-pointer"
               showZoneOnly={showZoneOnly}
               // style={{ width, height }}
@@ -247,21 +247,21 @@ const Upload = ({
               }}
             >
               {children}
-            </UploadZone>
+            </Dragger>
           )}
           {!showZoneOnly &&
             showUploadList &&
             files.map((file, index) => {
               return (
-                <UploadZone key={index} style={{ width, height }} file={file}>
+                <Dragger key={index} style={{ width, height }} file={file}>
                   {() => {
                     return "+";
                   }}
-                </UploadZone>
+                </Dragger>
               );
             })}
           {!showZoneOnly && showUploadButton && (
-            <UploadZone
+            <Dragger
               className="cursor-pointer"
               style={{ width, height }}
               overrideClick={overrideClick}
@@ -278,7 +278,7 @@ const Upload = ({
                 : () => {
                     return "+";
                   }}
-            </UploadZone>
+            </Dragger>
           )}
         </div>
       )}
