@@ -685,7 +685,7 @@ const InternalInputNumber = ({
         onChange={onInternalInput}
         disabled={disabled}
         readOnly={readOnly}
-        className={cn(readOnly && "cursor-default bg-muted", classNames?.input)}
+        className={cn(readOnly && "bg-muted cursor-default", classNames?.input)}
       />
     </div>
   );
@@ -730,7 +730,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
     const onStepRef = React.useRef<((up: boolean) => void) | null>(null);
 
     // Render clear icon for InputNumber (only show on hover)
-    const clearIcon = allowClear && value && isHovering && (
+    const clearIcon = !!allowClear && !!value && !!isHovering && (
       <ClearIcon
         visible
         onClick={() => handleReset()}
