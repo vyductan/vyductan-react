@@ -149,45 +149,52 @@ const FormField = <
       <ShadFormField
         control={control}
         name={name}
-        render={(ctx) => (
-          <FormItem layout={layout} className={className} {...props}>
-            {label}
-            <div className="w-full" data-slot="form-item-control">
-              <FormControl>
-                {cloneElement(children, {
-                  ...ctx.field,
-                  [finalValuePropName]: ctx.field.value,
-                  // Apply getValueProps if provided
-                  ...(getValueProps ? getValueProps(ctx.field.value) : {}),
-                  onBlur: (event: any) => {
-                    children.props.onBlur?.(event);
-                    ctx.field.onBlur();
-                  },
-                  onChange: (event: any) => {
-                    const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
+        render={(ctx) => {
+          return (
+            <FormItem layout={layout} className={className} {...props}>
+              {label}
+              <div className="w-full" data-slot="form-item-control">
+                <FormControl>
+                  {cloneElement(children, {
+                    ...ctx.field,
+                    [finalValuePropName]: ctx.field.value,
+                    // Apply getValueProps if provided
+                    ...(getValueProps ? getValueProps(ctx.field.value) : {}),
+                    onBlur: (event: any) => {
+                      children.props.onBlur?.(event);
+                      ctx.field.onBlur();
+                    },
+                    onChange: (event: any) => {
+                      children.props.onChange?.(event);
 
-                    const normalizedValue = normalize?.(value, ctx.field.value);
+                      const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
 
-                    ctx.field.onChange(
-                      normalize
-                        ? normalizedValue === undefined
-                          ? null
-                          : normalizedValue
-                        : value,
-                    );
-                  },
-                })}
-              </FormControl>
-              <FieldMessage
-                validateStatus={
-                  validateStatus ?? (help ? "default" : undefined)
-                }
-              >
-                {typeof help === "function" ? help(ctx) : help}
-              </FieldMessage>
-            </div>
-          </FormItem>
-        )}
+                      const normalizedValue = normalize?.(
+                        value,
+                        ctx.field.value,
+                      );
+
+                      ctx.field.onChange(
+                        normalize
+                          ? normalizedValue === undefined
+                            ? null
+                            : normalizedValue
+                          : value,
+                      );
+                    },
+                  })}
+                </FormControl>
+                <FieldMessage
+                  validateStatus={
+                    validateStatus ?? (help ? "default" : undefined)
+                  }
+                >
+                  {typeof help === "function" ? help(ctx) : help}
+                </FieldMessage>
+              </div>
+            </FormItem>
+          );
+        }}
       />
     );
   }
