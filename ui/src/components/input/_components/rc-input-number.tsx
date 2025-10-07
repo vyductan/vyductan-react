@@ -14,6 +14,7 @@ import getMiniDecimal, {
 import { useLayoutUpdateEffect } from "@rc-component/util/lib/hooks/useLayoutEffect";
 import proxyObject from "@rc-component/util/lib/proxyObject";
 import { composeRef } from "@rc-component/util/lib/ref";
+import { useHover } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -25,6 +26,7 @@ import useFrame from "../hooks/use-frame";
 import { triggerFocus } from "../utils/common-utils";
 import { getDecupleSteps } from "../utils/number-util";
 import { BaseInput } from "./base-input";
+import { ClearIcon } from "./clear-icon";
 import StepHandler from "./step-handler";
 
 export interface InputNumberRef extends HTMLInputElement {
@@ -116,6 +118,7 @@ type InputNumberProps<T extends ValueType = ValueType> = Omit<
   suffix?: React.ReactNode;
   addonBefore?: React.ReactNode;
   addonAfter?: React.ReactNode;
+  allowClear?: boolean | { clearIcon?: React.ReactNode };
 };
 
 type InternalInputNumberProps = Omit<
@@ -124,6 +127,7 @@ type InternalInputNumberProps = Omit<
 > & {
   ref: React.Ref<HTMLInputElement>;
   domRef: React.Ref<HTMLDivElement>;
+  onStepRef?: React.MutableRefObject<((up: boolean) => void) | null>;
 };
 
 const InternalInputNumber = ({
@@ -137,11 +141,11 @@ const InternalInputNumber = ({
   value,
   disabled,
   readOnly,
-  upHandler,
-  downHandler,
+  upHandler: _upHandler,
+  downHandler: _downHandler,
   keyboard,
   changeOnWheel = false,
-  controls = true,
+  controls: _controls = true,
 
   classNames,
   stringMode = false,
@@ -159,6 +163,7 @@ const InternalInputNumber = ({
   changeOnBlur = true,
 
   domRef,
+  onStepRef,
 
   ...inputProps
 }: InternalInputNumberProps) => {
@@ -568,6 +573,14 @@ const InternalInputNumber = ({
     shiftKeyRef.current = false;
   };
 
+  // Expose onStep function to parent via ref
+  React.useEffect(() => {
+    if (onStepRef) {
+      onStepRef.current = (up: boolean) => onInternalStep(up, "handler");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onStepRef]);
+
   React.useEffect(() => {
     if (changeOnWheel && focus) {
       const onWheel = (event: WheelEvent) => {
@@ -579,13 +592,16 @@ const InternalInputNumber = ({
       const input = inputRef.current;
       if (input) {
         // React onWheel is passive and we can't preventDefault() in it.
-        // That's why we should subscribe with DOM listener
+        // That's why we should subscribe with DOM listener.
         // https://stackoverflow.com/questions/63663025/react-onwheel-handler-cant-preventdefault-because-its-a-passive-event-listenev
         input.addEventListener("wheel", onWheel, { passive: false });
-        return () => input.removeEventListener("wheel", onWheel);
+        return () => {
+          input.removeEventListener("wheel", onWheel);
+        };
       }
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [changeOnWheel, focus]);
 
   // >>> Focus & Blur
   const onBlur = () => {
@@ -637,7 +653,10 @@ const InternalInputNumber = ({
     <div
       ref={domRef}
       data-slot="input-number"
-      className={cn("group relative w-[100px] text-sm", className)}
+      className={cn(
+        "group relative flex w-full items-center text-sm",
+        className,
+      )}
       style={style}
       onFocus={() => {
         setFocus(true);
@@ -649,29 +668,7 @@ const InternalInputNumber = ({
       onCompositionEnd={onCompositionEnd}
       onBeforeInput={onBeforeInput}
     >
-      {/* <div className={cn("")}>
-<input 
-autoComplete="off"
-role="spinbutton"
-aria-valuemin={min as any}
-aria-valuemax={max as any}
-aria-valuenow={decimalValue.isInvalidate() ? null : (decimalValue.toString() as any)}
-step={step}
-{...inputProps}
-ref={composeRef(inputRef, ref)}
-className={inputClassName}
-value={inputValue}
-onChange={onInternalInput}
-disabled={disabled}
-readOnly={readOnly}
-/>
-      </div> */}
       <input
-        // ref={ref}
-        // type="number"
-        // onChange={(e) => {
-        //   return onChange?.(Number(e.target.value));
-        // }}
         autoComplete="off"
         role="spinbutton"
         aria-valuemin={min as any}
@@ -683,31 +680,13 @@ readOnly={readOnly}
         }
         step={step}
         {...inputProps}
-        // onBlur={onInternalBlur}
-        // onKeyDown={onKeyDown}
-        // onKeyUp={onKeyUp}
-        // onCompositionStart={onCompositionStart}
-        // onCompositionEnd={onCompositionEnd}
-        // onBeforeInput={onBeforeInput}
-
         ref={ref ? composeRef(ref, inputRef) : inputRef}
         value={inputValue}
         onChange={onInternalInput}
         disabled={disabled}
         readOnly={readOnly}
-        // className={inputClassName}
-        // className={cn("leading-line-height", classNames?.input)}
-        className={cn(classNames?.input)}
+        className={cn(readOnly && "cursor-default bg-muted", classNames?.input)}
       />
-      {controls && (
-        <StepHandler
-          upNode={upHandler}
-          downNode={downHandler}
-          upDisabled={upDisabled}
-          downDisabled={downDisabled}
-          onStep={onInternalStep}
-        />
-      )}
     </div>
   );
 };
@@ -719,23 +698,69 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
       style,
       value,
       prefix,
-      suffix,
+      suffix: _suffix,
       addonBefore,
       addonAfter,
       className,
       classNames,
+      allowClear,
+      controls = true,
+      upHandler,
+      downHandler,
       ...rest
     } = props;
 
     const holderRef = React.useRef<HolderRef>(null);
     const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
     const inputFocusRef = React.useRef<HTMLInputElement>(null);
+    const isHovering = useHover(inputNumberDomRef);
 
     const focus = (option?: InputFocusOptions) => {
       if (inputFocusRef.current) {
         triggerFocus(inputFocusRef.current, option);
       }
     };
+
+    const handleReset = () => {
+      rest.onChange?.(null);
+      focus();
+    };
+
+    // Ref to hold onStep function from InternalInputNumber
+    const onStepRef = React.useRef<((up: boolean) => void) | null>(null);
+
+    // Render clear icon for InputNumber (only show on hover)
+    const clearIcon = allowClear && value && isHovering && (
+      <ClearIcon
+        visible
+        onClick={() => handleReset()}
+        className="relative z-10 order-2 ml-1"
+      />
+    );
+
+    // Render controls as suffix - override absolute positioning
+    const controlsNode = controls && (
+      <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
+        <StepHandler
+          upNode={upHandler}
+          downNode={downHandler}
+          upDisabled={false}
+          downDisabled={false}
+          onStep={(up) => {
+            onStepRef.current?.(up);
+            focus();
+          }}
+        />
+      </div>
+    );
+
+    // Combine clear icon and controls as suffix
+    const combinedSuffix = (
+      <>
+        {clearIcon}
+        {controlsNode}
+      </>
+    );
 
     React.useImperativeHandle(ref, () => {
       const target = inputFocusRef.current;
@@ -774,7 +799,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
         disabled={disabled}
         style={style}
         prefix={prefix}
-        suffix={suffix}
+        suffix={combinedSuffix}
         addonAfter={addonAfter}
         addonBefore={addonBefore}
         classNames={classNames}
@@ -790,6 +815,10 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
           disabled={disabled}
           ref={inputFocusRef}
           domRef={inputNumberDomRef}
+          onStepRef={onStepRef}
+          upHandler={upHandler}
+          downHandler={downHandler}
+          controls={false}
           // className={classNames?.input}
           classNames={{
             input: classNames?.input,

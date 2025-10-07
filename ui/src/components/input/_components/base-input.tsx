@@ -7,9 +7,9 @@ import { useHover } from "ahooks";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { BaseInputProps } from "../types";
-import { Icon } from "../../../icons";
 import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
+import { ClearIcon } from "./clear-icon";
 
 export interface HolderRef {
   /** Provider holder ref. Will return `null` if not wrap anything */
@@ -58,6 +58,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   };
 
   const hasAffix = hasPrefixSuffix(props);
+  const isAddon = hasAddon(props);
 
   let element: ReactElement = cloneElement(inputElement as ReactElement<any>, {
     value,
@@ -65,7 +66,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       cn(
         (inputElement as ReactElement<{ className?: string } | undefined>).props
           ?.className,
-        !hasAffix && classNames?.variant,
+        !hasAffix && !isAddon && [className, classNames?.variant],
       ) || null,
   });
 
@@ -82,40 +83,22 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
     // ================== Clear Icon ================== //
     let clearIcon: ReactNode = null;
     if (allowClear) {
-      const needClear = !disabled && !readOnly && value;
-      const iconNode =
-        typeof allowClear === "object" && allowClear.clearIcon ? (
-          allowClear.clearIcon
-        ) : (
-          <Icon
-            icon="icon-[ant-design--close-circle-filled]"
-            className="pointer-events-none size-4"
-          />
-        );
+      const needClear = !disabled && !readOnly && !!value;
 
       clearIcon = (
-        <button
-          type="button"
+        <ClearIcon
+          visible={needClear}
           onClick={(event) => {
             handleReset?.(event);
             onClear?.();
           }}
-          // Do not trigger onBlur when clear input
-          // https://github.com/ant-design/ant-design/issues/31200
-          onMouseDown={(e) => e.preventDefault()}
-          className={cn("size-4 opacity-30 hover:opacity-50", {
-            [`hidden`]: !needClear,
-            // [`mx-1`]: !!suffix,
-          })}
-        >
-          {iconNode}
-        </button>
+        />
       );
     }
 
     const suffixNode = (!!suffix || allowClear) && (
       <span
-        className={cn("ml-1 flex items-center", classNames?.suffix)}
+        className={cn("order-2 ml-1 flex items-center", classNames?.suffix)}
         style={styles?.suffix}
       >
         {allowClear && value && (!suffix || (isHovering && suffix)) ? (
@@ -133,11 +116,15 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
         data-slot="affix-wrapper"
         className={cn(
           "text-sm",
-          "relative inline-flex w-full transition-all",
-          "[&_input]:h-auto [&_input]:border-none [&_input]:p-0 [&_input]:outline-none",
-          cn(classNames?.affixWrapper, classNames?.variant),
+          "relative inline-flex w-full",
+          "[&_input]:h-auto [&_input]:border-none [&_input]:outline-none",
+          // When has addon, remove all visual styling and padding from affix wrapper
+          isAddon
+            ? "border-none bg-transparent p-0 shadow-none outline-none"
+            : "transition-all",
+          cn(classNames?.affixWrapper, !isAddon && classNames?.variant),
           // fix cannot merge className by GenericSlot
-          className,
+          !isAddon && className,
         )}
         style={styles?.affixWrapper}
         onClick={onInputClick}
@@ -161,49 +148,67 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   // ================== Addon ================== //
   if (hasAddon(props)) {
     // const wrapperCls = `${prefixCls}-group`;
-    const wrapperCls = ``;
-    const addonCls = `${wrapperCls}-addon`;
-    const groupWrapperCls = `${wrapperCls}-wrapper`;
+    const addonCls = cn(
+      "flex items-center",
+      "bg-muted px-3",
+      // "border border-input py-0",
+      "text-muted-foreground text-sm",
+    );
 
     const mergedWrapperClassName = cn(
       //   `${prefixCls}-wrapper`,
-      wrapperCls,
       classNames?.wrapper,
     );
 
-    const mergedGroupClassName = cn(
-      groupWrapperCls,
-      {
-        [`${groupWrapperCls}-disabled`]: disabled,
-      },
-      classNames?.groupWrapper,
-    );
+    // Clone element, override border/styling and remove border radius when has addons
+    const clonedElement = cloneElement(element as ReactElement<any>, {
+      className: cn(
+        (element as ReactElement<{ className?: string } | undefined>).props
+          ?.className,
+        // Override variant border/background/shadow when has addon
+        "!border-none !shadow-none !ring-0 !bg-transparent",
+        // Remove outline on focus-visible
+        "focus-visible:!outline-0",
+        // Remove padding from sides that touch addon
+        addonBefore && "!rounded-l-none",
+        addonAfter && "!rounded-r-none",
+        // Keep padding on the other sides
+        // !addonBefore && "pl-[11px]",
+        // !addonAfter && "pr-[11px]",
+      ),
+    });
 
     // Need another wrapper for changing display:table to display:inline-block
     // and put style prop in wrapper
     element = (
       <GroupWrapperComponent
         data-slot="input-group-wrapper"
-        className={mergedGroupClassName}
+        className={classNames?.groupWrapper}
         ref={groupRef}
       >
         <WrapperComponent
           data-slot="input-wrapper"
-          className={mergedWrapperClassName}
+          className={cn(
+            mergedWrapperClassName,
+            "flex items-stretch",
+            classNames?.variant,
+            "p-0",
+            className,
+          )}
         >
           {addonBefore && (
             <GroupAddonComponent
               data-slot="input-group-addon"
-              className={addonCls}
+              className={cn(addonCls, "rounded-l-md border-r-0")}
             >
               {addonBefore}
             </GroupAddonComponent>
           )}
-          {element}
+          {clonedElement}
           {addonAfter && (
             <GroupAddonComponent
               data-slot="input-group-addon"
-              className={addonCls}
+              className={cn(addonCls, "rounded-r-md border-l-0")}
             >
               {addonAfter}
             </GroupAddonComponent>
