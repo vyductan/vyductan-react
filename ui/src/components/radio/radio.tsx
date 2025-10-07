@@ -60,6 +60,7 @@ const Radio = ({
           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             if (disabled) return;
             const event = {
+              type: "change" as const,
               target: {
                 ...props,
                 value,
@@ -71,6 +72,7 @@ const Radio = ({
                 isActive,
                 preColor,
                 checked: true,
+                type: "radio" as const,
               },
               stopPropagation: () => e.stopPropagation(),
               preventDefault: () => e.preventDefault(),
@@ -111,6 +113,7 @@ const Radio = ({
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
           if (disabled) return;
           const event = {
+            type: "change" as const,
             target: {
               ...props,
               value,
@@ -122,6 +125,7 @@ const Radio = ({
               isActive,
               preColor,
               checked: true,
+              type: "radio" as const,
             },
             stopPropagation: () => e.stopPropagation(),
             preventDefault: () => e.preventDefault(),
