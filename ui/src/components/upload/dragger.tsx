@@ -9,7 +9,7 @@ import { Card } from "../card";
 import { message } from "../message";
 import ProgressBar from "./_components/progress-bar";
 
-type UploadZoneProps = Omit<
+type DraggerProps = Omit<
   React.ComponentProps<"div">,
   "children" | "onChange"
 > & {
@@ -36,7 +36,7 @@ type UploadZoneProps = Omit<
 
   onChange?: (file: UploadFileItem | undefined) => void;
 };
-const UploadZone = ({
+const Dragger = ({
   uploadService,
   onUploadSuccess,
 
@@ -55,7 +55,7 @@ const UploadZone = ({
   showUploadList,
   onChange,
   ...props
-}: UploadZoneProps) => {
+}: DraggerProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [preview, setPreview] = useState<string | undefined>(fileProp?.url);
@@ -159,7 +159,7 @@ const UploadZone = ({
     <>
       <Card
         className={cn(
-          "w-full border-2 border-dashed",
+          "w-full border-dashed py-0",
           preview && showUploadList && "rounded-md border-solid",
           className,
         )}
@@ -215,7 +215,7 @@ const UploadZone = ({
             className={cn(
               "absolute z-3 flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
               dragActive && "border-2 border-black",
-              "bg-white opacity-100 hover:bg-gray-50",
+              "cursor-pointer bg-white opacity-100 hover:bg-gray-50",
             )}
             // className={`${
             //   dragActive ? "border-2 border-black" : ""
@@ -331,5 +331,5 @@ const UploadZone = ({
   );
 };
 
-export type { UploadZoneProps };
-export { UploadZone };
+export type { DraggerProps as DraggerProps };
+export { Dragger };
