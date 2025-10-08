@@ -14,6 +14,7 @@ type CalendarSingleValueProps = Omit<
   onSelect?: (date: Dayjs, dateString: string) => void;
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
+  onMonthChange?: (month: Date) => void;
 };
 
 type CalendarMultipleValueProps = Omit<
@@ -25,6 +26,7 @@ type CalendarMultipleValueProps = Omit<
   onSelect?: (dates: Dayjs[], dateStrings: string[]) => void;
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
+  onMonthChange?: (month: Date) => void;
 };
 
 type CalendarProps =
@@ -74,12 +76,17 @@ const Calendar = (props: CalendarProps) => {
     );
   }
 
-  const { value, onSelect, disabledDate, ...rest } =
+  const { value, onSelect, disabledDate, onMonthChange, ...rest } =
     props as CalendarMultipleValueProps;
   const disabled = composeDisabled(rest.disabled, disabledDate);
+  
+  // Extract props that shouldn't be passed to ShadcnCalendar
+  const { className, ...restWithoutClassName } = rest;
+  
   return (
     <ShadcnCalendar
-      // {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
+      {...restWithoutClassName}
+      className={className}
       mode="multiple"
       required
       disabled={disabled}
@@ -90,9 +97,10 @@ const Calendar = (props: CalendarProps) => {
           dates.map((d) => dayjs(d).format(format)),
         )
       }
+      onMonthChange={onMonthChange}
     />
   );
-};
+}
 
 export type { CalendarProps };
 export { Calendar };
