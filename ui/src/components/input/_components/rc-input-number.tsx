@@ -128,6 +128,7 @@ type InternalInputNumberProps = Omit<
   ref: React.Ref<HTMLInputElement>;
   domRef: React.Ref<HTMLDivElement>;
   onStepRef?: React.MutableRefObject<((up: boolean) => void) | null>;
+  onDisabledChange?: (upDisabled: boolean, downDisabled: boolean) => void;
 };
 
 const InternalInputNumber = ({
@@ -164,6 +165,7 @@ const InternalInputNumber = ({
 
   domRef,
   onStepRef,
+  onDisabledChange,
 
   ...inputProps
 }: InternalInputNumberProps) => {
@@ -332,6 +334,11 @@ const InternalInputNumber = ({
 
     return decimalValue.lessEquals(minDecimal);
   }, [minDecimal, decimalValue]);
+
+  // Notify parent about disabled states
+  React.useEffect(() => {
+    onDisabledChange?.(upDisabled, downDisabled);
+  }, [upDisabled, downDisabled, onDisabledChange]);
 
   // Cursor controller
   const [recordCursor, restoreCursor] = useCursor(inputRef.current, focus);
@@ -574,12 +581,10 @@ const InternalInputNumber = ({
   };
 
   // Expose onStep function to parent via ref
-  React.useEffect(() => {
-    if (onStepRef) {
-      onStepRef.current = (up: boolean) => onInternalStep(up, "handler");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onStepRef]);
+  // Update on every render to avoid stale closure
+  if (onStepRef) {
+    onStepRef.current = (up: boolean) => onInternalStep(up, "handler");
+  }
 
   React.useEffect(() => {
     if (changeOnWheel && focus) {
@@ -715,6 +720,15 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
     const inputFocusRef = React.useRef<HTMLInputElement>(null);
     const isHovering = useHover(inputNumberDomRef);
 
+    // Track disabled states from InternalInputNumber
+    const [upDisabled, setUpDisabled] = useState(false);
+    const [downDisabled, setDownDisabled] = useState(false);
+
+    const handleDisabledChange = useCallback((up: boolean, down: boolean) => {
+      setUpDisabled(up);
+      setDownDisabled(down);
+    }, []);
+
     const focus = (option?: InputFocusOptions) => {
       if (inputFocusRef.current) {
         triggerFocus(inputFocusRef.current, option);
@@ -744,8 +758,8 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
         <StepHandler
           upNode={upHandler}
           downNode={downHandler}
-          upDisabled={false}
-          downDisabled={false}
+          upDisabled={disabled || upDisabled}
+          downDisabled={disabled || downDisabled}
           onStep={(up) => {
             onStepRef.current?.(up);
             focus();
@@ -816,6 +830,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
           ref={inputFocusRef}
           domRef={inputNumberDomRef}
           onStepRef={onStepRef}
+          onDisabledChange={handleDisabledChange}
           upHandler={upHandler}
           downHandler={downHandler}
           controls={false}
