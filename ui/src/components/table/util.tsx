@@ -109,23 +109,28 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
       columnDefMerged.cell = ({ column, row, getValue, table }) => {
         // First data column should have expand icon + indent
         const isFirstDataColumn = columnIndex === 0;
-        const hasTreeData = props.expandable && (row.depth > 0 || row.getCanExpand());
-        
+        const hasTreeData =
+          props.expandable &&
+          !props.expandable.expandedRowRender &&
+          (row.depth > 0 || row.getCanExpand());
+
         // Cell Content - render function can return ReactNode or RenderedCell
-        const cellContent = (render
-          ? typeof dataIndex === "string"
-            ? render(getValue() as never, row.original, row.index, {
-                table,
-                column,
-                row,
-              })
-            : render(undefined as never, row.original, row.index, {
-                table,
-                column,
-                row,
-              })
-          : (getValue() as ReactNode)) as React.ReactNode;
-        
+        const cellContent = (
+          render
+            ? typeof dataIndex === "string"
+              ? render(getValue() as never, row.original, row.index, {
+                  table,
+                  column,
+                  row,
+                })
+              : render(undefined as never, row.original, row.index, {
+                  table,
+                  column,
+                  row,
+                })
+            : (getValue() as ReactNode)
+        ) as React.ReactNode;
+
         // Only wrap with flex container if first column has tree data
         if (isFirstDataColumn && hasTreeData) {
           return (
@@ -154,7 +159,7 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
             </div>
           );
         }
-        
+
         // Regular cell without wrapper
         return cellContent;
       };

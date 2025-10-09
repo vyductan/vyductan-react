@@ -16,6 +16,7 @@ import type {
   ColumnGroupType,
   ColumnsType,
   ColumnType,
+  ExpandableConfig,
   FixedType,
   GetRowKey,
   Key,
@@ -134,6 +135,7 @@ export const useColumns = <TRecord extends AnyObject>(
     expandIconColumnIndex,
     expandedRowOffset = 0,
     expandRowByClick,
+    expandedRowRender,
     rowExpandable,
     onTriggerExpand,
 
@@ -152,6 +154,7 @@ export const useColumns = <TRecord extends AnyObject>(
     expandIcon?: RenderExpandIcon<TRecord>;
     expandIconColumnIndex?: number;
     expandRowByClick?: boolean;
+    expandedRowRender: ExpandableConfig<TRecord>["expandedRowRender"];
     rowExpandable?: (record: TRecord) => boolean;
     onTriggerExpand: TriggerEventHandler<TRecord>;
 
@@ -261,7 +264,8 @@ export const useColumns = <TRecord extends AnyObject>(
         title: expandColumnTitle,
         fixed: fixedColumn ?? undefined,
         width: expandColumnWidth ?? 50,
-        minWidth: typeof expandColumnWidth === "number" ? expandColumnWidth : 50,
+        minWidth:
+          typeof expandColumnWidth === "number" ? expandColumnWidth : 50,
         align: "center",
         enableResizing: false,
         render: (_, record, index, { row }) => {
@@ -269,8 +273,8 @@ export const useColumns = <TRecord extends AnyObject>(
           const expanded = expandedKeys.has(rowKey);
 
           // Check if row can expand using TanStack Table's logic
-          const recordExpandable = rowExpandable 
-            ? rowExpandable(record) 
+          const recordExpandable = rowExpandable
+            ? rowExpandable(record)
             : row.getCanExpand();
 
           const icon = expandIcon?.({
@@ -386,9 +390,10 @@ export const useColumns = <TRecord extends AnyObject>(
       expandable: {
         childrenColumnName,
         expandIcon,
+        expandedRowRender, // true when there's expandedRowRender (separate expand column)
       },
     });
-  }, [childrenColumnName, expandIcon, mergedColumns]);
+  }, [childrenColumnName, expandIcon, expandedRowRender, mergedColumns]);
 
   return [mergedColumns, columnsForTTTable, flattenColumns];
 };
