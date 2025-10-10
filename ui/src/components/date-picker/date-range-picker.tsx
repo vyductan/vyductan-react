@@ -16,6 +16,7 @@ import { Calendar } from "../calendar";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { useComponentConfig } from "../config-provider/context";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
@@ -51,7 +52,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     onChange,
 
     placeholder,
-    format: formatProp = "YYYY-MM-DD",
+    format: formatProp,
     showTime,
 
     classNames: _,
@@ -65,12 +66,21 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     className,
     ...rest
   } = props;
+  const {
+    format: formatConfig,
+    captionLayout: captionLayoutConfig,
+    // commitYearOnClose: commitYearOnCloseConfig,
+  } = useComponentConfig("datePicker");
+
   const [open, setOpen] = useState(false);
   const [activeInput, setActiveInput] = useState<"start" | "end" | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 
   // ====================== Format Date =======================
-  const format = showTime ? `${formatProp} HH:mm` : formatProp;
+  const format =
+    (formatProp ?? showTime)
+      ? `${formatConfig} HH:mm`
+      : (formatConfig ?? "YYYY-MM-DD");
 
   // Convert Date to Dayjs
   const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
@@ -116,6 +126,22 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     value?.[0] ? value[0].toDate() : undefined,
   );
 
+  // Update month when activeInput changes
+  useEffect(() => {
+    if (activeInput === "start" && value?.[0]) {
+      setMonth(value[0].toDate());
+    } else if (activeInput === "end" && value?.[1]) {
+      // For end date, show the month in the second panel (month - 1)
+      const endDate = value[1].toDate();
+      const prevMonth = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth() - 1,
+        1,
+      );
+      setMonth(prevMonth);
+    }
+  }, [activeInput, value]);
+
   // =============== Hover Preview (AntD-like) ===============
   const [hoverPreview, setHoverPreview] = useState<
     RangeValueType | undefined
@@ -131,7 +157,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     if (inputValue.trim()) {
       const parsed = dayjs(inputValue, format);
       if (parsed.isValid()) {
-        setValue([parsed, value?.[1] ?? null]);
+        const endDate = value?.[1] ?? null;
+        // If end date exists and parsed start date is after end date, swap them
+        if (endDate && parsed.isAfter(endDate)) {
+          setValue([endDate, parsed]);
+          setStartInputValue(endDate.format(format));
+          setEndInputValue(parsed.format(format));
+        } else {
+          setValue([parsed, endDate]);
+        }
         setMonth(parsed.toDate());
       }
     } else {
@@ -144,7 +178,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     if (inputValue.trim()) {
       const parsed = dayjs(inputValue, format);
       if (parsed.isValid()) {
-        setValue([value?.[0] ?? null, parsed]);
+        const startDate = value?.[0] ?? null;
+        // If start date exists and parsed end date is before start date, swap them
+        if (startDate && parsed.isBefore(startDate)) {
+          setValue([parsed, startDate]);
+          setStartInputValue(parsed.format(format));
+          setEndInputValue(startDate.format(format));
+        } else {
+          setValue([startDate, parsed]);
+        }
       }
     } else {
       setValue([value?.[0] ?? null, null]);
@@ -156,6 +198,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
       <Calendar
         mode="range"
         required
+        captionLayout={captionLayoutConfig}
         numberOfMonths={2}
         month={month}
         onMonthChange={setMonth}
@@ -167,23 +210,47 @@ const DateRangePicker = (props: DateRangePickerProps) => {
               }
             : undefined
         }
-        onSelect={(dateRange, triggerDate, modifiers) => {
-          if (!triggerDate) return;
-
+        onSelect={(dateRange, triggerDate, _modifiers) => {
           const selectedDate = dayjs(triggerDate);
 
           // Use activeInput to determine which date to set
           if (activeInput === "start") {
             // Selecting start date
-            setValue([selectedDate, value?.[1] ?? null]);
-            setStartInputValue(selectedDate.format(format));
+            const endDate = value?.[1] ?? null;
+            // If end date exists and selected start date is after end date, swap them
+            if (endDate && selectedDate.isAfter(endDate)) {
+              setValue([endDate, selectedDate]);
+              setStartInputValue(endDate.format(format));
+              setEndInputValue(selectedDate.format(format));
+            } else {
+              setValue([selectedDate, endDate]);
+              setStartInputValue(selectedDate.format(format));
+            }
             setActiveInput("end");
+            // Update month to show end date month in the second panel if it exists
+            if (value?.[1]) {
+              const endDate = value[1].toDate();
+              const prevMonth = new Date(
+                endDate.getFullYear(),
+                endDate.getMonth() - 1,
+                1,
+              );
+              setMonth(prevMonth);
+            }
             // Focus end input
             setTimeout(() => endInputRef.current?.focus(), 0);
           } else if (activeInput === "end") {
             // Selecting end date
-            setValue([value?.[0] ?? null, selectedDate]);
-            setEndInputValue(selectedDate.format(format));
+            const startDate = value?.[0] ?? null;
+            // If start date exists and selected end date is before start date, swap them
+            if (startDate && selectedDate.isBefore(startDate)) {
+              setValue([selectedDate, startDate]);
+              setStartInputValue(selectedDate.format(format));
+              setEndInputValue(startDate.format(format));
+            } else {
+              setValue([startDate, selectedDate]);
+              setEndInputValue(selectedDate.format(format));
+            }
             setActiveInput(null);
             setOpen(false);
           } else {
@@ -205,6 +272,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     activeInput,
     setStartInputValue,
     setEndInputValue,
+    captionLayoutConfig,
   ]);
 
   // prevent click label to focus input (open popover)
@@ -281,18 +349,38 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (open) {
                   e.preventDefault();
                   setActiveInput("start");
+                  if (value?.[0]) {
+                    setMonth(value[0].toDate());
+                  }
                 } else {
                   setOpen(true);
                   setActiveInput("start");
+                  if (value?.[0]) {
+                    setMonth(value[0].toDate());
+                  }
                 }
               }}
               onFocus={() => {
                 setActiveInput("start");
+                if (value?.[0]) {
+                  setMonth(value[0].toDate());
+                }
               }}
               onKeyUp={(event) => {
                 event.stopPropagation();
                 if (event.key === "Enter") {
                   handleStartInputChange(event.currentTarget.value);
+                  setActiveInput("end");
+                  if (value?.[1]) {
+                    // For end date, show the month in the second panel (month - 1)
+                    const endDate = value[1].toDate();
+                    const prevMonth = new Date(
+                      endDate.getFullYear(),
+                      endDate.getMonth() - 1,
+                      1,
+                    );
+                    setMonth(prevMonth);
+                  }
                   endInputRef.current?.focus();
                 } else if (event.key === "Escape") {
                   setOpen(false);
@@ -304,6 +392,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (newValue.trim()) {
                   const parsed = dayjs(newValue, format);
                   if (parsed.isValid()) {
+                    const endDate = value?.[1] ?? null;
+                    // If end date exists and parsed start date is after end date, swap them
+                    if (endDate && parsed.isAfter(endDate)) {
+                      setValue([endDate, parsed]);
+                      setStartInputValue(endDate.format(format));
+                      setEndInputValue(parsed.format(format));
+                    } else {
+                      setValue([parsed, endDate]);
+                    }
                     setMonth(parsed.toDate());
                   }
                 }
@@ -333,7 +430,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (startInputValue.trim()) {
                   const parsed = dayjs(startInputValue, format);
                   if (parsed.isValid()) {
-                    setValue([parsed, value?.[1] ?? null]);
+                    const endDate = value?.[1] ?? null;
+                    // If end date exists and parsed start date is after end date, swap them
+                    if (endDate && parsed.isAfter(endDate)) {
+                      setValue([endDate, parsed]);
+                      setStartInputValue(endDate.format(format));
+                      setEndInputValue(parsed.format(format));
+                    } else {
+                      setValue([parsed, endDate]);
+                    }
                   } else {
                     setStartInputValue(
                       value?.[0] ? value[0].format(format) : "",
@@ -380,13 +485,43 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (open) {
                   e.preventDefault();
                   setActiveInput("end");
+                  if (value?.[1]) {
+                    // For end date, show the month in the second panel (month - 1)
+                    const endDate = value[1].toDate();
+                    const prevMonth = new Date(
+                      endDate.getFullYear(),
+                      endDate.getMonth() - 1,
+                      1,
+                    );
+                    setMonth(prevMonth);
+                  }
                 } else {
                   setOpen(true);
                   setActiveInput("end");
+                  if (value?.[1]) {
+                    // For end date, show the month in the second panel (month - 1)
+                    const endDate = value[1].toDate();
+                    const prevMonth = new Date(
+                      endDate.getFullYear(),
+                      endDate.getMonth() - 1,
+                      1,
+                    );
+                    setMonth(prevMonth);
+                  }
                 }
               }}
               onFocus={() => {
                 setActiveInput("end");
+                if (value?.[1]) {
+                  // For end date, show the month in the second panel (month - 1)
+                  const endDate = value[1].toDate();
+                  const prevMonth = new Date(
+                    endDate.getFullYear(),
+                    endDate.getMonth() - 1,
+                    1,
+                  );
+                  setMonth(prevMonth);
+                }
               }}
               onKeyUp={(event) => {
                 event.stopPropagation();
@@ -403,6 +538,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (newValue.trim()) {
                   const parsed = dayjs(newValue, format);
                   if (parsed.isValid()) {
+                    const startDate = value?.[0] ?? null;
+                    // If start date exists and parsed end date is before start date, swap them
+                    if (startDate && parsed.isBefore(startDate)) {
+                      setValue([parsed, startDate]);
+                      setStartInputValue(parsed.format(format));
+                      setEndInputValue(startDate.format(format));
+                    } else {
+                      setValue([startDate, parsed]);
+                    }
                     setMonth(parsed.toDate());
                   }
                 }
@@ -432,7 +576,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (endInputValue.trim()) {
                   const parsed = dayjs(endInputValue, format);
                   if (parsed.isValid()) {
-                    setValue([value?.[0] ?? null, parsed]);
+                    const startDate = value?.[0] ?? null;
+                    // If start date exists and parsed end date is before start date, swap them
+                    if (startDate && parsed.isBefore(startDate)) {
+                      setValue([parsed, startDate]);
+                      setStartInputValue(parsed.format(format));
+                      setEndInputValue(startDate.format(format));
+                    } else {
+                      setValue([startDate, parsed]);
+                    }
                   } else {
                     setEndInputValue(value?.[1] ? value[1].format(format) : "");
                   }
