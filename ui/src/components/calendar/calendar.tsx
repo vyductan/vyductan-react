@@ -2,6 +2,7 @@ import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 
 import { Calendar as ShadcnCalendar } from "../../shadcn/calendar";
+import { CustomCalendarDayButton } from "./_components";
 
 type ShadcnCalendarProps = React.ComponentProps<typeof ShadcnCalendar>;
 
@@ -36,6 +37,7 @@ type CalendarProps =
       mode?: undefined;
       onSelect?: undefined;
       className?: string;
+      classNames?: ShadcnCalendarProps["classNames"];
     };
 
 function composeDisabled(
@@ -66,11 +68,15 @@ const Calendar = (props: CalendarProps) => {
     return (
       <ShadcnCalendar
         {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
+        // classNames={mergedClassNames(classNames)}
         mode="single"
         disabled={disabled}
         selected={value.toDate()}
         onSelect={(date) => {
           if (date) onSelect?.(dayjs(date), dayjs(date).format(format));
+        }}
+        components={{
+          DayButton: CustomCalendarDayButton,
         }}
       />
     );
@@ -79,14 +85,15 @@ const Calendar = (props: CalendarProps) => {
   const { value, onSelect, disabledDate, onMonthChange, ...rest } =
     props as CalendarMultipleValueProps;
   const disabled = composeDisabled(rest.disabled, disabledDate);
-  
+
   // Extract props that shouldn't be passed to ShadcnCalendar
   const { className, ...restWithoutClassName } = rest;
-  
+
   return (
     <ShadcnCalendar
       {...restWithoutClassName}
       className={className}
+      // classNames={mergedClassNames(classNames)}
       mode="multiple"
       required
       disabled={disabled}
@@ -98,9 +105,12 @@ const Calendar = (props: CalendarProps) => {
         )
       }
       onMonthChange={onMonthChange}
+      components={{
+        DayButton: CustomCalendarDayButton,
+      }}
     />
   );
-}
+};
 
 export type { CalendarProps };
 export { Calendar };
