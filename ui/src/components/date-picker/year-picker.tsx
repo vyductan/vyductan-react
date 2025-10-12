@@ -2,12 +2,12 @@
 
 import * as React from "react";
 
-import type { DatePickerPropsDayjs } from "./date-picker";
+import type { DatePickerProps } from "./date-picker";
 import { DatePicker } from "./date-picker";
 
 export type YearPickerProps = Omit<
-  DatePickerPropsDayjs,
-  "picker" | "disabledDate" | "showTime" | "valueType"
+  DatePickerProps,
+  "picker" | "disabledDate" | "showTime"
 > & {
   // valueType: "dayjs";
   // defaultValue?: Dayjs;

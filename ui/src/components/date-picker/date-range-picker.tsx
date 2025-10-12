@@ -13,10 +13,11 @@ import type { InputRef } from "../input";
 import type { DatePickerBaseProps } from "./date-picker";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
+import { RangeCalendar } from "../calendar/range-calendar";
+import { useComponentConfig } from "../config-provider/context";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
-import { useComponentConfig } from "../config-provider/context";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
@@ -33,6 +34,9 @@ type DateRangePickerProps = DatePickerBaseProps & {
   variant?: "outlined" | "filled" | "borderless";
   size?: "small" | "middle" | "large";
   status?: "error" | "warning";
+
+  /** Show separate calendars for start and end dates instead of single calendar with 2 panels */
+  separateCalendars?: boolean;
 
   styles?: {
     root?: React.CSSProperties;
@@ -62,6 +66,9 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     variant,
     size,
     status,
+    separateCalendars = true,
+    minDate,
+    maxDate,
 
     className,
     ...rest
@@ -116,6 +123,9 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     value?.[1] ? value[1].format(format) : "",
   );
 
+  // State for hover preview
+  const [hoverPreview, setHoverPreview] = useState<Dayjs | undefined>();
+
   // Sync input values when value changes
   useEffect(() => {
     setStartInputValue(value?.[0] ? value[0].format(format) : "");
@@ -123,8 +133,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   }, [value, format, setStartInputValue, setEndInputValue]);
 
   const [month, setMonth] = useState<Date | undefined>(
-    value?.[0] ? value[0].toDate() : undefined,
+    value?.[0] ? value[0].toDate() : new Date(),
   );
+
+  // Update month when value changes
+  useEffect(() => {
+    if (value?.[0]) {
+      setMonth(value[0].toDate());
+    }
+  }, [value]);
 
   // Update month when activeInput changes
   useEffect(() => {
@@ -143,9 +160,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   }, [activeInput, value]);
 
   // =============== Hover Preview (AntD-like) ===============
-  const [hoverPreview, setHoverPreview] = useState<
-    RangeValueType | undefined
-  >();
+  // hoverPreview is already declared above
 
   const startInputRef = React.useRef<InputRef>(null);
   const endInputRef = React.useRef<InputRef>(null);
@@ -194,6 +209,51 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   };
 
   const CalendarComponent = React.useMemo(() => {
+    // If separateCalendars is true, render 2 separate calendars using RangeCalendar
+    if (separateCalendars) {
+      return (
+        <RangeCalendar
+          value={value}
+          onChange={(dates) => {
+            setValue(dates ?? undefined);
+            if (dates?.[0]) {
+              setStartInputValue(dates[0].format(format));
+            }
+            if (dates?.[1]) {
+              setEndInputValue(dates[1].format(format));
+            }
+            // Auto-focus end input after start date selection
+            if (dates?.[0] && !dates[1]) {
+              setActiveInput("end");
+              setTimeout(() => endInputRef.current?.focus(), 0);
+            } else if (dates?.[1]) {
+              // Only close panel and reset activeInput if user is not actively focusing an input
+              // This prevents interrupting user interaction
+              setTimeout(() => {
+                setActiveInput(null);
+                setOpen(false);
+              }, 100);
+            }
+          }}
+          format={format}
+          captionLayout={captionLayoutConfig}
+          minDate={minDate}
+          maxDate={maxDate}
+          disabled={disabled}
+          activeInput={activeInput}
+          hoverPreview={hoverPreview}
+          onHoverPreviewChange={setHoverPreview}
+          onStartMonthChange={(month) => {
+            setMonth(month);
+          }}
+          onEndMonthChange={(month) => {
+            setMonth(month);
+          }}
+        />
+      );
+    }
+
+    // Default behavior: single calendar with 2 panels
     return (
       <Calendar
         mode="range"
@@ -202,6 +262,13 @@ const DateRangePicker = (props: DateRangePickerProps) => {
         numberOfMonths={2}
         month={month}
         onMonthChange={setMonth}
+        startMonth={
+          minDate?.toDate() ??
+          dayjs().subtract(50, "year").startOf("year").toDate()
+        }
+        endMonth={
+          maxDate?.toDate() ?? dayjs().add(50, "year").endOf("year").toDate()
+        }
         selected={
           value
             ? {
@@ -210,7 +277,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
               }
             : undefined
         }
-        onSelect={(dateRange, triggerDate, _modifiers) => {
+        onSelect={(_selected, triggerDate) => {
           const selectedDate = dayjs(triggerDate);
 
           // Use activeInput to determine which date to set
@@ -273,6 +340,12 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     setStartInputValue,
     setEndInputValue,
     captionLayoutConfig,
+    separateCalendars,
+    minDate,
+    maxDate,
+    disabled,
+    hoverPreview,
+    setHoverPreview,
   ]);
 
   // prevent click label to focus input (open popover)
@@ -326,8 +399,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
               ref={composedStartRef}
               id={id}
               value={
-                open && hoverPreview?.[0]
-                  ? hoverPreview[0].format(format)
+                open && hoverPreview && activeInput === "start"
+                  ? hoverPreview.format(format)
                   : startInputValue
               }
               placeholder={placeholder?.[0] ?? "Start Date"}
@@ -340,8 +413,9 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 input: cn(
                   "border-0 shadow-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0",
                   open &&
-                    hoverPreview?.[0] &&
-                    !value?.[0]?.isSame(hoverPreview[0], "day") &&
+                    hoverPreview &&
+                    activeInput === "start" &&
+                    !value?.[0]?.isSame(hoverPreview, "day") &&
                     "text-muted-foreground",
                 ),
               }}
@@ -462,8 +536,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             <Input
               ref={endInputRef}
               value={
-                open && hoverPreview?.[1]
-                  ? hoverPreview[1].format(format)
+                open && hoverPreview && activeInput === "end"
+                  ? hoverPreview.format(format)
                   : endInputValue
               }
               placeholder={placeholder?.[1] ?? "End Date"}
@@ -476,8 +550,9 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 input: cn(
                   "border-0 shadow-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0",
                   open &&
-                    hoverPreview?.[1] &&
-                    !value?.[1]?.isSame(hoverPreview[1], "day") &&
+                    hoverPreview &&
+                    activeInput === "end" &&
+                    !value?.[1]?.isSame(hoverPreview, "day") &&
                     "text-muted-foreground",
                 ),
               }}
