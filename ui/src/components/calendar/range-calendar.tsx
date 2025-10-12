@@ -202,8 +202,13 @@ const RangeCalendar = (props: RangeCalendarProps) => {
         // Focus end input: set as end date
         if (startDate && selectedDate.isBefore(startDate)) {
           onChange?.([selectedDate, startDate]);
-        } else if (startDate && selectedDate.isSame(startDate)) {
-          return; // Prevent duplicate values
+        } else if (
+          startDate &&
+          selectedDate.isSame(startDate) &&
+          endDate &&
+          !startDate.isSame(endDate)
+        ) {
+          return; // Prevent duplicate values only if we don't already have duplicate values
         } else {
           onChange?.([startDate, selectedDate]);
         }
@@ -287,6 +292,18 @@ const RangeCalendar = (props: RangeCalendarProps) => {
         return { from: hoverPreview.toDate(), to: actualEndDate?.toDate() };
       } else {
         // Hovering on end calendar
+        // Special case: if we have duplicate values and focus is on end input,
+        // treat the hover as updating the end date
+        if (
+          startDate &&
+          endDate &&
+          startDate.isSame(endDate) &&
+          activeInput === "end"
+        ) {
+          // When duplicate values and focusing end input, show hover as end date
+          return { from: startDate.toDate(), to: hoverPreview.toDate() };
+        }
+
         const actualStartDate =
           startDate && endDate && startDate.isSame(endDate) ? null : startDate;
 
