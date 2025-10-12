@@ -1,10 +1,8 @@
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 
-import { Calendar as ShadcnCalendar } from "../../shadcn/calendar";
-import { CustomCalendarDayButton } from "./_components";
-
-type ShadcnCalendarProps = React.ComponentProps<typeof ShadcnCalendar>;
+import type { ShadcnCalendarProps } from "./_components";
+import { CustomCalendar, CustomCalendarDayButton } from "./_components";
 
 type CalendarSingleValueProps = Omit<
   ShadcnCalendarProps,
@@ -16,6 +14,8 @@ type CalendarSingleValueProps = Omit<
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
   onMonthChange?: (month: Date) => void;
+  numberOfMonths?: number;
+  fixedWeeks?: boolean;
 };
 
 type CalendarMultipleValueProps = Omit<
@@ -28,16 +28,39 @@ type CalendarMultipleValueProps = Omit<
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;
   onMonthChange?: (month: Date) => void;
+  numberOfMonths?: number;
+  fixedWeeks?: boolean;
+};
+
+type CalendarRangeValueProps = Omit<
+  ShadcnCalendarProps,
+  "mode" | "required" | "selected" | "onSelect"
+> & {
+  mode: "range";
+  value?: [Dayjs | null, Dayjs | null];
+  onSelect?: (
+    dateRange: { from?: Date; to?: Date } | undefined,
+    triggerDate: Date,
+    modifiers: any,
+  ) => void;
+  format?: string;
+  disabledDate?: (date: Dayjs) => boolean;
+  onMonthChange?: (month: Date) => void;
+  numberOfMonths?: number;
+  fixedWeeks?: boolean;
 };
 
 type CalendarProps =
   | CalendarSingleValueProps
   | CalendarMultipleValueProps
+  | CalendarRangeValueProps
   | {
       mode?: undefined;
       onSelect?: undefined;
       className?: string;
       classNames?: ShadcnCalendarProps["classNames"];
+      numberOfMonths?: number;
+      fixedWeeks?: boolean;
     };
 
 function composeDisabled(
@@ -54,7 +77,21 @@ function composeDisabled(
 }
 
 const Calendar = (props: CalendarProps) => {
-  const { format = "YYYY-MM-DD" } = props as { format?: string };
+  const { format = "YYYY-MM-DD" } = props as {
+    format?: string;
+  };
+
+  if ("selected" in props) {
+    return (
+      <CustomCalendar
+        components={{
+          DayButton: CustomCalendarDayButton,
+        }}
+        fixedWeeks={true}
+        {...(props as ShadcnCalendarProps)}
+      />
+    );
+  }
 
   // Single (Dayjs convenience)
   if (
@@ -66,9 +103,8 @@ const Calendar = (props: CalendarProps) => {
     const { value, onSelect, disabledDate, ...rest } = props;
     const disabled = composeDisabled(rest.disabled, disabledDate);
     return (
-      <ShadcnCalendar
+      <CustomCalendar
         {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
-        // classNames={mergedClassNames(classNames)}
         mode="single"
         disabled={disabled}
         selected={value.toDate()}
@@ -78,6 +114,38 @@ const Calendar = (props: CalendarProps) => {
         components={{
           DayButton: CustomCalendarDayButton,
         }}
+        fixedWeeks={true}
+      />
+    );
+  }
+
+  // Range mode
+  if (props.mode === "range") {
+    const { value, onSelect, disabledDate, onMonthChange, ...rest } = props;
+    const disabled = composeDisabled(rest.disabled, disabledDate);
+
+    // Extract props that shouldn't be passed to ShadcnCalendar
+    const { className, numberOfMonths, ...restWithoutClassName } = rest;
+
+    // Range mode: single calendar with 2 panels
+    return (
+      <CustomCalendar
+        {...restWithoutClassName}
+        className={className}
+        mode="range"
+        required
+        disabled={disabled}
+        numberOfMonths={numberOfMonths ?? 2}
+        selected={
+          value
+            ? {
+                from: value[0] ? value[0].toDate() : undefined,
+                to: value[1] ? value[1].toDate() : undefined,
+              }
+            : undefined
+        }
+        onSelect={onSelect}
+        onMonthChange={onMonthChange}
       />
     );
   }
@@ -90,10 +158,9 @@ const Calendar = (props: CalendarProps) => {
   const { className, ...restWithoutClassName } = rest;
 
   return (
-    <ShadcnCalendar
+    <CustomCalendar
       {...restWithoutClassName}
       className={className}
-      // classNames={mergedClassNames(classNames)}
       mode="multiple"
       required
       disabled={disabled}
@@ -105,9 +172,6 @@ const Calendar = (props: CalendarProps) => {
         )
       }
       onMonthChange={onMonthChange}
-      components={{
-        DayButton: CustomCalendarDayButton,
-      }}
     />
   );
 };
