@@ -62,19 +62,19 @@ type DatePickerBaseProps = InputVariants &
 
     // Custom: when selecting a year in overlay, commit that year on close without needing to pick a day
     commitYearOnClose?: boolean;
+
+    minDate?: Dayjs;
+    maxDate?: Dayjs;
   };
 
-type DatePickerPropsDayjs = DatePickerBaseProps & {
+type DatePickerProps = DatePickerBaseProps & {
   ref?: React.Ref<InputRef>;
-  /** Default behavior - uses Dayjs */
-  valueType?: "dayjs";
   defaultValue?: Dayjs | null;
   value?: Dayjs | null;
   onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
   disabledDate?: DisabledDate<Dayjs>;
   placeholder?: string;
-  minDate?: Dayjs;
-  maxDate?: Dayjs;
+
   picker?: PickerMode;
 
   styles?: {
@@ -84,29 +84,6 @@ type DatePickerPropsDayjs = DatePickerBaseProps & {
     root?: string;
   };
 };
-
-type DatePickerPropsDate = DatePickerBaseProps & {
-  ref?: React.Ref<InputRef>;
-  /** Explicit Date mode - accepts and emits Date */
-  valueType: "date";
-  defaultValue?: Date | null;
-  value?: Date | null;
-  onChange?: (date: Date | null | undefined, dateString: string) => void;
-  disabledDate?: DisabledDate<Date>;
-  placeholder?: string;
-  minDate?: Date;
-  maxDate?: Date;
-  picker?: PickerMode;
-
-  styles?: {
-    root?: React.CSSProperties;
-  };
-  classNames?: {
-    root?: string;
-  };
-};
-
-type DatePickerProps = DatePickerPropsDayjs | DatePickerPropsDate;
 
 const DatePicker = (props: DatePickerProps) => {
   const {
@@ -138,8 +115,6 @@ const DatePicker = (props: DatePickerProps) => {
     ...rest
   } = props;
 
-  const valueType = props.valueType ?? "dayjs";
-
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
   const [open, setOpen] = useState(false);
@@ -166,9 +141,9 @@ const DatePicker = (props: DatePickerProps) => {
     if (!v) return undefined;
     return dayjs(v as any);
   };
-  const fromDayjs = (v: Dayjs | undefined): Dayjs | Date | undefined => {
+  const fromDayjs = (v: Dayjs | undefined): Dayjs | undefined => {
     if (!v) return undefined;
-    return valueType === "date" ? v.toDate() : v;
+    return v;
   };
 
   const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
@@ -444,11 +419,11 @@ const DatePicker = (props: DatePickerProps) => {
               // value={typedDate ? dayjs(typedDate) : (value ?? undefined)}
               selected={typedDate ?? (value ? value.toDate() : undefined)}
               startMonth={
-                (minDate ? dayjs(minDate as any) : undefined)?.toDate() ??
+                minDate?.toDate() ??
                 dayjs().subtract(50, "year").startOf("year").toDate()
               }
               endMonth={
-                (maxDate ? dayjs(maxDate as any) : undefined)?.toDate() ??
+                maxDate?.toDate() ??
                 dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
@@ -467,10 +442,7 @@ const DatePicker = (props: DatePickerProps) => {
               disabled={(date) => {
                 if (disabledDate) {
                   // Pass both the date and the required info object
-                  const currentArg =
-                    valueType === "date"
-                      ? (getDestinationValue(date).toDate() as any)
-                      : (getDestinationValue(date) as any);
+                  const currentArg = getDestinationValue(date) as any;
                   return disabledDate(currentArg, {
                     type: "date",
                   });
@@ -603,5 +575,5 @@ const DatePicker = (props: DatePickerProps) => {
   );
 };
 
-export type { DatePickerProps, DatePickerBaseProps, DatePickerPropsDayjs };
+export type { DatePickerProps, DatePickerBaseProps };
 export { DatePicker };

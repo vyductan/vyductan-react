@@ -8,6 +8,10 @@ export * from "./date-range-picker";
 export * from "./month-picker";
 export * from "./year-picker";
 
+// const ConditionDatePicker = () => {
+// return <DateRangePicker />
+// }
+
 type CompoundedComponent = typeof InternalDatePicker & {
   RangePicker: typeof DateRangePicker;
   MonthPicker: typeof MonthPicker;
