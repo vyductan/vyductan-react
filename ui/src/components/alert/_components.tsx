@@ -3,6 +3,7 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";
+import {Alert as ShadcnAlert} from "../../shadcn/alert";
 
 export const alertVariants = cva(
   [
@@ -31,23 +32,6 @@ export const alertVariants = cva(
   },
 );
 
-type AlertRootProps = React.ComponentProps<"div"> &
-  VariantProps<typeof alertVariants>;
-function AlertRoot({
-  className,
-  type,
-  bordered,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
-  return (
-    <div
-      data-slot="alert"
-      role="alert"
-      className={cn(alertVariants({ type, bordered }), "space-y-1", className)}
-      {...props}
-    />
-  );
-}
 
 function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -58,35 +42,8 @@ function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
     />
   );
 }
+type ShadcnAlertProps = React.ComponentProps<typeof ShadcnAlert>;
 
-function AlertMessage({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-message"
-      className={cn(
-        // "col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="alert-description"
-      className={cn(
-        "text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
-        className,
-      )}
-      {...props}
-    />
-  );
-}
-
-export type { AlertRootProps };
-export { AlertRoot, AlertContent, AlertMessage, AlertDescription };
+export { ShadcnAlert, AlertContent};
+export type { ShadcnAlertProps };
+export {AlertTitle, AlertDescription} from "../../shadcn/alert";
