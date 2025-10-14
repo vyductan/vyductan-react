@@ -1,38 +1,33 @@
-import React, { useEffect, useMemo } from "react";
-import { Slot } from "@radix-ui/react-slot";
+"use client";
+
+import type { Dayjs } from "dayjs";
+import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
-import { useHover } from "ahooks";
-import { formatDate, toDate } from "date-fns";
+import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AnyObject } from "../_util/type";
+import type { InputRef } from "../input";
 import type { DatePickerBaseProps } from "./date-picker";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { RangeCalendar } from "../calendar/range-calendar";
 import { useComponentConfig } from "../config-provider/context";
 import { inputSizeVariants, inputVariants } from "../input";
+import { Input } from "../input/input";
 import { Popover } from "../popover";
 
-type RangeValueType<DateType> = [
-  start: DateType | null | undefined,
-  end: DateType | null | undefined,
-];
-type NoUndefinedRangeValueType<DateType> = [
-  start: DateType | null,
-  end: DateType | null,
-];
+type RangeValueType = [Dayjs | null, Dayjs | null];
 
-type DateRangePickerProps<DateType extends AnyObject = Date> =
-  DatePickerBaseProps & {
-    ref?: React.RefObject<HTMLDivElement | null>;
+type DateRangePickerProps = DatePickerBaseProps & {
+  ref?: React.Ref<InputRef>;
 
-    value?: RangeValueType<DateType> | null;
-    defaultValue?: RangeValueType<DateType> | null;
-    /** Callback function, can be executed when the selected time is changing */
-    onChange?: (dates: NoUndefinedRangeValueType<DateType> | null) => void;
+  value?: RangeValueType | null;
+  defaultValue?: RangeValueType | null;
+  /** Callback function, can be executed when the selected time is changing */
+  onChange?: (dates: RangeValueType | null) => void;
 
   placeholder?: [string, string];
 
@@ -46,18 +41,23 @@ type DateRangePickerProps<DateType extends AnyObject = Date> =
   styles?: {
     root?: React.CSSProperties;
   };
+  classNames?: {
+    root?: string;
+  };
+};
 
-const DateRangePicker = <DateType extends AnyObject = Date>({
-  ref: refProp,
+const DateRangePicker = (props: DateRangePickerProps) => {
+  const {
+    ref,
+    id,
 
-  id: inputId,
+    value: valueProp,
+    defaultValue,
+    onChange,
 
-  disabled,
-  // borderless,
-  format = "dd/MM/yyyy",
-  // size,
-  // status,
-  placeholder,
+    placeholder,
+    format: formatProp,
+    showTime,
 
     classNames: _,
     styles: __,
@@ -70,48 +70,50 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
     minDate,
     maxDate,
 
-  className,
-  allowClear = false,
-  suffix = (
-    <Icon icon="icon-[mingcute--calendar-2-line]" className="opacity-50" />
-  ),
+    className,
+    ...rest
+  } = props;
+  const {
+    format: formatConfig,
+    captionLayout: captionLayoutConfig,
+    // commitYearOnClose: commitYearOnCloseConfig,
+  } = useComponentConfig("datePicker");
 
-  defaultValue,
-  value: valueProp,
-  onChange,
-}: DateRangePickerProps<DateType>) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [activeInput, setActiveInput] = useState<"start" | "end" | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   // ====================== Format Date =======================
-  format = showTime ? `${format} HH:mm` : format;
+  const format =
+    (formatProp ?? showTime)
+      ? `${formatConfig} HH:mm`
+      : (formatConfig ?? "YYYY-MM-DD");
 
-  const valueType = React.useMemo(() => {
-    let result = "format";
-    if (typeof valueProp === "string") {
-      result = "format";
-    } else if (typeof valueProp === "number") {
-      result = "number";
-    } else if (typeof valueProp === "object") {
-      result = "object";
-    }
-    return result;
+  // Convert Date to Dayjs
+  const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
+    if (!v) return undefined;
+    return dayjs(v as any);
+  };
+
+  const controlledValue = useMemo<RangeValueType | undefined>(() => {
+    if (!valueProp) return;
+    return [toDayjs(valueProp[0]) ?? null, toDayjs(valueProp[1]) ?? null];
   }, [valueProp]);
 
-  const getDestinationValue = React.useCallback(
-    (date: Date) => {
-      let result;
-      if (valueType === "string") {
-        result = formatDate(date, "yyyy-MM-dd'T'HH:mm:ss");
-      } else if (valueType === "format") {
-        result = formatDate(date, format);
-      } else if (typeof valueType === "number") {
-        result = date.getTime();
-      } else {
-        result = date;
-      }
-      return result as unknown as DateType;
+  const defaultDayjsValue = useMemo<RangeValueType | undefined>(() => {
+    if (!defaultValue) return;
+    return [toDayjs(defaultValue[0]) ?? null, toDayjs(defaultValue[1]) ?? null];
+  }, [defaultValue]);
+
+  // ====================== Value =======================
+  const [value, setValue] = useMergedState<RangeValueType | undefined>(
+    defaultDayjsValue,
+    {
+      value: controlledValue,
+      onChange: (next) => {
+        onChange?.(next ?? null);
+      },
     },
-    [format, valueType],
   );
 
   const [startInputValue, setStartInputValue] = useMergedState(
@@ -181,9 +183,30 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
         }
         setMonth(parsed.toDate());
       }
-      return pre;
-    });
-  }, [valueProp, setValue]);
+    } else {
+      setValue([null, value?.[1] ?? null]);
+    }
+  };
+
+  const handleEndInputChange = (inputValue: string) => {
+    setEndInputValue(inputValue);
+    if (inputValue.trim()) {
+      const parsed = dayjs(inputValue, format);
+      if (parsed.isValid()) {
+        const startDate = value?.[0] ?? null;
+        // If start date exists and parsed end date is before start date, swap them
+        if (startDate && parsed.isBefore(startDate)) {
+          setValue([parsed, startDate]);
+          setStartInputValue(parsed.format(format));
+          setEndInputValue(startDate.format(format));
+        } else {
+          setValue([startDate, parsed]);
+        }
+      }
+    } else {
+      setValue([value?.[0] ?? null, null]);
+    }
+  };
 
   const CalendarComponent = React.useMemo(() => {
     // If separateCalendars is true, render 2 separate calendars using RangeCalendar
@@ -249,10 +272,8 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
         selected={
           value
             ? {
-                from: value[0]
-                  ? toDate(value[0] as unknown as Date)
-                  : undefined,
-                to: value[1] ? toDate(value[1] as unknown as Date) : undefined,
+                from: value[0] ? value[0].toDate() : undefined,
+                to: value[1] ? value[1].toDate() : undefined,
               }
             : undefined
         }
@@ -299,21 +320,13 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
             }
             setActiveInput(null);
             setOpen(false);
-            onChange?.([
-              getDestinationValue(dateRange.from!),
-              getDestinationValue(dateRange.to),
-            ]);
-            // if (
-            //   value &&
-            //   value[0] !== defaultValue?.[0] &&
-            //   value[1] !== defaultValue?.[1]
-            // ) {
-            //   const start = value?.[0];
-            //   const end = value?.[1];
-            //   if (start !== undefined && end !== undefined) {
-            //     onChange?.([start, end]);
-            //   }
-            // }
+          } else {
+            // No active input - default to start
+            setValue([selectedDate, null]);
+            setStartInputValue(selectedDate.format(format));
+            setEndInputValue("");
+            setActiveInput("end");
+            setTimeout(() => endInputRef.current?.focus(), 0);
           }
         }}
       />
@@ -335,113 +348,33 @@ const DateRangePicker = <DateType extends AnyObject = Date>({
     setHoverPreview,
   ]);
 
-  const valueCompRef = React.useRef<HTMLDivElement>(null);
-  const ref = refProp ? composeRef(refProp, valueCompRef) : valueCompRef;
-  const isHovering = useHover(ref as React.RefObject<HTMLDivElement | null>);
-  const ClearButton = useMemo(
-    () => (
-      <button
-        type="button"
-        className={cn(
-          "flex opacity-30 transition-opacity duration-300 hover:opacity-50",
-        )}
-        onClick={() => {
-          setValue(undefined);
-          onChange?.([null, null]);
-        }}
-      >
-        <Icon
-          icon="icon-[ant-design--close-circle-filled]"
-          className="pointer-events-none size-3.5"
-        />
-      </button>
-    ),
-    [setValue, onChange],
-  );
-  const SuffixComp = useMemo(() => {
-    if (allowClear && value?.[0] && (!suffix || (isHovering && suffix))) {
-      return ClearButton;
-    } else if (suffix) {
-      return (
-        <Slot className={cn("flex shrink-0 items-center")}>
-          {typeof suffix === "string" ? <span>{suffix}</span> : suffix}
-        </Slot>
-      );
-    } else {
-      return null;
-    }
-  }, [allowClear, value, suffix, isHovering, ClearButton]);
-
-  const ValueComponent = React.useMemo(() => {
-    const input1 = value?.[0]
-      ? formatDate(toDate(value[0] as unknown as Date), format)
-      : undefined;
-    const input2 = value?.[1]
-      ? formatDate(toDate(value[1] as unknown as Date), format)
-      : undefined;
-
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          inputVariants({ disabled }),
-          inputSizeVariants(),
-          "items-center justify-between gap-2",
-          className,
-        )}
-        onClick={() => {
-          if (!open) setOpen(true);
-        }}
-      >
-        <div>
-          <span className={cn(!input1 && "text-muted-foreground")}>
-            {input1 ?? placeholder?.[0] ?? "Start Date"}
-          </span>
-          <span className={cn("text-muted-foreground px-2 text-center")}>
-            -
-          </span>
-          <span className={cn(!input2 && "text-muted-foreground")}>
-            {input2 ?? placeholder?.[1] ?? "End Date"}
-          </span>
-        </div>
-        {SuffixComp}
-      </div>
-    );
-  }, [
-    ref,
-    format,
-    className,
-    value,
-    // setValue,
-    // allowClear,
-    // borderless,
-    // inputId,
-    open,
-    // size,
-    // status,
-    // ref,
-    disabled,
-    placeholder,
-    SuffixComp,
-  ]);
+  // prevent click label to focus input (open popover)
+  useEffect(() => {
+    const labelElm = document.querySelector(`label[for="${id}"]`);
+    const eventFn = (event: Event) => {
+      event.preventDefault();
+    };
+    labelElm?.addEventListener("click", eventFn);
+    return () => {
+      labelElm?.removeEventListener("click", eventFn);
+    };
+  }, [id]);
 
   return (
     <>
       <Popover
-        open={open}
-        onOpenChange={(open) => {
-          setOpen(open);
-        }}
         className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
-        onInteractOutside={(event) => {
-          if (
-            event.target &&
-            "id" in event.target &&
-            event.target.id !== inputId
-          ) {
-            setOpen(false);
+        align={{
+          offset: [-12, 10],
+        }}
+        open={open}
+        onOpenChange={(open) => {
+          setOpen(open);
+          if (!open) {
+            setActiveInput(null);
+            setHoverPreview(undefined);
           }
         }}
         onOpenAutoFocus={(event) => {
