@@ -65,6 +65,7 @@ const buttonVariants = tv({
       rose: [],
     },
     size: {
+      lg: "",
       small: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
       middle: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
       large: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
@@ -80,10 +81,16 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
+      // Shadcn
       destructive:
         "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
+      secondary: [],
+      ghost: [],
+      outline: [],
+
+      // Own
       solid: ["text-white", "hover:text-white"],
-      outline: [
+      outlined: [
         // "hover:bg-accent",
         "border-input bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
@@ -183,9 +190,9 @@ const buttonVariants = tv({
         "hover:border-green-700 hover:bg-green-700",
       ],
     },
-    // outline
+    // outlined
     {
-      variant: "outline",
+      variant: "outlined",
       color: "primary",
       className: [
         "border-primary-500 text-primary shadow-xs",
@@ -216,7 +223,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "danger",
       className: [
         "border-red-600 bg-white text-red-600",
@@ -225,12 +232,12 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "link",
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "blue",
       className: [
         "border-blue-600 text-blue-600",
@@ -238,7 +245,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "green",
       className: [
         "border-green-600 text-green-600",
@@ -246,7 +253,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "emerald",
       className: [
         "border-emerald-600 text-emerald-600",
@@ -254,7 +261,7 @@ const buttonVariants = tv({
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "indigo",
       className: [
         "border-indigo-600 text-indigo-600",
@@ -494,7 +501,7 @@ const Button = ({
   const isHtmlType = type === "submit" || type === "reset" || type === "button";
   const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
-  let variantToPass = variant;
+  let variantToPass = variant === "outline" ? "outlined" : variant;
   if (!isHtmlType && type === "text") {
     variantToPass = "text";
   }
