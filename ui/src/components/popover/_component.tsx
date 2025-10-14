@@ -40,5 +40,9 @@ const PopoverContent = ({
 const PopoverClose = PopoverPrimitive.Close;
 
 export type { PopoverRootProps, PopoverContentProps };
-export { Popover as PopoverRoot, PopoverTrigger } from "../../shadcn/popover";
+export {
+  Popover as PopoverRoot,
+  PopoverTrigger,
+  PopoverAnchor,
+} from "../../shadcn/popover";
 export { PopoverContent, PopoverClose };
