@@ -1,6 +1,9 @@
 import React from "react";
 
-import { SidebarMenuButton as ShadcnSidebarMenuButton } from "@acme/ui/shadcn/sidebar";
+import {
+  Sidebar as ShadcnSidebar,
+  SidebarMenuButton as ShadcnSidebarMenuButton,
+} from "@acme/ui/shadcn/sidebar";
 
 import { cn } from "../../lib/utils";
 
@@ -19,9 +22,11 @@ const SidebarMenuButton = ({
   );
 };
 
-export { SidebarMenuButton };
+type ShadcnSidebarProps = React.ComponentProps<typeof ShadcnSidebar>;
+
+export type { ShadcnSidebarProps };
+export { ShadcnSidebar as SidebarRoot, SidebarMenuButton };
 export {
-  Sidebar as SidebarRoot,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
