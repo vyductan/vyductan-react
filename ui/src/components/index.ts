@@ -36,3 +36,4 @@ export * from "./space";
 export * from "./tabs";
 export * from "./tag";
 export * from "./textarea";
+export * from "./flex";
