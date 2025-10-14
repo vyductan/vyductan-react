@@ -11,7 +11,7 @@ type Subscriber = () => void;
 
 const subscribers = new Set<Subscriber>();
 
-export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 export type ResponsiveInfo = Record<Breakpoint, boolean>;
 
 let info: ResponsiveInfo;
@@ -22,7 +22,7 @@ const tailwindScreensConfig = {
   md: "768px",
   lg: "1024px",
   xl: "1280px",
-  "2xl": "1536px",
+  xxl: "1536px",
 };
 let responsiveConfig = (() => {
   const c: Record<string, number> = {};
@@ -80,7 +80,7 @@ export const useResponsive = () => {
       md: false,
       lg: false,
       xl: false,
-      "2xl": false,
+      xxl: false,
     };
     calculate();
     window.addEventListener("resize", handleResize);
