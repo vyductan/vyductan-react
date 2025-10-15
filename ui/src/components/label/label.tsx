@@ -18,7 +18,7 @@ const Label = ({
     );
   }
   return (
-    <ShadLabel className={cn("", className)} {...props}>
+    <ShadLabel className={cn("gap-1", className)} {...props}>
       {children}
       {required && <span className="text-red-600">*</span>}
     </ShadLabel>
