@@ -1,0 +1,209 @@
+# CheckableTag Component
+
+The CheckableTag component works like a checkbox, allowing users to toggle between checked and unchecked states. It's perfect for filtering, categorization, and selection interfaces.
+
+## Features
+
+- 🎯 **Toggle State** - Click to toggle between checked/unchecked
+- 🎨 **Visual Feedback** - Clear visual distinction between states
+- ♿ **Accessible** - Built with accessibility in mind
+- 🎛️ **Controlled** - Fully controlled component with onChange callback
+- 🎨 **Customizable** - Inherits all Tag styling options
+
+## Basic Usage
+
+### Simple CheckableTag
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+
+function BasicExample() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <CheckableTag checked={checked} onChange={setChecked}>
+      Movies
+    </CheckableTag>
+  );
+}
+```
+
+### Multiple CheckableTags
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+
+function MultipleExample() {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const categories = ["Movies", "Books", "Music", "Sports"];
+
+  const handleTagChange = (tag: string, checked: boolean) => {
+    if (checked) {
+      setSelectedTags([...selectedTags, tag]);
+    } else {
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      {categories.map((tag) => (
+        <CheckableTag
+          key={tag}
+          checked={selectedTags.includes(tag)}
+          onChange={(checked) => handleTagChange(tag, checked)}
+        >
+          {tag}
+        </CheckableTag>
+      ))}
+    </div>
+  );
+}
+```
+
+### With Custom Colors
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+
+function ColoredExample() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <CheckableTag
+      checked={checked}
+      onChange={setChecked}
+      color="success"
+      bordered
+    >
+      Success Tag
+    </CheckableTag>
+  );
+}
+```
+
+### With Icons
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+import { Icon } from "@acme/ui/icons";
+
+function WithIconExample() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <CheckableTag
+      checked={checked}
+      onChange={setChecked}
+      icon={<Icon icon="icon-[lucide--star]" />}
+    >
+      Favorite
+    </CheckableTag>
+  );
+}
+```
+
+## API
+
+### CheckableTag Props
+
+| Property  | Description                                     | Type                       | Default |
+| --------- | ----------------------------------------------- | -------------------------- | ------- |
+| checked   | Checked status of Tag                           | boolean                    | false   |
+| onChange  | Callback executed when Tag is checked/unchecked | (checked: boolean) => void | -       |
+| icon      | Set the icon of tag                             | ReactNode                  | -       |
+| color     | Color of the Tag                                | string                     | -       |
+| bordered  | Whether has border style                        | boolean                    | true    |
+| className | Additional CSS classes                          | string                     | -       |
+| children  | Tag content                                     | ReactNode                  | -       |
+
+All other props from the base Tag component are also supported.
+
+## Examples
+
+### Filter Tags
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+
+function FilterExample() {
+  const [filters, setFilters] = useState({
+    category: false,
+    featured: false,
+    new: false,
+  });
+
+  const handleFilterChange = (filter: string, checked: boolean) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filter]: checked,
+    }));
+  };
+
+  return (
+    <div className="space-y-2">
+      <h3>Filters</h3>
+      <div className="flex gap-2">
+        <CheckableTag
+          checked={filters.category}
+          onChange={(checked) => handleFilterChange("category", checked)}
+        >
+          Category
+        </CheckableTag>
+        <CheckableTag
+          checked={filters.featured}
+          onChange={(checked) => handleFilterChange("featured", checked)}
+          color="warning"
+        >
+          Featured
+        </CheckableTag>
+        <CheckableTag
+          checked={filters.new}
+          onChange={(checked) => handleFilterChange("new", checked)}
+          color="success"
+        >
+          New
+        </CheckableTag>
+      </div>
+    </div>
+  );
+}
+```
+
+### Selection Tags
+
+```tsx
+import { CheckableTag } from "@acme/ui";
+
+function SelectionExample() {
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  const items = ["Item 1", "Item 2", "Item 3", "Item 4"];
+
+  const handleSelection = (item: string, checked: boolean) => {
+    if (checked) {
+      setSelectedItems([...selectedItems, item]);
+    } else {
+      setSelectedItems(selectedItems.filter((i) => i !== item));
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <p>Selected: {selectedItems.join(", ") || "None"}</p>
+      <div className="flex gap-2">
+        {items.map((item) => (
+          <CheckableTag
+            key={item}
+            checked={selectedItems.includes(item)}
+            onChange={(checked) => handleSelection(item, checked)}
+          >
+            {item}
+          </CheckableTag>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
