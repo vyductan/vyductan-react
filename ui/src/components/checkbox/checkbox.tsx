@@ -125,7 +125,7 @@ const Checkbox = (props: CheckboxProps) => {
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <label
         className={cn(
-          "inline-flex items-center gap-x-2 text-sm",
+          "inline-flex cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           className,
         )}
@@ -137,7 +137,7 @@ const Checkbox = (props: CheckboxProps) => {
         <ShadcnCheckbox
           checked={indeterminate ? "indeterminate" : checked}
           onClick={onInputClick}
-          className={cn("data-[state=indeterminate]:bg-muted")}
+          className={cn("data-[state=indeterminate]:bg-muted", "self-center")}
           onCheckedChange={(checked) => {
             onChange?.({
               type: "change",
@@ -161,7 +161,11 @@ const Checkbox = (props: CheckboxProps) => {
           }}
           {...restProps}
         />
-        {loading ? <LoadingIcon /> : children}
+        {loading ? (
+          <LoadingIcon />
+        ) : (
+          <span className="leading-line-height px-2">{children}</span>
+        )}
       </label>
     </Wave>
   );

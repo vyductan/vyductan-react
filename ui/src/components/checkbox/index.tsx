@@ -1,3 +1,5 @@
+"use client";
+
 import type { XOR } from "ts-xor";
 
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
