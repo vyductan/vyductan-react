@@ -126,6 +126,7 @@ const Checkbox = (props: CheckboxProps) => {
       <label
         className={cn(
           "inline-flex cursor-pointer items-baseline text-sm",
+          "inline-flex shrink-0 items-center gap-x-2 text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           className,
         )}
