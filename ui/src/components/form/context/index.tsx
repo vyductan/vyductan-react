@@ -10,7 +10,9 @@ import * as React from "react";
 import { createContext, useContext } from "react";
 
 import type { Variant } from "../../config-provider";
+import type { ColProps } from "../../grid";
 import type { FormInstance } from "../hooks/use-form";
+import type { FormLabelAlign, FormLayout } from "../types";
 
 /* FormField */
 type FormFieldContextValue<
@@ -42,7 +44,11 @@ type FormProviderProps<
     "resetFields" | "setFieldsValue" | "schema" | "submit"
   > & {
     form?: FormInstance<TFieldValues, TContext, TTransformedValues>;
-    layout?: "vertical" | "horizontal";
+    layout?: FormLayout;
+    labelAlign?: FormLabelAlign;
+    labelCol?: ColProps;
+    labelWrap?: boolean;
+    wrapperCol?: ColProps;
     classNames?: {
       label?: string;
     };
