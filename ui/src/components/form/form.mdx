@@ -73,6 +73,120 @@ const FormExample = ({ initialValues }: Props) => {
 };
 ```
 
+### Label Layout (labelCol)
+
+Control label layout using the `labelCol` prop, similar to Ant Design. This is especially useful for horizontal forms where you want to control the width of labels.
+
+```tsx
+import { Button } from "@/components/button";
+import { Input } from "@/components/input";
+import { Field, Form, useForm } from "@/components/ui/form";
+
+const FormExample = () => {
+  const form = useForm({
+    schema: z.object({
+      username: z.string(),
+      email: z.string().email(),
+    }),
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
+  return (
+    <Form form={form} layout="horizontal" labelCol={{ span: 6 }}>
+      <Field control={form.control} name="username" label="Username">
+        <Input />
+      </Field>
+      <Field control={form.control} name="email" label="Email">
+        <Input />
+      </Field>
+      <Field>
+        <Button type="submit">Submit</Button>
+      </Field>
+    </Form>
+  );
+};
+```
+
+You can also use responsive column sizing:
+
+```tsx
+<Form form={form} layout="horizontal" labelCol={{ xs: 24, sm: 8, md: 6 }}>
+  {/* Form fields */}
+</Form>
+```
+
+### wrapperCol
+
+Control form control wrapper column width and layout.
+
+```tsx
+<Form
+  form={form}
+  layout="horizontal"
+  labelCol={{ span: 6 }}
+  wrapperCol={{ span: 18 }}
+>
+  <Field control={form.control} name="username" label="Username">
+    <Input />
+  </Field>
+</Form>
+```
+
+### labelAlign
+
+Set label text alignment. Options: `"left"` | `"right"`. Default is `"left"`.
+
+```tsx
+<Form form={form} layout="horizontal" labelCol={{ span: 6 }} labelAlign="right">
+  <Field control={form.control} name="username" label="Username">
+    <Input />
+  </Field>
+</Form>
+```
+
+### labelWrap
+
+Whether label can wrap. Set to `false` to prevent label wrapping (will show ellipsis).
+
+```tsx
+<Form form={form} layout="horizontal" labelCol={{ span: 6 }} labelWrap={false}>
+  <Field
+    control={form.control}
+    name="username"
+    label="Very Long Username Label"
+  >
+    <Input />
+  </Field>
+</Form>
+```
+
+### Combined Layout Example
+
+All layout props can be combined together:
+
+```tsx
+<Form
+  form={form}
+  layout="horizontal"
+  labelCol={{ span: 6 }}
+  wrapperCol={{ span: 16, offset: 2 }}
+  labelAlign="right"
+  labelWrap={false}
+>
+  <Field control={form.control} name="username" label="Username">
+    <Input />
+  </Field>
+  <Field control={form.control} name="email" label="Email Address">
+    <Input />
+  </Field>
+  <Field>
+    <Button type="submit">Submit</Button>
+  </Field>
+</Form>
+```
+
 ### Dynamic Form Item (FieldList)
 
 Add or remove form items dynamically. add function support config initial value.

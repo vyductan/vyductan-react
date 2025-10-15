@@ -23,3 +23,4 @@ export type OnSubmit<
     : never;
 
 export type FormLayout = "horizontal" | "vertical";
+export type FormLabelAlign = "left" | "right";

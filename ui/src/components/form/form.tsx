@@ -40,7 +40,12 @@ type FormProps<
   TTransformedValues = TFieldValues,
 > = Pick<
   FormRootProps<TFieldValues, TContext, TTransformedValues>,
-  "layout" | "classNames"
+  | "layout"
+  | "labelAlign"
+  | "labelCol"
+  | "labelWrap"
+  | "wrapperCol"
+  | "classNames"
 > &
   (
     | WithoutFormProp<TFieldValues, TContext, TTransformedValues>
@@ -56,6 +61,10 @@ const Form = <
 >({
   form,
   layout,
+  labelAlign,
+  labelCol,
+  labelWrap,
+  wrapperCol,
   classNames,
   // ...restProps
   ...props
@@ -75,6 +84,10 @@ const Form = <
       <FormRoot<TFieldValues, TContext, TTransformedValues>
         {...form}
         layout={layout}
+        labelAlign={labelAlign}
+        labelCol={labelCol}
+        labelWrap={labelWrap}
+        wrapperCol={wrapperCol}
         classNames={classNames}
       >
         <form onSubmit={form.submit} {...props} />
