@@ -106,9 +106,14 @@ function SpeechToTextPluginImpl() {
   const [editor] = useLexicalComposerContext();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isSpeechToText, setIsSpeechToText] = useState<boolean>(false);
+  const [isClient, setIsClient] = useState(false);
   const recognitionConstructor = SPEECH_RECOGNITION_CONSTRUCTOR;
   const recognition = useRef<SpeechRecognition | null>(null);
   const report = useReport();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (recognitionConstructor === null) {
@@ -177,6 +182,11 @@ function SpeechToTextPluginImpl() {
     );
   }, [editor]);
 
+  // Don't render on server side to avoid hydration mismatch
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <TooltipRoot>
       <TooltipTrigger asChild>
@@ -199,6 +209,7 @@ function SpeechToTextPluginImpl() {
   );
 }
 
+// Use dynamic rendering to avoid hydration issues
 export const SpeechToTextPlugin = SUPPORT_SPEECH_RECOGNITION
   ? SpeechToTextPluginImpl
   : () => null;

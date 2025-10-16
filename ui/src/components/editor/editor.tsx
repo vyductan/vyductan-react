@@ -38,7 +38,6 @@ export function Editor({
   // forFormItem?: boolean;
   value?: string;
 }) {
-  console.log("vv", value);
   return (
     <div className="bg-background overflow-hidden rounded-lg border shadow">
       <LexicalComposer

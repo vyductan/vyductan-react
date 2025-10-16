@@ -94,6 +94,11 @@ const ExcalidrawImage = React.forwardRef<HTMLDivElement, Props>(
 
     useEffect(() => {
       const setContent = async () => {
+        // Only run on client side to avoid SSR issues
+        if (typeof window === "undefined") {
+          return;
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         const svg: SVGElement = await exportToSvg({
           appState,

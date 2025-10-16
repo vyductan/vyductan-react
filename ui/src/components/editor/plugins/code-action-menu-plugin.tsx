@@ -47,7 +47,7 @@ function CodeActionMenuContainer({
   }
 
   const debouncedOnMouseMove = useDebounce(
-    (event: MouseEvent) => {
+    (event: MouseEvent | undefined) => {
       const { codeDOMNode, isOutside } = getMouseInfo(event);
       if (isOutside) {
         setShown(false);
@@ -93,12 +93,16 @@ function CodeActionMenuContainer({
       return;
     }
 
-    document.addEventListener("mousemove", debouncedOnMouseMove);
+    const handleMouseMove = (event: MouseEvent) => {
+      debouncedOnMouseMove(event);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       setShown(false);
       // debouncedOnMouseMove.cancel();
-      document.removeEventListener("mousemove", debouncedOnMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [shouldListenMouseMove, debouncedOnMouseMove]);
 
@@ -148,10 +152,15 @@ function CodeActionMenuContainer({
   );
 }
 
-function getMouseInfo(event: MouseEvent): {
+function getMouseInfo(event: MouseEvent | undefined): {
   codeDOMNode: HTMLElement | null;
   isOutside: boolean;
 } {
+  // Safety check for undefined event
+  if (!event) {
+    return { codeDOMNode: null, isOutside: true };
+  }
+
   const target = event.target;
 
   if (target && target instanceof HTMLElement) {
