@@ -39,6 +39,7 @@ type DraggerProps = Omit<
 const Dragger = ({
   uploadService,
   onUploadSuccess,
+  accept,
 
   file: fileProp,
   progress,
@@ -131,8 +132,25 @@ const Dragger = ({
   function handleFileChange(file: File) {
     message.dismiss();
 
-    if (file.type.split("/")[0] !== "image") {
-      message.error("We only accept image files");
+    // Check if file type is accepted based on accept prop
+    if (
+      accept &&
+      !accept.split(",").some((type) => {
+        const cleanType = type.trim();
+        if (cleanType.startsWith(".")) {
+          // File extension check
+          return file.name.toLowerCase().endsWith(cleanType.toLowerCase());
+        } else if (cleanType.includes("*")) {
+          // MIME type wildcard check
+          const baseType = cleanType.split("/")[0];
+          return file.type.startsWith(baseType + "/");
+        } else {
+          // Exact MIME type check
+          return file.type === cleanType;
+        }
+      })
+    ) {
+      message.error(`File type not supported. Accepted types: ${accept}`);
       return;
     }
 
@@ -249,7 +267,7 @@ const Dragger = ({
             <p className="mt-2 text-center text-sm text-gray-500">
               Max file size: 50MB
             </p>
-            <span className="sr-only">Photo upload</span>
+            <span className="sr-only">File upload</span>
           </div>
         )}
         {isUploading && <ProgressBar value={progress?.percent ?? 0} />}
@@ -258,7 +276,7 @@ const Dragger = ({
           ref={fileInputRef}
           // id="image-upload"
           type="file"
-          accept="image/*"
+          accept={accept}
           className="sr-only"
           onChange={async (event) => {
             const file = event.currentTarget.files?.[0];

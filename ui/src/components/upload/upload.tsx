@@ -8,6 +8,7 @@ import type { DownloadService, UploadFileItem, UploadService } from "./types";
 import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
 import { Button } from "../button";
 import { Card } from "../card";
+import { message } from "../message";
 import { Dragger } from "./dragger";
 
 type UploadProps = Omit<DraggerProps, "defaultValue" | "onChange"> & {
@@ -16,6 +17,8 @@ type UploadProps = Omit<DraggerProps, "defaultValue" | "onChange"> & {
   /** show upload zone only (not show list or plus button) */
   showZoneOnly?: boolean;
   showUploadButton?: boolean;
+  /** Maximum number of files that can be uploaded */
+  maxCount?: number;
   // children?: React.ReactNode;
   render?: {
     image: (file: UploadFileItem) => React.ReactNode;
@@ -64,6 +67,7 @@ const Upload = ({
   showZoneOnly = false,
   showUploadButton = true,
   showUploadList = true,
+  maxCount,
   // value,
   ...props
 }: UploadProps) => {
@@ -94,6 +98,21 @@ const Upload = ({
       },
     },
   );
+
+  // Helper function to check if we can add more files
+  const canAddMoreFiles = (currentFiles: UploadFileItem[]) => {
+    if (!maxCount) return true;
+    return currentFiles.length < maxCount;
+  };
+
+  // Helper function to add files with maxCount validation
+  const addFile = (newFile: UploadFileItem) => {
+    if (!canAddMoreFiles(files)) {
+      message.error(`Maximum ${maxCount} file(s) allowed`);
+      return;
+    }
+    setFiles([...files, newFile]);
+  };
 
   //   const [inputFile, setInputFile] = useState<File | null>(null)
   // const [isUploading, setIsUploading] = useState(false);
@@ -153,7 +172,7 @@ const Upload = ({
               style={{ width, height }}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([file]);
+                addFile(file);
               }}
               overrideClick={overrideClick}
             >
@@ -173,17 +192,35 @@ const Upload = ({
                 // style={{ width, height }}
                 uploadService={uploadService}
                 onUploadSuccess={(file) => {
-                  setFiles([...files, file]);
+                  addFile(file);
                 }}
                 onChange={(file) => {
                   if (file) {
-                    setFiles([...files, file]);
+                    addFile(file);
                   }
                 }}
               >
                 {children}
               </Dragger>
-            ) : (
+            ) : canAddMoreFiles(files) ? (
+              <Dragger
+                progress={progress}
+                // listType={listType}
+                // style={{ width, height }}
+                uploadService={uploadService}
+                onUploadSuccess={(file) => {
+                  addFile(file);
+                }}
+                onChange={(file) => {
+                  if (file) {
+                    addFile(file);
+                  }
+                }}
+              >
+                {children}
+              </Dragger>
+            ) : null}
+            {files.length > 0 &&
               files.map((item, index) => (
                 <Card
                   key={index}
@@ -221,8 +258,7 @@ const Upload = ({
                     />
                   </div>
                 </Card>
-              ))
-            )}
+              ))}
           </div>
         </>
       )}
@@ -238,11 +274,11 @@ const Upload = ({
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([...files, file]);
+                addFile(file);
               }}
               onChange={(file) => {
                 if (file) {
-                  setFiles([...files, file]);
+                  addFile(file);
                 }
               }}
             >
@@ -260,7 +296,7 @@ const Upload = ({
                 </Dragger>
               );
             })}
-          {!showZoneOnly && showUploadButton && (
+          {!showZoneOnly && showUploadButton && canAddMoreFiles(files) && (
             <Dragger
               className="cursor-pointer"
               style={{ width, height }}
@@ -268,7 +304,7 @@ const Upload = ({
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([...files, file]);
+                addFile(file);
               }}
               // onChange={(file) => {
               // }}
