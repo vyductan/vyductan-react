@@ -268,6 +268,14 @@ const buttonVariants = tv({
         "hover:border-indigo-700 hover:text-indigo-700",
       ],
     },
+    {
+      variant: "outline",
+      color: "orange",
+      className: [
+        "border-orange-600 text-orange-600",
+        "hover:border-orange-700 hover:text-orange-700",
+      ],
+    },
     // filled
     {
       variant: "filled",
