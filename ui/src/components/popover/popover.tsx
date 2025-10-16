@@ -97,7 +97,7 @@ export const Popover = (props: PopoverProps) => {
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
-        className={cn(arrow ? "border-none" : "", className)}
+        className={cn(arrow ? "border-none" : "", "w-auto", className)}
         {...(trigger === "hover"
           ? {
               onMouseOver: () => {
