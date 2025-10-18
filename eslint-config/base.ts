@@ -2,6 +2,7 @@
 // https://github.com/t3-oss/create-t3-turbo/blob/main/tooling/eslint/base.js
 
 /// <reference types="./types.d.ts" />
+
 import * as path from "node:path";
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
@@ -10,7 +11,7 @@ import turboPlugin from "eslint-plugin-turbo";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-import unicornPlugin from "./unicorn.js";
+import unicornPlugin from "./unicorn";
 
 /**
  * All packages that leverage t3-env should use this rule
@@ -18,6 +19,7 @@ import unicornPlugin from "./unicorn.js";
 export const restrictEnvAccess = defineConfig(
   { ignores: ["**/env.ts"] },
   {
+    files: ["**/*.js", "**/*.ts", "**/*.tsx"],
     rules: {
       "no-restricted-properties": [
         "error",
@@ -41,7 +43,7 @@ export const restrictEnvAccess = defineConfig(
   },
 );
 
-export default defineConfig(
+export const baseConfig = defineConfig(
   unicornPlugin,
   // Ignore files not tracked by VCS and any config files
   includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
@@ -86,7 +88,7 @@ export default defineConfig(
           allowConstantLoopConditions: true,
         },
       ],
-      // "@typescript-eslint/no-non-null-assertion": "error",
+      "@typescript-eslint/no-non-null-assertion": "error",
       "import/consistent-type-specifier-style": ["error", "prefer-top-level"],
 
       /*
@@ -94,22 +96,36 @@ export default defineConfig(
        */
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
+      // "@typescript-eslint/consistent-type-imports": [
+      //   "warn",
+      //   { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      // ],
+      // "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/require-await": "off",
+      //   "@typescript-eslint/no-misused-promises": [
+      //   "error",
+      //   { checksVoidReturn: { attributes: false } },
+      // ],
 
       /*
        * Nextjs
        * that rules allowed by Nextjs
        */
-      // "@typescript-eslint/unbound-method": "off",
-      // "@typescript-eslint/no-non-null-assertion": "error",
-      // "@typescript-eslint/prefer-nullish-coalescing": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-argument": "off",
-      "@typescript-eslint/no-explicit-any": "off",
+      // // "@typescript-eslint/unbound-method": "off",
+      // // "@typescript-eslint/no-non-null-assertion": "error",
+      // // "@typescript-eslint/prefer-nullish-coalescing": "off",
+      // "@typescript-eslint/no-unsafe-assignment": "off",
+      // "@typescript-eslint/no-unsafe-argument": "off",
+      // "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {
     linterOptions: { reportUnusedDisableDirectives: true },
-    languageOptions: { parserOptions: { projectService: true } },
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
   },
 );

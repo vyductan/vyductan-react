@@ -1,7 +1,7 @@
 import nextPlugin from "@next/eslint-plugin-next";
 import { defineConfig } from "eslint/config";
 
-export default defineConfig([
+export const nextjsConfig = defineConfig([
   {
     files: ["**/*.ts", "**/*.tsx"],
     plugins: {

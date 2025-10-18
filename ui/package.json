@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint",
+    "lint": "eslint --flag unstable_native_nodejs_ts_config",
     "registry:build": "pnpm dlx shadcn build ./registry.json -c ./src -o ./registry",
     "trace": "tsc --generateTrace .",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",

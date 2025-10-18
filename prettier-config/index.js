@@ -35,7 +35,7 @@ const config = {
       },
     },
     {
-      files: "*.js.hbs",
+      files: "*.ts.hbs",
       options: {
         parser: "babel",
       },
