@@ -136,32 +136,29 @@ const DatePicker = (props: DatePickerProps) => {
         ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
         : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
 
-  // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
-  const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
-    if (!v) return undefined;
-    return dayjs(v as any);
-  };
-  const fromDayjs = (v: Dayjs | undefined): Dayjs | undefined => {
-    if (!v) return undefined;
-    return v;
-  };
+  // // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
+  // const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
+  //   if (!v) return undefined;
+  //   return dayjs(v);
+  // };
+  // const fromDayjs = (v: Dayjs | undefined): Dayjs | undefined => {
+  //   if (!v) return undefined;
+  //   return v;
+  // };
 
-  const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
-  const defaultDayjsValue = useMemo(
-    () => toDayjs(defaultValue as any),
-    [defaultValue],
-  );
+  // const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
+  // const defaultDayjsValue = useMemo(
+  //   () => toDayjs(defaultValue as any),
+  //   [defaultValue],
+  // );
 
   // ====================== Value =======================
-  const [value, setValue] = useMergedState<Dayjs | undefined>(
-    defaultDayjsValue,
-    {
-      value: controlledValue,
-      onChange: (next) => {
-        onChange?.(fromDayjs(next) as any, next ? next.format(format) : "");
-      },
+  const [value, setValue] = useMergedState(defaultValue, {
+    value: valueProp,
+    onChange: (next) => {
+      onChange?.(next, next ? next.format(format) : "");
     },
-  );
+  });
   const preInputValue = value ? value.format(format) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue);
 
@@ -178,6 +175,7 @@ const DatePicker = (props: DatePickerProps) => {
 
   const inputRef = React.useRef<InputRef>(null);
 
+  // eslint-disable-next-line react-hooks/refs
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (value.trim()) {
@@ -242,9 +240,11 @@ const DatePicker = (props: DatePickerProps) => {
   );
 
   const computedDecadeRange = useMemo(() => {
+    const firstYear = currentDecadeRange[0];
+    const lastYear = currentDecadeRange.at(-1);
     return {
-      start: currentDecadeRange[0]!.year(),
-      end: currentDecadeRange.at(-1)!.year(),
+      start: firstYear?.year() ?? 0,
+      end: lastYear?.year() ?? 0,
       years: currentDecadeRange,
     };
   }, [currentDecadeRange]);
@@ -442,7 +442,7 @@ const DatePicker = (props: DatePickerProps) => {
               disabled={(date) => {
                 if (disabledDate) {
                   // Pass both the date and the required info object
-                  const currentArg = getDestinationValue(date) as any;
+                  const currentArg = getDestinationValue(date);
                   return disabledDate(currentArg, {
                     type: "date",
                   });

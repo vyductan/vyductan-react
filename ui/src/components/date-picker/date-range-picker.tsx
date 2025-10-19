@@ -2,7 +2,7 @@
 
 import type { Dayjs } from "dayjs";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMergedState } from "@rc-component/util";
 import { composeRef } from "@rc-component/util/lib/ref";
 import dayjs from "dayjs";
@@ -89,32 +89,13 @@ const DateRangePicker = (props: DateRangePickerProps) => {
       ? `${formatConfig} HH:mm`
       : (formatConfig ?? "YYYY-MM-DD");
 
-  // Convert Date to Dayjs
-  const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
-    if (!v) return undefined;
-    return dayjs(v as any);
-  };
-
-  const controlledValue = useMemo<RangeValueType | undefined>(() => {
-    if (!valueProp) return;
-    return [toDayjs(valueProp[0]) ?? null, toDayjs(valueProp[1]) ?? null];
-  }, [valueProp]);
-
-  const defaultDayjsValue = useMemo<RangeValueType | undefined>(() => {
-    if (!defaultValue) return;
-    return [toDayjs(defaultValue[0]) ?? null, toDayjs(defaultValue[1]) ?? null];
-  }, [defaultValue]);
-
   // ====================== Value =======================
-  const [value, setValue] = useMergedState<RangeValueType | undefined>(
-    defaultDayjsValue,
-    {
-      value: controlledValue,
-      onChange: (next) => {
-        onChange?.(next ?? null);
-      },
+  const [value, setValue] = useMergedState(defaultValue, {
+    value: valueProp,
+    onChange: (next) => {
+      onChange?.(next ?? null);
     },
-  );
+  });
 
   const [startInputValue, setStartInputValue] = useMergedState(
     value?.[0] ? value[0].format(format) : "",
@@ -165,6 +146,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   const startInputRef = React.useRef<InputRef>(null);
   const endInputRef = React.useRef<InputRef>(null);
 
+  // eslint-disable-next-line react-hooks/refs
   const composedStartRef = ref ? composeRef(ref, startInputRef) : startInputRef;
 
   const handleStartInputChange = (inputValue: string) => {
