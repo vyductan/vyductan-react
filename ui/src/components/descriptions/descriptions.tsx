@@ -132,8 +132,8 @@ export const Descriptions = ({
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
       bordered && ["px-6", "border-b border-e"],
-      size === "small" && "py-2",
-      size === "middle" || (!size && "py-3"),
+      size === "small" && "pb-2",
+      size === "middle" || (!size && "pb-3"),
     ],
     layout === "vertical" && [
       "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
@@ -200,10 +200,7 @@ export const Descriptions = ({
                         key={col.key ?? index}
                         className={cn(tdClassName, col.classNames?.children)}
                       >
-                        <span className={labelClassName}>
-                          {col.label}
-                          {colon ? ": " : ""}
-                        </span>
+                        <span className={labelClassName}>{col.label}</span>
                         {skeleton ? (
                           <Skeleton />
                         ) : (
