@@ -14,7 +14,14 @@ const subscribers = new Set<Subscriber>();
 export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 export type ResponsiveInfo = Record<Breakpoint, boolean>;
 
-let info: ResponsiveInfo;
+let info: ResponsiveInfo = {
+  xs: false,
+  sm: false,
+  md: false,
+  lg: false,
+  xl: false,
+  xxl: false,
+};
 
 const tailwindScreensConfig = {
   xs: "480px",
@@ -73,28 +80,16 @@ export function configResponsive(config: ResponsiveConfig) {
 }
 
 export const useResponsive = () => {
-  if (isBrowser && !listening) {
-    info = {
-      xs: false,
-      sm: false,
-      md: false,
-      lg: false,
-      xl: false,
-      xxl: false,
-    };
-    calculate();
-    window.addEventListener("resize", handleResize);
-    listening = true;
-  }
   const [state, setState] = useState<ResponsiveInfo>(info);
 
   useEffect(() => {
     if (!isBrowser) return;
 
-    // In React 18's StrictMode, useEffect perform twice, resize listener is remove, so handleResize is never perform.
-    // https://github.com/alibaba/hooks/issues/1910
+    // Initialize info and calculate initial values
     if (!listening) {
+      calculate();
       window.addEventListener("resize", handleResize);
+      listening = true;
     }
 
     const subscriber = () => {
