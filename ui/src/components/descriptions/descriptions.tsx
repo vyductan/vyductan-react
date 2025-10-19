@@ -80,8 +80,8 @@ export const Descriptions = ({
     }
     const matched = Object.entries(mergedColumnWithScreen).findLast(
       ([, v]) => v,
-    )![0] as Screens;
-    mergedColumn = column[matched]!;
+    )?.[0] as Screens;
+    mergedColumn = column[matched] ?? 0;
   }
 
   const rows =
