@@ -98,7 +98,7 @@ const Drawer = ({
               )}
               <div
                 data-slot="drawer-header-content"
-                className="flex flex-1 flex-col gap-1.5"
+                className="flex flex-1 flex-col"
               >
                 <DrawerTitle
                   className={cn("leading-[32px]", classNames?.title)}
