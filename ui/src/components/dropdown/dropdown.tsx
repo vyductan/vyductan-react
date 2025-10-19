@@ -3,7 +3,8 @@
 // import type { Placement } from "@popperjs/core";
 import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
 import type { ReactElement, ReactNode } from "react";
-import React, { cloneElement, Fragment } from "react";
+import type React from "react";
+import { cloneElement, Fragment } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -23,7 +24,7 @@ type MenuItem = {
   key?: string;
   label?: ReactNode;
   className?: string;
-  icon?: ReactElement<any>;
+  icon?: ReactElement<{ className?: string }>;
   shortcut?: ReactNode;
   group?: MenuItem[];
   as?: "title" | "separator";
