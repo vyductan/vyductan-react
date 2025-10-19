@@ -125,8 +125,7 @@ const Checkbox = (props: CheckboxProps) => {
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <label
         className={cn(
-          "inline-flex cursor-pointer items-baseline text-sm",
-          "inline-flex shrink-0 items-center gap-x-2 text-sm",
+          "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           className,
         )}
