@@ -89,9 +89,7 @@ const Drawer = ({
                       // "absolute top-4 right-4"
                     )}
                   >
-                    {closeIcon ? (
-                      closeIcon
-                    ) : (
+                    {closeIcon ?? (
                       <Icon icon="icon-[lucide--x]" className="size-5" />
                     )}
                     <span className="sr-only">Close</span>
