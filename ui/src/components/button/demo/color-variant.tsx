@@ -1,15 +1,10 @@
 "use client";
 
-import React from "react";
+import type React from "react";
 import { Button } from "@/components/ui/button";
-import { ConfigProvider } from "@/components/ui/config-provider";
 import { Flex } from "@/components/ui/flex";
 
-import { useResponsive } from "@acme/hooks/use-responsive";
-
 const App: React.FC = () => {
-  const { xxl } = useResponsive();
-
   return (
     <>
       <Flex vertical gap="small">

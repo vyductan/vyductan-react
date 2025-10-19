@@ -1,8 +1,8 @@
 "use client";
 
+import type * as React from "react";
 import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
-import * as React from "react";
 import { useUiConfig } from "@/components/ui/config-provider";
 import { GenericSlot } from "@/components/ui/slot";
 import { Slot } from "@radix-ui/react-slot";
