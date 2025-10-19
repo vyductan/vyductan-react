@@ -16,42 +16,11 @@ import { Empty } from "../empty";
 import { SelectTrigger, SelectValue } from "./_components";
 import { SelectMultipleContent } from "./_components/select-multiple-content";
 
-// export type SelectValue = React.ComponentProps<"select">["value"];
-// export type SelectSingleValue = string | number;
-// export type SelectMultipleValue = string[] | number[];
-// export type SelectMode = "default" | "multiple" | "tags";
-
 type SemanticName = "root";
 type PopupSemantic = "root";
 
-// type SelectValueType = string | number;
-
-// type SelectDefaultProps<
-//   TValue extends SelectValueType = string,
-//   TRecord extends AnyObject = AnyObject,
-// > = {
-//   mode?: "default";
-//   value?: TValue;
-//   onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
-// };
-
-// type SelectMultipleOrTagsProps<
-//   TValue extends SelectValueType = string,
-//   TRecord extends AnyObject = AnyObject,
-// > = {
-//   mode: "multiple" | "tags";
-//   value?: Array<TValue>;
-//   onChange?: (
-//     value?: Array<TValue>,
-//     option?: Array<Option<TValue, TRecord>>,
-//   ) => void;
-// };
-
 type SelectDefaultProps<
   TValue extends SelectValueType = SelectValueType,
-  // ValueType = any,
-  // OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
-  // TOption extends OptionType = OptionType,
   TRecord extends AnyObject = AnyObject,
 > = {
   mode?: never;
@@ -59,104 +28,35 @@ type SelectDefaultProps<
   defaultValue?: TValue;
   value?: TValue;
   onChange?: (value: TValue, option?: OptionType<TValue, TRecord>) => void;
-  // onChange?: (
-  //   value: ValueType,
-  //   option?: OptionType<ValueType, TRecord>,
-  // ) => void;
 };
 
 type SelectMultipleOrTagsProps<
   TValue extends SelectValueType = SelectValueType,
-  // ValueType = any,
-  // ValueType extends Array<SelectValueType> = Array<SelectValueType>,
   TRecord extends AnyObject = AnyObject,
-  // OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
 > = {
   mode: "multiple" | "tags";
 
   defaultValue?: TValue[];
   value?: TValue;
   onChange?: (value: TValue[], option?: OptionType<TValue, TRecord>[]) => void;
-  // onChange?: (
-  //   value: ValueType,
-  //   option?: OptionType<ValueType, TRecord>[],
-  // ) => void;
 };
 
-// type SelectWithoutAllowClearProps<
-//   TValue = SelectValueType,
-//   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
-// > =
-//   | {
-//       allowClear?: false;
-//       mode?: never;
-
-//       value: TValue;
-//       onChange?: (value: TValue, option: OptionType) => void;
-//     }
-//   | {
-//       allowClear?: false;
-//       mode: "multiple" | "tags";
-//       onChange?: (value: TValue[], option: OptionType[]) => void;
-//     };
-
-// type SelectAllowClearProps<
-//   ValueType = any,
-//   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
-// > = {
-//   allowClear: true;
-// } & (
-//   | {
-//       mode?: never;
-//       onChange?: (value?: ValueType, option?: OptionType) => void;
-//     }
-//   | {
-//       mode: "multiple" | "tags";
-//       onChange?: (value?: ValueType, option?: OptionType[]) => void;
-//     }
-// );
-
 type SelectProps<
-  // TValue extends SelectValueType = string,
-
-  // ValueType = any,
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
-  // TValue extends SelectValueType = SelectValueType,
-  // OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
-> = // | SelectDefaultProps<ValueType, OptionType<TValue, TRecord>>
-(| SelectDefaultProps<TValue, OptionType<TValue, TRecord>>
+> = (
+  | SelectDefaultProps<TValue, OptionType<TValue, TRecord>>
   | SelectMultipleOrTagsProps<TValue, OptionType<TValue, TRecord>>
 ) &
-  // | SelectMultipleOrTagsProps<ValueType, OptionType<TValue, TRecord>>
   Pick<SelectShadcnProps, "open" | "onOpenChange"> &
-  // XOR<
-  //   SelectDefaultProps<ValueType, OptionType>,
-  //   SelectMultipleOrTagsProps<ValueType, OptionType>
-  // > &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     id?: string;
-    // mode?: "multiple" | "tags";
-
-    // mode: "multiple" | "tags";
-
-    // defaultValue?: ValueType;
-    // value?: ValueType;
-    // defaultValue?: TValue;
-    // value?: TValue;
-    // onChange?: (value: ValueType, option?: OptionType[]) => void;
-
     options?: OptionType<TValue, TRecord>[];
     placeholder?: string;
     allowClear?: boolean;
 
-    // value?: TValue | null;
-    // defaultValue?: TValue | null;
     maxCount?: number;
-    // onChange?: (value: ValueType, option?: OptionType | OptionType[]) => void;
-
-    // allowClear?: boolean;
     loading?: boolean;
     suffixIcon?: React.ReactNode;
 
@@ -176,24 +76,11 @@ type SelectProps<
         index: number;
       },
     ) => React.ReactNode;
-    // optionsRender?: (options: Option<TValue, TRecord>[]) => React.ReactNode;
     onSearchChange?: (search: string) => void;
-    // onChange?: (
-    //   value?: TValue,
-    //   option?: TValue extends Array<any>
-    //     ? Array<Option<TValue, TRecord>>
-    //     : Option<TValue, TRecord>,
-    // ) => void;
-    // mode?: SelectMode;
 
     // Base
     showSearch?: boolean;
   };
-
-// type XorSelectProps<
-//   TValue extends SelectValueType = number,
-//   TRecord extends AnyObject = AnyObject,
-// > = XOR<SelectProps<TValue, TRecord>, SelectShadcnProps>;
 
 const Select = <
   TValue extends SelectValueType = SelectValueType,
@@ -240,36 +127,11 @@ const Select = <
   const isTags = mode === "tags";
   const isMultiple = mode === "multiple" || isTags;
 
-  // const [internalOpen, setInternalOpen] = useControlledState(open, open);
-  // const handleOpenChange = (open: boolean) => {
-  //   setInternalOpen(open);
-  //   onOpenChange?.(open);
-  // };
   const [internalOpen, setInternalOpen] = useControlledState(open);
-  // useEffect(() => {
-  //   setInternalOpen(open);
-  // }, [open]);
   const handleOpenChange = (open: boolean) => {
     setInternalOpen(open);
     onOpenChange?.(open);
   };
-
-  // const tranformValue = useCallback(
-  //   (value?: ValueType) => {
-  //     return value === undefined
-  //       ? []
-  //       : isMultiple
-  //         ? Array.isArray(value)
-  //           ? value.filter((v): v is SelectValueType => v != null)
-  //           : []
-  //         : isDefault
-  //           ? value == null
-  //             ? []
-  //             : ([value] as SelectValueType[])
-  //           : [];
-  //   },
-  //   [isMultiple, isDefault],
-  // );
 
   // =========================== Values ===========================
   const [internalValue, setInternalValue] = useControlledState(
@@ -286,19 +148,8 @@ const Select = <
           : [];
 
   const triggerChange = (value?: TValue) => {
-    console.log("triggerChange", value);
-    // const internalValue = (value);
-    // setInternalValue(value);
-    // onChange?.(value as ValueType, )
     if (value === undefined) {
       setInternalValue(undefined);
-      //   if (isDefault) {
-      //   setInternalValue(undefined);
-      // } else if (isMultiple) {
-      //   setInternalValue([]);
-      // }
-      // setInternalValue([]);
-      // onChange?.(undefined as ValueType);
       return;
     } else if (isDefault) {
       // const newValue = [value];
@@ -316,20 +167,6 @@ const Select = <
       const returnOptions = options.filter((o) => newValue.includes(o.value));
       onChange?.(newValue, returnOptions);
     }
-    // const newValue = isMultiple ? [...(internalValue ?? []), value] : value;
-    // setInternalValue(newValue);
-    // const returnOptions = options.filter((o) => newValue.includes(o.value));
-    // if (props.mode === "multiple" || props.mode === "tags") {
-    //   props.onChange?.(newValue, returnOptions);
-    // } else {
-    //   props.mode;
-    //   props.onChange;
-    //   props.onChange?.(newValue, returnOptions[0]!);
-    // }
-    // if (!mode) {
-    //   onChange?.(newValue, returnOptions[0]!);
-    // }
-    // onChange?.(newValue, isMultiple ? returnOptions : returnOptions[0]);
   };
 
   // Content for dropdown
@@ -372,21 +209,12 @@ const Select = <
                 e.stopPropagation();
                 e.preventDefault();
                 triggerChange(o.value);
-
-                // setInternalValue(
-                //   isMultiple ? [...(internalValue ?? []), o.value as SelectValueType] : o.value as SelectValueType,
-                // );
-                // handleSelect(o.value);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   e.stopPropagation();
                   triggerChange(o.value);
-                  // setInternalValue(
-                  //   isMultiple ? [...(internalValue ?? []), o.value] : o.value,
-                  // );
-                  // handleSelect(o.value);
                 }
               }}
               isActive={selectedValues.includes(o.value)}
@@ -402,7 +230,6 @@ const Select = <
   );
   const ContentComp = dropdownRender ? dropdownRender(content) : content;
 
-  console.log("ssss", internalOpen);
   return (
     <SelectRoot
       key={key}
@@ -435,7 +262,6 @@ const Select = <
         allowClear={allowClear}
         showClearIcon={selectedValues.length > 0}
         onClear={() => {
-          console.log("onClear");
           if (allowClear) {
             triggerChange();
           }
