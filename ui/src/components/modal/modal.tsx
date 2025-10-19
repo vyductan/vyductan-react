@@ -42,6 +42,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
       }) => React.ReactNode)
     | React.ReactNode;
   okText?: string;
+  okType?: "default" | "primary" | "danger";
   confirmLoading?: boolean;
   okButtonProps?: ButtonProps;
   cancelText?: string;
@@ -58,6 +59,7 @@ const Modal = ({
   description,
   footer,
   okText,
+  okType,
   confirmLoading,
   okButtonProps,
   title,
@@ -137,7 +139,12 @@ const Modal = ({
       <DialogClose asChild onClick={onCancel}>
         <Button variant="outline">{cancelText ?? "Cancel"}</Button>
       </DialogClose>
-      <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
+      <Button
+        loading={confirmLoading}
+        onClick={onOk}
+        {...(okType === "danger" ? { color: "danger" } : {})}
+        {...okButtonProps}
+      >
         {okText ?? "Ok"}
       </Button>
     </>
@@ -160,7 +167,7 @@ const Modal = ({
 
       <DialogContent
         className={cn(
-          "px-0",
+          "px-0 text-sm",
           "sm:max-w-auto", // override sm:max-w-lg of shadcn
           numWidth && "w-[var(--modal-width)]", // override max-w-lg of shadcn
           className,
@@ -177,7 +184,7 @@ const Modal = ({
         <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
           <DialogDescription
-            className={classNames?.description}
+            className={cn(!description && "hidden", classNames?.description)}
             asChild={typeof description === "object"}
           >
             {description}
