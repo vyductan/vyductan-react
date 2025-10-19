@@ -227,7 +227,7 @@ const buttonVariants = tv({
       color: "danger",
       className: [
         "border-red-600 bg-white text-red-600",
-        "hover:border-red-500 hover:bg-red-50 hover:text-red-500",
+        "hover:border-red-500 hover:text-red-500",
         "active:border-red-700 active:text-red-700",
       ],
     },
