@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ValueType } from "../form";
 import type { CheckboxChangeEvent } from "./checkbox";
 import { cn } from "../../lib/utils";
