@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -13,13 +14,12 @@ import type {
   NodeKey,
 } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
   SelectContent,
   SelectItem,
-  SelectRoot,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -79,7 +79,7 @@ export function InsertLayoutDialog({
 
   return (
     <>
-      <SelectRoot onValueChange={setLayout} defaultValue={layout}>
+      <Select onValueChange={setLayout} defaultValue={layout}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={buttonLabel} />
         </SelectTrigger>
@@ -90,7 +90,7 @@ export function InsertLayoutDialog({
             </SelectItem>
           ))}
         </SelectContent>
-      </SelectRoot>
+      </Select>
       <Button onClick={onClick}>Insert</Button>
     </>
   );

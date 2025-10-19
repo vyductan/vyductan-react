@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";

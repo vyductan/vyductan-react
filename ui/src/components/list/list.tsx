@@ -1,5 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";

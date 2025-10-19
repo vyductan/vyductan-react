@@ -1,5 +1,6 @@
+import type React from "react";
 import type { XOR } from "ts-xor";
-import React, { Children, isValidElement } from "react";
+import { Children, isValidElement } from "react";
 
 import type { TabsProps } from "./tabs";
 import { TabsContent, TabsList, TabsRoot } from "./_components";

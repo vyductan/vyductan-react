@@ -24,20 +24,24 @@ export type TooltipPlacement =
   | "leftBottom"
   | "rightTop"
   | "rightBottom";
-
-type TooltipProps = Omit<RduTooltipProps, "side"> & {
-  /**
-   * The text shown in the tooltip
-   */
-  title?: React.ReactNode;
+export type AbstractTooltipProps = {
   placement?: TooltipPlacement;
-  hidden?: boolean;
-  classNames?: {
-    title?: string;
-    arrow?: string;
-  };
-  align?: AlignType;
 };
+
+type TooltipProps = AbstractTooltipProps &
+  Omit<RduTooltipProps, "side"> & {
+    /**
+     * The text shown in the tooltip
+     */
+    title?: React.ReactNode;
+    placement?: TooltipPlacement;
+    hidden?: boolean;
+    classNames?: {
+      title?: string;
+      arrow?: string;
+    };
+    align?: AlignType;
+  };
 const Tooltip = (props: TooltipProps) => {
   const triggerRef = React.useRef(null);
 

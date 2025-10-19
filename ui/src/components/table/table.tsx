@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -692,7 +696,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   // );
 
   // ====================== Column ======================
-  const [mergedColumns, columnsForTTTable, flattenColumns] =
+  // TODO: remove flattenColumns
+  const [mergedColumns, columnsForTTTable, _flattenColumns] =
     useColumns<TRecord>(
       {
         ...props,
@@ -718,6 +723,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         // mergedChildrenColumnName,
 
         // rowSelection: rowSelection,
+        expandedRowRender: expandableConfig.expandedRowRender,
       },
       // transformColumns,
       null,
@@ -1004,9 +1010,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
           )}
           {TableAlertSection}
           <div
-            className={cn(
-              scroll?.y && "overflow-y-auto",
-            )}
+            className={cn(scroll?.y && "overflow-y-auto")}
             style={{
               maxHeight: scroll?.y,
             }}
@@ -1015,282 +1019,288 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               ref={ref}
               className={cn(
                 !scroll?.x && "w-full",
-              // bordered
-              // bordered &&
-              //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              // size === "small" ? "[&_th]:" : "",
+                // bordered
+                // bordered &&
+                //   "border-separate border-spacing-0 rounded-md border-s border-t",
+                // size === "small" ? "[&_th]:" : "",
 
-              classNames?.table,
-            )}
-            style={{
-              ...(scroll?.x
-                ? {
-                    width: scroll.x,
-                    tableLayout: "fixed",
-                    minWidth: "100%",
-                  }
-                : // Set tableLayout="fixed" when we have fixed-width columns (selection, expand)
-                  rowSelection || expandType === "nest"
-                  ? { tableLayout: "fixed" }
-                  : {}),
-            }}
-            bordered={bordered}
-            {...restProps}
-          >
-            {bodyColGroup}
-            {showHeader !== false && (
-              <TableHeaderComp
-                style={{
-                  // Auto sticky when scroll.y is set
-                  position: sticky || scroll?.y ? "sticky" : undefined,
-                  top: sticky
-                    ? typeof sticky === "boolean"
-                      ? 0
-                      : sticky.offsetHeader
-                    : scroll?.y
-                      ? 0
-                      : undefined,
-                  zIndex: sticky || scroll?.y ? 11 : undefined,
-                  backgroundColor: sticky || scroll?.y ? "hsl(var(--background))" : undefined,
-                }}
-                className={classNames?.header}
-              >
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className="hover:bg-transparent"
-                  >
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHeadAdvanced
-                          key={header.id}
-                          locale={tableLocale}
-                          column={header.column}
-                          scope="col"
-                          colSpan={header.colSpan}
-                          size={size}
-                          style={getCommonPinningStyles(header.column)}
-                          align={
-                            header.column.columnDef.meta?.align === "end"
-                              ? "right"
-                              : header.column.columnDef.meta?.align === "start"
-                                ? "left"
+                classNames?.table,
+              )}
+              style={{
+                ...(scroll?.x
+                  ? {
+                      width: scroll.x,
+                      tableLayout: "fixed",
+                      minWidth: "100%",
+                    }
+                  : // Set tableLayout="fixed" when we have fixed-width columns (selection, expand)
+                    rowSelection || expandType === "nest"
+                    ? { tableLayout: "fixed" }
+                    : {}),
+              }}
+              bordered={bordered}
+              {...restProps}
+            >
+              {bodyColGroup}
+              {showHeader !== false && (
+                <TableHeaderComp
+                  style={{
+                    // Auto sticky when scroll.y is set
+                    position: sticky || scroll?.y ? "sticky" : undefined,
+                    top: sticky
+                      ? typeof sticky === "boolean"
+                        ? 0
+                        : sticky.offsetHeader
+                      : scroll?.y
+                        ? 0
+                        : undefined,
+                    zIndex: sticky || scroll?.y ? 11 : undefined,
+                    backgroundColor:
+                      sticky || scroll?.y
+                        ? "hsl(var(--background))"
+                        : undefined,
+                  }}
+                  className={classNames?.header}
+                >
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow
+                      key={headerGroup.id}
+                      className="hover:bg-transparent"
+                    >
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHeadAdvanced
+                            key={header.id}
+                            locale={tableLocale}
+                            column={header.column}
+                            scope="col"
+                            colSpan={header.colSpan}
+                            size={size}
+                            style={getCommonPinningStyles(header.column)}
+                            align={
+                              header.column.columnDef.meta?.align === "end"
+                                ? "right"
                                 : header.column.columnDef.meta?.align ===
-                                    "match-parent"
-                                  ? undefined
-                                  : header.column.columnDef.meta?.align
-                          }
-                          className={cn(
-                            // align
-                            header.column.columnDef.meta?.align === "center" &&
-                              "text-center",
-                            header.column.columnDef.meta?.align === "right" &&
-                              "text-right",
-                            // pinning
-                            // scroll?.x &&
-                            getCommonPinningClassName(
-                              header.column,
-                              {
-                                scrollLeft: wrapperScrollLeft,
-                                scrollRight: wrapperScrollRight,
-                              },
-                              true,
-                            ),
-                            // selection column
-                            header.id === "selection" && "px-0",
-                            classNames?.head,
-                            // column className
-                            header.column.columnDef.meta?.className,
-                            header.column.columnDef.meta?.classNames?.head,
-                          )}
-                          {...header.column.columnDef.meta?.headAttributes}
-                        >
-                          {header.isPlaceholder
-                            ? undefined
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHeadAdvanced>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeaderComp>
-            )}
-            {/* padding with header [disable if bordered]*/}
-            {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
-            {skeleton ? (
-              <TableBody>
-                {Array.from({ length: mergedPagination?.pageSize ?? 5 })
-                  .fill(0)
-                  .map((_, index) => {
-                    return (
-                      <TableRow key={index} className="hover:bg-transparent">
-                        {table.getVisibleFlatColumns().map((x) => {
-                          return (
-                            <TableCell key={x.id}>
-                              <Skeleton className="h-4 w-full" />
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            ) : (
-              <TableBodyComp className={classNames?.body}>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row, rowIndex) =>
-                    "_customRow" in row.original ? (
-                      <TableRow
-                        key={row.id}
-                        className={cn(
-                          getRowClassName(row, rowIndex),
-                          row.original._customRowClassName,
-                        )}
-                        style={
-                          row.original._customRowStyle as React.CSSProperties
-                        }
-                      >
-                        <TableCell
-                          colSpan={mergedColumns.length}
-                          size={size}
-                          className={cn(
-                            row.original._customCellClassName as string,
-                          )}
-                        >
-                          {row.original._customRow}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <Fragment key={row.id}>
-                        <TableRowComp
-                          data-state={row.getIsSelected() && "selected"}
-                          data-row-key={getRowKey(row.original, rowIndex)}
-                          className={cn(
-                            // row.getIsExpanded() && "bg-gray-50",
-                            // row.getIsExpanded() && bordered === false
-                            //   ? "border-x"
-                            //   : "",
-                            getRowClassName(row, rowIndex),
-                          )}
-                          onClick={(e: React.MouseEvent) => {
-                            onRow?.(row.original).onClick?.(e);
-                            // onRow?.({
-                            //   record: row.original,
-                            //   row,
-                            //   table,
-                            //   event: e,
-                            // });
-
-                            if (expandable?.expandRowByClick) {
-                              const selection = globalThis.getSelection();
-                              if (selection?.type === "Range") {
-                                return;
-                              }
-                              row.getToggleExpandedHandler()();
-                              // row.getToggleExpandedHandler()();
+                                    "start"
+                                  ? "left"
+                                  : header.column.columnDef.meta?.align ===
+                                      "match-parent"
+                                    ? undefined
+                                    : header.column.columnDef.meta?.align
                             }
-                            // e.preventDefault();
-                            // e.stopPropagation();
-                          }}
-                        >
-                          {row.getVisibleCells().map((cell) => {
+                            className={cn(
+                              // align
+                              header.column.columnDef.meta?.align ===
+                                "center" && "text-center",
+                              header.column.columnDef.meta?.align === "right" &&
+                                "text-right",
+                              // pinning
+                              // scroll?.x &&
+                              getCommonPinningClassName(
+                                header.column,
+                                {
+                                  scrollLeft: wrapperScrollLeft,
+                                  scrollRight: wrapperScrollRight,
+                                },
+                                true,
+                              ),
+                              // selection column
+                              header.id === "selection" && "px-0",
+                              classNames?.head,
+                              // column className
+                              header.column.columnDef.meta?.className,
+                              header.column.columnDef.meta?.classNames?.head,
+                            )}
+                            {...header.column.columnDef.meta?.headAttributes}
+                          >
+                            {header.isPlaceholder
+                              ? undefined
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </TableHeadAdvanced>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeaderComp>
+              )}
+              {/* padding with header [disable if bordered]*/}
+              {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
+              {skeleton ? (
+                <TableBody>
+                  {Array.from({ length: mergedPagination?.pageSize ?? 5 })
+                    .fill(0)
+                    .map((_, index) => {
+                      return (
+                        <TableRow key={index} className="hover:bg-transparent">
+                          {table.getVisibleFlatColumns().map((x) => {
                             return (
-                              <TableCell
-                                key={cell.id}
-                                size={size}
-                                className={cn(
-                                  // align
-                                  cell.column.columnDef.meta?.align ===
-                                    "center" && "text-center",
-                                  cell.column.columnDef.meta?.align ===
-                                    "right" && "text-right",
-                                  // pinning
-                                  // scroll?.x &&
-                                  getCommonPinningClassName(cell.column, {
-                                    scrollLeft: wrapperScrollLeft,
-                                    scrollRight: wrapperScrollRight,
-                                  }),
-                                  // selection column
-                                  cell.id.endsWith("selection") && "px-0",
-                                  // column className
-                                  classNames?.cell,
-                                  cell.column.columnDef.meta?.className,
-                                  cell.column.columnDef.meta?.classNames?.cell,
-                                )}
-                                style={{
-                                  ...getCommonPinningStyles(cell.column),
-                                  ...(typeof cell.column.columnDef.meta?.styles
-                                    ?.cell === "function"
-                                    ? cell.column.columnDef.meta.styles.cell({
-                                        record: row.original,
-                                        index: row.index,
-                                        row,
-                                        column: cell.column,
-                                      })
-                                    : cell.column.columnDef.meta?.styles?.cell),
-                                }}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
+                              <TableCell key={x.id}>
+                                <Skeleton className="h-4 w-full" />
                               </TableCell>
                             );
                           })}
-                        </TableRowComp>
-                        {row.getIsExpanded() &&
-                          expandable?.expandedRowRender && (
-                            <TableRow className="bg-gray-50 hover:bg-gray-50">
-                              {/* 2nd row is a custom 1 cell row */}
-                              <TableCell
-                                colSpan={row.getVisibleCells().length}
-                                size={size}
-                                className={cn(
-                                  // "px-4 text-[13px]",
-                                  bordered === false ? "border-b" : "",
-                                )}
-                              >
-                                {expandable.expandedRowRender(
-                                  row.original,
-                                  row.index,
-                                  row.index,
-                                  row.getIsExpanded(),
-                                )}
-                              </TableCell>
-                            </TableRow>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              ) : (
+                <TableBodyComp className={classNames?.body}>
+                  {table.getRowModel().rows.length > 0 ? (
+                    table.getRowModel().rows.map((row, rowIndex) =>
+                      "_customRow" in row.original ? (
+                        <TableRow
+                          key={row.id}
+                          className={cn(
+                            getRowClassName(row, rowIndex),
+                            row.original._customRowClassName,
                           )}
-                      </Fragment>
-                    ),
-                  )
-                ) : (
-                  <TableRow
-                    className={cn("hover:bg-transparent", classNames?.empty)}
-                  >
-                    <TableCell
-                      colSpan={mergedColumns.length}
-                      className={cn(
-                        "text-muted-foreground h-48 text-center",
-                        bordered && "border-e",
-                      )}
+                          style={
+                            row.original._customRowStyle as React.CSSProperties
+                          }
+                        >
+                          <TableCell
+                            colSpan={mergedColumns.length}
+                            size={size}
+                            className={cn(
+                              row.original._customCellClassName as string,
+                            )}
+                          >
+                            {row.original._customRow}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <Fragment key={row.id}>
+                          <TableRowComp
+                            data-state={row.getIsSelected() && "selected"}
+                            data-row-key={getRowKey(row.original, rowIndex)}
+                            className={cn(
+                              // row.getIsExpanded() && "bg-gray-50",
+                              // row.getIsExpanded() && bordered === false
+                              //   ? "border-x"
+                              //   : "",
+                              getRowClassName(row, rowIndex),
+                            )}
+                            onClick={(e: React.MouseEvent) => {
+                              onRow?.(row.original).onClick?.(e);
+                              // onRow?.({
+                              //   record: row.original,
+                              //   row,
+                              //   table,
+                              //   event: e,
+                              // });
+
+                              if (expandable?.expandRowByClick) {
+                                const selection = globalThis.getSelection();
+                                if (selection?.type === "Range") {
+                                  return;
+                                }
+                                row.getToggleExpandedHandler()();
+                                // row.getToggleExpandedHandler()();
+                              }
+                              // e.preventDefault();
+                              // e.stopPropagation();
+                            }}
+                          >
+                            {row.getVisibleCells().map((cell) => {
+                              return (
+                                <TableCell
+                                  key={cell.id}
+                                  size={size}
+                                  className={cn(
+                                    // align
+                                    cell.column.columnDef.meta?.align ===
+                                      "center" && "text-center",
+                                    cell.column.columnDef.meta?.align ===
+                                      "right" && "text-right",
+                                    // pinning
+                                    // scroll?.x &&
+                                    getCommonPinningClassName(cell.column, {
+                                      scrollLeft: wrapperScrollLeft,
+                                      scrollRight: wrapperScrollRight,
+                                    }),
+                                    // selection column
+                                    cell.id.endsWith("selection") && "px-0",
+                                    // column className
+                                    classNames?.cell,
+                                    cell.column.columnDef.meta?.className,
+                                    cell.column.columnDef.meta?.classNames
+                                      ?.cell,
+                                  )}
+                                  style={{
+                                    ...getCommonPinningStyles(cell.column),
+                                    ...(typeof cell.column.columnDef.meta
+                                      ?.styles?.cell === "function"
+                                      ? cell.column.columnDef.meta.styles.cell({
+                                          record: row.original,
+                                          index: row.index,
+                                          row,
+                                          column: cell.column,
+                                        })
+                                      : cell.column.columnDef.meta?.styles
+                                          ?.cell),
+                                  }}
+                                >
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRowComp>
+                          {row.getIsExpanded() &&
+                            expandable?.expandedRowRender && (
+                              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                                {/* 2nd row is a custom 1 cell row */}
+                                <TableCell
+                                  colSpan={row.getVisibleCells().length}
+                                  size={size}
+                                  className={cn(
+                                    // "px-4 text-[13px]",
+                                    bordered === false ? "border-b" : "",
+                                  )}
+                                >
+                                  {expandable.expandedRowRender(
+                                    row.original,
+                                    row.index,
+                                    row.index,
+                                    row.getIsExpanded(),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )}
+                        </Fragment>
+                      ),
+                    )
+                  ) : (
+                    <TableRow
+                      className={cn("hover:bg-transparent", classNames?.empty)}
                     >
-                      {!loading &&
-                        (typeof tableLocale.emptyText === "function"
-                          ? tableLocale.emptyText()
-                          : tableLocale.emptyText)}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBodyComp>
-            )}
-            {summary && (
-              <TableFooter className={classNames?.footer}>
-                {summary(mergedData)}
-              </TableFooter>
-            )}
-          </TableRoot>
+                      <TableCell
+                        colSpan={mergedColumns.length}
+                        className={cn(
+                          "text-muted-foreground h-48 text-center",
+                          bordered && "border-e",
+                        )}
+                      >
+                        {!loading &&
+                          (typeof tableLocale.emptyText === "function"
+                            ? tableLocale.emptyText()
+                            : tableLocale.emptyText)}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBodyComp>
+              )}
+              {summary && (
+                <TableFooter className={classNames?.footer}>
+                  {summary(mergedData)}
+                </TableFooter>
+              )}
+            </TableRoot>
           </div>
           {pagination && (
             <Pagination

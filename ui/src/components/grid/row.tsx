@@ -1,5 +1,4 @@
 /* eslint-disable unicorn/no-for-loop */
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 import * as React from "react";
@@ -56,9 +55,9 @@ function useMergedPropByScreen(
       return;
     }
     for (let i = 0; i < responsiveArray.length; i++) {
-      const breakpoint: Breakpoint = responsiveArray[i]!;
+      const breakpoint = responsiveArray[i];
       // if do not match, do nothing
-      if (!screen || !screen[breakpoint]) {
+      if (!screen || !breakpoint || !screen[breakpoint]) {
         continue;
       }
       const curVal = oriProp[breakpoint];
@@ -155,95 +154,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default Row;
-
-// import * as React from "react"
-// import { cn } from "@/lib/utils"
-
-// export interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
-//   gutter?: number | [number, number]
-//   align?: 'top' | 'middle' | 'bottom'
-//   justify?: 'start' | 'end' | 'center' | 'space-around' | 'space-between' | 'space-evenly'
-//   wrap?: boolean
-//   className?: string
-//   style?: React.CSSProperties
-// }
-
-// const Row = React.forwardRef<HTMLDivElement, RowProps>(
-//   (
-//     {
-//       gutter = 0,
-//       align = 'top',
-//       justify = 'start',
-//       wrap = true,
-//       className,
-//       style,
-//       children,
-//       ...props
-//     },
-//     ref
-//   ) => {
-//     const [horizontalGutter, verticalGutter] = Array.isArray(gutter) ? gutter : [gutter, 0]
-
-//     const rowStyle: React.CSSProperties = { ...style }
-
-//     // Handle horizontal gutter
-//     if (horizontalGutter > 0) {
-//       row.marginLeft = horizontalGutter / -2
-//       row.marginRight = horizontalGutter / -2
-//     }
-
-//     // Handle vertical gutter
-//     if (verticalGutter > 0) {
-//       row.marginTop = verticalGutter / -2
-//       row.marginBottom = verticalGutter / -2
-//     }
-
-//     return (
-//       <div
-//         ref={ref}
-//         className={cn(
-//           'flex flex-wrap',
-//           {
-//             'items-start': align === 'top',
-//             'items-center': align === 'middle',
-//             'items-end': align === 'bottom',
-//             'justify-start': justify === 'start',
-//             'justify-end': justify === 'end',
-//             'justify-center': justify === 'center',
-//             'justify-around': justify === 'space-around',
-//             'justify-between': justify === 'space-between',
-//             'justify-evenly': justify === 'space-evenly',
-//             'flex-nowrap': !wrap,
-//           },
-//           className
-//         )}
-//         style={rowStyle}
-//         {...props}
-//       >
-//         {React.Children.map(children, (child) => {
-//           if (React.isValidElement(child)) {
-//             return React.cloneElement(child as React.ReactElement, {
-//               style: {
-//                 ...(horizontalGutter > 0 && {
-//                   paddingLeft: horizontalGutter / 2,
-//                   paddingRight: horizontalGutter / 2,
-//                 }),
-//                 ...(verticalGutter > 0 && {
-//                   paddingTop: verticalGutter / 2,
-//                   paddingBottom: verticalGutter / 2,
-//                 }),
-//                 ...child.props.style,
-//               },
-//             })
-//           }
-//           return child
-//         })}
-//       </div>
-//     )
-//   }
-// )
-
-// Row.displayName = 'Row'
-
-// export { Row }
-// export default Row

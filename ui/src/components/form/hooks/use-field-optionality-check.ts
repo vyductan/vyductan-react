@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ZodType } from "zod/v4";
 import { useMemo } from "react";
 import _ from "lodash";

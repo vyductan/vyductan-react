@@ -1,5 +1,5 @@
 import type { AnyObject } from "@/components/ui/_util/type";
-import * as React from "react";
+import type * as React from "react";
 
 import type { FilterSearchType, TableLocale } from "../../types";
 import { Icon } from "../../../../icons";

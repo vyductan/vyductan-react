@@ -1,7 +1,7 @@
 // Tabs with underline https://github.com/shadcn-ui/ui/discussions/683
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 import {

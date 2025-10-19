@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -8,7 +10,6 @@
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

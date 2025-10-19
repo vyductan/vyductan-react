@@ -14,7 +14,7 @@ import type {
   NodeKey,
   Spread,
 } from "lexical";
-import * as React from "react";
+import type * as React from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 

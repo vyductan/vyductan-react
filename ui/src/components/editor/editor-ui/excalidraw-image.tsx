@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -69,7 +72,7 @@ const removeStyleFromSvg_HACK = (svg: SVGElement) => {
     svg.setAttribute("height", viewBoxDimensions[3]!);
   }
 
-  if (styleTag && styleTag.tagName === "style") {
+  if (styleTag?.tagName === "style") {
     styleTag.remove();
   }
 };
@@ -95,7 +98,7 @@ const ExcalidrawImage = React.forwardRef<HTMLDivElement, Props>(
     useEffect(() => {
       const setContent = async () => {
         // Only run on client side to avoid SSR issues
-        if (typeof window === "undefined") {
+        if (globalThis.window === undefined) {
           return;
         }
 

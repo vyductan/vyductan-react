@@ -7,8 +7,8 @@
  */
 import type { BaseSelection, LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
+import type * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -102,7 +102,7 @@ function FloatingLinkEditor({
         setFloatingElemPositionForLinkEditor(domRect, editorElem, anchorElem);
       }
       setLastSelection(selection);
-    } else if (!activeElement || activeElement.className !== "link-input") {
+    } else if (activeElement?.className !== "link-input") {
       if (rootElement !== null) {
         setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
       }

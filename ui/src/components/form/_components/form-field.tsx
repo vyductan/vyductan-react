@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import type React from "react";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
-import React, { cloneElement, isValidElement } from "react";
+import { cloneElement, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 import { FormField as ShadFormField } from "@acme/ui/shadcn/form";

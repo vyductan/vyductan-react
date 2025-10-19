@@ -8,7 +8,7 @@
 
 import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { useRef } from "react";
 import { calculateZoomLevel } from "@lexical/utils";
 

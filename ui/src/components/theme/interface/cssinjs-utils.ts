@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { AliasToken } from "./alias";
 import type { ComponentTokenMap } from "./components";
 

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 /**
@@ -10,7 +14,6 @@
 import type { MenuTextMatch } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import type { TextNode } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Command,

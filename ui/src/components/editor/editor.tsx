@@ -22,28 +22,26 @@ const editorConfig: InitialConfigType = {
 };
 
 export function Editor({
-  editorState,
+  // editorState,
   editorSerializedState,
-  onChange,
   onSerializedChange,
 
-  // forFormItem = false,
   value,
+  onChange,
 }: {
-  editorState?: EditorState;
+  // editorState?: EditorState;
   editorSerializedState?: SerializedEditorState;
-  onChange?: (editorState: EditorState) => void;
   onSerializedChange?: (editorSerializedState: SerializedEditorState) => void;
 
-  // forFormItem?: boolean;
-  value?: string;
+  value?: SerializedEditorState;
+  onChange?: (editorState: EditorState) => void;
 }) {
   return (
     <div className="bg-background overflow-hidden rounded-lg border shadow">
       <LexicalComposer
         initialConfig={{
           ...editorConfig,
-          ...(editorState ? { editorState } : {}),
+          ...(value ? { value } : {}),
           ...(editorSerializedState
             ? { editorState: JSON.stringify(editorSerializedState) }
             : {}),

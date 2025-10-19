@@ -1,5 +1,5 @@
 import type { KeyboardEvent, MouseEvent } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 import { cn } from "@acme/ui/lib/utils";

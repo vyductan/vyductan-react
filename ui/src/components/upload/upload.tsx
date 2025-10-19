@@ -128,8 +128,8 @@ const Upload = ({
           {/* <UploadZone style={{ width, height }}>{children}</UploadZone> */}
           {files.length > 0 ? (
             <div className="group relative" style={{ width, height }}>
-              {render?.image ? (
-                render.image(files[0]!)
+              {render?.image && files[0] ? (
+                render.image(files[0])
               ) : (
                 <img src={files[0]?.url} />
               )}

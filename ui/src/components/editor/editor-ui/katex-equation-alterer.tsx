@@ -6,7 +6,6 @@
  *
  */
 import type { JSX } from "react";
-import * as React from "react";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";

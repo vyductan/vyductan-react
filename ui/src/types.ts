@@ -29,6 +29,7 @@ export interface AlignType {
   /**
    * @private Do not use in your production code
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _experimental?: Record<string, any>;
   /**
    * offset source node by offset[0] in x and offset[1] in y.
@@ -92,4 +93,4 @@ export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
 
 // export type Variant = (typeof Variants)[number];
 
-export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";

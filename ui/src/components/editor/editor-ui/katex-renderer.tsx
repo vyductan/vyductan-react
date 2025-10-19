@@ -6,7 +6,6 @@
  *
  */
 import type { JSX } from "react";
-import * as React from "react";
 import { useEffect, useRef } from "react";
 import katex from "katex";
 

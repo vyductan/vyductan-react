@@ -1,7 +1,7 @@
 "use client";
 
+import type * as React from "react";
 import type { XOR } from "ts-xor";
-import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 

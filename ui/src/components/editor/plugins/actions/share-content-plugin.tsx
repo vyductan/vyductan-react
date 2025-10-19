@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable unicorn/prefer-type-error */
+/* eslint-disable unicorn/prefer-global-this */
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -41,7 +44,7 @@ export function ShareContentPlugin() {
     if (!isClient) return;
 
     void docFromHash(globalThis.location.hash).then((doc) => {
-      if (doc && doc.source === "editor") {
+      if (doc?.source === "editor") {
         editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
         editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
       }

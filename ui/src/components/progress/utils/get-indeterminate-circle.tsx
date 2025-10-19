@@ -1,5 +1,3 @@
-import React from "react";
-
 interface IndeterminateOption {
   id: string;
   loading: boolean | undefined;

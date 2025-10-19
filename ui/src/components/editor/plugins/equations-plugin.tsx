@@ -7,7 +7,6 @@
  */
 import type { JSX } from "react";
 import { useCallback, useEffect } from "react";
-import * as React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $wrapNodeInElement } from "@lexical/utils";
 

@@ -4,6 +4,7 @@ import { cloneElement } from "react";
 import { cn } from "@acme/ui/lib/utils";
 
 type IconWrapperProps = Omit<HTMLAttributes<HTMLSpanElement>, "children"> & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   children: ReactElement<any>;
   srOnly?: string;
 };

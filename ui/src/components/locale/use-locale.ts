@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-useless-fallback-in-spread */
 /* eslint-disable @typescript-eslint/no-unsafe-return */

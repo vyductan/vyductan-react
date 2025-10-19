@@ -1,7 +1,6 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
-import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemType, MenuProps } from "../menu";

@@ -1,7 +1,9 @@
-import { XOR } from "ts-xor";
+import type { XOR } from "ts-xor";
 
-import { ShadcnSidebarProps, SidebarRoot } from "./_component";
-import { Sidebar as OwnSidebar, SidebarProps } from "./sidebar";
+import type { ShadcnSidebarProps } from "./_component";
+import type { SidebarProps } from "./sidebar";
+import { SidebarRoot } from "./_component";
+import { Sidebar as OwnSidebar } from "./sidebar";
 
 export * from "./_component";
 

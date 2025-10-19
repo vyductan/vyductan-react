@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -14,7 +15,6 @@ import type {
 } from "lexical";
 import type { JSX } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

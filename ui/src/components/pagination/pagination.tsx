@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
 import { useMergedState } from "@rc-component/util";
 import KeyCode from "@rc-component/util/lib/KeyCode";

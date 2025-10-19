@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { TransferLocale as TransferLocaleForEmpty } from "../empty";
 import type { PaginationLocale } from "../pagination/types";
 import type { TableLocale } from "../table";

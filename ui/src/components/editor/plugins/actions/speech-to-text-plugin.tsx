@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *

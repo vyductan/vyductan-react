@@ -7,8 +7,8 @@
  */
 // import './index.css';
 import type { JSX } from "react";
+import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import * as React from "react";
 import { $isCodeNode, CodeNode, getLanguageFriendlyName } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useDebounce } from "ahooks";

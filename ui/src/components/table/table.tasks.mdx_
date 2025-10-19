@@ -1,3 +1,9 @@
+---
+title: Table Tasks
+description: Tasks and issues for Table component development.
+component: true
+---
+
 - [x] rowSelection - Fixed type mismatch between TanStack Table's string keys and React.Key[] for selectedRowKeys
   - Updated rowSelection state conversion to use key.toString()
   - Fixed onRowSelectionChange to properly convert string keys back to React.Key[] type
