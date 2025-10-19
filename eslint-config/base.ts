@@ -8,10 +8,9 @@ import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 import turboPlugin from "eslint-plugin-turbo";
+import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
-
-import unicornPlugin from "./unicorn";
 
 /**
  * All packages that leverage t3-env should use this rule
@@ -44,7 +43,7 @@ export const restrictEnvAccess = defineConfig(
 );
 
 export const baseConfig = defineConfig(
-  unicornPlugin,
+  eslintPluginUnicorn.configs.recommended,
   // Ignore files not tracked by VCS and any config files
   includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
   { ignores: ["**/*.config.*"] },
@@ -117,6 +116,10 @@ export const baseConfig = defineConfig(
       // "@typescript-eslint/no-unsafe-assignment": "off",
       // "@typescript-eslint/no-unsafe-argument": "off",
       // "@typescript-eslint/no-explicit-any": "off",
+
+      "unicorn/prevent-abbreviations": "off",
+      "unicorn/no-nested-ternary": "off", // off beause conflict with prettier
+      "unicorn/no-null": "off", // off beause sometime backend return null
     },
   },
   {
