@@ -4,7 +4,7 @@ import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Option } from "../select/types";
+import type { OptionType } from "../select/types";
 import type { CommandRootProps } from "./_components";
 import { Icon } from "../../icons";
 import {
@@ -25,13 +25,13 @@ type CommandSingleValue<TValue extends CommandValueType = string> = {
   mode?: "default";
   value?: TValue;
   defaultValue?: TValue;
-  onChange?: (value?: TValue, option?: Option<TValue>) => void;
+  onChange?: (value?: TValue, option?: OptionType<TValue>) => void;
 };
 type CommandMultipleValue<TValue extends CommandValueType = string> = {
   mode: "multiple" | "tags";
   value?: TValue[];
   defaultValue?: TValue[];
-  onChange?: (value: TValue[], options?: Option<TValue>[]) => void;
+  onChange?: (value: TValue[], options?: OptionType<TValue>[]) => void;
 };
 
 export type OwnCommandProps<TValue extends CommandValueType = string> = Omit<
@@ -39,7 +39,7 @@ export type OwnCommandProps<TValue extends CommandValueType = string> = Omit<
   "defaultValue" | "value" | "onChange"
 > &
   (CommandSingleValue<TValue> | CommandMultipleValue<TValue>) & {
-    options: Option<TValue>[];
+    options: OptionType<TValue>[];
 
     empty?: React.ReactNode;
     placeholder?: string;
@@ -58,10 +58,10 @@ export type OwnCommandProps<TValue extends CommandValueType = string> = Omit<
     groupClassName?: string;
     optionRender?: {
       checked?: boolean;
-      icon?: (option: Option<TValue>) => React.ReactNode;
-      label?: (option: Option<TValue>) => React.ReactNode;
+      icon?: (option: OptionType<TValue>) => React.ReactNode;
+      label?: (option: OptionType<TValue>) => React.ReactNode;
     };
-    optionsRender?: (options: Option<TValue>[]) => React.ReactNode;
+    optionsRender?: (options: OptionType<TValue>[]) => React.ReactNode;
 
     dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
     dropdownFooter?: React.ReactNode;
