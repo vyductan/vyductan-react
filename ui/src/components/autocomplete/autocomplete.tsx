@@ -12,7 +12,7 @@ import type { AnyObject } from "../_util/type";
 import type { SizeType } from "../..";
 import type { CommandProps } from "../command";
 import type { PopoverContentProps } from "../popover";
-import type { Option } from "../select/types";
+import type { OptionType } from "../select/types";
 import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
 import { Input } from "../input";
@@ -38,8 +38,8 @@ export type AutocompleteProps<
     mode?: "combobox" | "input";
     value?: TValue;
     defaultValue?: TValue;
-    onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
-    options: Option<TValue, TRecord>[];
+    onChange?: (value?: TValue, option?: OptionType<TValue, TRecord>) => void;
+    options: OptionType<TValue, TRecord>[];
     optionsToSearch?: { value: string; label: string }[];
     optionLabelProp?: string;
 
@@ -136,7 +136,7 @@ const Autocomplete = <
 
   // ===================== Search (input mode) =====================
   const [search, setSearch] = React.useState<string>("");
-  const getOptionLabel = (option: Option<TValue, TRecord>) => {
+  const getOptionLabel = (option: OptionType<TValue, TRecord>) => {
     if (optionLabelProp && option[optionLabelProp as keyof typeof option]) {
       return option[optionLabelProp as keyof typeof option];
     }
@@ -216,8 +216,10 @@ const Autocomplete = <
         (o) => filter(o.value.toString(), search) > 0,
       );
       if (matches.length === 1) {
-        const only = matches[0]!;
-        setValue(only.value);
+        const only = matches[0];
+        if (only) {
+          setValue(only.value);
+        }
         // search will be synced in setValue onChange above
       }
     };
