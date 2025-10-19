@@ -1,23 +1,24 @@
 "use client";
 
 import * as React from "react";
+import { useControlledState } from "@rc-component/util";
 import { HexAlphaColorPicker } from "react-colorful";
 
 import type { ColorPickerPanelProps } from "./types";
 import { cn } from "../../lib/utils";
 import { Button } from "../button";
 import { Input } from "../input";
-import { Color } from "./color";
+import { AggregationColor } from "./color";
 
 const DEFAULT_HEX_ALPHA = "#000000ff";
 
-const colorToHexAlpha = (color?: Color): string => {
+const colorToHexAlpha = (color?: AggregationColor): string => {
   if (!color) {
     return DEFAULT_HEX_ALPHA;
   }
 
   const hex = color.toHexString().slice(1);
-  const alpha = Math.round(color.toHsl().a * 255)
+  const alpha = Math.round(color.toHsb().a * 255)
     .toString(16)
     .padStart(2, "0");
 
@@ -33,26 +34,21 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
   className,
   ...props
 }) => {
-  const [inputValue, setInputValue] = React.useState<string>(
-    value ? value.toString(format) : "",
+  const [internalValue, setInternalValue] = useControlledState(
+    undefined,
+    value,
   );
 
+  const inputValue =
+    format === "hex"
+      ? internalValue?.toHexString()
+      : internalValue?.toRgbString();
   const pickerColor = React.useMemo(() => colorToHexAlpha(value), [value]);
-
-  // Update internal state when value prop changes
-  React.useEffect(() => {
-    if (value) {
-      setInputValue(value.toString(format));
-      return;
-    }
-
-    setInputValue("");
-  }, [value, format]);
 
   const handlePickerChange = (nextColor: string) => {
     try {
-      const color = new Color(nextColor);
-      setInputValue(color.toString(format));
+      const color = new AggregationColor(nextColor);
+      setInternalValue(color);
       onChange?.(color);
     } catch {
       // Ignore invalid colors emitted by the picker (should not occur)
@@ -60,28 +56,33 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
   };
 
   const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
     try {
-      const color = new Color(newValue);
+      const color = new AggregationColor(newValue);
+      setInternalValue(color);
       onChange?.(color);
     } catch {
       // Invalid color, keep the input value but don't update the color
     }
   };
 
-  const handleInputBlur = () => {
-    if (value) {
-      setInputValue(value.toString(format));
+  const handleInputBlur = (newValue: string) => {
+    try {
+      const color = new AggregationColor(newValue);
+      setInternalValue(color);
+      onChange?.(color);
+    } catch {
+      // Invalid color, keep the input value but don't update the color
     }
   };
 
   const handlePresetClick = (presetColor: string) => {
-    const color = new Color(presetColor);
+    const color = new AggregationColor(presetColor);
     onChange?.(color);
   };
 
   const handleClear = () => {
-    setInputValue("");
+    setInternalValue(undefined);
+    // onChange?.(undefined);
     onClear?.();
   };
 
@@ -97,7 +98,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
           <Input
             value={inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
-            onBlur={handleInputBlur}
+            onBlur={(e) => handleInputBlur(e.target.value)}
             placeholder="Enter color"
             className="text-sm"
           />

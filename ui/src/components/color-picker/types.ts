@@ -1,5 +1,44 @@
 import type { TooltipPlacement } from "../tooltip";
-import type { Color } from "./color";
+import type { AggregationColor, Color } from "./color";
+
+export interface HSB {
+  h: number | string;
+  s: number | string;
+  b: number | string;
+}
+export interface RGB {
+  r: number | string;
+  g: number | string;
+  b: number | string;
+}
+export interface HSBA extends HSB {
+  a: number;
+}
+export interface RGBA extends RGB {
+  a: number;
+}
+export type ColorGenInput<T = Color> =
+  | string
+  | number
+  | RGB
+  | RGBA
+  | HSB
+  | HSBA
+  | T;
+
+export type Colors<T> = {
+  color: ColorGenInput<T>;
+  percent: number;
+}[];
+
+export type SingleValueType = AggregationColor | string;
+export type ColorValueType =
+  | SingleValueType
+  | null
+  | {
+      color: SingleValueType;
+      percent: number;
+    }[];
 
 export type ColorFormat = "hex" | "rgb" | "hsl";
 export type ColorPickerSize = "small" | "middle" | "large";
@@ -11,17 +50,17 @@ export interface ColorPickerProps {
   /**
    * The current color value
    */
-  value?: Color;
+  value?: ColorValueType;
 
   /**
    * Default color value
    */
-  defaultValue?: Color;
+  defaultValue?: ColorValueType;
 
   /**
    * Callback when color changes
    */
-  onChange?: (color?: Color) => void;
+  onChange?: (color?: ColorValueType) => void;
 
   /**
    * Callback when popover open state changes
@@ -93,12 +132,12 @@ export interface ColorPickerPanelProps {
   /**
    * The current color value
    */
-  value?: Color;
+  value?: AggregationColor;
 
   /**
    * Callback when color changes
    */
-  onChange?: (color: Color) => void;
+  onChange?: (color: AggregationColor) => void;
 
   /**
    * Callback when clear button is clicked

@@ -1,12 +1,13 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
+import { useControlledState } from "@rc-component/util";
 
-import type { Color } from "./color";
 import type { ColorPickerProps } from "./types";
 import { cn } from "../../lib/utils";
 import { Button } from "../button";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
+import { AggregationColor } from "./color";
 import { ColorPickerPanel } from "./color-picker-panel";
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({
@@ -28,39 +29,27 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   children,
   ...props
 }) => {
-  const [internalOpen, setInternalOpen] = React.useState(false);
-  const [internalValue, setInternalValue] = React.useState<Color | undefined>(
-    value ?? defaultValue ?? undefined,
+  // const [internalOpen, setInternalOpen] = React.useState(false);
+  const [internalValue, setInternalValue] = useControlledState(
+    defaultValue,
+    value,
   );
+  const color =
+    internalValue instanceof AggregationColor
+      ? internalValue
+      : new AggregationColor(internalValue ?? "#000000");
 
-  const isControlled = open !== undefined;
-  const isValueControlled = value !== undefined;
-
-  const currentOpen = isControlled ? open : internalOpen;
-  const currentValue = isValueControlled ? value : internalValue;
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!isControlled) {
-      setInternalOpen(newOpen);
-    }
-    onOpenChange?.(newOpen);
-  };
-
-  const handleChange = (color: Color) => {
-    if (!isValueControlled) {
-      setInternalValue(color);
-    }
+  const handleChange = (color: AggregationColor) => {
+    setInternalValue(color);
     onChange?.(color);
   };
 
   const handleClear = () => {
-    if (!isValueControlled) {
-      setInternalValue(undefined);
-    }
+    setInternalValue(undefined);
     onChange?.();
   };
 
-  const displayValue = currentValue?.toHexString() ?? "#000000";
+  const displayValue = color.toHexString();
   const displayText = showText ? displayValue : "";
 
   const triggerElement = children ?? (
@@ -86,9 +75,9 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
 
   return (
     <Popover
-      open={currentOpen}
-      onOpenChange={handleOpenChange}
-      placement={placement as any}
+      open={open}
+      onOpenChange={onOpenChange}
+      placement={placement}
       trigger={trigger}
     >
       <PopoverTrigger asChild disabled={disabled}>
@@ -96,7 +85,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <ColorPickerPanel
-          value={currentValue}
+          value={color}
           onChange={handleChange}
           onClear={allowClear ? handleClear : undefined}
           format={format}
