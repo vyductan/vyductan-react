@@ -1,9 +1,9 @@
-import type { VariantProps } from "class-variance-authority";
-import * as React from "react";
+import type * as React from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";
-import {Alert as ShadcnAlert} from "../../shadcn/alert";
+
+import type { Alert as ShadcnAlert } from "../../shadcn/alert";
 
 export const alertVariants = cva(
   [
@@ -32,7 +32,6 @@ export const alertVariants = cva(
   },
 );
 
-
 function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -44,6 +43,10 @@ function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
 }
 type ShadcnAlertProps = React.ComponentProps<typeof ShadcnAlert>;
 
-export { ShadcnAlert, AlertContent};
+export { AlertContent };
 export type { ShadcnAlertProps };
-export {AlertTitle, AlertDescription} from "../../shadcn/alert";
+export {
+  AlertTitle,
+  AlertDescription,
+  Alert as ShadcnAlert,
+} from "../../shadcn/alert";
