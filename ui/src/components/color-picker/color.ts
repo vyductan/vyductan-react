@@ -14,45 +14,106 @@ export type GradientColor = {
   percent: number;
 }[];
 
-class ExtendedColor extends ColorjsColor {
-  constructor(color: ColorTypes) {
-    super(color);
+export class Color {
+  private colorTypes: ColorTypes;
+  public a: number;
+  public r: number;
+  public g: number;
+  public b: number;
+  public h: number;
+  public s: number;
+  public l: number;
+
+  constructor(color: ColorGenInput) {
+    // console.log("color", color);
+
+    // Convert color input to a format that colorjs.io can understand
+    let colorTypes: ColorTypes;
+
+    if (Array.isArray(color)) {
+      colorTypes = "";
+    } else if (typeof color === "number") {
+      colorTypes = color.toString();
+    } else if (typeof color === "object") {
+      // Handle RGB/RGBA objects
+      if ("r" in color && "g" in color && "b" in color) {
+        const r: number =
+          typeof color.r === "string" ? Number.parseFloat(color.r) : color.r;
+        const g: number =
+          typeof color.g === "string" ? Number.parseFloat(color.g) : color.g;
+        const b: number =
+          typeof color.b === "string" ? Number.parseFloat(color.b) : color.b;
+        const a: number | undefined =
+          "a" in color
+            ? typeof color.a === "string"
+              ? Number.parseFloat(color.a)
+              : color.a
+            : undefined;
+        colorTypes = { space: "rgb", coords: [r, g, b], alpha: a };
+      }
+      // Handle HSB/HSBA objects
+      else {
+        const h: number =
+          typeof color.h === "string" ? Number.parseFloat(color.h) : color.h;
+        const s: number =
+          typeof color.s === "string" ? Number.parseFloat(color.s) : color.s;
+        const b: number =
+          typeof color.b === "string" ? Number.parseFloat(color.b) : color.b;
+        const a: number | undefined =
+          "a" in color
+            ? typeof color.a === "string"
+              ? Number.parseFloat(color.a)
+              : color.a
+            : undefined;
+        colorTypes = { space: "hsl", coords: [h, s, b], alpha: a };
+      }
+    } else {
+      colorTypes = color;
+    }
+    const _color = new ColorjsColor(colorTypes);
+    this.colorTypes = colorTypes;
+    this.a = _color.a;
+    this.r = _color.r;
+    this.g = _color.g;
+    this.b = _color.b;
+    this.h = _color.h;
+    this.s = _color.s;
+    this.l = _color.l;
   }
 
-  setA(a: number): ExtendedColor {
-    return new ExtendedColor(this.set("a", a));
+  clone(): Color {
+    return this;
   }
-  setH(h: number): ExtendedColor {
-    return new ExtendedColor(this.set("h", h));
-  }
-  setS(s: number): ExtendedColor {
-    return new ExtendedColor(this.set("s", s));
-  }
-  setB(b: number): ExtendedColor {
-    return new ExtendedColor(this.set("b", b));
+
+  setA(a: number) {
+    this.a = a;
+    return this;
   }
 
   toHexString(): string {
-    return this.toString({ format: "hex" });
+    const hex = new ColorjsColor(this.colorTypes).toString({
+      format: "hex",
+    });
+    return hex.length === 4
+      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        "#" + hex[1]!.repeat(2) + hex[2]!.repeat(2) + hex[3]!.repeat(2)
+      : hex;
   }
   toRgb(): {
     r: number;
     g: number;
     b: number;
-    a: number;
+    a: number | undefined;
   } {
-    return this.to("rgb");
+    return {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+      a: this.a,
+    };
   }
   toRgbString(): string {
-    return this.to("rgb").toString();
-  }
-  toHsl(): {
-    l: number;
-    a: number;
-    h: number;
-    s: number;
-  } {
-    return this.to("hsl");
+    return new ColorjsColor(this.colorTypes).toString({ format: "rgb" });
   }
 
   toHsb(): {
@@ -61,36 +122,20 @@ class ExtendedColor extends ColorjsColor {
     h: number;
     s: number;
   } {
-    const hsl = this.to("hsl");
-    // Convert HSL to HSB (HSV)
-    const h = hsl.h;
-    const s = hsl.s;
-    const l = hsl.l;
-    const a = hsl.a;
-
-    const v = l + s * Math.min(l, 1 - l);
-    const b = v === 0 ? 0 : 2 * (1 - l / v);
-
-    return { h, s: b, b: v, a };
+    return {
+      h: this.h,
+      s: this.s,
+      b: this.b,
+      a: this.a,
+    };
   }
   toHsbString(): string {
-    return this.toString({ format: "hsb" });
+    return new ColorjsColor(this.colorTypes).toString({ format: "hsb" });
   }
-}
-
-export declare class Color extends ExtendedColor {
-  constructor(color: ColorGenInput);
-  toHsbString(): string;
-  toHsb(): {
-    b: number;
-    a: number;
-    h: number;
-    s: number;
-  };
 }
 
 export class AggregationColor {
-  private metaColor: Color;
+  private metaColor: Color = new Color("#000000");
 
   private colors: GradientColor | undefined;
 
@@ -112,25 +157,16 @@ export class AggregationColor {
 
     const isArray = Array.isArray(color);
 
-    const firstColor = this.colors?.[0];
-    if (isArray && color.length > 0 && firstColor) {
+    if (isArray && color.length > 0) {
       this.colors = color.map(({ color: c, percent }) => ({
         color: new AggregationColor(c),
         percent,
       }));
-      this.metaColor = new ExtendedColor(firstColor.color.metaColor);
+      if (this.colors[0]) {
+        this.metaColor = new Color(this.colors[0].color.metaColor);
+      }
     } else {
-      this.metaColor = new ExtendedColor(
-        isArray
-          ? ""
-          : typeof color === "number"
-            ? color.toString()
-            : typeof color === "object" && "r" in color
-              ? `rgb(${color.r}, ${color.g}, ${color.b})`
-              : typeof color === "object" && "h" in color
-                ? `hsl(${color.h}, ${color.s}%, ${color.b}%)`
-                : color,
-      );
+      this.metaColor = new Color(isArray ? "" : color);
     }
 
     if (!color || (isArray && !this.colors)) {

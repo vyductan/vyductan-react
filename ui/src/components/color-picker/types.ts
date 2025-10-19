@@ -60,7 +60,7 @@ export interface ColorPickerProps {
   /**
    * Callback when color changes
    */
-  onChange?: (color?: ColorValueType) => void;
+  onChange?: (color: AggregationColor, colorString: string) => void;
 
   /**
    * Callback when popover open state changes
@@ -132,22 +132,17 @@ export interface ColorPickerPanelProps {
   /**
    * The current color value
    */
-  value?: AggregationColor;
+  hexValue?: string;
 
   /**
    * Callback when color changes
    */
-  onChange?: (color: AggregationColor) => void;
+  onChange?: (hexValue: string) => void;
 
   /**
    * Callback when clear button is clicked
    */
   onClear?: () => void;
-
-  /**
-   * Color format for display
-   */
-  format?: ColorFormat;
 
   /**
    * Preset colors

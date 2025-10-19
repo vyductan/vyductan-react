@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { useControlledState } from "@rc-component/util";
+import type * as React from "react";
+import { useEffect, useState } from "react";
 import { HexAlphaColorPicker } from "react-colorful";
 
 import type { ColorPickerPanelProps } from "./types";
@@ -10,56 +10,28 @@ import { Button } from "../button";
 import { Input } from "../input";
 import { AggregationColor } from "./color";
 
-const DEFAULT_HEX_ALPHA = "#000000ff";
-
-const colorToHexAlpha = (color?: AggregationColor): string => {
-  if (!color) {
-    return DEFAULT_HEX_ALPHA;
-  }
-
-  const hex = color.toHexString().slice(1);
-  const alpha = Math.round(color.toHsb().a * 255)
-    .toString(16)
-    .padStart(2, "0");
-
-  return `#${hex}${alpha}`;
-};
-
 export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
-  value,
+  hexValue,
   onChange,
   onClear,
-  format = "hex",
   presets = [],
   className,
   ...props
 }) => {
-  const [internalValue, setInternalValue] = useControlledState(
-    undefined,
-    value,
-  );
-
-  const inputValue =
-    format === "hex"
-      ? internalValue?.toHexString()
-      : internalValue?.toRgbString();
-  const pickerColor = React.useMemo(() => colorToHexAlpha(value), [value]);
+  const [inputValue, setInputValue] = useState(hexValue);
+  useEffect(() => {
+    setInputValue(hexValue);
+  }, [hexValue]);
 
   const handlePickerChange = (nextColor: string) => {
-    try {
-      const color = new AggregationColor(nextColor);
-      setInternalValue(color);
-      onChange?.(color);
-    } catch {
-      // Ignore invalid colors emitted by the picker (should not occur)
-    }
+    onChange?.(nextColor);
   };
 
   const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
     try {
-      const color = new AggregationColor(newValue);
-      setInternalValue(color);
-      onChange?.(color);
+      new AggregationColor(newValue);
+      onChange?.(newValue);
     } catch {
       // Invalid color, keep the input value but don't update the color
     }
@@ -67,22 +39,26 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
 
   const handleInputBlur = (newValue: string) => {
     try {
-      const color = new AggregationColor(newValue);
-      setInternalValue(color);
-      onChange?.(color);
+      new AggregationColor(newValue);
+      onChange?.(newValue);
     } catch {
       // Invalid color, keep the input value but don't update the color
     }
   };
 
   const handlePresetClick = (presetColor: string) => {
-    const color = new AggregationColor(presetColor);
-    onChange?.(color);
+    try {
+      new AggregationColor(presetColor);
+      // setInternalValue(color);
+      onChange?.(presetColor);
+    } catch {
+      // Invalid color, keep the input value but don't update the color
+    }
+
+    onChange?.(presetColor);
   };
 
   const handleClear = () => {
-    setInternalValue(undefined);
-    // onChange?.(undefined);
     onClear?.();
   };
 
@@ -92,7 +68,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
       <div className="flex items-center space-x-3">
         <div
           className="border-border h-8 w-8 rounded border"
-          style={{ backgroundColor: value?.toHexString() ?? "#000000" }}
+          style={{ backgroundColor: hexValue ?? "#000000" }}
         />
         <div className="flex-1">
           <Input
@@ -116,12 +92,11 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
       </div>
 
       {/* Color Picker Area */}
-      <div className="space-y-3">
-        <HexAlphaColorPicker
-          color={pickerColor}
-          onChange={handlePickerChange}
-        />
-      </div>
+      <HexAlphaColorPicker
+        className="!w-full"
+        color={hexValue}
+        onChange={handlePickerChange}
+      />
 
       {/* Presets */}
       {presets.length > 0 && (
