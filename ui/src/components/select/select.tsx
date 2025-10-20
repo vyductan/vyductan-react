@@ -15,6 +15,7 @@ import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
 import { Empty } from "../empty";
 import { SelectTrigger, SelectValue } from "./_components";
 import { SelectMultipleContent } from "./_components/select-multiple-content";
+import { SelectContext } from "./context";
 
 type SemanticName = "root";
 type PopupSemantic = "root";
@@ -80,6 +81,7 @@ type SelectProps<
 
     // Base
     showSearch?: boolean;
+    children?: React.ReactNode;
   };
 
 const Select = <
@@ -96,7 +98,6 @@ const Select = <
   const [key, setKey] = React.useState<number>(() => +Date.now());
 
   // ======================= CUSTOM SELECT =======================
-  if (!props.options) throw new Error("options is required");
 
   const {
     id,
@@ -119,6 +120,7 @@ const Select = <
     defaultValue,
     value,
     onChange,
+    children,
     ...triggerProps
   } = props;
 
@@ -172,137 +174,136 @@ const Select = <
   // Content for dropdown
   const content = (
     <>
-      {/* {isTags && inputValue && !options.some((o) => o.value === inputValue) && (
-        <SelectItem
-          value={inputValue}
-          onSelect={() => addTag(inputValue as ValueType)}
-          className="text-primary font-semibold"
-        >
-          Add "{inputValue}"
-        </SelectItem>
-      )} */}
-      {options.length > 0 ? (
-        options.map((o, oIndex) => {
-          const optionContent = optionRender
-            ? optionRender(
-                {
-                  label: o.label,
-                  data: o,
-                  key: String(o.value),
-                  value: o.value,
-                },
-                { index: oIndex },
-              )
-            : o.label;
+      {children ??
+        (options.length > 0 ? (
+          options.map((o, oIndex) => {
+            const optionContent = optionRender
+              ? optionRender(
+                  {
+                    label: o.label,
+                    data: o,
+                    key: String(o.value),
+                    value: o.value,
+                  },
+                  { index: oIndex },
+                )
+              : o.label;
 
-          return (
-            <SelectItem
-              key={String(o.value)}
-              value={o.value as string}
-              className={cn(
-                selectedValues.includes(o.value)
-                  ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
-                  : "",
-                o.color && tagColors[o.color],
-              )}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                triggerChange(o.value);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
+            return (
+              <SelectItem
+                key={String(o.value)}
+                value={o.value as string}
+                className={cn(
+                  selectedValues.includes(o.value)
+                    ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+                    : "",
+                  o.color && tagColors[o.color],
+                )}
+                onMouseDown={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   triggerChange(o.value);
-                }
-              }}
-              isActive={selectedValues.includes(o.value)}
-            >
-              {optionContent}
-            </SelectItem>
-          );
-        })
-      ) : (
-        <Empty />
-      )}
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    triggerChange(o.value);
+                  }
+                }}
+                isActive={selectedValues.includes(o.value)}
+              >
+                {optionContent}
+              </SelectItem>
+            );
+          })
+        ) : (
+          <Empty />
+        ))}
     </>
   );
   const ContentComp = dropdownRender ? dropdownRender(content) : content;
 
   return (
-    <SelectRoot
-      key={key}
-      defaultValue={
-        isDefault ? (defaultValue as string | undefined) : undefined
-      }
-      value={
-        isDefault
-          ? (selectedValues[0] as string | undefined)
-          : isMultiple
-            ? undefined
-            : undefined
-      }
-      open={internalOpen}
-      onOpenChange={handleOpenChange}
+    <SelectContext.Provider
+      value={{
+        selectedValues,
+        triggerChange: triggerChange as (value?: SelectValueType) => void,
+      }}
     >
-      <SelectTrigger
-        id={id}
-        loading={loading}
-        disabled={disabled}
-        className={cn(
-          "w-full",
-          isMultiple && "pl-[3px]",
-          tagColors[options.find((o) => o.value === value)?.color ?? ""],
-          className,
-        )}
-        variant={variant}
-        size={size}
-        status={status}
-        allowClear={allowClear}
-        showClearIcon={selectedValues.length > 0}
-        onClear={() => {
-          if (allowClear) {
-            triggerChange();
-          }
+      <SelectRoot
+        key={key}
+        defaultValue={
+          isDefault ? (defaultValue as string | undefined) : undefined
+        }
+        value={
+          isDefault
+            ? (selectedValues[0] as string | undefined)
+            : isMultiple
+              ? undefined
+              : undefined
+        }
+        open={internalOpen}
+        onOpenChange={handleOpenChange}
+      >
+        <SelectTrigger
+          id={id}
+          loading={loading}
+          disabled={disabled}
+          className={cn(
+            "w-full",
+            isMultiple && "pl-[3px]",
+            tagColors[options.find((o) => o.value === value)?.color ?? ""],
+            className,
+          )}
+          variant={variant}
+          size={size}
+          status={status}
+          allowClear={allowClear}
+          showClearIcon={selectedValues.length > 0}
+          onClear={() => {
+            if (allowClear) {
+              triggerChange();
+            }
 
-          setKey(+Date.now());
-        }}
-        {...triggerProps} // for form-control
-      >
-        {isMultiple ? (
-          <SelectMultipleContent
-            mode={mode}
-            onInputClick={() => {
-              handleOpenChange(true);
-            }}
-            selectedValues={selectedValues}
-            onAdd={(value) => {
-              triggerChange(value);
-            }}
-            onRemove={(value) => {
-              triggerChange(value);
-            }}
-            placeholder={placeholder}
-          />
-        ) : (
-          <SelectValue placeholder={placeholder} className="h-5" />
-        )}
-      </SelectTrigger>
-      <SelectContent
-        className={cn(
-          "",
-          options.some((o) => o.color)
-            ? "data-[radix-select-viewport]:space-y-2"
-            : "",
-        )}
-        // classNames={{
-        //   viewport: options.some((o) => o.color) ? "space-y-2" : "",
-        // }}
-      >
-        {ContentComp}
-      </SelectContent>
-    </SelectRoot>
+            setKey(+Date.now());
+          }}
+          {...triggerProps} // for form-control
+        >
+          {isMultiple ? (
+            <SelectMultipleContent
+              mode={mode}
+              onInputClick={() => {
+                handleOpenChange(true);
+              }}
+              selectedValues={selectedValues}
+              onAdd={(value) => {
+                triggerChange(value);
+              }}
+              onRemove={(value) => {
+                triggerChange(value);
+              }}
+              placeholder={placeholder}
+            />
+          ) : (
+            <SelectValue placeholder={placeholder} className="h-5" />
+          )}
+        </SelectTrigger>
+        <SelectContent
+          className={cn(
+            "",
+            options.some((o) => o.color)
+              ? "data-[radix-select-viewport]:space-y-2"
+              : "",
+          )}
+          // classNames={{
+          //   viewport: options.some((o) => o.color) ? "space-y-2" : "",
+          // }}
+        >
+          {ContentComp}
+        </SelectContent>
+      </SelectRoot>
+    </SelectContext.Provider>
   );
 };
 

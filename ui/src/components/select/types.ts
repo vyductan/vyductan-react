@@ -18,7 +18,7 @@ export type OptionType<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = {
-  label: React.ReactNode;
+  label?: React.ReactNode;
   value: TValue;
   icon?: string;
   color?: string;

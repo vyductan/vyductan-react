@@ -6,7 +6,13 @@ import type { SelectShadcnProps } from "./_components";
 import type { SelectProps } from "./select";
 import type { OptionType, SelectValueType } from "./types";
 import { Select as ShadcnSelect } from "../../shadcn/select";
-import { SelectContent, SelectTrigger } from "./_components";
+import {
+  SelectContent as Content,
+  SelectContent,
+  SelectTrigger,
+  SelectTrigger as Trigger,
+} from "./_components";
+import { Option } from "./_components/option";
 import { Select as OwnSelect } from "./select";
 
 type ConditionSelectProps<
@@ -16,7 +22,7 @@ type ConditionSelectProps<
   // OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
   // > = XOR<SelectProps<TValue, OptionType>, SelectShadcnProps>;
 > = XOR<SelectProps<TValue, OptionType<TValue, TRecord>>, SelectShadcnProps>;
-const Select = <
+const ConditionSelect = <
   TValue extends SelectValueType = SelectValueType,
   // ValueType = any,
   TRecord extends AnyObject = AnyObject,
@@ -31,18 +37,27 @@ const Select = <
       (child) =>
         React.isValidElement(child) &&
         (child.type === SelectContent || child.type === SelectTrigger),
-    ) &&
-    props.children &&
-    !props.options;
+    ) && !props.options;
 
-  if (isShadcnSelect) return <ShadcnSelect {...props} />;
+  if (isShadcnSelect) return <ShadcnSelect {...(props as SelectShadcnProps)} />;
 
-  // return <OwnSelect {...(props as SelectProps<TValue, OptionType>)} />;
   return <OwnSelect {...(props as SelectProps<TValue, TRecord>)} />;
 };
+
+type CompoundedSelect = typeof ConditionSelect & {
+  Option: typeof Option;
+  Trigger: typeof Trigger;
+  Content: typeof Content;
+};
+
+const Select = ConditionSelect as CompoundedSelect;
+Select.Option = Option;
+Select.Trigger = Trigger;
+Select.Content = Content;
 
 export { Select };
 export { Select as SelectRoot } from "../../shadcn/select";
 export type { SelectProps } from "./select";
 
 export * from "./_components";
+export { Option } from "./_components/option";
