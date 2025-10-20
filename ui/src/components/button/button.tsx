@@ -372,6 +372,15 @@ const buttonVariants = tv({
     },
     {
       variant: "text",
+      color: "blue",
+      className: [
+        "text-blue-600",
+        "hover:text-blue-hover",
+        "hover:bg-blue-100",
+      ],
+    },
+    {
+      variant: "text",
       color: "emerald",
       className: [
         "text-emerald-600",
