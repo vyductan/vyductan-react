@@ -7,7 +7,7 @@ import {
 } from "@acme/ui/shadcn/form";
 
 import type { GenericSlotProps } from "../../slot";
-import { Autocomplete } from "../../autocomplete";
+import { Autocomplete } from "../../auto-complete";
 import { DatePicker } from "../../date-picker";
 import { Select } from "../../select";
 import { GenericSlot } from "../../slot";
