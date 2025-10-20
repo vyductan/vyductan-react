@@ -77,6 +77,7 @@ type DatePickerProps = DatePickerBaseProps & {
 
   picker?: PickerMode;
 
+  style?: React.CSSProperties;
   styles?: {
     root?: React.CSSProperties;
   };
@@ -102,6 +103,7 @@ const DatePicker = (props: DatePickerProps) => {
     minDate,
     maxDate,
 
+    style,
     classNames: _,
     styles: __,
     disabled,
@@ -462,7 +464,11 @@ const DatePicker = (props: DatePickerProps) => {
           </div>
         }
       >
-        <div data-slot="picker-input" className={cn("inline-flex", className)}>
+        <div
+          data-slot="picker-input"
+          className={cn("inline-flex", className)}
+          style={style}
+        >
           <Input
             ref={composedRef}
             id={id}
