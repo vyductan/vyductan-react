@@ -155,8 +155,12 @@ const Tag = ({
           onPointerDown={(e) => {
             e.stopPropagation();
           }}
-          onPointerUp={() => {
+          onPointerUp={(e) => {
+            e.stopPropagation();
             onClose?.();
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         />
       ) : (
