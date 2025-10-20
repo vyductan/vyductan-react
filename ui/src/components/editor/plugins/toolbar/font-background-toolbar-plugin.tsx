@@ -1,6 +1,7 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useMemo, useState } from "react";
-import { Color, ColorPicker } from "@/components/ui/color-picker";
+import { ColorPicker } from "@/components/ui/color-picker";
+import { AggregationColor } from "@/components/ui/color-picker/color";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
@@ -46,14 +47,14 @@ export function FontBackgroundToolbarPlugin() {
 
   const currentColor = useMemo(() => {
     try {
-      return new Color(bgColor);
+      return new AggregationColor(bgColor);
     } catch {
       return;
     }
   }, [bgColor]);
 
   const onFontColorSelect = useCallback(
-    (color?: Color) => {
+    (color?: AggregationColor) => {
       const nextColor = color?.toHexString();
 
       if (!nextColor) {
