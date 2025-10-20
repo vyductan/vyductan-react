@@ -38,6 +38,7 @@ type DateRangePickerProps = DatePickerBaseProps & {
   /** Show separate calendars for start and end dates instead of single calendar with 2 panels */
   separateCalendars?: boolean;
 
+  style?: React.CSSProperties;
   styles?: {
     root?: React.CSSProperties;
   };
@@ -59,6 +60,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     format: formatProp,
     showTime,
 
+    style,
     classNames: _,
     styles: __,
     disabled,
@@ -375,6 +377,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
           )}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
+          style={style}
         >
           <div className="relative flex-1">
             <Input
