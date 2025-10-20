@@ -19,9 +19,9 @@ import { Input } from "../input";
 import { inputSizeVariants } from "../input/variants";
 import { Popover } from "../popover";
 
-type AutocompleteValueType = string | number;
-export type AutocompleteProps<
-  TValue extends AutocompleteValueType = string,
+type AutoCompleteValueType = string | number;
+export type AutoCompleteProps<
+  TValue extends AutoCompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
 > = Pick<PopoverContentProps, "onFocusOutside"> &
   Pick<
@@ -43,6 +43,7 @@ export type AutocompleteProps<
     optionsToSearch?: { value: string; label: string }[];
     optionLabelProp?: string;
 
+    style?: React.CSSProperties;
     className?: string;
     size?: SizeType;
     disabled?: boolean;
@@ -57,8 +58,8 @@ export type AutocompleteProps<
     onSearchChange?: (search: string) => void;
   };
 
-const Autocomplete = <
-  TValue extends AutocompleteValueType = string,
+const AutoComplete = <
+  TValue extends AutoCompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
 >({
   mode = "combobox",
@@ -69,6 +70,7 @@ const Autocomplete = <
   optionLabelProp,
   optionRender,
 
+  style,
   className,
   size,
   disabled,
@@ -90,7 +92,7 @@ const Autocomplete = <
   // Popover
   onFocusOutside,
   ...props
-}: AutocompleteProps<TValue, TRecord>) => {
+}: AutoCompleteProps<TValue, TRecord>) => {
   /* Filter Detault*/
   const filter =
     filterProp ??
@@ -237,7 +239,7 @@ const Autocomplete = <
           onFocusOutside?.(e);
         }}
       >
-        <div>
+        <div style={style}>
           <Input
             size={size}
             disabled={disabled}
@@ -365,7 +367,7 @@ const Autocomplete = <
   );
 };
 
-export { Autocomplete };
+export { AutoComplete };
 
 export function removeTones(string_: string): string {
   return string_
