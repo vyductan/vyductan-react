@@ -28,7 +28,8 @@ type CheckboxGroupProps<T extends FormValueType> = {
 
   className?: string;
   classNames?: {
-    item: string;
+    item?: string;
+    label?: string;
   };
 };
 const CheckboxGroup = <T extends FormValueType = FormValueType>({
@@ -81,6 +82,7 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
               onChange?.(newValue);
             }}
             className={cn(classNames?.item, o.className)}
+            classNames={classNames}
           >
             {o.label}
           </Checkbox>

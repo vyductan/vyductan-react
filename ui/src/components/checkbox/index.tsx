@@ -6,10 +6,10 @@ import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
 import type { CheckboxProps } from "./checkbox";
 import { Checkbox as InternalCheckbox } from "./checkbox";
-import { CheckboxGroup } from "./group";
+import { CheckboxGroup } from "./checkbox-group";
 
 export * from "./checkbox";
-export * from "./group";
+export * from "./checkbox-group";
 
 type ShadcnCheckboxProps = Omit<
   React.ComponentProps<typeof ShadcnCheckbox>,
@@ -37,6 +37,6 @@ const Checkbox = ((props: XORCheckboxProps) => {
 Checkbox.Group = CheckboxGroup;
 
 export { Checkbox };
-export { CheckboxGroup } from "./group";
+export { CheckboxGroup } from "./checkbox-group";
 
 export { type CheckboxProps } from "./checkbox";
