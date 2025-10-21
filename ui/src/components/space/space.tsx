@@ -63,7 +63,7 @@ const Space = React.forwardRef<HTMLDivElement, SpaceProps>(
   (
     {
       direction = "horizontal",
-      size = "middle",
+      size = "small",
       align = "center",
       wrap = false,
       children,
