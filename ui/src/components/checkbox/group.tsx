@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useControlledState } from "@rc-component/util";
+import { useMergedState } from "@rc-component/util";
 
 import type { FormValueType } from "../form";
 import type { CheckboxChangeEvent } from "./checkbox";
@@ -41,10 +41,9 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
   className,
   classNames,
 }: CheckboxGroupProps<T>) => {
-  const [internalValue, setInternalValue] = useControlledState(
-    defaultValue ?? [],
+  const [internalValue, setInternalValue] = useMergedState(defaultValue ?? [], {
     value,
-  );
+  });
   const memoizedOptions = useMemo<CheckboxOptionType<T>[]>(
     () =>
       options.map((option) => {
