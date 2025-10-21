@@ -49,7 +49,7 @@ const Drawer = ({
   className,
   classNames,
   placement = "right",
-  width,
+  width = 448,
   closeIcon,
   ...props
 }: DrawerProps) => {
@@ -63,15 +63,17 @@ const Drawer = ({
       </DrawerRoot>
     );
 
-  const contentStyle =
-    width === undefined
-      ? undefined
-      : { width: typeof width === "number" ? `${width}px` : width };
-
   return (
     <DrawerRoot direction={placement} handleOnly {...props}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent className={cn(className)} style={contentStyle}>
+      <DrawerContent
+        style={
+          {
+            "--drawer-width": typeof width === "number" ? `${width}px` : width,
+          } as React.CSSProperties
+        }
+        className={cn("w-[var(--drawer-width)]", className)}
+      >
         <div className="flex flex-1 flex-col overflow-hidden">
           <DrawerHeader className={cn(classNames?.header)}>
             <div className="flex flex-1 flex-row items-start gap-2">
