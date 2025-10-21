@@ -1,6 +1,18 @@
 import type { VariantProps } from "tailwind-variants";
 import { tv } from "tailwind-variants";
 
+const inputDisabledVariants = tv({
+  variants: {
+    disabled: {
+      true: [
+        "bg-background-active hover:border-input! cursor-not-allowed opacity-50",
+      ],
+    },
+  },
+  defaultVariants: {
+    disabled: false,
+  },
+});
 const inputVariants = tv({
   base: [
     // disable shadcn focus-visible classes
@@ -21,11 +33,7 @@ const inputVariants = tv({
     // "focus-within:outline-hidden",
   ],
   variants: {
-    disabled: {
-      true: [
-        "bg-background-active hover:border-input! cursor-not-allowed opacity-50",
-      ],
-    },
+    disabled: inputDisabledVariants.variants.disabled,
     // readOnly: {
     //   true: ["pointer-events-none cursor-not-allowed"],
     // },
@@ -104,4 +112,4 @@ type InputVariant = VariantProps<typeof inputVariants>["variant"];
 type InputStatus = VariantProps<typeof inputVariants>["status"];
 
 export type { InputVariants, InputSizeVariants, InputVariant, InputStatus };
-export { inputVariants, inputSizeVariants };
+export { inputVariants, inputDisabledVariants, inputSizeVariants };
