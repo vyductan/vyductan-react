@@ -8,6 +8,7 @@ import Wave from "../../lib/wave";
 import { LoadingIcon } from "../button";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
+import { inputDisabledVariants } from "../input";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
@@ -127,6 +128,7 @@ const Checkbox = (props: CheckboxProps) => {
         className={cn(
           "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
+          inputDisabledVariants({ disabled: mergedDisabled }),
           className,
         )}
         style={{ ...checkbox?.style, ...style }}
@@ -135,9 +137,14 @@ const Checkbox = (props: CheckboxProps) => {
         onClick={onLabelClick}
       >
         <ShadcnCheckbox
+          className={cn(
+            "data-[state=indeterminate]:bg-muted",
+            "self-center",
+            "disabled:border-black/55 disabled:bg-black/15",
+          )}
           checked={indeterminate ? "indeterminate" : checked}
+          disabled={mergedDisabled}
           onClick={onInputClick}
-          className={cn("data-[state=indeterminate]:bg-muted", "self-center")}
           onCheckedChange={(checked) => {
             onChange?.({
               type: "change",

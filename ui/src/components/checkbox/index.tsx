@@ -5,7 +5,8 @@ import type { XOR } from "ts-xor";
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
 import type { CheckboxProps } from "./checkbox";
-import { Checkbox as OwnCheckbox } from "./checkbox";
+import { Checkbox as InternalCheckbox } from "./checkbox";
+import { CheckboxGroup } from "./group";
 
 export * from "./checkbox";
 export * from "./group";
@@ -17,16 +18,25 @@ type ShadcnCheckboxProps = Omit<
 
 type XORCheckboxProps = XOR<CheckboxProps, ShadcnCheckboxProps>;
 
-const Checkbox = (props: XORCheckboxProps) => {
+type InternalCheckboxType = typeof InternalCheckbox;
+
+type CompoundedComponent = InternalCheckboxType & {
+  Group: typeof CheckboxGroup;
+};
+
+const Checkbox = ((props: XORCheckboxProps) => {
   const isShadcnCheckbox = props.onCheckedChange !== undefined;
 
   if (isShadcnCheckbox) {
     return <ShadcnCheckbox {...props} />;
   }
 
-  return <OwnCheckbox {...(props as CheckboxProps)} />;
-};
+  return <InternalCheckbox {...(props as CheckboxProps)} />;
+}) as unknown as CompoundedComponent;
+
+Checkbox.Group = CheckboxGroup;
 
 export { Checkbox };
+export { CheckboxGroup } from "./group";
 
 export { type CheckboxProps } from "./checkbox";

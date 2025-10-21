@@ -1,10 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ValueType } from "../form";
+import { useMemo } from "react";
+import { useControlledState } from "@rc-component/util";
+
+import type { FormValueType } from "../form";
 import type { CheckboxChangeEvent } from "./checkbox";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
 
-export interface CheckboxOptionType<T = any> {
+export interface CheckboxOptionType<T = FormValueType> {
   label: React.ReactNode;
   value: T;
   style?: React.CSSProperties;
@@ -16,45 +18,69 @@ export interface CheckboxOptionType<T = any> {
   required?: boolean;
 }
 
-type CheckboxGroupProps<T extends ValueType> = {
+type CheckboxGroupProps<T extends FormValueType> = {
   name?: string;
   value?: T[];
-  options?: { label: string; value: T }[];
+  defaultValue?: T[];
+  options?: (CheckboxOptionType<T> | string | number)[];
   onChange?: (checkedValues: T[]) => void;
+  disabled?: boolean;
 
   className?: string;
   classNames?: {
     item: string;
   };
 };
-const CheckboxGroup = <T extends ValueType = string>({
+const CheckboxGroup = <T extends FormValueType = FormValueType>({
   name,
   value,
+  defaultValue,
   options = [],
   onChange,
+  disabled,
   className,
   classNames,
 }: CheckboxGroupProps<T>) => {
+  const [internalValue, setInternalValue] = useControlledState(
+    defaultValue ?? [],
+    value,
+  );
+  const memoizedOptions = useMemo<CheckboxOptionType<T>[]>(
+    () =>
+      options.map((option) => {
+        if (typeof option === "string" || typeof option === "number") {
+          return { label: option, value: option } as CheckboxOptionType<T>;
+        }
+        return option;
+      }),
+    [options],
+  );
+
   return (
     <div
       data-slot="checkbox-group"
       className={cn("inline-flex flex-wrap gap-2", className)}
     >
-      {options.map((o) => {
+      {memoizedOptions.map((o) => {
+        const isDisabled = o.disabled ?? disabled;
         return (
           <Checkbox
             key={o.value.toString()}
             name={name}
-            checked={value?.includes(o.value)}
+            checked={internalValue.includes(o.value)}
             value={o.value as string}
+            disabled={isDisabled}
             onChange={(e) => {
-              onChange?.(
-                e.target.checked
-                  ? [...(value ?? []), o.value]
-                  : (value ?? []).filter((x) => x !== o.value),
-              );
+              if (isDisabled) return;
+
+              const newValue = e.target.checked
+                ? [...internalValue, o.value]
+                : internalValue.filter((x) => x !== o.value);
+
+              setInternalValue(newValue);
+              onChange?.(newValue);
             }}
-            className={classNames?.item}
+            className={cn(classNames?.item, o.className)}
           >
             {o.label}
           </Checkbox>
@@ -64,4 +90,5 @@ const CheckboxGroup = <T extends ValueType = string>({
   );
 };
 
+export type { CheckboxGroupProps };
 export { CheckboxGroup };
