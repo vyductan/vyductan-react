@@ -49,7 +49,7 @@ export class Color {
               ? Number.parseFloat(color.a)
               : color.a
             : undefined;
-        colorTypes = { space: "rgb", coords: [r, g, b], alpha: a };
+        colorTypes = { space: "srgb", coords: [r, g, b], alpha: a };
       }
       // Handle HSB/HSBA objects
       else {
