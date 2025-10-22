@@ -1,20 +1,28 @@
-import type { VariantProps } from "class-variance-authority";
 import type React from "react";
 import { Fragment } from "react";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../config-provider/size-context";
+import type { PaginationProps } from "../pagination";
 import { Spin } from "../spin";
+import { ListProvider } from "./context";
+import { ListItem } from "./list-item";
+import { ListItemMeta } from "./list-item-meta";
 
-const listVariants = cva([""], {
+export const listVariants = cva([""], {
   variants: {
     size: {
-      default: [""],
+      small: ["py-2 px-4"],
+      middle: ["py-3 px-6"],
+      large: ["py-4 px-6"],
     },
   },
 });
-interface ListProps<T> extends VariantProps<typeof listVariants> {
+interface ListProps<T> {
+  itemLayout?: "horizontal" | "vertical";
+  size?: SizeType;
   bordered?: boolean;
   className?: string;
   // rootClassName?: string;
@@ -34,53 +42,86 @@ interface ListProps<T> extends VariantProps<typeof listVariants> {
   footer?: React.ReactNode;
   // locale?: ListLocale;
   renderItem: (item: T, index: number) => React.ReactNode;
+
+  pagination?:
+    | (PaginationProps & {
+        position?: "top" | "bottom" | "both";
+      })
+    | false;
 }
 
-const List = <TRecord extends Record<string, unknown>>({
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint, @typescript-eslint/no-explicit-any
+const List = <T extends any>({
+  itemLayout = "horizontal",
+  bordered = false,
   // pagination = false as ListProps<any>['pagination'],
   // prefixCls: customizePrefixCls,
-  // bordered = false,
   // split = true,
   // className,
   // rootClassName,
   // style,
-  // itemLayout,
   // loadMore,
   // grid,
   dataSource = [],
-  // size,
+  size = "middle",
   loading = false,
   header,
   footer,
   rowKey,
   renderItem,
   // ...rest
-}: ListProps<TRecord>) => {
+}: ListProps<T>) => {
   return (
-    <>
-      {header && <div>{header}</div>}
-      <Spin spinning={loading}>
-        {/* {childrenContent} */}
-        <ul className={cn(listVariants({}))}>
-          {dataSource.map((item, index) => (
-            <Fragment
-              key={
-                typeof rowKey === "function"
-                  ? rowKey(item)
-                  : rowKey
-                    ? (item[rowKey] as string)
-                    : `list-item-${index}`
-              }
-            >
-              {renderItem(item, index)}
-            </Fragment>
-          ))}
-        </ul>
-      </Spin>
-      {footer && <div>{footer}</div>}
-    </>
+    <ListProvider itemLayout={itemLayout} size={size}>
+      <div className={cn(bordered && "rounded-md border")}>
+        {header && (
+          <div
+            className={cn(
+              "text-sm",
+              bordered && "border-b",
+              listVariants({ size }),
+            )}
+          >
+            {header}
+          </div>
+        )}
+        <Spin spinning={loading}>
+          <ul>
+            {dataSource.map((item, index) => (
+              <Fragment
+                key={
+                  typeof rowKey === "function"
+                    ? rowKey(item)
+                    : rowKey
+                      ? (item[rowKey] as string)
+                      : `list-item-${index}`
+                }
+              >
+                {renderItem(item, index)}
+              </Fragment>
+            ))}
+          </ul>
+        </Spin>
+        {footer && (
+          <div className={cn("text-sm", listVariants({ size }))}>{footer}</div>
+        )}
+      </div>
+    </ListProvider>
   );
 };
 
+// Add ListItem and Meta as static properties to List
+const ListWithItem = List as typeof List & {
+  Item: typeof ListItem & {
+    Meta: typeof ListItemMeta;
+  };
+};
+
+ListWithItem.Item = ListItem as typeof ListItem & {
+  Meta: typeof ListItemMeta;
+};
+
+ListWithItem.Item.Meta = ListItemMeta;
+
 export type { ListProps };
-export { List };
+export { ListWithItem as List };
