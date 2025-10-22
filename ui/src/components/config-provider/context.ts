@@ -10,6 +10,7 @@ import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
 import type { PaginationProps } from "../pagination";
+import type { ResultProps } from "../result";
 import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
 import type { TextAreaProps } from "../textarea";
@@ -76,6 +77,7 @@ export type SelectConfig = ComponentStyleConfig &
 export type PaginationConfig = ComponentStyleConfig &
   Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
 
+export type ResultConfig = ComponentStyleConfig & Pick<ResultProps, "icons">;
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {

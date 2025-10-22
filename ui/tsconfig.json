@@ -6,8 +6,10 @@
     "jsx": "preserve",
     "rootDir": ".",
     "paths": {
+      "@/lib/*": ["./src/lib/*"],
       "@/components/ui/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"]
+      "@/components/icons": ["./src/icons/index.ts"],
+      "@/components/icons/*": ["./src/icons/*"]
     }
   },
   "include": ["src"],

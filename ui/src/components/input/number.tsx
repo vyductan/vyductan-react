@@ -7,7 +7,7 @@ import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { SizeType } from "../../types";
+import type { SizeType } from "../config-provider/size-context";
 import type {
   ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProps,

@@ -9,8 +9,8 @@ import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
-import type { SizeType } from "../..";
 import type { CommandProps } from "../command";
+import type { SizeType } from "../config-provider/size-context";
 import type { PopoverContentProps } from "../popover";
 import type { OptionType } from "../select/types";
 import { Button, LoadingIcon } from "../button";

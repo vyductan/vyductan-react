@@ -1,6 +1,5 @@
 import { useContext } from "react";
 
-import type { SizeType } from "@acme/ui/types";
 import { cn } from "@acme/ui/lib/utils";
 import {
   CardAction as ShadcnCardAction,
@@ -11,6 +10,7 @@ import {
   CardTitle as ShadcnCardTitle,
 } from "@acme/ui/shadcn/card";
 
+import type { SizeType } from "../../config-provider/size-context";
 import { CardContext } from "../context";
 
 type CardRootProps = React.ComponentProps<typeof ShadcnCardRoot> & {
