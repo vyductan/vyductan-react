@@ -46,7 +46,7 @@ function FormItem({
     >
       {/* {String(hasFormMessage)} */}
       {children}
-      {hasFormMessage && <div className="-mb-6" />}
+      {hasFormMessage && <div className="-mb-8" />}
     </ShadFormItem>
   );
   // return (
