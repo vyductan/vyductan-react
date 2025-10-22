@@ -12,13 +12,15 @@ import { Skeleton } from "../skeleton";
 
 export type DescriptionsItem = {
   key?: React.Key;
+  label?: React.ReactNode;
+  children?: React.ReactNode;
+
   span?: number;
+  className?: string;
   classNames?: {
     label?: string;
     children?: string;
   };
-  label?: React.ReactNode;
-  children?: React.ReactNode;
 };
 type DescriptionProps = {
   title?: React.ReactNode;
@@ -176,6 +178,7 @@ export const Descriptions = ({
                             "w-[1%] whitespace-nowrap",
                             thClassName,
                             col.classNames?.label,
+                            col.className,
                           )}
                           style={labelStyle}
                         >
@@ -186,6 +189,7 @@ export const Descriptions = ({
                             tdClassName,
                             col.classNames?.children,
                             "last:border-r-0",
+                            col.className,
                           )}
                         >
                           {skeleton ? (
@@ -198,7 +202,11 @@ export const Descriptions = ({
                     ) : (
                       <td
                         key={col.key ?? index}
-                        className={cn(tdClassName, col.classNames?.children)}
+                        className={cn(
+                          tdClassName,
+                          col.classNames?.children,
+                          col.className,
+                        )}
                       >
                         <span className={labelClassName}>{col.label}</span>
                         {skeleton ? (
@@ -301,13 +309,13 @@ function createVerticalRows(
     currentRowLabels.push({
       span: itemSpan,
       content: item.label,
-      className: item.classNames?.label,
+      className: cn(item.classNames?.label, item.className),
     });
 
     currentRowValues.push({
       span: itemSpan,
       content: item.children,
-      className: item.classNames?.children,
+      className: cn(item.classNames?.children, item.className),
     });
 
     currentRowSpan += itemSpan;
