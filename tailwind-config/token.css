@@ -1,6 +1,8 @@
 :root {
-  --primary: var(--color-primary-600);
   --ring: var(--color-primary-100);
+  --solid: oklch(0.205 0 0);
+  --solid-hover: oklab(0.205 0 0 / 0.9);
+  --solid-active: oklab(0.205 0 0 / 0.95);
 
   --breakpoint-xs: 480px;
   --control-height: 32px;
@@ -13,12 +15,20 @@
 }
 
 @theme inline {
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-400);
+  --color-primary-active: var(--color-primary-600);
+  --color-secondary-hover: oklch(0.922 0 0);
+  --color-secondary-active: oklch(0.95 0 0);
   --color-error: var(--color-red-500);
   --color-error-hover: var(--color-red-600);
   --color-link: var(--color-blue-500);
   --color-link-hover: var(--color-blue-600);
   --color-success: var(--color-green-500);
   --color-success-hover: var(--color-green-600);
+  --color-solid: var(--solid);
+  --color-solid-hover: var(--solid-hover);
+  --color-solid-active: var(--solid-active);
 
   --color-text-placeholder: var(--color-muted-foreground);
 
