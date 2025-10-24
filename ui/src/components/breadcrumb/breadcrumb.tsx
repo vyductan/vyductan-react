@@ -109,6 +109,8 @@ const Breadcrumb = (props: BreadcrumbProps) => {
 export type { BreadcrumbItemDef, BreadcrumbProps, OwnBreadcrumbProps };
 export { Breadcrumb };
 
+export { BreadcrumbLink } from "./_components";
+
 export {
   BreadcrumbList,
   BreadcrumbPage,
