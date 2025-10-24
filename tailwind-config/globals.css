@@ -24,6 +24,10 @@
     text-rendering: optimizeLegibility;
   }
 
+  a {
+    @apply text-primary hover:text-primary-hover active:text-primary-active cursor-pointer;
+  }
+
   @supports (font: -apple-system-body) and (-webkit-appearance: none) {
     [data-wrapper] {
       @apply min-[1800px]:border-t;
