@@ -109,7 +109,7 @@ const buttonVariants = tv({
       icon: [
         'sm:has-[span[class*="sm::not-sr-only"]]:w-auto',
         'max-sm:has-[span[class*="sm::not-sr-only"]]:p-0',
-        '[&:not(:has(span[class*="sm::not-sr-only"]))]:p-0',
+        // '[&:not(:has(span[class*="sm::not-sr-only"]))]:p-0',
       ],
       circle: "rounded-full",
     },
@@ -594,7 +594,7 @@ const buttonVariants = tv({
       className: "w-6",
     },
     {
-      size: "middle",
+      size: ["middle", "default"],
       shape: ["icon", "circle"],
       className: "size-8",
     },
@@ -667,7 +667,6 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const buttonConfig = useUiConfig((state) => state.components.button);
-
   let sizeToPass = size as ButtonVariants["size"];
   if (size === "sm") {
     sizeToPass = "small";
@@ -706,10 +705,6 @@ const Button = ({
     variant === "outline" || variant === "dashed" ? "outlined" : variant;
   if (!isHtmlType && type === "text") {
     variantToPass = "text";
-  }
-
-  if (variant === "solid" && color === "default") {
-    console.log(variantToPass, color);
   }
 
   return (
