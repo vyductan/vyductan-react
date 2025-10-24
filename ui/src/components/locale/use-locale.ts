@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-useless-fallback-in-spread */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import * as React from "react";
 
@@ -24,7 +23,9 @@ const useLocale = <C extends LocaleComponentName = LocaleComponentName>(
     const locale = defaultLocale || defaultLocaleData[componentName];
     const localeFromContext = fullLocale?.[componentName] ?? {};
     return {
-      ...(typeof locale === "function" ? locale() : locale),
+      ...(typeof locale === "function"
+        ? (locale as () => Locale[C])()
+        : locale),
       ...(localeFromContext || {}),
     };
   }, [componentName, defaultLocale, fullLocale]);

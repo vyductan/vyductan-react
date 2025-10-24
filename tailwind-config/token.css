@@ -1,8 +1,8 @@
 :root {
   --ring: var(--color-primary-100);
-  --solid: oklch(0.205 0 0);
-  --solid-hover: oklab(0.205 0 0 / 0.9);
-  --solid-active: oklab(0.205 0 0 / 0.95);
+  --button-solid: oklch(0.205 0 0);
+  --button-solid-hover: oklab(0.205 0 0 / 0.9);
+  --button-solid-active: oklab(0.205 0 0 / 0.95);
 
   --breakpoint-xs: 480px;
   --control-height: 32px;
@@ -26,9 +26,9 @@
   --color-link-hover: var(--color-blue-600);
   --color-success: var(--color-green-500);
   --color-success-hover: var(--color-green-600);
-  --color-solid: var(--solid);
-  --color-solid-hover: var(--solid-hover);
-  --color-solid-active: var(--solid-active);
+  --color-button-solid: var(--button-solid);
+  --color-button-solid-hover: var(--button-solid-hover);
+  --color-button-solid-active: var(--button-solid-active);
 
   --color-text-placeholder: var(--color-muted-foreground);
 

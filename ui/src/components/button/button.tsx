@@ -183,7 +183,11 @@ const buttonVariants = tv({
     {
       variant: "solid",
       color: "default",
-      className: ["bg-solid", "hover:bg-solid-hover", "active:bg-solid-active"],
+      className: [
+        "bg-button-solid",
+        "hover:bg-button-solid-hover",
+        "active:bg-button-solid-active",
+      ],
     },
     {
       variant: "solid",
