@@ -8,21 +8,11 @@ import { useResponsive } from "@acme/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../config-provider/size-context";
+import type { DescriptionsItem, VerticalCell } from "./types";
 import { Skeleton } from "../skeleton";
+import { createHorizontalRows, createVerticalRows } from "./utils";
 
-export type DescriptionsItem = {
-  key?: React.Key;
-  label?: React.ReactNode;
-  children?: React.ReactNode;
-
-  span?: number;
-  className?: string;
-  classNames?: {
-    label?: string;
-    children?: string;
-  };
-};
-type DescriptionProps = {
+type DescriptionsProps = {
   title?: React.ReactNode;
   items: DescriptionsItem[];
 
@@ -49,7 +39,7 @@ type DescriptionProps = {
   colon?: boolean;
   extra?: ReactNode;
 };
-export const Descriptions = ({
+const Descriptions = ({
   title,
   items,
   extra,
@@ -65,7 +55,7 @@ export const Descriptions = ({
   layout = "horizontal",
   colon = true,
   // ...props
-}: DescriptionProps) => {
+}: DescriptionsProps) => {
   const responsiveInfo = useResponsive();
 
   let mergedColumn = 0;
@@ -88,7 +78,7 @@ export const Descriptions = ({
 
   const rows =
     layout === "horizontal"
-      ? chunkArray(items, mergedColumn)
+      ? createHorizontalRows(items, mergedColumn)
       : createVerticalRows(items, mergedColumn);
 
   const headerClassName = cn("mb-4 flex items-center", classNames?.header);
@@ -181,6 +171,7 @@ export const Descriptions = ({
                             col.className,
                           )}
                           style={labelStyle}
+                          colSpan={col.span}
                         >
                           <span>{col.label}</span>
                         </th>
@@ -191,6 +182,7 @@ export const Descriptions = ({
                             "last:border-r-0",
                             col.className,
                           )}
+                          colSpan={col.span}
                         >
                           {skeleton ? (
                             <Skeleton />
@@ -207,6 +199,7 @@ export const Descriptions = ({
                           col.classNames?.children,
                           col.className,
                         )}
+                        colSpan={col.span}
                       >
                         <span className={labelClassName}>{col.label}</span>
                         {skeleton ? (
@@ -265,74 +258,5 @@ export const Descriptions = ({
   );
 };
 
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const chunkedArray: T[][] = [];
-  for (let index = 0; index < array.length; index += size) {
-    const chunk = array.slice(index, index + size);
-    chunkedArray.push(chunk);
-  }
-  return chunkedArray;
-}
-type VerticalCell = {
-  content: ReactNode;
-  span?: number;
-  className?: string;
-};
-type VerticalRow = VerticalCell[];
-function createVerticalRows(
-  data: DescriptionsItem[],
-  columns: number,
-): VerticalRow[] {
-  const rows: VerticalRow[] = [];
-  let currentRowLabels: VerticalCell[] = [];
-  let currentRowValues: VerticalCell[] = [];
-  let currentRowSpan = 0;
-
-  // Process each item and create rows based on column spans
-  for (const item of data) {
-    const itemSpan = item.span ?? 1;
-
-    // If adding this item would exceed the column limit, start new rows
-    if (currentRowSpan + itemSpan > columns) {
-      // Add the current rows if they have content
-      if (currentRowLabels.length > 0) {
-        rows.push([...currentRowLabels], [...currentRowValues]);
-      }
-
-      // Reset for new rows
-      currentRowLabels = [];
-      currentRowValues = [];
-      currentRowSpan = 0;
-    }
-
-    // Add item to current rows
-    currentRowLabels.push({
-      span: itemSpan,
-      content: item.label,
-      className: cn(item.classNames?.label, item.className),
-    });
-
-    currentRowValues.push({
-      span: itemSpan,
-      content: item.children,
-      className: cn(item.classNames?.children, item.className),
-    });
-
-    currentRowSpan += itemSpan;
-
-    // // If we've reached the column limit, start new rows
-    // if (currentRowSpan >= columns) {
-    //   rows.push([...currentRowLabels], [...currentRowValues]);
-    //   currentRowLabels = [];
-    //   currentRowValues = [];
-    //   currentRowSpan = 0;
-    // }
-  }
-
-  // Add the last rows if they have content
-  if (currentRowLabels.length > 0) {
-    rows.push(currentRowLabels, currentRowValues);
-  }
-
-  return rows;
-}
+export type { DescriptionsProps };
+export { Descriptions };
