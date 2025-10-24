@@ -48,6 +48,7 @@ coverage
 
 # typescript
 *.tsbuildinfo
+.cache
 
 # turbo
 .turbo
