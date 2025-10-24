@@ -34,11 +34,11 @@ const columns: TableProps<DataType>["columns"] = [
     key: "tags",
     dataIndex: "tags",
     render: (_, { tags }) => (
-      <>
+      <div className="flex items-center gap-2">
         {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
+          let color = tag.length > 5 ? "indigo" : "green";
           if (tag === "loser") {
-            color = "volcano";
+            color = "orange";
           }
           return (
             <Tag color={color} key={tag}>
@@ -46,7 +46,7 @@ const columns: TableProps<DataType>["columns"] = [
             </Tag>
           );
         })}
-      </>
+      </div>
     ),
   },
   {

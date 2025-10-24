@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -40,7 +38,6 @@ import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
   ExpandableConfig,
-  ExpandType,
   FilterValue,
   GetComponentProps,
   GetPopupContainer,
@@ -72,11 +69,12 @@ import {
   TableHeader,
   TableRoot,
   TableRow,
+  TableWrapperFooter,
+  TableWrapperHeader,
 } from "./_components";
 import { ColGroup } from "./_components/col-group";
-import renderExpandIcon from "./_components/expand-icon";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
-import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
+import { useColumns } from "./hooks/use-columns";
 import useExpand from "./hooks/use-expand";
 import { getFilterData } from "./hooks/use-filter";
 import useLazyKVMap from "./hooks/use-lazy-kv-map";
@@ -194,6 +192,8 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     toolbar?: (table: TableDef<TRecord>) => React.JSX.Element;
     /** Summary content */
     summary?: (currentData: TRecord[]) => React.ReactNode;
+    /** Footer content */
+    footer?: (currentData: TRecord[]) => React.ReactNode;
 
     onChange?: (
       pagination: TablePaginationConfig,
@@ -228,9 +228,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     loading = false,
     skeleton = false,
 
-    columns,
-    children,
-    childrenColumnName: legacyChildrenColumnName,
+    columns: _columns,
+    children: _children,
+    childrenColumnName: _legacyChildrenColumnName,
     dataSource,
     pagination,
 
@@ -248,6 +248,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     toolbar,
     extra,
     alertRender,
+    footer,
 
     // Customize
     showHeader,
@@ -259,11 +260,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     sortDirections,
     showSorterTooltip,
 
-    expandable,
-    expandIcon,
-    expandedRowRender,
-    expandIconColumnIndex,
-    indentSize,
+    expandable: _expandable,
+    expandIcon: _expandIcon,
+    expandedRowRender: _expandedRowRender,
+    expandIconColumnIndex: _expandIconColumnIndex,
+    indentSize: _indentSize,
 
     // getPopupContainer,
 
@@ -296,25 +297,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
   const tableLocale: TableLocale = { ...contextLocale.Table, ...locale };
 
-  const mergedExpandable: ExpandableConfig<TRecord> = {
-    childrenColumnName: legacyChildrenColumnName,
-    expandIconColumnIndex,
-    ...expandable,
-    expandIcon: expandable?.expandIcon ?? tableConfig?.expandable?.expandIcon,
-  };
-  const { childrenColumnName = "children" } = mergedExpandable;
-  const expandType = React.useMemo<ExpandType>(() => {
-    if (rawData.some((item) => item?.[childrenColumnName])) {
-      return "nest";
-    }
-
-    if (expandedRowRender || expandable?.expandedRowRender) {
-      return "row";
-    }
-
-    return null;
-  }, [rawData]);
-
   // =======================
   const internalRefs: NonNullable<RcTableProps["internalRefs"]> = {
     body: React.useRef<HTMLDivElement>(null),
@@ -339,8 +321,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       return key ?? index;
     };
   }, [rowKey]);
-
-  const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
 
   // ============================ Events =============================
   const changeEventInfo: Partial<ChangeEventInfo<TRecord>> = {};
@@ -400,39 +380,15 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   };
 
   // ========================== Expandable ==========================
-  // Pass origin render status into `rc-table`, this can be removed when refactor with `rc-table`
-  (mergedExpandable as any).__PARENT_RENDER_ICON__ =
-    mergedExpandable.expandIcon;
-
-  // Customize expandable icon
-  mergedExpandable.expandIcon =
-    mergedExpandable.expandIcon || expandIcon || renderExpandIcon(tableLocale!);
-
-  // Adjust expand icon index, no overwrite expandIconColumnIndex if set.
-  if (
-    expandType === "nest" &&
-    mergedExpandable.expandIconColumnIndex === undefined
-  ) {
-    mergedExpandable.expandIconColumnIndex = rowSelection ? 1 : 0;
-  } else if (mergedExpandable.expandIconColumnIndex! > 0 && rowSelection) {
-    mergedExpandable.expandIconColumnIndex! -= 1;
-  }
-
-  // Indent size
-  if (typeof mergedExpandable.indentSize !== "number") {
-    mergedExpandable.indentSize =
-      typeof indentSize === "number" ? indentSize : 15;
-  }
-
   const [
     expandedState,
     setExpandedState,
 
     expandableConfig,
-    _expandableType,
+    expandType,
     mergedExpandedKeys,
     mergedExpandIcon,
-    _mergedChildrenColumnName,
+    childrenColumnName,
     onTriggerExpand,
   ] = useExpand(
     // {
@@ -453,6 +409,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     rawData,
     getRowKey,
   );
+
+  const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
 
   // useEffect(() => {
   //   const expandedRowKeys = expandable?.expandedRowKeys ?? [];
@@ -482,18 +440,46 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   },
   // );
 
-  const baseColumns = React.useMemo(
-    () =>
-      columns || (convertChildrenToColumns(children) as ColumnsType<TRecord>),
-    [columns, children],
-  );
-
   /**
    * Controlled state in `columns` is not a good idea that makes too many code (1000+ line?) to read
    * state out and then put it back to title render. Move these code into `hooks` but still too
    * complex. We should provides Table props like `sorter` & `filter` to handle control in next big
    * version.
    */
+
+  // ====================== Column ======================
+  // TODO: remove flattenColumns
+  const [mergedColumns, columnsForTTTable, _flattenColumns] =
+    useColumns<TRecord>(
+      {
+        ...props,
+        ...expandableConfig,
+        // Only create expand column for custom expandedRowRender (row type)
+        // For tree data (nest type), expand icon renders inline in first data column
+        expandable: !!expandableConfig.expandedRowRender,
+        expandColumnTitle: expandableConfig.columnTitle,
+        expandedKeys: mergedExpandedKeys,
+        getRowKey,
+        // https://github.com/ant-design/ant-design/issues/23894
+        onTriggerExpand,
+        expandIcon: mergedExpandIcon,
+        expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
+        // direction,
+        // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
+        // clientWidth: componentWidth,
+
+        //   expandable ??
+        //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
+        // getRowKey,
+
+        // mergedChildrenColumnName,
+
+        // rowSelection: rowSelection,
+        expandedRowRender: expandableConfig.expandedRowRender,
+      },
+      // transformColumns,
+      null,
+    );
 
   // ============================ Sorter =============================
   const onSorterChange = (
@@ -518,7 +504,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     _sorterTitleProps,
     getSorters,
   ] = useSorter<TRecord>({
-    mergedColumns: baseColumns,
+    mergedColumns: mergedColumns,
     onSorterChange,
     sortDirections: sortDirections ?? ["ascend", "descend"],
     tableLocale,
@@ -695,41 +681,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
-  // ====================== Column ======================
-  // TODO: remove flattenColumns
-  const [mergedColumns, columnsForTTTable, _flattenColumns] =
-    useColumns<TRecord>(
-      {
-        ...props,
-        ...expandableConfig,
-        // Only create expand column for custom expandedRowRender (row type)
-        // For tree data (nest type), expand icon renders inline in first data column
-        expandable: !!expandableConfig.expandedRowRender,
-        expandColumnTitle: expandableConfig.columnTitle,
-        expandedKeys: mergedExpandedKeys,
-        getRowKey,
-        // https://github.com/ant-design/ant-design/issues/23894
-        onTriggerExpand,
-        expandIcon: mergedExpandIcon,
-        expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
-        // direction,
-        // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
-        // clientWidth: componentWidth,
-
-        //   expandable ??
-        //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
-        // getRowKey,
-
-        // mergedChildrenColumnName,
-
-        // rowSelection: rowSelection,
-        expandedRowRender: expandableConfig.expandedRowRender,
-      },
-      // transformColumns,
-      null,
-    );
-
   // Create table instance with memoized values and required properties
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: mergedData,
     columns: [
@@ -782,17 +735,15 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     getRowId: (originalRow, index) => getRowKey(originalRow, index).toString(),
     // Expandable rows
     getExpandedRowModel: getExpandedRowModel(),
-    getSubRows: (row) =>
-      row[expandable?.childrenColumnName ?? "children"] ?? [],
+    getSubRows: (row) => row[childrenColumnName] ?? [],
     // For tree data (nest): only expand if row has children
     // For custom expandedRowRender: always allow expand
     getRowCanExpand: (row) => {
-      if (expandable?.expandedRowRender) {
+      if (expandableConfig.expandedRowRender) {
         return true; // Allow expanding for custom detail rows
       }
       // For tree data, check if row has children
-      const children =
-        row.original[expandable?.childrenColumnName ?? "children"];
+      const children = row.original[childrenColumnName];
       return Array.isArray(children) && children.length > 0;
     },
     onExpandedChange: handleExpandedChange,
@@ -947,6 +898,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
   // Use table.getAllLeafColumns() to include dynamically added columns (selection, etc.)
   const allLeafColumns = table.getAllLeafColumns();
+
   const bodyColGroup = (
     <ColGroup
       colWidths={allLeafColumns.map((col) => {
@@ -988,33 +940,35 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             // bordered === "around" && [
-            "[&_table]:border-separate [&_table]:rounded-md",
+            // "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md",
             // ],
             className,
           )}
           style={style}
         >
           {TableToolbarSection}
-          {title && (
-            <div
-              className={cn(
-                "flex items-center justify-between",
-                bordered ? "mb-4" : "mb-1",
-              )}
-            >
-              <div className="leading-none font-semibold tracking-tight">
-                {title(mergedData)}
-              </div>
-              {extra && <div>{extra}</div>}
-            </div>
-          )}
+
           {TableAlertSection}
           <div
-            className={cn(scroll?.y && "overflow-y-auto")}
+            className={cn(
+              scroll?.y && "overflow-y-auto",
+              // bordered && "rounded-md border",
+            )}
             style={{
               maxHeight: scroll?.y,
             }}
           >
+            {(title || extra) && (
+              <TableWrapperHeader bordered={bordered} size={size}>
+                <div
+                  data-slot="table-title"
+                  // className="font-semibold tracking-tight"
+                >
+                  {title?.(mergedData)}
+                </div>
+                {extra && <div>{extra}</div>}
+              </TableWrapperHeader>
+            )}
             <TableRoot
               ref={ref}
               className={cn(
@@ -1023,7 +977,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                 // bordered &&
                 //   "border-separate border-spacing-0 rounded-md border-s border-t",
                 // size === "small" ? "[&_th]:" : "",
-
+                (title || extra) && "rounded-t-none",
+                footer && "rounded-b-none",
                 classNames?.table,
               )}
               style={{
@@ -1192,7 +1147,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                               //   event: e,
                               // });
 
-                              if (expandable?.expandRowByClick) {
+                              if (expandableConfig.expandRowByClick) {
                                 const selection = globalThis.getSelection();
                                 if (selection?.type === "Range") {
                                   return;
@@ -1252,7 +1207,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                             })}
                           </TableRowComp>
                           {row.getIsExpanded() &&
-                            expandable?.expandedRowRender && (
+                            expandableConfig.expandedRowRender && (
                               <TableRow className="bg-gray-50 hover:bg-gray-50">
                                 {/* 2nd row is a custom 1 cell row */}
                                 <TableCell
@@ -1263,7 +1218,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                     bordered === false ? "border-b" : "",
                                   )}
                                 >
-                                  {expandable.expandedRowRender(
+                                  {expandableConfig.expandedRowRender(
                                     row.original,
                                     row.index,
                                     row.index,
@@ -1301,6 +1256,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                 </TableFooter>
               )}
             </TableRoot>
+            {footer && (
+              <TableWrapperFooter bordered={bordered} size={size}>
+                {footer(mergedData)}
+              </TableWrapperFooter>
+            )}
           </div>
           {pagination && (
             <Pagination
