@@ -4,7 +4,6 @@ import { Fragment } from "react";
 
 import {
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -14,6 +13,7 @@ import {
 import type { AnyObject } from "../_util/type";
 import { Icon } from "../../icons";
 import { Skeleton } from "../skeleton";
+import { BreadcrumbLink } from "./_components";
 
 type ShadcnBreadcrumbProps = React.ComponentProps<typeof ShadcnBreadcrumb>;
 
@@ -110,7 +110,6 @@ export type { BreadcrumbItemDef, BreadcrumbProps, OwnBreadcrumbProps };
 export { Breadcrumb };
 
 export {
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
