@@ -1,7 +1,5 @@
 "use client";
 
-import * as React from "react";
-
 import type { DatePickerProps } from "./date-picker";
 import { DatePicker } from "./date-picker";
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 // https://github.com/ant-design/ant-design/tree/master/components/input-number
 // Dec 30, 2024
 // https://github.com/ant-design/ant-design/commit/39d9c1c6bfb3f2b40eaff9d4c12ba6532139f96f
@@ -6,7 +7,7 @@ import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { SizeType } from "../../types";
+import type { SizeType } from "../config-provider/size-context";
 import type {
   ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProps,

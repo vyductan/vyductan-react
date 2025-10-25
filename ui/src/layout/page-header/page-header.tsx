@@ -1,12 +1,16 @@
 import type { AvatarProps } from "@/components/ui/avatar";
 import type { BreadcrumbProps } from "@/components/ui/breadcrumb";
+import type { DirectionType } from "@/components/ui/config-provider/context";
 import type { TagProps } from "@/components/ui/tag";
+import { useContext } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+import { ConfigContext } from "@/components/ui/config-provider";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import { buttonVariants, Space } from "../../components";
+import { Icon } from "../../icons";
 import { PageHeading } from "./_components";
 
 type PageHeaderProps = {
@@ -19,12 +23,13 @@ type PageHeaderProps = {
   };
   avatar?: AvatarProps;
   tags?: React.ReactElement<TagProps> | React.ReactElement<TagProps>[];
-  onBack?:
-    | { asChild: React.ReactNode }
-    | React.MouseEventHandler<HTMLButtonElement>;
 
   className?: string;
+  classNames?: {
+    title?: string;
+  };
   backIcon?: React.ReactNode;
+  onBack?: React.MouseEventHandler<HTMLElement>;
 
   render?: (
     originNodes: {
@@ -36,31 +41,64 @@ type PageHeaderProps = {
   ) => React.ReactNode;
 };
 
-const renderTitle = (props: PageHeaderProps) => {
-  const { title, avatar, subTitle, tags, onBack } = props;
+const renderBack = (
+  backIcon?: React.ReactNode,
+  onBack?: React.MouseEventHandler<HTMLElement>,
+) => {
+  if (!backIcon || !onBack) {
+    return null;
+  }
+  return (
+    <div
+      role="button"
+      onClick={(e) => {
+        onBack(e);
+      }}
+      className={cn(
+        "mr-2 cursor-pointer",
+        buttonVariants({ variant: "text", shape: "icon" }),
+      )}
+      aria-label="back"
+    >
+      {backIcon}
+    </div>
+  );
+};
+
+const getBackIcon = (
+  props: PageHeaderProps,
+  direction: DirectionType = "ltr",
+) => {
+  if (props.backIcon !== undefined) {
+    return props.backIcon;
+  }
+  return direction === "rtl" ? (
+    <Icon icon="icon-[lucide--arrow-right]" />
+  ) : (
+    <Icon icon="icon-[lucide--arrow-left]" />
+  );
+};
+
+const renderTitle = (
+  props: PageHeaderProps,
+  direction: DirectionType = "ltr",
+) => {
+  const { title, avatar, subTitle, tags, classNames, onBack } = props;
   const hasHeading = title ?? subTitle ?? tags;
   // If there is nothing, return a null
   if (!hasHeading) {
     return;
   }
-  // const backIcon = getBackIcon(props, direction);
-  // const backIconDom = renderBack(backIcon, onBack);
+  const backIcon = getBackIcon(props, direction);
+  const backIconDom = renderBack(backIcon, onBack);
   return (
     <div className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
-      {/* {backIconDom} */}
-      <div className="flex items-center gap-2">
-        {onBack && (
-          <Button
-            shape="icon"
-            variant="text"
-            // icon={<Icon icon="icon-[lucide--arrow-left]" />}
-            asChild={typeof onBack === "object"}
-          >
-            {typeof onBack === "object" && onBack.asChild}
-          </Button>
-        )}
+      <div className="flex items-center">
+        {backIconDom}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
-        {title && <PageHeading>{title}</PageHeading>}
+        {title && (
+          <PageHeading className={classNames?.title}>{title}</PageHeading>
+        )}
       </div>
       {subTitle && (
         <p
@@ -79,7 +117,11 @@ const renderExtra = (props: PageHeaderProps) => {
   if (!extra) {
     return;
   }
-  return <span className={cn(`my-[calc(var(--margin-xs)/2)]`)}>{extra}</span>;
+  return (
+    <span className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
+      <Space>{extra}</Space>
+    </span>
+  );
 };
 
 const renderChildren = (props: PageHeaderProps) => {
@@ -97,7 +139,9 @@ const renderBreadcrumb = (breadcrumb?: PageHeaderProps["breadcrumb"]) => {
 };
 
 const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
-  const title = renderTitle(props);
+  const { direction } = useContext(ConfigContext);
+
+  const title = renderTitle(props, direction);
   const extra = renderExtra(props);
   const children = renderChildren(props);
   const breadcrumb = renderBreadcrumb(props.breadcrumb);

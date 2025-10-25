@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import type React from "react";
 import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form";
-import React, { cloneElement, isValidElement } from "react";
+import { cloneElement, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 import { FormField as ShadFormField } from "@acme/ui/shadcn/form";
@@ -165,44 +168,51 @@ const FormField = <
         name={name}
         render={(ctx) => {
           const controlContent = (
-            <div
-              className="flex w-full items-center"
-              data-slot="form-item-control-input"
-            >
-              <FormControl>
-                {cloneElement(children, {
-                  ...ctx.field,
-                  [finalValuePropName]: ctx.field.value,
-                  // Apply getValueProps if provided
-                  ...(getValueProps ? getValueProps(ctx.field.value) : {}),
-                  onBlur: (event: any) => {
-                    children.props.onBlur?.(event);
-                    ctx.field.onBlur();
-                  },
-                  onChange: (event: any) => {
-                    children.props.onChange?.(event);
-
-                    const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
-
-                    const normalizedValue = normalize?.(value, ctx.field.value);
-
-                    ctx.field.onChange(
-                      normalize
-                        ? normalizedValue === undefined
-                          ? null
-                          : normalizedValue
-                        : value,
-                    );
-                  },
-                })}
-              </FormControl>
-              <FieldMessage
-                validateStatus={
-                  validateStatus ?? (help ? "default" : undefined)
-                }
+            <div className="w-full" data-slot="form-item-control">
+              <div
+                className="flex w-full items-center"
+                data-slot="form-item-control-input"
               >
-                {typeof help === "function" ? help(ctx) : help}
-              </FieldMessage>
+                <FormControl>
+                  {cloneElement(children, {
+                    ...ctx.field,
+                    [finalValuePropName]: ctx.field.value,
+                    // Apply getValueProps if provided
+                    ...(getValueProps ? getValueProps(ctx.field.value) : {}),
+                    onBlur: (event: any) => {
+                      children.props.onBlur?.(event);
+                      ctx.field.onBlur();
+                    },
+                    onChange: (event: any) => {
+                      children.props.onChange?.(event);
+
+                      const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
+
+                      const normalizedValue = normalize?.(
+                        value,
+                        ctx.field.value,
+                      );
+
+                      ctx.field.onChange(
+                        normalize
+                          ? normalizedValue === undefined
+                            ? null
+                            : normalizedValue
+                          : value,
+                      );
+                    },
+                  })}
+                </FormControl>
+              </div>
+              <div data-slot="form-item-additional">
+                <FieldMessage
+                  validateStatus={
+                    validateStatus ?? (help ? "default" : undefined)
+                  }
+                >
+                  {typeof help === "function" ? help(ctx) : help}
+                </FieldMessage>
+              </div>
             </div>
           );
 

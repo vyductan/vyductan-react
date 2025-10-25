@@ -1,4 +1,4 @@
-import React, { Children, isValidElement } from "react";
+import { Children, isValidElement } from "react";
 import { cn } from "@/lib/utils";
 
 import {
@@ -7,7 +7,7 @@ import {
 } from "@acme/ui/shadcn/form";
 
 import type { GenericSlotProps } from "../../slot";
-import { Autocomplete } from "../../autocomplete";
+import { AutoComplete } from "../../auto-complete";
 import { DatePicker } from "../../date-picker";
 import { Select } from "../../select";
 import { GenericSlot } from "../../slot";
@@ -28,7 +28,7 @@ const FormControl = ({ className, ...props }: GenericSlotProps) => {
               (child.type === DatePicker ||
                 child.type === TimePicker ||
                 child.type === Select ||
-                child.type === Autocomplete),
+                child.type === AutoComplete),
           )
             ? "w-full"
             : "",

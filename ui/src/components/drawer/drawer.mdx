@@ -1,21 +1,26 @@
-## Basic
+---
+title: Drawer
+description: A panel that slides out from the edge of the screen.
+featured: true
+component: true
+---
 
-Basic drawer
+## When To Use
 
-```tsx
-import { Drawer } from "@/components/ui/drawer";
+A Drawer is a panel that is typically overlaid on top of a page and slides in from the side. It contains a set of information or actions. Since the user can interact with the Drawer without leaving the current page, tasks can be achieved more efficiently within the same context.
 
-function App() {
-  const [open, setOpen] = useState(false);
-  return (
-    <Drawer
-      title="Drawer"
-      description="Drawer description"
-      open={open}
-      onOpenChange={setOpen}
-    >
-      <p>Drawer content</p>
-    </Drawer>
-  );
-}
-```
+- Use a Form to create or edit a set of information.
+- Processing subtasks. When subtasks are too heavy for a Popover and we still want to keep the subtasks in the context of the main task, Drawer comes very handy.
+- When the same Form is needed in multiple places.
+
+> Notes for developers
+>
+> Since the `5.17.0`, we provided the `loading` prop by the Spin. However, since the `5.18.0` version, we have fixed this design error and replaced the Spin with the Skeleton, and also modified the type of `loading` prop, which can only accept `boolean` type.
+
+## Examples
+
+### Basic
+
+Basic drawer.
+
+<ComponentPreview name="drawer-basic" className="mb-4" />

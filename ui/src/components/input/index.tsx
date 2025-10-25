@@ -6,10 +6,12 @@ import { Textarea } from "../textarea";
 import { Input as InternalInput } from "./input";
 import { InputNumber } from "./number";
 import { InputPassword } from "./password";
+import { InputSearch } from "./search";
 
 export * from "./input";
 export * from "./number";
 export * from "./password";
+export * from "./search";
 export * from "./types";
 export * from "./variants";
 
@@ -17,6 +19,7 @@ type CompoundedComponent = typeof InternalInput & {
   TextArea: typeof Textarea;
   Number: typeof InputNumber;
   Password: typeof InputPassword;
+  Search: typeof InputSearch;
 };
 
 type ConditionTypeInputProps<
@@ -44,5 +47,6 @@ const Input = ConditionTypeInput as CompoundedComponent;
 Input.TextArea = Textarea;
 Input.Number = InputNumber;
 Input.Password = InputPassword;
+Input.Search = InputSearch;
 
 export { Input };

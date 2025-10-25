@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/no-typeof-undefined */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */

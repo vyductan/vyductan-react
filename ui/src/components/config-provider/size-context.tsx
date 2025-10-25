@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 
-export type SizeType = "small" | "middle" | "large" | undefined;
+import type { inputSizeVariants } from "../input";
+
+export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
 
 const SizeContext = React.createContext<SizeType>(undefined);
 

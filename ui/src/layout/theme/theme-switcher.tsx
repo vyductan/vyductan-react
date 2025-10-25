@@ -1,7 +1,6 @@
 "use client";
 
 import type { ButtonProps } from "@/components/ui/button";
-import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { useTheme } from "next-themes";

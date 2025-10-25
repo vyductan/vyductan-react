@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/no-array-for-each */
@@ -23,8 +25,7 @@ const useLazyKVMap = <RecordType extends AnyObject = AnyObject>(
 
   function getRecordByKey(key: Key): RecordType {
     if (
-      !mapCacheRef.current ||
-      mapCacheRef.current.data !== data ||
+      mapCacheRef.current?.data !== data ||
       mapCacheRef.current.childrenColumnName !== childrenColumnName ||
       mapCacheRef.current.getRowKey !== getRowKey
     ) {

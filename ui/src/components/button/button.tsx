@@ -1,8 +1,8 @@
 "use client";
 
+import type * as React from "react";
 import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
-import * as React from "react";
 import { useUiConfig } from "@/components/ui/config-provider";
 import { GenericSlot } from "@/components/ui/slot";
 import { Slot } from "@radix-ui/react-slot";
@@ -29,7 +29,7 @@ const buttonVariants = tv({
     type: {
       default: [],
       primary: ["border-primary", "hover:border-primary-hover"],
-      dashed: ["border-dashed"],
+      dashed: [],
       link: ["border-transparent"],
       text: ["border-0"],
     },
@@ -65,6 +65,7 @@ const buttonVariants = tv({
       rose: [],
     },
     size: {
+      lg: "",
       small: "h-6 gap-1.5 rounded-sm px-2 py-0 font-normal",
       middle: "h-8 rounded-md px-[15px] has-[>svg]:px-2.5",
       large: "h-10 rounded-lg px-4 py-2 has-[>svg]:px-4",
@@ -80,17 +81,20 @@ const buttonVariants = tv({
         "hover:border-primary-600 hover:bg-primary-600",
         "active:ring-primary",
       ],
+      // Shadcn
       destructive:
         "border-red-600 bg-red-600 text-white shadow-xs hover:bg-red-700 focus-visible:ring-red-600/20 active:bg-red-800 dark:focus-visible:ring-red-600/40",
+      secondary: [],
+      ghost: [],
+      outline: [],
+
+      // Own
       solid: ["text-white", "hover:text-white"],
-      outline: [
+      outlined: [
         // "hover:bg-accent",
         "border-input bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
-      dashed: [
-        "border-border border border-dashed",
-        "hover:border-primary-600 hover:text-primary-600",
-      ],
+      dashed: [],
       // filled: [],
       // ghost: [
       //   "border-none",
@@ -175,91 +179,118 @@ const buttonVariants = tv({
         "hover:border-pink-600 hover:bg-pink-600",
       ],
     },
+    // solid
+    {
+      variant: "solid",
+      color: "default",
+      className: [
+        "bg-button-solid",
+        "hover:bg-button-solid-hover",
+        "active:bg-button-solid-active",
+      ],
+    },
+    {
+      variant: "solid",
+      color: "primary",
+      className: [
+        "bg-primary",
+        "hover:bg-primary-hover",
+        "active:bg-primary-active",
+      ],
+    },
+    {
+      variant: "solid",
+      color: "danger",
+      className: ["bg-red-500", "hover:bg-red-400", "active:bg-red-600"],
+    },
+    {
+      variant: "solid",
+      color: "orange",
+      className: [
+        "bg-orange-500",
+        "hover:bg-orange-400",
+        "active:bg-orange-600",
+      ],
+    },
     {
       variant: "solid",
       color: "green",
+      className: ["bg-green-500", "hover:bg-green-400", "active:bg-green-600"],
+    },
+    {
+      variant: "solid",
+      color: "emerald",
       className: [
-        "border-green-600 bg-green-600",
-        "hover:border-green-700 hover:bg-green-700",
+        "bg-emerald-500",
+        "hover:bg-emerald-400",
+        "active:bg-emerald-600",
       ],
     },
-    // outline
     {
-      variant: "outline",
+      variant: "solid",
+      color: "cyan",
+      className: ["bg-cyan-500", "hover:bg-cyan-400", "active:bg-cyan-600"],
+    },
+    {
+      variant: "solid",
+      color: "blue",
+      className: ["bg-blue-500", "hover:bg-blue-400", "active:bg-blue-600"],
+    },
+    {
+      variant: "solid",
+      color: "indigo",
+      className: [
+        "bg-indigo-500",
+        "hover:bg-indigo-400",
+        "active:bg-indigo-600",
+      ],
+    },
+    {
+      variant: "solid",
+      color: "purple",
+      className: [
+        "bg-purple-500",
+        "hover:bg-purple-400",
+        "active:bg-purple-600",
+      ],
+    },
+    {
+      variant: "solid",
+      color: "pink",
+      className: ["bg-pink-500", "hover:bg-pink-400", "active:bg-pink-600"],
+    },
+    // outlined
+    {
+      variant: "outlined",
+      color: "default",
+      className: [
+        "",
+        "hover:border-primary-hover hover:text-primary-hover",
+        "active:border-primary-active active:text-primary-active",
+      ],
+    },
+    {
+      variant: "outlined",
       color: "primary",
       className: [
-        "border-primary-500 text-primary shadow-xs",
+        "border-primary-500 text-primary",
         "hover:border-primary-600 hover:text-primary-600",
         "active:ring-primary",
       ],
     },
     {
-      variant: "default",
+      variant: "outlined",
       color: "danger",
       className: [
-        "border-red-600 bg-red-600 text-white shadow-xs",
-        "hover:border-red-700 hover:bg-red-700",
-        "active:border-red-800 active:bg-red-800",
-      ],
-    },
-    {
-      variant: "default",
-      color: "link",
-      className: ["border-link bg-link text-white", "hover:bg-link-hover"],
-    },
-    {
-      variant: "default",
-      color: "success",
-      className: [
-        "border-green-600 bg-green-600",
-        "hover:border-green-700 hover:bg-green-700",
-      ],
-    },
-    {
-      variant: "outline",
-      color: "danger",
-      className: [
-        "border-red-600 bg-white text-red-600",
-        "hover:border-red-500 hover:bg-red-50 hover:text-red-500",
+        "border-red-500 text-red-500",
+        "hover:border-red-600 hover:text-red-600",
         "active:border-red-700 active:text-red-700",
       ],
     },
     {
-      variant: "outline",
+      variant: "outlined",
       color: "link",
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
-    },
-    {
-      variant: "outline",
-      color: "blue",
-      className: [
-        "border-blue-600 text-blue-600",
-        "hover:border-blue-700 hover:text-blue-700",
-      ],
-    },
-    {
-      variant: "outline",
-      color: "green",
-      className: [
-        "border-green-600 text-green-600",
-        "hover:border-green-700 hover:text-green-700",
-      ],
-    },
-    {
-      variant: "outline",
-      color: "emerald",
-      className: [
-        "border-emerald-600 text-emerald-600",
-        "hover:border-emerald-700 hover:text-emerald-700",
-      ],
-    },
-    {
-      variant: "outline",
-      color: "indigo",
-      className: [
-        "border-indigo-600 text-indigo-600",
-        "hover:border-indigo-700 hover:text-indigo-700",
-      ],
     },
     {
       variant: "outline",
@@ -269,13 +300,96 @@ const buttonVariants = tv({
         "hover:border-orange-700 hover:text-orange-700",
       ],
     },
-    // filled
+    {
+      variant: "outlined",
+      color: "green",
+      className: [
+        "border-green-600 text-green-600",
+        "hover:border-green-700 hover:text-green-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "emerald",
+      className: [
+        "border-emerald-600 text-emerald-600",
+        "hover:border-emerald-700 hover:text-emerald-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "cyan",
+      className: [
+        "border-cyan-600 text-cyan-600",
+        "hover:border-cyan-700 hover:text-cyan-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "blue",
+      className: [
+        "border-blue-600 text-blue-600",
+        "hover:border-blue-700 hover:text-blue-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "indigo",
+      className: [
+        "border-indigo-600 text-indigo-600",
+        "hover:border-indigo-700 hover:text-indigo-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "purple",
+      className: [
+        "border-purple-600 text-purple-600",
+        "hover:border-purple-700 hover:text-purple-700",
+      ],
+    },
+    {
+      variant: "outlined",
+      color: "pink",
+      className: [
+        "border-pink-600 text-pink-600",
+        "hover:border-pink-700 hover:text-pink-700",
+      ],
+    },
+    // filled | light
+    {
+      variant: "filled",
+      color: "default",
+      className: [
+        "bg-secondary",
+        "hover:bg-secondary-hover",
+        "active:bg-secondary-active",
+      ],
+    },
     {
       variant: "filled",
       color: "primary",
       className: [
-        "bg-primary-100 text-primary-600",
-        "hover:bg-primary-200 hover:text-primary-700",
+        "bg-primary-50 text-primary",
+        "hover:bg-primary-100 hover:text-primary",
+        "active:bg-primary-200 active:text-primary-active",
+      ],
+    },
+    {
+      variant: "filled",
+      color: "danger",
+      className: [
+        "bg-red-50 text-red-500",
+        "hover:bg-red-100 hover:text-red-500",
+        "active:bg-red-200 active:text-red-500",
+      ],
+    },
+    {
+      variant: "filled",
+      color: "orange",
+      className: [
+        "bg-orange-100 text-orange-600",
+        "hover:bg-orange-200 hover:text-orange-700",
       ],
     },
     {
@@ -286,17 +400,36 @@ const buttonVariants = tv({
         "hover:bg-green-200 hover:text-green-700",
       ],
     },
-    // light
     {
       variant: "filled",
-      className: ["bg-gray-100 text-gray-950", "hover:bg-gray-200"],
+      color: "emerald",
+      className: [
+        "bg-emerald-100 text-emerald-600",
+        "hover:bg-emerald-200 hover:text-emerald-700",
+      ],
     },
     {
       variant: "filled",
-      color: "primary",
+      color: "cyan",
       className: [
-        "bg-primary-200 text-primary-500",
-        "hover:bg-primary-600 hover:text-white",
+        "bg-cyan-100 text-cyan-600",
+        "hover:bg-cyan-200 hover:text-cyan-700",
+      ],
+    },
+    {
+      variant: "filled",
+      color: "blue",
+      className: [
+        "bg-blue-100 text-blue-600",
+        "hover:bg-blue-200 hover:text-blue-700",
+      ],
+    },
+    {
+      variant: "filled",
+      color: "indigo",
+      className: [
+        "bg-indigo-100 text-indigo-600",
+        "hover:bg-indigo-200 hover:text-indigo-700",
       ],
     },
     {
@@ -304,98 +437,156 @@ const buttonVariants = tv({
       color: "link",
       className: [
         "text-link bg-blue-100",
-        // "hover:text-white hover:bg-info",
         "hover:bg-link-hover hover:text-white",
       ],
     },
     {
       variant: "filled",
-      color: "danger",
+      color: "purple",
       className: [
-        "bg-red-50 text-red-600",
-        "hover:bg-red-100 hover:text-red-700",
-        "active:bg-red-200 active:text-red-800",
+        "bg-purple-100 text-purple-600",
+        "hover:bg-purple-200 hover:text-purple-700",
       ],
     },
     {
       variant: "filled",
-      color: "success",
+      color: "pink",
       className: [
-        "bg-success/10 text-success",
-        "hover:bg-success hover:text-white",
-      ],
-    },
-    {
-      primary: true,
-      variant: "outline",
-      className: [
-        "border-primary text-primary bg-transparent",
-        "hover:bg-primary-active hover:border-primary-hover hover:text-primary-hover",
-        "hover:bg-blue-100 dark:hover:bg-blue-300",
+        "bg-pink-100 text-pink-600",
+        "hover:bg-pink-200 hover:text-pink-700",
       ],
     },
     // Text
     {
       variant: "text",
+      color: "default",
+      className: ["", "hover:bg-secondary", "active:bg-secondary-active"],
+    },
+    {
+      variant: "text",
       color: "primary",
       className: [
         "text-primary",
-        "hover:text-primary-600",
-        "hover:bg-primary-100",
+        "hover:bg-primary-50 hover:text-primary-hover",
+        "active:bg-primary-200 active:text-primary-active",
       ],
     },
     {
       variant: "text",
       color: "danger",
-      className: ["text-error", "hover:text-error-hover", "hover:bg-red-100"],
-    },
-    {
-      variant: "text",
-      color: "success",
       className: [
-        "text-success",
-        "hover:text-success-hover",
-        "hover:bg-green-100",
+        "text-red-500",
+        "hover:bg-red-50 hover:text-red-400",
+        "active:bg-red-200 active:text-red-600",
       ],
     },
     {
       variant: "text",
-      color: "link",
-      className: ["text-link", "hover:text-link-hover", "hover:bg-blue-100"],
-    },
-    {
-      variant: "text",
-      color: "blue",
+      color: "green",
       className: [
-        "text-blue-600",
-        "hover:text-blue-hover",
-        "hover:bg-blue-100",
+        "text-green-500",
+        "hover:bg-green-50 hover:text-green-400",
+        "active:bg-green-200 active:text-green-600",
       ],
     },
     {
       variant: "text",
       color: "emerald",
       className: [
-        "text-emerald-600",
-        "hover:text-emerald-hover",
-        "hover:bg-emerald-100",
+        "text-emerald-500",
+        "hover:bg-emerald-50 hover:text-emerald-400",
+        "active:bg-emerald-200 active:text-emerald-600",
+      ],
+    },
+    {
+      variant: "text",
+      color: "cyan",
+      className: [
+        "text-cyan-500",
+        "hover:bg-cyan-50 hover:text-cyan-400",
+        "active:bg-cyan-200 active:text-cyan-600",
+      ],
+    },
+    {
+      variant: "text",
+      color: "blue",
+      className: [
+        "text-blue-500",
+        "hover:bg-blue-50 hover:text-blue-400",
+        "active:bg-blue-200 active:text-blue-600",
       ],
     },
     {
       variant: "text",
       color: "indigo",
       className: [
-        "text-indigo-600",
-        "hover:text-indigo-hover",
-        "hover:bg-indigo-100",
+        "text-indigo-500",
+        "hover:bg-indigo-50 hover:text-indigo-400",
+        "active:bg-indigo-200 active:text-indigo-600",
       ],
     },
+    {
+      variant: "text",
+      color: "purple",
+      className: [
+        "text-purple-500",
+        "hover:bg-purple-50 hover:text-purple-400",
+        "active:bg-purple-200 active:text-purple-600",
+      ],
+    },
+    {
+      variant: "text",
+      color: "pink",
+      className: [
+        "text-pink-500",
+        "hover:bg-pink-50 hover:text-pink-400",
+        "active:bg-pink-200 active:text-pink-600",
+      ],
+    },
+
     // Link
     {
       variant: "link",
       color: "default",
-      className: ["text-primary", "hover:text-primary-hover"],
+      className: ["", "hover:text-primary-hover", "active:text-primary-active"],
     },
+    {
+      variant: "link",
+      color: "danger",
+      className: [
+        "text-red-500",
+        "hover:text-red-hover",
+        "active:text-red-active",
+      ],
+    },
+    {
+      variant: "link",
+      color: "pink",
+      className: [
+        "text-pink-500",
+        "hover:text-pink-400",
+        "active:text-pink-600",
+      ],
+    },
+    {
+      variant: "link",
+      color: "purple",
+      className: [
+        "text-purple-500",
+        "hover:text-purple-400",
+        "active:text-purple-600",
+      ],
+    },
+    {
+      variant: "link",
+      color: "cyan",
+      className: [
+        "text-cyan-500",
+        "hover:text-cyan-400",
+        "active:text-cyan-600",
+      ],
+    },
+    // ========
     // Size
     {
       size: "small",
@@ -403,7 +594,7 @@ const buttonVariants = tv({
       className: "w-6",
     },
     {
-      size: "middle",
+      size: ["middle", "default"],
       shape: ["icon", "circle"],
       className: "size-8",
     },
@@ -476,7 +667,6 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const buttonConfig = useUiConfig((state) => state.components.button);
-
   let sizeToPass = size as ButtonVariants["size"];
   if (size === "sm") {
     sizeToPass = "small";
@@ -511,7 +701,8 @@ const Button = ({
   const isHtmlType = type === "submit" || type === "reset" || type === "button";
   const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
-  let variantToPass = variant;
+  let variantToPass =
+    variant === "outline" || variant === "dashed" ? "outlined" : variant;
   if (!isHtmlType && type === "text") {
     variantToPass = "text";
   }
@@ -521,6 +712,7 @@ const Button = ({
       <Comp
         className={cn(
           "relative",
+          variant === "dashed" && "border-dashed",
           buttonVariants({
             color: danger ? "danger" : color,
             disabled,

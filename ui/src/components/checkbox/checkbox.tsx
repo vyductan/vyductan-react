@@ -30,8 +30,11 @@ type AbstractCheckboxProps<T> = {
   loading?: boolean;
 
   // styles
-  className?: string;
   style?: React.CSSProperties;
+  className?: string;
+  classNames?: {
+    label?: string;
+  };
 
   // render
   children?: React.ReactNode;
@@ -73,8 +76,9 @@ const Checkbox = (props: CheckboxProps) => {
     // defaultChecked,
 
     // styles
-    className,
     style,
+    className,
+    classNames,
     // render
     children,
 
@@ -126,7 +130,7 @@ const Checkbox = (props: CheckboxProps) => {
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <label
         className={cn(
-          "inline-flex shrink-0 cursor-pointer items-center gap-x-2 text-sm",
+          "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           inputDisabledVariants({ disabled: mergedDisabled }),
           className,
@@ -168,7 +172,16 @@ const Checkbox = (props: CheckboxProps) => {
           }}
           {...restProps}
         />
-        {loading ? <LoadingIcon /> : children}
+        {loading ? (
+          <LoadingIcon />
+        ) : (
+          <span
+            data-slot="checkbox-label"
+            className={cn("leading-line-height px-2", classNames?.label)}
+          >
+            {children}
+          </span>
+        )}
       </label>
     </Wave>
   );

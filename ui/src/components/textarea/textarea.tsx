@@ -1,6 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
+import type * as React from "react";
 import type { TextareaAutosizeProps } from "react-textarea-autosize";
-import * as React from "react";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import * as React from "react";
+import type * as React from "react";
 
 import type { AnyObject } from "../../_util/type";
 import type { TableLocale } from "../types";
@@ -23,18 +22,18 @@ function renderExpandIcon(locale: TableLocale) {
   ) => {
     const { onExpand, record, expanded, expandable } = props;
     const iconPrefix = `row-expand-icon`;
-    
+
     // Don't render expand icon for non-expandable rows
     if (!expandable) {
       return <span className={`${iconPrefix} ${iconPrefix}-spaced`} />;
     }
-    
+
     return (
       <Button
         variant="text"
         size="small"
         onClick={(e) => {
-          onExpand(record, e!);
+          onExpand(record, e);
           e.stopPropagation();
         }}
         className={cn(iconPrefix, {

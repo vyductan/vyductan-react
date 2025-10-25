@@ -63,7 +63,7 @@ const Space = React.forwardRef<HTMLDivElement, SpaceProps>(
   (
     {
       direction = "horizontal",
-      size = "middle",
+      size = "small",
       align = "center",
       wrap = false,
       children,
@@ -109,13 +109,19 @@ const Space = React.forwardRef<HTMLDivElement, SpaceProps>(
               {split}
             </span>
           )}
-          <div className="inline-flex">{child}</div>
+          {child}
         </React.Fragment>
       );
     });
 
     return (
-      <div ref={ref} className={classes} style={mergedStyle} {...props}>
+      <div
+        data-slot="space"
+        ref={ref}
+        className={classes}
+        style={mergedStyle}
+        {...props}
+      >
         {nodes}
       </div>
     );

@@ -7,7 +7,6 @@
  */
 import type { BaseSelection, NodeKey } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -1,4 +1,6 @@
-import * as React from "react";
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import type * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";

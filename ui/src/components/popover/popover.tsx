@@ -5,17 +5,18 @@ import { useDebounce } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AlignType, Placement } from "../../types";
+import type { AlignType } from "../../types";
+import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
 import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_component";
 
-export type PopoverProps = PopoverRootProps &
+export type PopoverProps = AbstractTooltipProps &
+  PopoverRootProps &
   Omit<PopoverContentProps, "content" | "sideOffset" | "align"> & {
     trigger?: "click" | "hover" | "focus";
     content?: React.ReactNode;
 
     align?: AlignType;
-    placement?: Placement;
 
     arrow?: boolean;
   };

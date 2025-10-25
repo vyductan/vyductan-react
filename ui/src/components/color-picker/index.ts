@@ -9,4 +9,3 @@ export type {
   ColorPickerTrigger,
   TriggerPlacement as ColorPickerPlacement,
 } from "./types";
-export type { RgbaColor, HslColor, HslaColor, ColorValue } from "./color";

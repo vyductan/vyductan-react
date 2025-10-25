@@ -1,0 +1,43 @@
+:root {
+  --ring: var(--color-primary-100);
+  --button-solid: oklch(0.205 0 0);
+  --button-solid-hover: oklab(0.205 0 0 / 0.9);
+  --button-solid-active: oklab(0.205 0 0 / 0.95);
+
+  --breakpoint-xs: 480px;
+  --control-height: 32px;
+  --control-height-lg: 40px;
+  --control-height-sm: 24px;
+  --line-height: 22px;
+  --margin-xs: 8px;
+
+  --progress-default-color: var(--color-blue-600);
+}
+
+@theme inline {
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-400);
+  --color-primary-active: var(--color-primary-600);
+  --color-secondary-hover: oklch(0.922 0 0);
+  --color-secondary-active: oklch(0.95 0 0);
+  --color-error: var(--color-red-500);
+  --color-error-hover: var(--color-red-600);
+  --color-link: var(--color-blue-500);
+  --color-link-hover: var(--color-blue-600);
+  --color-success: var(--color-green-500);
+  --color-success-hover: var(--color-green-600);
+  --color-button-solid: var(--button-solid);
+  --color-button-solid-hover: var(--button-solid-hover);
+  --color-button-solid-active: var(--button-solid-active);
+
+  --color-text-placeholder: var(--color-muted-foreground);
+
+  --spacing-control: var(--control-height);
+  --spacing-control-sm: var(--control-height-sm);
+  --spacing-control-lg: var(--control-height-lg);
+  --spacing-line-height: var(--line-height);
+
+  --box-shadow-secondary:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}

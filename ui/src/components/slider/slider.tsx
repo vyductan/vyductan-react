@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { XOR } from "ts-xor";
 
 import { Slider as SliderShadcn } from "@acme/ui/shadcn/slider";

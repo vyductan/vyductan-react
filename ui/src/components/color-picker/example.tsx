@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import { Color } from "./color";
+import { AggregationColor } from "./color";
 import { ColorPicker } from "./color-picker";
 
 export const ColorPickerExample: React.FC = () => {
@@ -15,8 +15,8 @@ export const ColorPickerExample: React.FC = () => {
       <div className="space-y-2">
         <label className="text-sm font-medium">Basic Color Picker</label>
         <ColorPicker
-          value={color ? new Color(color) : undefined}
-          onChange={(newColor) => setColor(newColor?.toHexString())}
+          value={color ? new AggregationColor(color) : undefined}
+          onChange={(newColor) => setColor(newColor.toHexString())}
           showText
           allowClear
         />
@@ -39,7 +39,7 @@ export const ColorPickerExample: React.FC = () => {
             "#800080",
             "#008000",
           ]}
-          onChange={(newColor) => setColor(newColor?.toHexString())}
+          onChange={(newColor) => setColor(newColor.toHexString())}
         />
       </div>
 

@@ -1,4 +1,5 @@
 import type { Dayjs } from "dayjs";
+import type { Modifiers } from "react-day-picker";
 import dayjs from "dayjs";
 
 import type { ShadcnCalendarProps } from "./_components";
@@ -41,7 +42,7 @@ type CalendarRangeValueProps = Omit<
   onSelect?: (
     dateRange: { from?: Date; to?: Date } | undefined,
     triggerDate: Date,
-    modifiers: any,
+    modifiers: Modifiers,
   ) => void;
   format?: string;
   disabledDate?: (date: Dayjs) => boolean;

@@ -36,7 +36,7 @@ export const PageContainer = ({
     <div
       className={cn(
         "@container",
-        "flex flex-1 flex-col gap-4 p-4 pb-10 lg:p-6 xl:p-8",
+        "flex flex-1 flex-col gap-4 p-4 pb-10 lg:p-6",
         className,
       )}
     >

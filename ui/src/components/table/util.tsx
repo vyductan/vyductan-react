@@ -134,27 +134,31 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
         // Only wrap with flex container if first column has tree data
         if (isFirstDataColumn && hasTreeData) {
           return (
-            <div className="flex items-center gap-1">
+            <div
+              data-slot="table-row-content"
+              className="flex items-center gap-1"
+            >
               {/* Tree Data: Indent (only on first column, only children) */}
               {row.depth > 0 && (
                 <span
+                  data-slot={`table-row-indent-level-${row.depth}`}
+                  aria-hidden="true"
                   style={{
-                    paddingLeft: `${row.depth * 2}rem`,
+                    paddingLeft: `${row.depth * (props.expandable?.indentSize ?? 15)}px`,
                   }}
                 />
               )}
               {/* Tree Data: Expand Icon (only on first column) */}
-              {row.getCanExpand() && props.expandable?.expandIcon ? (
-                props.expandable.expandIcon({
-                  record: row.original,
-                  expanded: row.getIsExpanded(),
-                  expandable: row.getCanExpand(),
-                  onExpand: row.getToggleExpandedHandler(),
-                })
-              ) : (
-                // Placeholder to maintain alignment for leaf nodes
-                <span className="inline-block w-6" />
-              )}
+              <span className="inline-block w-6">
+                {row.getCanExpand() && props.expandable?.expandIcon
+                  ? props.expandable.expandIcon({
+                      record: row.original,
+                      expanded: row.getIsExpanded(),
+                      expandable: row.getCanExpand(),
+                      onExpand: row.getToggleExpandedHandler(),
+                    })
+                  : null}
+              </span>
               {cellContent}
             </div>
           );

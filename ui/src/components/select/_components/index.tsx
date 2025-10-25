@@ -1,10 +1,11 @@
+import type React from "react";
 import type { VariantProps } from "tailwind-variants";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 
+import type { Select as ShadcnSelect } from "@acme/ui/shadcn/select";
 import { SelectTrigger as ShacnSelectTrigger } from "@acme/ui/shadcn/select";
 
-import type { ValueType } from "../../form";
 import type { inputSizeVariants } from "../../input";
 import type { SelectClearProps } from "./select-clear";
 import { Icon } from "../../../icons";
@@ -12,8 +13,6 @@ import { inputVariants } from "../../input";
 import { SelectClear } from "./select-clear";
 
 const SelectTrigger = ({
-  value,
-
   children,
   className,
 
@@ -21,7 +20,7 @@ const SelectTrigger = ({
   status,
   variant,
   allowClear,
-  clearIcon,
+  showClearIcon,
   onClear,
   loading,
   disabled,
@@ -31,11 +30,10 @@ const SelectTrigger = ({
 }: Omit<React.ComponentProps<typeof ShacnSelectTrigger>, "size"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> &
-  Pick<SelectClearProps, "allowClear" | "clearIcon"> & {
+  Pick<SelectClearProps, "allowClear" | "showClearIcon"> & {
     onClear?: () => void;
     loading?: boolean;
     /* For clear */
-    value?: ValueType | undefined;
     suffixIcon?: React.ReactNode;
   }) => {
   const mergedAllowClear = useMemo<boolean>(() => {
@@ -50,16 +48,17 @@ const SelectTrigger = ({
   return (
     <ShacnSelectTrigger
       data-size={mergedSize}
+      disabled={disabled}
       className={cn(
         "group relative",
         "w-full",
-        inputVariants({ variant, status }),
+        inputVariants({ variant, status, disabled }),
         // inputSizeVariants({ size }),
         // controlHeightVariants({ size }),
         "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
         [
           "*:data-[slot=select-value]:truncate",
-          !value && "*:data-[slot=select-value]:h-[22px]",
+          !showClearIcon && "*:data-[slot=select-value]:h-[22px]",
         ],
 
         // for radix icon
@@ -67,7 +66,7 @@ const SelectTrigger = ({
         [
           "[&>svg:last-of-type]:transition-opacity",
           mergedAllowClear &&
-            value &&
+            showClearIcon &&
             "[&>svg:last-of-type]:group-hover:opacity-0",
           loading && "[&>svg:last-of-type]:hidden",
           suffixIcon && "[&>svg:last-of-type]:hidden",
@@ -80,9 +79,9 @@ const SelectTrigger = ({
       {children}
       {mergedAllowClear && (
         <SelectClear
-          clearIcon={clearIcon}
+          allowClear={allowClear}
           onPointerDown={onClear}
-          value={value}
+          showClearIcon={showClearIcon}
         />
       )}
 
@@ -104,6 +103,9 @@ const SelectTrigger = ({
   );
 };
 
+type SelectShadcnProps = React.ComponentProps<typeof ShadcnSelect>;
+
+export type { SelectShadcnProps };
 export { SelectTrigger };
 
 export {

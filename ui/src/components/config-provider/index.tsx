@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from "react";
@@ -10,6 +11,7 @@ import type {
   InputNumberConfig,
   MentionsConfig,
   PaginationConfig,
+  ResultConfig,
   SelectConfig,
   TextAreaConfig,
 } from "./context";
@@ -82,7 +84,7 @@ export interface ConfigProviderProps {
   mentions?: MentionsConfig;
   // modal?: ModalConfig;
   // progress?: ComponentStyleConfig;
-  // result?: ComponentStyleConfig;
+  result?: ResultConfig;
   // slider?: ComponentStyleConfig;
   // menu?: MenuConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;

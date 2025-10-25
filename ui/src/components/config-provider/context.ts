@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
@@ -7,7 +10,8 @@ import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
 import type { PaginationProps } from "../pagination";
-import type { XorSelectProps } from "../select";
+import type { ResultProps } from "../result";
+import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
 import type { TextAreaProps } from "../textarea";
 import type {
@@ -68,11 +72,12 @@ export type MentionsConfig = ComponentStyleConfig &
   Pick<MentionsProps, "variant">;
 
 export type SelectConfig = ComponentStyleConfig &
-  Pick<XorSelectProps, "showSearch" | "variant" | "classNames" | "styles">;
+  Pick<SelectProps, "showSearch" | "variant" | "classNames" | "styles">;
 
 export type PaginationConfig = ComponentStyleConfig &
   Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
 
+export type ResultConfig = ComponentStyleConfig & Pick<ResultProps, "icons">;
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {

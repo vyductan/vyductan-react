@@ -8,7 +8,6 @@
 import type { LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import * as React from "react";
 import { Separator } from "@/components/ui/divider";
 import { $isCodeHighlightNode } from "@lexical/code";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";

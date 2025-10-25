@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/no-useless-undefined */
-import * as React from "react";
+import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 import { SkeletonElement } from "./element";

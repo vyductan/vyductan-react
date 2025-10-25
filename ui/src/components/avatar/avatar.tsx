@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import React from "react";
 import { cn } from "@/lib/utils";
 
-import type { Breakpoint } from "../_util/responsive-observer";
 import type { AvatarContextType, AvatarSize } from "./avatar-context";
 import { responsiveArray } from "../_util/responsive-observer";
 import { ConfigContext } from "../config-provider";
@@ -61,11 +60,9 @@ export const InternalAvatar = (props: OwnAvatarProps) => {
       return {};
     }
 
-    const currentBreakpoint: Breakpoint = responsiveArray.find(
-      (screen) => screens[screen],
-    )!;
+    const currentBreakpoint = responsiveArray.find((screen) => screens[screen]);
 
-    const currentSize = size[currentBreakpoint];
+    const currentSize = currentBreakpoint ? size[currentBreakpoint] : undefined;
 
     return currentSize
       ? {

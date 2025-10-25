@@ -21,6 +21,7 @@ function FormItem({
   );
   const [hasFormMessage, setHasFormMessage] = React.useState(false);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasFormMessage(
       !!(
         composedRef &&
@@ -45,7 +46,7 @@ function FormItem({
     >
       {/* {String(hasFormMessage)} */}
       {children}
-      {hasFormMessage && <div className="-mb-6" />}
+      {hasFormMessage && <div className="-mb-8" />}
     </ShadFormItem>
   );
   // return (

@@ -1,0 +1,445 @@
+"use client";
+
+import type { VariantProps } from "class-variance-authority";
+import React, { useMemo } from "react";
+import { Tag, tagColors } from "@/components/ui/tag";
+import useControlledState from "@rc-component/util/lib/hooks/useControlledState";
+
+import { cn } from "@acme/ui/lib/utils";
+
+import type { AnyObject } from "../_util/type";
+import type { inputSizeVariants, InputVariants } from "../input";
+import type {
+  BaseOptionType,
+  DefaultOptionType,
+  FlattenOptionData,
+  SelectValueType,
+} from "./types";
+import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
+import { Empty } from "../empty";
+import { SelectTrigger, SelectValue } from "./_components";
+import { SelectMultiple } from "./_components/select-input/content/multiple-content";
+
+// export type SelectValue = React.ComponentProps<"select">["value"];
+// export type SelectSingleValue = string | number;
+// export type SelectMultipleValue = string[] | number[];
+// export type SelectMode = "default" | "multiple" | "tags";
+
+type SemanticName = "root";
+type PopupSemantic = "root";
+
+// type SelectValueType = string | number;
+
+// type SelectDefaultProps<
+//   TValue extends SelectValueType = string,
+//   TRecord extends AnyObject = AnyObject,
+// > = {
+//   mode?: "default";
+//   value?: TValue;
+//   onChange?: (value?: TValue, option?: Option<TValue, TRecord>) => void;
+// };
+
+// type SelectMultipleOrTagsProps<
+//   TValue extends SelectValueType = string,
+//   TRecord extends AnyObject = AnyObject,
+// > = {
+//   mode: "multiple" | "tags";
+//   value?: Array<TValue>;
+//   onChange?: (
+//     value?: Array<TValue>,
+//     option?: Array<Option<TValue, TRecord>>,
+//   ) => void;
+// };
+
+// type SelectDefaultProps<
+//   TValue extends SelectValueType = SelectValueType,
+//   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+//   // TRecord extends AnyObject = AnyObject,
+// > = {
+//   mode?: never;
+// } & (
+//   | {
+//       allowClear?: false;
+
+//       defaultValue?: TValue;
+//       value?: TValue;
+//       onChange?: (value: TValue, option: OptionType) => void;
+//     }
+//   | {
+//       allowClear: true;
+
+//       defaultValue?: TValue;
+//       value?: TValue;
+//       onChange?: (value?: TValue, option?: OptionType) => void;
+//     }
+// );
+
+// type SelectMultipleOrTagsProps<
+//   TValue extends SelectValueType = SelectValueType,
+//   // TRecord extends AnyObject = AnyObject,
+//   OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+// > = {
+//   mode: "multiple" | "tags";
+// } & (
+//   | {
+//       allowClear?: false;
+
+//       defaultValue?: TValue[];
+//       value?: TValue[];
+//       onChange?: (value: TValue[], option: OptionType[]) => void;
+//     }
+//   | {
+//       allowClear: true;
+
+//       defaultValue?: TValue[];
+//       value?: TValue[];
+//       onChange?: (value?: TValue[], option?: OptionType[]) => void;
+//     }
+// );
+
+type SelectWithoutAllowClearProps<
+  // TValue = SelectValueType,
+  ValueType = any,
+  OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+> = {
+  allowClear?: false;
+
+  onChange?: (value: ValueType, option: OptionType) => void;
+};
+
+type SelectAllowClearProps<
+  ValueType = any,
+  OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+> = {
+  allowClear: true;
+  // value?: ValueType;
+  onChange?: (value?: ValueType, option?: OptionType[]) => void;
+};
+
+type SelectProps<
+  // TValue extends SelectValueType = string,
+  // TRecord extends AnyObject = AnyObject,
+  ValueType = any,
+  // TValue extends SelectValueType = SelectValueType,
+  OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+> =
+  // XOR<
+  //   SelectDefaultProps<ValueType, OptionType>,
+  //   SelectMultipleOrTagsProps<ValueType, OptionType>
+  // > &
+  (
+    | SelectWithoutAllowClearProps<ValueType, OptionType>
+    | SelectAllowClearProps<ValueType, OptionType>
+  ) &
+    InputVariants &
+    VariantProps<typeof inputSizeVariants> & {
+      id?: string;
+      mode?: "multiple" | "tags";
+      value?: ValueType;
+      options: OptionType[];
+      placeholder?: string;
+
+      // value?: TValue | null;
+      // defaultValue?: TValue | null;
+      maxCount?: number;
+      // onChange?: (value: ValueType, option?: OptionType | OptionType[]) => void;
+
+      // allowClear?: boolean;
+      loading?: boolean;
+      suffixIcon?: React.ReactNode;
+
+      style?: React.CSSProperties;
+      className?: string;
+      styles?: Partial<Record<SemanticName, React.CSSProperties>> & {
+        popup?: Partial<Record<PopupSemantic, React.CSSProperties>>;
+      };
+      classNames?: Partial<Record<SemanticName, string>> & {
+        popup?: Partial<Record<PopupSemantic, string>>;
+      };
+      empty?: React.ReactNode;
+      dropdownRender?: (originalNode: React.ReactNode) => React.ReactNode;
+      optionRender?: (
+        oriOption: FlattenOptionData<OptionType>,
+        info: {
+          index: number;
+        },
+      ) => React.ReactNode;
+      // optionsRender?: (options: Option<TValue, TRecord>[]) => React.ReactNode;
+      onSearchChange?: (search: string) => void;
+      // onChange?: (
+      //   value?: TValue,
+      //   option?: TValue extends Array<any>
+      //     ? Array<Option<TValue, TRecord>>
+      //     : Option<TValue, TRecord>,
+      // ) => void;
+      // mode?: SelectMode;
+
+      // Base
+      showSearch?: boolean;
+    };
+
+// type XorSelectProps<
+//   TValue extends SelectValueType = number,
+//   TRecord extends AnyObject = AnyObject,
+// > = XOR<SelectProps<TValue, TRecord>, SelectShadcnProps>;
+
+const Select = <
+  TValue extends SelectValueType = SelectValueType,
+  // TRecord extends AnyObject = AnyObject,
+  ValueType = any,
+  OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+>(
+  props: SelectProps<TValue, OptionType>,
+) => {
+  // const { mode, value, onChange } = props;
+
+  // if (mode === "default") {
+  //   value;
+  //   onChange;
+  // }
+
+  const [open, setOpen] = React.useState(false);
+
+  // fix placeholder did not back when set value to undefined
+  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-1434801848
+  // https://github.com/radix-ui/primitives/issues/1569#issuecomment-2166384619
+  const [key, setKey] = React.useState<number>(+Date.now());
+
+  // ======================= CUSTOM SELECT =======================
+  if (!props.options) throw new Error("options is required");
+
+  const {
+    id,
+    options = [],
+    placeholder,
+
+    allowClear,
+    disabled,
+    loading,
+
+    className,
+    variant,
+    size,
+    status,
+    dropdownRender,
+    optionRender,
+    // optionsRender,
+
+    mode, // NOTE: do not set default (for typescript work)
+    defaultValue,
+    value,
+    onChange,
+    ...triggerProps
+  } = props;
+
+  // ======================= TAGS/MULTIPLE MODE =======================
+  const isDefault = !mode;
+  const isTags = mode === "tags";
+  const isMultiple = mode === "multiple" || isTags;
+
+  // =========================== Values ===========================
+  const [internalValue, setInternalValue] = useControlledState(
+    defaultValue === undefined
+      ? undefined
+      : isMultiple
+        ? defaultValue
+          ? defaultValue
+          : []
+        : isDefault
+          ? defaultValue
+            ? [defaultValue]
+            : []
+          : [],
+    value === undefined
+      ? undefined
+      : isMultiple
+        ? value
+          ? value
+          : []
+        : isDefault
+          ? value
+            ? [value]
+            : []
+          : [],
+  );
+
+  const triggerChange = (value: any) => {
+    if (value === undefined) {
+      setInternalValue([]);
+      onChange?.(undefined, undefined);
+      return;
+    }
+    const newValue = isMultiple ? [...(internalValue ?? []), value] : value;
+    setInternalValue(newValue);
+    const returnOptions = options.filter((o) => newValue.includes(o.value));
+    if (props.mode === "multiple" || props.mode === "tags") {
+      props.onChange?.(newValue, returnOptions);
+    } else {
+      props.mode;
+      props.onChange;
+      props.onChange?.(newValue, returnOptions[0]!);
+    }
+    if (!mode) {
+      onChange?.(newValue, returnOptions[0]!);
+    }
+    // onChange?.(newValue, isMultiple ? returnOptions : returnOptions[0]);
+  };
+
+  // Content for dropdown
+  const content = (
+    <>
+      {/* {isTags && inputValue && !options.some((o) => o.value === inputValue) && (
+        <SelectItem
+          value={inputValue}
+          onSelect={() => addTag(inputValue as ValueType)}
+          className="text-primary font-semibold"
+        >
+          Add "{inputValue}"
+        </SelectItem>
+      )} */}
+      {options.length > 0 ? (
+        options.map((o) => {
+          const optionContent = optionRender
+            ? optionRender(
+                {
+                  label: o.label,
+                  data: o,
+                  key: String(o.value),
+                  value: o.value,
+                },
+                { index: o.value },
+              )
+            : o.label;
+
+          return (
+            <SelectItem
+              key={String(o.value)}
+              value={o.value as string}
+              className={cn(
+                internalValue?.includes(o.value)
+                  ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+                  : "",
+                o.color && tagColors[o.color],
+              )}
+              onMouseDown={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                triggerChange(o.value);
+                setInternalValue(
+                  isMultiple ? [...(internalValue ?? []), o.value] : o.value,
+                );
+                // handleSelect(o.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setInternalValue(
+                    isMultiple ? [...(internalValue ?? []), o.value] : o.value,
+                  );
+                  // handleSelect(o.value);
+                }
+              }}
+              isActive={internalValue?.includes(o.value)}
+            >
+              {optionContent}
+            </SelectItem>
+          );
+        })
+      ) : (
+        <Empty />
+      )}
+    </>
+  );
+  const ContentComp = dropdownRender ? dropdownRender(content) : content;
+
+  return (
+    <SelectRoot
+      key={key}
+      defaultValue={
+        isDefault ? (defaultValue as string | undefined) : undefined
+      }
+      value={
+        isDefault
+          ? (value as string | undefined)
+          : isMultiple
+            ? Array.isArray(value)
+              ? (value[0] as string)
+              : undefined
+            : undefined
+      }
+      open={true}
+      onOpenChange={setOpen}
+    >
+      <SelectTrigger
+        id={id}
+        loading={loading}
+        disabled={disabled}
+        className={cn(
+          "w-full",
+          isMultiple && "pl-[3px]",
+          tagColors[options.find((o) => o.value === value)?.color ?? ""],
+          className,
+        )}
+        variant={variant}
+        size={size}
+        status={status}
+        allowClear={allowClear}
+        showClearIcon={internalValue && internalValue?.length > 0}
+        onClear={() => {
+          if (allowClear) {
+            onChange?.();
+            //   if (isMultiple) {
+            //   onChange?.();
+            // } else {
+            //   onChange?.();
+            // }
+          }
+
+          // if (isMultiple) {
+          //   onChange?.([] as ValueType);
+          // }
+          // if (isDefault) {
+          //   onChange?.();
+          // }
+          setKey(+Date.now());
+        }}
+        {...triggerProps} // for form-control
+      >
+        {isMultiple ? (
+          <SelectMultiple
+            mode={mode}
+            onInputClick={() => {
+              setOpen(true);
+            }}
+            value={internalValue ?? []}
+            onChange={(values) => {
+              if (onChange) {
+                onChange(values, []);
+              }
+            }}
+            placeholder={placeholder}
+          />
+        ) : (
+          <SelectValue placeholder={placeholder} className="h-5" />
+        )}
+      </SelectTrigger>
+      <SelectContent
+        className={cn(
+          "",
+          options.some((o) => o.color)
+            ? "data-[radix-select-viewport]:space-y-2"
+            : "",
+        )}
+        // classNames={{
+        //   viewport: options.some((o) => o.color) ? "space-y-2" : "",
+        // }}
+      >
+        {ContentComp}
+      </SelectContent>
+    </SelectRoot>
+  );
+};
+
+export type { SelectProps };
+export { Select };

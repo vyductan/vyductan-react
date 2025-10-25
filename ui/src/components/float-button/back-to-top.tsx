@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useContext, useEffect, useState } from "react";

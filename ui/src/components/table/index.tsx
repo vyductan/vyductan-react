@@ -6,7 +6,6 @@ import { TableRoot } from "./_components";
 import { OwnTable } from "./table";
 
 export * from "./table";
-export * from "./types";
 export * from "./locale/en-us";
 export * from "./locale/vi-vn";
 export * from "./_components";
@@ -29,4 +28,11 @@ const Table = <TRecord extends RecordWithCustomRow = AnyObject>(
 };
 
 export type { XORTableProps as TableProps };
+export type {
+  ColumnGroupType as TableColumnGroupType,
+  // ColumnProps as TableColumnProps,
+  ColumnsType as TableColumnsType,
+  ColumnType as TableColumnType,
+  TablePaginationConfig,
+} from "./types";
 export { Table };

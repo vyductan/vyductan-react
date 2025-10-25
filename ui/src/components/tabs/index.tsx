@@ -1,5 +1,6 @@
+import type React from "react";
 import type { XOR } from "ts-xor";
-import React, { Children, isValidElement } from "react";
+import { Children, isValidElement } from "react";
 
 import type { TabsProps } from "./tabs";
 import { TabsContent, TabsList, TabsRoot } from "./_components";
@@ -10,11 +11,12 @@ export * from "./_components";
 type ShadcnTabsProps = React.ComponentProps<typeof TabsRoot>;
 type ConditionTabsProps = XOR<TabsProps, ShadcnTabsProps>;
 const Tabs = ({ children, ...props }: ConditionTabsProps) => {
-  const isShadcnTabs = Children.toArray(children).some(
-    (child) =>
-      isValidElement(child) &&
-      (child.type === TabsList || child.type === TabsContent),
-  );
+  const isShadcnTabs =
+    Children.toArray(children).some(
+      (child) =>
+        isValidElement(child) &&
+        (child.type === TabsList || child.type === TabsContent),
+    ) || !props.items;
   if (isShadcnTabs) {
     return <TabsRoot {...(props as ShadcnTabsProps)}>{children}</TabsRoot>;
   }

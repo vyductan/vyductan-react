@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/prefer-spread */

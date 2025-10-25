@@ -90,6 +90,7 @@ const TimePicker = (props: TimePickerProps) => {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<InputRef>(null);
   React.useImperativeHandle(ref, () => ({
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     nativeElement: rootRef.current!,
     focus: (options) => {
       inputRef.current?.focus(options);

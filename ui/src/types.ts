@@ -1,7 +1,3 @@
-import type { VariantProps } from "tailwind-variants";
-
-import type { inputSizeVariants } from "./components/input";
-
 export type Direction = "ltr" | "rtl";
 
 export type Placement =
@@ -29,6 +25,7 @@ export interface AlignType {
   /**
    * @private Do not use in your production code
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _experimental?: Record<string, any>;
   /**
    * offset source node by offset[0] in x and offset[1] in y.
@@ -85,11 +82,8 @@ export interface AlignType {
   ignoreShake?: boolean;
 }
 
-// export type SizeType = "sm" | "md" | "lg" | undefined;
-export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
-
 // export const Variants = ["outlined", "borderless", "filled"] as const;
 
 // export type Variant = (typeof Variants)[number];
 
-export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";

@@ -186,6 +186,7 @@ export const App: React.FC<AppProps> & {
     title = "Confirm",
     content,
     okText = "OK",
+    okType,
     okButtonProps,
     cancelText = "Cancel",
   } = modalState.config;
@@ -201,6 +202,7 @@ export const App: React.FC<AppProps> & {
         onOk={handleOk}
         onCancel={handleCancel}
         okText={okText}
+        okType={okType}
         okButtonProps={okButtonProps}
         cancelText={cancelText}
         confirmLoading={modalState.loading}

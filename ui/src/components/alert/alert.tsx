@@ -2,16 +2,18 @@ import type { ReactNode } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AlertRootProps } from "./_components";
+import type { ShadcnAlertProps } from "./_components";
 import { Icon } from "../../icons";
 import {
-  AlertContent,
+  ShadcnAlert,
+  AlertTitle,
   AlertDescription,
-  AlertMessage,
-  AlertRoot,
+  alertVariants,
+  AlertContent,
 } from "./_components";
 
-type AlertProps = Omit<AlertRootProps, "title"> & {
+type AlertProps =Omit<ShadcnAlertProps, "title"> & {
+  type?: "default" | "error" | "info" | "warning";
   message?: ReactNode;
   description?: ReactNode;
   showIcon?: boolean;
@@ -33,14 +35,17 @@ const Alert = ({
       <Icon icon="icon-[mingcute--warning-line]" />
     ) : undefined;
   return (
-    <AlertRoot type={type} bordered={bordered} className={cn(className)}>
+    <ShadcnAlert
+    className={cn(alertVariants({ type, bordered }), "space-y-1", className)}
+    >
       {showIcon && <span className="me-2">{icon}</span>}
       <AlertContent>
-        {message && <AlertMessage>{message}</AlertMessage>}
+        {message && <AlertTitle>{message}</AlertTitle>}
         {description && <AlertDescription>{description}</AlertDescription>}
       </AlertContent>
-    </AlertRoot>
+    </ShadcnAlert>
   );
 };
 
+export type { AlertProps };
 export { Alert };

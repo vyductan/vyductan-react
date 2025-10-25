@@ -1,7 +1,6 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
-import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemType, MenuProps } from "../menu";
@@ -18,9 +17,7 @@ import {
   SidebarRoot,
 } from "./_component";
 
-type ShadcnSidebarProps = React.ComponentProps<typeof SidebarRoot>;
-
-type OwnSidebarProps = {
+type SidebarProps = {
   className?: string;
   classNames?: {
     header?: string;
@@ -31,7 +28,7 @@ type OwnSidebarProps = {
 
   itemRender?: (
     item: MenuItemType,
-    classNames: OwnSidebarProps["classNames"],
+    classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
   contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
@@ -48,17 +45,10 @@ type OwnSidebarProps = {
   }) => void;
 };
 
-type SidebarProps = XOR<ShadcnSidebarProps, OwnSidebarProps>;
-
 const Sidebar = (props: SidebarProps) => {
   const [selectKeys] = useMergedState(props.defaultSelectedKeys ?? [], {
     value: props.selectedKeys,
   });
-
-  const isShadcnSidebar = !props.items || !props.itemRender;
-  if (isShadcnSidebar) {
-    return <SidebarRoot {...(props as ShadcnSidebarProps)} />;
-  }
 
   const {
     className,
@@ -148,4 +138,5 @@ const Sidebar = (props: SidebarProps) => {
   );
 };
 
+export type { SidebarProps };
 export { Sidebar };
