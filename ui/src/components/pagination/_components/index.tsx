@@ -62,11 +62,13 @@ function PaginationLink({
       data-active={isActive}
       className={cn(
         buttonVariants({
-          variant: isActive ? "outline" : "text",
+          variant: isActive ? "outlined" : "text",
+          color: isActive ? "primary" : "default",
           size: size === "sm" ? "small" : size,
           shape,
           disabled,
         }),
+        !isActive && "text-muted-foreground",
         className,
       )}
       {...props}
@@ -98,7 +100,7 @@ function PaginationPrevious({
     <PaginationLink
       aria-label="Go to previous page"
       size="default"
-      className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
+      className={cn(className)}
       asChild={asChild}
       {...(childrenProp ? props : {})}
     >
@@ -108,8 +110,8 @@ function PaginationPrevious({
 }
 
 function PaginationNext({
-  className,
   asChild,
+  className,
   children: childrenProp,
   ...props
 }: Omit<React.ComponentProps<typeof PaginationLink>, "children"> & {
@@ -132,7 +134,7 @@ function PaginationNext({
     <PaginationLink
       aria-label="Go to next page"
       size="default"
-      className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
+      className={cn(className)}
       asChild={asChild}
       {...(childrenProp ? props : {})}
     >

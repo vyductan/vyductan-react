@@ -109,7 +109,7 @@ const buttonVariants = tv({
       icon: [
         'sm:has-[span[class*="sm::not-sr-only"]]:w-auto',
         'max-sm:has-[span[class*="sm::not-sr-only"]]:p-0',
-        // '[&:not(:has(span[class*="sm::not-sr-only"]))]:p-0',
+        '[&:not(:has(span[class*="sm::not-sr-only"]))]:p-0',
       ],
       circle: "rounded-full",
     },
