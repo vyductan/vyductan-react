@@ -7,6 +7,7 @@ import useMemo from "rc-util/lib/hooks/useMemo";
 import type {
   ConfigConsumerProps,
   DatePickerConfig,
+  FormConfig,
   InputConfig,
   InputNumberConfig,
   MentionsConfig,
@@ -23,6 +24,15 @@ export { Variants } from "./context";
 export { ConfigContext } from "./context";
 
 export interface ConfigProviderProps {
+  datePicker?: DatePickerConfig;
+  form?: FormConfig;
+  input?: InputConfig;
+  inputNumber?: InputNumberConfig;
+  mentions?: MentionsConfig;
+  pagination?: PaginationConfig;
+  result?: ResultConfig;
+  select?: SelectConfig;
+  textArea?: TextAreaConfig;
   // getTargetContainer?: () => HTMLElement | Window;
   // getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;
   // prefixCls?: string;
@@ -33,10 +43,7 @@ export interface ConfigProviderProps {
   // /** @deprecated Please use `{ button: { autoInsertSpace: boolean }}` instead */
   // autoInsertSpaceInButton?: boolean;
   // variant?: Variant;
-  // form?: FormConfig;
-  input?: InputConfig;
-  inputNumber?: InputNumberConfig;
-  textArea?: TextAreaConfig;
+  // colorPicker?: ComponentStyleConfig;
   // /**
   //  * @descEN Language package setting, you can find the packages in `antd/locale`.
   //  */
@@ -81,10 +88,8 @@ export interface ConfigProviderProps {
   // image?: ImageConfig;
   // layout?: ComponentStyleConfig;
   // list?: ListConfig;
-  mentions?: MentionsConfig;
   // modal?: ModalConfig;
   // progress?: ComponentStyleConfig;
-  result?: ResultConfig;
   // slider?: ComponentStyleConfig;
   // menu?: MenuConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;
@@ -94,8 +99,6 @@ export interface ConfigProviderProps {
   // badge?: BadgeConfig;
   // radio?: ComponentStyleConfig;
   // rate?: ComponentStyleConfig;
-  select?: SelectConfig;
-  pagination?: PaginationConfig;
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // tree?: ComponentStyleConfig;
@@ -109,8 +112,6 @@ export interface ConfigProviderProps {
   // timePicker?: TimePickerConfig;
   // upload?: ComponentStyleConfig;
   // notification?: NotificationConfig;
-  // colorPicker?: ComponentStyleConfig;
-  datePicker?: DatePickerConfig;
   // rangePicker?: RangePickerConfig;
   // dropdown?: ComponentStyleConfig;
   // flex?: FlexConfig;
