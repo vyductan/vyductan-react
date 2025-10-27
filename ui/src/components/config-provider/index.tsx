@@ -134,8 +134,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
   parentContext,
   children,
 
-  datePicker,
-  pagination,
+  ...componentsConfig
 }) => {
   // const context = React.useMemo(() => {
   //   return {
@@ -144,17 +143,15 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
   //   };
   // }, [parentContext, legacyLocale]);
 
-  const baseConfig = {
-    datePicker,
-    pagination,
-  };
   const config: ConfigConsumerProps = {
     ...parentContext,
   };
 
-  for (const key of Object.keys(baseConfig) as (keyof typeof baseConfig)[]) {
-    if (baseConfig[key] !== undefined) {
-      (config as any)[key] = baseConfig[key];
+  for (const key of Object.keys(
+    componentsConfig,
+  ) as (keyof typeof componentsConfig)[]) {
+    if (componentsConfig[key] !== undefined) {
+      (config as any)[key] = componentsConfig[key];
     }
   }
 
