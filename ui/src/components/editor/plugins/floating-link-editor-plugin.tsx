@@ -229,7 +229,7 @@ function FloatingLinkEditor({
               value={editedLinkUrl}
               onChange={(event) => setEditedLinkUrl(event.target.value)}
               onKeyDown={monitorInputInteraction}
-              className="flex-grow"
+              className="grow"
             />
             <Button
               shape="icon"

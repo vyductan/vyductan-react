@@ -1,3 +1,4 @@
+import type { VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cva } from "class-variance-authority";
 
@@ -15,22 +16,24 @@ export const alertVariants = cva(
   {
     variants: {
       type: {
-        default: "bg-card text-card-foreground",
+        // default: "bg-card text-card-foreground",
         // destructive:
         // "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
-        error: "border-red-300 bg-red-100 text-red-600",
         info: "border-blue-300 bg-blue-100 text-blue-600",
+        success: "border-green-300 bg-green-100 text-green-600",
         warning: "border-amber-300 bg-amber-100 text-amber-600",
+        error: "border-red-300 bg-red-100 text-red-600",
       },
       bordered: {
         false: "border-transparent",
       },
     },
     defaultVariants: {
-      type: "default",
+      type: "info",
     },
   },
 );
+type AlertType = VariantProps<typeof alertVariants>["type"];
 
 function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -44,7 +47,7 @@ function AlertContent({ className, ...props }: React.ComponentProps<"div">) {
 type ShadcnAlertProps = React.ComponentProps<typeof ShadcnAlert>;
 
 export { AlertContent };
-export type { ShadcnAlertProps };
+export type { AlertType, ShadcnAlertProps };
 export {
   AlertTitle,
   AlertDescription,
