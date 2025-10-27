@@ -26,12 +26,13 @@ type FormItemProps<TFieldValues extends FieldValues = FieldValues> = {
 
   required?: boolean;
 
+  className?: string;
   layout?: FormLayout;
+  colon?: boolean;
   labelCol?: ColProps;
   labelAlign?: FormLabelAlign;
   labelWrap?: boolean;
   wrapperCol?: ColProps;
-  colon?: boolean;
 
   valuePropName?: string;
   getValueProps?: (value: any) => Record<string, any>;
@@ -47,12 +48,13 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
   children,
   required: defaultRequired,
 
+  className,
   layout,
+  colon,
   labelCol,
   labelAlign,
   labelWrap,
   wrapperCol,
-  colon,
 
   valuePropName,
   getValueProps,
@@ -79,12 +81,13 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
         label={label}
         description={description}
         required={required}
+        className={className}
         layout={mergedLayout}
+        colon={mergedColon}
         labelCol={mergedLabelCol}
         labelAlign={mergedLabelAlign}
         labelWrap={mergedLabelWrap}
         wrapperCol={mergedWrapperCol}
-        colon={mergedColon}
         invalid={false}
         errors={[]}
       >
@@ -111,12 +114,13 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
             label={label}
             description={description}
             required={required}
+            className={className}
             layout={mergedLayout}
+            colon={mergedColon}
             labelCol={mergedLabelCol}
             labelAlign={mergedLabelAlign}
             labelWrap={mergedLabelWrap}
             wrapperCol={mergedWrapperCol}
-            colon={mergedColon}
             invalid={fieldState.invalid}
             errors={[fieldState.error]}
           >

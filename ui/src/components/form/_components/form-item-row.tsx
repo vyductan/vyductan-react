@@ -19,11 +19,11 @@ const FormItemRow = ({
   description,
   className,
   layout,
+  colon,
   labelCol,
   labelAlign,
   labelWrap,
   wrapperCol,
-  colon,
   errors,
   children,
   ...props
@@ -38,12 +38,13 @@ const FormItemRow = ({
   label?: React.ReactNode;
   description?: React.ReactNode;
 
+  className?: string;
   layout?: FormLayout;
+  colon?: boolean;
   labelCol?: ColProps;
   labelAlign?: FormLabelAlign;
   labelWrap?: boolean;
   wrapperCol?: ColProps;
-  colon?: boolean;
 
   errors?: Array<{ message?: string } | undefined>;
 }) => {
@@ -54,7 +55,7 @@ const FormItemRow = ({
         htmlFor={id ? `${id}-${name}` : undefined}
         required={required}
         colon={colon}
-        className="h-control"
+        className={cn(layout === "horizontal" && "h-control")}
       >
         {label}
       </FieldLabel>
@@ -136,7 +137,10 @@ const FormItemRow = ({
           >
             <div
               data-slot="form-item-control-input"
-              className={cn("min-h-control")}
+              className={cn(
+                "min-h-control",
+                layout === "vertical" && "*:w-full",
+              )}
             >
               {children}
             </div>

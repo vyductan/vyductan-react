@@ -37,6 +37,8 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Input } from "../../input";
+
 const addons = [
   {
     id: "analytics",
@@ -56,6 +58,7 @@ const addons = [
 ] as const;
 
 const formSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
   plan: z
     .string({
       error: "Please select a subscription plan",
@@ -86,6 +89,7 @@ export default function FormRhfComplex() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      username: "",
       plan: "basic",
       billingPeriod: "",
       addons: [],
@@ -120,6 +124,35 @@ export default function FormRhfComplex() {
       </CardHeader>
       <CardContent>
         <form id="form-rhf-complex" onSubmit={form.handleSubmit(onSubmit)}>
+          <FieldGroup>
+            <Controller
+              name="username"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-username">
+                    Username
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-username"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="shadcn"
+                    autoComplete="username"
+                  />
+                  <FieldDescription>
+                    This is your public display name. Must be between 3 and 10
+                    characters. Must only contain letters, numbers, and
+                    underscores.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
           <FieldGroup>
             <Controller
               name="plan"
