@@ -1,27 +1,27 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import type { VariantProps } from "tailwind-variants";
 import * as React from "react";
-import omit from "rc-util/lib/omit";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
 import { tv } from "tailwind-variants";
 
-import type { ProgressProps as ShadcnProgressProps } from "@acme/ui/shadcn/progress";
 import { cn } from "@acme/ui/lib/utils";
-import { Progress as ShadcnProgress } from "@acme/ui/shadcn/progress";
 
 import type { ConfigConsumerProps } from "../config-provider/context";
+import type { CircleProps } from "./circle";
 import { devUseWarning } from "../_util/warning";
 import { Icon } from "../../icons";
 import { ConfigContext } from "../config-provider/context";
 import { CircularProgress } from "./circle";
 import { getSuccessPercent, validProgress } from "./utils";
 
+import "./style.css";
+
 export const ProgressTypes = ["line", "circle", "dashboard"] as const;
 export type ProgressType = (typeof ProgressTypes)[number];
-const ProgressStatuses = ["normal", "exception", "active", "success"] as const;
+// const ProgressStatuses = ["normal", "exception", "active", "success"] as const;
 export type ProgressSize = "default" | "small";
 export type StringGradients = Record<string, string>;
 type FromToGradients = { from: string; to: string };
@@ -33,22 +33,41 @@ export interface PercentPositionType {
   align?: "start" | "center" | "end";
   type?: "inner" | "outer";
 }
-export type SemanticName = "root" | "rail" | "track";
 
-const progressVariants = tv({
-  base: "",
+// Status colors - shared between line and circle progress
+export const STATUS_COLORS = {
+  default: {
+    color: "var(--color-blue-500)",
+    class: "bg-blue-500",
+  },
+  active: {
+    color: "var(--color-blue-500)",
+    class: "bg-blue-500",
+  },
+  success: {
+    color: "var(--color-green-500)",
+    class: "bg-green-500",
+  },
+  exception: {
+    color: "var(--color-red-500)",
+    class: "bg-red-500",
+  },
+} as const;
+
+const progressIndicatorVariants = tv({
   variants: {
     status: {
-      default: "*:data-[slot=progress-indicator]:bg-blue-500",
-      success: "*:data-[slot=progress-indicator]:bg-green-500",
-      warning: "*:data-[slot=progress-indicator]:bg-yellow-500",
-      danger: "*:data-[slot=progress-indicator]:bg-red-500",
+      default: STATUS_COLORS.default.class,
+      active: `progress-active relative overflow-hidden ${STATUS_COLORS.active.class}`,
+      success: STATUS_COLORS.success.class,
+      exception: STATUS_COLORS.exception.class,
     },
   },
-  defaultVariants: {
-    status: "default",
-  },
 });
+
+export type ProgressStatus = VariantProps<
+  typeof progressIndicatorVariants
+>["status"];
 
 export interface SuccessProps {
   percent?: number;
@@ -61,59 +80,69 @@ export type ProgressAriaProps = Pick<
   React.AriaAttributes,
   "aria-label" | "aria-labelledby"
 >;
-type ProgressProps = Pick<
-  ShadcnProgressProps,
-  "value" | "className" | "indicatorClassName"
-> &
-  ProgressAriaProps &
-  VariantProps<typeof progressVariants> & {
-    ref?: React.RefObject<HTMLDivElement>;
-    percent?: number;
-    steps?: number | { count: number; gap: number };
+export type CommonProgressProps = ProgressAriaProps & {
+  ref?: React.RefObject<HTMLDivElement>;
 
-    gapPosition?: "top" | "bottom" | "left" | "right";
-    style?: React.CSSProperties;
-    size?:
-      | number
-      | [number | string, number]
-      | ProgressSize
-      | { width?: number; height?: number };
-    /** @deprecated Use `size` instead */
-    width?: number;
-    strokeLinecap?: "butt" | "square" | "round";
-    strokeWidth?: number;
-    gapDegree?: number;
+  value?: number;
 
-    type?: ProgressType;
-    showInfo?: boolean;
-    strokeColor?: string | string[] | ProgressGradient;
-    trailColor?: string;
-    trailWidth?: number;
-    percentPosition?: PercentPositionType;
+  type?: ProgressType;
+  status?: ProgressStatus;
+  className?: string;
+  percent?: number;
+  steps?: number | { count: number; gap: number };
 
-    format?: (percent?: number, successPercent?: number) => React.ReactNode;
-    status?: (typeof ProgressStatuses)[number];
-    /** Configs of successfully progress bar */
-    success?: SuccessProps;
-    /** @deprecated Use `success` instead */
-    successPercent?: number;
+  gapPosition?: "top" | "bottom" | "left" | "right";
+  style?: React.CSSProperties;
+  size?:
+    | number
+    | [number | string, number]
+    | ProgressSize
+    | { width?: number; height?: number };
+  /** @deprecated Use `size` instead */
+  width?: number;
+  strokeColor?: string | string[] | ProgressGradient;
+  strokeLinecap?: "butt" | "square" | "round";
+  strokeWidth?: number;
+  gapDegree?: number;
 
-    children?: React.ReactNode;
+  showInfo?: boolean;
+  trailColor?: string;
+  trailWidth?: number;
+  percentPosition?: PercentPositionType;
 
-    id?: string;
-    loading?: boolean;
-    classNames?: Partial<Record<SemanticName, string>>;
-    styles?: Partial<Record<SemanticName, React.CSSProperties>>;
+  format?: (percent?: number, successPercent?: number) => React.ReactNode;
+  // status?: (typeof ProgressStatuses)[number];
+  /** Configs of successfully progress bar */
+  success?: SuccessProps;
+  /** @deprecated Use `success` instead */
+  successPercent?: number;
+
+  children?: React.ReactNode;
+
+  id?: string;
+  loading?: boolean;
+  classNames?: {
+    text?: string;
   };
+  // styles?: Partial<Record<SemanticName, React.CSSProperties>>;
+};
+type LineProps = CommonProgressProps & {
+  type?: "line";
+  status?: ProgressStatus | "active";
+};
+
+type ProgressProps = LineProps | CircleProps;
+
 function Progress(props: ProgressProps) {
   const {
     ref,
+    style,
     className,
+    classNames,
     percent = 0,
     steps,
 
-    type,
-    style,
+    type = "line",
     size = "default",
     showInfo = true,
     strokeColor,
@@ -121,7 +150,7 @@ function Progress(props: ProgressProps) {
 
     status,
     format,
-    ...restProps
+    ..._restProps
   } = props;
 
   const { align: infoAlign = "end", type: infoPosition = "outer" } =
@@ -129,16 +158,77 @@ function Progress(props: ProgressProps) {
   const strokeColorNotArray = Array.isArray(strokeColor)
     ? strokeColor[0]
     : strokeColor;
-  // const strokeColorIsBright = React.useMemo(() => {
-  //   if (strokeColorNotArray) {
-  //     const color =
-  //       typeof strokeColorNotArray === "string"
-  //         ? strokeColorNotArray
-  //         : Object.values(strokeColorNotArray)[0];
-  //     return new FastColor(color).isLight();
-  //   }
-  //   return false;
-  // }, [strokeColor]);
+
+  // Parse size to get width and height
+  const sizeStyle = React.useMemo(() => {
+    if (type === "line") {
+      let height: number | string = 8; // default height
+      let width: number | string | undefined;
+
+      if (size === "small") {
+        height = 6;
+      } else if (size === "default") {
+        height = 8;
+      } else if (typeof size === "number") {
+        height = size;
+      } else if (Array.isArray(size)) {
+        width = typeof size[0] === "number" ? `${size[0]}px` : size[0];
+        height = size[1] || 8;
+      } else if (typeof size === "object") {
+        width = size.width;
+        height = size.height || 8;
+      }
+
+      return {
+        width: width,
+        height: typeof height === "number" ? `${height}px` : height,
+      };
+    }
+    return {};
+  }, [size, type]);
+
+  // Get stroke color style for progress indicator
+  const getStrokeColorStyle = React.useMemo(() => {
+    if (!strokeColor) return null;
+
+    if (typeof strokeColor === "string") {
+      return { backgroundColor: strokeColor };
+    }
+
+    if (Array.isArray(strokeColor)) {
+      // Gradient from array
+      const gradientColors = strokeColor.join(", ");
+      return {
+        backgroundImage: `linear-gradient(to right, ${gradientColors})`,
+      };
+    }
+
+    if (typeof strokeColor === "object") {
+      // Gradient from object
+      const gradient = strokeColor;
+      const { direction = "to right" } = gradient;
+
+      if ("from" in gradient && "to" in gradient) {
+        const { from, to } = gradient as FromToGradients & {
+          direction?: string;
+        };
+        return {
+          backgroundImage: `linear-gradient(${direction}, ${from}, ${to})`,
+        };
+      }
+
+      const colors = gradient as StringGradients & { direction?: string };
+      const colorValues = Object.entries(colors)
+        .filter(([key]) => key !== "direction")
+        .map(([, value]) => value)
+        .join(", ");
+      return {
+        backgroundImage: `linear-gradient(${direction}, ${colorValues})`,
+      };
+    }
+
+    return null;
+  }, [strokeColor]);
 
   const percentNumber = React.useMemo<number>(() => {
     const successPercent = getSuccessPercent(props);
@@ -151,13 +241,11 @@ function Progress(props: ProgressProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percent, props.success, props.successPercent]);
 
-  const progressStatus = React.useMemo<
-    (typeof ProgressStatuses)[number]
-  >(() => {
-    if (!ProgressStatuses.includes(status!) && percentNumber >= 100) {
+  const progressStatus = React.useMemo<ProgressStatus>(() => {
+    if (percentNumber >= 100) {
       return "success";
     }
-    return status || "normal";
+    return status || "default";
   }, [status, percentNumber]);
 
   const { direction, progress: progressStyle } =
@@ -185,25 +273,64 @@ function Progress(props: ProgressProps) {
       );
     } else if (progressStatus === "exception") {
       text = isLineType ? (
-        <Icon icon="icon-[ant-design--close-circle-filled]" />
+        <Icon
+          icon="icon-[ant-design--close-circle-filled]"
+          className="text-red-500"
+        />
       ) : (
-        <Icon icon="icon-[lucide--x]" />
+        <Icon icon="icon-[lucide--x]" className="text-[1.2em] text-red-500" />
       );
     } else if (progressStatus === "success") {
       text = isLineType ? (
-        <Icon icon="icon-[ant-design--check-circle-filled]" />
+        <Icon
+          icon="icon-[ant-design--check-circle-filled]"
+          className="text-green-500"
+        />
       ) : (
-        <Icon icon="icon-[lucide--check]" />
+        <Icon
+          icon="icon-[lucide--check]"
+          className="text-[1.2em] text-green-500"
+        />
       );
     }
 
     return (
       <span
-        className={cn(`progress-text`, {
-          // [`progress-text-bright`]: isBrightInnerColor,
-          [`progress-text-${infoAlign}`]: isPureLineType,
-          [`progress-text-${infoPosition}`]: isPureLineType,
-        })}
+        data-slot="progress-text"
+        className={cn(
+          "block",
+          {
+            // Line - Inner positioning
+            "w-full px-2 font-medium text-white":
+              isPureLineType && infoPosition === "inner",
+            "text-left":
+              isPureLineType &&
+              infoPosition === "inner" &&
+              infoAlign === "start",
+            "text-center":
+              isPureLineType &&
+              infoPosition === "inner" &&
+              infoAlign === "center",
+            "text-right":
+              isPureLineType && infoPosition === "inner" && infoAlign === "end",
+
+            // Line - Outer positioning
+            "ml-2": isPureLineType && infoPosition === "outer",
+            "order-first mr-2 ml-0":
+              isPureLineType &&
+              infoPosition === "outer" &&
+              infoAlign === "start",
+
+            // Line - Font sizes
+            "text-xs": isPureLineType && size === "small",
+            "text-sm": isPureLineType && size !== "small",
+
+            // Circle - text centered with relative font size (1em)
+            "text-center text-[1em] font-medium":
+              type === "circle" || type === "dashboard",
+          },
+          classNames?.text,
+        )}
         title={typeof text === "string" ? text : undefined}
       >
         {text}
@@ -245,55 +372,82 @@ function Progress(props: ProgressProps) {
 
   let progress: React.ReactNode;
 
-  if (type === "line") {
+  if (!type || type === "line") {
     progress = (
-      <div className={cn("relative w-full", className)}>
-        <ShadcnProgress
-          className={cn(progressVariants({ status }), "bg-accent")}
+      <>
+        <ProgressPrimitive.Root
+          data-slot="progress"
           value={percent}
-          {...props}
-        />
-        {showInfo && (
-          <div className="mt-1 flex justify-end">
-            <span className="text-muted-foreground text-xs">{percent}%</span>
-          </div>
-        )}
-      </div>
+          className={cn(
+            "bg-muted relative overflow-hidden rounded-full",
+            !sizeStyle.width && "w-full",
+            className,
+          )}
+          style={sizeStyle}
+        >
+          <ProgressPrimitive.Indicator
+            data-slot="progress-indicator"
+            className={cn(
+              "h-full w-full flex-1 transition-all",
+              // Default color when no strokeColor and no special status
+              !strokeColor &&
+                progressIndicatorVariants({ status: progressStatus }),
+            )}
+            style={{
+              width: `${percent}%`,
+              // Only apply strokeColor if status is not success/exception
+              ...(progressStatus !== "success" &&
+              progressStatus !== "exception" &&
+              getStrokeColorStyle
+                ? getStrokeColorStyle
+                : {}),
+            }}
+            // style={{ transform: `translateX(-${100 - (percent || 0)}%)` }}
+          >
+            {infoPosition === "inner" && progressInfo}
+          </ProgressPrimitive.Indicator>
+        </ProgressPrimitive.Root>
+        {infoPosition === "outer" && progressInfo}
+      </>
     );
   } else if (type === "circle" || type === "dashboard") {
     progress = (
       <CircularProgress
-        {...props}
+        type={type}
+        percent={percent}
+        size={size}
         strokeColor={strokeColorNotArray}
-        progressStatus={progressStatus}
+        strokeLinecap={props.strokeLinecap}
+        strokeWidth={props.strokeWidth}
+        trailColor={props.trailColor}
+        trailWidth={props.trailWidth}
+        gapDegree={props.gapDegree}
+        gapPosition={props.gapPosition}
+        steps={steps}
+        success={props.success}
+        status={progressStatus}
+        className={className}
+        style={style}
       >
         {progressInfo}
       </CircularProgress>
     );
   }
 
-  const classString = cn();
-
   return (
     <div
       ref={ref}
       dir={direction}
       style={{ ...progressStyle?.style, ...style }}
-      className={classString}
+      className={cn("relative", {
+        "w-full": !sizeStyle.width,
+        "inline-flex items-center": isLineType && infoPosition === "outer",
+      })}
       role="progressbar"
       aria-valuenow={percentNumber}
       aria-valuemin={0}
       aria-valuemax={100}
-      {...omit(restProps, [
-        "trailColor",
-        "strokeWidth",
-        "width",
-        "gapDegree",
-        "gapPosition",
-        "strokeLinecap",
-        "success",
-        "successPercent",
-      ])}
+      data-slot="progress-wrapper"
     >
       {progress}
     </div>

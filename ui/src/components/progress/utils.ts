@@ -45,7 +45,7 @@ export const getPercentage = ({
 export const getStrokeColor = ({
   success = {},
   strokeColor,
-}: Partial<CircleProps>): (string | Record<PropertyKey, string>)[] => {
+}: Partial<CircleProps>) => {
   const { strokeColor: successColor } = success;
   return [successColor || "var(--color-green-600)", strokeColor || null!];
 };

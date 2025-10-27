@@ -21,10 +21,10 @@ export const getCircleStyle = (
     gapDegree === 0
       ? 0
       : {
-          bottom: 0,
-          top: 180,
-          left: 90,
-          right: -90,
+          bottom: -180,
+          top: 0,
+          left: -90,
+          right: 90,
         }[gapPosition ?? "bottom"];
 
   let strokeDashoffset = ((100 - percent) / 100) * perimeterWithoutGap;
