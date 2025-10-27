@@ -5,10 +5,10 @@ import { notification } from "../../notification";
 import { useFormContext } from "../context";
 
 export const FormErrorsNotification = () => {
-  const form = useFormContext();
-  const formSchema = form?.schema;
-  const formFields = form?.control._fields;
-  const formErrors = form?.formState.errors;
+  const formContext = useFormContext();
+  const formSchema = formContext?.form?.schema;
+  const formFields = formContext?.form?.control._fields;
+  const formErrors = formContext?.form?.formState.errors;
   useEffect(() => {
     if (
       formErrors &&

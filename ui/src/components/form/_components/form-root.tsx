@@ -21,15 +21,17 @@ const FormProvider = <
         props as unknown as FormProviderProps<FieldValues, any, FieldValues>
       }
     >
-      <RHFormProvider {...props}>{children}</RHFormProvider>
+      {props.form ? (
+        <RHFormProvider {...props.form}>{children}</RHFormProvider>
+      ) : (
+        children
+      )}
       <FormErrorsNotification />
     </FormContext.Provider>
   );
 };
 
-const FormRoot = FormProvider;
-
-export { FormRoot };
+export { FormProvider };
 
 export {
   type FormProviderProps,

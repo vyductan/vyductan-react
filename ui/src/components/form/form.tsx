@@ -3,11 +3,12 @@
 
 import type { ReactNode } from "react";
 import type { DefaultValues, FieldErrors, FieldValues } from "react-hook-form";
+import React from "react";
 
 import type { FormRootProps } from "./_components/form-root";
 // import type { FormBaseProps, FormContextValue } from "./context";
 import type { FormInstance, UseFormProps } from "./hooks/use-form";
-import { FormRoot } from "./_components/form-root";
+import { FormProvider } from "./_components/form-root";
 import { useForm } from "./hooks/use-form";
 
 type ErrorField = { name: string[]; errors: string[] };
@@ -42,6 +43,9 @@ type WithFormProp<
   TTransformedValues = TFieldValues,
 > = {
   form: FormInstance<TFieldValues, TContext, TTransformedValues>;
+
+  onFinish?: never;
+  onFinishFailed?: never;
 } & Omit<
   React.DetailedHTMLProps<
     React.FormHTMLAttributes<HTMLFormElement>,
@@ -61,6 +65,7 @@ type FormProps<
   | "labelCol"
   | "labelWrap"
   | "wrapperCol"
+  | "colon"
   | "classNames"
 > &
   (
@@ -77,41 +82,50 @@ const Form = <
   TContext,
   TTransformedValues extends FieldValues = TFieldValues,
 >({
+  id: idProps,
   form,
   layout,
   labelAlign,
   labelCol,
   labelWrap,
   wrapperCol,
+  colon = true,
   classNames,
   children,
   ...props
 }: FormProps<TFieldValues, TContext, TTransformedValues>) => {
+  const generatedId = React.useId();
+  const id = idProps ?? generatedId;
+
   if (form) {
     return (
-      <FormRoot<TFieldValues, TContext, TTransformedValues>
-        {...form}
+      <FormProvider<TFieldValues, TContext, TTransformedValues>
+        id={id}
+        form={form}
         layout={layout}
         labelAlign={labelAlign}
         labelCol={labelCol}
         labelWrap={labelWrap}
         wrapperCol={wrapperCol}
+        colon={colon}
         classNames={classNames}
       >
-        <form onSubmit={form.submit as any} {...props}>
+        <form id={id} onSubmit={form.submit} {...props}>
           {children}
         </form>
-      </FormRoot>
+      </FormProvider>
     );
   }
 
   return (
     <FormWithoutFormProp
+      id={id}
       layout={layout}
       labelAlign={labelAlign}
       labelCol={labelCol}
       labelWrap={labelWrap}
       wrapperCol={wrapperCol}
+      colon={colon}
       classNames={classNames}
       {...props}
     >
@@ -128,17 +142,20 @@ const FormWithoutFormProp = <
   props: FormConfigProps<TFieldValues, TContext, TTransformedValues> &
     Pick<
       FormRootProps<TFieldValues, TContext, TTransformedValues>,
+      | "id"
       | "layout"
       | "labelAlign"
       | "labelCol"
       | "labelWrap"
       | "wrapperCol"
+      | "colon"
       | "classNames"
     > & {
       children: ReactNode;
     },
 ) => {
   const {
+    id,
     initialValues,
     onFinish,
     onFinishFailed,
@@ -147,6 +164,7 @@ const FormWithoutFormProp = <
     labelCol,
     labelWrap,
     wrapperCol,
+    colon,
     classNames,
     children,
     schema,
@@ -239,19 +257,21 @@ const FormWithoutFormProp = <
   };
 
   return (
-    <FormRoot<TFieldValues, TContext, TTransformedValues>
+    <FormProvider<TFieldValues, TContext, TTransformedValues>
+      id={id}
       {...form}
       layout={layout}
       labelAlign={labelAlign}
       labelCol={labelCol}
       labelWrap={labelWrap}
       wrapperCol={wrapperCol}
+      colon={colon}
       classNames={classNames}
     >
-      <form onSubmit={handleSubmit as any} {...htmlFormProps}>
+      <form id={id} onSubmit={handleSubmit} {...htmlFormProps}>
         {children}
       </form>
-    </FormRoot>
+    </FormProvider>
   );
 };
 
