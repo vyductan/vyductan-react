@@ -72,7 +72,7 @@ const Checkbox = (props: CheckboxProps) => {
     disabled,
 
     indeterminate = false,
-    checked,
+    // checked,
     // defaultChecked,
 
     // styles
@@ -146,7 +146,7 @@ const Checkbox = (props: CheckboxProps) => {
             "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
           )}
-          checked={indeterminate ? "indeterminate" : checked}
+          checked={indeterminate ? "indeterminate" : restProps.checked}
           disabled={mergedDisabled}
           onClick={onInputClick}
           onCheckedChange={(checked) => {
