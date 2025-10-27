@@ -8,6 +8,7 @@ import React from "react";
 import type { FormRootProps } from "./_components/form-root";
 // import type { FormBaseProps, FormContextValue } from "./context";
 import type { FormInstance, UseFormProps } from "./hooks/use-form";
+import { useComponentConfig } from "../config-provider/context";
 import { FormProvider } from "./_components/form-root";
 import { useForm } from "./hooks/use-form";
 
@@ -84,18 +85,24 @@ const Form = <
 >({
   id: idProps,
   form,
-  layout,
+  layout: layoutProp,
   labelAlign,
   labelCol,
   labelWrap,
   wrapperCol,
-  colon = true,
+  colon: colonProp,
   classNames,
   children,
   ...props
 }: FormProps<TFieldValues, TContext, TTransformedValues>) => {
   const generatedId = React.useId();
   const id = idProps ?? generatedId;
+
+  const { layout: layoutConfig, colon: colonConfig } =
+    useComponentConfig("form");
+
+  const layout = layoutProp ?? layoutConfig ?? "horizontal";
+  const colon = colonProp ?? colonConfig ?? true;
 
   if (form) {
     return (
