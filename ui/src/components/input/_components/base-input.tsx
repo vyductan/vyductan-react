@@ -167,12 +167,12 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
         (element as ReactElement<{ className?: string } | undefined>).props
           ?.className,
         // Override variant border/background/shadow when has addon
-        "!border-none !shadow-none !ring-0 !bg-transparent",
+        "border-none! shadow-none! ring-0! bg-transparent!",
         // Remove outline on focus-visible
-        "focus-visible:!outline-0",
+        "focus-visible:outline-0!",
         // Remove padding from sides that touch addon
-        addonBefore && "!rounded-l-none",
-        addonAfter && "!rounded-r-none",
+        addonBefore && "rounded-l-none!",
+        addonAfter && "rounded-r-none!",
         // Keep padding on the other sides
         // !addonBefore && "pl-[11px]",
         // !addonAfter && "pr-[11px]",

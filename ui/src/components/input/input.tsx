@@ -78,7 +78,7 @@ const Input = (props: InputProps) => {
 
     status,
 
-    autoComplete,
+    autoComplete = "off",
     onChange,
     onFocus,
     onBlur,
@@ -357,7 +357,7 @@ const Input = (props: InputProps) => {
         className={cn(
           "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
           !hasAffix && inputSizeVariants({ size: mergedSize }),
-          otherProps.readOnly && "cursor-default bg-muted",
+          otherProps.readOnly && "bg-muted cursor-default",
           classNames?.input,
         )}
         style={styles?.input}
@@ -378,7 +378,12 @@ const Input = (props: InputProps) => {
   };
 
   // Check if has affix (prefix/suffix/allowClear)
-  const hasAffix = !!(rest.prefix || suffix || rest.allowClear || countConfig.show);
+  const hasAffix = !!(
+    rest.prefix ||
+    suffix ||
+    rest.allowClear ||
+    countConfig.show
+  );
 
   const getSuffix = () => {
     // Max length value
