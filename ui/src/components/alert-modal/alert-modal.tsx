@@ -91,7 +91,8 @@ export const AlertModal = ({
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
             className={cn(
               buttonVariants({
-                color: okButtonProps?.color,
+                variant: okButtonProps?.variant ?? "solid",
+                color: okButtonProps?.color ?? "primary",
               }),
             )}
           >
