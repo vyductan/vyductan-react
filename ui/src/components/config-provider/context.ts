@@ -5,6 +5,7 @@ import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
 import type { ShowWaveEffect } from "../../lib/wave/interface";
+import type { ButtonProps } from "../button";
 import type { DatePickerProps } from "../date-picker";
 import type { FormProps } from "../form";
 import type { InputNumberProps, InputProps } from "../input";
@@ -48,6 +49,9 @@ export interface ComponentStyleConfig {
   className?: string;
   style?: React.CSSProperties;
 }
+
+export type ButtonConfig = ComponentStyleConfig &
+  Pick<ButtonProps, "classNames" | "variant" | "color" | "shape">;
 
 export type DatePickerConfig = ComponentStyleConfig &
   Pick<

@@ -5,6 +5,7 @@ import React from "react";
 import useMemo from "rc-util/lib/hooks/useMemo";
 
 import type {
+  ButtonConfig,
   ConfigConsumerProps,
   DatePickerConfig,
   FormConfig,
@@ -24,6 +25,7 @@ export { Variants } from "./context";
 export { ConfigContext } from "./context";
 
 export interface ConfigProviderProps {
+  button?: ButtonConfig;
   datePicker?: DatePickerConfig;
   form?: FormConfig;
   input?: InputConfig;
@@ -71,7 +73,6 @@ export interface ConfigProviderProps {
   // avatar?: ComponentStyleConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;
-  // button?: ButtonConfig;
   // breadcrumb?: ComponentStyleConfig;
   // calendar?: ComponentStyleConfig;
   // carousel?: ComponentStyleConfig;
