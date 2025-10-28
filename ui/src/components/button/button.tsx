@@ -26,22 +26,12 @@ const buttonVariants = tv({
     "[&_span[role='img']]:pointer-events-none [&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
   ],
   variants: {
-    type: {
-      default: [],
-      primary: ["border-primary", "hover:border-primary-hover"],
-      dashed: [],
-      link: ["border-transparent"],
-      text: ["border-0"],
-    },
-    primary: {
-      true: ["border-primary", "hover:border-primary-hover"],
-    },
     action: {
       true: [],
     },
     color: {
       default: [],
-      primary: ["text-primary", "hover:text-primary-700"],
+      primary: [],
       danger: [],
       link: [],
       success: [],
@@ -124,140 +114,105 @@ const buttonVariants = tv({
     },
   },
   compoundVariants: [
-    // primary
-    {
-      primary: true,
-      color: "default",
-      className: ["text-white", "hover:text-white"],
-    },
-    {
-      primary: true,
-      color: "danger",
-      className: [
-        "border-red-600 bg-red-600 text-white",
-        "hover:border-red-700 hover:bg-red-700",
-        "active:border-red-800 active:bg-red-800",
-      ],
-    },
-    {
-      primary: true,
-      color: "amber",
-      className: [
-        "border-amber-500 bg-amber-500",
-        "hover:border-amber-600 hover:bg-amber-600",
-      ],
-    },
-    {
-      primary: true,
-      color: "gray",
-      className: [
-        "border-gray-500 bg-gray-500",
-        "hover:border-gray-600 hover:bg-gray-600",
-      ],
-    },
-    {
-      primary: true,
-      color: "green",
-      className: [
-        "border-green-500 bg-green-500",
-        "hover:border-green-600 hover:bg-green-600",
-      ],
-    },
-    {
-      primary: true,
-      color: "teal",
-      className: [
-        "border-teal-500 bg-teal-500",
-        "hover:border-teal-600 hover:bg-teal-600",
-      ],
-    },
-    {
-      primary: true,
-      color: "pink",
-      className: [
-        "border-pink-500 bg-pink-500",
-        "hover:border-pink-600 hover:bg-pink-600",
-      ],
-    },
     // solid
     {
       variant: "solid",
       color: "default",
       className: [
-        "bg-button-solid",
-        "hover:bg-button-solid-hover",
-        "active:bg-button-solid-active",
+        "border-button-solid bg-button-solid",
+        "hover:border-button-solid-hover hover:bg-button-solid-hover",
+        "active:border-button-solid-active active:bg-button-solid-active",
       ],
     },
     {
       variant: "solid",
       color: "primary",
       className: [
-        "bg-primary",
-        "hover:bg-primary-hover",
-        "active:bg-primary-active",
+        "border-primary bg-primary",
+        "hover:border-primary-hover hover:bg-primary-hover",
+        "active:border-primary-active active:bg-primary-active",
       ],
     },
     {
       variant: "solid",
       color: "danger",
-      className: ["bg-red-500", "hover:bg-red-400", "active:bg-red-600"],
+      className: [
+        "border-red-500 bg-red-500",
+        "hover:border-red-400 hover:bg-red-400",
+        "active:border-red-600 active:bg-red-600",
+      ],
     },
     {
       variant: "solid",
       color: "orange",
       className: [
-        "bg-orange-500",
-        "hover:bg-orange-400",
-        "active:bg-orange-600",
+        "border-orange-500 bg-orange-500",
+        "hover:border-orange-400 hover:bg-orange-400",
+        "active:border-orange-600 active:bg-orange-600",
       ],
     },
     {
       variant: "solid",
       color: "green",
-      className: ["bg-green-500", "hover:bg-green-400", "active:bg-green-600"],
+      className: [
+        "border-green-500 bg-green-500",
+        "hover:border-green-400 hover:bg-green-400",
+        "active:border-green-600 active:bg-green-600",
+      ],
     },
     {
       variant: "solid",
       color: "emerald",
       className: [
-        "bg-emerald-500",
-        "hover:bg-emerald-400",
-        "active:bg-emerald-600",
+        "border-emerald-500 bg-emerald-500",
+        "hover:border-emerald-400 hover:bg-emerald-400",
+        "active:border-emerald-600 active:bg-emerald-600",
       ],
     },
     {
       variant: "solid",
       color: "cyan",
-      className: ["bg-cyan-500", "hover:bg-cyan-400", "active:bg-cyan-600"],
+      className: [
+        "border-cyan-500 bg-cyan-500",
+        "hover:border-cyan-400 hover:bg-cyan-400",
+        "active:border-cyan-600 active:bg-cyan-600",
+      ],
     },
     {
       variant: "solid",
       color: "blue",
-      className: ["bg-blue-500", "hover:bg-blue-400", "active:bg-blue-600"],
+      className: [
+        "border-blue-500 bg-blue-500",
+        "hover:border-blue-400 hover:bg-blue-400",
+        "active:border-blue-600 active:bg-blue-600",
+      ],
     },
     {
       variant: "solid",
       color: "indigo",
       className: [
-        "bg-indigo-500",
-        "hover:bg-indigo-400",
-        "active:bg-indigo-600",
+        "border-indigo-500 bg-indigo-500",
+        "hover:border-indigo-400 hover:bg-indigo-400",
+        "active:border-indigo-600 active:bg-indigo-600",
       ],
     },
     {
       variant: "solid",
       color: "purple",
       className: [
-        "bg-purple-500",
-        "hover:bg-purple-400",
-        "active:bg-purple-600",
+        "border-purple-500 bg-purple-500",
+        "hover:border-purple-400 hover:bg-purple-400",
+        "active:border-purple-600 active:bg-purple-600",
       ],
     },
     {
       variant: "solid",
       color: "pink",
-      className: ["bg-pink-500", "hover:bg-pink-400", "active:bg-pink-600"],
+      className: [
+        "border-pink-500 bg-pink-500",
+        "hover:border-pink-400 hover:bg-pink-400",
+        "active:border-pink-600 active:bg-pink-600",
+      ],
     },
     // outlined
     {
@@ -273,18 +228,9 @@ const buttonVariants = tv({
       variant: "outlined",
       color: "primary",
       className: [
-        "border-primary-500 text-primary",
-        "hover:border-primary-600 hover:text-primary-600",
-        "active:ring-primary",
-      ],
-    },
-    {
-      variant: "outlined",
-      color: "danger",
-      className: [
-        "border-red-500 text-red-500",
-        "hover:border-red-600 hover:text-red-600",
-        "active:border-red-700 active:text-red-700",
+        "border-primary text-primary",
+        "hover:border-primary-hover hover:text-primary-hover",
+        "active:border-primary-active active:text-primary-active",
       ],
     },
     {
@@ -293,67 +239,84 @@ const buttonVariants = tv({
       className: ["text-link", "hover:bg-link-hover hover:text-white"],
     },
     {
-      variant: "outline",
+      variant: "outlined",
+      color: "danger",
+      className: [
+        "border-red-500 text-red-500",
+        "hover:border-red-400 hover:text-red-400",
+        "active:border-red-600 active:text-red-600",
+      ],
+    },
+    {
+      variant: "outlined",
       color: "orange",
       className: [
-        "border-orange-600 text-orange-600",
-        "hover:border-orange-700 hover:text-orange-700",
+        "border-orange-500 text-orange-500",
+        "hover:border-orange-400 hover:text-orange-400",
+        "active:border-orange-600 active:text-orange-600",
       ],
     },
     {
       variant: "outlined",
       color: "green",
       className: [
-        "border-green-600 text-green-600",
-        "hover:border-green-700 hover:text-green-700",
+        "border-green-500 text-green-500",
+        "hover:border-green-400 hover:text-green-400",
+        "active:border-green-600 active:text-green-600",
       ],
     },
     {
       variant: "outlined",
       color: "emerald",
       className: [
-        "border-emerald-600 text-emerald-600",
-        "hover:border-emerald-700 hover:text-emerald-700",
+        "border-emerald-500 text-emerald-500",
+        "hover:border-emerald-400 hover:text-emerald-400",
+        "active:border-emerald-600 active:text-emerald-600",
       ],
     },
     {
       variant: "outlined",
       color: "cyan",
       className: [
-        "border-cyan-600 text-cyan-600",
-        "hover:border-cyan-700 hover:text-cyan-700",
+        "border-cyan-500 text-cyan-500",
+        "hover:border-cyan-400 hover:text-cyan-400",
+        "active:border-cyan-600 active:text-cyan-600",
       ],
     },
     {
       variant: "outlined",
       color: "blue",
       className: [
-        "border-blue-600 text-blue-600",
-        "hover:border-blue-700 hover:text-blue-700",
+        "border-blue-500 text-blue-500",
+        "hover:border-blue-400 hover:text-blue-400",
+        "active:border-blue-600 active:text-blue-600",
       ],
     },
     {
       variant: "outlined",
       color: "indigo",
       className: [
-        "border-indigo-600 text-indigo-600",
-        "hover:border-indigo-700 hover:text-indigo-700",
+        "border-indigo-500 text-indigo-500",
+        "hover:border-indigo-400 hover:text-indigo-400",
+        "active:border-indigo-600 active:text-indigo-600",
       ],
     },
     {
       variant: "outlined",
       color: "purple",
       className: [
-        "border-purple-600 text-purple-600",
-        "hover:border-purple-700 hover:text-purple-700",
+        "border-purple-500 text-purple-500",
+        "hover:border-purple-400 hover:text-purple-400",
+        "active:border-purple-600 active:text-purple-600",
       ],
     },
     {
       variant: "outlined",
       color: "pink",
       className: [
-        "border-pink-600 text-pink-600",
-        "hover:border-pink-700 hover:text-pink-700",
+        "border-pink-500 text-pink-500",
+        "hover:border-pink-400 hover:text-pink-400",
+        "active:border-pink-600 active:text-pink-600",
       ],
     },
     // filled | light
@@ -552,12 +515,26 @@ const buttonVariants = tv({
     },
     {
       variant: "link",
-      color: "danger",
+      color: "primary",
       className: [
-        "text-red-500",
-        "hover:text-red-hover",
-        "active:text-red-active",
+        "text-primary",
+        "hover:text-primary-hover",
+        "active:text-primary-active",
       ],
+    },
+    {
+      variant: "link",
+      color: "link",
+      className: [
+        "text-primary",
+        "hover:text-primary-hover",
+        "active:text-primary-active",
+      ],
+    },
+    {
+      variant: "link",
+      color: "danger",
+      className: ["text-red-500", "hover:text-red-400", "active:text-red-600"],
     },
     {
       variant: "link",
@@ -605,8 +582,8 @@ const buttonVariants = tv({
     },
   ],
   defaultVariants: {
-    variant: "default",
-    color: "default",
+    // variant: "default",
+    // color: "default",
     size: "middle",
     shape: "default",
   },
@@ -624,7 +601,19 @@ type TVButtonOptions = PartialDeep<Partial<ExtractedTVButtonOptions>>;
 type ButtonVariants = VariantProps<typeof buttonVariants>;
 
 type HtmlType = React.ButtonHTMLAttributes<HTMLButtonElement>["type"];
-type ButtonType = ButtonVariants["type"];
+type ButtonType = "default" | "primary" | "dashed" | "link" | "text";
+type ColorVariantPairType = [
+  color: ButtonVariants["color"],
+  variant: ButtonVariants["variant"],
+];
+
+const ButtonTypeMap: Partial<Record<ButtonType, ColorVariantPairType>> = {
+  default: ["default", "outlined"],
+  primary: ["primary", "solid"],
+  dashed: ["default", "dashed"],
+  link: ["link", "link"],
+  text: ["default", "text"],
+};
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "color">,
@@ -651,16 +640,15 @@ const Button = ({
   href,
   children,
   className,
-  color = "default",
+  color,
   disabled,
   loading,
-  primary,
   size,
   shape,
   srOnly,
   variant,
   icon,
-  type,
+  type = "default",
   htmlType,
   htmlColor,
   danger,
@@ -701,22 +689,50 @@ const Button = ({
   const isHtmlType = type === "submit" || type === "reset" || type === "button";
   const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
-  let variantToPass =
-    variant === "outline" || variant === "dashed" ? "outlined" : variant;
-  if (!isHtmlType && type === "text") {
-    variantToPass = "text";
+  // Map type to [color, variant] using ButtonTypeMap
+  // Default to "default" type if no button type is provided (Ant Design behavior)
+  const buttonType: ButtonType = isHtmlType ? "default" : type;
+
+  let colorToPass: ButtonVariants["color"] = color;
+  let variantToPass: ButtonVariants["variant"] = variant;
+
+  // Map type to color/variant using ButtonTypeMap
+  if (buttonType in ButtonTypeMap) {
+    const mapping = ButtonTypeMap[buttonType];
+    if (mapping) {
+      const [mappedColor, mappedVariant] = mapping;
+      // Only use mapped values if not explicitly overridden
+      if (!color) {
+        colorToPass = mappedColor;
+      }
+      if (!variant) {
+        variantToPass = mappedVariant;
+      }
+    }
   }
+
+  // Convert "outline" and "dashed" to "outlined" for styling
+  if (variantToPass === "outline" || variantToPass === "dashed") {
+    variantToPass = "outlined";
+  }
+
+  // Apply danger color override
+  if (danger) {
+    colorToPass = "danger";
+  }
+
+  // Check if original variant is dashed for border-dashed class
+  const isDashed = variant === "dashed" || buttonType === "dashed";
 
   return (
     <Wave component="Button" disabled={loading}>
       <Comp
         className={cn(
           "relative",
-          variant === "dashed" && "border-dashed",
+          isDashed && "border-dashed",
           buttonVariants({
-            color: danger ? "danger" : color,
+            color: colorToPass,
             disabled,
-            primary: !primary && !!variant ? undefined : (primary ?? true),
             size: sizeToPass,
             shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
             variant: variantToPass,
@@ -726,12 +742,11 @@ const Button = ({
               buttonConfig.classNames
                 .variants as unknown as ExtractedTVButtonOptions,
             )({
-              color: danger ? "danger" : color,
+              color: colorToPass,
               disabled,
-              primary: !primary && !!variant ? undefined : (primary ?? true),
               size: sizeToPass,
               shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-              variant,
+              variant: variantToPass,
             }),
           className,
         )}
