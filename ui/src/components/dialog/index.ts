@@ -1,1 +1,1 @@
-export * from "../../shadcn/dialog";
+export * from "./_components";
