@@ -72,7 +72,10 @@ const FormItemRow = ({
       <div
         key="form-item-control-input"
         data-slot="form-item-control-input"
-        className={cn("min-h-control")}
+        className={cn(
+          "min-h-control flex items-center",
+          layout === "vertical" && "*:w-full",
+        )}
       >
         {children}
       </div>
@@ -135,15 +138,7 @@ const FormItemRow = ({
             offset={label ? undefined : 8}
             {...wrapperCol}
           >
-            <div
-              data-slot="form-item-control-input"
-              className={cn(
-                "min-h-control",
-                layout === "vertical" && "*:w-full",
-              )}
-            >
-              {children}
-            </div>
+            {formControlNodes}
             {invalid && (
               <div data-slot="form-item-additional">
                 <FieldError errors={errors} />
