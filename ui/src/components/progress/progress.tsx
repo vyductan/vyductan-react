@@ -146,10 +146,23 @@ function Progress(props: ProgressProps) {
     size = "default",
     showInfo = true,
     strokeColor,
+    trailColor,
+    strokeLinecap,
+    strokeWidth,
+    trailWidth,
+    gapDegree,
+    gapPosition,
+    success,
+    successPercent,
+    loading: _loading,
+    id: _id,
+    value: _value,
+    width: _width,
     percentPosition = {},
 
     status,
     format,
+    // Remove props that should not be passed to DOM elements
     ..._restProps
   } = props;
 
@@ -231,15 +244,17 @@ function Progress(props: ProgressProps) {
   }, [strokeColor]);
 
   const percentNumber = React.useMemo<number>(() => {
-    const successPercent = getSuccessPercent(props);
+    const computedSuccessPercent = getSuccessPercent({
+      success,
+      successPercent,
+    });
     return Number.parseInt(
-      successPercent === undefined
+      computedSuccessPercent === undefined
         ? percent.toString()
-        : successPercent.toString(),
+        : computedSuccessPercent.toString(),
       10,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [percent, props.success, props.successPercent]);
+  }, [percent, success, successPercent]);
 
   const progressStatus = React.useMemo<ProgressStatus>(() => {
     if (percentNumber >= 100) {
@@ -257,7 +272,10 @@ function Progress(props: ProgressProps) {
     if (!showInfo) {
       return null;
     }
-    const successPercent = getSuccessPercent(props);
+    const computedSuccessPercent = getSuccessPercent({
+      success,
+      successPercent,
+    });
     let text: React.ReactNode;
     const textFormatter = format || ((number) => `${number}%`);
     // const isBrightInnerColor =
@@ -269,7 +287,7 @@ function Progress(props: ProgressProps) {
     ) {
       text = textFormatter(
         validProgress(percent),
-        validProgress(successPercent),
+        validProgress(computedSuccessPercent),
       );
     } else if (progressStatus === "exception") {
       text = isLineType ? (
@@ -365,7 +383,7 @@ function Progress(props: ProgressProps) {
       }
     }
 
-    if (props.success && "progress" in props.success) {
+    if (success && "progress" in success) {
       warning.deprecated(false, "success.progress", "success.percent");
     }
   }
@@ -379,11 +397,14 @@ function Progress(props: ProgressProps) {
           data-slot="progress"
           value={percent}
           className={cn(
-            "bg-muted relative overflow-hidden rounded-full",
+            "relative overflow-hidden rounded-full bg-[rgba(0,0,0,0.06)]",
             !sizeStyle.width && "w-full",
             className,
           )}
-          style={sizeStyle}
+          style={{
+            ...sizeStyle,
+            ...(trailColor ? { backgroundColor: trailColor } : {}),
+          }}
         >
           <ProgressPrimitive.Indicator
             data-slot="progress-indicator"
@@ -417,14 +438,14 @@ function Progress(props: ProgressProps) {
         percent={percent}
         size={size}
         strokeColor={strokeColorNotArray}
-        strokeLinecap={props.strokeLinecap}
-        strokeWidth={props.strokeWidth}
-        trailColor={props.trailColor}
-        trailWidth={props.trailWidth}
-        gapDegree={props.gapDegree}
-        gapPosition={props.gapPosition}
+        strokeLinecap={strokeLinecap}
+        strokeWidth={strokeWidth}
+        trailColor={trailColor}
+        trailWidth={trailWidth}
+        gapDegree={gapDegree}
+        gapPosition={gapPosition}
         steps={steps}
-        success={props.success}
+        success={success}
         status={progressStatus}
         className={className}
         style={style}
