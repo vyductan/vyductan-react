@@ -86,7 +86,7 @@ export const App: React.FC<AppProps> & {
         ),
         okText: config.okText ?? "OK",
         okButtonProps: {
-          primary: true,
+          type: "primary",
           color: "amber",
           ...config.okButtonProps,
         },
