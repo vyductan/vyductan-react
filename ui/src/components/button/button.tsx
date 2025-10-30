@@ -3,7 +3,6 @@
 import type * as React from "react";
 import type { VariantProps } from "tailwind-variants";
 import type { PartialDeep } from "type-fest";
-import { useUiConfig } from "@/components/ui/config-provider";
 import { GenericSlot } from "@/components/ui/slot";
 import { Slot } from "@radix-ui/react-slot";
 import { tv } from "tailwind-variants";
@@ -12,6 +11,7 @@ import type { IconProps } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 import Wave from "../../lib/wave";
+import { useComponentConfig } from "../config-provider/context";
 import { LoadingIcon } from "./loading-icon";
 
 const buttonVariants = tv({
@@ -228,7 +228,7 @@ const buttonVariants = tv({
       variant: "outlined",
       color: "primary",
       className: [
-        "border-primary text-primary",
+        "",
         "hover:border-primary-hover hover:text-primary-hover",
         "active:border-primary-active active:text-primary-active",
       ],
@@ -639,26 +639,68 @@ const Button = ({
   asChild = false,
   href,
   children,
+
   className,
-  color,
+  type: typeProp,
+  color: colorProp,
+  size: sizeProp,
+  variant: variantProp,
+  shape,
+  icon,
   disabled,
   loading,
-  size,
-  shape,
-  srOnly,
-  variant,
-  icon,
-  type = "default",
+  danger,
   htmlType,
   htmlColor,
-  danger,
+  srOnly,
   ...props
 }: ButtonProps) => {
-  const buttonConfig = useUiConfig((state) => state.components.button);
-  let sizeToPass = size as ButtonVariants["size"];
+  const {
+    type: typeConfig,
+    color: colorConfig,
+    size: sizeConfig,
+    variant: variantConfig,
+  } = useComponentConfig("button");
+
+  let size = sizeProp ?? sizeConfig;
   if (size === "sm") {
-    sizeToPass = "small";
+    size = "small";
   }
+
+  const type = typeProp ?? typeConfig ?? "default";
+  const isHtmlType = type === "submit" || type === "reset" || type === "button";
+  const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
+
+  // Map type to [color, variant] using ButtonTypeMap
+  // Default to "default" type if no button type is provided (Ant Design behavior)
+  const buttonType: ButtonType = isHtmlType ? "default" : type;
+
+  let color = colorProp ?? colorConfig;
+  let variant = variantProp ?? variantConfig;
+  const isDashed = variant === "dashed" || buttonType === "dashed";
+
+  // Map type to color/variant using ButtonTypeMap
+  if (buttonType in ButtonTypeMap) {
+    const mapping = ButtonTypeMap[buttonType];
+    if (mapping) {
+      const [mappedColor, mappedVariant] = mapping;
+      // Only use mapped values if not explicitly overridden
+      color ??= mappedColor;
+      variant ??= mappedVariant;
+    }
+  }
+
+  // Convert "outline" and "dashed" to "outlined" for styling
+  if (variant === "outline" || variant === "dashed") {
+    variant = "outlined";
+  }
+
+  // Apply danger color override
+  if (danger) {
+    color = "danger";
+  }
+
+  // Check if original variant is dashed for border-dashed class
 
   const Comp = asChild || href ? Slot : "button";
 
@@ -666,7 +708,7 @@ const Button = ({
     <>
       {(!!loading || icon) && (
         <GenericSlot<Partial<IconProps>>
-          className={cn("size-4", sizeToPass === "small" && "size-[14px]")}
+          className={cn("size-4", size === "small" && "size-[14px]")}
           // srOnly={
           //   srOnly && typeof children === "string"
           //     ? children
@@ -686,44 +728,6 @@ const Button = ({
     </>
   );
 
-  const isHtmlType = type === "submit" || type === "reset" || type === "button";
-  const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
-
-  // Map type to [color, variant] using ButtonTypeMap
-  // Default to "default" type if no button type is provided (Ant Design behavior)
-  const buttonType: ButtonType = isHtmlType ? "default" : type;
-
-  let colorToPass: ButtonVariants["color"] = color;
-  let variantToPass: ButtonVariants["variant"] = variant;
-
-  // Map type to color/variant using ButtonTypeMap
-  if (buttonType in ButtonTypeMap) {
-    const mapping = ButtonTypeMap[buttonType];
-    if (mapping) {
-      const [mappedColor, mappedVariant] = mapping;
-      // Only use mapped values if not explicitly overridden
-      if (!color) {
-        colorToPass = mappedColor;
-      }
-      if (!variant) {
-        variantToPass = mappedVariant;
-      }
-    }
-  }
-
-  // Convert "outline" and "dashed" to "outlined" for styling
-  if (variantToPass === "outline" || variantToPass === "dashed") {
-    variantToPass = "outlined";
-  }
-
-  // Apply danger color override
-  if (danger) {
-    colorToPass = "danger";
-  }
-
-  // Check if original variant is dashed for border-dashed class
-  const isDashed = variant === "dashed" || buttonType === "dashed";
-
   return (
     <Wave component="Button" disabled={loading}>
       <Comp
@@ -731,23 +735,12 @@ const Button = ({
           "relative",
           isDashed && "border-dashed",
           buttonVariants({
-            color: colorToPass,
+            variant,
+            color,
+            size,
             disabled,
-            size: sizeToPass,
             shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-            variant: variantToPass,
           }),
-          buttonConfig?.classNames?.variants &&
-            tv(
-              buttonConfig.classNames
-                .variants as unknown as ExtractedTVButtonOptions,
-            )({
-              color: colorToPass,
-              disabled,
-              size: sizeToPass,
-              shape: (icon && !children) || srOnly ? (shape ?? "icon") : shape,
-              variant: variantToPass,
-            }),
           className,
         )}
         disabled={loading ?? disabled}
