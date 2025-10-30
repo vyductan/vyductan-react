@@ -12,8 +12,7 @@ import type {
 } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
 
-import { useFormContext } from "../context";
-import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
+import { useRequiredFieldCheck } from "../hooks/use-field-optionality-check";
 import { Field } from "./form-field";
 
 type FieldListProps<
@@ -107,8 +106,7 @@ const FieldList = <
     errors: control?._formState.errors[name],
   };
 
-  const form = useFormContext<TFieldValues>();
-  const isOptional = useFieldOptionalityCheck(name, form?.schema);
+  const isOptional = useRequiredFieldCheck(name);
 
   return (
     <Field

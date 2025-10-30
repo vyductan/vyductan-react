@@ -811,7 +811,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
 
     return (
       <BaseInput
-        className={className}
+        className={cn("w-[90px]", className)}
         triggerFocus={focus}
         value={value}
         disabled={disabled}

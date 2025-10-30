@@ -138,6 +138,7 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
   return (
     <RowContext.Provider value={rowContext}>
       <div
+        data-slot="row"
         {...others}
         className={classes}
         style={{ ...rowStyle, ...style }}

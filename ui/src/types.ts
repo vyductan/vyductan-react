@@ -87,3 +87,5 @@ export interface AlignType {
 // export type Variant = (typeof Variants)[number];
 
 export type Screens = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+
+export type { AnyObject } from "./components/_util/type";

@@ -18,13 +18,7 @@ type ShadcnCheckboxProps = Omit<
 
 type XORCheckboxProps = XOR<CheckboxProps, ShadcnCheckboxProps>;
 
-type InternalCheckboxType = typeof InternalCheckbox;
-
-type CompoundedComponent = InternalCheckboxType & {
-  Group: typeof CheckboxGroup;
-};
-
-const Checkbox = ((props: XORCheckboxProps) => {
+const ConditionCheckbox = (props: XORCheckboxProps) => {
   const isShadcnCheckbox = props.onCheckedChange !== undefined;
 
   if (isShadcnCheckbox) {
@@ -32,7 +26,14 @@ const Checkbox = ((props: XORCheckboxProps) => {
   }
 
   return <InternalCheckbox {...(props as CheckboxProps)} />;
-}) as unknown as CompoundedComponent;
+};
+
+type InternalCheckboxType = typeof ConditionCheckbox;
+
+type CompoundedComponent = InternalCheckboxType & {
+  Group: typeof CheckboxGroup;
+};
+const Checkbox = ConditionCheckbox as unknown as CompoundedComponent;
 
 Checkbox.Group = CheckboxGroup;
 

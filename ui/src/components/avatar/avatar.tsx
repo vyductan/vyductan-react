@@ -84,7 +84,7 @@ export const InternalAvatar = (props: OwnAvatarProps) => {
   const sizeCls = cn(
     size === "small" && "size-6 text-xs",
     size === "default" && "size-10 text-lg",
-    size === "large" && "size-16 text-[1.25rem] leading-[4rem]",
+    size === "large" && "size-16 text-[1.25rem] leading-16",
   );
   const classString = cn(sizeCls, avatar?.className, className);
 

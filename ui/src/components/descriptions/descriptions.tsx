@@ -87,7 +87,7 @@ const Descriptions = ({
     classNames?.view,
   );
   const labelClassName = cn(
-    "text-muted-foreground inline-flex items-baseline font-medium",
+    "text-muted-foreground inline-flex items-center font-medium", // items-center instead of items-baseline to fix <div> label
     [
       "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
       layout === "horizontal" && "after:mr-2",

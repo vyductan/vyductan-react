@@ -119,7 +119,12 @@ const Modal = ({
         originNode: undefined,
         extra: {
           OkBtn: (
-            <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
+            <Button
+              type="primary"
+              loading={confirmLoading}
+              onClick={onOk}
+              {...okButtonProps}
+            >
               {okText ?? "Ok"}
             </Button>
           ),
@@ -140,6 +145,7 @@ const Modal = ({
         <Button variant="outline">{cancelText ?? "Cancel"}</Button>
       </DialogClose>
       <Button
+        type="primary"
         loading={confirmLoading}
         onClick={onOk}
         {...(okType === "danger" ? { color: "danger" } : {})}
@@ -169,7 +175,7 @@ const Modal = ({
         className={cn(
           "px-0 text-sm",
           "sm:max-w-auto", // override sm:max-w-lg of shadcn
-          numWidth && "w-[var(--modal-width)]", // override max-w-lg of shadcn
+          numWidth && "w-(--modal-width)", // override max-w-lg of shadcn
           className,
         )}
         style={{

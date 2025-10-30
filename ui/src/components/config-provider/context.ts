@@ -5,7 +5,9 @@ import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
 import type { ShowWaveEffect } from "../../lib/wave/interface";
+import type { ButtonProps } from "../button";
 import type { DatePickerProps } from "../date-picker";
+import type { FormProps } from "../form";
 import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
@@ -48,6 +50,9 @@ export interface ComponentStyleConfig {
   style?: React.CSSProperties;
 }
 
+export type ButtonConfig = ComponentStyleConfig &
+  Pick<ButtonProps, "classNames" | "variant" | "color" | "shape">;
+
 export type DatePickerConfig = ComponentStyleConfig &
   Pick<
     DatePickerProps,
@@ -57,6 +62,12 @@ export type DatePickerConfig = ComponentStyleConfig &
     | "format"
     | "captionLayout"
     | "commitYearOnClose"
+  >;
+
+export type FormConfig = ComponentStyleConfig &
+  Pick<
+    FormProps,
+    "layout" | "labelCol" | "wrapperCol" | "labelAlign" | "labelWrap" | "colon"
   >;
 
 export type InputConfig = ComponentStyleConfig &
@@ -122,7 +133,7 @@ export interface ConfigComponentProps {
   mentions?: MentionsConfig;
   // space?: SpaceConfig;
   // splitter?: ComponentStyleConfig;
-  // form?: FormConfig;
+  form?: FormConfig;
   select?: SelectConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;

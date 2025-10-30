@@ -8,25 +8,41 @@ import useId from "@rc-component/util/lib/hooks/useId";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ProgressGradient, ProgressProps } from "./progress";
+import type {
+  CommonProgressProps,
+  ProgressGradient,
+  ProgressStatus,
+} from "./progress";
 import { Tooltip } from "../tooltip";
 import PtgCircle from "./circle/ptg-circle";
 import { getCircleStyle, VIEW_BOX_SIZE } from "./circle/util";
 import { useTransitionDuration } from "./hooks/use-transition-duration";
+import { STATUS_COLORS } from "./progress";
 import { getPercentage, getSize, getStrokeColor } from "./utils";
 import getIndeterminateCircle from "./utils/get-indeterminate-circle";
 
 const CIRCLE_MIN_STROKE_WIDTH = 3;
 
-interface CircleProps extends Omit<ProgressProps, "format" | "ref"> {
+export type CircleProps = CommonProgressProps & {
+  type?: "circle" | "dashboard";
+  status?: ProgressStatus;
   children?: React.ReactNode;
-  progressStatus: string;
+  styles?: {
+    root?: React.CSSProperties;
+    rail?: React.CSSProperties;
+    track?: React.CSSProperties;
+  };
+  classNames?: {
+    root?: string;
+    rail?: string;
+    track?: string;
+  };
   strokeColor?: string | ProgressGradient;
 
   gapDegree?: number;
-}
+};
 
-function Circle(props: CircleProps) {
+function Circle({ ref: _ref, ...props }: CircleProps) {
   const {
     id,
     children,
@@ -39,18 +55,21 @@ function Circle(props: CircleProps) {
     // gaugePrimaryColor,
     // gaugeSecondaryColor,
     // strokeColor,
-    strokeLinecap,
-    trailColor = null as unknown as string,
+    strokeLinecap = "round",
+    trailColor = "var(--muted)",
     trailWidth,
     className,
     type,
     loading,
     success,
+    status,
 
     gapDegree: gapDegreeProp = 0,
     classNames,
     styles,
     style,
+
+    format: _format,
     ...restProps
   } = props;
   const [width, height] = getSize(size, "circle");
@@ -75,6 +94,7 @@ function Circle(props: CircleProps) {
       return 75;
     }
     return 0;
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
   }, [gapDegreeProp, type]);
 
   const percentArray = getPercentage(props);
@@ -84,14 +104,23 @@ function Circle(props: CircleProps) {
   // using className to style stroke color
   const isGradient =
     Object.prototype.toString.call(props.strokeColor) === "[object Object]";
+
+  // Apply status color if no strokeColor is provided
+  const finalStrokeColor =
+    props.strokeColor ||
+    (status ? STATUS_COLORS[status]?.color : STATUS_COLORS.default.color);
+
   const strokeColor = getStrokeColor({
     success,
-    strokeColor: props.strokeColor,
+    strokeColor: finalStrokeColor,
   });
 
-  const wrapperClassName = cn(`circle-inner`, {
-    ["circle-gradient"]: isGradient,
-  });
+  const wrapperClassName = cn(
+    "relative inline-flex items-center justify-center",
+    {
+      ["circle-gradient"]: isGradient,
+    },
+  );
 
   const smallCircle = width <= 20;
 
@@ -129,7 +158,9 @@ function Circle(props: CircleProps) {
 
   const radius = halfSize - strokeWidth / 2;
   const perimeter = Math.PI * 2 * radius;
-  const rotateDeg = gapDegree > 0 ? 90 + gapDegree / 2 : -90;
+  // Dashboard starts from bottom-left (Ant Design): 90 + 180 = 270° - gapDegree/2
+  // Circle starts from top: -90°
+  const rotateDeg = gapDegree > 0 ? 270 - gapDegree / 2 : -90;
   const perimeterWithoutGap = perimeter * ((360 - gapDegree) / 360);
   const { count: stepCount, gap: stepGap } =
     typeof steps === "object" ? steps : { count: steps!, gap: 2 };
@@ -298,7 +329,11 @@ function Circle(props: CircleProps) {
   const node = (
     <div className={wrapperClassName} style={circleStyle}>
       {circleContent}
-      {!smallCircle && children}
+      {!smallCircle && children && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {children}
+        </div>
+      )}
     </div>
   );
 
@@ -317,5 +352,4 @@ function toArray<T>(value: T | T[]): T[] {
   return Array.isArray(mergedValue) ? mergedValue : [mergedValue];
 }
 
-export type { CircleProps };
 export { Circle as CircularProgress };

@@ -50,9 +50,18 @@ function DrawerContent({
 
           //
           // "flex flex-col [&>div]:flex-1",
-          "!touch-auto !select-text",
+          "touch-auto! select-text!",
           className,
         )}
+        // Prevent drawer from closing when clicking on toast notifications (Sonner)
+        onInteractOutside={(e) => {
+          if (
+            e.target instanceof Element &&
+            e.target.closest("[data-sonner-toast]")
+          ) {
+            e.preventDefault();
+          }
+        }}
         {...props}
       >
         <div className="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />

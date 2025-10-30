@@ -12,7 +12,7 @@ import { FormField as ShadFormField } from "@acme/ui/shadcn/form";
 import type { FormItemLabelProps } from "./form-label";
 import { Col } from "../../grid";
 import { useFormContext } from "../context";
-import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
+import { useRequiredFieldCheck } from "../hooks/use-field-optionality-check";
 import { FormControl } from "./form-control";
 import { FormItem } from "./form-item";
 import { FieldLabel } from "./form-label";
@@ -102,14 +102,13 @@ const FormField = <
 
   ...props
 }: FieldProps<TFieldValues, TName, TTransformedValues>) => {
-  const form = useFormContext<TFieldValues, any, TFieldValues>();
-  const mergedLayout = layout ?? form?.layout;
-  const classNames = form?.classNames;
-  const wrapperCol = form?.wrapperCol;
+  const formContext = useFormContext<TFieldValues, any, TFieldValues>();
+  const mergedLayout = layout ?? formContext?.layout;
+  const classNames = formContext?.classNames;
+  const wrapperCol = formContext?.wrapperCol;
 
-  const optional = useFieldOptionalityCheck(name, form?.schema);
-  const mergedRequired =
-    required ?? (optional === undefined ? false : !optional);
+  const requiredChecked = useRequiredFieldCheck(name);
+  const mergedRequired = required ?? requiredChecked ?? false;
 
   // if (render && name) {
   //   return (
@@ -154,7 +153,7 @@ const FormField = <
 
   if (
     !render &&
-    form &&
+    formContext &&
     name &&
     isValidElement<{
       onBlur?: (event: any) => void;
