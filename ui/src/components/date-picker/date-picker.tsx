@@ -22,7 +22,6 @@ import { Button } from "../button";
 import { Calendar } from "../calendar";
 // For typing DayButton props if needed in future (not strictly required below)
 // import type { DayButton as RdpDayButton } from "react-day-picker";
-import { useUiConfig } from "../config-provider/config-provider";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
@@ -129,14 +128,14 @@ const DatePicker = (props: DatePickerProps) => {
   const commitYearOnClose = commitYearOnCloseProp ?? commitYearOnCloseConfig;
 
   // ====================== Format Date =======================
-  const datePickerConfig = useUiConfig((state) => state.components.datePicker);
+  const { format: datePickerFormat } = useComponentConfig("datePicker");
   const format =
     formatProp ??
     (picker === "year"
       ? "YYYY"
       : showTime
-        ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
-        : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
+        ? `${formatConfig ?? datePickerFormat} HH:mm`
+        : (formatConfig ?? datePickerFormat ?? "YYYY-MM-DD"));
 
   // // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
   // const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {

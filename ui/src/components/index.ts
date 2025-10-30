@@ -8,6 +8,7 @@ export * from "./avatar";
 export * from "./badge";
 export * from "./button";
 export * from "./card";
+export * from "./code-block";
 export * from "./col";
 export * from "./color-picker";
 export * from "./date-picker";

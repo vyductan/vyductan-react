@@ -51,7 +51,7 @@ export interface ComponentStyleConfig {
 }
 
 export type ButtonConfig = ComponentStyleConfig &
-  Pick<ButtonProps, "classNames" | "variant" | "color" | "shape">;
+  Pick<ButtonProps, "classNames" | "type" | "variant" | "color" | "size">;
 
 export type DatePickerConfig = ComponentStyleConfig &
   Pick<
@@ -137,7 +137,7 @@ export interface ConfigComponentProps {
   select?: SelectConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;
-  // button?: ButtonConfig;
+  button?: ButtonConfig;
   // divider?: ComponentStyleConfig;
   // drawer?: DrawerConfig;
   // calendar?: ComponentStyleConfig;
