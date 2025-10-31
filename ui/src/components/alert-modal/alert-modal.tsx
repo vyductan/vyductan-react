@@ -2,7 +2,9 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 import type { ModalProps } from "../modal";
-import { buttonVariants, LoadingIcon } from "../button";
+import { Icon } from "../../icons";
+import { buttonColorVariants, buttonVariants, LoadingIcon } from "../button";
+import { tagColors } from "../tag";
 import {
   AlertDialogAction,
   AlertDialogCancel,
@@ -17,6 +19,7 @@ import {
 
 export type AlertModalProps = Omit<ModalProps, "onOk"> & {
   onConfirm?: () => void;
+  type?: "confirm" | "warning" | "info" | "success" | "error";
 };
 
 export const AlertModal = ({
@@ -31,11 +34,9 @@ export const AlertModal = ({
   onConfirm,
   onCancel,
   onOpenChange,
-
+  type = "confirm",
   children,
-
   okButtonProps,
-
   ...rest
 }: AlertModalProps) => {
   const handleOpenChange = React.useCallback(
@@ -57,33 +58,102 @@ export const AlertModal = ({
     );
   }
 
+  const isWarning = type === "warning";
+  const isError = type === "error";
+  const isInfo = type === "info";
+  const isSuccess = type === "success";
+  const isSimpleType = isWarning || isError || isInfo || isSuccess;
+
+  const getIconConfig = () => {
+    switch (type) {
+      case "warning": {
+        return {
+          icon: "icon-[lucide--alert-triangle]",
+          class: tagColors.warning,
+        };
+      }
+      case "error": {
+        return {
+          icon: "icon-[ix--error-filled]",
+          class: tagColors.error,
+        };
+      }
+      case "info": {
+        return {
+          icon: "icon-[si--info-fill]",
+          class: tagColors.processing,
+        };
+      }
+      case "success": {
+        return {
+          icon: "icon-[lucide--check-circle]",
+          class: tagColors.success,
+        };
+      }
+      default: {
+        return null;
+      }
+    }
+  };
+
+  const iconConfig = getIconConfig();
+
   return (
     <AlertDialogRoot onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
-        <AlertDialogHeader className={classNames?.header}>
+        {iconConfig && (
+          <div className="flex justify-center">
+            <div
+              className={cn(
+                "flex h-16 w-16 items-center justify-center rounded-full",
+                iconConfig.class,
+              )}
+            >
+              <Icon icon={iconConfig.icon} className={cn("size-10")} />
+            </div>
+          </div>
+        )}
+        <AlertDialogHeader
+          className={cn(classNames?.header, isSimpleType && "text-center")}
+        >
           {title && (
-            <AlertDialogTitle className={classNames?.title}>
+            <AlertDialogTitle
+              className={cn(classNames?.title, isSimpleType && "text-center")}
+            >
               {title}
             </AlertDialogTitle>
           )}
-          <AlertDialogDescription className={classNames?.description}>
-            {description}
-          </AlertDialogDescription>
+          {description && (
+            <AlertDialogDescription
+              className={cn(
+                classNames?.description,
+                isSimpleType && "text-center",
+              )}
+            >
+              {description}
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
 
-        <AlertDialogFooter className={classNames?.footer}>
-          <AlertDialogCancel
-            className={cn(
-              buttonVariants({
-                variant: "outline",
-              }),
-            )}
-          >
-            {cancelText}
-          </AlertDialogCancel>
+        <AlertDialogFooter
+          className={cn(classNames?.footer, isSimpleType && "flex-col")}
+        >
+          {!isSimpleType && (
+            <AlertDialogCancel
+              className={cn(
+                buttonVariants({
+                  size: "middle",
+                }),
+                buttonColorVariants({
+                  variant: "outlined",
+                }),
+              )}
+            >
+              {cancelText}
+            </AlertDialogCancel>
+          )}
           <AlertDialogAction
-            isOpenControlled={rest.open !== undefined}
             onClick={(e) => {
               e.preventDefault();
               onConfirm?.();
@@ -91,9 +161,13 @@ export const AlertModal = ({
             onKeyDown={(e) => e.key === "Enter" && onConfirm?.()}
             className={cn(
               buttonVariants({
+                size: "middle",
+              }),
+              buttonColorVariants({
                 variant: okButtonProps?.variant ?? "solid",
                 color: okButtonProps?.color ?? "primary",
               }),
+              isSimpleType && "w-full",
             )}
           >
             {confirmLoading && <LoadingIcon />}
