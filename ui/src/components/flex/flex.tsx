@@ -25,7 +25,7 @@ interface FlexProps extends React.HTMLAttributes<HTMLDivElement> {
    * The alignment of items along the cross axis
    * @default 'start'
    */
-  align?: "start" | "end" | "center" | "baseline" | "stretch";
+  align?: React.CSSProperties["alignItems"];
 
   /**
    * Whether to wrap items when they overflow
