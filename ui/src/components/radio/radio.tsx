@@ -5,22 +5,22 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { ButtonColorVariants } from "../button/button-variants";
 import type { AbstractCheckboxProps } from "../checkbox";
 import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
-import { Label } from "../label";
+import { buttonVariants } from "../button";
 import {
-  radioButtonSolidActiveColors,
-  radioButtonSolidColors,
-  radioColors,
-} from "./colors";
+  buttonColorVariants,
+  disabledVariants,
+} from "../button/button-variants";
 
 type RadioProps = AbstractCheckboxProps<RadioChangeEvent> & {
   label?: React.ReactNode;
   value?: any;
-  color?: string;
-  optionType?: "button";
-  buttonStyle?: "solid";
+  color?: ButtonColorVariants["color"];
+  optionType?: "default" | "button";
+  buttonStyle?: "outline" | "solid";
   isActive?: boolean;
   preColor?: string;
 };
@@ -38,20 +38,74 @@ const Radio = ({
   onChange,
   ...props
 }: RadioProps) => {
-  if (optionType === "button" && buttonStyle) {
+  const variant =
+    buttonStyle === "solid"
+      ? isActive
+        ? "solid"
+        : "outlined"
+      : isActive
+        ? "outlined"
+        : "link";
+  let mergedColor = color;
+  if (isActive && buttonStyle === "outline" && color === "default") {
+    mergedColor = "primary";
+  }
+  // if (label === "Default" && buttonStyle === "outline") {
+  //   console.log(
+  //     "color",
+  //     color,
+  //     "variant",
+  //     variant,
+  //     "isActive",
+  //     isActive,
+  //     buttonVariants({
+  //       disabled,
+  //       color,
+  //       variant,
+  //     }),
+  //   );
+  // }
+
+  if (optionType === "button") {
     return (
       <label
         className={cn(
-          "ring-offset-background inline-flex cursor-pointer items-center justify-center px-3 py-[5px] text-sm font-medium whitespace-nowrap transition-all",
-          "border border-l-0 first:rounded-s-md first:border-l last:rounded-e-md",
-          "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden",
-          radioColors[color],
-          disabled && "pointer-events-none cursor-not-allowed opacity-50",
-          radioButtonSolidColors[color],
-          preColor && radioButtonSolidColors[preColor]?.split(" ")[1],
-          isActive &&
-            radioButtonSolidActiveColors[color] +
-              " shadow-xs [&>button]:text-white",
+          // "ring-offset-background inline-flex cursor-pointer items-center justify-center px-3 py-[5px] text-sm font-medium whitespace-nowrap",
+          // "-mr-px border first:rounded-s-md last:mr-0 last:rounded-e-md",
+          // "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden",
+          // buttonStyle === "outline" && radioColors[color],
+          // buttonStyle === "solid" && !isActive && "bg-white",
+          // buttonStyle === "solid" && !isActive && radioColors[color],
+          // disabled && "pointer-events-none cursor-not-allowed opacity-50",
+          // buttonStyle === "solid" && !isActive && radioButtonSolidColors[color],
+          // buttonStyle === "solid" &&
+          //   !isActive &&
+          //   preColor &&
+          //   radioButtonSolidColors[preColor]?.split(" ")[1],
+          // isActive &&
+          //   buttonStyle === "solid" &&
+          //   radioButtonSolidActiveColors[color] +
+          //     " relative z-10 shadow-xs [&>button]:text-white",
+          // isActive &&
+          //   buttonStyle === "outline" &&
+          //   radioButtonOutlineActiveColors[color] + " relative z-10",
+          "-mr-px",
+          buttonVariants({
+            size: "middle",
+          }),
+          buttonColorVariants({
+            color: mergedColor,
+            variant,
+          }),
+          disabledVariants({
+            disabled,
+          }),
+          buttonStyle === "outline" && !isActive && "border-input",
+
+          // Override rounded for group buttons: first has left rounded, last has right rounded
+          "rounded-none first:rounded-l-md last:rounded-r-md",
+          // Add z-index for active item to ensure it appears above adjacent buttons
+          isActive && "relative z-10",
           className,
         )}
       >
@@ -84,9 +138,7 @@ const Radio = ({
             props.onClick?.(e);
           }}
         >
-          <Label asChild>
-            <span>{label}</span>
-          </Label>
+          <span>{label}</span>
         </RadioGroupPrimitive.Item>
         {/* <Label htmlFor={value as string}>{label}</Label> */}
       </label>
@@ -98,9 +150,20 @@ const Radio = ({
       className={cn(
         "flex items-center",
         "cursor-pointer text-sm",
-        radioColors[color],
-        disabled &&
-          "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
+        // disabled &&
+        // "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
+        buttonVariants({
+          size: "middle",
+        }),
+        buttonColorVariants({
+          variant: "link",
+          color,
+        }),
+        disabledVariants({
+          disabled,
+        }),
+        "size-auto gap-0 p-0",
+        color === "default" && "hover:text-foreground",
         className,
       )}
     >
@@ -109,6 +172,14 @@ const Radio = ({
         value={value}
         className={cn(
           "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+          // [
+          //   buttonVariants({
+          //     disabled,
+          //     variant: "link",
+          //     color,
+          //   }),
+          //   "size-auto gap-0 p-0",
+          // ],
         )}
         disabled={disabled}
         {...props}
@@ -139,7 +210,16 @@ const Radio = ({
       >
         <RadioGroupPrimitive.Indicator
           data-slot="radio-group-indicator"
-          className="relative flex items-center justify-center"
+          className={cn("relative flex items-center justify-center", [
+            buttonColorVariants({
+              variant: "link",
+              color,
+            }),
+            disabledVariants({
+              disabled,
+            }),
+            "size-auto gap-0 p-0",
+          ])}
         >
           <Icon
             icon="icon-[bi--circle-fill]"

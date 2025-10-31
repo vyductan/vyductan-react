@@ -1,0 +1,40 @@
+import { Col, Row } from "@/components/ui/grid";
+import { ComponentSource } from "@/components/ui/mdx";
+
+import RadioBasicDemo from "./demo/basic";
+import RadioButtonStyleDemo from "./demo/button-style";
+import RadioColorDemo from "./demo/color";
+import RadioDisabledDemo from "./demo/disabled";
+
+# Radio
+
+Radio button component for selecting a single option from a group. Built on top of Radix UI primitives and follows Ant Design API patterns.
+
+## Examples
+
+### Basic Usage
+
+The simplest usage.
+
+<ComponentSource src="radio/demo/basic.tsx" __comp__={RadioBasicDemo} />
+
+### Button Style
+
+The combination of `optionType="button"` and `buttonStyle="solid"` will render a solid button style radio group.
+
+<ComponentSource
+  src="radio/demo/button-style.tsx"
+  __comp__={RadioButtonStyleDemo}
+/>
+
+### Color
+
+Use `color` prop to set different colors for radio buttons. Available colors include `default`, `success`, `processing`, `error`, `warning`, and custom colors like `blue`, `green`, `purple`, `pink`, `teal`, etc.
+
+<ComponentSource src="radio/demo/color.tsx" __comp__={RadioColorDemo} />
+
+### Disabled
+
+Radio unavailable state.
+
+<ComponentSource src="radio/demo/disabled.tsx" __comp__={RadioDisabledDemo} />
