@@ -6,13 +6,13 @@ import { Icon } from "../../icons";
 import { buttonColorVariants, buttonVariants, LoadingIcon } from "../button";
 import { tagColors } from "../tag";
 import {
+  AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogRoot,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./_components";
@@ -52,9 +52,9 @@ export const AlertModal = ({
   const isShadcnAlertDialog = !!children;
   if (isShadcnAlertDialog) {
     return (
-      <AlertDialogRoot onOpenChange={onOpenChange} {...rest}>
+      <AlertDialog onOpenChange={onOpenChange} {...rest}>
         {children}
-      </AlertDialogRoot>
+      </AlertDialog>
     );
   }
 
@@ -99,7 +99,7 @@ export const AlertModal = ({
   const iconConfig = getIconConfig();
 
   return (
-    <AlertDialogRoot onOpenChange={handleOpenChange} {...rest}>
+    <AlertDialog onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
         {iconConfig && (
@@ -175,6 +175,6 @@ export const AlertModal = ({
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
-    </AlertDialogRoot>
+    </AlertDialog>
   );
 };
