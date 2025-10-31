@@ -56,26 +56,28 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   const displayText = showText ? displayValue : "";
 
   const triggerElement = children ?? (
-    <Button
-      variant="outline"
-      size={size}
-      disabled={disabled}
-      data-slot="color-picker-trigger"
-      shape="icon"
-      {...props}
-    >
-      <div
-        data-slot="color-picker-color-block"
-        style={{
-          backgroundColor: displayValue,
-        }}
-        className="w-control-sm h-control-sm rounded-sm"
+    <div>
+      <Button
+        variant="outlined"
+        size={size}
+        disabled={disabled}
+        data-slot="color-picker-trigger"
+        shape="icon"
+        {...props}
       >
-        {showText && (
-          <span className="text-foreground/70 text-xs">{displayText}</span>
-        )}
-      </div>
-    </Button>
+        <div
+          data-slot="color-picker-color-block"
+          style={{
+            backgroundColor: displayValue,
+          }}
+          className="w-control-sm h-control-sm rounded-sm"
+        >
+          {showText && (
+            <span className="text-foreground/70 text-xs">{displayText}</span>
+          )}
+        </div>
+      </Button>
+    </div>
   );
 
   return (

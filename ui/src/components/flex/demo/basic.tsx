@@ -143,10 +143,10 @@ export function FlexBasicDemo() {
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
           <span>Before </span>
           <Flex inline gap={8}>
-            <Button variant="outline" size="small">
+            <Button variant="outlined" size="small">
               Inline
             </Button>
-            <Button variant="outline" size="small">
+            <Button variant="outlined" size="small">
               Flex
             </Button>
           </Flex>

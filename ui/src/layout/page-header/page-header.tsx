@@ -9,7 +9,7 @@ import { ConfigContext } from "@/components/ui/config-provider";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { buttonVariants, Space } from "../../components";
+import { buttonColorVariants, buttonVariants, Space } from "../../components";
 import { Icon } from "../../icons";
 import { PageHeading } from "./_components";
 
@@ -56,7 +56,8 @@ const renderBack = (
       }}
       className={cn(
         "mr-2 cursor-pointer",
-        buttonVariants({ variant: "text", shape: "icon" }),
+        buttonVariants({ shape: "icon" }),
+        buttonColorVariants({ variant: "text" }),
       )}
       aria-label="back"
     >

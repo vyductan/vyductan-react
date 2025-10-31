@@ -12,6 +12,7 @@ import {
 } from "@acme/ui/shadcn/alert-dialog";
 
 import { buttonVariants } from "../button";
+import { buttonColorVariants } from "../button/button-variants";
 
 const AlertDialogRoot = AlertDialog;
 const AlertDialogCancel = ShadcnAlertDialogCancel;
@@ -30,7 +31,10 @@ const AlertDialogAction = (
     <ShadcnAlertDialogAction
       className={cn(
         buttonVariants({
-          color: "danger",
+          size: "middle",
+        }),
+        buttonColorVariants({
+          color: isOpenControlled ? "danger" : "default",
         }),
         className,
       )}

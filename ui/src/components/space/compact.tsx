@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +47,7 @@ export const useCompactItemContext = (direction: DirectionType) => {
         compactDirection === "vertical" &&
         "rounded-none",
       // Hover/focus states
-      "hover:z-[2] focus:z-[2] focus-visible:z-[2]",
+      "hover:z-2 focus:z-2 focus-visible:z-2",
     );
   }, [direction, compactItemContext]);
 

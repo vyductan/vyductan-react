@@ -6,7 +6,7 @@ import { Icon } from "@acme/ui/icons";
 export const NavigationRight = (props: ButtonProps) => {
   return (
     <Button
-      variant="outline"
+      variant="outlined"
       icon={<Icon icon="icon-[mingcute--right-fill]" className="size-4" />}
       {...props}
     />

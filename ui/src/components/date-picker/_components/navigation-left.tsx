@@ -6,7 +6,7 @@ import { Icon } from "@acme/ui/icons";
 export const NavigationLeft = (props: ButtonProps) => {
   return (
     <Button
-      variant="outline"
+      variant="outlined"
       icon={<Icon icon="icon-[mingcute--left-fill]" className="size-4" />}
       {...props}
     />

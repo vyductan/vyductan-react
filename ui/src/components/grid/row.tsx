@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
