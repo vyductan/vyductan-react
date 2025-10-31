@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 import { useControlledState } from "@rc-component/util";
 
+import type { ButtonColorVariants } from "../button/button-variants";
 import type { FormValueType } from "../form";
 import type { CheckboxChangeEvent } from "./checkbox";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
 
-export interface CheckboxOptionType<T = FormValueType> {
+export interface CheckboxOptionType<T extends FormValueType = FormValueType> {
   label: React.ReactNode;
   value: T;
   style?: React.CSSProperties;
@@ -14,24 +15,32 @@ export interface CheckboxOptionType<T = FormValueType> {
   disabled?: boolean;
   title?: string;
   id?: string;
-  onChange?: (e: CheckboxChangeEvent) => void;
+  onChange?: (e: CheckboxChangeEvent<T>) => void;
   required?: boolean;
+
+  color?: ButtonColorVariants["color"];
 }
 
-type CheckboxGroupProps<T extends FormValueType> = {
-  name?: string;
-  value?: T[];
-  defaultValue?: T[];
-  options?: (CheckboxOptionType<T> | string | number)[];
-  onChange?: (checkedValues: T[]) => void;
-  disabled?: boolean;
-
+export interface AbstractCheckboxGroupProps<
+  T extends FormValueType = FormValueType,
+> {
+  options?: CheckboxOptionType<T>[];
+  style?: React.CSSProperties;
   className?: string;
   classNames?: {
     item?: string;
     label?: string;
   };
-};
+  disabled?: boolean;
+}
+
+type CheckboxGroupProps<T extends FormValueType = FormValueType> =
+  AbstractCheckboxGroupProps<T> & {
+    name?: string;
+    value?: T[];
+    defaultValue?: T[];
+    onChange?: (checkedValues: T[]) => void;
+  };
 const CheckboxGroup = <T extends FormValueType = FormValueType>({
   name,
   value,

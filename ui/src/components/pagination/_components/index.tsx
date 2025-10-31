@@ -1,10 +1,6 @@
 import type { ButtonProps } from "@/components/ui/button";
 import * as React from "react";
-import {
-  buttonColorVariants,
-  buttonVariants,
-  disabledVariants,
-} from "@/components/ui/button";
+import { buttonColorVariants, buttonVariants } from "@/components/ui/button";
 import { Slot } from "@radix-ui/react-slot";
 
 import { Icon } from "@acme/ui/icons";
@@ -72,8 +68,6 @@ function PaginationLink({
         buttonColorVariants({
           variant: isActive ? "outlined" : "text",
           color: isActive ? "primary" : "default",
-        }),
-        disabledVariants({
           disabled,
         }),
         !isActive && "text-muted-foreground",

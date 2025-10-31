@@ -4,11 +4,7 @@ import type { Button as ShadcnButton } from "../../shadcn/button";
 import type { ButtonProps } from "./button";
 import { Button as InternalButton } from "./button";
 
-export {
-  buttonVariants,
-  buttonColorVariants,
-  disabledVariants,
-} from "./button-variants";
+export { buttonVariants, buttonColorVariants } from "./button-variants";
 export { LoadingIcon } from "./loading-icon";
 
 type ShadcnButtonProps = React.ComponentProps<typeof ShadcnButton>;
@@ -26,17 +22,6 @@ const ConditionButton = ({
   let mergedVariant: ButtonProps["variant"];
   let mergedShape: ButtonProps["shape"] = shape;
 
-  //   const isShadcnButton =
-  //     variant === "outline" ||
-  //     variant === "destructive" ||
-  //     variant === "secondary" ||
-  //     variant === "ghost" ||
-  //     size === "sm" ||
-  //     size === "lg" ||
-  //     size === "icon" ||
-  //     size === "icon-sm" ||
-  //     size === "icon-lg";
-  //   if (isShadcnButton) {
   switch (size) {
     case "sm": {
       mergedSize = "small";
@@ -110,19 +95,8 @@ const ConditionButton = ({
 
       break;
     }
-    // }
   }
 
-  if (variant === "solid") {
-    console.log(
-      "mergedVariant",
-      mergedVariant,
-      "mergedColor",
-      mergedColor,
-      // "mergedSize",
-      // mergedSize,
-    );
-  }
   return (
     <InternalButton
       size={mergedSize}

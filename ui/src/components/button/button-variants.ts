@@ -1,17 +1,10 @@
 import type { VariantProps } from "tailwind-variants";
 import { tv } from "tailwind-variants";
 
-export const disabledVariants = tv({
-  variants: {
-    disabled: {
-      true: "pointer-events-none cursor-not-allowed opacity-50",
-    },
-  },
-});
 export const buttonVariants = tv({
   base: [
     "inline-flex shrink-0 items-center justify-center gap-2 border text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
-    "disabled:pointer-events-none disabled:opacity-50",
+    // "disabled:pointer-events-none disabled:opacity-50",
     // "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4", // moved to &_span
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
@@ -72,6 +65,9 @@ export type ButtonColorVariants = VariantProps<typeof buttonColorVariants>;
 
 export const buttonColorVariants = tv({
   variants: {
+    disabled: {
+      true: "cursor-not-allowed",
+    },
     variant: {
       solid: ["text-white", "hover:text-white"],
       outlined: [
@@ -1104,6 +1100,52 @@ export const buttonColorVariants = tv({
         "text-gray-500",
         "hover:text-gray-400",
         "active:text-gray-600",
+      ],
+    },
+    // Disabled states - use muted colors instead of opacity
+    {
+      disabled: true,
+      variant: "solid",
+      className: [
+        "bg-muted/80 border-input text-muted-foreground/50",
+        "hover:!bg-muted/80 hover:!border-input hover:!text-muted-foreground/50",
+        "active:!bg-muted/80 active:!border-input active:!text-muted-foreground/50",
+      ],
+    },
+    {
+      disabled: true,
+      variant: "outlined",
+      className: [
+        "border-input text-muted-foreground/50 bg-muted/80",
+        "hover:!border-input hover:!text-muted-foreground/50 hover:!bg-muted/80",
+        "active:!border-input active:!text-muted-foreground/50 active:!bg-muted/80",
+      ],
+    },
+    {
+      disabled: true,
+      variant: "filled",
+      className: [
+        "bg-muted/80 text-muted-foreground/50 border-transparent",
+        "hover:!bg-muted/80 hover:!text-muted-foreground/50 hover:!border-transparent",
+        "active:!bg-muted/80 active:!text-muted-foreground/50 active:!border-transparent",
+      ],
+    },
+    {
+      disabled: true,
+      variant: "text",
+      className: [
+        "text-muted-foreground/50 border-transparent bg-transparent",
+        "hover:!text-muted-foreground/50 hover:!border-transparent hover:!bg-transparent",
+        "active:!text-muted-foreground/50 active:!border-transparent active:!bg-transparent",
+      ],
+    },
+    {
+      disabled: true,
+      variant: "link",
+      className: [
+        "text-muted-foreground/50 border-transparent",
+        "hover:!text-muted-foreground/50 hover:!border-transparent",
+        "active:!text-muted-foreground/50 active:!border-transparent",
       ],
     },
   ],
