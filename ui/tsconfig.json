@@ -7,11 +7,13 @@
     "rootDir": ".",
     "paths": {
       "@/lib/*": ["./src/lib/*"],
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/components/ui": ["./src/components/index.ts"],
       "@/components/ui/*": ["./src/components/*"],
       "@/components/icons": ["./src/icons/index.ts"],
       "@/components/icons/*": ["./src/icons/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "./src/shadcn/*.tsx"]
 }
