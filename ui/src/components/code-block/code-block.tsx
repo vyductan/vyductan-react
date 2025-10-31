@@ -1,6 +1,11 @@
 "use client";
 
 import type { ComponentProps } from "react";
+import type {
+  BundledLanguage,
+  SpecialLanguage,
+  StringLiteralUnion,
+} from "shiki/bundle/web";
 import { memo, useEffect, useMemo, useState } from "react";
 import { codeToHtml } from "shiki/bundle/web";
 import { useCopyToClipboard } from "usehooks-ts";
@@ -8,35 +13,35 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Icon } from "../../icons";
 import { Button } from "../button";
 
-export const programmingLanguages = {
-  javascript: ".js",
-  python: ".py",
-  java: ".java",
-  c: ".c",
-  cpp: ".cpp",
-  "c++": ".cpp",
-  "c#": ".cs",
-  ruby: ".rb",
-  php: ".php",
-  swift: ".swift",
-  "objective-c": ".m",
-  kotlin: ".kt",
-  typescript: ".ts",
-  go: ".go",
-  perl: ".pl",
-  rust: ".rs",
-  scala: ".scala",
-  haskell: ".hs",
-  lua: ".lua",
-  shell: ".sh",
-  sql: ".sql",
-  html: ".html",
-  css: ".css",
-  // add more file extensions here, make sure the key is same as language prop in CodeBlock.tsx component
-};
+// export const programmingLanguages = {
+//   javascript: ".js",
+//   python: ".py",
+//   java: ".java",
+//   c: ".c",
+//   cpp: ".cpp",
+//   "c++": ".cpp",
+//   "c#": ".cs",
+//   ruby: ".rb",
+//   php: ".php",
+//   swift: ".swift",
+//   "objective-c": ".m",
+//   kotlin: ".kt",
+//   typescript: ".ts",
+//   go: ".go",
+//   perl: ".pl",
+//   rust: ".rs",
+//   scala: ".scala",
+//   haskell: ".hs",
+//   lua: ".lua",
+//   shell: ".sh",
+//   sql: ".sql",
+//   html: ".html",
+//   css: ".css",
+//   // add more file extensions here, make sure the key is same as language prop in CodeBlock.tsx component
+// };
 
 export type CodeBlockProps = Omit<ComponentProps<"div">, "children"> & {
-  language?: keyof typeof programmingLanguages;
+  language?: StringLiteralUnion<BundledLanguage | SpecialLanguage, string>;
   children: string;
 };
 export const CodeBlock = memo(
@@ -52,7 +57,7 @@ export const CodeBlock = memo(
         try {
           const highlighted = await codeToHtml(children, {
             lang,
-            theme: "vsc-dark-plus",
+            theme: "github-light",
           });
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (cancelled) return;
@@ -76,15 +81,11 @@ export const CodeBlock = memo(
       await copyToClipboard(children);
     };
     return (
-      <div className="relative w-full bg-zinc-950 font-sans">
-        <div className="flex w-full items-center justify-between bg-zinc-800 px-6 py-2 pr-4 text-zinc-100">
+      <div className="relative w-full font-sans">
+        <div className="flex w-full items-center justify-between px-6 py-2 pr-4">
           <span className="text-xs lowercase">{language}</span>
           <div className="flex items-center space-x-1">
-            <Button
-              variant="text"
-              className="text-xs hover:bg-zinc-800 focus-visible:ring-1 focus-visible:ring-slate-700 focus-visible:ring-offset-0"
-              onClick={onCopy}
-            >
+            <Button variant="text" onClick={onCopy}>
               {isCopied ? (
                 <Icon icon="lucide:clipboard-check" />
               ) : (
