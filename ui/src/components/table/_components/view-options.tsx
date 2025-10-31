@@ -30,7 +30,7 @@ export function TableViewOptions<TData>({
           ref={triggerRef}
           aria-label="Toggle columns"
           role="combobox"
-          variant="outline"
+          variant="outlined"
           className={cn("ml-auto hidden md:flex", className)}
           icon={<Icon icon="icon-[lucide--settings-2]" />}
         >

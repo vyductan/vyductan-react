@@ -82,7 +82,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
         {onClear && (
           <Button
             variant="text"
-            size="sm"
+            size="small"
             onClick={handleClear}
             className="text-muted-foreground hover:text-foreground"
           >
@@ -93,7 +93,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
 
       {/* Color Picker Area */}
       <HexAlphaColorPicker
-        className="!w-full"
+        className="w-full!"
         color={hexValue}
         onChange={handlePickerChange}
       />

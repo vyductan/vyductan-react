@@ -1,3 +1,5 @@
+"use client";
+
 import type { ButtonProps } from "@/components/ui/button";
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import React, { useContext, useMemo } from "react";

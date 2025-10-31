@@ -51,7 +51,7 @@ export function MarkdownTogglePlugin({
       onClick={handleMarkdownToggle}
       title="Convert From Markdown"
       aria-label="Convert from markdown"
-      size={"sm"}
+      size="small"
       className="p-2"
     >
       <FileTextIcon className="size-4" />

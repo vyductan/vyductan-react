@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-array-for-each */

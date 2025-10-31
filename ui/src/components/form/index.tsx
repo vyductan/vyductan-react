@@ -1,5 +1,8 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FieldValues } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
 import type { FormInstance, UseFormProps } from "./hooks/use-form";
 import warning from "../_util/warning";
@@ -11,12 +14,11 @@ import { Provider as FormProvider } from "./context";
 import { Form as InternalForm } from "./form";
 import { useForm } from "./hooks/use-form";
 import { useFormInstance } from "./hooks/use-form-instance";
-import { useWatch } from "./hooks/use-watch";
 
 export * from "./form";
 export * from "./context";
 export * from "./hooks/use-form";
-export * from "./hooks/use-watch";
+
 // export * from "./_components/form-field";
 export * from "./_components/form-label";
 export * from "./_components/form-message";

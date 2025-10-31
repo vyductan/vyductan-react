@@ -19,7 +19,7 @@ export function ImportExportPlugin() {
             onClick={() => importFile(editor)}
             title="Import"
             aria-label="Import editor state from JSON"
-            size={"sm"}
+            size="small"
             className="p-2"
           >
             <UploadIcon className="size-4" />
@@ -40,7 +40,7 @@ export function ImportExportPlugin() {
             }
             title="Export"
             aria-label="Export editor state to JSON"
-            size={"sm"}
+            size="small"
             className="p-2"
           >
             <DownloadIcon className="size-4" />

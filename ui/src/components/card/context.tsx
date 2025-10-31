@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 import type { SizeType } from "../config-provider/size-context";

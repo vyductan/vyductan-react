@@ -1,6 +1,10 @@
 import type { ButtonProps } from "@/components/ui/button";
 import * as React from "react";
-import { buttonVariants } from "@/components/ui/button";
+import {
+  buttonColorVariants,
+  buttonVariants,
+  disabledVariants,
+} from "@/components/ui/button";
 import { Slot } from "@radix-ui/react-slot";
 
 import { Icon } from "@acme/ui/icons";
@@ -62,10 +66,14 @@ function PaginationLink({
       data-active={isActive}
       className={cn(
         buttonVariants({
+          size,
+          shape,
+        }),
+        buttonColorVariants({
           variant: isActive ? "outlined" : "text",
           color: isActive ? "primary" : "default",
-          size: size === "sm" ? "small" : size,
-          shape,
+        }),
+        disabledVariants({
           disabled,
         }),
         !isActive && "text-muted-foreground",
@@ -99,7 +107,6 @@ function PaginationPrevious({
   return (
     <PaginationLink
       aria-label="Go to previous page"
-      size="default"
       className={cn(className)}
       asChild={asChild}
       {...(childrenProp ? props : {})}
@@ -133,7 +140,6 @@ function PaginationNext({
   return (
     <PaginationLink
       aria-label="Go to next page"
-      size="default"
       className={cn(className)}
       asChild={asChild}
       {...(childrenProp ? props : {})}

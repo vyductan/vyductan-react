@@ -55,7 +55,7 @@ export function FontSizeToolbarPlugin() {
     <div className="flex items-center gap-1">
       <div className="flex items-center gap-1">
         <Button
-          variant="outline"
+          variant="outlined"
           shape="icon"
           className="h-8 w-8"
           onClick={() => updateFontSize(fontSize - 1)}
@@ -73,7 +73,7 @@ export function FontSizeToolbarPlugin() {
           max={MAX_FONT_SIZE}
         />
         <Button
-          variant="outline"
+          variant="outlined"
           shape="icon"
           className="h-8 w-8"
           onClick={() => updateFontSize(fontSize + 1)}

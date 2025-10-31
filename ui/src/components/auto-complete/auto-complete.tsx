@@ -297,7 +297,7 @@ const AutoComplete = <
       onFocusOutside={onFocusOutside}
     >
       <Button
-        variant="outline"
+        variant="outlined"
         role="combobox"
         aria-expanded={open}
         size={size}

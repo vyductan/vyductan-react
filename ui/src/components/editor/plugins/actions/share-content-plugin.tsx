@@ -70,7 +70,7 @@ export function ShareContentPlugin() {
           }}
           title="Share"
           aria-label="Share Playground link to current editor state"
-          size={"sm"}
+          size="small"
           className="p-2"
         >
           <SendIcon className="size-4" />

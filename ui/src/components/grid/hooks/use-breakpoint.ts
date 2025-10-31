@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect";
 

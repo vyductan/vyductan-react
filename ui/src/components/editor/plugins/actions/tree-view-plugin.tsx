@@ -17,7 +17,7 @@ export function TreeViewPlugin(): JSX.Element {
   return (
     <DialogRoot>
       <DialogTrigger asChild>
-        <Button size={"sm"} variant="text" className="p-2">
+        <Button size="small" variant="text" className="p-2">
           <NotebookPenIcon className="h-4 w-4" />
         </Button>
       </DialogTrigger>
