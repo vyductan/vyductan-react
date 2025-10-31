@@ -26,7 +26,8 @@ export const CollapsibleCodeBlock = ({
   return (
     <>
       <div className="flex items-center justify-between px-6 py-4">
-        {component}
+        <div>{component}</div>
+
         <Button variant="text" onClick={toggleCodeCollapse}>
           <Icon
             icon="icon-[lucide--code]"

@@ -82,7 +82,7 @@ const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
   // Giải pháp: Dùng __comp__ prop đã được pass vào (đơn giản nhất)
 
   return (
-    <Card className="mt-6 inline-flex w-full flex-col sm:max-w-1/2">
+    <Card className="mt-6 inline-flex w-full flex-col sm:max-w-3xl">
       <CollapsibleCodeBlock
         component={<__comp__ />}
         language={language}
