@@ -39,7 +39,7 @@ const ButtonTypeMap: Partial<Record<ButtonType, ColorVariantPairType>> = {
 };
 
 export type ButtonProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  React.ComponentProps<"button">,
   "type" | "color"
 > &
   ButtonVariants &

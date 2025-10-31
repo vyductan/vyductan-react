@@ -5,9 +5,11 @@ import { buttonVariants } from "../button";
 import { buttonColorVariants } from "../button/button-variants";
 
 const AlertDialogAction = (
-  props: React.ComponentProps<typeof ShadcnAlertDialogAction>,
+  props: React.ComponentProps<typeof ShadcnAlertDialogAction> & {
+    isOpenControlled?: boolean;
+  },
 ) => {
-  const { className, ...restProps } = props;
+  const { isOpenControlled, className, ...restProps } = props;
   return (
     <ShadcnAlertDialogAction
       className={cn(
