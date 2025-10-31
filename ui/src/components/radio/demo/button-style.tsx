@@ -1,5 +1,6 @@
 "use client";
 
+import type { RadioChangeEvent } from "@/components/ui/radio";
 import type React from "react";
 import { useState } from "react";
 import { RadioGroup } from "@/components/ui/radio";
@@ -7,8 +8,8 @@ import { RadioGroup } from "@/components/ui/radio";
 const App: React.FC = () => {
   const [value, setValue] = useState("a");
 
-  const onChange = (e: string) => {
-    setValue(e);
+  const onChange = (e: RadioChangeEvent<string>) => {
+    setValue(e.target.value);
     console.log("radio checked", e);
   };
 
@@ -30,4 +31,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
