@@ -6,8 +6,6 @@ const onChange = (checkedValues: string[]) => {
   console.log("checked =", checkedValues);
 };
 
-const plainOptions = ["Apple", "Pear", "Orange"];
-
 const options: CheckboxOptionType<string>[] = [
   { label: "Apple", value: "Apple" },
   { label: "Pear", value: "Pear", className: "text-green-500" },
@@ -27,12 +25,6 @@ const optionsWithDisabled: CheckboxOptionType<string>[] = [
 
 const App: React.FC = () => (
   <>
-    <Checkbox.Group
-      options={plainOptions}
-      defaultValue={["Apple"]}
-      onChange={onChange}
-    />
-    <br />
     <br />
     <Checkbox.Group
       options={options}

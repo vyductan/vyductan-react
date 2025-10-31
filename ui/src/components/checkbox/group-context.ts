@@ -1,17 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
+import type { FormValueType } from "../form";
 import type { CheckboxOptionType } from "./checkbox-group";
 
-export interface CheckboxGroupContext<T = any> {
+export interface CheckboxGroupContext<
+  TValue extends FormValueType = FormValueType,
+> {
   name?: string;
-  toggleOption?: (option: CheckboxOptionType<T>) => void;
-  value?: string;
+  toggleOption?: (option: CheckboxOptionType<TValue>) => void;
+  value?: TValue[];
   disabled?: boolean;
-  registerValue: (val: T) => void;
-  cancelValue: (val: T) => void;
+  registerValue: (val: TValue) => void;
+  cancelValue: (val: TValue) => void;
 }
 
-const GroupContext = React.createContext<CheckboxGroupContext | null>(null);
+const GroupContext =
+  React.createContext<CheckboxGroupContext<FormValueType> | null>(null);
 
 export default GroupContext;

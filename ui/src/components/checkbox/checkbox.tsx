@@ -3,6 +3,8 @@ import * as React from "react";
 import { cn } from "@acme/ui/lib/utils";
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
+import type { FormValueType } from "../form";
+import type { CheckboxGroupContext } from "./group-context";
 import { devUseWarning } from "../_util/warning";
 import Wave from "../../lib/wave";
 import { LoadingIcon } from "../button";
@@ -12,15 +14,18 @@ import { inputDisabledVariants } from "../input";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
-type AbstractCheckboxProps<T> = {
+type AbstractCheckboxProps<
+  TChangeEvent,
+  TValue extends FormValueType = FormValueType,
+> = {
   id?: string;
   name?: string;
 
   // value
-  value?: string;
+  value?: TValue;
   checked?: boolean;
   defaultChecked?: boolean;
-  onChange?: (e: T) => void;
+  onChange?: (e: TChangeEvent) => void;
   onClick?: React.MouseEventHandler<HTMLElement>;
   onMouseEnter?: React.MouseEventHandler<HTMLElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLElement>;
@@ -42,31 +47,41 @@ type AbstractCheckboxProps<T> = {
   // config
   skipGroup?: boolean;
 };
-export interface CheckboxChangeEventTarget extends CheckboxProps {
+export interface CheckboxChangeEventTarget<
+  TValue extends FormValueType = FormValueType,
+> extends Omit<CheckboxProps<TValue>, "value"> {
   checked: boolean;
   name?: string;
   type: "checkbox" | "radio";
+  value: TValue;
 }
 
-export interface CheckboxChangeEvent {
+export interface CheckboxChangeEvent<
+  TValue extends FormValueType = FormValueType,
+> {
   type: "change";
-  target: CheckboxChangeEventTarget;
+  target: CheckboxChangeEventTarget<TValue>;
   stopPropagation: () => void;
   preventDefault: () => void;
   nativeEvent: MouseEvent;
 }
 
-type CheckboxProps = AbstractCheckboxProps<CheckboxChangeEvent> &
-  React.AriaAttributes & {
-    key?: React.Key; // fix warning when use key (shadcn)
-    indeterminate?: boolean;
-  };
+type CheckboxProps<TValue extends FormValueType = FormValueType> =
+  AbstractCheckboxProps<CheckboxChangeEvent<TValue>, TValue> &
+    React.AriaAttributes & {
+      key?: React.Key; // fix warning when use key (shadcn)
+      indeterminate?: boolean;
+    };
 
-const Checkbox = (props: CheckboxProps) => {
+const Checkbox = <TValue extends FormValueType = FormValueType>(
+  props: CheckboxProps<TValue>,
+) => {
   const {
     // id,
     // "aria-describedby": ariaDescribedBy,
     // "aria-invalid": ariaInvalid,
+
+    value,
 
     loading,
     disabled,
@@ -93,7 +108,9 @@ const Checkbox = (props: CheckboxProps) => {
   } = props;
 
   const { direction, checkbox } = React.useContext(ConfigContext);
-  const checkboxGroup = React.useContext(GroupContext);
+  const checkboxGroup = React.useContext(
+    GroupContext as unknown as React.Context<CheckboxGroupContext<TValue> | null>,
+  );
   const contextDisabled = React.useContext(DisabledContext);
   const mergedDisabled = checkboxGroup?.disabled ?? disabled ?? contextDisabled;
 
@@ -107,20 +124,21 @@ const Checkbox = (props: CheckboxProps) => {
     );
   }
 
-  const checkboxProps: CheckboxProps = { ...restProps };
+  const checkboxProps: CheckboxProps<TValue> = { ...restProps };
   if (checkboxGroup && !skipGroup) {
     checkboxProps.onChange = (...args) => {
       if (onChange) {
         onChange(...args);
       }
-      if (checkboxGroup.toggleOption) {
-        checkboxGroup.toggleOption({ label: children, value: restProps.value });
+      if (checkboxGroup.toggleOption && value !== undefined) {
+        checkboxGroup.toggleOption({ label: children, value });
       }
     };
     checkboxProps.name = checkboxGroup.name;
-    checkboxProps.checked = restProps.value
-      ? checkboxGroup.value?.includes(restProps.value)
-      : false;
+    checkboxProps.checked =
+      value === undefined
+        ? false
+        : Boolean(checkboxGroup.value?.includes(value));
   }
 
   // ============================ Event Lock ============================
@@ -146,6 +164,7 @@ const Checkbox = (props: CheckboxProps) => {
             "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
           )}
+          value={value as string | undefined}
           checked={indeterminate ? "indeterminate" : restProps.checked}
           disabled={mergedDisabled}
           onClick={onInputClick}
@@ -155,6 +174,7 @@ const Checkbox = (props: CheckboxProps) => {
               target: {
                 type: "checkbox",
                 name: props.name,
+                value: value as unknown as TValue,
                 checked: checked === "indeterminate" ? false : checked,
                 indeterminate,
                 // "aria-describedby": ariaDescribedBy,
