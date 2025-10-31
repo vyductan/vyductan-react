@@ -11,11 +11,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { ButtonColorVariants, ButtonVariants } from "./button-variants";
 import Wave from "../../lib/wave";
 import { useComponentConfig } from "../config-provider/context";
-import {
-  buttonColorVariants,
-  buttonVariants,
-  disabledVariants,
-} from "./button-variants";
+import { buttonColorVariants, buttonVariants } from "./button-variants";
 import { LoadingIcon } from "./loading-icon";
 
 type TypeWithGeneric<T> = T[];
@@ -168,8 +164,6 @@ const Button = ({
           buttonColorVariants({
             variant,
             color,
-          }),
-          disabledVariants({
             disabled,
           }),
           className,
