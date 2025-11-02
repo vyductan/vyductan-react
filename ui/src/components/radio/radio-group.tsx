@@ -76,7 +76,6 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
             optionType={optionType}
             buttonStyle={buttonStyle}
             onChange={(e) => {
-              console.log("e", e);
               if (isDisabled) return;
 
               if (e.target.checked) {
