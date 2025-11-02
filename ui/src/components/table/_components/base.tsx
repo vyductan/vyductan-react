@@ -186,6 +186,7 @@ function TableCell({ className, size, ...props }: TableCellProps) {
         // 'whitespace-nowrap',
         // "p-2",
         // own
+        "whitespace-normal",
         "p-3",
         size === "small" && "p-2 leading-[22px]",
         // "break-words",

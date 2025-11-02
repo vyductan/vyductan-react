@@ -1,3 +1,5 @@
+"use client";
+
 import type { TableProps } from "@/components/ui/table";
 import type React from "react";
 import { Space } from "@/components/ui/space";
@@ -73,7 +75,8 @@ const data: DataType[] = [
     key: "2",
     name: "Jim Green",
     age: 42,
-    address: "London No. 1 Lake Park",
+    address:
+      "Kucukayasofya Mah. Donus SOKAK Uyar Apt. No:3 34000 Istanbul,Turkey",
     tags: ["loser"],
   },
   {
