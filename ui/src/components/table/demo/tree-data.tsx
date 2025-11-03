@@ -1,3 +1,5 @@
+"use client";
+
 import type { TableColumnsType, TableProps } from "@/components/ui/table";
 import type React from "react";
 import { useState } from "react";
