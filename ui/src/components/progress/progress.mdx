@@ -1,12 +1,39 @@
----
-title: Progress
-description: A progress indicator component for showing completion status.
-component: true
----
+import { ComponentSource } from "@/components/ui/mdx";
 
-modified:
+import ProgressCircleDemo from "./demo/circle";
+import ProgressInfoPositionDemo from "./demo/info-position";
+import ProgressLineDemo from "./demo/line";
+import ProgressSizeDemo from "./demo/size";
 
-```
-`util.ts`
-line 28: [gapPosition ?? "bottom"]
-```
+# Progress
+
+A progress indicator component for showing completion status. Built with Radix UI primitives and follows Ant Design API patterns.
+
+## Examples
+
+### Line
+
+Standard line progress bars with different statuses including active (with blinking animation), exception, success, and normal states.
+
+<ComponentSource src="progress/demo/line.tsx" __comp__={ProgressLineDemo} />
+
+### Circle
+
+Circular progress indicators showing completion percentage in a circular format.
+
+<ComponentSource src="progress/demo/circle.tsx" __comp__={ProgressCircleDemo} />
+
+### Size
+
+Progress bars support different sizes through the `size` prop. You can use preset sizes (`"default"`, `"small"`) or custom dimensions with numbers or arrays.
+
+<ComponentSource src="progress/demo/size.tsx" __comp__={ProgressSizeDemo} />
+
+### Info Position
+
+Control the position and alignment of the percentage text using the `percentPosition` prop with `type` ("inner" or "outer") and `align` ("start", "center", or "end") options.
+
+<ComponentSource
+  src="progress/demo/info-position.tsx"
+  __comp__={ProgressInfoPositionDemo}
+/>
