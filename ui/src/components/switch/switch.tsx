@@ -1,87 +1,86 @@
 "use client";
 
 import type * as React from "react";
-import type { XOR } from "ts-xor";
+import * as SwitchPrimitive from "@radix-ui/react-switch";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { Switch as ShadcnSwitch } from "../../shadcn/switch";
+import { LoadingIcon } from "../button/loading-icon";
 
-type ShadcnSwitchProps = React.ComponentProps<typeof ShadcnSwitch>;
-type OwnSwitchProps = Omit<
-  ShadcnSwitchProps,
+export type OwnSwitchProps = Omit<
+  React.ComponentProps<typeof SwitchPrimitive.Root>,
   "onChange" | "onCheckedChange"
 > & {
   onChange?: (checked: boolean) => void;
-  /** Content to show when the state is checked */
-  checkedChildren?: React.ReactNode;
-  /** Content to show when the state is unchecked */
-  unCheckedChildren?: React.ReactNode;
   /** Additional class name for the switch container */
   className?: string;
   /** Alias for checked prop */
   value?: boolean;
+  /** Size of the switch */
+  size?: "small" | "default";
+  /** Loading state of switch */
+  loading?: boolean;
 };
-type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
-const Switch = (props: SwitchProps) => {
-  const isShadcnSwitchProps = props.onCheckedChange;
 
-  if (isShadcnSwitchProps) {
-    const { className, ...restProps } = props;
-    return (
-      <ShadcnSwitch
-        className={cn(
-          "h-[22px] w-11",
-          "data-[slot=switch-thumb]:size-[18px]",
-          className,
-        )}
-        {...restProps}
-      />
-    );
-  }
-
+export const Switch = (props: OwnSwitchProps) => {
   const {
     className,
     onChange,
-    checkedChildren,
-    unCheckedChildren,
     checked,
     value,
+    defaultChecked,
+    size = "default",
+    loading,
+    disabled,
     ...restProps
-  } = props as OwnSwitchProps;
+  } = props;
 
-  const hasChildren = checkedChildren ?? unCheckedChildren;
   // Use value as alias for checked, with value taking precedence
-  const isChecked = value ?? checked;
+  // If checked or value is provided, use controlled mode
+  // Otherwise, use defaultChecked for uncontrolled mode
+  const isControlled = value !== undefined || checked !== undefined;
+  const isChecked = isControlled ? (value ?? checked ?? false) : undefined;
+
+  const isSmall = size === "small";
+  const isDisabled = Boolean(loading) || Boolean(disabled);
 
   return (
-    <ShadcnSwitch
+    <SwitchPrimitive.Root
+      data-slot="switch"
       className={cn(
-        !hasChildren && "h-[22px] w-11",
-        !hasChildren && "data-[slot=switch-thumb]:size-[18px]",
-        hasChildren && "h-6 min-w-11",
-        hasChildren && "data-[slot=switch-thumb]:size-5",
+        "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        isSmall ? "h-4 w-7" : "h-[22px] w-11",
         className,
       )}
       checked={isChecked}
+      defaultChecked={defaultChecked}
+      disabled={isDisabled}
       onCheckedChange={(checked) => {
         onChange?.(checked);
       }}
       {...restProps}
     >
-      {hasChildren && (
-        <div
-          className={cn(
-            "absolute inset-0 flex items-center justify-center text-xs font-medium whitespace-nowrap",
-            "transition-all duration-200 ease-in-out",
-            isChecked ? "right-5 left-1.5" : "right-1.5 left-5",
-          )}
-        >
-          {isChecked ? checkedChildren : unCheckedChildren}
-        </div>
-      )}
-    </ShadcnSwitch>
+      <SwitchPrimitive.Thumb
+        data-slot="switch-thumb"
+        className={cn(
+          "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none relative block rounded-full ring-0 transition-transform",
+          isSmall ? "size-3" : "size-[18px]",
+          isSmall
+            ? "data-[state=checked]:translate-x-[14px] data-[state=unchecked]:translate-x-px"
+            : "data-[state=checked]:translate-x-[24px] data-[state=unchecked]:translate-x-[2px]",
+        )}
+      >
+        {loading && (
+          <div
+            className={cn(
+              "absolute inset-px flex items-center justify-center opacity-50",
+              isSmall ? "size-2.5" : "size-4",
+            )}
+          >
+            <LoadingIcon className="size-full" />
+          </div>
+        )}
+      </SwitchPrimitive.Thumb>
+    </SwitchPrimitive.Root>
   );
 };
-
-export { Switch };

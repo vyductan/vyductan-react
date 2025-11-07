@@ -1,0 +1,66 @@
+import { ComponentSource } from "@/components/ui/mdx";
+
+import SwitchBasicDemo from "./demo/basic";
+import SwitchControlledDemo from "./demo/controlled";
+import SwitchDisabledDemo from "./demo/disabled";
+import SwitchLoadingDemo from "./demo/loading";
+import SwitchSizeDemo from "./demo/size";
+
+# Switch
+
+Switch component với API tương tự Ant Design, hỗ trợ hiển thị trạng thái bật/tắt. Built on top of Radix UI primitives and follows Ant Design API patterns.
+
+## Examples
+
+### Basic Usage
+
+The simplest usage.
+
+<ComponentSource src="switch/demo/basic.tsx" __comp__={SwitchBasicDemo} />
+
+### Controlled
+
+Controlled switch with state management.
+
+<ComponentSource
+  src="switch/demo/controlled.tsx"
+  __comp__={SwitchControlledDemo}
+/>
+
+### Disabled
+
+Switch unavailable state.
+
+<ComponentSource src="switch/demo/disabled.tsx" __comp__={SwitchDisabledDemo} />
+
+### Size
+
+Switch có hai kích thước: `small` và `default`.
+
+<ComponentSource src="switch/demo/size.tsx" __comp__={SwitchSizeDemo} />
+
+### Loading
+
+Switch có thể hiển thị trạng thái loading.
+
+<ComponentSource src="switch/demo/loading.tsx" __comp__={SwitchLoadingDemo} />
+
+## API
+
+### Props
+
+| Property         | Description                                    | Type                         | Default     |
+| ---------------- | ---------------------------------------------- | ---------------------------- | ----------- |
+| `checked`        | Whether the switch is checked                  | `boolean`                    | `false`     |
+| `value`          | Alias for `checked` prop                       | `boolean`                    | -           |
+| `onChange`       | Callback when switch state changes             | `(checked: boolean) => void` | -           |
+| `className`      | Additional class name for the switch container | `string`                     | -           |
+| `disabled`       | Whether the switch is disabled                 | `boolean`                    | `false`     |
+| `defaultChecked` | Whether the switch is checked by default       | `boolean`                    | `false`     |
+| `size`           | Size of the switch                             | `"small" \| "default"`       | `"default"` |
+| `loading`        | Loading state of switch                        | `boolean`                    | `false`     |
+
+### Notes
+
+- Component hỗ trợ cả API của Ant Design (sử dụng `onChange`, `checked`, `value`) và Shadcn Switch (sử dụng `onCheckedChange`)
+- `value` prop có độ ưu tiên cao hơn `checked` nếu cả hai đều được cung cấp
