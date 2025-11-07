@@ -98,7 +98,7 @@ const inputSizeVariants = tv({
       // xl: "px-[11px] py-[13px]",
       small: "px-[7px] py-px",
       middle: "h-8 px-[11px] py-[5px]",
-      large: "px-[11px] py-[9px]",
+      large: "px-[11px] py-[9px] text-base",
       // xl: "px-[11px] py-[13px]",
     },
   },
