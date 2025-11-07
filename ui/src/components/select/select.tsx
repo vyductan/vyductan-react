@@ -293,7 +293,7 @@ const Select = <
           className={cn(
             "",
             options.some((o) => o.color)
-              ? "data-[radix-select-viewport]:space-y-2"
+              ? "data-radix-select-viewport:space-y-2"
               : "",
           )}
           // classNames={{

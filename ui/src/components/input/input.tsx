@@ -220,8 +220,10 @@ const Input = (props: InputProps) => {
     if (keyLockRef.current) {
       keyLockRef.current = false;
     }
-    setFocused((prev) => (prev && disabledFromContext ? false : prev));
-  }, [disabledFromContext]);
+    if (disabledFromContext && focused && inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, [disabledFromContext, focused]);
 
   const triggerChange = (
     e:

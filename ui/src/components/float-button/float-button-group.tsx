@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback, useEffect } from "react";
 import useMergedState from "@rc-component/util/lib/hooks/useMergedState";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";

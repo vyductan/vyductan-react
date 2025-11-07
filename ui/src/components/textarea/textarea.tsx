@@ -52,9 +52,12 @@ const Textarea = ({
   size,
   status,
   variant,
+  value,
   ...props
 }: TextAreaProps) => {
   const Comp = autoSize ? TextareaAutosize : TextareaShadcn;
+  // Ensure value is never null - convert null/undefined to empty string
+  const safeValue = value ?? "";
   return (
     <Comp
       className={cn(
@@ -65,6 +68,7 @@ const Textarea = ({
       ref={ref}
       {...(typeof autoSize === "object" ? autoSize : {})}
       {...props}
+      value={safeValue}
     />
   );
 };

@@ -1117,7 +1117,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                           }
                         >
                           <TableCell
-                            colSpan={mergedColumns.length}
+                            colSpan={allLeafColumns.length}
                             size={size}
                             className={cn(
                               row.original._customCellClassName as string,
