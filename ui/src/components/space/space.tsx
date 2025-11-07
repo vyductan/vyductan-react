@@ -64,10 +64,10 @@ const Space = React.forwardRef<HTMLDivElement, SpaceProps>(
     {
       direction = "horizontal",
       size = "small",
-      align = "center",
       wrap = false,
       children,
       className,
+      align,
       style,
       split,
       ...props
