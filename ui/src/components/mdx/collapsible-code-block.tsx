@@ -25,25 +25,27 @@ export const CollapsibleCodeBlock = ({
 
   return (
     <>
-      <div className="flex items-center justify-between px-6 py-4">
-        <div>{component}</div>
+      <div data-slot="code-box-demo" className="py-4">
+        {component}
+      </div>
 
+      <div className="flex items-center justify-center border-t px-6 py-3">
         <Button variant="text" onClick={toggleCodeCollapse}>
           <Icon
             icon="icon-[lucide--code]"
             className={cn(
               "transition-transform duration-200",
-              isCodeCollapsed && "rotate-180",
+              !isCodeCollapsed && "rotate-180",
             )}
           />
-          <span className="sr-only">
+          <span className="ml-2">
             {isCodeCollapsed ? "Show code" : "Hide code"}
           </span>
         </Button>
       </div>
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out",
+          "relative overflow-hidden transition-all duration-300 ease-in-out",
           isCodeCollapsed ? "max-h-0 opacity-0" : "max-h-[5000px] opacity-100",
         )}
       >
