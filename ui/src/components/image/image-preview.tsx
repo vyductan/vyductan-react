@@ -1,5 +1,5 @@
 import { useMergedState } from "@rc-component/util";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 
 import { cn } from "@acme/ui/lib/utils";
 

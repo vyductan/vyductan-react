@@ -3,7 +3,7 @@
 "use client";
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";
