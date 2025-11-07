@@ -9,9 +9,13 @@ import { cn } from "@acme/ui/lib/utils";
 import type { ItemType, MenuItemType, SelectEventHandler } from "./types";
 import { Divider } from "../divider";
 import { MenuItem, SubMenu } from "./_components";
+import { MenuVertical } from "./menu-vertical";
 
 type MenuProps = {
   className?: string;
+  classNames?: {
+    item?: string;
+  };
   defaultOpenKeys?: string[];
   defaultSelectedKeys?: string[];
   items: ItemType[];
@@ -41,17 +45,19 @@ type MenuProps = {
 };
 const Menu = ({
   className,
-  // defaultOpenKeys,
+  defaultOpenKeys,
   defaultSelectedKeys,
   items,
-  // openKeys,
-  mode = "inline",
+  openKeys,
+  mode = "vertical",
   selectedKeys,
   onSelect,
+  onOpenChange,
   // getPopupContainer,
   // subMenuOpenDelay = 0.1,
   // subMenuCloseDelay = 0.1,
 }: MenuProps) => {
+  // Always call hooks before conditional returns (React rules)
   // const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
   //   defaultOpenKeys ?? [],
   //   {
@@ -64,6 +70,24 @@ const Menu = ({
       value: selectedKeys,
     },
   );
+
+  // Use MenuVertical component for vertical mode
+  if (mode === "vertical") {
+    return (
+      <MenuVertical
+        className={className}
+        defaultOpenKeys={defaultOpenKeys}
+        defaultSelectedKeys={defaultSelectedKeys}
+        items={items}
+        openKeys={openKeys}
+        selectedKeys={selectedKeys}
+        onSelect={onSelect}
+        onOpenChange={onOpenChange}
+      />
+    );
+  }
+
+  // For non-vertical modes, use the original implementation
 
   const renderItem = (menu: ItemType[]) => {
     return menu.map((item, index) => {

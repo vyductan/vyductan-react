@@ -1,40 +1,3 @@
-// interface ItemSharedProps {
-//   key: React.Key;
-//   ref?: React.Ref<HTMLLIElement | null>;
-//   style?: React.CSSProperties;
-//   className?: string;
-//   hidden?: boolean;
-// }
-
-// export type MenuItemType = ItemSharedProps & {
-//   type?: "item";
-
-//   key: React.Key;
-
-//   /* Page Title */
-//   title?: React.ReactNode;
-
-//   /* Menu Label */
-//   label?: React.ReactNode;
-
-//   path?: string;
-
-//   icon?: React.ReactNode;
-
-//   children?: MenuItemDef[];
-
-//   // // >>>>> Active
-//   // onMouseEnter?: MenuHoverEventHandler;
-//   // onMouseLeave?: MenuHoverEventHandler;
-//   //
-//   // // >>>>> Events
-//   // onClick?: MenuClickEventHandler;
-// };
-// export interface MenuItemGroupType extends ItemSharedProps {
-//   type: "group";
-//   label?: React.ReactNode;
-//   children: MenuItemDef[];
-// }
 export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
   type: "divider";
 
@@ -54,7 +17,7 @@ export interface SubMenuType<T extends MenuItemType = MenuItemType>
   icon?: React.ReactNode;
   theme?: "dark" | "filled";
   children: ItemType<T>[];
-  type: "submenu";
+  type?: "submenu";
   label?: React.ReactNode;
   disabled?: boolean;
   key: string;
@@ -114,8 +77,8 @@ export type RenderIconType =
 export interface MenuInfo {
   key: string;
   keyPath: string[];
-  /** @deprecated This will not support in future. You should avoid to use this */
-  item: React.ReactInstance;
+  // /** @deprecated This will not support in future. You should avoid to use this */
+  // item: React.ReactInstance;
   domEvent: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>;
 }
 export interface MenuTitleInfo {
