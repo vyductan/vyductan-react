@@ -30,6 +30,16 @@ export function $convertSummaryElement(): DOMConversionOutput | null {
   };
 }
 
+function transformCollapsibleTitleNode(node: LexicalNode): void {
+  invariant(
+    $isCollapsibleTitleNode(node),
+    "node is not a CollapsibleTitleNode",
+  );
+  if (node.isEmpty()) {
+    node.remove();
+  }
+}
+
 export class CollapsibleTitleNode extends ElementNode {
   static getType(): string {
     return "collapsible-title";
@@ -90,15 +100,7 @@ export class CollapsibleTitleNode extends ElementNode {
   }
 
   static transform(): (node: LexicalNode) => void {
-    return (node: LexicalNode) => {
-      invariant(
-        $isCollapsibleTitleNode(node),
-        "node is not a CollapsibleTitleNode",
-      );
-      if (node.isEmpty()) {
-        node.remove();
-      }
-    };
+    return transformCollapsibleTitleNode;
   }
 
   insertNewAfter(_: RangeSelection, restoreSelection = true): ElementNode {

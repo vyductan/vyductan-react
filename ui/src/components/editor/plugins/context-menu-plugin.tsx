@@ -11,15 +11,10 @@ import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import * as React from "react";
 import { CommandItem, CommandList, CommandRoot } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { PopoverContent, PopoverRoot } from "@/components/ui/popover";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
-import { PopoverPortal } from "@radix-ui/react-popover";
 import {
   $getNearestNodeFromDOMNode,
   $getSelection,
@@ -191,37 +186,51 @@ export function ContextMenuPlugin(): JSX.Element {
         { options: _options, selectOptionAndCleanUp },
         { setMenuRef },
       ) => {
-        return anchorElementRef.current ? (
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverPortal container={anchorElementRef.current}>
-              <div>
-                <PopoverTrigger
-                  ref={setMenuRef}
-                  style={{
-                    marginLeft: anchorElementRef.current.style.width,
-                    userSelect: "none",
-                  }}
-                />
-                <PopoverContent className="w-[200px] p-1">
-                  <CommandRoot>
-                    <CommandList>
-                      {options.map((option) => (
-                        <CommandItem
-                          key={option.key}
-                          onSelect={() => {
-                            selectOptionAndCleanUp(option);
-                          }}
-                        >
-                          {option.title}
-                        </CommandItem>
-                      ))}
-                    </CommandList>
-                  </CommandRoot>
-                </PopoverContent>
-              </div>
-            </PopoverPortal>
-          </Popover>
-        ) : null;
+        if (!anchorElementRef.current) {
+          return null;
+        }
+
+        const anchorRect = anchorElementRef.current.getBoundingClientRect();
+
+        return (
+          <PopoverRoot open={isOpen} onOpenChange={setIsOpen}>
+            <div
+              ref={setMenuRef}
+              style={{
+                position: "fixed",
+                left: anchorRect.left,
+                top: anchorRect.top,
+                width: anchorRect.width,
+                height: anchorRect.height,
+                pointerEvents: "none",
+                zIndex: -1,
+              }}
+            />
+            <PopoverContent
+              className="w-[200px] p-1"
+              style={{
+                position: "fixed",
+                left: anchorRect.left,
+                top: anchorRect.top,
+              }}
+            >
+              <CommandRoot>
+                <CommandList>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option.key}
+                      onSelect={() => {
+                        selectOptionAndCleanUp(option);
+                      }}
+                    >
+                      {option.title}
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </CommandRoot>
+            </PopoverContent>
+          </PopoverRoot>
+        );
       }}
     />
   );
