@@ -105,7 +105,6 @@ const Tabs = (props: TabsProps) => {
       >
         {items.length > 0 && (
           <TabsList
-            type={type}
             className={classNames?.list}
             style={tabBarStyle}
             {...listProps}
@@ -115,7 +114,6 @@ const Tabs = (props: TabsProps) => {
               <TabsTrigger
                 key={x.key}
                 value={x.key}
-                tabsType={type}
                 className={classNames?.trigger}
                 {...x.triggerProps}
               >

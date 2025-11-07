@@ -7,6 +7,7 @@ import { TabsContent, TabsList, TabsRoot } from "./_components";
 import { Tabs as OwnTabs } from "./tabs";
 
 export * from "./_components";
+export * from "./context";
 
 type ShadcnTabsProps = React.ComponentProps<typeof TabsRoot>;
 type ConditionTabsProps = XOR<TabsProps, ShadcnTabsProps>;
