@@ -84,44 +84,45 @@ const Sidebar = (props: SidebarProps) => {
           </SidebarGroup>
         );
       }
-      if (item.type === "submenu") {
+      if (
+        item.type === "submenu" ||
+        (item.type === undefined && "children" in item)
+      ) {
         return <></>;
       }
 
-      /* Item type Render */
-      // if (item.hidden) {
-      //   return;
-      // }
-      const { key, label, title } = item;
-      const mergedLabel = label ?? title;
-      const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      let labelToRender: ReactNode = mergedLabel;
-      labelToRender = itemRender
-        ? itemRender(item, classNames, labelToRender)
-        : labelToRender;
+      if (item.type === "item" || !("children" in item)) {
+        const { key, label, title } = item;
+        const mergedLabel = label ?? title;
+        const isActive = selectKeys.some((x) => key.toString().startsWith(x));
+        let labelToRender: ReactNode = mergedLabel;
+        labelToRender = itemRender
+          ? itemRender(item, classNames, labelToRender)
+          : labelToRender;
 
-      return (
-        <SidebarMenuItem
-          key={key}
-          onClick={(event) => {
-            onSelect?.({ item: { key, label: mergedLabel }, key, event });
-          }}
-          onKeyUp={(event) => {
-            onSelect?.({ item: { key, label: mergedLabel }, key, event });
-          }}
-        >
-          <SidebarMenuButton
-            asChild
-            isActive={isActive}
-            tooltip={
-              typeof mergedLabel === "string" ? mergedLabel : key.toString()
-            }
-            className={classNames?.menuButton}
+        return (
+          <SidebarMenuItem
+            key={key}
+            onClick={(event) => {
+              onSelect?.({ item: { key, label: mergedLabel }, key, event });
+            }}
+            onKeyUp={(event) => {
+              onSelect?.({ item: { key, label: mergedLabel }, key, event });
+            }}
           >
-            {labelToRender}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      );
+            <SidebarMenuButton
+              asChild
+              isActive={isActive}
+              tooltip={
+                typeof mergedLabel === "string" ? mergedLabel : key.toString()
+              }
+              className={classNames?.menuButton}
+            >
+              {labelToRender}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        );
+      }
     });
   };
 
