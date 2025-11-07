@@ -102,7 +102,8 @@ const Form = <
     useComponentConfig("form");
 
   const layout = layoutProp ?? layoutConfig ?? "horizontal";
-  const colon = colonProp ?? colonConfig ?? true;
+  const colon =
+    colonProp ?? (layout === "vertical" ? false : (colonConfig ?? true));
 
   if (form) {
     return (
