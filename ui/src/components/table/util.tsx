@@ -105,67 +105,67 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
             }
           : { enableSorting: false }),
         ...restProps,
-      };
-      columnDefMerged.cell = ({ column, row, getValue, table }) => {
-        // First data column should have expand icon + indent
-        const isFirstDataColumn = columnIndex === 0;
-        const hasTreeData =
-          props.expandable &&
-          !props.expandable.expandedRowRender &&
-          (row.depth > 0 || row.getCanExpand());
+        cell: ({ column, row, getValue, table }) => {
+          // First data column should have expand icon + indent
+          const isFirstDataColumn = columnIndex === 0;
+          const hasTreeData =
+            props.expandable &&
+            !props.expandable.expandedRowRender &&
+            (row.depth > 0 || row.getCanExpand());
 
-        // Cell Content - render function can return ReactNode or RenderedCell
-        const cellContent = (
-          render
-            ? typeof dataIndex === "string"
-              ? render(getValue() as never, row.original, row.index, {
-                  table,
-                  column,
-                  row,
-                })
-              : render(undefined as never, row.original, row.index, {
-                  table,
-                  column,
-                  row,
-                })
-            : (getValue() as ReactNode)
-        ) as React.ReactNode;
+          // Cell Content - render function can return ReactNode or RenderedCell
+          const cellContent = (
+            render
+              ? typeof dataIndex === "string"
+                ? render(getValue() as never, row.original, row.index, {
+                    table,
+                    column,
+                    row,
+                  })
+                : render(undefined as never, row.original, row.index, {
+                    table,
+                    column,
+                    row,
+                  })
+              : (getValue() as ReactNode)
+          ) as React.ReactNode;
 
-        // Only wrap with flex container if first column has tree data
-        if (isFirstDataColumn && hasTreeData) {
-          return (
-            <div
-              data-slot="table-row-content"
-              className="flex items-center gap-1"
-            >
-              {/* Tree Data: Indent (only on first column, only children) */}
-              {row.depth > 0 && (
-                <span
-                  data-slot={`table-row-indent-level-${row.depth}`}
-                  aria-hidden="true"
-                  style={{
-                    paddingLeft: `${row.depth * (props.expandable?.indentSize ?? 15)}px`,
-                  }}
-                />
-              )}
-              {/* Tree Data: Expand Icon (only on first column) */}
-              <span className="inline-block w-6">
-                {row.getCanExpand() && props.expandable?.expandIcon
-                  ? props.expandable.expandIcon({
-                      record: row.original,
-                      expanded: row.getIsExpanded(),
-                      expandable: row.getCanExpand(),
-                      onExpand: row.getToggleExpandedHandler(),
-                    })
-                  : null}
-              </span>
-              {cellContent}
-            </div>
-          );
-        }
+          // Only wrap with flex container if first column has tree data
+          if (isFirstDataColumn && hasTreeData) {
+            return (
+              <div
+                data-slot="table-row-content"
+                className="flex items-center gap-1"
+              >
+                {/* Tree Data: Indent (only on first column, only children) */}
+                {row.depth > 0 && (
+                  <span
+                    data-slot={`table-row-indent-level-${row.depth}`}
+                    aria-hidden="true"
+                    style={{
+                      paddingLeft: `${row.depth * (props.expandable?.indentSize ?? 15)}px`,
+                    }}
+                  />
+                )}
+                {/* Tree Data: Expand Icon (only on first column) */}
+                <span className="inline-block w-6">
+                  {row.getCanExpand() && props.expandable?.expandIcon
+                    ? props.expandable.expandIcon({
+                        record: row.original,
+                        expanded: row.getIsExpanded(),
+                        expandable: row.getCanExpand(),
+                        onExpand: row.getToggleExpandedHandler(),
+                      })
+                    : null}
+                </span>
+                {cellContent}
+              </div>
+            );
+          }
 
-        // Regular cell without wrapper
-        return cellContent;
+          // Regular cell without wrapper
+          return cellContent;
+        },
       };
 
       return columnDefMerged;
