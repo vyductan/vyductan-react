@@ -1,0 +1,44 @@
+import { Col, Row } from "@/components/ui/grid";
+import { ComponentSource } from "@/components/ui/mdx";
+
+import DropdownBasicDemo from "./demo/basic";
+import DisabledDemo from "./demo/disabled";
+import PlacementsDemo from "./demo/placements";
+import SubMenuDemo from "./demo/sub-menu";
+import TriggerDemo from "./demo/trigger";
+
+# Dropdown
+
+A dropdown menu component that displays a list of options when triggered. Built on top of the DropdownMenu primitive components and follows Ant Design API patterns with Shadcn UI styling.
+
+## Examples
+
+### Basic Usage
+
+Display the document sample code for the basic usage of the Dropdown component.
+
+<ComponentSource src="dropdown/demo/basic.tsx" __comp__={DropdownBasicDemo} />
+
+### Sub Menu
+
+Dropdown supports nested sub-menus with groups and cascading menus.
+
+<ComponentSource src="dropdown/demo/sub-menu.tsx" __comp__={SubMenuDemo} />
+
+### Placements
+
+Dropdown supports different placement options to control where the menu appears relative to the trigger: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`, `top`, `bottom`, `left`, `right`.
+
+<ComponentSource src="dropdown/demo/placements.tsx" __comp__={PlacementsDemo} />
+
+### Trigger
+
+Dropdown supports multiple trigger modes: `click` (default), `hover`, and `contextMenu` (right-click). You can use a single trigger or combine multiple triggers in an array.
+
+<ComponentSource src="dropdown/demo/trigger.tsx" __comp__={TriggerDemo} />
+
+### Disabled
+
+Dropdown can be disabled to prevent interaction.
+
+<ComponentSource src="dropdown/demo/disabled.tsx" __comp__={DisabledDemo} />
