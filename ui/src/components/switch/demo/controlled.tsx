@@ -12,5 +12,3 @@ export default function ControlledDemo() {
 
   return <Switch checked={checked} onChange={handleChange} />;
 }
-
-

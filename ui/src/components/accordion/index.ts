@@ -1,1 +1,1 @@
-export * from '../../shadcn/accordion';
+export * from "../../shadcn/accordion";

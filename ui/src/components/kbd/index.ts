@@ -1,1 +1,1 @@
-export * from '../../shadcn/kbd';
+export * from "../../shadcn/kbd";
