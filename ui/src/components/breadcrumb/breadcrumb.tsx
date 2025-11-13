@@ -78,7 +78,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
             <Fragment key={key}>
               {skeleton ? (
                 <li>
-                  <Skeleton className="w-20" />
+                  <Skeleton className="h-4 w-20" />
                 </li>
               ) : index < items.length - 1 ? (
                 x.href || x.icon || x.onClick ? (
