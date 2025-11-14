@@ -1235,7 +1235,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                       className={cn("hover:bg-transparent", classNames?.empty)}
                     >
                       <TableCell
-                        colSpan={mergedColumns.length}
+                        colSpan={allLeafColumns.length}
                         className={cn(
                           "text-muted-foreground h-48 text-center",
                           bordered && "border-e",

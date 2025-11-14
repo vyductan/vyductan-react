@@ -44,7 +44,7 @@ const Divider = ({
       children &&
       "grow basis-0",
     dashed &&
-      "text-border bg-[color:transparent] bg-[repeating-linear-gradient(to_right,currentColor_0_4px,transparent_4px_8px)]",
+      "text-border bg-transparent bg-[repeating-linear-gradient(to_right,currentColor_0_4px,transparent_4px_8px)]",
     className,
   );
   if (!children || orientation === "horizontal" || orientation === "vertical") {
