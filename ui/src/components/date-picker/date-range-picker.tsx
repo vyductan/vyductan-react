@@ -206,17 +206,29 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             if (dates?.[1]) {
               setEndInputValue(dates[1].format(format));
             }
-            // Auto-focus end input after start date selection
-            if (dates?.[0] && !dates[1]) {
+            // When user is focused on input 1 (start) and selects a date,
+            // always switch to input 2 and keep panel open (even if both inputs have values)
+            if (activeInput === "start") {
               setActiveInput("end");
               setTimeout(() => endInputRef.current?.focus(), 0);
-            } else if (dates?.[1]) {
-              // Only close panel and reset activeInput if user is not actively focusing an input
-              // This prevents interrupting user interaction
+            } else if (activeInput === "end" && dates?.[1]) {
+              // Only close panel when selecting end date while focused on input 2
               setTimeout(() => {
                 setActiveInput(null);
                 setOpen(false);
               }, 100);
+            } else if (!activeInput) {
+              // No active input - if start date selected, switch to input 2
+              if (dates?.[0] && !dates[1]) {
+                setActiveInput("end");
+                setTimeout(() => endInputRef.current?.focus(), 0);
+              } else if (dates?.[1]) {
+                // Both dates selected without active input - close panel
+                setTimeout(() => {
+                  setActiveInput(null);
+                  setOpen(false);
+                }, 100);
+              }
             }
           }}
           format={format}

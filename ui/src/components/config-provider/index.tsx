@@ -4,6 +4,7 @@
 import React from "react";
 import useMemo from "rc-util/lib/hooks/useMemo";
 
+import type { Locale } from "../locale";
 import type {
   ButtonConfig,
   ConfigConsumerProps,
@@ -25,6 +26,7 @@ export { Variants } from "./context";
 export { ConfigContext } from "./context";
 
 export interface ConfigProviderProps {
+  locale?: Locale;
   button?: ButtonConfig;
   datePicker?: DatePickerConfig;
   form?: FormConfig;

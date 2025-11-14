@@ -1,2 +1,1 @@
-types.generated.ts
-routeTree.gen.ts
+src/shadcn/**

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { notification } from "../../notification";
 import { useFormContext } from "../context";

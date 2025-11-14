@@ -35,7 +35,7 @@ export function Editor({
     <LexicalComposer
       initialConfig={{
         ...editorConfig,
-        editorState: value,
+        editorState: typeof value === "object" ? JSON.stringify(value) : value,
       }}
     >
       <TooltipProvider>

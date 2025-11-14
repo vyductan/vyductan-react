@@ -20,8 +20,16 @@ type TabItemDef = {
   className?: string;
   triggerProps?: Omit<TabsTriggerProps, "value">;
 };
+type TabsShadcnProps = {
+  type?: never;
+  items?: never;
+} & TabsRootProps;
 
-type TabsProps = {
+type TabsOwnProps = {
+  defaultValue?: never;
+  onValueChange?: never;
+  children?: never;
+} & {
   type?: TabsType;
   style?: React.CSSProperties;
   className?: string;
@@ -49,7 +57,13 @@ type TabsProps = {
   listProps?: TabsListProps;
 };
 
+type TabsProps = TabsShadcnProps | TabsOwnProps;
 const Tabs = (props: TabsProps) => {
+  const isShadcnTabs = !!props.children && !props.items;
+  if (isShadcnTabs) {
+    return <TabsRoot {...props}>{props.children}</TabsRoot>;
+  }
+
   const {
     type = "line",
     className,
@@ -63,7 +77,7 @@ const Tabs = (props: TabsProps) => {
     tabBarStyle,
     listProps,
     ...restProps
-  } = props;
+  } = props as TabsOwnProps;
 
   // Parse extra
   let assertExtra: TabBarExtraMap = {};

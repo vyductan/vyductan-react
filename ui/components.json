@@ -10,12 +10,12 @@
     "cssVariables": true,
     "prefix": ""
   },
+  "iconLibrary": "lucide",
   "aliases": {
-    "components": "@acme/ui/components",
+    "components": "@acme/ui/shadcn",
     "utils": "@acme/ui/lib/utils",
-    "ui": "@acme/ui/shadcn",
+    "hooks": "@acme/ui/hooks",
     "lib": "@acme/ui/lib",
-    "hooks": "@acme/ui/hooks"
-  },
-  "iconLibrary": "lucide"
+    "ui": "@acme/ui/components"
+  }
 }
