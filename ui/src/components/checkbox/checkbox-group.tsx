@@ -52,9 +52,10 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
   classNames,
 }: CheckboxGroupProps<T>) => {
   const [internalValue, setInternalValue] = useControlledState(
-    defaultValue ?? [],
+    defaultValue,
     value,
   );
+
   const memoizedOptions = useMemo<CheckboxOptionType<T>[]>(
     () =>
       options.map((option) => {
@@ -77,18 +78,18 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
           <Checkbox
             key={o.value.toString()}
             name={name}
-            checked={internalValue.includes(o.value)}
+            checked={internalValue?.includes(o.value)}
             value={o.value as string}
             disabled={isDisabled}
             onChange={(e) => {
               if (isDisabled) return;
 
               const newValue = e.target.checked
-                ? [...internalValue, o.value]
-                : internalValue.filter((x) => x !== o.value);
+                ? [...(internalValue ?? []), o.value]
+                : internalValue?.filter((x) => x !== o.value);
 
               setInternalValue(newValue);
-              onChange?.(newValue);
+              onChange?.(newValue ?? []);
             }}
             className={cn(classNames?.item, o.className)}
             classNames={classNames}
