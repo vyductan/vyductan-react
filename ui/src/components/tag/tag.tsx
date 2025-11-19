@@ -130,21 +130,35 @@ const Tag = ({
   onClose,
   ...props
 }: TagProps) => {
+  console.log("color", color);
   const tagConfig = useUiConfig((state) => state.components.tag);
 
   const bordered = borderedProp ?? tagConfig?.bordered;
+
+  // Check if color is a hex color (starts with #)
+  const isHexColor = color?.startsWith("#");
+
   return (
     <Badge
       className={cn(
         tagVariants({
           variant,
-          color,
+          color: isHexColor ? undefined : color,
           bordered,
         }),
         closeIcon && "pr-1",
+        isHexColor && "text-white",
         tagConfig?.className,
         className,
       )}
+      style={
+        isHexColor
+          ? {
+              backgroundColor: color,
+              borderColor: color,
+            }
+          : undefined
+      }
       {...props}
     >
       {icon}
