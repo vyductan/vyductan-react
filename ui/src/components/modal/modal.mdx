@@ -1,0 +1,242 @@
+import { ComponentSource } from "@/components/ui/mdx";
+
+import BasicDemo from "./demo/basic";
+import ConfirmationDemo from "./demo/confirmation";
+import CustomFooterDemo from "./demo/custom-footer";
+import FormDemo from "./demo/form";
+import ScrollableDemo from "./demo/scrollable";
+import TriggerDemo from "./demo/trigger";
+import WidthsDemo from "./demo/widths";
+
+# Modal
+
+A flexible modal dialog component for displaying content in an overlay window. Built on top of the Dialog primitive components and follows Ant Design API patterns with Shadcn UI styling.
+
+## Features
+
+- 🎯 **Declarative & Imperative** - Use as a component or with `App.useApp().modal.confirm()`
+- 🎨 **Customizable** - Support for custom width, footer, and classNames
+- 📱 **Responsive** - Responsive width breakpoints support
+- ⚡ **Loading State** - Built-in async operation support with loading indicators
+- ♿ **Accessible** - Keyboard navigation and screen reader support
+
+## Examples
+
+### Basic Usage
+
+The simplest way to use Modal with state management.
+
+<ComponentSource src="modal/demo/basic.tsx" __comp__={BasicDemo} />
+
+### Trigger Prop
+
+Use the `trigger` prop to automatically handle modal opening.
+
+<ComponentSource src="modal/demo/trigger.tsx" __comp__={TriggerDemo} />
+
+### Custom Footer
+
+Customize the modal footer with either a function or React node.
+
+- **Function Footer**: Access to default `OkBtn` and `CancelBtn` components with ability to reorder or add custom buttons
+- **Node Footer**: Completely custom footer content
+- **Null Footer**: Remove the footer entirely
+
+<ComponentSource
+  src="modal/demo/custom-footer.tsx"
+  __comp__={CustomFooterDemo}
+/>
+
+### Modal Widths
+
+Control the width of the modal with fixed or responsive values.
+
+- Fixed width in pixels (e.g., `400`, `520`, `800`)
+- Percentage width (e.g., `"90%"`)
+- Responsive width with breakpoints (`{ xs: "90%", sm: 400, md: 600, lg: 800 }`)
+
+<ComponentSource src="modal/demo/widths.tsx" __comp__={WidthsDemo} />
+
+### Confirmation Dialogs
+
+Modal with confirmation actions, loading states, and danger variants.
+
+<ComponentSource
+  src="modal/demo/confirmation.tsx"
+  __comp__={ConfirmationDemo}
+/>
+
+### Modal with Form
+
+Modal containing form inputs with description.
+
+<ComponentSource src="modal/demo/form.tsx" __comp__={FormDemo} />
+
+### Scrollable Content
+
+Modal with long content that automatically becomes scrollable.
+
+<ComponentSource src="modal/demo/scrollable.tsx" __comp__={ScrollableDemo} />
+
+## API Reference
+
+### Modal Props
+
+| Property         | Type                                         | Default     | Description                            |
+| ---------------- | -------------------------------------------- | ----------- | -------------------------------------- |
+| `open`           | `boolean`                                    | `false`     | Whether the modal is visible           |
+| `title`          | `ReactNode`                                  | -           | The modal title                        |
+| `description`    | `ReactNode`                                  | -           | The modal description                  |
+| `width`          | `string \| number \| ResponsiveWidth`        | `520`       | Width of the modal                     |
+| `trigger`        | `ReactNode`                                  | -           | Trigger element to open modal          |
+| `onOk`           | `() => void`                                 | -           | Callback when OK button is clicked     |
+| `onCancel`       | `() => void`                                 | -           | Callback when Cancel button is clicked |
+| `onOpenChange`   | `(open: boolean) => void`                    | -           | Callback when modal visibility changes |
+| `okText`         | `string`                                     | `"Ok"`      | Text of the OK button                  |
+| `cancelText`     | `string`                                     | `"Cancel"`  | Text of the Cancel button              |
+| `okType`         | `"default" \| "primary" \| "danger"`         | `undefined` | Type of OK button                      |
+| `confirmLoading` | `boolean`                                    | `false`     | Whether OK button is in loading state  |
+| `okButtonProps`  | `ButtonProps`                                | -           | Additional props for OK button         |
+| `footer`         | `ReactNode \| Function \| null`              | -           | Custom footer content or null to hide  |
+| `className`      | `string`                                     | -           | Additional CSS class for modal content |
+| `classNames`     | `{ header?, title?, description?, footer? }` | -           | CSS classes for different parts        |
+
+### ResponsiveWidth
+
+```tsx
+type ResponsiveWidth = Partial<Record<Breakpoint, string | number>>;
+type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+```
+
+### Footer Function Signature
+
+```tsx
+type FooterFunction = (params: {
+  originNode: ReactNode;
+  extra: {
+    OkBtn: ReactElement;
+    CancelBtn: ReactElement;
+  };
+}) => ReactNode;
+```
+
+## Imperative API (App Context)
+
+The Modal component supports imperative usage through the App context for quick confirmations and warnings.
+
+> [!IMPORTANT]
+> To use imperative methods, your app must be wrapped with the `App` component:
+>
+> ```tsx
+> import { App } from "@/components/ui/app";
+>
+> function Root() {
+>   return (
+>     <App>
+>       <YourAppContent />
+>     </App>
+>   );
+> }
+> ```
+
+### Confirm Dialog
+
+Use `modal.confirm()` for confirmation dialogs with OK and Cancel buttons.
+
+```tsx
+import { App } from "@/components/ui/app";
+
+function MyComponent() {
+  const { modal } = App.useApp();
+
+  const handleDelete = () => {
+    modal.confirm({
+      title: "Delete Item",
+      content: "Are you sure you want to delete this item?",
+      onOk: () => {
+        // Handle delete action
+        console.log("Item deleted");
+      },
+      onCancel: () => {
+        console.log("Delete cancelled");
+      },
+    });
+  };
+
+  return (
+    <Button onClick={handleDelete} color="danger">
+      Delete Item
+    </Button>
+  );
+}
+```
+
+### Warning Dialog
+
+`modal.warning()` renders a single OK button with a warning icon.
+
+```tsx
+import { App } from "@/components/ui/app";
+
+function MyComponent() {
+  const { modal } = App.useApp();
+
+  const handleWarning = () => {
+    modal.warning({
+      title: "Unsaved changes",
+      content: "You have unsaved changes. Leaving now will discard them.",
+      onOk: () => {
+        // Handle acknowledgment
+      },
+    });
+  };
+
+  return <Button onClick={handleWarning}>Show Warning</Button>;
+}
+```
+
+> [!NOTE]
+>
+> - Warning dialog hides the Cancel button and styles the OK button with an amber accent
+> - Use `App.useApp().modal.warning()` rather than `Modal.warning()` directly
+
+### Async Operations
+
+The confirm dialog automatically handles async operations with loading states:
+
+```tsx
+const { modal } = App.useApp();
+
+const handleAsyncAction = () => {
+  modal.confirm({
+    title: "Async Action",
+    content: "This will perform an async operation.",
+    onOk: async () => {
+      // Loading state is shown automatically
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Async operation completed");
+    },
+  });
+};
+```
+
+### ConfirmConfig
+
+| Property         | Type                                 | Default     | Description                     |
+| ---------------- | ------------------------------------ | ----------- | ------------------------------- |
+| `title`          | `ReactNode`                          | `"Confirm"` | The confirm dialog title        |
+| `content`        | `ReactNode`                          | -           | The confirm dialog content      |
+| `onOk`           | `() => void \| Promise<void>`        | -           | Callback when OK is clicked     |
+| `onCancel`       | `() => void`                         | -           | Callback when Cancel is clicked |
+| `okText`         | `string`                             | `"OK"`      | Text of the OK button           |
+| `cancelText`     | `string`                             | `"Cancel"`  | Text of the Cancel button       |
+| `okType`         | `"default" \| "primary" \| "danger"` | `"primary"` | Type of OK button               |
+| `confirmLoading` | `boolean`                            | `false`     | Whether OK button shows loading |
+
+## Accessibility
+
+- Modal traps focus within the dialog
+- Pressing Escape closes the modal
+- Clicking the backdrop closes the modal
+- Proper ARIA attributes are applied
+- Screen reader announcements are supported

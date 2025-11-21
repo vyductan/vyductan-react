@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import type { ButtonProps } from "@/components/ui/button";
@@ -36,8 +35,8 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
     | ((params: {
         originNode: React.ReactNode;
         extra: {
-          OkBtn: React.ReactElement<any>;
-          CancelBtn: React.ReactElement<any>;
+          OkBtn: React.ReactElement<ButtonProps>;
+          CancelBtn: React.ReactElement<ButtonProps>;
         };
       }) => React.ReactNode)
     | React.ReactNode;
