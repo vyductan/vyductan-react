@@ -1,6 +1,6 @@
 import { cn } from "@acme/ui/lib/utils";
 
-export const PageHeading = ({
+export const PageTitle = ({
   className,
   ...props
 }: React.ComponentProps<"h1">) => {

@@ -4,14 +4,16 @@ import type { DirectionType } from "@/components/ui/config-provider/context";
 import type { TagProps } from "@/components/ui/tag";
 import { useContext } from "react";
 import { Avatar } from "@/components/ui/avatar";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { ConfigContext } from "@/components/ui/config-provider";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { buttonColorVariants, buttonVariants, Space } from "../../components";
 import { Icon } from "../../icons";
-import { PageHeading } from "./_components";
+import { buttonColorVariants, buttonVariants } from "../button";
+import { PageBreadcrumb } from "./page-breadcrumb";
+import { PageDescription } from "./page-description";
+import { PageExtra } from "./page-extra";
+import { PageTitle } from "./page-title";
 
 type PageHeaderProps = {
   title?: React.ReactNode;
@@ -80,85 +82,49 @@ const getBackIcon = (
   );
 };
 
-const renderTitle = (
-  props: PageHeaderProps,
-  direction: DirectionType = "ltr",
-) => {
+const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
+  const { direction } = useContext(ConfigContext);
+
   const { title, avatar, subTitle, tags, classNames, onBack } = props;
   const hasHeading = title ?? subTitle ?? tags;
-  // If there is nothing, return a null
-  if (!hasHeading) {
-    return;
-  }
+
   const backIcon = getBackIcon(props, direction);
   const backIconDom = renderBack(backIcon, onBack);
-  return (
+
+  const titleNode = hasHeading ? (
     <div className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
       <div className="flex items-center">
         {backIconDom}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
         {title && (
-          <PageHeading className={classNames?.title}>{title}</PageHeading>
+          <PageTitle className={classNames?.title}>{title}</PageTitle>
         )}
       </div>
-      {subTitle && (
-        <p
-          title={typeof subTitle === "string" ? subTitle : undefined}
-          className="text-muted-foreground"
-        >
-          {subTitle}
-        </p>
-      )}
+      <PageDescription subTitle={subTitle} />
       {tags && <span>{tags}</span>}
     </div>
-  );
-};
-const renderExtra = (props: PageHeaderProps) => {
-  const { extra } = props;
-  if (!extra) {
-    return;
-  }
-  return (
-    <span className={cn(`my-[calc(var(--margin-xs)/2)]`)}>
-      <Space>{extra}</Space>
-    </span>
-  );
-};
+  ) : null;
 
-const renderChildren = (props: PageHeaderProps) => {
-  const { children } = props;
-  if (!children) {
-    return;
-  }
-  return <div>{children}</div>;
-};
-
-const renderBreadcrumb = (breadcrumb?: PageHeaderProps["breadcrumb"]) => {
-  if (breadcrumb?.render) return breadcrumb.render(breadcrumb);
-  if (!breadcrumb?.items?.length) return <></>;
-  return <Breadcrumb className="hidden sm:flex" {...breadcrumb} />;
-};
-
-const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
-  const { direction } = useContext(ConfigContext);
-
-  const title = renderTitle(props, direction);
-  const extra = renderExtra(props);
-  const children = renderChildren(props);
-  const breadcrumb = renderBreadcrumb(props.breadcrumb);
+  const extraNode = <PageExtra extra={props.extra} />;
+  const breadcrumbNode = props.breadcrumb ? (
+    <PageBreadcrumb {...props.breadcrumb} />
+  ) : null;
 
   if (render) {
-    return render({ title, extra, breadcrumb }, className);
+    return render(
+      { title: titleNode, extra: extraNode, breadcrumb: breadcrumbNode },
+      className,
+    );
   }
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      {breadcrumb}
+      {breadcrumbNode}
       <div className={cn("flex justify-between")}>
-        {title}
-        {extra}
+        {titleNode}
+        {extraNode}
       </div>
-      {children}
+      {props.children && <div>{props.children}</div>}
     </div>
   );
 };
