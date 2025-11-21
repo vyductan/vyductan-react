@@ -6,7 +6,7 @@ import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { Badge } from "@acme/ui/shadcn/badge";
 
-import { useUiConfig } from "../config-provider/config-provider";
+import { useComponentConfig } from "../config-provider";
 
 // Based on Vercel
 const color: Record<string, string> = {
@@ -130,21 +130,36 @@ const Tag = ({
   onClose,
   ...props
 }: TagProps) => {
-  const tagConfig = useUiConfig((state) => state.components.tag);
+  const tagConfig = useComponentConfig("tag");
+  const bordered = borderedProp ?? tagConfig.bordered;
+  const finalVariant = variant ?? tagConfig.variant;
+  const finalColor = color ?? tagConfig.color;
 
-  const bordered = borderedProp ?? tagConfig?.bordered;
+  // Check if color is a hex color (starts with #)
+  const isHexColor =
+    typeof finalColor === "string" && finalColor.startsWith("#");
+
   return (
     <Badge
       className={cn(
         tagVariants({
-          variant,
-          color,
+          variant: finalVariant,
+          color: isHexColor ? undefined : finalColor,
           bordered,
         }),
         closeIcon && "pr-1",
-        tagConfig?.className,
+        isHexColor && "text-white",
+        tagConfig.className,
         className,
       )}
+      style={
+        isHexColor
+          ? {
+              backgroundColor: finalColor,
+              borderColor: finalColor,
+            }
+          : undefined
+      }
       {...props}
     >
       {icon}

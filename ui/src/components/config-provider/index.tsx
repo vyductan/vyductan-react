@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
@@ -16,14 +18,14 @@ import type {
   PaginationConfig,
   ResultConfig,
   SelectConfig,
+  TagConfig,
   TextAreaConfig,
 } from "./context";
 import { ConfigContext } from "./context";
 
-export { useUiConfig, UiConfigProvider } from "./config-provider";
 export type { Variant } from "./context";
 export { Variants } from "./context";
-export { ConfigContext } from "./context";
+export { ConfigContext, useComponentConfig } from "./context";
 
 export interface ConfigProviderProps {
   locale?: Locale;
@@ -36,6 +38,7 @@ export interface ConfigProviderProps {
   pagination?: PaginationConfig;
   result?: ResultConfig;
   select?: SelectConfig;
+  tag?: TagConfig;
   textArea?: TextAreaConfig;
   // getTargetContainer?: () => HTMLElement | Window;
   // getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;

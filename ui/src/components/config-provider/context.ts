@@ -15,6 +15,7 @@ import type { PaginationProps } from "../pagination";
 import type { ResultProps } from "../result";
 import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
+import type { TagProps } from "../tag";
 import type { TextAreaProps } from "../textarea";
 import type {
   AliasToken,
@@ -96,6 +97,9 @@ export interface TableConfig extends ComponentStyleConfig {
   };
 }
 
+export type TagConfig = ComponentStyleConfig &
+  Pick<TagProps, "bordered" | "variant" | "color" | "className">;
+
 export type TextAreaConfig = ComponentStyleConfig &
   Pick<
     TextAreaProps,
@@ -170,7 +174,7 @@ export interface ConfigComponentProps {
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // message?: ComponentStyleConfig;
-  // tag?: TagConfig;
+  tag?: TagConfig;
   table?: TableConfig;
   textArea?: TextAreaConfig;
   // card?: CardConfig;
