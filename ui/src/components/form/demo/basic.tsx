@@ -34,7 +34,7 @@ const App: React.FC = () => {
       style={{ maxWidth: 600 }}
       autoComplete="off"
       // labelAlign="left"
-      // layout="vertical"
+      // layout="horizontal"
     >
       <Field
         label={

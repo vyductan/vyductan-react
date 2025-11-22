@@ -109,9 +109,6 @@ const FormItemRow = ({
         >
           {label ? (
             <Col
-              data-slot={
-                labelCol ? `col-${labelCol.span}-form-item-label` : undefined
-              }
               className={cn(
                 "pr-3 text-end",
                 layout === "vertical" && "text-start",
@@ -126,12 +123,10 @@ const FormItemRow = ({
             </Col>
           ) : null}
           <Col
-            data-slot={
-              wrapperCol
-                ? `col-${wrapperCol.span}-form-item-control`
-                : undefined
-            }
-            className={cn("flex-1", !label && "ml-auto")}
+            className={cn(
+              "flex-1",
+              !label && layout !== "vertical" && "ml-auto",
+            )}
             style={{
               width: label ? undefined : "100%",
             }}
