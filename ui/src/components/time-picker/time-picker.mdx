@@ -1,0 +1,46 @@
+import { ComponentSource } from "@/components/ui/mdx";
+
+import BasicDemo from "./demo/basic";
+import HourMinuteDemo from "./demo/hour-minute";
+
+# TimePicker
+
+A component for selecting time.
+
+## Features
+
+- 🕒 **Time Selection** - Select hours and minutes.
+- ⌨️ **Input Support** - Type time directly into the input.
+- 🎨 **Customizable** - Supports standard input props and styling.
+
+## Examples
+
+### Basic Usage
+
+The simplest way to use TimePicker with state management.
+
+<ComponentSource src="time-picker/demo/basic.tsx" __comp__={BasicDemo} />
+
+### Hour and Minute
+
+While part of `format` is omitted, the corresponding column in panel will disappear, too.
+
+<ComponentSource
+  src="time-picker/demo/hour-minute.tsx"
+  __comp__={HourMinuteDemo}
+/>
+
+## API Reference
+
+### TimePicker Props
+
+| Property       | Type                                        | Default         | Description                         |
+| -------------- | ------------------------------------------- | --------------- | ----------------------------------- |
+| `value`        | `Dayjs`                                     | -               | The current time value              |
+| `defaultValue` | `Dayjs`                                     | -               | The default time value              |
+| `onChange`     | `(time: Dayjs, timeString: string) => void` | -               | Callback when time changes          |
+| `format`       | `string`                                    | `"HH:mm"`       | The time format                     |
+| `showNow`      | `boolean`                                   | -               | Whether to show the "Now" button    |
+| `disabled`     | `boolean`                                   | `false`         | Whether the time picker is disabled |
+| `placeholder`  | `string`                                    | `"Select time"` | Placeholder text                    |
+| `status`       | `"error" \| "warning"`                      | -               | Validation status                   |

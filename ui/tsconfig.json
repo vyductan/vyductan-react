@@ -6,6 +6,7 @@
     "jsx": "preserve",
     "rootDir": ".",
     "paths": {
+      "@acme/ui/*": ["./src/ui/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/components/ui": ["./src/components/index.ts"],
