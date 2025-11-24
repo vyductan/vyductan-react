@@ -130,7 +130,6 @@ const Tag = ({
   onClose,
   ...props
 }: TagProps) => {
-  console.log("color", color);
   const tagConfig = useUiConfig((state) => state.components.tag);
 
   const bordered = borderedProp ?? tagConfig?.bordered;
