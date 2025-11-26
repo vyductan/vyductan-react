@@ -3,7 +3,7 @@
 import type React from "react";
 import dayjs from "dayjs";
 
-import { TimePicker } from "@acme/ui/components/time-picker";
+import { TimePicker } from "..";
 
 const format = "HH:mm";
 
