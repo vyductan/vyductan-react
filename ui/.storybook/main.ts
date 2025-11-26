@@ -72,20 +72,18 @@ const config: StorybookConfig = {
       config.build.rollupOptions.output = {};
     }
 
-    // Configure sourcemap and code splitting for output
+    // Configure code splitting for output
+    // Note: Vite doesn't support rollupOptions.output.sourcemap, use build.sourcemap instead
     if (Array.isArray(config.build.rollupOptions.output)) {
       config.build.rollupOptions.output = config.build.rollupOptions.output.map(
         (output) => ({
           ...output,
-          sourcemap: output.sourcemap !== false ? true : false,
           manualChunks: output.manualChunks || createManualChunks,
         }),
       );
     } else if (typeof config.build.rollupOptions.output === "object") {
       config.build.rollupOptions.output = {
         ...config.build.rollupOptions.output,
-        sourcemap:
-          config.build.rollupOptions.output.sourcemap !== false ? true : false,
         manualChunks:
           config.build.rollupOptions.output.manualChunks || createManualChunks,
       };

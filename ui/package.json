@@ -80,6 +80,7 @@
     "@typescript/analyze-trace": "^0.10.1",
     "ahooks": "^3.9.6",
     "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.0",
     "cmdk": "^1.1.1",
     "colorjs.io": "^0.5.2",
     "date-fns": "^4.1.0",
