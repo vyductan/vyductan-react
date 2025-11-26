@@ -96,9 +96,7 @@ const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
       <div className="flex items-center">
         {backIconDom}
         {avatar && <Avatar className={cn(avatar.className)} {...avatar} />}
-        {title && (
-          <PageTitle className={classNames?.title}>{title}</PageTitle>
-        )}
+        {title && <PageTitle className={classNames?.title}>{title}</PageTitle>}
       </div>
       <PageDescription subTitle={subTitle} />
       {tags && <span>{tags}</span>}
