@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "buildCommand": "pnpm storybook:build",
+  "outputDirectory": "storybook-static",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
+}

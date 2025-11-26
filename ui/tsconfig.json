@@ -15,6 +15,6 @@
       "@/components/icons/*": ["./src/icons/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", ".storybook"],
   "exclude": ["node_modules", "./src/shadcn/*.tsx"]
 }
