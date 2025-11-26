@@ -112,7 +112,7 @@
     "@acme/tsconfig": "workspace:*",
     "@iconify/json": "^2.2.399",
     "@iconify/tailwind4": "^1.0.6",
-    "@tailwindcss/postcss": "^4.1.16",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/lodash": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",

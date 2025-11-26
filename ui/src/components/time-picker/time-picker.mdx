@@ -5,13 +5,16 @@ import HourMinuteDemo from "./demo/hour-minute";
 
 # TimePicker
 
-A component for selecting time.
+A time input component with native browser support and custom visual picker.
 
 ## Features
 
-- 🕒 **Time Selection** - Select hours and minutes.
-- ⌨️ **Input Support** - Type time directly into the input.
-- 🎨 **Customizable** - Supports standard input props and styling.
+- 🕒 **Infinite Scroll** - Seamlessly scroll through hours, minutes, and seconds
+- ⚡ **Smart Scrolling** - Instant scroll on open, smooth scroll on selection
+- 🎨 **Customizable Format** - Support for HH:mm, HH:mm:ss, and more
+- ⌨️ **Input Support** - Type time directly or use visual picker
+- 📱 **Mobile Friendly** - Works seamlessly on all devices
+- ♿ **Accessible** - Full keyboard navigation support
 
 ## Examples
 
@@ -30,17 +33,81 @@ While part of `format` is omitted, the corresponding column in panel will disapp
   __comp__={HourMinuteDemo}
 />
 
+### Form Integration
+
+```tsx
+import { TimePicker } from "@/components/ui";
+import { Field, Form, useForm } from "@/components/ui/form";
+import dayjs from "dayjs";
+
+function FormExample() {
+  const form = useForm({
+    defaultValues: {
+      startTime: "09:00:00",
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <Field
+        control={form.control}
+        name="startTime"
+        normalize={(value: dayjs.Dayjs) => value.format("HH:mm:ss")}
+        getValueProps={(value: string | undefined) => ({
+          value: value ? dayjs(value, "HH:mm:ss") : undefined,
+        })}
+      >
+        <TimePicker placeholder="Select start time" />
+      </Field>
+    </Form>
+  );
+}
+```
+
+### Different Formats
+
+```tsx
+// 24-hour format (default)
+<TimePicker format="HH:mm" />
+
+// With seconds
+<TimePicker format="HH:mm:ss" />
+
+// 12-hour format (if supported)
+<TimePicker format="hh:mm A" />
+```
+
 ## API Reference
 
 ### TimePicker Props
 
-| Property       | Type                                        | Default         | Description                         |
-| -------------- | ------------------------------------------- | --------------- | ----------------------------------- |
-| `value`        | `Dayjs`                                     | -               | The current time value              |
-| `defaultValue` | `Dayjs`                                     | -               | The default time value              |
-| `onChange`     | `(time: Dayjs, timeString: string) => void` | -               | Callback when time changes          |
-| `format`       | `string`                                    | `"HH:mm"`       | The time format                     |
-| `showNow`      | `boolean`                                   | -               | Whether to show the "Now" button    |
-| `disabled`     | `boolean`                                   | `false`         | Whether the time picker is disabled |
-| `placeholder`  | `string`                                    | `"Select time"` | Placeholder text                    |
-| `status`       | `"error" \| "warning"`                      | -               | Validation status                   |
+| Property       | Type                                                             | Default         | Description                             |
+| -------------- | ---------------------------------------------------------------- | --------------- | --------------------------------------- |
+| `value`        | `Dayjs \| string \| null \| undefined`                           | -               | The current time value                  |
+| `defaultValue` | `Dayjs \| string \| null \| undefined`                           | -               | The default time value                  |
+| `onChange`     | `(time: Dayjs \| null, timeString: string \| undefined) => void` | -               | Callback when time changes              |
+| `format`       | `string`                                                         | `"HH:mm:ss"`    | The time format                         |
+| `placeholder`  | `string`                                                         | `"Select time"` | Placeholder text                        |
+| `open`         | `boolean`                                                        | -               | Whether the picker is open (controlled) |
+| `onOpenChange` | `(open: boolean) => void`                                        | -               | Callback when open state changes        |
+| `disabled`     | `boolean`                                                        | `false`         | Whether the time picker is disabled     |
+| `status`       | `"error" \| "warning"`                                           | -               | Validation status                       |
+
+## Migration from Ant Design
+
+```tsx
+// Ant Design
+import { TimePicker } from 'antd';
+<TimePicker value={moment('12:08', 'HH:mm')} format="HH:mm" />
+
+// @acme/ui TimePicker
+import { TimePicker } from '@/components/ui';
+<TimePicker value={dayjs('12:08', 'HH:mm')} format="HH:mm" />
+```
+
+### Key Differences
+
+- Uses **Dayjs** instead of Moment.js
+- **Native input** behavior by default
+- **Infinite scroll** with seamless boundary reset
+- **"Now" button** for quick current time selection
