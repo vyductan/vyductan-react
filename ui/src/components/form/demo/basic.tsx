@@ -1,7 +1,7 @@
 import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Field, Form, useForm } from "@/components/ui/form";
+import { Form, FormItem, useForm } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { User } from "lucide-react";
 import { z } from "zod";
@@ -36,7 +36,7 @@ const App: React.FC = () => {
       // labelAlign="left"
       // layout="horizontal"
     >
-      <Field
+      <FormItem
         label={
           <div className="flex items-center gap-2">
             <User />
@@ -47,7 +47,7 @@ const App: React.FC = () => {
         control={form.control}
       >
         <Input />
-      </Field>
+      </FormItem>
 
       <Form.Item label="Password Long" name="password" control={form.control}>
         <Input.Password />

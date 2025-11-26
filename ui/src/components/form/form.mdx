@@ -4,318 +4,88 @@ description: A form component for data collection and validation.
 component: true
 ---
 
-### Basic Usage
+import { ComponentSource } from "@/components/ui/mdx";
 
-Basic Form data control. Includes layout, initial values, validation and submit.
+import AntdDemo from "./demo/antd";
+import BasicDemo from "./demo/basic";
+import LayoutMultipleDemo from "./demo/layout-multiple";
+import ShadcnDemo from "./demo/shadcn";
 
-```tsx
-import { Button } from "@/components/button";
-import { Input } from "@/components/input";
-import { Field, Form, useForm } from "@/components/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
+# Form
 
-import { InsertExampleSchema } from "~/api/example/validators";
+A form component for data collection and validation.
 
-type Props = {
-  initialValues?: {
-    username: string;
-    password: string;
-  };
-};
-const FormExample = ({ initialValues }: Props) => {
-  const queryClient = useQueryClient();
+## Features
 
-  const insertMutation = useMutation(
-    orpc.example.insert.mutationOptions({
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: orpc.example.list.key(),
-        });
-        message.success("Successfully!");
-      },
-      onError: (error) => {
-        apiErrorHandling(error);
-      },
-    }),
-  );
+- 📋 **Schema Validation** - Built-in support for Zod schema validation
+- 🧩 **Type Safety** - Full TypeScript integration with `react-hook-form`
+- 🎨 **Flexible Layout** - Support for horizontal, vertical, and inline layouts
+- 🔌 **Ant Design Compatible** - Supports `labelCol`, `wrapperCol`, and other Ant Design props
+- ♿ **Accessible** - Built on top of Radix UI primitives
 
-  const form = useForm({
-    schema: InsertExampleSchema,
-    values: initialValues,
-    onSubmit: (values) => {
-      insertMutation.mutate(values);
-    },
-  });
-
-  return (
-    <Form form={form}>
-      <Field control={form.control} name="username" label="Username">
-        <Input />
-      </Field>
-      <Field control={form.control} name="password" label="Password">
-        <Input type="password" />
-      </Field>
-      <Field control={form.control} name="remember" label="Remember">
-        <Checkbox />
-      </Field>
-      <Field control={form.control} name="role" label="Role">
-        <Select options={[{ label: "Admin", value: "admin" }]} />
-      </Field>
-      <Autocomplete
-        allowClear
-        options={members.map((member) => ({
-          value: member.id,
-          label: member.name,
-        }))}
-      />
-      <Field>
-        <Button type="submit" loading={insertMutation.isPending}>
-          Submit
-        </Button>
-      </Field>
-    </Form>
-  );
-};
-```
-
-### Label Layout (labelCol)
-
-Control label layout using the `labelCol` prop, similar to Ant Design. This is especially useful for horizontal forms where you want to control the width of labels.
-
-```tsx
-import { Button } from "@/components/button";
-import { Input } from "@/components/input";
-import { Field, Form, useForm } from "@/components/ui/form";
-
-const FormExample = () => {
-  const form = useForm({
-    schema: z.object({
-      username: z.string(),
-      email: z.string().email(),
-    }),
-    onSubmit: (values) => {
-      console.log(values);
-    },
-  });
-
-  return (
-    <Form form={form} layout="horizontal" labelCol={{ span: 6 }}>
-      <Field control={form.control} name="username" label="Username">
-        <Input />
-      </Field>
-      <Field control={form.control} name="email" label="Email">
-        <Input />
-      </Field>
-      <Field>
-        <Button type="submit">Submit</Button>
-      </Field>
-    </Form>
-  );
-};
-```
-
-You can also use responsive column sizing:
-
-```tsx
-<Form form={form} layout="horizontal" labelCol={{ xs: 24, sm: 8, md: 6 }}>
-  {/* Form fields */}
-</Form>
-```
-
-### wrapperCol
-
-Control form control wrapper column width and layout.
-
-```tsx
-<Form
-  form={form}
-  layout="horizontal"
-  labelCol={{ span: 6 }}
-  wrapperCol={{ span: 18 }}
+> [!IMPORTANT]
+> **Prioritize Shadcn Usage**
 >
-  <Field control={form.control} name="username" label="Username">
-    <Input />
-  </Field>
-</Form>
-```
-
-### labelAlign
-
-Set label text alignment. Options: `"left"` | `"right"`. Default is `"left"`.
-
-```tsx
-<Form form={form} layout="horizontal" labelCol={{ span: 6 }} labelAlign="right">
-  <Field control={form.control} name="username" label="Username">
-    <Input />
-  </Field>
-</Form>
-```
-
-### labelWrap
-
-Whether label can wrap. Set to `false` to prevent label wrapping (will show ellipsis).
-
-```tsx
-<Form form={form} layout="horizontal" labelCol={{ span: 6 }} labelWrap={false}>
-  <Field
-    control={form.control}
-    name="username"
-    label="Very Long Username Label"
-  >
-    <Input />
-  </Field>
-</Form>
-```
-
-### Combined Layout Example
-
-All layout props can be combined together:
-
-```tsx
-<Form
-  form={form}
-  layout="horizontal"
-  labelCol={{ span: 6 }}
-  wrapperCol={{ span: 16, offset: 2 }}
-  labelAlign="right"
-  labelWrap={false}
+> We strongly recommend using the **Shadcn** style (via `zod` and `useForm`) for all new forms. This ensures better type safety, performance, and consistency with the rest of the UI.
 >
-  <Field control={form.control} name="username" label="Username">
-    <Input />
-  </Field>
-  <Field control={form.control} name="email" label="Email Address">
-    <Input />
-  </Field>
-  <Field>
-    <Button type="submit">Submit</Button>
-  </Field>
-</Form>
-```
+> The Ant Design style (using `Form.Item` with `rules`) is supported for migration purposes but should be avoided for new development.
 
-### Dynamic Form Item (FieldList)
+## Examples
 
-Add or remove form items dynamically. add function support config initial value.
+### Basic Usage (Shadcn Style)
 
-```tsx
-<Form>
-  <FieldList control={form.control} name="names">
-    {(fields, { add, remove }, { errors }) => (
-      <>
-        {fields.map((field, index) => (
-          <Field
-            label={`Passenger ${index + 1}`}
-            required={false}
-            key={field.key}
-          >
-            <Field {...field}>
-              <Input placeholder="passenger name" style={{ width: "60%" }} />
-            </Field>
-            {fields.length > 1 ? (
-              <Icon
-                icon="icon-[lucide--minus-circle]"
-                onClick={() => remove(field.name)}
-              />
-            ) : null}
-          </Field>
-        ))}
-        <Field>
-          <Button
-            type="dashed"
-            onClick={() => add()}
-            style={{ width: "60%" }}
-            icon={<Icon icon="icon-[lucide--plus]" />}
-          >
-            Add field
-          </Button>
-          <Button
-            type="dashed"
-            onClick={() => {
-              add("The head item", 0);
-            }}
-            style={{ width: "60%", marginTop: "20px" }}
-            icon={<Icon icon="icon-[lucide--plus]" />}
-          >
-            Add field at head
-          </Button>
-        </Field>
-      </>
-    )}
-  </FieldList>
-  <Field>
-    <Button type="primary" htmlType="submit">
-      Submit
-    </Button>
-  </Field>
-</Form>
-```
+The recommended way to build forms using `zod` schema and `useForm`.
 
-### Form Modal
+<ComponentSource src="form/demo/basic.tsx" __comp__={BasicDemo} />
 
-```tsx
-type Props = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+### Complex Form (Shadcn Style)
 
-  initialValues: { id: string; name: string } | undefined;
-  onSuccess?: (data: { id: string; name: string }) => void;
-};
-export const InvoicePeriodFormModal = ({
-  open,
-  onOpenChange,
-  initialValues,
-  onSuccess,
-}: Props) => {
-  const queryClient = useQueryClient();
-  const insertMutation = useMutation({
-    onSettled: async (data, error) => {
-      if (data) {
-        message.success("Successfully!");
-        await queryClient.invalidateQueries({
-          queryKey: "",
-        });
-        onOpenChange(false);
-        onSuccess?.(data.data);
-      } else {
-        message.error("Failed!");
-      }
-    },
-  });
+A complex form example demonstrating various form fields and validation.
 
-  const form = useForm({
-    schema: InsertSchema,
-    values: initialValues,
-    onSubmit: (values) => {
-      insertMutation.mutate({
-        ...values,
-      });
-    },
-  });
+<ComponentSource src="form/demo/shadcn.tsx" __comp__={ShadcnDemo} />
 
-  return (
-    <>
-      <Modal
-        title="Form Modal"
-        open={open}
-        onOpenChange={onOpenChange}
-        onOk={async () => {
-          await form.submit();
-        }}
-        okText="Submit"
-        confirmLoading={insertMutation.isPending}
-      >
-        <Form form={form}>
-          <div className="grid grid-cols-1 gap-x-6 md:grid-cols-2">
-            <Field control={form.control} name="id" label="ID">
-              <Input />
-            </Field>
-            <Field control={form.control} name="name" label="Name">
-              <Input />
-            </Field>
-          </div>
-        </Form>
-      </Modal>
-    </>
-  );
-};
-```
+### Layout Control
+
+Control label layout using `labelCol` and `wrapperCol`, similar to Ant Design. This is useful for horizontal forms.
+
+<ComponentSource
+  src="form/demo/layout-multiple.tsx"
+  __comp__={LayoutMultipleDemo}
+/>
+
+### Ant Design Style (Legacy)
+
+> [!WARNING]
+> This style is supported for backward compatibility. Please use the Shadcn style for new forms.
+
+<ComponentSource src="form/demo/antd.tsx" __comp__={AntdDemo} />
+
+## API Reference
+
+### Form Props
+
+| Property     | Type                                     | Default      | Description                          |
+| ------------ | ---------------------------------------- | ------------ | ------------------------------------ |
+| `form`       | `UseFormReturn`                          | -            | The form instance from `useForm`     |
+| `layout`     | `"horizontal" \| "vertical" \| "inline"` | `"vertical"` | Form layout                          |
+| `labelCol`   | `ColProps`                               | -            | Label layout configuration           |
+| `wrapperCol` | `ColProps`                               | -            | Control wrapper layout configuration |
+| `labelAlign` | `"left" \| "right"`                      | `"right"`    | Label text alignment                 |
+| `labelWrap`  | `boolean`                                | `false`      | Whether label can wrap               |
+| `colon`      | `boolean`                                | `true`       | Whether to show colon after label    |
+| `disabled`   | `boolean`                                | `false`      | Whether to disable all form fields   |
+
+### Field Props
+
+| Property      | Type        | Default | Description                                    |
+| ------------- | ----------- | ------- | ---------------------------------------------- |
+| `control`     | `Control`   | -       | The control object from `useForm`              |
+| `name`        | `string`    | -       | The field name                                 |
+| `label`       | `ReactNode` | -       | The field label                                |
+| `description` | `ReactNode` | -       | The field description                          |
+| `tooltip`     | `ReactNode` | -       | Tooltip text or node                           |
+| `required`    | `boolean`   | `false` | Whether the field is required (shows asterisk) |
+
+### useForm
+
+We use `react-hook-form` under the hood. See [react-hook-form documentation](https://react-hook-form.com/docs/useform) for full API details.
