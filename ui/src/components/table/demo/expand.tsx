@@ -1,4 +1,3 @@
-"use client";
 
 import type { TableColumnsType } from "@/components/ui/table";
 import type React from "react";

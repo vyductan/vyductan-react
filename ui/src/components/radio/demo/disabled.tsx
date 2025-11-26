@@ -1,4 +1,3 @@
-"use client";
 
 import type React from "react";
 import { RadioGroup } from "@/components/ui/radio";

@@ -1,5 +1,3 @@
-"use client";
-
 import type { MenuProps } from "@/components/ui/menu";
 import type React from "react";
 import { Button } from "@/components/ui/button";

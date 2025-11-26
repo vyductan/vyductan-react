@@ -1,4 +1,3 @@
-"use client";
 
 import type { RadioChangeEvent } from "@/components/ui/radio";
 import type React from "react";

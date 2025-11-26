@@ -59,6 +59,82 @@ const config: StorybookConfig = {
 
     config.resolve.alias = aliasObj;
 
+    // Improve sourcemap configuration to resolve original locations
+    // Enable sourcemaps for better error reporting in both dev and build
+    config.build = config.build || {};
+    if (config.build.sourcemap === undefined) {
+      config.build.sourcemap = true;
+    }
+
+    // Ensure proper sourcemap generation in rollup
+    config.build.rollupOptions = config.build.rollupOptions || {};
+    if (!config.build.rollupOptions.output) {
+      config.build.rollupOptions.output = {};
+    }
+
+    // Configure sourcemap and code splitting for output
+    if (Array.isArray(config.build.rollupOptions.output)) {
+      config.build.rollupOptions.output = config.build.rollupOptions.output.map(
+        (output) => ({
+          ...output,
+          sourcemap: output.sourcemap !== false ? true : false,
+          manualChunks: output.manualChunks || createManualChunks,
+        }),
+      );
+    } else if (typeof config.build.rollupOptions.output === "object") {
+      config.build.rollupOptions.output = {
+        ...config.build.rollupOptions.output,
+        sourcemap:
+          config.build.rollupOptions.output.sourcemap !== false ? true : false,
+        manualChunks:
+          config.build.rollupOptions.output.manualChunks || createManualChunks,
+      };
+    }
+
+    // Configure sourcemap for dev server (where warnings occur)
+    config.server = config.server || {};
+    config.server.sourcemapIgnoreList =
+      config.server.sourcemapIgnoreList || false;
+
+    // Suppress harmless warnings in Storybook build
+    config.build = config.build || {};
+    config.build.rollupOptions = config.build.rollupOptions || {};
+    const originalOnWarn = config.build.rollupOptions.onwarn;
+    config.build.rollupOptions.onwarn = (warning, warn) => {
+      // Suppress "use client" directive warnings - these are harmless in Storybook
+      // Component files need "use client" for Next.js but it's ignored in Storybook
+      if (
+        warning.message?.includes('"use client"') ||
+        warning.message?.includes(
+          "Module level directives cause errors when bundled",
+        )
+      ) {
+        return;
+      }
+      // Suppress sourcemap resolution errors - these don't affect functionality
+      if (
+        warning.message?.includes(
+          "Error when using sourcemap for reporting an error",
+        ) ||
+        warning.message?.includes("Can't resolve original location of error")
+      ) {
+        return;
+      }
+      // Call original warn handler for other warnings
+      if (originalOnWarn) {
+        originalOnWarn(warning, warn);
+      } else {
+        warn(warning);
+      }
+    };
+
+    // Suppress harmless warnings by configuring log level filter
+    // Note: These warnings are harmless - "use client" is needed for Next.js
+    // but ignored in Storybook, and sourcemap errors don't affect functionality
+    if (!config.logLevel || config.logLevel === "info") {
+      // Keep info level but we'll filter specific warnings via onwarn
+    }
+
     // Add custom plugin to handle @acme/ui package resolution
     const originalPlugins = config.plugins || [];
     config.plugins = [
@@ -310,6 +386,107 @@ const config: StorybookConfig = {
     return config;
   },
 };
+
+// Manual chunks function for code splitting optimization
+function createManualChunks(id: string): string | undefined {
+  // React core libraries
+  if (
+    id.includes("node_modules/react/") ||
+    id.includes("node_modules/react-dom/") ||
+    id.includes("node_modules/react-is/") ||
+    id.includes("node_modules/scheduler/")
+  ) {
+    return "vendor-react";
+  }
+
+  // UI libraries - Radix UI
+  if (id.includes("node_modules/@radix-ui/")) {
+    return "vendor-radix-ui";
+  }
+
+  // UI libraries - Framer Motion
+  if (id.includes("node_modules/framer-motion/")) {
+    return "vendor-framer-motion";
+  }
+
+  // Syntax highlighters - Shiki and related
+  if (
+    id.includes("node_modules/shiki/") ||
+    id.includes("node_modules/@shikijs/") ||
+    id.includes("node_modules/vscode-oniguruma/") ||
+    id.includes("node_modules/vscode-textmate/")
+  ) {
+    return "vendor-syntax";
+  }
+
+  // WebAssembly and large binary dependencies
+  if (
+    id.includes("node_modules/@wasm-tool/") ||
+    id.includes(".wasm") ||
+    id.includes("wasm-tool")
+  ) {
+    return "vendor-wasm";
+  }
+
+  // Accessibility testing - axe-core
+  if (
+    id.includes("node_modules/axe-core/") ||
+    id.includes("node_modules/@axe-core/")
+  ) {
+    return "vendor-axe";
+  }
+
+  // Date/time utilities
+  if (
+    id.includes("node_modules/dayjs/") ||
+    id.includes("node_modules/date-fns/") ||
+    id.includes("node_modules/moment/")
+  ) {
+    return "vendor-date";
+  }
+
+  // Storybook addons and core
+  if (id.includes("node_modules/@storybook/") || id.includes("storybook/")) {
+    // Split Storybook addons separately
+    if (id.includes("@storybook/addon-")) {
+      return "storybook-addons";
+    }
+    // Storybook core can stay in main bundle or be split
+    return "storybook-core";
+  }
+
+  // Ant Design and RC components
+  if (
+    id.includes("node_modules/antd/") ||
+    id.includes("node_modules/rc-") ||
+    id.includes("node_modules/@rc-component/")
+  ) {
+    return "vendor-antd";
+  }
+
+  // Other large vendor libraries
+  if (id.includes("node_modules/")) {
+    // Group other node_modules into vendor chunk
+    // Extract package name from path
+    const match = id.match(/node_modules\/(@?[^/]+)/);
+    if (match) {
+      const packageName = match[1];
+      // Keep very large packages separate
+      if (
+        packageName.startsWith("@") ||
+        packageName.includes("lucide") ||
+        packageName.includes("clsx") ||
+        packageName.includes("class-variance-authority")
+      ) {
+        return "vendor-misc";
+      }
+    }
+    return "vendor";
+  }
+
+  return undefined;
+}
+
 export default config;
 
 function getAbsolutePath(value: string): any {

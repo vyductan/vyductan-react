@@ -1,4 +1,3 @@
-"use client";
 
 import type { TableProps } from "@/components/ui/table";
 import type React from "react";

@@ -1,4 +1,3 @@
-"use client";
 
 import type { ItemType } from "@/components/ui/menu";
 import type React from "react";

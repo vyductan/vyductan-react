@@ -1,5 +1,3 @@
-"use client";
-
 import type { Dayjs } from "dayjs";
 import type React from "react";
 import { useState } from "react";

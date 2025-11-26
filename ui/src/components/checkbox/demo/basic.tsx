@@ -1,4 +1,3 @@
-"use client";
 
 import type { CheckboxProps } from "@/components/ui/checkbox";
 import type React from "react";
