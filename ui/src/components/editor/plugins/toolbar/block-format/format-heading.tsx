@@ -8,9 +8,12 @@ import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";
 
 export function FormatHeading({ levels = [] }: { levels: HeadingTagType[] }) {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
-  const formatHeading = (headingSize: HeadingTagType) => {
+  const formatHeading = (headingSize: HeadingTagType) => (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     if (blockType !== headingSize) {
       activeEditor.update(() => {
         const selection = $getSelection();
@@ -23,7 +26,7 @@ export function FormatHeading({ levels = [] }: { levels: HeadingTagType[] }) {
     <SelectItem
       key={level}
       value={level}
-      onPointerDown={() => formatHeading(level)}
+      onSelect={formatHeading(level)}
     >
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[level]?.icon}

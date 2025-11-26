@@ -1,28 +1,27 @@
 .EditorTheme__code {
-  background-color: transparent;
-  font-family: Menlo, Consolas, Monaco, monospace;
+  background-color: rgba(247, 246, 243, 1);
+  font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
   display: block;
-  padding: 8px 8px 8px 52px;
-  line-height: 1.53;
-  font-size: 13px;
-  margin: 0;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding: 16px;
+  line-height: 1.5;
+  font-size: 14px;
+  margin: 4px 0;
   overflow-x: auto;
-  border: 1px solid #ccc;
+  border: none;
   position: relative;
-  border-radius: 8px;
+  border-radius: 3px;
   tab-size: 2;
+  color: rgba(55, 53, 47, 0.9);
 }
 .EditorTheme__code:before {
   content: attr(data-gutter);
   position: absolute;
   background-color: transparent;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid rgba(55, 53, 47, 0.09);
   left: 0;
   top: 0;
-  padding: 8px;
-  color: #777;
+  padding: 16px 8px;
+  color: rgba(55, 53, 47, 0.4);
   white-space: pre-wrap;
   text-align: right;
   min-width: 25px;
@@ -30,12 +29,13 @@
 .EditorTheme__table {
   border-collapse: collapse;
   border-spacing: 0;
-  overflow-y: scroll;
-  overflow-x: scroll;
+  overflow-y: auto;
+  overflow-x: auto;
   table-layout: fixed;
-  width: fit-content;
   width: 100%;
-  margin: 0px 25px 30px 0px;
+  margin: 4px 0;
+  border-radius: 3px;
+  border: 1px solid rgba(55, 53, 47, 0.09);
 }
 .EditorTheme__tokenComment {
   color: slategray;
@@ -63,21 +63,28 @@
 }
 
 .Collapsible__container {
-  background-color: var(--background);
-  border: 1px solid #ccc;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 3px;
+  margin: 2px 0;
+  transition: background-color 0.1s ease;
+}
+
+.Collapsible__container:hover {
+  background-color: rgba(55, 53, 47, 0.03);
 }
 
 .Collapsible__title {
-  padding: 0.25rem;
-  padding-left: 1rem;
+  padding: 3px 2px;
+  padding-left: 1.5rem;
   position: relative;
-  font-weight: bold;
+  font-weight: 600;
   outline: none;
   cursor: pointer;
   list-style-type: disclosure-closed;
   list-style-position: inside;
+  color: rgba(55, 53, 47, 0.9);
+  user-select: none;
 }
 
 .Collapsible__title p {
@@ -88,4 +95,284 @@
 }
 .Collapsible__container[open] > .Collapsible__title {
   list-style-type: disclosure-open;
+}
+
+/* Notion-like block hover effects */
+.ContentEditable__root [data-lexical-editor="true"] > * {
+  position: relative;
+  transition: background-color 0.1s ease;
+}
+
+.ContentEditable__root [data-lexical-editor="true"] > *:hover {
+  background-color: rgba(55, 53, 47, 0.03);
+  border-radius: 3px;
+}
+
+/* Better spacing for blocks */
+.ContentEditable__root [data-lexical-editor="true"] > * + * {
+  margin-top: 1px;
+}
+
+/* Ensure blocks have relative positioning for drag handle */
+.ContentEditable__root [data-lexical-editor="true"] > p,
+.ContentEditable__root [data-lexical-editor="true"] > h1,
+.ContentEditable__root [data-lexical-editor="true"] > h2,
+.ContentEditable__root [data-lexical-editor="true"] > h3,
+.ContentEditable__root [data-lexical-editor="true"] > h4,
+.ContentEditable__root [data-lexical-editor="true"] > h5,
+.ContentEditable__root [data-lexical-editor="true"] > h6,
+.ContentEditable__root [data-lexical-editor="true"] > blockquote,
+.ContentEditable__root [data-lexical-editor="true"] > ul,
+.ContentEditable__root [data-lexical-editor="true"] > ol,
+.ContentEditable__root [data-lexical-editor="true"] > pre {
+  position: relative;
+}
+
+/* Better quote styling - Notion-like */
+.ContentEditable__root [data-lexical-editor="true"] > blockquote {
+  border-left: 3px solid rgba(55, 53, 47, 0.16);
+  padding-left: 14px;
+  padding-right: 0;
+  margin: 4px 0;
+  color: rgba(55, 53, 47, 0.7);
+}
+
+/* Improve list styling */
+.ContentEditable__root [data-lexical-editor="true"] > ul,
+.ContentEditable__root [data-lexical-editor="true"] > ol {
+  margin: 2px 0;
+  padding-left: 24px;
+}
+
+/* Code block improvements */
+.ContentEditable__root [data-lexical-editor="true"] > pre {
+  margin: 4px 0;
+}
+
+/* Better focus states */
+.ContentEditable__root [data-lexical-editor="true"] > *:focus-within {
+  outline: none;
+}
+
+/* Improve empty state */
+.ContentEditable__root [data-lexical-editor="true"]:empty::before {
+  content: attr(aria-placeholder);
+  color: rgba(55, 53, 47, 0.4);
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Better placeholder styling when editor is focused */
+.ContentEditable__root [data-lexical-editor="true"]:focus:empty::before {
+  color: rgba(55, 53, 47, 0.35);
+}
+
+/* Drag and drop zone styling */
+.ContentEditable__root [data-lexical-editor="true"][data-drag-over="true"] {
+  background-color: rgba(55, 53, 47, 0.03);
+  border: 2px dashed rgba(55, 53, 47, 0.2);
+  border-radius: 4px;
+}
+
+/* Better selection */
+.ContentEditable__root ::selection {
+  background-color: rgba(55, 53, 47, 0.15);
+}
+
+/* Improve caret visibility */
+.ContentEditable__root [data-lexical-editor="true"] {
+  caret-color: rgba(55, 53, 47, 0.8);
+}
+
+/* Smooth transitions for all interactive elements */
+.ContentEditable__root [data-lexical-editor="true"] > * {
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+/* Better focus ring for accessibility */
+.ContentEditable__root [data-lexical-editor="true"]:focus {
+  outline: none;
+}
+
+/* Improve link hover states */
+.ContentEditable__root [data-lexical-editor="true"] a {
+  transition: text-decoration-color 0.15s ease;
+}
+
+/* Better code block selection */
+.EditorTheme__code ::selection {
+  background-color: rgba(55, 53, 47, 0.2);
+}
+
+/* Improve table interaction */
+.EditorTheme__table tbody tr {
+  transition: background-color 0.1s ease;
+}
+
+.EditorTheme__table tbody tr:hover {
+  background-color: rgba(55, 53, 47, 0.03);
+}
+
+/* Better block spacing on focus */
+.ContentEditable__root [data-lexical-editor="true"] > *:focus-within {
+  background-color: transparent;
+}
+
+/* Improve table cell styling */
+.EditorTheme__tableCell {
+  border: 1px solid rgba(55, 53, 47, 0.09);
+  padding: 8px 12px;
+  min-width: 100px;
+}
+
+.EditorTheme__tableCellHeader {
+  background-color: rgba(55, 53, 47, 0.03);
+  font-weight: 600;
+}
+
+/* Better horizontal rule */
+.ContentEditable__root [data-lexical-editor="true"] > hr {
+  border: none;
+  border-top: 1px solid rgba(55, 53, 47, 0.09);
+  margin: 8px 0;
+  height: 1px;
+}
+
+/* Improve image and media blocks */
+.ContentEditable__root [data-lexical-editor="true"] .editor-image,
+.ContentEditable__root [data-lexical-editor="true"] .inline-editor-image {
+  border-radius: 3px;
+  margin: 4px 0;
+  max-width: 100%;
+}
+
+/* Better text code inline styling */
+.ContentEditable__root [data-lexical-editor="true"] code {
+  background-color: rgba(247, 246, 243, 1);
+  color: #eb5757;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 85%;
+  font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
+}
+
+/* Improve link styling */
+.ContentEditable__root [data-lexical-editor="true"] a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(55, 53, 47, 0.4);
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.1s ease;
+}
+
+.ContentEditable__root [data-lexical-editor="true"] a:hover {
+  text-decoration-color: rgba(55, 53, 47, 0.6);
+}
+
+/* Better list item spacing */
+.ContentEditable__root [data-lexical-editor="true"] li {
+  margin: 1px 0;
+  padding-left: 2px;
+}
+
+/* Improve checkbox styling */
+.ContentEditable__root [data-lexical-editor="true"] input[type="checkbox"] {
+  margin-right: 6px;
+  cursor: pointer;
+  min-width: 18px;
+  min-height: 18px;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .ContentEditable__root [data-lexical-editor="true"] {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .ContentEditable__root [data-lexical-editor="true"] > h1 {
+    font-size: 1.75rem;
+  }
+
+  .ContentEditable__root [data-lexical-editor="true"] > h2 {
+    font-size: 1.5rem;
+  }
+
+  .ContentEditable__root [data-lexical-editor="true"] > h3 {
+    font-size: 1.25rem;
+  }
+
+  .EditorTheme__code {
+    font-size: 13px;
+    padding: 12px;
+  }
+
+  .EditorTheme__table {
+    font-size: 14px;
+  }
+
+  .EditorTheme__tableCell {
+    padding: 6px 8px;
+  }
+
+  /* Show drag handle on focus for better visibility */
+  .ContentEditable__root [data-lexical-editor="true"] > *:focus-within ~ .draggable-block-menu,
+  .ContentEditable__root [data-lexical-editor="true"] > *:hover ~ .draggable-block-menu {
+    opacity: 1 !important;
+  }
+
+  /* Hide drag handle on very small screens to save space */
+  @media (max-width: 480px) {
+    .draggable-block-menu {
+      display: none;
+    }
+  }
+
+  /* Better spacing for mobile */
+  .ContentEditable__root [data-lexical-editor="true"] > * {
+    margin-top: 2px;
+  }
+
+  /* Smaller quote padding on mobile */
+  .ContentEditable__root [data-lexical-editor="true"] > blockquote {
+    padding-left: 12px;
+    margin: 3px 0;
+  }
+
+  /* Compact list spacing */
+  .ContentEditable__root [data-lexical-editor="true"] > ul,
+  .ContentEditable__root [data-lexical-editor="true"] > ol {
+    padding-left: 20px;
+    margin: 2px 0;
+  }
+}
+
+/* Better focus ring for accessibility */
+.ContentEditable__root [data-lexical-editor="true"]:focus {
+  outline: none;
+}
+
+/* Improve empty paragraph handling */
+.ContentEditable__root [data-lexical-editor="true"] > p:empty::before {
+  content: "\200B"; /* Zero-width space to maintain height */
+}
+
+/* Better spacing for nested lists */
+.ContentEditable__root [data-lexical-editor="true"] ul ul,
+.ContentEditable__root [data-lexical-editor="true"] ol ol,
+.ContentEditable__root [data-lexical-editor="true"] ul ol,
+.ContentEditable__root [data-lexical-editor="true"] ol ul {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* Improve table row hover */
+.EditorTheme__table tbody tr:hover {
+  background-color: rgba(55, 53, 47, 0.03);
+}
+
+/* Better code block line numbers if present */
+.EditorTheme__code:before {
+  color: rgba(55, 53, 47, 0.4);
+  border-right-color: rgba(55, 53, 47, 0.09);
 }

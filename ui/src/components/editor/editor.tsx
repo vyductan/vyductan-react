@@ -1,9 +1,6 @@
 "use client";
 
-import type {
-  InitialConfigType,
-  InitialEditorStateType,
-} from "@lexical/react/LexicalComposer";
+import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState } from "lexical";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
@@ -27,26 +24,29 @@ const editorConfig: InitialConfigType = {
 export function Editor({
   value,
   onChange,
+  placeholder,
 }: {
-  value?: InitialEditorStateType;
-  onChange?: (editorState: EditorState) => void;
+  value?: string;
+  onChange?: (jsonString: string, editorState: EditorState) => void;
+  placeholder?: string;
 }) {
   return (
     <LexicalComposer
       initialConfig={{
         ...editorConfig,
-        editorState: typeof value === "object" ? JSON.stringify(value) : value,
+        editorState: value,
       }}
     >
       <TooltipProvider>
         <SharedAutocompleteContext>
           <FloatingLinkContext>
-            <Plugins />
+            <Plugins placeholder={placeholder} />
 
             <OnChangePlugin
               ignoreSelectionChange={true}
               onChange={(editorState) => {
-                onChange?.(editorState);
+                const jsonString = JSON.stringify(editorState.toJSON());
+                onChange?.(jsonString, editorState);
               }}
             />
           </FloatingLinkContext>

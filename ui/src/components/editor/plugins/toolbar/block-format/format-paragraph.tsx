@@ -12,9 +12,12 @@ import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/bloc
 const BLOCK_FORMAT_VALUE = "paragraph";
 
 export function FormatParagraph() {
-  const { activeEditor } = useToolbarContext();
+  const { activeEditor, formatHandledRef } = useToolbarContext();
 
-  const formatParagraph = () => {
+  const formatParagraph = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     activeEditor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -24,7 +27,7 @@ export function FormatParagraph() {
   };
 
   return (
-    <SelectItem value={BLOCK_FORMAT_VALUE} onPointerDown={formatParagraph}>
+    <SelectItem value={BLOCK_FORMAT_VALUE} onSelect={formatParagraph}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}

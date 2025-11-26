@@ -9,9 +9,12 @@ import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/bloc
 const BLOCK_FORMAT_VALUE = "quote";
 
 export function FormatQuote() {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
-  const formatQuote = () => {
+  const formatQuote = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     if (blockType !== "quote") {
       activeEditor.update(() => {
         const selection = $getSelection();
@@ -21,7 +24,7 @@ export function FormatQuote() {
   };
 
   return (
-    <SelectItem value="quote" onPointerDown={formatQuote}>
+    <SelectItem value="quote" onSelect={formatQuote}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}

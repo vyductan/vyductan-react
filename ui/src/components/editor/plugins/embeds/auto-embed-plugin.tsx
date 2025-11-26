@@ -34,10 +34,19 @@ import {
 } from "@lexical/react/LexicalAutoEmbedPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { PopoverPortal } from "@radix-ui/react-popover";
-import { FigmaIcon, YoutubeIcon } from "lucide-react";
+import {
+  FigmaIcon,
+  InstagramIcon,
+  YoutubeIcon,
+  TwitterIcon,
+  MusicIcon,
+} from "lucide-react";
 
 import { useEditorModal } from "../../editor-hooks/use-modal";
 import { INSERT_FIGMA_COMMAND } from "../../plugins/embeds/figma-plugin";
+import { INSERT_INSTAGRAM_COMMAND } from "../../plugins/embeds/instagram-plugin";
+import { INSERT_TIKTOK_COMMAND } from "../../plugins/embeds/tiktok-plugin";
+import { INSERT_TWITTER_COMMAND } from "../../plugins/embeds/twitter-plugin";
 import { INSERT_YOUTUBE_COMMAND } from "../../plugins/embeds/youtube-plugin";
 
 interface PlaygroundEmbedConfig extends EmbedConfig {
@@ -124,7 +133,91 @@ export const FigmaEmbedConfig: PlaygroundEmbedConfig = {
   type: "figma",
 };
 
-export const EmbedConfigs = [YoutubeEmbedConfig, FigmaEmbedConfig];
+export const TwitterEmbedConfig: PlaygroundEmbedConfig = {
+  contentName: "Twitter Tweet",
+  exampleUrl: "https://twitter.com/elonmusk/status/1234567890",
+  icon: <TwitterIcon className="size-4" />,
+  insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
+    editor.dispatchCommand(INSERT_TWITTER_COMMAND, result.id);
+  },
+  keywords: ["twitter", "tweet", "x.com"],
+  parseUrl: async (url: string) => {
+    // Match: https://twitter.com/username/status/1234567890
+    // or: https://x.com/username/status/1234567890
+    const match =
+      /(?:twitter\.com|x\.com)\/(?:\w+\/)?status\/(\d+)/.exec(url);
+
+    if (match && match[1]) {
+      return {
+        id: match[1],
+        url,
+      };
+    }
+
+    return null;
+  },
+  type: "twitter-tweet",
+};
+
+export const InstagramEmbedConfig: PlaygroundEmbedConfig = {
+  contentName: "Instagram Post",
+  exampleUrl: "https://www.instagram.com/p/ABC123/",
+  icon: <InstagramIcon className="size-4" />,
+  insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
+    editor.dispatchCommand(INSERT_INSTAGRAM_COMMAND, result.id);
+  },
+  keywords: ["instagram", "ig", "post"],
+  parseUrl: async (url: string) => {
+    // Match: https://www.instagram.com/p/ABC123/
+    const match = /instagram\.com\/p\/([A-Za-z0-9_-]+)/.exec(url);
+
+    if (match && match[1]) {
+      return {
+        id: match[1],
+        url,
+      };
+    }
+
+    return null;
+  },
+  type: "instagram-post",
+};
+
+export const TikTokEmbedConfig: PlaygroundEmbedConfig = {
+  contentName: "TikTok Video",
+  exampleUrl: "https://www.tiktok.com/@username/video/1234567890",
+  icon: <MusicIcon className="size-4" />,
+  insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
+    editor.dispatchCommand(INSERT_TIKTOK_COMMAND, {
+      videoId: result.id,
+      username: (result as any).username,
+    });
+  },
+  keywords: ["tiktok", "video", "short"],
+  parseUrl: async (url: string) => {
+    // Match: https://www.tiktok.com/@username/video/1234567890
+    const match = /tiktok\.com\/@(\w+)\/video\/(\d+)/.exec(url);
+
+    if (match && match[2]) {
+      return {
+        id: match[2],
+        url,
+        username: match[1],
+      };
+    }
+
+    return null;
+  },
+  type: "tiktok-video",
+};
+
+export const EmbedConfigs = [
+  YoutubeEmbedConfig,
+  FigmaEmbedConfig,
+  TwitterEmbedConfig,
+  InstagramEmbedConfig,
+  TikTokEmbedConfig,
+];
 
 const debounce = (callback: (text: string) => void, delay: number) => {
   let timeoutId: number;

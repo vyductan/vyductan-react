@@ -52,6 +52,7 @@ import {
   Heading3Icon,
   ImageIcon,
   ListChecksIcon,
+  VideoIcon,
   ListCollapseIcon,
   ListIcon,
   ListOrderedIcon,
@@ -61,6 +62,7 @@ import {
   ScissorsIcon,
   TableIcon,
   TextIcon,
+  PaperclipIcon,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
@@ -71,7 +73,10 @@ import { InsertEquationDialog } from "../plugins/equations-plugin";
 import { INSERT_EXCALIDRAW_COMMAND } from "../plugins/excalidraw-plugin";
 import { InsertImageDialog } from "../plugins/images-plugin";
 import { InsertLayoutDialog } from "../plugins/layout-plugin";
+import { InsertVideoDialog } from "../plugins/video-plugin";
+import { InsertFileAttachmentDialog } from "../plugins/file-attachment-plugin";
 import { INSERT_PAGE_BREAK } from "../plugins/page-break-plugin";
+import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
 import { InsertPollDialog } from "../plugins/poll-plugin";
 import { InsertTableDialog } from "../plugins/table-plugin";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
@@ -147,22 +152,34 @@ function getDynamicOptions(editor: LexicalEditor, queryString: string) {
 
 type ShowModal = ReturnType<typeof useEditorModal>[1];
 
-function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
-  return [
-    new ComponentPickerOption("Paragraph", {
-      icon: <TextIcon className="size-4" />,
-      keywords: ["normal", "paragraph", "p", "text"],
-      onSelect: () =>
-        editor.update(() => {
-          const selection = $getSelection();
-          if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createParagraphNode());
-          }
-        }),
-    }),
+type OptionCategory = "basic" | "media" | "embeds" | "advanced";
+
+interface CategorizedOption {
+  option: ComponentPickerOption;
+  category: OptionCategory;
+}
+
+function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): CategorizedOption[] {
+  const options: CategorizedOption[] = [
+    // Basic Blocks
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Paragraph", {
+        icon: <TextIcon className="size-4" />,
+        keywords: ["normal", "paragraph", "p", "text"],
+        onSelect: () =>
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              $setBlocksType(selection, () => $createParagraphNode());
+            }
+          }),
+      }),
+    },
     ...([1, 2, 3] as const).map(
-      (n) =>
-        new ComponentPickerOption(`Heading ${n}`, {
+      (n) => ({
+        category: "basic" as OptionCategory,
+        option: new ComponentPickerOption(`Heading ${n}`, {
           icon: <HeadingIcons n={n} />,
           keywords: ["heading", "header", `h${n}`],
           onSelect: () =>
@@ -173,137 +190,228 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal) {
               }
             }),
         }),
+      }),
     ),
-    new ComponentPickerOption("Table", {
-      icon: <TableIcon className="size-4" />,
-      keywords: ["table", "grid", "spreadsheet", "rows", "columns"],
-      onSelect: () =>
-        showModal("Insert Table", (onClose) => (
-          <InsertTableDialog activeEditor={editor} onClose={onClose} />
-        )),
-    }),
-    new ComponentPickerOption("Numbered List", {
-      icon: <ListOrderedIcon className="size-4" />,
-      keywords: ["numbered list", "ordered list", "ol"],
-      onSelect: () =>
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Bulleted List", {
-      icon: <ListIcon className="size-4" />,
-      keywords: ["bulleted list", "unordered list", "ul"],
-      onSelect: () =>
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Check List", {
-      icon: <ListTodoIcon className="size-4" />,
-      keywords: ["check list", "todo list"],
-      onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Quote", {
-      icon: <QuoteIcon className="size-4" />,
-      keywords: ["block quote"],
-      onSelect: () =>
-        editor.update(() => {
-          const selection = $getSelection();
-          if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createQuoteNode());
-          }
-        }),
-    }),
-    new ComponentPickerOption("Code", {
-      icon: <CodeIcon className="size-4" />,
-      keywords: ["javascript", "python", "js", "codeblock"],
-      onSelect: () =>
-        editor.update(() => {
-          const selection = $getSelection();
-
-          if ($isRangeSelection(selection)) {
-            if (selection.isCollapsed()) {
-              $setBlocksType(selection, () => $createCodeNode());
-            } else {
-              // Will this ever happen?
-              const textContent = selection.getTextContent();
-              const codeNode = $createCodeNode();
-              selection.insertNodes([codeNode]);
-              selection.insertRawText(textContent);
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Numbered List", {
+        icon: <ListOrderedIcon className="size-4" />,
+        keywords: ["numbered list", "ordered list", "ol"],
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Bulleted List", {
+        icon: <ListIcon className="size-4" />,
+        keywords: ["bulleted list", "unordered list", "ul"],
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Check List", {
+        icon: <ListTodoIcon className="size-4" />,
+        keywords: ["check list", "todo list"],
+        onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Quote", {
+        icon: <QuoteIcon className="size-4" />,
+        keywords: ["block quote"],
+        onSelect: () =>
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              $setBlocksType(selection, () => $createQuoteNode());
             }
-          }
-        }),
-    }),
-    new ComponentPickerOption("Divider", {
-      icon: <MinusIcon className="size-4" />,
-      keywords: ["horizontal rule", "divider", "hr"],
-      onSelect: () =>
-        editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Page Break", {
-      icon: <ScissorsIcon className="size-4" />,
-      keywords: ["page break", "divider"],
-      onSelect: () => editor.dispatchCommand(INSERT_PAGE_BREAK, void 0),
-    }),
-    new ComponentPickerOption("Excalidraw", {
-      icon: <FrameIcon className="size-4" />,
-      keywords: ["excalidraw", "diagram", "drawing"],
-      onSelect: () => editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Poll", {
-      icon: <ListChecksIcon className="size-4" />,
-      keywords: ["poll", "vote"],
-      onSelect: () =>
-        showModal("Insert Poll", (onClose) => (
-          <InsertPollDialog activeEditor={editor} onClose={onClose} />
-        )),
-    }),
-    ...EmbedConfigs.map(
-      (embedConfig) =>
-        new ComponentPickerOption(`Embed ${embedConfig.contentName}`, {
-          icon: embedConfig.icon,
-          keywords: [...embedConfig.keywords, "embed"],
-          onSelect: () =>
-            editor.dispatchCommand(INSERT_EMBED_COMMAND, embedConfig.type),
-        }),
-    ),
-    new ComponentPickerOption("Equation", {
-      icon: <DiffIcon className="size-4" />,
-      keywords: ["equation", "latex", "math"],
-      onSelect: () =>
-        showModal("Insert Equation", (onClose) => (
-          <InsertEquationDialog activeEditor={editor} onClose={onClose} />
-        )),
-    }),
-    new ComponentPickerOption("Image", {
-      icon: <ImageIcon className="size-4" />,
-      keywords: ["image", "photo", "picture", "file"],
-      onSelect: () =>
-        showModal("Insert Image", (onClose) => (
-          <InsertImageDialog activeEditor={editor} onClose={onClose} />
-        )),
-    }),
-    new ComponentPickerOption("Collapsible", {
-      icon: <ListCollapseIcon className="size-4" />,
-      keywords: ["collapse", "collapsible", "toggle"],
-      onSelect: () =>
-        editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, void 0),
-    }),
-    new ComponentPickerOption("Columns Layout", {
-      icon: <Columns3Icon className="size-4" />,
-      keywords: ["columns", "layout", "grid"],
-      onSelect: () =>
-        showModal("Insert Columns Layout", (onClose) => (
-          <InsertLayoutDialog activeEditor={editor} onClose={onClose} />
-        )),
-    }),
+          }),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Code", {
+        icon: <CodeIcon className="size-4" />,
+        keywords: ["javascript", "python", "js", "codeblock"],
+        onSelect: () =>
+          editor.update(() => {
+            const selection = $getSelection();
+
+            if ($isRangeSelection(selection)) {
+              if (selection.isCollapsed()) {
+                $setBlocksType(selection, () => $createCodeNode());
+              } else {
+                const textContent = selection.getTextContent();
+                const codeNode = $createCodeNode();
+                selection.insertNodes([codeNode]);
+                selection.insertRawText(textContent);
+              }
+            }
+          }),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Divider", {
+        icon: <MinusIcon className="size-4" />,
+        keywords: ["horizontal rule", "divider", "hr"],
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Table", {
+        icon: <TableIcon className="size-4" />,
+        keywords: ["table", "grid", "spreadsheet", "rows", "columns"],
+        onSelect: () =>
+          showModal("Insert Table", (onClose) => (
+            <InsertTableDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Collapsible", {
+        icon: <ListCollapseIcon className="size-4" />,
+        keywords: ["collapse", "collapsible", "toggle"],
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Columns Layout", {
+        icon: <Columns3Icon className="size-4" />,
+        keywords: ["columns", "layout", "grid"],
+        onSelect: () =>
+          showModal("Insert Columns Layout", (onClose) => (
+            <InsertLayoutDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
     ...(["left", "center", "right", "justify"] as const).map(
-      (alignment) =>
-        new ComponentPickerOption(`Align ${alignment}`, {
+      (alignment) => ({
+        category: "basic" as OptionCategory,
+        option: new ComponentPickerOption(`Align ${alignment}`, {
           icon: <AlignIcons alignment={alignment} />,
           keywords: ["align", "justify", alignment],
           onSelect: () =>
             editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, alignment),
         }),
+      }),
     ),
+
+    // Media
+    {
+      category: "media",
+      option: new ComponentPickerOption("Image", {
+        icon: <ImageIcon className="size-4" />,
+        keywords: ["image", "photo", "picture", "file"],
+        onSelect: () =>
+          showModal("Insert Image", (onClose) => (
+            <InsertImageDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
+    {
+      category: "media",
+      option: new ComponentPickerOption("Video", {
+        icon: <VideoIcon className="size-4" />,
+        keywords: ["video", "movie", "mp4", "webm"],
+        onSelect: () =>
+          showModal("Insert Video", (onClose) => (
+            <InsertVideoDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
+    {
+      category: "media",
+      option: new ComponentPickerOption("File Attachment", {
+        icon: <PaperclipIcon className="size-4" />,
+        keywords: ["file", "attachment", "pdf", "docx", "xlsx", "pptx", "zip"],
+        onSelect: () =>
+          showModal("Insert File Attachment", (onClose) => (
+            <InsertFileAttachmentDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
+
+    // Embeds
+    ...EmbedConfigs.map(
+      (embedConfig) => ({
+        category: "embeds" as OptionCategory,
+        option: new ComponentPickerOption(`Embed ${embedConfig.contentName}`, {
+          icon: embedConfig.icon,
+          keywords: [...embedConfig.keywords, "embed"],
+          onSelect: () =>
+            editor.dispatchCommand(INSERT_EMBED_COMMAND, embedConfig.type),
+        }),
+      }),
+    ),
+
+    // Advanced
+    {
+      category: "advanced",
+      option: new ComponentPickerOption("Table of Contents", {
+        icon: <ListIcon className="size-4" />,
+        keywords: ["toc", "table of contents", "contents", "index"],
+        onSelect: () => editor.dispatchCommand(INSERT_TOC_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "advanced",
+      option: new ComponentPickerOption("Page Break", {
+        icon: <ScissorsIcon className="size-4" />,
+        keywords: ["page break", "divider"],
+        onSelect: () => editor.dispatchCommand(INSERT_PAGE_BREAK, void 0),
+      }),
+    },
+    {
+      category: "advanced",
+      option: new ComponentPickerOption("Excalidraw", {
+        icon: <FrameIcon className="size-4" />,
+        keywords: ["excalidraw", "diagram", "drawing"],
+        onSelect: () => editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "advanced",
+      option: new ComponentPickerOption("Poll", {
+        icon: <ListChecksIcon className="size-4" />,
+        keywords: ["poll", "vote"],
+        onSelect: () =>
+          showModal("Insert Poll", (onClose) => (
+            <InsertPollDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
+    {
+      category: "advanced",
+      option: new ComponentPickerOption("Equation", {
+        icon: <DiffIcon className="size-4" />,
+        keywords: ["equation", "latex", "math"],
+        onSelect: () =>
+          showModal("Insert Equation", (onClose) => (
+            <InsertEquationDialog activeEditor={editor} onClose={onClose} />
+          )),
+      }),
+    },
   ];
+
+  return options;
 }
+
+const CATEGORY_LABELS: Record<OptionCategory, string> = {
+  basic: "Basic Blocks",
+  media: "Media",
+  embeds: "Embeds",
+  advanced: "Advanced",
+};
 
 export function ComponentPickerMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -315,22 +423,26 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   });
 
   const options = useMemo(() => {
-    const baseOptions = getBaseOptions(editor, showModal);
+    const categorizedOptions = getBaseOptions(editor, showModal);
+    const baseOptions = categorizedOptions.map((item) => item.option);
 
     if (!queryString) {
-      return baseOptions;
+      return categorizedOptions;
     }
 
     const regex = new RegExp(queryString, "i");
 
-    return [
-      ...getDynamicOptions(editor, queryString),
-      ...baseOptions.filter(
-        (option) =>
-          regex.test(option.title) ||
-          option.keywords.some((keyword) => regex.test(keyword)),
-      ),
-    ];
+    const filteredOptions = categorizedOptions.filter(
+      (item) =>
+        regex.test(item.option.title) ||
+        item.option.keywords.some((keyword) => regex.test(keyword)),
+    );
+
+    const dynamicOptions = getDynamicOptions(editor, queryString).map(
+      (option) => ({ category: "basic" as OptionCategory, option }),
+    );
+
+    return [...dynamicOptions, ...filteredOptions];
   }, [editor, queryString, showModal]);
 
   const onSelectOption = useCallback(
@@ -349,6 +461,27 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
     [editor],
   );
 
+  // Group options by category
+  const groupedOptions = useMemo(() => {
+    const groups: Record<OptionCategory, CategorizedOption[]> = {
+      basic: [],
+      media: [],
+      embeds: [],
+      advanced: [],
+    };
+
+    options.forEach((item) => {
+      groups[item.category].push(item);
+    });
+
+    return groups;
+  }, [options]);
+
+  // Calculate selected index across all options
+  const flatOptions = useMemo(() => {
+    return options.map((item) => item.option);
+  }, [options]);
+
   return (
     <>
       {modal}
@@ -356,54 +489,108 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
         onQueryChange={setQueryString}
         onSelectOption={onSelectOption}
         triggerFn={checkForTriggerMatch}
-        options={options}
+        options={flatOptions}
         menuRenderFn={(
           anchorElementRef,
           { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) => {
-          return anchorElementRef.current && options.length > 0
+          return anchorElementRef.current && flatOptions.length > 0
             ? createPortal(
-                <div className="fixed w-[250px] rounded-md shadow-md">
+                <div className="fixed w-[calc(100vw-2rem)] sm:w-[280px] max-w-[280px] rounded-lg border border-gray-200 bg-white shadow-lg z-50">
                   <CommandRoot
                     onKeyDown={(e) => {
                       if (e.key === "ArrowUp") {
                         e.preventDefault();
                         setHighlightedIndex(
                           selectedIndex === null
-                            ? options.length - 1
-                            : (selectedIndex - 1 + options.length) %
-                                options.length,
+                            ? flatOptions.length - 1
+                            : (selectedIndex - 1 + flatOptions.length) %
+                                flatOptions.length,
                         );
                       } else if (e.key === "ArrowDown") {
                         e.preventDefault();
                         setHighlightedIndex(
                           selectedIndex === null
                             ? 0
-                            : (selectedIndex + 1) % options.length,
+                            : (selectedIndex + 1) % flatOptions.length,
                         );
                       }
                     }}
                   >
-                    <CommandList>
-                      <CommandGroup>
-                        {options.map((option, index) => (
-                          <CommandItem
-                            key={option.key}
-                            value={option.title}
-                            onSelect={() => {
-                              selectOptionAndCleanUp(option);
-                            }}
-                            className={`flex items-center gap-2 ${
-                              selectedIndex === index
-                                ? "bg-accent"
-                                : "!bg-transparent"
-                            }`}
-                          >
-                            {option.icon}
-                            {option.title}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                    <CommandList className="max-h-[60vh] sm:max-h-[300px] overflow-y-auto p-1">
+                      {queryString ? (
+                        // When searching, show all results without categories
+                        <CommandGroup>
+                          {flatOptions.map((option, index) => (
+                            <CommandItem
+                              key={option.key}
+                              value={option.title}
+                              onSelect={() => {
+                                selectOptionAndCleanUp(option);
+                              }}
+                              className={`flex items-center gap-2 sm:gap-3 rounded-md px-2 sm:px-2 py-2 sm:py-1.5 text-sm transition-colors touch-manipulation ${
+                                selectedIndex === index
+                                  ? "bg-gray-100 text-gray-900"
+                                  : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                              }`}
+                            >
+                              <span className="flex-shrink-0 text-gray-500">
+                                {option.icon}
+                              </span>
+                              <span className="flex-1">{option.title}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ) : (
+                        // When not searching, show grouped by category
+                        <>
+                          {(Object.keys(groupedOptions) as OptionCategory[]).map(
+                            (category) => {
+                              const categoryOptions = groupedOptions[category];
+                              if (categoryOptions.length === 0) return null;
+
+                              let categoryStartIndex = 0;
+                              for (const cat of Object.keys(groupedOptions) as OptionCategory[]) {
+                                if (cat === category) break;
+                                categoryStartIndex += groupedOptions[cat].length;
+                              }
+
+                              return (
+                                <CommandGroup key={category}>
+                                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                    {CATEGORY_LABELS[category]}
+                                  </div>
+                                  {categoryOptions.map((item, itemIndex) => {
+                                    const globalIndex =
+                                      categoryStartIndex + itemIndex;
+                                    return (
+                                      <CommandItem
+                                        key={item.option.key}
+                                        value={item.option.title}
+                                        onSelect={() => {
+                                          selectOptionAndCleanUp(item.option);
+                                        }}
+                                        className={`flex items-center gap-2 sm:gap-3 rounded-md px-2 sm:px-2 py-2 sm:py-1.5 text-sm transition-colors touch-manipulation ${
+                                          selectedIndex === globalIndex
+                                            ? "bg-gray-100 text-gray-900"
+                                            : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                        }`}
+                                      >
+                                        <span className="flex-shrink-0 text-gray-500">
+                                          {item.option.icon}
+                                        </span>
+                                        <span className="flex-1">
+                                          {item.option.title}
+                                        </span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              );
+                            },
+                          )}
+                        </>
+                      )}
                     </CommandList>
                   </CommandRoot>
                 </div>,

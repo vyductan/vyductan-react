@@ -13,7 +13,7 @@ import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/bloc
 const BLOCK_FORMAT_VALUE = "bullet";
 
 export function FormatBulletedList() {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
   const formatParagraph = () => {
     activeEditor.update(() => {
@@ -24,7 +24,11 @@ export function FormatBulletedList() {
     });
   };
 
-  const formatBulletedList = () => {
+  const formatBulletedList = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Mark that format is being handled by onSelect
+    formatHandledRef.current = true;
     if (blockType === "number") {
       formatParagraph();
     } else {
@@ -33,7 +37,7 @@ export function FormatBulletedList() {
   };
 
   return (
-    <SelectItem value={BLOCK_FORMAT_VALUE} onPointerDown={formatBulletedList}>
+    <SelectItem value={BLOCK_FORMAT_VALUE} onSelect={formatBulletedList}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}

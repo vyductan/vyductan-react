@@ -238,16 +238,17 @@ export function DraggableBlockPlugin({
           <div
             ref={menuRef}
             data-slot="draggable-block-menu"
-            className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute -top-px left-0 flex cursor-grab items-center justify-center rounded-sm px-px leading-7 opacity-0 will-change-transform group-hover:opacity-100 hover:bg-gray-100 active:cursor-grabbing`}
+            className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute -left-6 sm:-left-7 top-0 flex h-7 w-5 sm:w-6 cursor-grab items-center justify-center rounded transition-all will-change-transform group-hover:opacity-100 hover:bg-gray-100 hover:scale-110 active:cursor-grabbing active:bg-gray-200 active:scale-95 opacity-0 touch-manipulation`}
+            title="Drag to reorder"
             onClick={handleMenuClick}
           >
-            <GripVerticalIcon className="size-4 opacity-30" />
+            <GripVerticalIcon className="size-4 text-gray-400" />
           </div>
         }
         targetLineComponent={
           <div
             ref={targetLineRef}
-            className="bg-secondary-foreground pointer-events-none absolute top-0 left-0 h-1 opacity-0 will-change-transform"
+            className="bg-primary pointer-events-none absolute top-0 left-0 h-0.5 opacity-0 will-change-transform transition-opacity"
           />
         }
         isOnMenu={isOnMenu}

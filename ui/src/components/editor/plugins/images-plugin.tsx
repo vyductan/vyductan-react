@@ -124,19 +124,34 @@ export function InsertImageUploadedDialogBody({
     <div className="grid gap-4 py-4">
       <div className="grid gap-2">
         <Label htmlFor="image-upload">Image Upload</Label>
-        <Input
-          id="image-upload"
-          type="file"
-          onChange={(e) => loadImage(e.target.files)}
-          accept="image/*"
-          data-test-id="image-modal-file-upload"
-        />
+        <div className="relative">
+          <Input
+            id="image-upload"
+            type="file"
+            onChange={(e) => loadImage(e.target.files)}
+            accept="image/*"
+            data-test-id="image-modal-file-upload"
+            className="cursor-pointer"
+          />
+          <p className="mt-1.5 text-xs text-gray-500">
+            Drag and drop an image here, or click to browse
+          </p>
+        </div>
       </div>
+      {src && (
+        <div className="rounded-lg border border-gray-200 p-2">
+          <img
+            src={src}
+            alt="Preview"
+            className="max-h-48 w-full rounded object-contain"
+          />
+        </div>
+      )}
       <div className="grid gap-2">
-        <Label htmlFor="alt-text">Alt Text</Label>
+        <Label htmlFor="alt-text">Alt Text (Optional)</Label>
         <Input
           id="alt-text"
-          placeholder="Descriptive alternative text"
+          placeholder="Descriptive alternative text for accessibility"
           onChange={(e) => setAltText(e.target.value)}
           value={altText}
           data-test-id="image-modal-alt-text-input"
@@ -147,8 +162,9 @@ export function InsertImageUploadedDialogBody({
         disabled={isDisabled}
         onClick={() => onClick({ altText, src })}
         data-test-id="image-modal-file-upload-btn"
+        className="w-full"
       >
-        Confirm
+        Insert Image
       </Button>
     </div>
   );

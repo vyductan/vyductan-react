@@ -13,7 +13,7 @@ import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/bloc
 const BLOCK_FORMAT_VALUE = "check";
 
 export function FormatCheckList() {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
   const formatParagraph = () => {
     activeEditor.update(() => {
@@ -24,7 +24,10 @@ export function FormatCheckList() {
     });
   };
 
-  const formatCheckList = () => {
+  const formatCheckList = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     if (blockType === "number") {
       formatParagraph();
     } else {
@@ -33,7 +36,7 @@ export function FormatCheckList() {
   };
 
   return (
-    <SelectItem value={BLOCK_FORMAT_VALUE} onPointerDown={formatCheckList}>
+    <SelectItem value={BLOCK_FORMAT_VALUE} onSelect={formatCheckList}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}

@@ -13,7 +13,7 @@ import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/bloc
 const BLOCK_FORMAT_VALUE = "number";
 
 export function FormatNumberedList() {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
   const formatParagraph = () => {
     activeEditor.update(() => {
@@ -24,7 +24,10 @@ export function FormatNumberedList() {
     });
   };
 
-  const formatNumberedList = () => {
+  const formatNumberedList = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     if (blockType === "number") {
       formatParagraph();
     } else {
@@ -33,7 +36,7 @@ export function FormatNumberedList() {
   };
 
   return (
-    <SelectItem value={BLOCK_FORMAT_VALUE} onPointerDown={formatNumberedList}>
+    <SelectItem value={BLOCK_FORMAT_VALUE} onSelect={formatNumberedList}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}
