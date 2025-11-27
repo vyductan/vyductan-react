@@ -8,8 +8,18 @@ import { reactConfig } from "@acme/eslint-config/react";
 
 export default defineConfig([
   {
-    ignores: ["dist/**", "./src/shadcn/*.tsx", "./src/hooks/use-mobile.ts"],
+    ignores: ["dist/**", "./src/shadcn/*.tsx", "./src/hooks/use-mobile.ts", "!.storybook"],
   },
   ...baseConfig,
   ...reactConfig,
+  // storybook.configs['flat/recommended'],
+  // ...storybook.configs["flat/recommended"],
+  // {
+  //   languageOptions: {
+  //     parserOptions: {
+  //       tsconfigRootDir: import.meta.dirname,
+  //       allowDefaultProject: [".storybook/**"],
+  //     },
+  //   },
+  // },
 ]);

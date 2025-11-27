@@ -1,15 +1,25 @@
-export type BadgeProps = React.ComponentProps<"span"> & {
+export type TagWithCountProps = React.ComponentProps<"span"> & {
   count?: React.ReactNode;
 
   /** Set offset of the badge dot [left, top] */
   offset?: [number, number];
 };
-export const InternalBadge = ({
+
+export const TagWithCount = ({
   count,
   children,
   offset,
+  className,
   ...restProps
-}: BadgeProps) => {
+}: TagWithCountProps) => {
+  if (!count) {
+    return (
+      <span className={className} {...restProps}>
+        {children}
+      </span>
+    );
+  }
+
   return (
     <span className="relative" {...restProps}>
       {children}

@@ -2,10 +2,10 @@ import type { ButtonProps } from "@/components/ui/button";
 import React, { useContext } from "react";
 import { Button } from "@/components/ui/button";
 
-import type { BadgeProps } from "../badge";
+import type { TagWithCountProps } from "../tag/tag-with-count";
 import type { TooltipProps } from "../tooltip";
 import type { FloatButtonElement } from "./types";
-import { Badge } from "../badge";
+import { TagWithCount } from "../tag/tag-with-count";
 import { Tooltip } from "../tooltip";
 import FloatButtonGroupContext from "./context";
 
@@ -17,7 +17,7 @@ export type FloatButtonProps = ButtonProps & {
   tooltip?: TooltipProps["title"];
   href?: string;
   target?: React.HTMLAttributeAnchorTarget;
-  badge?: Omit<BadgeProps, "status" | "text" | "title" | "children">;
+  badge?: Omit<TagWithCountProps, "status" | "text" | "title" | "children">;
   ["aria-label"]?: React.HtmlHTMLAttributes<HTMLElement>["aria-label"];
 };
 export const FloatButton = React.forwardRef<
@@ -53,7 +53,7 @@ export const FloatButton = React.forwardRef<
   );
 
   if ("badge" in props) {
-    buttonNode = <Badge {...badge}>{buttonNode}</Badge>;
+    buttonNode = <TagWithCount {...badge}>{buttonNode}</TagWithCount>;
   }
 
   if ("tooltip" in props) {

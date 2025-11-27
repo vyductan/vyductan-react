@@ -11,7 +11,8 @@
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
-    "storybook:build": "turbo run storybook:build",
+    "storybook:build": "turbo run storybook:build --filter=@acme/ui --",
+    "storybook:dev": "turbo run storybook:dev --filter=@acme/ui",
     "typecheck": "turbo run typecheck"
   },
   "prettier": "@acme/prettier-config",

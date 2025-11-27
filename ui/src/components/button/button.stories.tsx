@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Plus, Send, Trash2 } from "lucide-react";
+import { expect, fn, userEvent, within } from "storybook/test";
 
 import { Button } from "./button";
 
@@ -202,7 +203,7 @@ export const Loading: Story = {
       <Button {...args} loading icon={<Plus />}>
         Loading with Icon
       </Button>
-      <Button {...args} loading shape="circle" icon={<Plus />} />
+      <Button {...args} loading shape="circle" icon={<Plus />} aria-label="Loading" />
     </div>
   ),
   args: {
@@ -228,5 +229,87 @@ export const Disabled: Story = {
   args: {
     children: "Disabled",
     color: "primary",
+  },
+};
+
+// Interaction Testing - Test button click behavior
+export const InteractionTest: Story = {
+  args: {
+    children: "Click Me",
+    variant: "solid",
+    color: "primary",
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Click button and verify onClick is called", async () => {
+      // Find the button by its text
+      const button = canvas.getByRole("button", { name: /click me/i });
+
+      // Verify button is in the document and visible
+      await expect(button).toBeInTheDocument();
+      await expect(button).toBeVisible();
+
+      // Click the button
+      await userEvent.click(button);
+
+      // Assert that onClick was called
+      await expect(args.onClick).toHaveBeenCalled();
+      await expect(args.onClick).toHaveBeenCalledTimes(1);
+    });
+  },
+};
+
+// Interaction Testing - Test disabled button behavior
+export const InteractionDisabled: Story = {
+  args: {
+    children: "Disabled Button",
+    variant: "solid",
+    color: "primary",
+    disabled: true,
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Verify disabled button cannot be clicked", async () => {
+      const button = canvas.getByRole("button", { name: /disabled button/i });
+
+      // Verify button is disabled
+      await expect(button).toBeDisabled();
+
+      // Try to click (should not trigger onClick)
+      await userEvent.click(button);
+
+      // Assert that onClick was NOT called
+      await expect(args.onClick).not.toHaveBeenCalled();
+    });
+  },
+};
+
+// Interaction Testing - Test button with icon
+export const InteractionWithIcon: Story = {
+  args: {
+    children: "Add Item",
+    icon: <Plus className="size-4" />,
+    variant: "solid",
+    color: "primary",
+    onClick: fn(),
+  },
+  play: async ({ args, canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Click button with icon", async () => {
+      const button = canvas.getByRole("button", { name: /add item/i });
+
+      await expect(button).toBeInTheDocument();
+
+      // Click the button
+      await userEvent.click(button);
+
+      // Verify onClick was called
+      await expect(args.onClick).toHaveBeenCalledTimes(1);
+    });
   },
 };

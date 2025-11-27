@@ -3,6 +3,110 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { StorybookConfig } from "@storybook/nextjs-vite";
 
+function getAbsolutePath(value: string): any {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}
+
+// Manual chunks function for code splitting optimization
+function createManualChunks(id: string): string | undefined {
+  // React core libraries
+  if (
+    id.includes("node_modules/react/") ||
+    id.includes("node_modules/react-dom/") ||
+    id.includes("node_modules/react-is/") ||
+    id.includes("node_modules/scheduler/")
+  ) {
+    return "vendor-react";
+  }
+
+  // UI libraries - Radix UI
+  if (id.includes("node_modules/@radix-ui/")) {
+    return "vendor-radix-ui";
+  }
+
+  // UI libraries - Framer Motion
+  if (id.includes("node_modules/framer-motion/")) {
+    return "vendor-framer-motion";
+  }
+
+  // Syntax highlighters - Shiki and related
+  if (
+    id.includes("node_modules/shiki/") ||
+    id.includes("node_modules/@shikijs/") ||
+    id.includes("node_modules/vscode-oniguruma/") ||
+    id.includes("node_modules/vscode-textmate/")
+  ) {
+    return "vendor-syntax";
+  }
+
+  // WebAssembly and large binary dependencies
+  if (
+    id.includes("node_modules/@wasm-tool/") ||
+    id.includes(".wasm") ||
+    id.includes("wasm-tool")
+  ) {
+    return "vendor-wasm";
+  }
+
+  // Accessibility testing - axe-core
+  if (
+    id.includes("node_modules/axe-core/") ||
+    id.includes("node_modules/@axe-core/")
+  ) {
+    return "vendor-axe";
+  }
+
+  // Date/time utilities
+  if (
+    id.includes("node_modules/dayjs/") ||
+    id.includes("node_modules/date-fns/") ||
+    id.includes("node_modules/moment/")
+  ) {
+    return "vendor-date";
+  }
+
+  // Storybook addons and core
+  if (id.includes("node_modules/@storybook/") || id.includes("storybook/")) {
+    // Split Storybook addons separately
+    if (id.includes("@storybook/addon-")) {
+      return "storybook-addons";
+    }
+    // Storybook core can stay in main bundle or be split
+    return "storybook-core";
+  }
+
+  // Ant Design and RC components
+  if (
+    id.includes("node_modules/antd/") ||
+    id.includes("node_modules/rc-") ||
+    id.includes("node_modules/@rc-component/")
+  ) {
+    return "vendor-antd";
+  }
+
+  // Other large vendor libraries
+  if (id.includes("node_modules/")) {
+    // Group other node_modules into vendor chunk
+    // Extract package name from path
+    const match = id.match(/node_modules\/(@?[^/]+)/);
+    if (match) {
+      const packageName = match[1];
+      // Keep very large packages separate
+      if (
+        packageName.startsWith("@") ||
+        packageName.includes("lucide") ||
+        packageName.includes("clsx") ||
+        packageName.includes("class-variance-authority")
+      ) {
+        return "vendor-misc";
+      }
+    }
+    return "vendor";
+  }
+
+  return undefined;
+}
+
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
@@ -11,12 +115,23 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-a11y"),
     getAbsolutePath("@storybook/addon-themes"),
     getAbsolutePath("@storybook/addon-docs"),
+    // Only include vitest addon in development mode to avoid build issues
+    ...(process.env.NODE_ENV !== "production" &&
+    process.env.STORYBOOK_BUILD !== "true"
+      ? [getAbsolutePath("@storybook/addon-vitest")]
+      : []),
+    getAbsolutePath("@chromatic-com/storybook")
   ],
   framework: {
     name: getAbsolutePath("@storybook/nextjs-vite"),
     options: {},
   },
   async viteFinal(config) {
+    // Store Storybook's original define configuration to maintain internal module aliases
+    // This is critical for Storybook's internal modules like __STORYBOOK_MODULE_CORE_EVENTS__
+    // Storybook sets up these defines automatically, and we must preserve them
+    const originalDefine = config.define ? { ...config.define } : undefined;
+
     // Resolve @acme/ui package exports and TypeScript path aliases to source files
     const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
     config.resolve = config.resolve || {};
@@ -376,117 +491,33 @@ const config: StorybookConfig = {
               return resolvedTs;
             }
           }
+          // Handle @acme/hooks/* (workspace package)
+          // @acme/hooks exports: "./*": "./src/*/index.ts"
+          // So @acme/hooks/use-responsive -> @acme/hooks/src/use-responsive/index.ts
+          if (id.startsWith("@acme/hooks/")) {
+            const hooksRoot = resolve(projectRoot, "../hooks");
+            const path = id.replace("@acme/hooks/", "");
+            // Resolve to src/{path}/index.ts based on export pattern
+            const resolved = resolve(hooksRoot, `src/${path}/index.ts`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
           return null;
         },
       },
     ];
 
+    // Restore Storybook's original define configuration to ensure internal modules work
+    // Merge with any defines that might have been added during config modifications
+    // Always ensure define exists as an object to prevent undefined errors
+    config.define = {
+      ...(originalDefine || {}),
+      ...(config.define || {}),
+    };
+
     return config;
   },
 };
 
-// Manual chunks function for code splitting optimization
-function createManualChunks(id: string): string | undefined {
-  // React core libraries
-  if (
-    id.includes("node_modules/react/") ||
-    id.includes("node_modules/react-dom/") ||
-    id.includes("node_modules/react-is/") ||
-    id.includes("node_modules/scheduler/")
-  ) {
-    return "vendor-react";
-  }
-
-  // UI libraries - Radix UI
-  if (id.includes("node_modules/@radix-ui/")) {
-    return "vendor-radix-ui";
-  }
-
-  // UI libraries - Framer Motion
-  if (id.includes("node_modules/framer-motion/")) {
-    return "vendor-framer-motion";
-  }
-
-  // Syntax highlighters - Shiki and related
-  if (
-    id.includes("node_modules/shiki/") ||
-    id.includes("node_modules/@shikijs/") ||
-    id.includes("node_modules/vscode-oniguruma/") ||
-    id.includes("node_modules/vscode-textmate/")
-  ) {
-    return "vendor-syntax";
-  }
-
-  // WebAssembly and large binary dependencies
-  if (
-    id.includes("node_modules/@wasm-tool/") ||
-    id.includes(".wasm") ||
-    id.includes("wasm-tool")
-  ) {
-    return "vendor-wasm";
-  }
-
-  // Accessibility testing - axe-core
-  if (
-    id.includes("node_modules/axe-core/") ||
-    id.includes("node_modules/@axe-core/")
-  ) {
-    return "vendor-axe";
-  }
-
-  // Date/time utilities
-  if (
-    id.includes("node_modules/dayjs/") ||
-    id.includes("node_modules/date-fns/") ||
-    id.includes("node_modules/moment/")
-  ) {
-    return "vendor-date";
-  }
-
-  // Storybook addons and core
-  if (id.includes("node_modules/@storybook/") || id.includes("storybook/")) {
-    // Split Storybook addons separately
-    if (id.includes("@storybook/addon-")) {
-      return "storybook-addons";
-    }
-    // Storybook core can stay in main bundle or be split
-    return "storybook-core";
-  }
-
-  // Ant Design and RC components
-  if (
-    id.includes("node_modules/antd/") ||
-    id.includes("node_modules/rc-") ||
-    id.includes("node_modules/@rc-component/")
-  ) {
-    return "vendor-antd";
-  }
-
-  // Other large vendor libraries
-  if (id.includes("node_modules/")) {
-    // Group other node_modules into vendor chunk
-    // Extract package name from path
-    const match = id.match(/node_modules\/(@?[^/]+)/);
-    if (match) {
-      const packageName = match[1];
-      // Keep very large packages separate
-      if (
-        packageName.startsWith("@") ||
-        packageName.includes("lucide") ||
-        packageName.includes("clsx") ||
-        packageName.includes("class-variance-authority")
-      ) {
-        return "vendor-misc";
-      }
-    }
-    return "vendor";
-  }
-
-  return undefined;
-}
-
 export default config;
-
-function getAbsolutePath(value: string): any {
-  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
-}

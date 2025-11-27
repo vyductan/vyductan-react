@@ -88,6 +88,16 @@ const Button = ({
     variant: variantConfig,
   } = useComponentConfig("button");
 
+  // Validate accessibility for icon-only buttons
+  const isIconOnly = (!!icon || loading) && !children && !srOnly;
+  const hasAccessibleName = !!props["aria-label"] || props["aria-labelledby"];
+
+  if (process.env.NODE_ENV !== "production" && isIconOnly && !hasAccessibleName) {
+    console.warn(
+      "Button: Icon-only buttons must have an accessible name. Please provide either 'aria-label' or 'aria-labelledby' prop."
+    );
+  }
+
   const size = sizeProp ?? sizeConfig;
 
   const type = typeProp ?? typeConfig ?? "default";
