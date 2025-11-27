@@ -90,6 +90,7 @@
     "embla-carousel-react": "^8.6.0",
     "katex": "0.16.25",
     "lexical": "^0.38.2",
+    "lodash": "^4.17.21",
     "lucide-react": "catalog:",
     "motion": "^12.23.24",
     "next-themes": "catalog:",

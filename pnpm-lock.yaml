@@ -369,6 +369,9 @@ importers:
       lexical:
         specifier: ^0.38.2
         version: 0.38.2
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lucide-react:
         specifier: 'catalog:'
         version: 0.552.0(react@19.2.0)
