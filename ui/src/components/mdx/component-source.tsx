@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { Card } from "@/components/ui/card";
 
 import { CollapsibleCodeBlock } from "./collapsible-code-block";
@@ -10,73 +8,21 @@ type CompDemoProps = {
 };
 
 const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
-  // const [code, setCode] = useState("");
+  // Component source code display for Storybook
+  // Note: File reading happens at build time via Storybook's source loader addon
+  // The 'src' prop is used for reference/display purposes only
 
-  // useEffect(() => {
-  //   let aborted = false;
-  //   const params = new URLSearchParams();
-  //   if (src) params.set("src", src);
-  //   if (from) params.set("from", from);
-
-  //   fetch(`/api/code?${params.toString()}`)
-  //     .then((r) => r.text())
-  //     .then((t) => {
-  //       if (!aborted) setCode(t || (typeof src === "string" ? src : ""));
-  //     })
-  //     .catch(() => {
-  //       if (!aborted) setCode(typeof src === "string" ? src : "");
-  //     });
-
-  //   return () => {
-  //     aborted = true;
-  //   };
-  // }, [src, from]);
-
-  let fileContent = "";
-  let absolutePath = "";
-  let componentPath = "";
-  let language = "";
+  let language = "tsx";
 
   if (typeof src === "string") {
-    try {
-      absolutePath = path.resolve(
-        process.cwd(),
-        "../../@acme/ui/src/components/" + src,
-      );
-      componentPath = "@/components/ui/" + src.replace(".tsx", "");
-      language = src.split(".")[1] ?? "tsx";
-      if (absolutePath && fs.existsSync(absolutePath)) {
-        fileContent = fs.readFileSync(absolutePath, "utf8");
-      }
-
-      // if (src.startsWith(".")) {
-      //   if (typeof from === "string") {
-      //     const url = new URL(src, from);
-      //     absolutePath = fileURLToPath(url);
-      //   } else {
-      //     absolutePath = path.resolve(process.cwd(), src);
-      //   }
-      // } else if (path.isAbsolute(src)) {
-      //   absolutePath = src;
-      // }
-
-      // if (absolutePath && fs.existsSync(absolutePath)) {
-      //   fileContent = fs.readFileSync(absolutePath, "utf8");
-      // }
-      console.log(
-        "fileContent",
-        componentPath,
-        // fileContent,
-        // absolutePath,
-        // process.cwd(),
-        // path.resolve(process.cwd(), "../../@acme/ui/src/components/" + src),
-      );
-    } catch {
-      // ignore and fallback
-    }
+    const extension = src.split(".").pop();
+    language =
+      extension === "ts" || extension === "tsx" ? "tsx" : (extension ?? "tsx");
   }
 
-  const content = fileContent || (typeof src === "string" ? src : "");
+  // The actual source code will be provided by Storybook's source addon
+  // For now, use the src path as placeholder content
+  const content = typeof src === "string" ? src : "";
 
   // Dynamic import không thể dùng với biến - cần static string literal
   // Giải pháp: Dùng __comp__ prop đã được pass vào (đơn giản nhất)

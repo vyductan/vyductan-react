@@ -33,3 +33,4 @@ catalogs:
 onlyBuiltDependencies:
   - esbuild
   - sharp
+  - core-js-pure
