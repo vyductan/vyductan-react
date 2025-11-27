@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 import type { ProgressProps } from "..";
@@ -37,20 +37,19 @@ export interface ColorGradientProps {
   gapDegree: number;
 }
 
-const PtgCircle = React.forwardRef<SVGCircleElement, ColorGradientProps>(
-  (props, ref) => {
-    const {
-      color,
-      gradientId,
-      radius,
-      className,
-      style: circleStyleForStack,
-      ptg,
-      strokeLinecap,
-      strokeWidth,
-      size,
-      gapDegree,
-    } = props;
+const PtgCircle = ({
+  color,
+  gradientId,
+  radius,
+  className,
+  style: circleStyleForStack,
+  ptg,
+  strokeLinecap,
+  strokeWidth,
+  size,
+  gapDegree,
+  ref,
+}: ColorGradientProps & { ref?: React.Ref<SVGCircleElement> }) => {
 
     const isGradient = color && typeof color === "object";
 
@@ -108,8 +107,7 @@ const PtgCircle = React.forwardRef<SVGCircleElement, ColorGradientProps>(
         </foreignObject>
       </>
     );
-  },
-);
+};
 
 if (process.env.NODE_ENV !== "production") {
   PtgCircle.displayName = "PtgCircle";

@@ -1,4 +1,4 @@
-import type { ForwardedRef } from "react";
+import type { Ref } from "react";
 import React from "react";
 import { useMergedState } from "@rc-component/util";
 import { format } from "date-fns";
@@ -17,16 +17,14 @@ type MonthPickerProps = {
   value?: number;
   onChange?: (value?: number) => void;
 };
-const MonthPickerInternal = (
-  {
-    id: inputId,
-    open: openProp,
+const MonthPicker = ({
+  id: inputId,
+  open: openProp,
 
-    value,
-    onChange,
-  }: MonthPickerProps,
-  ref: ForwardedRef<HTMLDivElement>,
-) => {
+  value,
+  onChange,
+  ref,
+}: MonthPickerProps & { ref?: Ref<HTMLDivElement> }) => {
   const [open, setOpen] = useMergedState(false, {
     value: openProp,
   });
@@ -123,8 +121,5 @@ const MonthPickerInternal = (
     </Popover>
   );
 };
-export const MonthPicker = React.forwardRef(MonthPickerInternal) as (
-  props: MonthPickerProps & {
-    ref?: React.ForwardedRef<HTMLInputElement>;
-  },
-) => ReturnType<typeof MonthPickerInternal>;
+
+export { MonthPicker };

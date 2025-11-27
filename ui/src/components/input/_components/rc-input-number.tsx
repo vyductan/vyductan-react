@@ -700,24 +700,23 @@ const InternalInputNumber = ({
   );
 };
 
-const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
-  (props, ref) => {
-    const {
-      disabled,
-      style,
-      value,
-      prefix,
-      suffix: _suffix,
-      addonBefore,
-      addonAfter,
-      className,
-      classNames,
-      allowClear,
-      controls = true,
-      upHandler,
-      downHandler,
-      ...rest
-    } = props;
+const InputNumber = ({
+  disabled,
+  style,
+  value,
+  prefix,
+  suffix: _suffix,
+  addonBefore,
+  addonAfter,
+  className,
+  classNames,
+  allowClear,
+  controls = true,
+  upHandler,
+  downHandler,
+  ref,
+  ...rest
+}: InputNumberProps & { ref?: React.Ref<InputNumberRef> }) => {
 
     const holderRef = React.useRef<HolderRef>(null);
     const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
@@ -846,12 +845,7 @@ const InputNumber = React.forwardRef<InputNumberRef, InputNumberProps>(
         />
       </BaseInput>
     );
-  },
-) as <T extends ValueType = ValueType>(
-  props: React.PropsWithChildren<InputNumberProps<T>> & {
-    ref?: React.Ref<HTMLInputElement>;
-  },
-) => React.ReactElement;
+};
 export default InputNumber;
 export type { InputNumberProps };
 

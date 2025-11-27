@@ -13,6 +13,7 @@
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "storybook:build": "turbo run storybook:build --filter=@acme/ui --",
     "storybook:dev": "turbo run storybook:dev --filter=@acme/ui",
+    "storybook:preview": "turbo run storybook:preview --filter=@acme/ui",
     "typecheck": "turbo run typecheck"
   },
   "prettier": "@acme/prettier-config",

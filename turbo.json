@@ -17,6 +17,10 @@
       "cache": false,
       "persistent": true
     },
+    "storybook:preview": {
+      "cache": false,
+      "persistent": true
+    },
     "dev": {
       "dependsOn": ["^dev"],
       "cache": false,

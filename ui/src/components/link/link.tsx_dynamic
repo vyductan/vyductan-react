@@ -1,6 +1,6 @@
 import type { LinkProps as NextLinkProps } from "next/link";
-import type { AnchorHTMLAttributes, DetailedHTMLProps } from "react";
-import { forwardRef, useEffect, useState } from "react";
+import type { AnchorHTMLAttributes, DetailedHTMLProps, Ref } from "react";
+import { useEffect, useState } from "react";
 
 // import NextLink from "next/link";
 // import { Link as RrdLink } from "react-router-dom";
@@ -14,7 +14,11 @@ type LinkProps = NextLinkProps &
     "href"
   >;
 // const X = globalThis.next ? NextLink : RrdLink;
-const Link = forwardRef(({ href, ...props }: LinkProps, ref) => {
+const Link = ({
+  href,
+  ref,
+  ...props
+}: LinkProps & { ref?: Ref<HTMLAnchorElement> }) => {
   const isNextJs = (
     globalThis as unknown as {
       next: { version: string; appDir: boolean } | undefined;
@@ -50,5 +54,5 @@ const Link = forwardRef(({ href, ...props }: LinkProps, ref) => {
       {...props}
     />
   );
-});
+};
 export { Link };

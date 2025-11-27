@@ -78,10 +78,7 @@ const spanToTailwindClass: Record<number, string> = {
 };
 
 const sizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
-const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
-  const { direction } = React.useContext(ConfigContext);
-  const { gutter, wrap } = React.useContext(RowContext);
-
+const Col = (props: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
   const {
     span,
     order,
@@ -94,6 +91,8 @@ const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
     style,
     ...others
   } = props;
+  const { direction } = React.useContext(ConfigContext);
+  const { gutter, wrap } = React.useContext(RowContext);
 
   // ===================== Size ======================
   const sizeStyle: Record<string, string> = {};
@@ -193,118 +192,14 @@ const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
       {...others}
       style={{ ...mergedStyle, ...style, ...sizeStyle }}
       className={classes}
-      ref={ref}
     >
       {children}
     </div>
   );
-});
+};
 
 if (process.env.NODE_ENV !== "production") {
   Col.displayName = "Col";
 }
 
 export default Col;
-
-// import * as React from "react"
-// import { cn } from "@/lib/utils"
-
-// export type ColSize = {
-//   span?: number
-//   order?: number
-//   offset?: number
-//   push?: number
-//   pull?: number
-// }
-
-// export interface ColProps extends React.HTMLAttributes<HTMLDivElement> {
-//   span?: number
-//   order?: number
-//   offset?: number
-//   push?: number
-//   pull?: number
-//   xs?: number | ColSize
-//   sm?: number | ColSize
-//   md?: number | ColSize
-//   lg?: number | ColSize
-//   xl?: number | ColSize
-//   xxl?: number | ColSize
-//   className?: string
-//   style?: React.CSSProperties
-// }
-
-// const Col = React.forwardRef<HTMLDivElement, ColProps>(
-//   (
-//     {
-//       span,
-//       order,
-//       offset,
-//       push,
-//       pull,
-//       xs,
-//       sm,
-//       md,
-//       lg,
-//       xl,
-//       xxl,
-//       className,
-//       style,
-//       children,
-//       ...props
-//     },
-//     ref
-//   ) => {
-//     const sizeClasses: string[] = []
-//     const sizeProps = { xs, sm, md, lg, xl, xxl }
-
-//     // Handle span, order, offset, push, pull for all sizes
-//     Object.entries(sizeProps).forEach(([size, sizeProp]) => {
-//       if (typeof sizeProp === 'number') {
-//         sizeClasses.push(`col-${size}-${sizeProp}`)
-//       } else if (sizeProp) {
-//         const sizeClass = [`col-${size}-${sizeProp.span || 'auto'}`]
-//         if (sizeProp.offset) sizeClass.push(`col-${size}-offset-${sizeProp.offset}`)
-//         if (sizeProp.order) sizeClass.push(`col-${size}-order-${sizeProp.order}`)
-//         if (sizeProp.push) sizeClass.push(`col-${size}-push-${sizeProp.push}`)
-//         if (sizeProp.pull) sizeClass.push(`col-${size}-pull-${sizeProp.pull}`)
-//         sizeClasses.push(...sizeClass)
-//       }
-//     })
-
-//     // Base grid classes
-//     const baseClasses = []
-//     if (span) {
-//       baseClasses.push(`col-span-${span}`)
-//     } else if (!xs && !sm && !md && !lg && !xl && !xxl) {
-//       // If no size props are provided, default to full width
-//       baseClasses.push('flex-1')
-//     }
-
-//     // Handle order, offset, push, pull for default size
-//     if (order) baseClasses.push(`order-${order}`)
-//     if (offset) baseClasses.push(`ml-${offset}/12`)
-//     if (push) baseClasses.push(`ml-${push}/12`)
-//     if (pull) baseClasses.push(`-ml-${pull}/12`)
-
-//     return (
-//       <div
-//         ref={ref}
-//         className={cn(
-//           'relative min-w-0',
-//           baseClasses,
-//           sizeClasses,
-//           className
-//         )}
-//         style={style}
-//         {...props}
-//       >
-//         {children}
-//       </div>
-//     )
-//   }
-// )
-
-// Col.displayName = 'Col'
-
-// export { Col }
-// export default Col

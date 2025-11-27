@@ -59,74 +59,68 @@ const sizeMap = {
  * A component for creating consistent spacing between elements.
  * Follows Ant Design's Space API but with Shadcn UI styling.
  */
-const Space = React.forwardRef<HTMLDivElement, SpaceProps>(
-  (
+const Space = ({
+  direction = "horizontal",
+  size = "small",
+  wrap = false,
+  children,
+  className,
+  align,
+  style,
+  split,
+  ...props
+}: SpaceProps & { ref?: React.Ref<HTMLDivElement> }) => {
+  const gap = typeof size === "number" ? size : sizeMap[size];
+
+  const mergedStyle: React.CSSProperties = {
+    gap: `${gap}px`,
+    ...style,
+  };
+
+  const classes = cn(
+    "flex",
     {
-      direction = "horizontal",
-      size = "small",
-      wrap = false,
-      children,
-      className,
-      align,
-      style,
-      split,
-      ...props
+      "flex-row": direction === "horizontal",
+      "flex-col": direction === "vertical",
+      "flex-wrap": wrap,
+      "items-start": align === "start",
+      "items-end": align === "end",
+      "items-center": align === "center",
+      "items-baseline": align === "baseline",
     },
-    ref,
-  ) => {
-    const gap = typeof size === "number" ? size : sizeMap[size];
+    className,
+  );
 
-    const mergedStyle: React.CSSProperties = {
-      gap: `${gap}px`,
-      ...style,
-    };
-
-    const classes = cn(
-      "flex",
-      {
-        "flex-row": direction === "horizontal",
-        "flex-col": direction === "vertical",
-        "flex-wrap": wrap,
-        "items-start": align === "start",
-        "items-end": align === "end",
-        "items-center": align === "center",
-        "items-baseline": align === "baseline",
-      },
-      className,
-    );
-
-    const childNodes = React.Children.toArray(children);
-    const nodes = childNodes.map((child, i) => {
-      const key =
-        (child && typeof child === "object" && "key" in child
-          ? child.key
-          : null) ?? i;
-
-      return (
-        <React.Fragment key={key}>
-          {i > 0 && split && (
-            <span className="inline-flex items-center" aria-hidden>
-              {split}
-            </span>
-          )}
-          {child}
-        </React.Fragment>
-      );
-    });
+  const childNodes = React.Children.toArray(children);
+  const nodes = childNodes.map((child, i) => {
+    const key =
+      (child && typeof child === "object" && "key" in child
+        ? child.key
+        : null) ?? i;
 
     return (
-      <div
-        data-slot="space"
-        ref={ref}
-        className={classes}
-        style={mergedStyle}
-        {...props}
-      >
-        {nodes}
-      </div>
+      <React.Fragment key={key}>
+        {i > 0 && split && (
+          <span className="inline-flex items-center" aria-hidden>
+            {split}
+          </span>
+        )}
+        {child}
+      </React.Fragment>
     );
-  },
-);
+  });
+
+  return (
+    <div
+      data-slot="space"
+      className={classes}
+      style={mergedStyle}
+      {...props}
+    >
+      {nodes}
+    </div>
+  );
+};
 
 Space.displayName = "Space";
 

@@ -20,17 +20,13 @@ export type FloatButtonProps = ButtonProps & {
   badge?: Omit<TagWithCountProps, "status" | "text" | "title" | "children">;
   ["aria-label"]?: React.HtmlHTMLAttributes<HTMLElement>["aria-label"];
 };
-export const FloatButton = React.forwardRef<
-  FloatButtonElement,
-  FloatButtonProps
->((props, ref) => {
-  const {
-    shape = "circle",
-    tooltip,
-    badge = {},
-
-    ...restProps
-  } = props;
+export const FloatButton = ({
+  shape = "circle",
+  tooltip,
+  badge = {},
+  ref,
+  ...restProps
+}: FloatButtonProps & { ref?: React.Ref<FloatButtonElement> }) => {
   const groupShape = useContext(FloatButtonGroupContext);
 
   const mergeShape = groupShape ?? shape;
@@ -52,11 +48,11 @@ export const FloatButton = React.forwardRef<
     </div>
   );
 
-  if ("badge" in props) {
+  if (badge && Object.keys(badge).length > 0) {
     buttonNode = <TagWithCount {...badge}>{buttonNode}</TagWithCount>;
   }
 
-  if ("tooltip" in props) {
+  if (tooltip) {
     buttonNode = <Tooltip title={tooltip}>{buttonNode}</Tooltip>;
   }
 
@@ -71,7 +67,7 @@ export const FloatButton = React.forwardRef<
   //       {buttonNode}
   //     </button>
   //   )
-});
+};
 
 if (process.env.NODE_ENV !== "production") {
   FloatButton.displayName = "FloatButton";

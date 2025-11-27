@@ -65,73 +65,68 @@ interface FlexProps extends React.HTMLAttributes<HTMLDivElement> {
  * A flexible layout component that provides a simple way to create flexbox layouts.
  * Similar to Ant Design's Flex component but with enhanced TypeScript support.
  */
-const Flex = React.forwardRef<HTMLDivElement, FlexProps>(
-  (
+const Flex = ({
+  direction = "row",
+  vertical = false,
+  justify = "start",
+  align = "start",
+  wrap = false,
+  gap = 0,
+  children,
+  className,
+  style,
+  inline = false,
+  ...props
+}: FlexProps & { ref?: React.Ref<HTMLDivElement> }) => {
+  const gapValue = typeof gap === "number" ? `${gap}px` : gap;
+
+  const mergedStyle: React.CSSProperties = {
+    gap: gapValue,
+    ...style,
+  };
+
+  // Determine the actual direction based on vertical prop
+  const actualDirection = vertical ? "column" : direction;
+
+  const classes = cn(
+    inline ? "inline-flex" : "flex",
+    "gap-2",
     {
-      direction = "row",
-      vertical = false,
-      justify = "start",
-      align = "start",
-      wrap = false,
-      gap = 0,
-      children,
-      className,
-      style,
-      inline = false,
-      ...props
+      // Direction
+      "flex-row": actualDirection === "row",
+      "flex-col": actualDirection === "column",
+      "flex-row-reverse": actualDirection === "row-reverse",
+      "flex-col-reverse": actualDirection === "column-reverse",
+
+      // Justify content
+      "justify-start": justify === "start",
+      "justify-end": justify === "end",
+      "justify-center": justify === "center",
+      "justify-between": justify === "between",
+      "justify-around": justify === "around",
+      "justify-evenly": justify === "evenly",
+
+      // Align items
+      "items-start": align === "start",
+      "items-end": align === "end",
+      "items-center": align === "center",
+      "items-baseline": align === "baseline",
+      "items-stretch": align === "stretch",
+
+      // Wrap
+      "flex-wrap": wrap === true || wrap === "wrap",
+      "flex-nowrap": wrap === "nowrap",
+      "flex-wrap-reverse": wrap === "wrap-reverse",
     },
-    ref,
-  ) => {
-    const gapValue = typeof gap === "number" ? `${gap}px` : gap;
+    className,
+  );
 
-    const mergedStyle: React.CSSProperties = {
-      gap: gapValue,
-      ...style,
-    };
-
-    // Determine the actual direction based on vertical prop
-    const actualDirection = vertical ? "column" : direction;
-
-    const classes = cn(
-      inline ? "inline-flex" : "flex",
-      "gap-2",
-      {
-        // Direction
-        "flex-row": actualDirection === "row",
-        "flex-col": actualDirection === "column",
-        "flex-row-reverse": actualDirection === "row-reverse",
-        "flex-col-reverse": actualDirection === "column-reverse",
-
-        // Justify content
-        "justify-start": justify === "start",
-        "justify-end": justify === "end",
-        "justify-center": justify === "center",
-        "justify-between": justify === "between",
-        "justify-around": justify === "around",
-        "justify-evenly": justify === "evenly",
-
-        // Align items
-        "items-start": align === "start",
-        "items-end": align === "end",
-        "items-center": align === "center",
-        "items-baseline": align === "baseline",
-        "items-stretch": align === "stretch",
-
-        // Wrap
-        "flex-wrap": wrap === true || wrap === "wrap",
-        "flex-nowrap": wrap === "nowrap",
-        "flex-wrap-reverse": wrap === "wrap-reverse",
-      },
-      className,
-    );
-
-    return (
-      <div ref={ref} className={classes} style={mergedStyle} {...props}>
-        {children}
-      </div>
-    );
-  },
-);
+  return (
+    <div className={classes} style={mergedStyle} {...props}>
+      {children}
+    </div>
+  );
+};
 
 Flex.displayName = "Flex";
 

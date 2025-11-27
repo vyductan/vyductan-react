@@ -1,5 +1,8 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import { withThemeByClassName } from "@storybook/addon-themes";
+// Ensure React is loaded early to prevent "forwardRef is undefined" errors
+// This ensures React is available before any libraries (like @rc-component/util) try to use it
+import "react";
 
 import "../src/styles/globals.css";
 

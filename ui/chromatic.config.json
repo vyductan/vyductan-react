@@ -1,4 +1,6 @@
 {
+  "buildCommand": "pnpm storybook:build",
+  "outputDir": "storybook-static",
   "onlyChanged": true,
   "projectId": "Project:6926cbf4e0c40878cbc6cb3c",
   "storybookBaseDir": "ui",
