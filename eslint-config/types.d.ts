@@ -42,3 +42,11 @@ declare module "@next/eslint-plugin-next" {
 //   };
 //   export const rules: Record<string, Rule.RuleModule>;
 // }
+
+// declare module "eslint-plugin-storybook" {
+//   import type { ConfigArray, ConfigWithExtends } from "eslint/config";
+
+//   export const configs: {
+//     "flat/recommended": ConfigArray<ConfigWithExtends>;
+//   };
+// }
