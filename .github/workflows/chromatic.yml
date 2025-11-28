@@ -24,8 +24,7 @@ jobs:
         run: pnpm storybook:build
 
       - name: Publish to Chromatic
-        uses: chromaui/action@v1
-        with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-          workingDir: ui
-          exitZeroOnChanges: true
+        working-directory: ui
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: pnpm chromatic

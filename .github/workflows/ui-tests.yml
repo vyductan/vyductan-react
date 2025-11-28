@@ -1,0 +1,26 @@
+name: UI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Storybook Interaction Tests
+    runs-on: ubuntu-latest
+    container:
+      # Use Playwright Docker image for faster test execution
+      # https://playwright.dev/docs/docker#pull-the-image
+      image: mcr.microsoft.com/playwright:v1.52.0-noble
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./github/setup
+
+      - name: Run Storybook Tests
+        working-directory: ui
+        run: pnpm test:storybook
