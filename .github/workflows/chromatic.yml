@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup
-        uses: ./.github/setup
+        uses: ./github/setup
 
       - name: Publish to Chromatic
         uses: chromaui/action@v1
