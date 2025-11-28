@@ -14,6 +14,7 @@
     "storybook:build": "turbo run storybook:build --filter=@acme/ui --",
     "storybook:dev": "turbo run storybook:dev --filter=@acme/ui",
     "storybook:preview": "turbo run storybook:preview --filter=@acme/ui",
+    "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
   "prettier": "@acme/prettier-config",

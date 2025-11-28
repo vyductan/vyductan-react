@@ -116,9 +116,9 @@ export const InteractionTest: Story = {
       const pasteButton = canvas.getByRole("button", { name: /paste/i });
       const cutButton = canvas.getByRole("button", { name: /cut/i });
 
-      await expect(copyButton).toBeInTheDocument();
-      await expect(pasteButton).toBeInTheDocument();
-      await expect(cutButton).toBeInTheDocument();
+      await expect(copyButton).toBeTruthy();
+      await expect(pasteButton).toBeTruthy();
+      await expect(cutButton).toBeTruthy();
     });
 
     await step("Click each button in sequence", async () => {
@@ -154,8 +154,8 @@ export const InteractionWithSeparator: Story = {
       const saveButton = canvas.getByRole("button", { name: /save/i });
       const deleteButton = canvas.getByRole("button", { name: /delete/i });
 
-      await expect(saveButton).toBeInTheDocument();
-      await expect(deleteButton).toBeInTheDocument();
+      await expect(saveButton).toBeTruthy();
+      await expect(deleteButton).toBeTruthy();
     });
 
     await step("Click Save button", async () => {

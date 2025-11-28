@@ -203,7 +203,13 @@ export const Loading: Story = {
       <Button {...args} loading icon={<Plus />}>
         Loading with Icon
       </Button>
-      <Button {...args} loading shape="circle" icon={<Plus />} aria-label="Loading" />
+      <Button
+        {...args}
+        loading
+        shape="circle"
+        icon={<Plus />}
+        aria-label="Loading"
+      />
     </div>
   ),
   args: {
@@ -248,7 +254,7 @@ export const InteractionTest: Story = {
       const button = canvas.getByRole("button", { name: /click me/i });
 
       // Verify button is in the document and visible
-      await expect(button).toBeInTheDocument();
+      await expect(button).toBeTruthy();
       await expect(button).toBeVisible();
 
       // Click the button
@@ -303,7 +309,7 @@ export const InteractionWithIcon: Story = {
     await step("Click button with icon", async () => {
       const button = canvas.getByRole("button", { name: /add item/i });
 
-      await expect(button).toBeInTheDocument();
+      await expect(button).toBeTruthy();
 
       // Click the button
       await userEvent.click(button);

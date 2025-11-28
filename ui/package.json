@@ -28,6 +28,8 @@
     "storybook:build": "storybook build",
     "storybook:dev": "storybook dev -p 6006",
     "storybook:preview": "serve storybook-static",
+    "test": "vitest --project storybook",
+    "test:storybook": "vitest --project storybook",
     "trace": "tsc --generateTrace .",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "ui-add": "pnpm dlx shadcn@latest add && prettier src --write --list-different"

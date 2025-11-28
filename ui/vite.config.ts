@@ -2,9 +2,9 @@
 import path, { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
-import tailwindcss from "@tailwindcss/vite";
 
 // const dirname =
 //   typeof __dirname !== "undefined"
@@ -25,18 +25,22 @@ export default defineConfig({
     },
     projects: [
       {
-        extends: true,
+        // Don't extend root config to avoid inheriting include pattern
+        // Storybook 8.5.0+ uses stories field from Storybook config instead
         plugins: [
-      tailwindcss(),
+          tailwindcss(),
 
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({
             configDir: path.join(__dirname, ".storybook"),
+            storybookScript: "pnpm storybook --no-open",
           }),
         ],
         test: {
           name: "storybook",
+          globals: true,
+          // No include - Storybook 8.5.0+ uses stories field from Storybook config
           browser: {
             enabled: true,
             headless: true,
@@ -62,6 +66,17 @@ export default defineConfig({
       "@/components/ui/*": resolve(__dirname, "./src/components/*"),
       "@/components/icons": resolve(__dirname, "./src/icons/index.ts"),
       "@/components/icons/*": resolve(__dirname, "./src/icons/*"),
+    },
+  },
+  server: {
+    fs: {
+      // Allow serving files from node_modules and Storybook cache
+      // This is needed for browser tests to access pre-bundled dependencies
+      allow: [
+        "..",
+        resolve(__dirname, "node_modules"),
+        resolve(__dirname, "node_modules/.cache"),
+      ],
     },
   },
 });
