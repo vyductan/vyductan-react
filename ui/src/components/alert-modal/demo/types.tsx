@@ -1,8 +1,8 @@
 
 import type React from "react";
 import { useState } from "react";
-import { AlertModal } from "@/components/ui/alert-modal";
-import { Button } from "@/components/ui/button";
+import { AlertModal } from "@acme/ui/components/alert-modal";
+import { Button } from "@acme/ui/components/button";
 
 const TypesDemo: React.FC = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);

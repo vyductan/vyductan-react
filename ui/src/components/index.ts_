@@ -20,6 +20,7 @@ export * from "./form";
 export * from "./input";
 export * from "./layout";
 export * from "./menu";
+export * from "./dropdown";
 export * from "./message";
 export * from "./modal";
 export * from "./notification";

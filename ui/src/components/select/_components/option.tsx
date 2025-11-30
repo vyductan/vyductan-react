@@ -1,8 +1,8 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { SelectValueType } from "../types";
-import { SelectItem } from "../../../shadcn/select";
+import { SelectItem } from "@acme/ui/shadcn/select";
 import { SelectContext } from "../context";
 
 type OptionProps = {

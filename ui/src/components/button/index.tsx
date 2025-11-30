@@ -1,6 +1,6 @@
 import type { XOR } from "ts-xor";
 
-import type { Button as ShadcnButton } from "../../shadcn/button";
+import type { Button as ShadcnButton } from "@acme/ui/shadcn/button";
 import type { ButtonProps } from "./button";
 import { Button as InternalButton } from "./button";
 

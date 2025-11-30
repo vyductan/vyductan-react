@@ -1,1 +1,1 @@
-export * from "../../shadcn/button-group";
+export * from "@acme/ui/shadcn/button-group";

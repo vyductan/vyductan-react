@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Icon } from "@/components/icons";
-import { Button } from "@/components/ui/button";
-import { CodeBlock } from "@/components/ui/code-block";
-import { cn } from "@/lib/utils";
+import { Icon } from "@acme/ui/icons";
+import { Button } from "@acme/ui/components/button";
+import { CodeBlock } from "@acme/ui/components/code-block";
+import { cn } from "@acme/ui/lib/utils";
 
 type CollapsibleCodeBlockProps = {
   component: React.ReactNode;

@@ -2,7 +2,7 @@ import type { EditorThemeClasses } from "lexical";
 
 import "./editor-theme.css";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 export const editorTheme: EditorThemeClasses = {
   ltr: "text-left",

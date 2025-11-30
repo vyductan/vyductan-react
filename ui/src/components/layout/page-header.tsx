@@ -1,10 +1,10 @@
-import type { AvatarProps } from "@/components/ui/avatar";
-import type { BreadcrumbProps } from "@/components/ui/breadcrumb";
-import type { DirectionType } from "@/components/ui/config-provider/context";
-import type { TagProps } from "@/components/ui/tag";
+import type { AvatarProps } from "@acme/ui/components/avatar";
+import type { BreadcrumbProps } from "@acme/ui/components/breadcrumb";
+import type { DirectionType } from "@acme/ui/components/config-provider/context";
+import type { TagProps } from "@acme/ui/components/tag";
 import { useContext } from "react";
-import { Avatar } from "@/components/ui/avatar";
-import { ConfigContext } from "@/components/ui/config-provider";
+import { Avatar } from "@acme/ui/components/avatar";
+import { ConfigContext } from "@acme/ui/components/config-provider";
 
 import { cn } from "@acme/ui/lib/utils";
 

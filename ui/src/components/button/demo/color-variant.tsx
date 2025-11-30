@@ -1,7 +1,7 @@
 
 import type React from "react";
-import { Button } from "@/components/ui/button";
-import { Flex } from "@/components/ui/flex";
+import { Button } from "@acme/ui/components/button";
+import { Flex } from "@acme/ui/components/flex";
 
 const App: React.FC = () => {
   return (

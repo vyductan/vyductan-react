@@ -1,6 +1,6 @@
 import type React from "react";
-import { Select } from "@/components/ui/select";
-import { Space } from "@/components/ui/space";
+import { Select } from "@acme/ui/components/select";
+import { Space } from "@acme/ui/components/space";
 
 const handleChange = (value: string[]) => {
   console.log(`selected ${value.join(",")}`);

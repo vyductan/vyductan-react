@@ -27,4 +27,4 @@ jobs:
         working-directory: ui
         env:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-        run: pnpm chromatic
+        run: pnpm chromatic -- --exit-once-uploaded

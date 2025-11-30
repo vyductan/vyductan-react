@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import { Separator } from "@acme/ui/shadcn/separator";
 

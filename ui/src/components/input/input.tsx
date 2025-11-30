@@ -4,7 +4,7 @@
 
 import * as React from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 import { useMergedState } from "@rc-component/util";
 import omit from "@rc-component/util/lib/omit";
 

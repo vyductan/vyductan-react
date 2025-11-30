@@ -5,7 +5,7 @@ import {
   SheetHeader as ShadcnSheetHeader,
   SheetTitle as ShadcnSheetTitle,
   SheetClose,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";
 import { Button } from "../button";
 
 type SheetContentProps = React.ComponentProps<typeof ShadcnSheetContent>;
@@ -79,4 +79,4 @@ export {
   SheetDescription,
   Sheet as SheetRoot,
   SheetTrigger,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";

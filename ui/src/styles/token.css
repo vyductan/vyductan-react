@@ -15,17 +15,17 @@
 }
 
 @theme inline {
-  --color-primary: var(--color-primary-500);
-  --color-primary-hover: var(--color-primary-400);
-  --color-primary-active: var(--color-primary-600);
+  --color-primary: var(--color-primary-600);
+  --color-primary-hover: var(--color-primary-500);
+  --color-primary-active: var(--color-primary-700);
   --color-secondary-hover: oklch(0.922 0 0);
   --color-secondary-active: oklch(0.95 0 0);
-  --color-error: var(--color-red-500);
-  --color-error-hover: var(--color-red-600);
-  --color-link: var(--color-blue-500);
-  --color-link-hover: var(--color-blue-600);
-  --color-success: var(--color-green-500);
-  --color-success-hover: var(--color-green-600);
+  --color-error: var(--color-red-600);
+  --color-error-hover: var(--color-red-500);
+  --color-link: var(--color-blue-600);
+  --color-link-hover: var(--color-blue-500);
+  --color-success: var(--color-green-600);
+  --color-success-hover: var(--color-green-500);
   --color-button-solid: var(--button-solid);
   --color-button-solid-hover: var(--button-solid-hover);
   --color-button-solid-active: var(--button-solid-active);

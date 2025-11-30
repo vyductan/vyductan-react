@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 import { useTheme } from "next-themes";
 import { Toaster as Sonner } from "sonner";
 

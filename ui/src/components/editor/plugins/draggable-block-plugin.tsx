@@ -1,8 +1,8 @@
 import type { LexicalNode, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { CommandItem, CommandList, CommandRoot } from "@/components/ui/command";
-import { Popover } from "@/components/ui/popover";
+import { CommandItem, CommandList, CommandRoot } from "@acme/ui/components/command";
+import { Popover } from "@acme/ui/components/popover";
 import { $createCodeNode } from "@lexical/code";
 import {
   $createListItemNode,

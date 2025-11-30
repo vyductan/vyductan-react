@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectRoot,
   SelectTrigger,
-} from "@/components/ui/select";
+} from "@acme/ui/components/select";
 import {
   $isCodeNode,
   CODE_LANGUAGE_FRIENDLY_NAME_MAP,

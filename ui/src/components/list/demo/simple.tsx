@@ -1,7 +1,7 @@
 import type React from "react";
-import { Divider } from "@/components/ui/divider";
-import { List } from "@/components/ui/list";
-import { Typography } from "@/components/ui/typography";
+import { Divider } from "@acme/ui/components/divider";
+import { List } from "@acme/ui/components/list";
+import { Typography } from "@acme/ui/components/typography";
 
 const data = [
   "Racing car sprays burning fuel into crowd.",

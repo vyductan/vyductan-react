@@ -22,15 +22,15 @@ import {
 } from "lexical";
 import { mergeRegister } from "@lexical/utils";
 import { SearchIcon, XIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@acme/ui/components/dialog";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
 
 interface FindReplacePluginProps {
   isOpen?: boolean;

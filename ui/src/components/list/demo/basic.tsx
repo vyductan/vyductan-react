@@ -1,6 +1,6 @@
 import type React from "react";
-import { Avatar } from "@/components/ui/avatar";
-import { List } from "@/components/ui/list";
+import { Avatar } from "@acme/ui/components/avatar";
+import { List } from "@acme/ui/components/list";
 
 const data = [
   {

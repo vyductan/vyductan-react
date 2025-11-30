@@ -1,2 +1,2 @@
 export { Dropdown, type DropdownProps } from "./dropdown";
-export * from "../../shadcn/dropdown-menu";
+export * from "@acme/ui/components/dropdown-menu";

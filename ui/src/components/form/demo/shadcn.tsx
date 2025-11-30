@@ -1,6 +1,6 @@
 
 import type * as React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
@@ -8,8 +8,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@acme/ui/components/card";
+import { Checkbox } from "@acme/ui/components/checkbox";
 import {
   Field,
   FieldContent,
@@ -21,16 +21,16 @@ import {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-} from "@/components/ui/field";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+} from "@acme/ui/components/field";
+import { RadioGroup, RadioGroupItem } from "@acme/ui/components/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "@acme/ui/components/select";
+import { Switch } from "@acme/ui/components/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";

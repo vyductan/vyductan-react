@@ -1,1 +1,1 @@
-export * from "../../shadcn/item";
+export * from "@acme/ui/shadcn/item";

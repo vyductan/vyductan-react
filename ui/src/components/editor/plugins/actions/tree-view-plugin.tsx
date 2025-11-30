@@ -1,13 +1,13 @@
 import type { JSX } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   DialogContent,
   DialogHeader,
   Dialog as DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/modal";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+} from "@acme/ui/components/modal";
+import { ScrollArea, ScrollBar } from "@acme/ui/components/scroll-area";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { TreeView } from "@lexical/react/LexicalTreeView";
 import { NotebookPenIcon } from "lucide-react";

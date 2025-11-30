@@ -3,7 +3,7 @@ import type { XOR } from "ts-xor";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { Switch as ShadcnSwitch } from "../../shadcn/switch";
+import { Switch as ShadcnSwitch } from "@acme/ui/shadcn/switch";
 import { Switch as InternalSwitch } from "./switch";
 
 type ShadcnSwitchProps = React.ComponentProps<typeof ShadcnSwitch>;

@@ -9,8 +9,8 @@ import type { BaseSelection, LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
 import type * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 import {
   $createLinkNode,
   $isAutoLinkNode,

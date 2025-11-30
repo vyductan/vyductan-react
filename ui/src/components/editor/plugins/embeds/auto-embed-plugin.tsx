@@ -13,20 +13,20 @@ import type {
 import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   CommandGroup,
   CommandItem,
   CommandList,
   CommandRoot,
-} from "@/components/ui/command";
-import { Input } from "@/components/ui/input";
-import { DialogFooter } from "@/components/ui/modal";
+} from "@acme/ui/components/command";
+import { Input } from "@acme/ui/components/input";
+import { DialogFooter } from "@acme/ui/components/modal";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@acme/ui/components/popover";
 import {
   AutoEmbedOption,
   LexicalAutoEmbedPlugin,

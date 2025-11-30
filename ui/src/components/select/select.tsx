@@ -2,7 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import React from "react";
-import { tagColors } from "@/components/ui/tag";
+import { tagColors } from "@acme/ui/components/tag";
 import useControlledState from "@rc-component/util/lib/hooks/useControlledState";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -11,7 +11,7 @@ import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { SelectShadcnProps } from "./_components";
 import type { FlattenOptionData, OptionType, SelectValueType } from "./types";
-import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
+import { SelectContent, SelectItem, SelectRoot } from "@acme/ui/shadcn/select";
 import { Empty } from "../empty";
 import { SelectTrigger, SelectValue } from "./_components";
 import { SelectMultipleContent } from "./_components/select-multiple-content";

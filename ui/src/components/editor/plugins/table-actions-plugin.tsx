@@ -10,7 +10,7 @@
 
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,

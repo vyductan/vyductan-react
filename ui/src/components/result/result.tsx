@@ -9,7 +9,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "../../shadcn/empty";
+} from "@acme/ui/shadcn/empty";
 
 type ResultProps = {
   status?: "success" | "info" | "warning" | "error" | "500" | "404";

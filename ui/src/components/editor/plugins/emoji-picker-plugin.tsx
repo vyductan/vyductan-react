@@ -12,7 +12,7 @@ import {
   CommandItem,
   CommandList,
   CommandRoot,
-} from "@/components/ui/command";
+} from "@acme/ui/components/command";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   MenuOption,

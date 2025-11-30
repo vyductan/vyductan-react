@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { DirectionType } from "../config-provider/context";
 import type { SizeType } from "../config-provider/size-context";
-import { ButtonGroup } from "../../shadcn/button-group";
+import { ButtonGroup } from "@acme/ui/shadcn/button-group";
 
 export interface SpaceCompactItemContextType {
   compactSize?: SizeType;

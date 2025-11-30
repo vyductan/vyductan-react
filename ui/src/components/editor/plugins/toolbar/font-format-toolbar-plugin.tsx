@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { BaseSelection, TextFormatType } from "lexical";
 import { useState } from "react";
-import { Toggle } from "@/components/ui/toggle";
+import { Toggle } from "@acme/ui/components/toggle";
 import { $isTableSelection } from "@lexical/table";
 import { $isRangeSelection, FORMAT_TEXT_COMMAND } from "lexical";
 import {

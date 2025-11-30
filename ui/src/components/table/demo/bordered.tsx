@@ -1,7 +1,7 @@
 
-import type { TableProps } from "@/components/ui/table";
+import type { TableProps } from "@acme/ui/components/table";
 import type React from "react";
-import { Table } from "@/components/ui/table";
+import { Table } from "@acme/ui/components/table";
 
 interface DataType {
   key: string;

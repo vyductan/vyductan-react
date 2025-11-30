@@ -15,7 +15,7 @@ import {
   CommandItem,
   CommandList,
   CommandRoot,
-} from "@/components/ui/command";
+} from "@acme/ui/components/command";
 import { $createCodeNode } from "@lexical/code";
 import {
   INSERT_CHECK_LIST_COMMAND,

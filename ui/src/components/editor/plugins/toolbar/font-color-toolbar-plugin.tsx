@@ -1,7 +1,7 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useMemo, useState } from "react";
-import { ColorPicker } from "@/components/ui/color-picker";
-import { AggregationColor } from "@/components/ui/color-picker/color";
+import { ColorPicker } from "@acme/ui/components/color-picker";
+import { AggregationColor } from "@acme/ui/components/color-picker/color";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,

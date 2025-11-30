@@ -1,8 +1,8 @@
 "use client";
 
-import type { ButtonProps } from "@/components/ui/button";
+import type { ButtonProps } from "@acme/ui/components/button";
 import * as React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 
 import { cn } from "@acme/ui/lib/utils";
 

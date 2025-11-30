@@ -1,6 +1,6 @@
 import type { BaseSelection, ElementFormatType } from "lexical";
 import { useState } from "react";
-import { Separator } from "@/components/ui/divider";
+import { Separator } from "@acme/ui/components/divider";
 import { $isLinkNode } from "@lexical/link";
 import { $findMatchingParent } from "@lexical/utils";
 import {
@@ -19,7 +19,7 @@ import {
   IndentIncreaseIcon,
 } from "lucide-react";
 
-import { ToggleGroup, ToggleGroupItem } from "../../../../shadcn/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@acme/ui/shadcn/toggle-group";
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 import { getSelectedNode } from "../../utils/get-selected-node";

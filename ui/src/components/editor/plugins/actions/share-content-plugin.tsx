@@ -3,12 +3,12 @@
 /* eslint-disable unicorn/prefer-global-this */
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@acme/ui/components/tooltip";
 import {
   editorStateFromSerializedDocument,
   serializedDocumentFromEditorState,

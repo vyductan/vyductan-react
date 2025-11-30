@@ -1,21 +1,21 @@
 import type React from "react";
-import { AutoComplete } from "@/components/ui/auto-complete";
-import { Button } from "@/components/ui/button";
-// import { TreeSelect } from '@/components/ui/tree-select';
-import { DatePicker } from "@/components/ui/date-picker";
-import { InputNumber } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-import { Space } from "@/components/ui/space";
-// import { Cascader } from '@/components/ui/cascader';
-// import { TimePicker } from "@/components/ui/time-picker";
-import { Tooltip } from "@/components/ui/tooltip";
+import { AutoComplete } from "@acme/ui/components/auto-complete";
+import { Button } from "@acme/ui/components/button";
+// import { TreeSelect } from '@acme/ui/components/tree-select';
+import { DatePicker } from "@acme/ui/components/date-picker";
+import { InputNumber } from "@acme/ui/components/input";
+import { Select } from "@acme/ui/components/select";
+import { Space } from "@acme/ui/components/space";
+// import { Cascader } from '@acme/ui/components/cascader';
+// import { TimePicker } from "@acme/ui/components/time-picker";
+import { Tooltip } from "@acme/ui/components/tooltip";
 
 import { Icon } from "../../../icons";
 import { ColorPicker } from "../../color-picker";
 import { Input } from "../../input";
 
-// import { TreeSelect } from '@/components/ui/tree-select';
-// import { TreeNode } from '@/components/ui/tree-node';
+// import { TreeSelect } from '@acme/ui/components/tree-select';
+// import { TreeNode } from '@acme/ui/components/tree-node';
 
 const { Option } = Select;
 

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Switch } from "@/components/ui/switch";
+import { Switch } from "@acme/ui/components/switch";
 
 export default function ControlledDemo() {
   const [checked, setChecked] = useState(false);

@@ -7,12 +7,12 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@acme/ui/components/tooltip";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   KEY_MODIFIER_COMMAND,

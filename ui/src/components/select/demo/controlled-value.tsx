@@ -1,5 +1,5 @@
 import React from "react";
-import { Select } from "@/components/ui/select";
+import { Select } from "@acme/ui/components/select";
 
 const App: React.FC = () => {
   const [value, setValue] = React.useState<string>("lucy");

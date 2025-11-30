@@ -1,6 +1,6 @@
-import type { ButtonProps } from "@/components/ui/button";
+import type { ButtonProps } from "@acme/ui/components/button";
 import * as React from "react";
-import { buttonColorVariants, buttonVariants } from "@/components/ui/button";
+import { buttonColorVariants, buttonVariants } from "@acme/ui/components/button";
 import { Slot } from "@radix-ui/react-slot";
 
 import { Icon } from "@acme/ui/icons";

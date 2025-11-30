@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
-import { DropdownMenuItem as ShadcnDropdownMenuItem } from "../../shadcn/dropdown-menu";
+import { DropdownMenuItem as ShadcnDropdownMenuItem } from "@acme/ui/shadcn/dropdown-menu";
 
 const DropdownMenuItem = ({
   className,
@@ -36,4 +36,4 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "../../shadcn/dropdown-menu";
+} from "@acme/ui/shadcn/dropdown-menu";

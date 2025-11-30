@@ -17,12 +17,12 @@ import type {
 import type { JSX, ReactElement } from "react";
 import * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 import {
   DialogClose,
   DialogContent,
   Dialog as DialogRoot,
-} from "@/components/ui/modal";
+} from "@acme/ui/components/modal";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 
 import { Excalidraw } from "./excalidraw";

@@ -1,9 +1,9 @@
-import type { FormProps } from "@/components/ui/form";
+import type { FormProps } from "@acme/ui/components/form";
 import type React from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Button } from "@acme/ui/components/button";
+import { Checkbox } from "@acme/ui/components/checkbox";
+import { Form } from "@acme/ui/components/form";
+import { Input } from "@acme/ui/components/input";
 
 type FieldType = {
   username?: string;

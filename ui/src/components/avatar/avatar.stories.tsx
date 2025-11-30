@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { User } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/shadcn/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/components/avatar";
 
 const meta = {
   title: "Components/Avatar",

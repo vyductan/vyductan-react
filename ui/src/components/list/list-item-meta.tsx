@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar } from "@acme/ui/components/avatar";
 
 interface ListItemMetaProps {
   avatar?: ReactNode;

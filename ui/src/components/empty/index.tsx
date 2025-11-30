@@ -6,7 +6,7 @@ import {
   EmptyContent,
   EmptyHeader,
   Empty as ShadcnEmpty,
-} from "../../shadcn/empty";
+} from "@acme/ui/shadcn/empty";
 import { Empty as InternalEmpty } from "./empty";
 import SimpleEmptyImg from "./simple";
 
@@ -47,4 +47,4 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
-} from "../../shadcn/empty";
+} from "@acme/ui/shadcn/empty";

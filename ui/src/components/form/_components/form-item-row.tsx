@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { ColProps } from "../../grid";
 import type { FormLabelAlign, FormLayout } from "../types";
@@ -6,7 +6,7 @@ import {
   FieldError,
   Field as ShadcnField,
   FieldDescription as ShadcnFieldDescription,
-} from "../../../shadcn/field";
+} from "@acme/ui/shadcn/field";
 import { FieldLabel } from "../../field";
 import { Col, Row } from "../../grid";
 

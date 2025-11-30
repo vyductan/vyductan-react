@@ -2,19 +2,43 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "@acme/tsconfig/internal-package.json",
   "compilerOptions": {
+    "rootDir": ".",
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": ".",
+    "baseUrl": "src/",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@acme/ui/*": ["./src/ui/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/components/ui": ["./src/components/index.ts"],
-      "@/components/ui/*": ["./src/components/*"],
-      "@/components/icons": ["./src/icons/index.ts"],
-      "@/components/icons/*": ["./src/icons/*"]
+      "@acme/ui/*": ["./*"],
+      // "@acme/ui/shadcn/*": ["./shadcn/*"],
+      // "@acme/ui/lib/*": ["./lib/*"],
+      // "@acme/ui/icons/*": ["./icons/*"],
+      // "@acme/ui/lib/utils": ["./src/lib/utils.ts"],
+      // "@acme/ui/hooks/*": ["./src/hooks/*"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/components": ["./src/components/index.ts"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/icons/*": ["./src/icons/*"],
+
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/components": ["./src/components/index.ts"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@/lib/*": ["./src/lib/*"],
+      // "@/hooks/*": ["./src/hooks/*"],
+      // "@/components/ui": ["./src/components/index.ts"],
+      // "@/components/ui/*": ["./src/components/*"],
+      // "@/components/icons": ["./src/icons/index.ts"],
+      // "@/components/icons/*": ["./src/icons/*"]
     }
   },
-  "include": ["src", ".storybook"],
-  "exclude": ["node_modules", "./src/shadcn/*.tsx"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mdx",
+    ".storybook/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
 }

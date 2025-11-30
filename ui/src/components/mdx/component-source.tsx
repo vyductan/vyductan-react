@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "@acme/ui/components/card";
 
 import { CollapsibleCodeBlock } from "./collapsible-code-block";
 
@@ -41,8 +41,8 @@ const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
 // Nếu muốn dùng dynamic import với variable paths, bạn cần tạo mapping như sau:
 // function getComponentLoader(componentPath: string) {
 //   const componentMap: Record<string, () => Promise<{ default: React.FC }>> = {
-//     "@/components/ui/alert-modal/demo/basic": () =>
-//       import("@/components/ui/alert-modal/demo/basic"),
+//     "@acme/ui/components/alert-modal/demo/basic": () =>
+//       import("@acme/ui/components/alert-modal/demo/basic"),
 //     // Thêm các component khác vào đây với static imports
 //   };
 //   return componentMap[componentPath];

@@ -15,10 +15,10 @@ import type {
 } from "lexical";
 import type { JSX } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { DialogFooter } from "@/components/ui/modal";
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { DialogFooter } from "@acme/ui/components/modal";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $createTableNodeWithDimensions,

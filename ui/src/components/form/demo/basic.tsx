@@ -1,8 +1,8 @@
 import type React from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormItem, useForm } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Button } from "@acme/ui/components/button";
+import { Checkbox } from "@acme/ui/components/checkbox";
+import { Form, FormItem, useForm } from "@acme/ui/components/form";
+import { Input } from "@acme/ui/components/input";
 import { User } from "lucide-react";
 import { z } from "zod";
 

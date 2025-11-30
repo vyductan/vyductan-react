@@ -1,6 +1,6 @@
-import type { ButtonProps } from "@/components/ui/button";
+import type { ButtonProps } from "@acme/ui/components/button";
 import React, { useContext } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 
 import type { TagWithCountProps } from "../tag/tag-with-count";
 import type { TooltipProps } from "../tooltip";

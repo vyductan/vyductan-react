@@ -9,9 +9,9 @@ import type { ListType } from "@lexical/list";
 import type { LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/divider";
-import { Dropdown } from "@/components/ui/dropdown";
+import { Button } from "@acme/ui/components/button";
+import { Separator } from "@acme/ui/components/divider";
+import { Dropdown } from "@acme/ui/components/dropdown";
 import { $createCodeNode, $isCodeHighlightNode } from "@lexical/code";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
@@ -73,7 +73,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
-import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@acme/ui/shadcn/toggle-group";
 import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";

@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from "react";
 
-import isBrowser from "../utils/is-browser";
+import { isBrowser } from "@acme/ui/lib/utils";
 
 type Subscriber = () => void;
 

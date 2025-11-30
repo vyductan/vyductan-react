@@ -1,8 +1,8 @@
 
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Modal } from "@/components/ui/modal";
+import { Button } from "@acme/ui/components/button";
+import { Modal } from "@acme/ui/components/modal";
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);

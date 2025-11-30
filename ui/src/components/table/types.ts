@@ -8,7 +8,7 @@ import type {
   Table,
 } from "@tanstack/react-table";
 
-import type { Breakpoint } from "@acme/hooks/use-responsive";
+import type { Breakpoint } from "@acme/ui/hooks/use-responsive";
 
 import type { AnyObject } from "../_util/type";
 import type { CheckboxProps } from "../checkbox";

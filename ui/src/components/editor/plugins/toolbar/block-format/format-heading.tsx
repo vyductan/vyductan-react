@@ -1,5 +1,5 @@
 import type { HeadingTagType } from "@lexical/rich-text";
-import { SelectItem } from "@/components/ui/select";
+import { SelectItem } from "@acme/ui/components/select";
 import { $createHeadingNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection } from "lexical";

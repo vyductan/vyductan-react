@@ -1,6 +1,6 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useEffect, useState } from "react";
-import { Toggle } from "@/components/ui/toggle";
+import { Toggle } from "@acme/ui/components/toggle";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $isRangeSelection,

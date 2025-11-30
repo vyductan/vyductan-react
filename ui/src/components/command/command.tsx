@@ -1,5 +1,5 @@
 import type { XOR } from "ts-xor";
-import { tagColors } from "@/components/ui/tag";
+import { tagColors } from "@acme/ui/components/tag";
 import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";

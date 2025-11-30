@@ -5,7 +5,7 @@ import {
   SelectItem,
   SelectRoot,
   SelectTrigger,
-} from "@/components/ui/select";
+} from "@acme/ui/components/select";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,

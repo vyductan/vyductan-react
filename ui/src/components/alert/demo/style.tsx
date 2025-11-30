@@ -1,5 +1,5 @@
 import type React from "react";
-import { Alert } from "@/components/ui/alert";
+import { Alert } from "@acme/ui/components/alert";
 
 const App: React.FC = () => (
   <>

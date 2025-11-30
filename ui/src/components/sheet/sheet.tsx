@@ -118,4 +118,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";

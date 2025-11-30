@@ -15,7 +15,8 @@
     "storybook:dev": "turbo run storybook:dev --filter=@acme/ui",
     "storybook:preview": "turbo run storybook:preview --filter=@acme/ui",
     "test": "turbo run test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "chromatic": "cd ui && pnpm chromatic"
   },
   "prettier": "@acme/prettier-config",
   "devDependencies": {
@@ -27,9 +28,9 @@
     "turbo": "^2.6.0",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.17.1",
+  "packageManager": "pnpm@10.24.0",
   "engines": {
     "node": "24.x",
-    "pnpm": "^10.17.1"
+    "pnpm": "^10.24.0"
   }
 }

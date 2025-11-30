@@ -1,7 +1,7 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,

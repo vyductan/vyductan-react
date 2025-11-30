@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint } from "../_util/responsive-observer";
 import type { LiteralUnion } from "../_util/type";

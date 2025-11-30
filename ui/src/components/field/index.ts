@@ -9,5 +9,5 @@ export {
   FieldSet,
   FieldContent,
   FieldTitle,
-} from "../../shadcn/field";
+} from "@acme/ui/shadcn/field";
 export * from "./field-label";

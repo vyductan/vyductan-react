@@ -1,5 +1,5 @@
 import type React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 
 import { Result } from "../result";
 

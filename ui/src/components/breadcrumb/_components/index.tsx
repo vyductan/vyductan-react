@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import { BreadcrumbLink as ShadcnBreadcrumbLink } from "@acme/ui/shadcn/breadcrumb";
 

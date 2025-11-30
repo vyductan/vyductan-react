@@ -1,9 +1,9 @@
 
 import type React from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Modal } from "@/components/ui/modal";
-import { Space } from "@/components/ui/space";
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
+import { Modal } from "@acme/ui/components/modal";
+import { Space } from "@acme/ui/components/space";
 
 const App: React.FC = () => {
   return (

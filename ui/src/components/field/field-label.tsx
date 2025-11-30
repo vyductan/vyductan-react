@@ -2,7 +2,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { FormLabelAlign } from "../form";
 import type { ColProps } from "../grid";
-import { FieldLabel as ShadFieldLabel } from "../../shadcn/field";
+import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
 import { useFormContext } from "../form";
 import { Col } from "../grid";
 

@@ -7,11 +7,11 @@
  */
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@acme/ui/components/button";
+import { Checkbox } from "@acme/ui/components/checkbox";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { Textarea } from "@acme/ui/components/textarea";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundary } from "react-error-boundary";
 

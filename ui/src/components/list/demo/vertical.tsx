@@ -1,8 +1,8 @@
 import type React from "react";
-import { Icon } from "@/components/icons";
-import { Avatar } from "@/components/ui/avatar";
-import { List } from "@/components/ui/list";
-import { Space } from "@/components/ui/space";
+import { Icon } from "@acme/ui/icons";
+import { Avatar } from "@acme/ui/components/avatar";
+import { List } from "@acme/ui/components/list";
+import { Space } from "@acme/ui/components/space";
 
 const data = Array.from({ length: 23 }).map((_, i) => ({
   href: "https://ant.design",

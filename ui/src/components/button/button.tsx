@@ -2,7 +2,7 @@
 
 import type * as React from "react";
 import type { PartialDeep } from "type-fest";
-import { GenericSlot } from "@/components/ui/slot";
+import { GenericSlot } from "@acme/ui/components/slot";
 import { Slot } from "@radix-ui/react-slot";
 
 import type { IconProps } from "@acme/ui/icons";

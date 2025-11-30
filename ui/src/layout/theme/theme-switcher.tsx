@@ -1,8 +1,8 @@
 "use client";
 
-import type { ButtonProps } from "@/components/ui/button";
-import { Button } from "@/components/ui/button";
-import { Dropdown } from "@/components/ui/dropdown";
+import type { ButtonProps } from "@acme/ui/components/button";
+import { Button } from "@acme/ui/components/button";
+import { Dropdown } from "@acme/ui/components/dropdown";
 import { useTheme } from "next-themes";
 
 import { Icon } from "@acme/ui/icons";

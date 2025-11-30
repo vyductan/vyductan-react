@@ -1,5 +1,5 @@
-import type { BreadcrumbProps } from "@/components/ui/breadcrumb";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
+import type { BreadcrumbProps } from "@acme/ui/components/breadcrumb";
+import { Breadcrumb } from "@acme/ui/components/breadcrumb";
 
 export type PageBreadcrumbProps = BreadcrumbProps & {
   render?: (props: BreadcrumbProps) => React.ReactNode;

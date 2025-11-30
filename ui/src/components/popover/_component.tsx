@@ -1,7 +1,7 @@
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-import type { Popover as ShadcnPopover } from "../../shadcn/popover";
-import { PopoverContent as ShadcnPopoverContent } from "../../shadcn/popover";
+import type { Popover as ShadcnPopover } from "@acme/ui/shadcn/popover";
+import { PopoverContent as ShadcnPopoverContent } from "@acme/ui/shadcn/popover";
 
 type PopoverRootProps = React.ComponentProps<typeof ShadcnPopover>;
 
@@ -44,5 +44,5 @@ export {
   Popover as PopoverRoot,
   PopoverTrigger,
   PopoverAnchor,
-} from "../../shadcn/popover";
+} from "@acme/ui/shadcn/popover";
 export { PopoverContent, PopoverClose };

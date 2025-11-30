@@ -1,6 +1,6 @@
 import type React from "react";
-import { Flex } from "@/components/ui/flex";
-import { Progress } from "@/components/ui/progress";
+import { Flex } from "@acme/ui/components/flex";
+import { Progress } from "@acme/ui/components/progress";
 
 const App: React.FC = () => (
   <Flex gap="small" wrap>

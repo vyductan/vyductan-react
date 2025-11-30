@@ -1,5 +1,5 @@
 import type React from "react";
-import { Select } from "@/components/ui/select";
+import { Select } from "@acme/ui/components/select";
 
 const handleChange = (value: string) => {
   console.log(`selected ${value}`);

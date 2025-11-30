@@ -27,7 +27,7 @@ import {
   SheetIcon,
   ArchiveIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/components/button";
 
 import { $isFileAttachmentNode } from "../nodes/file-attachment-node";
 

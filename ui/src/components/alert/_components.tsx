@@ -4,7 +4,7 @@ import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { Alert as ShadcnAlert } from "../../shadcn/alert";
+import type { Alert as ShadcnAlert } from "@acme/ui/shadcn/alert";
 
 export const alertVariants = cva(
   [
@@ -52,4 +52,4 @@ export {
   AlertTitle,
   AlertDescription,
   Alert as ShadcnAlert,
-} from "../../shadcn/alert";
+} from "@acme/ui/shadcn/alert";

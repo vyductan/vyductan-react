@@ -6,7 +6,7 @@ import {
   SelectGroup,
   SelectRoot,
   SelectTrigger,
-} from "@/components/ui/select";
+} from "@acme/ui/components/select";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { $findMatchingParent, $getNearestNodeOfType } from "@lexical/utils";

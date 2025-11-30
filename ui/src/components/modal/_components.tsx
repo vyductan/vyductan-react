@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { DialogContent as ShadcnDialogContent } from "../../shadcn/dialog";
+import { DialogContent as ShadcnDialogContent } from "@acme/ui/shadcn/dialog";
 
 function DialogContent({
   onInteractOutside,
@@ -34,4 +34,4 @@ export {
   DialogTrigger,
   DialogOverlay,
   DialogPortal,
-} from "../../shadcn/dialog";
+} from "@acme/ui/shadcn/dialog";

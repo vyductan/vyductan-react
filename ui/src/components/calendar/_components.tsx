@@ -1,12 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 import {
   CalendarDayButton,
   Calendar as ShadcnCalendar,
-} from "../../shadcn/calendar";
+} from "@acme/ui/shadcn/calendar";
 
 export const CustomCalendarDayButton = ({
   className,

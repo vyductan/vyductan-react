@@ -1,4 +1,4 @@
-import { SelectItem } from "@/components/ui/select";
+import { SelectItem } from "@acme/ui/components/select";
 import { INSERT_ORDERED_LIST_COMMAND } from "@lexical/list";
 import { $setBlocksType } from "@lexical/selection";
 import {

@@ -11,7 +11,7 @@
  * - Link
  */
 
-import { Separator } from "@/components/ui/divider";
+import { Separator } from "@acme/ui/components/divider";
 
 import { ToolbarPlugin } from "./toolbar/toolbar-plugin";
 import { FontFormatToolbarPlugin } from "./toolbar/font-format-toolbar-plugin";

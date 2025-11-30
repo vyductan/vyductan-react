@@ -13,7 +13,7 @@ import {
   COMMAND_PRIORITY_LOW,
 } from "lexical";
 import { mergeRegister } from "@lexical/utils";
-import { Modal } from "@/components/ui/modal";
+import { Modal } from "@acme/ui/components/modal";
 import { Icon } from "@acme/ui/icons";
 
 interface ShortcutGroup {

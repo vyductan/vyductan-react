@@ -10,16 +10,16 @@
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { DialogFooter } from "@/components/ui/modal";
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { DialogFooter } from "@acme/ui/components/modal";
 import {
   TabsContent,
   TabsList,
   TabsRoot,
   TabsTrigger,
-} from "@/components/ui/tabs";
+} from "@acme/ui/components/tabs";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $insertNodeToNearestRoot, $wrapNodeInElement } from "@lexical/utils";
 import {

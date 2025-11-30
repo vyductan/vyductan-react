@@ -1,7 +1,7 @@
 
 import type React from "react";
-import { Space } from "@/components/ui/space";
-import { Tabs } from "@/components/ui/tabs";
+import { Space } from "@acme/ui/components/space";
+import { Tabs } from "@acme/ui/components/tabs";
 
 const items = [
   { key: "1", label: "Tab 1", children: "Content of Tab 1" },

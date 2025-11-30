@@ -1,10 +1,10 @@
 import type { Preview } from "@storybook/nextjs-vite";
-import { withThemeByClassName } from "@storybook/addon-themes";
+// import { withThemeByClassName } from "@storybook/addon-themes";
 // Ensure React is loaded early to prevent "forwardRef is undefined" errors
 // This ensures React is available before any libraries (like @rc-component/util) try to use it
-import "react";
+// import "react";
 
-import "../src/styles/globals.css";
+import "styles/globals.css";
 
 const preview: Preview = {
   parameters: {
@@ -15,7 +15,7 @@ const preview: Preview = {
       },
     },
 
-    layout: "centered",
+    // layout: "centered",
 
     a11y: {
       // 'todo' - show a11y violations in the test UI only
@@ -24,15 +24,15 @@ const preview: Preview = {
       test: "todo",
     },
   },
-  decorators: [
-    withThemeByClassName({
-      themes: {
-        light: "light",
-        dark: "dark",
-      },
-      defaultTheme: "light",
-    }),
-  ],
+  // decorators: [
+  //   withThemeByClassName({
+  //     themes: {
+  //       light: "light",
+  //       dark: "dark",
+  //     },
+  //     defaultTheme: "light",
+  //   }),
+  // ],
 };
 
 export default preview;

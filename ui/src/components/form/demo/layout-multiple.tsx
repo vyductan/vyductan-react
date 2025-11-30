@@ -1,7 +1,7 @@
 import type React from "react";
-import { Divider } from "@/components/ui/divider";
-import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Divider } from "@acme/ui/components/divider";
+import { Form } from "@acme/ui/components/form";
+import { Input } from "@acme/ui/components/input";
 
 const App: React.FC = () => (
   <>

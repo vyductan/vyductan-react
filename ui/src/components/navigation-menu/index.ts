@@ -9,4 +9,4 @@ export {
   NavigationMenuLink,
   NavigationMenuIndicator,
   NavigationMenuViewport,
-} from "../../shadcn/navigation-menu";
+} from "@acme/ui/shadcn/navigation-menu";

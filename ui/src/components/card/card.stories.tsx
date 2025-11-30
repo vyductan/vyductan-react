@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ArrowRight, Bell, Settings } from "lucide-react";
 
 import {
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@acme/ui/shadcn/card";
+} from "@acme/ui/components/card";
 
 import { Button } from "../button";
 
@@ -66,7 +66,7 @@ export const WithFooter: Story = {
 export const WithImage: Story = {
   render: () => (
     <Card className="w-[350px] overflow-hidden">
-      <div className="h-[200px] bg-gradient-to-br from-blue-400 to-purple-500" />
+      <div className="h-[200px] bg-linear-to-br from-blue-400 to-purple-500" />
       <CardHeader>
         <CardTitle>Beautiful Gradient</CardTitle>
         <CardDescription>A card with a cover image</CardDescription>

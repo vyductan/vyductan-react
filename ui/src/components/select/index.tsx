@@ -5,7 +5,7 @@ import type { AnyObject } from "../_util/type";
 import type { SelectShadcnProps } from "./_components";
 import type { SelectProps } from "./select";
 import type { OptionType, SelectValueType } from "./types";
-import { Select as ShadcnSelect } from "../../shadcn/select";
+import { Select as ShadcnSelect } from "@acme/ui/shadcn/select";
 import {
   SelectContent as Content,
   SelectContent,
@@ -56,7 +56,7 @@ Select.Trigger = Trigger;
 Select.Content = Content;
 
 export { Select };
-export { Select as SelectRoot } from "../../shadcn/select";
+export { Select as SelectRoot } from "@acme/ui/shadcn/select";
 export type { SelectProps } from "./select";
 
 export * from "./_components";
