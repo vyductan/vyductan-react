@@ -714,6 +714,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   indeterminate={row.getIsSomeSelected()}
                   onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
+                  className="flex"
                 />
               ),
               enableSorting: false,
