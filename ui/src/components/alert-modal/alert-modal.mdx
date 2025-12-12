@@ -23,37 +23,3 @@ Display the document sample code for the basic usage of the AlertModal component
 AlertModal supports different types to display different visual styles and icons: `confirm`, `warning`, `info`, `success`, and `error`.
 
 <ComponentSource src="alert-modal/demo/types.tsx" __comp__={TypesDemo} />
-
-## Layout 2 Cột
-
-Bạn có thể sử dụng `Row` và `Col` để tạo layout 2 cột. Mỗi `Col` với `span={12}` sẽ chiếm một nửa chiều rộng (24 là tổng số cột).
-
-### Sử dụng Row và Col
-
-```tsx
-<Row gutter={16}>
-  <Col span={12}>
-    <div>Nội dung cột 1</div>
-  </Col>
-  <Col span={12}>
-    <div>Nội dung cột 2</div>
-  </Col>
-</Row>
-```
-
-### Ví dụ thực tế với 2 ComponentSource
-
-<Row gutter={16}>
-  <Col span={12}>
-    <ComponentSource
-      src="alert-modal/demo/basic.tsx"
-      __comp__={AlertModalBasicDemo}
-    />
-  </Col>
-  <Col span={12}>
-    <ComponentSource
-      src="alert-modal/demo/basic.tsx"
-      __comp__={AlertModalBasicDemo}
-    />
-  </Col>
-</Row>
