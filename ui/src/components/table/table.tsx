@@ -681,6 +681,15 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
+  // Filter selectedRowKeys to only include keys that exist in mergedData
+  // This prevents TanStack Table from trying to select non-existent rows (e.g., when data is filtered)
+  const availableRowKeys = React.useMemo(() => {
+    const keySet = new Set(
+      mergedData.map((item, index) => getRowKey(item, index).toString()),
+    );
+    return selectedRowKeys.filter((key) => keySet.has(key.toString()));
+  }, [mergedData, selectedRowKeys, getRowKey]);
+
   // Create table instance with memoized values and required properties
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -714,6 +723,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   indeterminate={row.getIsSomeSelected()}
                   onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
+                  className="flex"
                 />
               ),
               enableSorting: false,
@@ -726,7 +736,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     state: {
       sorting: sortingState,
       rowSelection: Object.fromEntries(
-        selectedRowKeys.map((key) => [key.toString(), true]),
+        availableRowKeys.map((key) => [key.toString(), true]),
       ),
       expanded: expandedState,
     },
