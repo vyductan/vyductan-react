@@ -87,8 +87,8 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
     disabled,
 
     indeterminate = false,
-    // checked,
-    // defaultChecked,
+    checked,
+    defaultChecked,
 
     // styles
     style,
@@ -114,35 +114,26 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
   const contextDisabled = React.useContext(DisabledContext);
   const mergedDisabled = checkboxGroup?.disabled ?? disabled ?? contextDisabled;
 
+  const isGroup = !!(checkboxGroup && !skipGroup);
+
   if (process.env.NODE_ENV !== "production") {
     const warning = devUseWarning("Checkbox");
 
     warning(
-      "checked" in restProps || !!checkboxGroup || !("value" in restProps),
+      checked !== undefined || !!checkboxGroup || value === undefined,
       "usage",
       "`value` is not a valid prop, do you mean `checked`?",
     );
   }
 
-  const checkboxProps: CheckboxProps<TValue> = { ...restProps };
-  if (checkboxGroup && !skipGroup) {
-    checkboxProps.onChange = (...args) => {
-      if (onChange) {
-        onChange(...args);
-      }
-      if (checkboxGroup.toggleOption && value !== undefined) {
-        checkboxGroup.toggleOption({ label: children, value });
-      }
-    };
-    checkboxProps.name = checkboxGroup.name;
-    checkboxProps.checked =
-      value === undefined
-        ? false
-        : Boolean(checkboxGroup.value?.includes(value));
-  }
+  const mergedChecked = isGroup
+    ? value === undefined
+      ? false
+      : !!checkboxGroup.value?.includes(value)
+    : checked;
 
   // ============================ Event Lock ============================
-  const [onLabelClick, onInputClick] = useBubbleLock(checkboxProps.onClick);
+  const [onLabelClick, onInputClick] = useBubbleLock(restProps.onClick);
 
   return (
     <Wave component="Checkbox" disabled={mergedDisabled}>
@@ -165,17 +156,19 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
             "disabled:border-black/55 disabled:bg-black/15",
           )}
           value={value as string | undefined}
-          checked={indeterminate ? "indeterminate" : restProps.checked}
+          checked={indeterminate ? "indeterminate" : mergedChecked}
+          defaultChecked={defaultChecked}
+          name={isGroup ? checkboxGroup.name : restProps.name}
           disabled={mergedDisabled}
           onClick={onInputClick}
-          onCheckedChange={(checked) => {
+          onCheckedChange={(nextChecked) => {
             onChange?.({
               type: "change",
               target: {
                 type: "checkbox",
-                name: props.name,
+                name: isGroup ? checkboxGroup.name : restProps.name,
                 value: value as unknown as TValue,
-                checked: checked === "indeterminate" ? false : checked,
+                checked: nextChecked === "indeterminate" ? false : nextChecked,
                 indeterminate,
                 // "aria-describedby": ariaDescribedBy,
                 // "aria-invalid": ariaInvalid,
@@ -189,6 +182,10 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
                 //
               },
             });
+
+            if (isGroup && checkboxGroup.toggleOption && value !== undefined) {
+              checkboxGroup.toggleOption({ label: children, value });
+            }
           }}
           {...restProps}
         />
