@@ -20,7 +20,7 @@ export interface AlignType {
    * move point of source node to align with point of target node.
    * Such as ['tr','cc'], align top right point of source node with center point of target node.
    * Point can be 't'(top), 'b'(bottom), 'c'(center), 'l'(left), 'r'(right) */
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
   points?: (string | AlignPoint)[];
   /**
    * @private Do not use in your production code
