@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-
 import React, { cloneElement, useRef } from "react";
 import isVisible from "@rc-component/util/lib/Dom/isVisible";
 import { composeRef, getNodeRef, supportRef } from "@rc-component/util/lib/ref";
