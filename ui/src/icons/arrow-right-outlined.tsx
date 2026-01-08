@@ -1,5 +1,5 @@
-import type { IconProps } from "./icon";
-import { Icon } from "./icon";
+import type { IconProps } from "./icon-component";
+import { Icon } from "./icon-component";
 
 type ArrowRightOutlinedProps = Omit<IconProps, "icon">;
 export const ArrowRightOutlined = (props: ArrowRightOutlinedProps) => {

@@ -1,4 +1,4 @@
-export * from "./icon";
+export { Icon, type IconProps } from "./icon-component";
 export * from "./wrapper";
 
 export * from "./arrow-down-filled";

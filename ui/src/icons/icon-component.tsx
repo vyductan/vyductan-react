@@ -4,6 +4,26 @@ import "iconify-icon";
 
 import { cn } from "@acme/ui/lib/utils";
 
+declare module "react" {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      "iconify-icon": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          icon: string;
+          width?: string | number;
+          height?: string | number;
+          flip?: string;
+          rotate?: string;
+          inline?: boolean;
+          class?: string;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
+
 // https://icon-sets.iconify.design/
 export type IconProps = DetailedHTMLProps<
   HTMLAttributes<HTMLSpanElement>,
@@ -22,6 +42,11 @@ export type IconProps = DetailedHTMLProps<
 const normalizeIconName = (icon: string): string => {
   // Remove icon-[ prefix and ] suffix if present
   let normalized = icon.replace(/^icon-\[/, "").replace(/\]$/, "");
+
+  // if not has "--" auto add "lucide:"
+  if (!normalized.includes("--") && !normalized.includes(":")) {
+    normalized = `lucide:${normalized}`;
+  }
 
   // Convert lucide-- to lucide:
   normalized = normalized.replace(/^lucide--/, "lucide:");

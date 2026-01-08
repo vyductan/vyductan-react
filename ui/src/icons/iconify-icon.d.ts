@@ -8,7 +8,7 @@ declare module "react" {
     interface IntrinsicElements {
       "iconify-icon": DetailedHTMLProps<
         HTMLAttributes<HTMLElement> & {
-          icon?: string;
+          icon: string;
           width?: string | number;
           height?: string | number;
           flip?: string;
