@@ -15,6 +15,7 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../../config-provider/size-context";
 import type { MentionData } from "../plugins/mentions-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
@@ -66,7 +67,10 @@ export function Plugins({
   variant = "default",
   mentionsData,
   className,
+  contentClassName,
+  placeholderClassName,
   autoFocus,
+  size = "middle",
 }: {
   placeholder?: string;
   onImageUpload?: (file: File) => Promise<string>;
@@ -74,7 +78,10 @@ export function Plugins({
   variant?: "default" | "simple";
   mentionsData?: MentionData[];
   className?: string;
+  contentClassName?: string;
+  placeholderClassName?: string;
   autoFocus?: boolean;
+  size?: SizeType;
 }) {
   const [editor] = useLexicalComposerContext();
   useEffect(() => {
@@ -145,6 +152,11 @@ export function Plugins({
         contentEditable={
           <div className="group relative" ref={onRef}>
             <ContentEditable
+              className={cn(
+                contentClassName,
+                size === "small" ? "text-sm" : "text-base",
+              )}
+              placeholderClassName={placeholderClassName}
               // className="py-[3px] px-0.5 text-sm wrap-break-word whitespace-break-spaces"
               placeholder={editable ? placeholder : ""}
               // placeholderClassName="text-gray-400 pointer-events-none absolute top-2.5 sm:top-3.5 left-2 sm:left-4 overflow-hidden leading-6 sm:leading-7 text-ellipsis select-none whitespace-nowrap transition-colors max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)]"
@@ -174,7 +186,7 @@ export function Plugins({
       <MentionsPlugin mentionsData={mentionsData} />
       {variant !== "simple" && <PageBreakPlugin />}
       {variant !== "simple" && editable && (
-        <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+        <DraggableBlockPlugin anchorElem={floatingAnchorElem} size={size} />
       )}
       {variant !== "simple" && <KeywordsPlugin />}
       <EmojisPlugin />

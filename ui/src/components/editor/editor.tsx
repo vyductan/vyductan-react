@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
+import type { SizeType } from "../config-provider/size-context";
 import type { ImageResolverFn } from "./context/image-resolver-context";
 import type { MentionData } from "./plugins/mentions-plugin";
 import { EditorProviders } from "./editor-providers";
@@ -42,7 +43,10 @@ type EditorPropsBase = {
   variant?: "default" | "simple";
   mentionsData?: MentionData[];
   className?: string;
+  contentClassName?: string;
+  placeholderClassName?: string;
   autoFocus?: boolean;
+  size?: SizeType;
 };
 
 type JsonEditorProps = EditorPropsBase & {
@@ -72,7 +76,10 @@ export function Editor({
   variant = "default",
   mentionsData,
   className,
+  contentClassName,
+  placeholderClassName,
   autoFocus = true,
+  size = "middle",
 }: EditorProps) {
   const isMarkdownMode = mode === "markdown";
 
@@ -93,7 +100,10 @@ export function Editor({
             variant={variant}
             mentionsData={mentionsData}
             className={className}
+            contentClassName={contentClassName}
+            placeholderClassName={placeholderClassName}
             autoFocus={autoFocus}
+            size={size}
           />
 
           {!isMarkdownMode && (

@@ -37,15 +37,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@acme/ui/components/popover";
+import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../../config-provider/size-context";
 import { $createCheckBlockNode } from "../nodes/check-block-node";
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
 
 export function DraggableBlockPlugin({
   anchorElem,
+  size = "middle",
 }: {
   anchorElem: HTMLElement | null;
+  size?: SizeType;
 }): JSX.Element | null {
   const menuRef = useRef<HTMLDivElement>(null);
   const targetLineRef = useRef<HTMLDivElement>(null);
@@ -309,25 +313,32 @@ export function DraggableBlockPlugin({
 
   /* Memoized Menu Component to prevent re-renders */
   const menuComponent = useMemo(() => {
+    const isSmall = size === "small";
+
     return (
       <div
         ref={setMenuRef}
         data-slot="draggable-block-menu"
-        className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} bg-background hover:bg-muted/50 absolute top-0 left-0 flex items-center justify-center p-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
+        className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute top-0 left-0 -ml-1 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
       >
         {/* Plus Button */}
         <div
-          className="text-muted-foreground hover:bg-muted hover:text-foreground mr-1 cursor-pointer rounded p-0.5 transition-colors"
+          className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded p-1 transition-colors"
           onClick={handleAddBlockBelow}
         >
-          <PlusIcon className="size-3" />
+          <PlusIcon className={isSmall ? "size-3" : "size-4"} />
         </div>
 
         {/* Drag Handle with Popover */}
         <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <PopoverTrigger asChild>
-            <div className="group/drag flex size-4 cursor-grab items-center justify-center rounded text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 active:scale-95 active:cursor-grabbing active:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-300">
-              <GripVerticalIcon className="size-3" />
+            <div
+              className={cn(
+                "group/drag flex cursor-grab items-center justify-center rounded text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 active:scale-95 active:cursor-grabbing active:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-300",
+                isSmall ? "h-4 w-3.5" : "h-6 w-5",
+              )}
+            >
+              <GripVerticalIcon className={isSmall ? "size-3" : "size-4"} />
             </div>
           </PopoverTrigger>
           <PopoverContent
@@ -437,6 +448,7 @@ export function DraggableBlockPlugin({
     menuElement,
     isMenuOpen,
     isTurnIntoOpen,
+    size,
   ]);
 
   // Hide target line when dragging outside the editor

@@ -108,7 +108,7 @@ export function ContentEditable({
           unicodeBidi: "plaintext",
         }}
         className={cn(
-          "px-12 py-4 text-sm wrap-break-word whitespace-break-spaces focus:outline-none",
+          "px-12 py-4 wrap-break-word whitespace-break-spaces focus:outline-none",
           className,
         )}
         aria-placeholder={dynamicPlaceholder}
