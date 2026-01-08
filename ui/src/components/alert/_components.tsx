@@ -2,9 +2,8 @@ import type { VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cva } from "class-variance-authority";
 
-import { cn } from "@acme/ui/lib/utils";
-
 import type { Alert as ShadcnAlert } from "@acme/ui/shadcn/alert";
+import { cn } from "@acme/ui/lib/utils";
 
 export const alertVariants = cva(
   [

@@ -1,8 +1,9 @@
 import type { XOR } from "ts-xor";
 
+import { Alert as ShadcnAlert } from "@acme/ui/shadcn/alert";
+
 import type { ShadcnAlertProps } from "./_components";
 import type { AlertProps as OwnAlertProps } from "./alert";
-import { Alert as ShadcnAlert } from "@acme/ui/shadcn/alert";
 import { Alert as OwnAlert } from "./alert";
 
 export * from "./_components";
