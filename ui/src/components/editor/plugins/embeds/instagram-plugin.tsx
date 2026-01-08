@@ -1,6 +1,6 @@
 /**
  * Instagram Plugin
- * 
+ *
  * Plugin để embed Instagram posts vào Lexical editor
  */
 
@@ -25,7 +25,9 @@ export function InstagramPlugin(): JSX.Element | null {
 
   useEffect(() => {
     if (!editor.hasNodes([InstagramNode])) {
-      throw new Error("InstagramPlugin: InstagramNode not registered on editor");
+      throw new Error(
+        "InstagramPlugin: InstagramNode not registered on editor",
+      );
     }
 
     return editor.registerCommand<string>(
@@ -42,4 +44,3 @@ export function InstagramPlugin(): JSX.Element | null {
 
   return null;
 }
-

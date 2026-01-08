@@ -1,6 +1,6 @@
 /**
  * Instagram Embed Node
- * 
+ *
  * Node để embed Instagram posts vào Lexical editor
  * Hỗ trợ Instagram URL: https://www.instagram.com/p/ABC123/
  */
@@ -40,19 +40,17 @@ function InstagramComponent({
 }: InstagramComponentProps) {
   useEffect(() => {
     // Load Instagram embed script
-    if (!window.instgrm) {
+    if (globalThis.instgrm) {
+      globalThis.instgrm.Embeds.process();
+    } else {
       const script = document.createElement("script");
       script.src = "https://www.instagram.com/embed.js";
       script.async = true;
-      document.body.appendChild(script);
+      document.body.append(script);
 
-      script.onload = () => {
-        if (window.instgrm?.Embeds) {
-          window.instgrm.Embeds.process();
-        }
-      };
-    } else if (window.instgrm?.Embeds) {
-      window.instgrm.Embeds.process();
+      script.addEventListener("load", () => {
+        globalThis.instgrm?.Embeds.process();
+      });
     }
   }, [postId]);
 
@@ -154,8 +152,8 @@ export class InstagramNode extends DecoratorBlockNode {
     const element = document.createElement("blockquote");
     element.dataset.lexicalInstagram = this.__id;
     element.className = "instagram-media";
-    element.setAttribute("data-instgrm-permalink", `https://www.instagram.com/p/${this.__id}/`);
-    element.setAttribute("data-instgrm-version", "14");
+    element.dataset.instgrmPermalink = `https://www.instagram.com/p/${this.__id}/`;
+    element.dataset.instgrmVersion = "14";
     return { element };
   }
 
@@ -215,14 +213,13 @@ export function $isInstagramNode(
   return node instanceof InstagramNode;
 }
 
-// Extend Window interface for Instagram embed
+// Extend globalThis for Instagram embed
 declare global {
-  interface Window {
-    instgrm?: {
-      Embeds: {
-        process: () => void;
-      };
-    };
-  }
+  var instgrm:
+    | {
+        Embeds: {
+          process: () => void;
+        };
+      }
+    | undefined;
 }
-

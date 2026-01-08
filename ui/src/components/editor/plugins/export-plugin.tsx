@@ -1,13 +1,19 @@
 /**
  * Export Plugin
- * 
+ *
  * Plugin để export editor content ra PDF và Word
  * Hỗ trợ:
  * - Export to PDF
  * - Export to Word (DOCX)
  */
 
+import type { LexicalEditor } from "lexical";
 import { useState } from "react";
+import { $convertToMarkdownString } from "@lexical/markdown";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $getRoot } from "lexical";
+import { DownloadIcon, FileIcon, FileTextIcon } from "lucide-react";
+
 import { Button } from "@acme/ui/components/button";
 import { Dropdown } from "@acme/ui/components/dropdown";
 import {
@@ -15,37 +21,33 @@ import {
   TooltipRoot,
   TooltipTrigger,
 } from "@acme/ui/components/tooltip";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import type { LexicalEditor } from "lexical";
-import { $getRoot } from "lexical";
-import { $convertToMarkdownString } from "@lexical/markdown";
-import { DownloadIcon, FileTextIcon, FileIcon } from "lucide-react";
+
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 /**
  * Export to PDF using browser print functionality
  */
-async function exportToPDF(editor: LexicalEditor, fileName: string) {
+function exportToPDF(editor: LexicalEditor, fileName: string) {
   const editorState = editor.getEditorState();
   let htmlContent = "";
 
   editorState.read(() => {
-    const root = $getRoot();
+    const _root = $getRoot();
     const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-    
+
     // Convert markdown to HTML for better PDF rendering
     // Simple markdown to HTML conversion
     htmlContent = markdown
-      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-      .replace(/^\* (.*$)/gim, "<li>$1</li>")
-      .replace(/^\d+\. (.*$)/gim, "<li>$1</li>")
-      .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/gim, "<em>$1</em>")
-      .replace(/`(.*?)`/gim, "<code>$1</code>")
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>')
-      .replace(/\n/gim, "<br>");
+      .replaceAll(/^# (.*$)/gim, "<h1>$1</h1>")
+      .replaceAll(/^## (.*$)/gim, "<h2>$1</h2>")
+      .replaceAll(/^### (.*$)/gim, "<h3>$1</h3>")
+      .replaceAll(/^\* (.*$)/gim, "<li>$1</li>")
+      .replaceAll(/^\d+\. (.*$)/gim, "<li>$1</li>")
+      .replaceAll(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+      .replaceAll(/\*(.*?)\*/gim, "<em>$1</em>")
+      .replaceAll(/`(.*?)`/gim, "<code>$1</code>")
+      .replaceAll(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>')
+      .replaceAll(/\n/gim, "<br>");
   });
 
   // Create a new window for printing
@@ -87,7 +89,7 @@ async function exportToPDF(editor: LexicalEditor, fileName: string) {
   `);
 
   printWindow.document.close();
-  
+
   // Wait for content to load, then print
   setTimeout(() => {
     printWindow.print();
@@ -101,26 +103,26 @@ async function exportToPDF(editor: LexicalEditor, fileName: string) {
 /**
  * Export to Word (DOCX) by creating HTML file with proper MIME type
  */
-async function exportToWord(editor: LexicalEditor, fileName: string) {
+function exportToWord(editor: LexicalEditor, fileName: string) {
   const editorState = editor.getEditorState();
   let htmlContent = "";
 
   editorState.read(() => {
-    const root = $getRoot();
+    const _root = $getRoot();
     const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-    
+
     // Convert markdown to HTML
     htmlContent = markdown
-      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
-      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-      .replace(/^\* (.*$)/gim, "<li>$1</li>")
-      .replace(/^\d+\. (.*$)/gim, "<li>$1</li>")
-      .replace(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/gim, "<em>$1</em>")
-      .replace(/`(.*?)`/gim, "<code>$1</code>")
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>')
-      .replace(/\n/gim, "<br>");
+      .replaceAll(/^# (.*$)/gim, "<h1>$1</h1>")
+      .replaceAll(/^## (.*$)/gim, "<h2>$1</h2>")
+      .replaceAll(/^### (.*$)/gim, "<h3>$1</h3>")
+      .replaceAll(/^\* (.*$)/gim, "<li>$1</li>")
+      .replaceAll(/^\d+\. (.*$)/gim, "<li>$1</li>")
+      .replaceAll(/\*\*(.*?)\*\*/gim, "<strong>$1</strong>")
+      .replaceAll(/\*(.*?)\*/gim, "<em>$1</em>")
+      .replaceAll(/`(.*?)`/gim, "<code>$1</code>")
+      .replaceAll(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>')
+      .replaceAll(/\n/gim, "<br>");
   });
 
   // Create Word document HTML
@@ -168,7 +170,7 @@ async function exportToWord(editor: LexicalEditor, fileName: string) {
   // Create blob and download
   const blob = new Blob(
     [
-      "\ufeff", // BOM for UTF-8
+      "\uFEFF", // BOM for UTF-8
       wordContent,
     ],
     { type: "application/msword" },
@@ -178,9 +180,9 @@ async function exportToWord(editor: LexicalEditor, fileName: string) {
   const link = document.createElement("a");
   link.href = url;
   link.download = `${fileName}.doc`;
-  document.body.appendChild(link);
+  document.body.append(link);
   link.click();
-  document.body.removeChild(link);
+  link.remove();
   URL.revokeObjectURL(url);
 }
 
@@ -188,11 +190,11 @@ export function ExportPlugin() {
   const [editor] = useLexicalComposerContext();
   const [isExporting, setIsExporting] = useState(false);
 
-  const handleExportPDF = async () => {
+  const handleExportPDF = () => {
     setIsExporting(true);
     try {
       const fileName = `Document ${new Date().toISOString().split("T")[0]}`;
-      await exportToPDF(editor, fileName);
+      exportToPDF(editor, fileName);
     } catch (error) {
       console.error("Error exporting PDF:", error);
       alert("Failed to export PDF. Please try again.");
@@ -201,11 +203,11 @@ export function ExportPlugin() {
     }
   };
 
-  const handleExportWord = async () => {
+  const handleExportWord = () => {
     setIsExporting(true);
     try {
       const fileName = `Document ${new Date().toISOString().split("T")[0]}`;
-      await exportToWord(editor, fileName);
+      exportToWord(editor, fileName);
     } catch (error) {
       console.error("Error exporting Word:", error);
       alert("Failed to export Word document. Please try again.");
@@ -254,4 +256,3 @@ export function ExportPlugin() {
     </TooltipRoot>
   );
 }
-

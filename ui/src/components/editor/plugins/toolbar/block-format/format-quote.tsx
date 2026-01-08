@@ -1,7 +1,8 @@
-import { SelectItem } from "@acme/ui/components/select";
 import { $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection } from "lexical";
+
+import { SelectItem } from "@acme/ui/components/select";
 
 import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";

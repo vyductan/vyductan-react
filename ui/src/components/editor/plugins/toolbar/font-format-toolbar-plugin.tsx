@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { BaseSelection, TextFormatType } from "lexical";
 import { useState } from "react";
-import { Toggle } from "@acme/ui/components/toggle";
 import { $isTableSelection } from "@lexical/table";
 import { $isRangeSelection, FORMAT_TEXT_COMMAND } from "lexical";
 import {
@@ -11,6 +10,8 @@ import {
   StrikethroughIcon,
   UnderlineIcon,
 } from "lucide-react";
+
+import { Toggle } from "@acme/ui/components/toggle";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";

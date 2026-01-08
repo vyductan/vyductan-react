@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+
 import { message } from "../../message";
 
 interface EditorErrorBoundaryProps {
@@ -46,9 +47,12 @@ export class EditorErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError && this.state.error) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
+      const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;
       return (
-        <FallbackComponent error={this.state.error} resetError={this.resetError} />
+        <FallbackComponent
+          error={this.state.error}
+          resetError={this.resetError}
+        />
       );
     }
 
@@ -67,20 +71,19 @@ function DefaultErrorFallback({
   resetError: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center p-8 border border-red-200 rounded-lg bg-red-50">
-      <h3 className="text-lg font-semibold text-red-800 mb-2">
+    <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
+      <h3 className="mb-2 text-lg font-semibold text-red-800">
         Lỗi trình soạn thảo
       </h3>
-      <p className="text-sm text-red-600 mb-4">
+      <p className="mb-4 text-sm text-red-600">
         {error.message || "Đã xảy ra lỗi không xác định"}
       </p>
       <button
         onClick={resetError}
-        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+        className="rounded bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
       >
         Thử lại
       </button>
     </div>
   );
 }
-

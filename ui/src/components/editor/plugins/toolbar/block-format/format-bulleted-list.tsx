@@ -1,4 +1,3 @@
-import { SelectItem } from "@acme/ui/components/select";
 import { INSERT_UNORDERED_LIST_COMMAND } from "@lexical/list";
 import { $setBlocksType } from "@lexical/selection";
 import {
@@ -6,6 +5,8 @@ import {
   $getSelection,
   $isRangeSelection,
 } from "lexical";
+
+import { SelectItem } from "@acme/ui/components/select";
 
 import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";

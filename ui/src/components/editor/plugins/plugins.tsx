@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ClickableLinkPlugin } from "@lexical/react/LexicalClickableLinkPlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { HashtagPlugin } from "@lexical/react/LexicalHashtagPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
@@ -14,14 +13,18 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 
+import { cn } from "@acme/ui/lib/utils";
+
+import type { MentionData } from "../plugins/mentions-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
+import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
+import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
+import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
 import { CodeHighlightPlugin } from "../plugins/code-highlight-plugin";
-import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
 import { CollapsiblePlugin } from "../plugins/collapsible-plugin";
 import { ComponentPickerMenuPlugin } from "../plugins/component-picker-plugin";
-import { ContextMenuPlugin } from "../plugins/context-menu-plugin";
 import { DragDropPastePlugin } from "../plugins/drag-drop-paste-plugin";
 import { DraggableBlockPlugin } from "../plugins/draggable-block-plugin";
 import { AutoEmbedPlugin } from "../plugins/embeds/auto-embed-plugin";
@@ -36,15 +39,15 @@ import { EquationsPlugin } from "../plugins/equations-plugin";
 import { ExcalidrawPlugin } from "../plugins/excalidraw-plugin";
 import { FileAttachmentPlugin } from "../plugins/file-attachment-plugin";
 import { FindReplacePlugin } from "../plugins/find-replace-plugin";
-import { FixedToolbarPlugin } from "../plugins/fixed-toolbar-plugin";
 import { FloatingLinkEditorPlugin } from "../plugins/floating-link-editor-plugin";
 import { FloatingTextFormatToolbarPlugin } from "../plugins/floating-text-format-toolbar-plugin";
 import { ImagesPlugin } from "../plugins/images-plugin";
-import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { KeyboardShortcutsHelpPlugin } from "../plugins/keyboard-shortcuts-help-plugin";
+import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { LayoutPlugin } from "../plugins/layout-plugin";
 import { LinkPlugin } from "../plugins/link-plugin";
 import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugin";
+import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
@@ -54,11 +57,30 @@ import { TOCPlugin } from "../plugins/toc-plugin";
 import { VideoPlugin } from "../plugins/video-plugin";
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 
+// import { EditorDebugViewPlugin } from "./actions/editor-debug-view-plugin";
+
 export function Plugins({
-  placeholder = "Type '/' for commands, or 'Ctrl+/' for shortcuts",
+  placeholder = "Write, press ‘space’ for AI, ‘/’ for commands…",
+  onImageUpload,
+  editable = true,
+  variant = "default",
+  mentionsData,
+  className,
+  autoFocus,
 }: {
   placeholder?: string;
+  onImageUpload?: (file: File) => Promise<string>;
+  editable?: boolean;
+  variant?: "default" | "simple";
+  mentionsData?: MentionData[];
+  className?: string;
+  autoFocus?: boolean;
 }) {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    editor.setEditable(editable);
+  }, [editor, editable]);
+
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -72,7 +94,13 @@ export function Plugins({
   return (
     <div
       ref={containerRef}
-      className="editor-scroll-container relative min-h-[300px] sm:min-h-[400px] overflow-auto bg-white rounded-lg transition-colors"
+      className={cn(
+        "editor-scroll-container relative transition-colors",
+        editable
+          ? "min-h-[300px] overflow-y-auto sm:min-h-[400px]"
+          : "min-h-0 overflow-visible",
+        className,
+      )}
       style={{
         scrollbarWidth: "thin",
         scrollbarColor: "rgba(156, 163, 175, 0) transparent",
@@ -109,17 +137,17 @@ export function Plugins({
       `,
         }}
       />
-      {/* Fixed Toolbar - Toolbar cố định ở trên editor */}
-      <FixedToolbarPlugin containerRef={containerRef} />
+      {/* <FixedToolbarPlugin containerRef={containerRef} /> */}
+      {/* <FixedToolbarPlugin containerRef={containerRef} /> */}
 
-      <AutoFocusPlugin />
+      {autoFocus && editable && <AutoFocusPlugin />}
       <RichTextPlugin
         contentEditable={
-          <div className="group" ref={onRef}>
+          <div className="group relative" ref={onRef}>
             <ContentEditable
-              className="pl-6 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 focus:outline-none font-sans text-sm sm:text-[15px] leading-6 sm:leading-7 min-h-[200px] transition-colors"
-              placeholder={placeholder}
-              placeholderClassName="text-gray-400 pointer-events-none absolute top-2 sm:top-3 left-6 sm:left-8 overflow-hidden leading-6 sm:leading-7 text-ellipsis select-none whitespace-nowrap transition-colors max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)]"
+              // className="py-[3px] px-0.5 text-sm wrap-break-word whitespace-break-spaces"
+              placeholder={editable ? placeholder : ""}
+              // placeholderClassName="text-gray-400 pointer-events-none absolute top-2.5 sm:top-3.5 left-2 sm:left-4 overflow-hidden leading-6 sm:leading-7 text-ellipsis select-none whitespace-nowrap transition-colors max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)]"
             />
           </div>
         }
@@ -128,59 +156,80 @@ export function Plugins({
 
       <ClickableLinkPlugin />
       <CheckListPlugin />
+      {variant !== "simple" && editable && <BlockCopyPastePlugin />}
+      <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
-      <TableActionsPlugin anchorElem={floatingAnchorElem} />
+      <TablePlugin />
+      {variant !== "simple" && editable && (
+        <TableActionsPlugin anchorElem={floatingAnchorElem} />
+      )}
       <TOCPlugin />
       <ListPlugin />
       <TabIndentationPlugin />
-      <HashtagPlugin />
+      {variant !== "simple" && <HashtagPlugin />}
       <HistoryPlugin />
       <BlockTypeNormalizationPlugin />
 
-      <MentionsPlugin />
-      <PageBreakPlugin />
-      <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
-      <KeywordsPlugin />
+      <MentionsPlugin mentionsData={mentionsData} />
+      {variant !== "simple" && <PageBreakPlugin />}
+      {variant !== "simple" && editable && (
+        <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
+      )}
+      {variant !== "simple" && <KeywordsPlugin />}
       <EmojisPlugin />
-      <ImagesPlugin />
-      <VideoPlugin />
-      <FileAttachmentPlugin />
-      <ExcalidrawPlugin />
-      <PollPlugin />
-      <LayoutPlugin />
-      <EquationsPlugin />
-      <CollapsiblePlugin />
+      {variant !== "simple" && <ImagesPlugin />}
+      {variant !== "simple" && <VideoPlugin />}
+      {variant !== "simple" && <FileAttachmentPlugin />}
+      {variant !== "simple" && <ExcalidrawPlugin />}
+      {variant !== "simple" && <PollPlugin />}
+      {variant !== "simple" && <LayoutPlugin />}
+      {variant !== "simple" && <EquationsPlugin />}
+      {variant !== "simple" && <CollapsiblePlugin />}
 
-      <AutoEmbedPlugin />
-      <FigmaPlugin />
-      <YouTubePlugin />
-      <TwitterPlugin />
-      <InstagramPlugin />
-      <TikTokPlugin />
+      {variant !== "simple" && <AutoEmbedPlugin />}
+      {variant !== "simple" && <FigmaPlugin />}
+      {variant !== "simple" && <YouTubePlugin />}
+      {variant !== "simple" && <TwitterPlugin />}
+      {variant !== "simple" && <InstagramPlugin />}
+      {variant !== "simple" && <TikTokPlugin />}
 
       <CodeHighlightPlugin />
-      <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+      {variant !== "simple" && editable && (
+        <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+      )}
 
-      {/* Tắt MarkdownShortcutPlugin để tránh tự động thay đổi text khi gõ markdown syntax */}
-      {/* <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} /> */}
+      {/* MarkdownShortcutPlugin enabled for checklist support (- [ ]) */}
+      <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
       {/* <TypingPerfPlugin /> */}
       <TabFocusPlugin />
       <AutoLinkPlugin />
       <LinkPlugin />
       <FindReplacePlugin />
 
-      {/* ComponentPickerMenuPlugin - ĐÃ TẮT để tránh tự động thay đổi text khi gõ "/" */}
-      {/* <ComponentPickerMenuPlugin /> */}
-      <ContextMenuPlugin />
-      <DragDropPastePlugin />
-      <EmojiPickerPlugin />
+      {/* ComponentPickerMenuPlugin - Slash commands like Not ion */}
+      {variant !== "simple" && editable && <ComponentPickerMenuPlugin />}
+      {/* <ContextMenuPlugin /> */}
+      {variant !== "simple" && editable && (
+        <DragDropPastePlugin
+          onImageUpload={onImageUpload}
+          anchorElem={floatingAnchorElem ?? undefined}
+        />
+      )}
+      {editable && <MarkdownPastePlugin />}
+      {editable && <EmojiPickerPlugin />}
 
-      <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />
-      <FloatingTextFormatToolbarPlugin anchorElem={floatingAnchorElem} />
+      {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />}
+      {editable && (
+        <FloatingTextFormatToolbarPlugin
+          anchorElem={floatingAnchorElem}
+          variant={variant}
+        />
+      )}
 
       <KeyboardShortcutsHelpPlugin />
-      <ListMaxIndentLevelPlugin />
+      {editable && <ListMaxIndentLevelPlugin />}
+      {/* <EditorDebugViewPlugin /> */}
     </div>
   );
 }

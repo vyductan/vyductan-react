@@ -46,7 +46,7 @@ export function ToolbarContext({
   children: React.ReactNode;
 }) {
   const formatHandledRef = useRef(false);
-  
+
   return (
     <Context.Provider
       value={{

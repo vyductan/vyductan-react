@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -15,7 +13,7 @@ import type {
 } from "@excalidraw/excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
 import type { JSX } from "react";
-import * as React from "react";
+import type * as React from "react";
 import { useEffect, useState } from "react";
 import { exportToSvg } from "@excalidraw/excalidraw";
 
@@ -90,48 +88,47 @@ const ExcalidrawImage = ({
   height = "inherit",
   ref,
 }: Props & { ref?: React.Ref<HTMLDivElement> }): JSX.Element => {
-    const [Svg, setSvg] = useState<SVGElement | null>(null);
+  const [Svg, setSvg] = useState<SVGElement | null>(null);
 
-    useEffect(() => {
-      const setContent = async () => {
-        // Only run on client side to avoid SSR issues
-        if (globalThis.window === undefined) {
-          return;
-        }
+  useEffect(() => {
+    const setContent = async () => {
+      // Only run on client side to avoid SSR issues
+      if (globalThis.window === undefined) {
+        return;
+      }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        const svg: SVGElement = await exportToSvg({
-          appState,
-          elements,
-          files,
-        });
-        removeStyleFromSvg_HACK(svg);
+      const svg: SVGElement = await exportToSvg({
+        appState,
+        elements,
+        files,
+      });
+      removeStyleFromSvg_HACK(svg);
 
-        svg.setAttribute("width", "100%");
-        svg.setAttribute("height", "100%");
-        svg.setAttribute("display", "block");
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      svg.setAttribute("display", "block");
 
-        setSvg(svg);
-      };
-      void setContent();
-    }, [elements, files, appState]);
+      setSvg(svg);
+    };
+    void setContent();
+  }, [elements, files, appState]);
 
-    const containerStyle: React.CSSProperties = {};
-    if (width !== "inherit") {
-      containerStyle.width = `${width}px`;
-    }
-    if (height !== "inherit") {
-      containerStyle.height = `${height}px`;
-    }
+  const containerStyle: React.CSSProperties = {};
+  if (width !== "inherit") {
+    containerStyle.width = `${width}px`;
+  }
+  if (height !== "inherit") {
+    containerStyle.height = `${height}px`;
+  }
 
-    return (
-      <div
-        ref={ref}
-        className={rootClassName ?? ""}
-        style={containerStyle}
-        dangerouslySetInnerHTML={{ __html: Svg?.outerHTML ?? "" }}
-      />
-    );
+  return (
+    <div
+      ref={ref}
+      className={rootClassName ?? ""}
+      style={containerStyle}
+      dangerouslySetInnerHTML={{ __html: Svg?.outerHTML ?? "" }}
+    />
+  );
 };
 
 ExcalidrawImage.displayName = "ExcalidrawImage";

@@ -8,20 +8,18 @@ export const editorTheme: EditorThemeClasses = {
   ltr: "text-left",
   rtl: "text-right",
   heading: {
-    h1: "scroll-m-20 text-3xl font-bold tracking-tight my-2",
-    h2: "scroll-m-20 text-2xl font-semibold tracking-tight my-2",
-    h3: "scroll-m-20 text-xl font-semibold tracking-tight my-2",
-    h4: "scroll-m-20 text-lg font-semibold tracking-tight my-1.5",
-    h5: "scroll-m-20 text-base font-semibold tracking-tight my-1.5",
-    h6: "scroll-m-20 text-sm font-semibold tracking-tight my-1",
+    h1: "scroll-m-20 text-3xl font-bold tracking-tight leading-[44px]",
+    h2: "scroll-m-20 text-2xl font-semibold tracking-tight leading-[36px]",
+    h3: "scroll-m-20 text-xl font-semibold tracking-tight leading-[32px]",
+    h4: "scroll-m-20 text-lg font-semibold tracking-tight leading-[28px]",
+    h5: "scroll-m-20 text-base font-semibold tracking-tight leading-[24px]",
+    h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px]",
   },
-  paragraph: cn(
-    "leading-7 my-1",
-  ),
+  paragraph: cn("leading-[24px]"),
   quote: "border-l-[3px] border-gray-300 pl-3.5 pr-0 my-1 italic text-gray-600",
   link: "text-inherit underline decoration-[rgba(55,53,47,0.4)] underline-offset-2 hover:decoration-[rgba(55,53,47,0.6)] transition-colors cursor-pointer",
   list: {
-    checklist: "relative",
+    checklist: "relative !list-none p-0",
     listitem: "mx-0",
     listitemChecked:
       'relative mx-0 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
@@ -38,7 +36,12 @@ export const editorTheme: EditorThemeClasses = {
       "list-outside !list-[upper-alpha]",
       "list-outside !list-[lower-alpha]",
     ],
-    ul: "my-1 ml-6 p-0 list-outside [&>li]:mt-1",
+    ul: "my-1 ml-6 list-disc [&>li]:mt-1",
+    ulDepth: [
+      "list-outside !list-disc",
+      "list-outside !list-[circle]",
+      "list-outside !list-[square]",
+    ],
   },
   hashtag: "text-blue-600 bg-blue-100 rounded-md px-1",
   text: {
@@ -105,7 +108,7 @@ export const editorTheme: EditorThemeClasses = {
     "EditorTheme__tableCellResizer absolute -right-1 h-full w-2 cursor-ew-resize z-10 top-0",
   tableCellSelected: "EditorTheme__tableCellSelected bg-muted",
   tableCellSortedIndicator:
-    "EditorTheme__tableCellSortedIndicator block opacity-50 bsolute bottom-0 left-0 w-full h-1 bg-muted",
+    "EditorTheme__tableCellSortedIndicator block opacity-50 absolute bottom-0 left-0 w-full h-1 bg-muted",
   tableResizeRuler:
     "EditorTheme__tableCellResizeRuler block absolute w-[1px] h-full bg-primary top-0",
   tableRowStriping:
@@ -124,4 +127,8 @@ export const editorTheme: EditorThemeClasses = {
   indent: "[--lexical-indent-base-value:40px]",
   mark: "",
   markOverlap: "",
+  checkBlock:
+    'relative pl-8 my-1 [&>span[data-lexical-text="true"]]:w-full [&>span[data-lexical-text="true"]]:inline-block before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-1 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded hover:before:bg-muted focus:before:ring-2 focus:before:ring-offset-1 focus:before:ring-primary',
+  checkBlockChecked:
+    '[&>span[data-lexical-text="true"]]:line-through text-muted-foreground before:bg-primary hover:before:bg-primary before:bg-no-repeat after:content-[""] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-[7px] after:w-[3px] after:left-[10.5px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
 };

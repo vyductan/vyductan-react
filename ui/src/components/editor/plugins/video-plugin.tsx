@@ -1,6 +1,6 @@
 /**
  * Video Plugin
- * 
+ *
  * Plugin để upload và insert video files vào Lexical editor
  * Hỗ trợ:
  * - Upload video file (MP4, WebM, etc.)
@@ -10,6 +10,16 @@
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $wrapNodeInElement } from "@lexical/utils";
+import {
+  $createParagraphNode,
+  $insertNodes,
+  $isRootOrShadowRoot,
+  COMMAND_PRIORITY_EDITOR,
+  createCommand,
+} from "lexical";
+
 import { Button } from "@acme/ui/components/button";
 import { Input } from "@acme/ui/components/input";
 import { Label } from "@acme/ui/components/label";
@@ -20,16 +30,6 @@ import {
   TabsRoot,
   TabsTrigger,
 } from "@acme/ui/components/tabs";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $insertNodeToNearestRoot, $wrapNodeInElement } from "@lexical/utils";
-import {
-  $createParagraphNode,
-  $getSelection,
-  $insertNodes,
-  $isRootOrShadowRoot,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from "lexical";
 
 import type { VideoPayload } from "../nodes/video-node";
 import { $createVideoNode, VideoNode } from "../nodes/video-node";
@@ -99,8 +99,13 @@ export function InsertVideoUploadedDialogBody({
     if (!file) return;
 
     // Validate file type
-    const validTypes = ["video/mp4", "video/webm", "video/ogg", "video/quicktime"];
-    if (!validTypes.some((type) => file.type.startsWith(type.split("/")[0]!))) {
+    const validTypes = [
+      "video/mp4",
+      "video/webm",
+      "video/ogg",
+      "video/quicktime",
+    ];
+    if (!validTypes.includes(file.type) && !file.type.startsWith("video/")) {
       alert("Please select a valid video file (MP4, WebM, OGG, etc.)");
       return;
     }
@@ -219,4 +224,3 @@ export function VideoPlugin(): JSX.Element | null {
 
   return null;
 }
-

@@ -15,10 +15,6 @@ import type {
 } from "lexical";
 import type { JSX } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import { Input } from "@acme/ui/components/input";
-import { Label } from "@acme/ui/components/label";
-import { DialogFooter } from "@acme/ui/components/modal";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $createTableNodeWithDimensions,
@@ -26,6 +22,11 @@ import {
   TableNode,
 } from "@lexical/table";
 import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { DialogFooter } from "@acme/ui/components/modal";
 
 import { invariant } from "../shared/invariant";
 

@@ -10,8 +10,6 @@ import type { LexicalNode } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useMemo } from "react";
 import * as React from "react";
-import { CommandItem, CommandList, CommandRoot } from "@acme/ui/components/command";
-import { PopoverContent, PopoverRoot } from "@acme/ui/components/popover";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { MenuOption } from "@lexical/react/LexicalContextMenuPlugin";
@@ -23,6 +21,13 @@ import {
   CUT_COMMAND,
   PASTE_COMMAND,
 } from "lexical";
+
+import {
+  CommandItem,
+  CommandList,
+  CommandRoot,
+} from "@acme/ui/components/command";
+import { PopoverContent, PopoverRoot } from "@acme/ui/components/popover";
 
 import { LexicalContextMenuPlugin } from "./default/lexical-context-menu-plugin";
 

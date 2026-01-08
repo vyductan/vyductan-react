@@ -1,10 +1,11 @@
-import { SelectItem } from "@acme/ui/components/select";
 import { $setBlocksType } from "@lexical/selection";
 import {
   $createParagraphNode,
   $getSelection,
   $isRangeSelection,
 } from "lexical";
+
+import { SelectItem } from "@acme/ui/components/select";
 
 import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";

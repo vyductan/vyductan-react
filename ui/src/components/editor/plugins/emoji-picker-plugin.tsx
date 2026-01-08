@@ -1,18 +1,5 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
 import type { TextNode } from "lexical";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandRoot,
-} from "@acme/ui/components/command";
+import { useCallback, useMemo, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   MenuOption,
@@ -21,6 +8,14 @@ import {
 import { $createTextNode, $getSelection, $isRangeSelection } from "lexical";
 import { createPortal } from "react-dom";
 
+import {
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandRoot,
+} from "@acme/ui/components/command";
+
+import emojiList from "../utils/emoji-list";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 class EmojiOption extends MenuOption {
@@ -42,32 +37,12 @@ class EmojiOption extends MenuOption {
   }
 }
 
-type Emoji = {
-  emoji: string;
-  description: string;
-  category: string;
-  aliases: Array<string>;
-  tags: Array<string>;
-  unicode_version: string;
-  ios_version: string;
-  skin_tones?: boolean;
-};
-
 const MAX_EMOJI_SUGGESTION_COUNT = 10;
 
 export function EmojiPickerPlugin() {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
-  const [emojis, setEmojis] = useState<Array<Emoji>>([]);
-  useEffect(() => {
-    void import("../utils/emoji-list")
-      .then((file) => {
-        setEmojis(file.default);
-      })
-      .catch((error) => {
-        console.error("Failed to load emoji list", error);
-      });
-  }, []);
+  const emojis = emojiList; // Use the static list directly
 
   const emojiOptions = useMemo(
     () =>
@@ -171,7 +146,7 @@ export function EmojiPickerPlugin() {
                           className={`flex items-center gap-2 ${
                             selectedIndex === index
                               ? "bg-accent"
-                              : "!bg-transparent"
+                              : "bg-transparent!"
                           }`}
                         >
                           {option.emoji} {option.title}

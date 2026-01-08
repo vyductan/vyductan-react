@@ -1,6 +1,6 @@
 /**
  * Twitter Plugin
- * 
+ *
  * Plugin để embed Twitter tweets vào Lexical editor
  */
 
@@ -42,4 +42,3 @@ export function TwitterPlugin(): JSX.Element | null {
 
   return null;
 }
-

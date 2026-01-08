@@ -1,6 +1,6 @@
 /**
  * File Attachment Node
- * 
+ *
  * Node để render file attachment trong Lexical editor
  * Hỗ trợ các loại file: PDF, DOCX, XLSX, PPTX, ZIP, etc.
  */
@@ -37,13 +37,13 @@ function $convertFileAttachmentElement(
   domNode: Node,
 ): null | DOMConversionOutput {
   const element = domNode as HTMLElement;
-  const fileName = element.getAttribute("data-file-name") || "File";
-  const fileUrl = element.getAttribute("data-file-url") || "";
-  const fileSize = element.getAttribute("data-file-size")
-    ? Number.parseInt(element.getAttribute("data-file-size") || "0", 10)
+  const fileName = element.dataset.fileName ?? "File";
+  const fileUrl = element.dataset.fileUrl ?? "";
+  const fileSize = element.dataset.fileSize
+    ? Number.parseInt(element.dataset.fileSize, 10)
     : undefined;
-  const mimeType = element.getAttribute("data-mime-type") || undefined;
-  const description = element.getAttribute("data-description") || undefined;
+  const mimeType = element.dataset.mimeType ?? undefined;
+  const description = element.dataset.description ?? undefined;
 
   if (!fileUrl) {
     return null;
@@ -92,8 +92,11 @@ export class FileAttachmentNode extends DecoratorNode<JSX.Element> {
     );
   }
 
-  static importJSON(serializedNode: SerializedFileAttachmentNode): FileAttachmentNode {
-    const { fileName, fileUrl, fileSize, mimeType, description } = serializedNode;
+  static importJSON(
+    serializedNode: SerializedFileAttachmentNode,
+  ): FileAttachmentNode {
+    const { fileName, fileUrl, fileSize, mimeType, description } =
+      serializedNode;
     return $createFileAttachmentNode({
       fileName,
       fileUrl,
@@ -104,27 +107,31 @@ export class FileAttachmentNode extends DecoratorNode<JSX.Element> {
   }
 
   exportDOM(): DOMExportOutput {
-    const element = document.createElement("div");
-    element.setAttribute("data-file-name", this.__fileName);
-    element.setAttribute("data-file-url", this.__fileUrl);
+    // Export as markdown link: [filename](fileUrl)
+    const anchor = document.createElement("a");
+    anchor.href = this.__fileUrl;
+    anchor.textContent = this.__fileName;
+    anchor.dataset.fileAttachment = "true";
+
+    // Add metadata as data attributes for potential import
     if (this.__fileSize) {
-      element.setAttribute("data-file-size", this.__fileSize.toString());
+      anchor.dataset.fileSize = this.__fileSize.toString();
     }
     if (this.__mimeType) {
-      element.setAttribute("data-mime-type", this.__mimeType);
+      anchor.dataset.mimeType = this.__mimeType;
     }
     if (this.__description) {
-      element.setAttribute("data-description", this.__description);
+      anchor.title = this.__description;
     }
-    element.textContent = this.__fileName;
-    return { element };
+
+    return { element: anchor };
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       div: (node: Node) => {
         const element = node as HTMLElement;
-        if (element.hasAttribute("data-file-url")) {
+        if (Object.hasOwn(element.dataset, "fileUrl")) {
           return {
             conversion: $convertFileAttachmentElement,
             priority: 0,
@@ -222,4 +229,3 @@ export function $isFileAttachmentNode(
 ): node is FileAttachmentNode {
   return node instanceof FileAttachmentNode;
 }
-

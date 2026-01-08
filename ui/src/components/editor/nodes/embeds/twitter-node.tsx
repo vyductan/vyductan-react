@@ -1,6 +1,6 @@
 /**
  * Twitter Embed Node
- * 
+ *
  * Node để embed Twitter tweets vào Lexical editor
  * Hỗ trợ Twitter URL: https://twitter.com/username/status/1234567890
  */
@@ -40,20 +40,20 @@ function TwitterComponent({
 }: TwitterComponentProps) {
   useEffect(() => {
     // Load Twitter widget script
-    if (!window.twttr) {
+    if (globalThis.twttr) {
+      globalThis.twttr.widgets.load();
+    } else {
       const script = document.createElement("script");
       script.src = "https://platform.twitter.com/widgets.js";
       script.async = true;
-      script.charset = "utf-8";
-      document.body.appendChild(script);
+      script.charset = "utf8";
+      document.body.append(script);
 
-      script.onload = () => {
-        if (window.twttr?.widgets) {
-          window.twttr.widgets.load();
+      script.addEventListener("load", () => {
+        if (globalThis.twttr?.widgets) {
+          globalThis.twttr.widgets.load();
         }
-      };
-    } else if (window.twttr?.widgets) {
-      window.twttr.widgets.load();
+      });
     }
   }, [tweetId]);
 
@@ -69,9 +69,7 @@ function TwitterComponent({
         data-dnt="true"
         data-lang="en"
       >
-        <a href={`https://twitter.com/x/status/${tweetId}`}>
-          Loading tweet...
-        </a>
+        <a href={`https://twitter.com/x/status/${tweetId}`}>Loading tweet...</a>
       </blockquote>
     </BlockWithAlignableContents>
   );
@@ -130,12 +128,12 @@ export class TwitterNode extends DecoratorBlockNode {
     const element = document.createElement("blockquote");
     element.dataset.lexicalTwitter = this.__id;
     element.className = "twitter-tweet";
-    element.setAttribute("data-theme", "light");
-    element.setAttribute("data-dnt", "true");
+    element.dataset.theme = "light";
+    element.dataset.dnt = "true";
     const link = document.createElement("a");
     link.href = `https://twitter.com/x/status/${this.__id}`;
     link.textContent = "Loading tweet...";
-    element.appendChild(link);
+    element.append(link);
     return { element };
   }
 
@@ -195,14 +193,13 @@ export function $isTwitterNode(
   return node instanceof TwitterNode;
 }
 
-// Extend Window interface for Twitter widget
+// Extend globalThis for Twitter widget
 declare global {
-  interface Window {
-    twttr?: {
-      widgets: {
-        load: () => void;
-      };
-    };
-  }
+  var twttr:
+    | {
+        widgets: {
+          load: () => void;
+        };
+      }
+    | undefined;
 }
-

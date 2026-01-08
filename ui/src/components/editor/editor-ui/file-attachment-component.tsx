@@ -1,10 +1,12 @@
 /**
  * File Attachment Component
- * 
+ *
  * Component để render file attachment card trong editor
  */
 
 import type { NodeKey } from "lexical";
+import type { ReactElement } from "react";
+import { useCallback, useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { mergeRegister } from "@lexical/utils";
@@ -17,16 +19,16 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
-import { useEffect } from "react";
 import {
+  ArchiveIcon,
   DownloadIcon,
   FileIcon,
   FileTextIcon,
   ImageIcon,
   PresentationIcon,
   SheetIcon,
-  ArchiveIcon,
 } from "lucide-react";
+
 import { Button } from "@acme/ui/components/button";
 
 import { $isFileAttachmentNode } from "../nodes/file-attachment-node";
@@ -40,7 +42,7 @@ interface FileAttachmentComponentProps {
   nodeKey: NodeKey;
 }
 
-function getFileIcon(mimeType?: string): JSX.Element {
+function getFileIcon(mimeType?: string): ReactElement {
   if (!mimeType) {
     return <FileIcon className="size-5" />;
   }
@@ -98,19 +100,23 @@ export default function FileAttachmentComponent({
   nodeKey,
 }: FileAttachmentComponentProps) {
   const [editor] = useLexicalComposerContext();
-  const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
+  const [isSelected, setSelected, clearSelection] =
+    useLexicalNodeSelection(nodeKey);
 
-  const onDelete = (event: KeyboardEvent) => {
-    if (isSelected && $isNodeSelection($getSelection())) {
-      event.preventDefault();
-      const node = $getNodeByKey(nodeKey);
-      if ($isFileAttachmentNode(node)) {
-        node.remove();
+  const onDelete = useCallback(
+    (event: KeyboardEvent) => {
+      if (isSelected && $isNodeSelection($getSelection())) {
+        event.preventDefault();
+        const node = $getNodeByKey(nodeKey);
+        if ($isFileAttachmentNode(node)) {
+          node.remove();
+        }
+        setSelected(false);
       }
-      setSelected(false);
-    }
-    return false;
-  };
+      return false;
+    },
+    [isSelected, nodeKey, setSelected],
+  );
 
   useEffect(() => {
     return mergeRegister(
@@ -122,7 +128,7 @@ export default function FileAttachmentComponent({
           if (target.closest("button")) {
             return false;
           }
-          if (target.closest('[data-lexical-file-attachment]')) {
+          if (target.closest("[data-lexical-file-attachment]")) {
             if (event.shiftKey) {
               setSelected(!isSelected);
             } else {
@@ -135,14 +141,18 @@ export default function FileAttachmentComponent({
         },
         COMMAND_PRIORITY_LOW,
       ),
-      editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(
+        KEY_DELETE_COMMAND,
+        onDelete,
+        COMMAND_PRIORITY_LOW,
+      ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         onDelete,
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [clearSelection, editor, isSelected, setSelected]);
+  }, [clearSelection, editor, isSelected, setSelected, onDelete]);
 
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -150,9 +160,9 @@ export default function FileAttachmentComponent({
     link.href = fileUrl;
     link.download = fileName;
     link.target = "_blank";
-    document.body.appendChild(link);
+    document.body.append(link);
     link.click();
-    document.body.removeChild(link);
+    link.remove();
   };
 
   return (
@@ -162,9 +172,7 @@ export default function FileAttachmentComponent({
         isSelected ? "ring-2 ring-blue-500" : "hover:bg-gray-50"
       }`}
     >
-      <div className="flex-shrink-0 text-gray-400">
-        {getFileIcon(mimeType)}
-      </div>
+      <div className="shrink-0 text-gray-400">{getFileIcon(mimeType)}</div>
       <div className="min-w-0 flex-1">
         <div className="font-medium text-gray-900">{fileName}</div>
         {description && (
@@ -180,7 +188,7 @@ export default function FileAttachmentComponent({
         variant="outline"
         size="sm"
         onClick={handleDownload}
-        className="flex-shrink-0"
+        className="shrink-0"
       >
         <DownloadIcon className="size-4" />
         <span className="ml-1">Download</span>
@@ -188,4 +196,3 @@ export default function FileAttachmentComponent({
     </div>
   );
 }
-

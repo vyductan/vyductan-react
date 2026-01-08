@@ -1,6 +1,6 @@
 /**
  * TikTok Plugin
- * 
+ *
  * Plugin để embed TikTok videos vào Lexical editor
  */
 
@@ -11,10 +11,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $insertNodeToNearestRoot } from "@lexical/utils";
 import { COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
 
-import {
-  $createTikTokNode,
-  TikTokNode,
-} from "../../nodes/embeds/tiktok-node";
+import { $createTikTokNode, TikTokNode } from "../../nodes/embeds/tiktok-node";
 
 export const INSERT_TIKTOK_COMMAND: LexicalCommand<{
   videoId: string;
@@ -43,4 +40,3 @@ export function TikTokPlugin(): JSX.Element | null {
 
   return null;
 }
-

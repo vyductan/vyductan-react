@@ -7,13 +7,14 @@
  */
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ErrorBoundary } from "react-error-boundary";
+
 import { Button } from "@acme/ui/components/button";
 import { Checkbox } from "@acme/ui/components/checkbox";
 import { Input } from "@acme/ui/components/input";
 import { Label } from "@acme/ui/components/label";
 import { Textarea } from "@acme/ui/components/textarea";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { ErrorBoundary } from "react-error-boundary";
 
 import KatexRenderer from "../editor-ui/katex-renderer";
 

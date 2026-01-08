@@ -1,6 +1,6 @@
 /**
  * File Attachment Plugin
- * 
+ *
  * Plugin để upload và attach files (PDF, DOCX, XLSX, etc.) vào Lexical editor
  * Hỗ trợ:
  * - Upload file từ máy tính
@@ -10,6 +10,16 @@
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $wrapNodeInElement } from "@lexical/utils";
+import {
+  $createParagraphNode,
+  $insertNodes,
+  $isRootOrShadowRoot,
+  COMMAND_PRIORITY_EDITOR,
+  createCommand,
+} from "lexical";
+
 import { Button } from "@acme/ui/components/button";
 import { Input } from "@acme/ui/components/input";
 import { Label } from "@acme/ui/components/label";
@@ -20,16 +30,6 @@ import {
   TabsRoot,
   TabsTrigger,
 } from "@acme/ui/components/tabs";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $insertNodeToNearestRoot, $wrapNodeInElement } from "@lexical/utils";
-import {
-  $createParagraphNode,
-  $getSelection,
-  $insertNodes,
-  $isRootOrShadowRoot,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from "lexical";
 
 import type { FileAttachmentPayload } from "../nodes/file-attachment-node";
 import {
@@ -107,17 +107,20 @@ export function InsertFileAttachmentUriDialogBody({
 
 export function InsertFileAttachmentUploadedDialogBody({
   onClick,
+  onFileUpload,
 }: {
   onClick: (payload: FileAttachmentPayload) => void;
+  onFileUpload?: (file: File) => Promise<string>;
 }) {
   const [fileName, setFileName] = useState("");
   const [fileUrl, setFileUrl] = useState("");
-  const [fileSize, setFileSize] = useState<number | undefined>(undefined);
-  const [mimeType, setMimeType] = useState<string | undefined>(undefined);
+  const [fileSize, setFileSize] = useState<number | undefined>();
+  const [mimeType, setMimeType] = useState<string | undefined>();
   const [description, setDescription] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -128,16 +131,34 @@ export function InsertFileAttachmentUploadedDialogBody({
       return;
     }
 
-    // Read file as data URL
-    const reader = new FileReader();
-    reader.addEventListener("load", (event) => {
-      const result = event.target?.result as string;
-      setFileUrl(result);
-      setFileName(file.name);
-      setFileSize(file.size);
-      setMimeType(file.type);
-    });
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+
+    try {
+      if (onFileUpload) {
+        // Upload to Supabase
+        const uploadedUrl = await onFileUpload(file);
+        setFileUrl(uploadedUrl);
+        setFileName(file.name);
+        setFileSize(file.size);
+        setMimeType(file.type);
+      } else {
+        // Fallback: Read file as data URL
+        const reader = new FileReader();
+        reader.addEventListener("load", (event) => {
+          const result = event.target?.result as string;
+          setFileUrl(result);
+          setFileName(file.name);
+          setFileSize(file.size);
+          setMimeType(file.type);
+        });
+        reader.readAsDataURL(file);
+      }
+    } catch (error) {
+      console.error("Failed to upload file:", error);
+      alert("Failed to upload file. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const isDisabled = fileUrl === "" || fileName === "";
@@ -151,10 +172,13 @@ export function InsertFileAttachmentUploadedDialogBody({
           type="file"
           ref={fileInputRef}
           onChange={handleFileUpload}
+          disabled={isUploading}
           data-test-id="file-attachment-modal-upload-input"
         />
         <p className="text-xs text-gray-500">
-          Supported: PDF, DOCX, XLSX, PPTX, ZIP, etc. (Max 50MB)
+          {isUploading
+            ? "Uploading file..."
+            : "Supported: PDF, DOCX, XLSX, PPTX, ZIP, etc. (Max 50MB)"}
         </p>
       </div>
       {fileUrl && (
@@ -170,7 +194,9 @@ export function InsertFileAttachmentUploadedDialogBody({
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="file-description-upload">Description (Optional)</Label>
+            <Label htmlFor="file-description-upload">
+              Description (Optional)
+            </Label>
             <Input
               id="file-description-upload"
               placeholder="File description"
@@ -184,7 +210,7 @@ export function InsertFileAttachmentUploadedDialogBody({
       <DialogFooter>
         <Button
           type="submit"
-          disabled={isDisabled}
+          disabled={isDisabled || isUploading}
           onClick={() =>
             onClick({
               fileName,
@@ -196,7 +222,7 @@ export function InsertFileAttachmentUploadedDialogBody({
           }
           data-test-id="file-attachment-modal-confirm-upload-btn"
         >
-          Confirm
+          {isUploading ? "Uploading..." : "Confirm"}
         </Button>
       </DialogFooter>
     </div>
@@ -206,9 +232,11 @@ export function InsertFileAttachmentUploadedDialogBody({
 export function InsertFileAttachmentDialog({
   activeEditor,
   onClose,
+  onFileUpload,
 }: {
   activeEditor: LexicalEditor;
   onClose: () => void;
+  onFileUpload?: (file: File) => Promise<string>;
 }): JSX.Element {
   const handleClick = (payload: FileAttachmentPayload) => {
     activeEditor.dispatchCommand(INSERT_FILE_ATTACHMENT_COMMAND, payload);
@@ -222,7 +250,10 @@ export function InsertFileAttachmentDialog({
         <TabsTrigger value="url">URL</TabsTrigger>
       </TabsList>
       <TabsContent value="upload">
-        <InsertFileAttachmentUploadedDialogBody onClick={handleClick} />
+        <InsertFileAttachmentUploadedDialogBody
+          onClick={handleClick}
+          onFileUpload={onFileUpload}
+        />
       </TabsContent>
       <TabsContent value="url">
         <InsertFileAttachmentUriDialogBody onClick={handleClick} />
@@ -247,7 +278,10 @@ export function FileAttachmentPlugin(): JSX.Element | null {
         const fileAttachmentNode = $createFileAttachmentNode(payload);
         $insertNodes([fileAttachmentNode]);
         if ($isRootOrShadowRoot(fileAttachmentNode.getParentOrThrow())) {
-          $wrapNodeInElement(fileAttachmentNode, $createParagraphNode).selectEnd();
+          $wrapNodeInElement(
+            fileAttachmentNode,
+            $createParagraphNode,
+          ).selectEnd();
         }
 
         return true;
@@ -258,4 +292,3 @@ export function FileAttachmentPlugin(): JSX.Element | null {
 
   return null;
 }
-

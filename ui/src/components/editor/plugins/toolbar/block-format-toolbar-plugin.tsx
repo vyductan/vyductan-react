@@ -1,26 +1,27 @@
 "use client";
 
 import type { BaseSelection } from "lexical";
-import {
-  SelectContent,
-  SelectGroup,
-  SelectRoot,
-  SelectTrigger,
-} from "@acme/ui/components/select";
 import { $isListNode, ListNode } from "@lexical/list";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { $findMatchingParent, $getNearestNodeOfType } from "@lexical/utils";
 import { $isRangeSelection, $isRootOrShadowRoot } from "lexical";
 
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectTrigger,
+} from "@acme/ui/components/select";
+
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 import { blockTypeToBlockName } from "../../plugins/toolbar/block-format/block-format-data";
-import { FormatParagraph } from "./block-format/format-paragraph";
-import { FormatHeading } from "./block-format/format-heading";
 import { FormatBulletedList } from "./block-format/format-bulleted-list";
-import { FormatNumberedList } from "./block-format/format-numbered-list";
 import { FormatCheckList } from "./block-format/format-check-list";
 import { FormatCodeBlock } from "./block-format/format-code-block";
+import { FormatHeading } from "./block-format/format-heading";
+import { FormatNumberedList } from "./block-format/format-numbered-list";
+import { FormatParagraph } from "./block-format/format-paragraph";
 import { FormatQuote } from "./block-format/format-quote";
 
 export function BlockFormatDropDown({
@@ -28,7 +29,8 @@ export function BlockFormatDropDown({
 }: {
   children: React.ReactNode;
 }) {
-  const { activeEditor, blockType, setBlockType, formatHandledRef } = useToolbarContext();
+  const { activeEditor, blockType, setBlockType, formatHandledRef } =
+    useToolbarContext();
 
   function $updateToolbar(selection: BaseSelection) {
     if ($isRangeSelection(selection)) {
@@ -72,7 +74,7 @@ export function BlockFormatDropDown({
   useUpdateToolbarHandler($updateToolbar);
 
   return (
-    <SelectRoot
+    <Select
       value={blockType}
       onValueChange={(value) => {
         // If format was already handled by onSelect, don't update blockType
@@ -81,13 +83,23 @@ export function BlockFormatDropDown({
           formatHandledRef.current = false;
           return;
         }
-        
+
         // Validate that value is a valid blockType before updating
-        const validBlockTypes = ["paragraph", "h1", "h2", "h3", "bullet", "number", "check", "code", "quote"];
+        const validBlockTypes = [
+          "paragraph",
+          "h1",
+          "h2",
+          "h3",
+          "bullet",
+          "number",
+          "check",
+          "code",
+          "quote",
+        ];
         if (!validBlockTypes.includes(value)) {
           return;
         }
-        
+
         // Only update blockType if it's different from current value
         if (value !== blockType) {
           setBlockType(value);
@@ -101,7 +113,7 @@ export function BlockFormatDropDown({
       <SelectContent>
         <SelectGroup>{children}</SelectGroup>
       </SelectContent>
-    </SelectRoot>
+    </Select>
   );
 }
 
@@ -110,7 +122,7 @@ export function BlockFormatDropDown({
  * Wrapper component để sử dụng BlockFormatDropDown với tất cả format options
  */
 export function BlockFormatToolbarPlugin({
-  blockType,
+  blockType: _blockType,
 }: {
   blockType: string;
 }) {

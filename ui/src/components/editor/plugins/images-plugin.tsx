@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -10,16 +9,6 @@
 import type { LexicalCommand, LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import { Input } from "@acme/ui/components/input";
-import { Label } from "@acme/ui/components/label";
-import { DialogFooter } from "@acme/ui/components/modal";
-import {
-  TabsContent,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
-} from "@acme/ui/components/tabs";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $wrapNodeInElement, mergeRegister } from "@lexical/utils";
 import {
@@ -38,6 +27,17 @@ import {
   DRAGSTART_COMMAND,
   DROP_COMMAND,
 } from "lexical";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { DialogFooter } from "@acme/ui/components/modal";
+import {
+  TabsContent,
+  TabsList,
+  TabsRoot,
+  TabsTrigger,
+} from "@acme/ui/components/tabs";
 
 import type { ImagePayload } from "../nodes/image-node";
 import { $createImageNode, $isImageNode, ImageNode } from "../nodes/image-node";
@@ -104,18 +104,29 @@ export function InsertImageUploadedDialogBody({
 }) {
   const [src, setSrc] = useState("");
   const [altText, setAltText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const isDisabled = src === "";
+  const isDisabled = src === "" || isLoading;
 
   const loadImage = (files: FileList | null) => {
     const reader = new FileReader();
+    setIsLoading(true);
+
     reader.addEventListener("load", function () {
       if (typeof reader.result === "string") {
         setSrc(reader.result);
       }
+      setIsLoading(false);
       return "";
     });
-    if (files !== null) {
+
+    reader.addEventListener("error", function () {
+      setIsLoading(false);
+    });
+
+    if (files === null) {
+      setIsLoading(false);
+    } else {
       reader.readAsDataURL(files[0]!);
     }
   };
@@ -132,19 +143,34 @@ export function InsertImageUploadedDialogBody({
             accept="image/*"
             data-test-id="image-modal-file-upload"
             className="cursor-pointer"
+            disabled={isLoading}
           />
           <p className="mt-1.5 text-xs text-gray-500">
-            Drag and drop an image here, or click to browse
+            {isLoading
+              ? "Processing image..."
+              : "Drag and drop an image here, or click to browse"}
           </p>
         </div>
       </div>
       {src && (
-        <div className="rounded-lg border border-gray-200 p-2">
-          <img
-            src={src}
-            alt="Preview"
-            className="max-h-48 w-full rounded object-contain"
-          />
+        <div className="relative rounded-lg border border-gray-200 p-2">
+          <picture>
+            <img
+              src={src}
+              alt="Preview"
+              className={`max-h-48 w-full rounded object-contain ${isLoading ? "opacity-50 blur-sm" : ""}`}
+            />
+          </picture>
+          {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+                <span className="text-sm font-medium text-gray-700">
+                  Loading...
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       )}
       <div className="grid gap-2">
@@ -155,6 +181,7 @@ export function InsertImageUploadedDialogBody({
           onChange={(e) => setAltText(e.target.value)}
           value={altText}
           data-test-id="image-modal-alt-text-input"
+          disabled={isLoading}
         />
       </div>
       <Button
@@ -164,7 +191,7 @@ export function InsertImageUploadedDialogBody({
         data-test-id="image-modal-file-upload-btn"
         className="w-full"
       >
-        Insert Image
+        {isLoading ? "Processing..." : "Insert Image"}
       </Button>
     </div>
   );
@@ -231,12 +258,7 @@ export function ImagesPlugin({
       editor.registerCommand<InsertImagePayload>(
         INSERT_IMAGE_COMMAND,
         (payload) => {
-          const imageNode = $createImageNode(payload);
-          $insertNodes([imageNode]);
-          if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
-            $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd();
-          }
-
+          $insertImageNode(payload);
           return true;
         },
         COMMAND_PRIORITY_EDITOR,
@@ -387,7 +409,7 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
         ? (target as Document).defaultView
         : (target as Element).ownerDocument.defaultView;
   const domSelection = getDOMSelection(targetWindow);
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
   if (document.caretRangeFromPoint) {
     range = document.caretRangeFromPoint(event.clientX, event.clientY);
   } else if (event.rangeParent && domSelection !== null) {
@@ -398,4 +420,16 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
   }
 
   return range;
+}
+
+export function $insertImageNode(
+  payload: InsertImagePayload,
+): ImageNode | null {
+  const imageNode = $createImageNode(payload);
+  $insertNodes([imageNode]);
+  if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
+    $wrapNodeInElement(imageNode, $createParagraphNode).selectEnd();
+  }
+
+  return imageNode;
 }

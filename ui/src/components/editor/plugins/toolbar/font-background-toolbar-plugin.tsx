@@ -1,12 +1,13 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useMemo, useState } from "react";
-import { ColorPicker } from "@acme/ui/components/color-picker";
-import { AggregationColor } from "@acme/ui/components/color-picker/color";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
+
+import { ColorPicker } from "@acme/ui/components/color-picker";
+import { AggregationColor } from "@acme/ui/components/color-picker/color";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";

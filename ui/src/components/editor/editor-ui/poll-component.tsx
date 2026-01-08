@@ -8,8 +8,6 @@
 import type { BaseSelection, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import { Input } from "@acme/ui/components/input";
 import { useCollaborationContext } from "@lexical/react/LexicalCollaborationContext";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
@@ -23,6 +21,9 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 
 import type { Option, Options, PollNode } from "../nodes/poll-node";
 import { $isPollNode, createPollOption } from "../nodes/poll-node";
@@ -109,7 +110,7 @@ function PollOptionComponent({
       </div>
       <button
         disabled={options.length < 3}
-        className={`relative z-0 ml-1.5 flex h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent bg-[position:6px_6px] bg-no-repeat opacity-30 before:absolute before:top-1.5 before:left-[13px] before:block before:h-[15px] before:w-0.5 before:-rotate-45 before:bg-gray-400 before:content-[''] after:absolute after:top-1.5 after:left-[13px] after:block after:h-[15px] after:w-0.5 after:rotate-45 after:bg-gray-400 after:content-[''] hover:bg-gray-100 hover:opacity-100 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:opacity-30`}
+        className={`relative z-0 ml-1.5 flex h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent bg-position-[6px_6px] bg-no-repeat opacity-30 before:absolute before:top-1.5 before:left-[13px] before:block before:h-[15px] before:w-0.5 before:-rotate-45 before:bg-gray-400 before:content-[''] after:absolute after:top-1.5 after:left-[13px] after:block after:h-[15px] after:w-0.5 after:rotate-45 after:bg-gray-400 after:content-[''] hover:bg-gray-100 hover:opacity-100 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:opacity-30`}
         aria-label="Remove"
         onClick={() => {
           withPollNode((node) => {

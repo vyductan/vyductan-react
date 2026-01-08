@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { Button } from "@acme/ui/components/button";
 import { $isDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import { $isTableSelection } from "@lexical/table";
@@ -11,6 +10,8 @@ import {
   $isTextNode,
 } from "lexical";
 import { EraserIcon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 

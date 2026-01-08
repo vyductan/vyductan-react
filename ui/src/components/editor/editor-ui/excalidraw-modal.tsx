@@ -17,13 +17,14 @@ import type {
 import type { JSX, ReactElement } from "react";
 import * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+
 import { Button } from "@acme/ui/components/button";
 import {
   DialogClose,
   DialogContent,
   Dialog as DialogRoot,
 } from "@acme/ui/components/modal";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 
 import { Excalidraw } from "./excalidraw";
 
@@ -227,7 +228,6 @@ export function ExcalidrawModal({
                 onChange={onChange}
                 excalidrawAPI={excalidrawAPIRefCallback}
                 initialData={{
-                  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                   appState: initialAppState || { isLoading: false },
                   elements: initialElements,
                   files: initialFiles,

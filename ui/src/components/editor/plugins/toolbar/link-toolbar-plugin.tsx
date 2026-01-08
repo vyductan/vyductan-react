@@ -1,6 +1,5 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useEffect, useState } from "react";
-import { Toggle } from "@acme/ui/components/toggle";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
   $isRangeSelection,
@@ -8,6 +7,8 @@ import {
   KEY_MODIFIER_COMMAND,
 } from "lexical";
 import { LinkIcon } from "lucide-react";
+
+import { Toggle } from "@acme/ui/components/toggle";
 
 import { useFloatingLinkContext } from "../../context/floating-link-context";
 import { useToolbarContext } from "../../context/toolbar-context";

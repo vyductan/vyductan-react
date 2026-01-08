@@ -2,19 +2,16 @@
 
 /**
  * Keyboard Shortcuts Help Plugin
- * 
+ *
  * Hiển thị modal với danh sách keyboard shortcuts khi nhấn Ctrl+/ hoặc Cmd+/
  */
-
+import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  KEY_MODIFIER_COMMAND,
-  COMMAND_PRIORITY_LOW,
-} from "lexical";
 import { mergeRegister } from "@lexical/utils";
+import { COMMAND_PRIORITY_LOW, KEY_MODIFIER_COMMAND } from "lexical";
+
 import { Modal } from "@acme/ui/components/modal";
-import { Icon } from "@acme/ui/icons";
 
 interface ShortcutGroup {
   title: string;
@@ -81,7 +78,7 @@ function ShortcutKey({ keyText }: { keyText: string }) {
   );
 }
 
-export function KeyboardShortcutsHelpPlugin(): JSX.Element | null {
+export function KeyboardShortcutsHelpPlugin(): ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -90,7 +87,7 @@ export function KeyboardShortcutsHelpPlugin(): JSX.Element | null {
       editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (payload) => {
-          const event = payload as KeyboardEvent;
+          const event = payload;
           if (
             (event.metaKey || event.ctrlKey) &&
             event.key === "/" &&
@@ -107,7 +104,8 @@ export function KeyboardShortcutsHelpPlugin(): JSX.Element | null {
     );
   }, [editor]);
 
-  const isMac = typeof window !== "undefined" &&
+  const isMac =
+    globalThis.window !== undefined &&
     navigator.platform.toUpperCase().includes("MAC");
 
   const formatKeys = (keys: string[]): string[] => {
@@ -148,8 +146,12 @@ export function KeyboardShortcutsHelpPlugin(): JSX.Element | null {
                     </span>
                     <div className="flex items-center gap-1.5">
                       {formatKeys(shortcut.keys).map((key, keyIndex) => (
-                        <span key={keyIndex} className="inline-flex items-center">
-                          {isMac && (key === "⌘" || key === "⌥" || key === "⇧") ? (
+                        <span
+                          key={keyIndex}
+                          className="inline-flex items-center"
+                        >
+                          {isMac &&
+                          (key === "⌘" || key === "⌥" || key === "⇧") ? (
                             <kbd className="inline-flex h-6 min-w-[24px] items-center justify-center rounded border border-gray-300 bg-gray-50 px-2 text-xs font-medium text-gray-700 shadow-sm">
                               {key}
                             </kbd>
@@ -195,4 +197,3 @@ export function KeyboardShortcutsHelpPlugin(): JSX.Element | null {
     </>
   );
 }
-

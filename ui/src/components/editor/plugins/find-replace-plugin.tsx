@@ -2,26 +2,25 @@
 
 /**
  * Find & Replace Plugin
- * 
+ *
  * Tính năng tìm kiếm và thay thế text trong Lexical editor
  * - Keyboard shortcut: Cmd/Ctrl+F (Find), Cmd/Ctrl+H (Replace)
  * - Highlight tất cả matches
  * - Navigate giữa các matches (Next/Previous)
  * - Replace one hoặc Replace all
  */
-
-import { useState, useEffect, useCallback } from "react";
+import type { LexicalNode } from "lexical";
+import { useCallback, useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { mergeRegister } from "@lexical/utils";
 import {
   $getRoot,
-  $getSelection,
-  $isRangeSelection,
+  $isElementNode,
   $isTextNode,
-  KEY_MODIFIER_COMMAND,
   COMMAND_PRIORITY_LOW,
+  KEY_MODIFIER_COMMAND,
 } from "lexical";
-import { mergeRegister } from "@lexical/utils";
-import { SearchIcon, XIcon } from "lucide-react";
+
 import { Button } from "@acme/ui/components/button";
 import {
   Dialog,
@@ -47,54 +46,59 @@ export function FindReplacePlugin({
   const [replaceText, setReplaceText] = useState("");
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-  const [matches, setMatches] = useState<Array<{ key: string; offset: number }>>(
-    [],
-  );
+  const [matches, setMatches] = useState<
+    Array<{ key: string; offset: number }>
+  >([]);
 
   const actualIsOpen = controlledIsOpen ?? isOpen;
   const actualOnOpenChange = controlledOnOpenChange ?? setIsOpen;
 
   // Find all matches
-  const findMatches = useCallback(() => {
-    if (!searchText.trim()) {
-      setMatches([]);
-      setMatchCount(0);
-      setCurrentMatchIndex(0);
-      return;
-    }
+  const findMatches = useCallback(
+    (text: string) => {
+      if (!text.trim()) {
+        setMatches([]);
+        setMatchCount(0);
+        setCurrentMatchIndex(0);
+        return;
+      }
 
-    editor.getEditorState().read(() => {
-      const root = $getRoot();
-      const allMatches: Array<{ key: string; offset: number }> = [];
-      const searchLower = searchText.toLowerCase();
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        const allMatches: Array<{ key: string; offset: number }> = [];
+        const searchLower = text.toLowerCase();
 
-      function traverse(node: any) {
-        if ($isTextNode(node)) {
-          const text = node.getTextContent();
-          const textLower = text.toLowerCase();
-          let index = 0;
+        function traverse(node: LexicalNode) {
+          if ($isTextNode(node)) {
+            const nodeText = node.getTextContent();
+            const textLower = nodeText.toLowerCase();
+            let index = 0;
 
-          while ((index = textLower.indexOf(searchLower, index)) !== -1) {
-            allMatches.push({
-              key: node.getKey(),
-              offset: index,
-            });
-            index += searchLower.length;
+            while ((index = textLower.indexOf(searchLower, index)) !== -1) {
+              allMatches.push({
+                key: node.getKey(),
+                offset: index,
+              });
+              index += searchLower.length;
+            }
+          }
+
+          if ($isElementNode(node)) {
+            const children = node.getChildren<LexicalNode>();
+            for (const child of children) {
+              traverse(child);
+            }
           }
         }
 
-        const children = node.getChildren();
-        for (const child of children) {
-          traverse(child);
-        }
-      }
-
-      traverse(root);
-      setMatches(allMatches);
-      setMatchCount(allMatches.length);
-      setCurrentMatchIndex(0);
-    });
-  }, [editor, searchText]);
+        traverse(root);
+        setMatches(allMatches);
+        setMatchCount(allMatches.length);
+        setCurrentMatchIndex(0);
+      });
+    },
+    [editor],
+  );
 
   // Navigate to match
   const navigateToMatch = useCallback(
@@ -117,8 +121,12 @@ export function FindReplacePlugin({
 
         const node = editor.getEditorState()._nodeMap.get(match.key);
         if (node && $isTextNode(node)) {
-          const selection = node.select(match.offset, match.offset + searchText.length);
-          selection?.scrollIntoView();
+          node.select(match.offset, match.offset + searchText.length);
+          // Scroll to the element containing the selection
+          const element = editor.getElementByKey(match.key);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
         }
       });
     },
@@ -159,8 +167,8 @@ export function FindReplacePlugin({
 
     editor.update(() => {
       // Process in reverse to maintain offsets
-      const sortedMatches = [...matches].sort(
-        (a, b) => (b.key === a.key ? b.offset - a.offset : 0),
+      const sortedMatches = matches.toSorted((a, b) =>
+        b.key === a.key ? b.offset - a.offset : 0,
       );
 
       for (const match of sortedMatches) {
@@ -187,7 +195,7 @@ export function FindReplacePlugin({
       editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (payload) => {
-          const event = payload as KeyboardEvent;
+          const event = payload;
           if ((event.metaKey || event.ctrlKey) && event.key === "f") {
             event.preventDefault();
             actualOnOpenChange(true);
@@ -205,11 +213,12 @@ export function FindReplacePlugin({
     );
   }, [editor, actualOnOpenChange]);
 
-  // Find matches when search text changes
+  // Find matches when dialog opens
   useEffect(() => {
     if (actualIsOpen) {
-      findMatches();
+      findMatches(searchText);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actualIsOpen, findMatches]);
 
   return (
@@ -227,7 +236,7 @@ export function FindReplacePlugin({
                 value={searchText}
                 onChange={(e) => {
                   setSearchText(e.target.value);
-                  setTimeout(findMatches, 100);
+                  findMatches(e.target.value);
                 }}
                 placeholder="Search..."
                 autoFocus
@@ -290,4 +299,3 @@ export function FindReplacePlugin({
     </Dialog>
   );
 }
-

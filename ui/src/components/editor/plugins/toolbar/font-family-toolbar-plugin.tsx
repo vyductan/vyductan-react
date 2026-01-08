@@ -1,17 +1,18 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
 import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-} from "@acme/ui/components/select";
-import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
 import { TypeIcon } from "lucide-react";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@acme/ui/components/select";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
@@ -73,10 +74,13 @@ export function FontFamilyToolbarPlugin() {
       activeEditor.update(() => {
         const selection = $getSelection();
         if (selection !== null) {
-          const fontValue = FONT_FAMILY_MAP[option] ?? FONT_FAMILY_MAP[DEFAULT_FONT];
-          $patchStyleText(selection, {
-            [style]: fontValue,
-          });
+          const fontValue =
+            FONT_FAMILY_MAP[option] ?? FONT_FAMILY_MAP[DEFAULT_FONT] ?? "";
+          if (fontValue) {
+            $patchStyleText(selection, {
+              [style]: fontValue,
+            });
+          }
         }
       });
     },
@@ -86,7 +90,7 @@ export function FontFamilyToolbarPlugin() {
   const buttonAriaLabel = "Formatting options for font family";
 
   return (
-    <SelectRoot
+    <Select
       value={fontFamily}
       onValueChange={(value) => {
         setFontFamily(value);
@@ -105,6 +109,6 @@ export function FontFamilyToolbarPlugin() {
           </SelectItem>
         ))}
       </SelectContent>
-    </SelectRoot>
+    </Select>
   );
 }

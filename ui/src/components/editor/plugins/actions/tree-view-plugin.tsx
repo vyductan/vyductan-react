@@ -1,4 +1,8 @@
 import type { JSX } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { TreeView } from "@lexical/react/LexicalTreeView";
+import { NotebookPenIcon } from "lucide-react";
+
 import { Button } from "@acme/ui/components/button";
 import {
   DialogContent,
@@ -8,9 +12,6 @@ import {
   DialogTrigger,
 } from "@acme/ui/components/modal";
 import { ScrollArea, ScrollBar } from "@acme/ui/components/scroll-area";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { TreeView } from "@lexical/react/LexicalTreeView";
-import { NotebookPenIcon } from "lucide-react";
 
 export function TreeViewPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();

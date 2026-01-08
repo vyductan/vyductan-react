@@ -1,6 +1,6 @@
 /**
  * Table Actions Plugin
- * 
+ *
  * Plugin để thêm các tính năng nâng cao cho table:
  * - Merge cells
  * - Split cells
@@ -9,38 +9,39 @@
  */
 
 import type { LexicalCommand, LexicalEditor } from "lexical";
+import type { ReactElement } from "react";
 import { useEffect, useState } from "react";
-import { Button } from "@acme/ui/components/button";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $getSelection,
-  $isRangeSelection,
-  $createParagraphNode,
-  $createTextNode,
-  COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from "lexical";
-import {
-  $isTableNode,
-  $isTableCellNode,
-  $isTableRowNode,
   $createTableCellNode,
   $createTableRowNode,
+  $isTableCellNode,
+  $isTableNode,
+  $isTableRowNode,
+  TableCellHeaderStates,
   TableCellNode,
   TableNode,
   TableRowNode,
-  TableCellHeaderStates,
 } from "@lexical/table";
+import { $findMatchingParent } from "@lexical/utils";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getSelection,
+  $isRangeSelection,
+  createCommand,
+} from "lexical";
 import {
   Columns3Icon,
-  Rows3Icon,
   CombineIcon,
-  SplitIcon,
   PlusIcon,
+  Rows3Icon,
+  SplitIcon,
   TrashIcon,
 } from "lucide-react";
-import { $findMatchingParent } from "@lexical/utils";
 import { createPortal } from "react-dom";
+
+import { Button } from "@acme/ui/components/button";
 
 export const MERGE_TABLE_CELLS_COMMAND: LexicalCommand<void> = createCommand(
   "MERGE_TABLE_CELLS_COMMAND",
@@ -107,7 +108,6 @@ function TableActionsToolbar({
         setCanSplit(tableCell.getColSpan() > 1 || tableCell.getRowSpan() > 1);
 
         // Check if multiple cells are selected (can merge)
-        const selectedCells = new Set<TableCellNode>();
         const anchorNode = selection.anchor.getNode();
         const focusNode = selection.focus.getNode();
 
@@ -131,7 +131,7 @@ function TableActionsToolbar({
         }
 
         // Calculate position for toolbar
-        const domSelection = window.getSelection();
+        const domSelection = globalThis.getSelection();
         if (domSelection && domSelection.rangeCount > 0) {
           const range = domSelection.getRangeAt(0);
           const rect = range.getBoundingClientRect();
@@ -177,7 +177,8 @@ function TableActionsToolbar({
       // Get text content from both cells
       const anchorText = anchorCell.getTextContent();
       const focusText = focusCell.getTextContent();
-      const mergedText = anchorText + (anchorText && focusText ? " " : "") + focusText;
+      const mergedText =
+        anchorText + (anchorText && focusText ? " " : "") + focusText;
 
       // Update anchor cell with merged content
       anchorCell.clear();
@@ -440,7 +441,7 @@ function TableActionsToolbar({
         size="sm"
         onClick={handleDeleteRow}
         title="Delete Row"
-        className="h-8 w-8 p-0 text-destructive"
+        className="text-destructive h-8 w-8 p-0"
       >
         <TrashIcon className="size-4" />
         <Rows3Icon className="size-3" />
@@ -450,7 +451,7 @@ function TableActionsToolbar({
         size="sm"
         onClick={handleDeleteColumn}
         title="Delete Column"
-        className="h-8 w-8 p-0 text-destructive"
+        className="text-destructive h-8 w-8 p-0"
       >
         <TrashIcon className="size-4" />
         <Columns3Icon className="size-3" />
@@ -464,7 +465,7 @@ export function TableActionsPlugin({
   anchorElem,
 }: {
   anchorElem: HTMLElement | null;
-}): JSX.Element | null {
+}): ReactElement | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -478,7 +479,7 @@ export function TableActionsPlugin({
     const unregister: Array<() => void> = [];
 
     return () => {
-      unregister.forEach((fn) => fn());
+      for (const fn of unregister) fn();
     };
   }, [editor]);
 
@@ -488,4 +489,3 @@ export function TableActionsPlugin({
 
   return <TableActionsToolbar editor={editor} anchorElem={anchorElem} />;
 }
-

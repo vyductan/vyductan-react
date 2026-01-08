@@ -1,6 +1,6 @@
 /**
  * Table of Contents Node
- * 
+ *
  * Node để render Table of Contents trong Lexical editor
  * Tự động extract headings và tạo TOC với links
  */
@@ -33,7 +33,7 @@ export interface TOCPayload {
 
 function $convertTOCElement(domNode: Node): null | DOMConversionOutput {
   const element = domNode as HTMLElement;
-  if (element.hasAttribute("data-lexical-toc")) {
+  if (Object.hasOwn(element.dataset, "lexicalToc")) {
     const node = $createTOCNode();
     return { node };
   }
@@ -72,7 +72,7 @@ export class TOCNode extends DecoratorNode<JSX.Element> {
 
   exportDOM(): DOMExportOutput {
     const element = document.createElement("div");
-    element.setAttribute("data-lexical-toc", "true");
+    element.dataset.lexicalToc = "true";
     element.className = "toc-container";
     return { element };
   }
@@ -81,7 +81,7 @@ export class TOCNode extends DecoratorNode<JSX.Element> {
     return {
       div: (node: Node) => {
         const element = node as HTMLElement;
-        if (element.hasAttribute("data-lexical-toc")) {
+        if (Object.hasOwn(element.dataset, "lexicalToc")) {
           return {
             conversion: $convertTOCElement,
             priority: 0,
@@ -112,7 +112,9 @@ export class TOCNode extends DecoratorNode<JSX.Element> {
     };
   }
 
-  getHeadings(): Array<{ id: string; text: string; level: number }> | undefined {
+  getHeadings():
+    | Array<{ id: string; text: string; level: number }>
+    | undefined {
     return this.__headings;
   }
 
@@ -142,7 +144,8 @@ export function $createTOCNode(
   return $applyNodeReplacement(new TOCNode(headings));
 }
 
-export function $isTOCNode(node: LexicalNode | null | undefined): node is TOCNode {
+export function $isTOCNode(
+  node: LexicalNode | null | undefined,
+): node is TOCNode {
   return node instanceof TOCNode;
 }
-

@@ -34,4 +34,3 @@ export type LexicalRootNode = {
 export type LexicalEditorContent = {
   root: LexicalRootNode;
 };
-

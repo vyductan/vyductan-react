@@ -9,8 +9,6 @@ import type { BaseSelection, LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
 import type * as React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import { Input } from "@acme/ui/components/input";
 import {
   $createLinkNode,
   $isAutoLinkNode,
@@ -33,6 +31,9 @@ import {
 } from "lexical";
 import { Check, Pencil, Trash, X } from "lucide-react";
 import { createPortal } from "react-dom";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { getSelectedNode } from "../utils/get-selected-node";
@@ -123,14 +124,12 @@ function FloatingLinkEditor({
         }
 
         // Fallback to center of editor
-        if (!domRect) {
-          domRect = new DOMRect(
-            rootRect.left + rootRect.width / 2 - 200,
-            rootRect.top + Math.min(100, rootRect.height / 4),
-            400,
-            40,
-          );
-        }
+        domRect ??= new DOMRect(
+          rootRect.left + rootRect.width / 2 - 200,
+          rootRect.top + Math.min(100, rootRect.height / 4),
+          400,
+          40,
+        );
       }
 
       if (domRect && rootElement) {
@@ -152,7 +151,7 @@ function FloatingLinkEditor({
       editor.isEditable() &&
       isLink;
 
-    if (hasLinkSelection && !isLinkEditMode) {
+    if (hasLinkSelection) {
       // Show with a small delay to avoid flickering
       if (showTimeoutRef.current) {
         clearTimeout(showTimeoutRef.current);
@@ -172,7 +171,7 @@ function FloatingLinkEditor({
         }
         setLastSelection(selection);
       }, 150); // Small delay to avoid showing on quick selections
-    } else if (!isLinkEditMode) {
+    } else {
       // Hide editor when not in edit mode and no link selected
       if (showTimeoutRef.current) {
         clearTimeout(showTimeoutRef.current);
@@ -187,10 +186,8 @@ function FloatingLinkEditor({
           }
           setShouldShow(false);
           setLastSelection(null);
-          if (!isLinkEditMode) {
-            setIsLinkEditMode(false);
-            setLinkUrl("");
-          }
+          setIsLinkEditMode(false);
+          setLinkUrl("");
           hideTimeoutRef.current = null;
         }, 200); // Delay to allow mouse movement to editor
       } else if (!shouldShow) {
@@ -199,10 +196,8 @@ function FloatingLinkEditor({
           setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
         }
         setLastSelection(null);
-        if (!isLinkEditMode) {
-          setIsLinkEditMode(false);
-          setLinkUrl("");
-        }
+        setIsLinkEditMode(false);
+        setLinkUrl("");
       }
     }
 
@@ -212,8 +207,9 @@ function FloatingLinkEditor({
     editor,
     setIsLinkEditMode,
     isLinkEditMode,
-    linkUrl,
     editedLinkUrl,
+    isLink,
+    shouldShow,
   ]);
 
   useEffect(() => {
@@ -582,11 +578,8 @@ function useFloatingLinkEditorToolbar(
             const linkNode = $findMatchingParent(node, $isLinkNode);
             const autoLinkNode = $findMatchingParent(node, $isAutoLinkNode);
             return (
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
               (focusLinkNode && !focusLinkNode.is(linkNode)) ||
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
               (linkNode && !linkNode.is(focusLinkNode)) ||
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
               (focusAutoLinkNode && !focusAutoLinkNode.is(autoLinkNode)) ||
               (autoLinkNode &&
                 (!autoLinkNode.is(focusAutoLinkNode) ||

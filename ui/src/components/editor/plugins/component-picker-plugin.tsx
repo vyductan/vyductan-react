@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -7,15 +7,9 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type { LexicalEditor, TextNode } from "lexical";
+import type { EditorState, LexicalEditor, TextNode } from "lexical";
 import type { JSX } from "react";
-import { useCallback, useMemo, useState } from "react";
-import {
-  CommandGroup,
-  CommandItem,
-  CommandList,
-  CommandRoot,
-} from "@acme/ui/components/command";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { $createCodeNode } from "@lexical/code";
 import {
   INSERT_CHECK_LIST_COMMAND,
@@ -36,6 +30,7 @@ import {
   $createParagraphNode,
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
   FORMAT_ELEMENT_COMMAND,
 } from "lexical";
 import {
@@ -52,33 +47,41 @@ import {
   Heading3Icon,
   ImageIcon,
   ListChecksIcon,
-  VideoIcon,
   ListCollapseIcon,
   ListIcon,
   ListOrderedIcon,
   ListTodoIcon,
   MinusIcon,
+  PaperclipIcon,
   QuoteIcon,
   ScissorsIcon,
   TableIcon,
   TextIcon,
-  PaperclipIcon,
+  VideoIcon,
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
+import {
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandRoot,
+} from "@acme/ui/components/command";
+
+import { useComponentPickerContext } from "../context/component-picker-context";
 import { useEditorModal } from "../editor-hooks/use-modal";
 import { INSERT_COLLAPSIBLE_COMMAND } from "../plugins/collapsible-plugin";
 import { EmbedConfigs } from "../plugins/embeds/auto-embed-plugin";
 import { InsertEquationDialog } from "../plugins/equations-plugin";
 import { INSERT_EXCALIDRAW_COMMAND } from "../plugins/excalidraw-plugin";
+import { InsertFileAttachmentDialog } from "../plugins/file-attachment-plugin";
 import { InsertImageDialog } from "../plugins/images-plugin";
 import { InsertLayoutDialog } from "../plugins/layout-plugin";
-import { InsertVideoDialog } from "../plugins/video-plugin";
-import { InsertFileAttachmentDialog } from "../plugins/file-attachment-plugin";
 import { INSERT_PAGE_BREAK } from "../plugins/page-break-plugin";
-import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
 import { InsertPollDialog } from "../plugins/poll-plugin";
 import { InsertTableDialog } from "../plugins/table-plugin";
+import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
+import { InsertVideoDialog } from "../plugins/video-plugin";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 // const LexicalTypeaheadMenuPlugin = dynamic(
@@ -159,12 +162,15 @@ interface CategorizedOption {
   category: OptionCategory;
 }
 
-function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): CategorizedOption[] {
+function getBaseOptions(
+  editor: LexicalEditor,
+  showModal: ShowModal,
+): CategorizedOption[] {
   const options: CategorizedOption[] = [
     // Basic Blocks
     {
       category: "basic",
-      option: new ComponentPickerOption("Paragraph", {
+      option: new ComponentPickerOption("Text", {
         icon: <TextIcon className="size-4" />,
         keywords: ["normal", "paragraph", "p", "text"],
         onSelect: () =>
@@ -176,46 +182,49 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): Categorize
           }),
       }),
     },
-    ...([1, 2, 3] as const).map(
-      (n) => ({
-        category: "basic" as OptionCategory,
-        option: new ComponentPickerOption(`Heading ${n}`, {
-          icon: <HeadingIcons n={n} />,
-          keywords: ["heading", "header", `h${n}`],
-          onSelect: () =>
-            editor.update(() => {
-              const selection = $getSelection();
-              if ($isRangeSelection(selection)) {
-                $setBlocksType(selection, () => $createHeadingNode(`h${n}`));
-              }
-            }),
-        }),
+    ...([1, 2, 3] as const).map((n) => ({
+      category: "basic" as OptionCategory,
+      option: new ComponentPickerOption(`Heading ${n}`, {
+        icon: <HeadingIcons n={n} />,
+        keywords: ["heading", "header", `h${n}`],
+        keyboardShortcut: "#".repeat(n),
+        onSelect: () =>
+          editor.update(() => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              $setBlocksType(selection, () => $createHeadingNode(`h${n}`));
+            }
+          }),
       }),
-    ),
+    })),
     {
       category: "basic",
-      option: new ComponentPickerOption("Numbered List", {
+      option: new ComponentPickerOption("Numbered list", {
         icon: <ListOrderedIcon className="size-4" />,
         keywords: ["numbered list", "ordered list", "ol"],
+        keyboardShortcut: "1.",
         onSelect: () =>
           editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0),
       }),
     },
     {
       category: "basic",
-      option: new ComponentPickerOption("Bulleted List", {
+      option: new ComponentPickerOption("Bulleted list", {
         icon: <ListIcon className="size-4" />,
         keywords: ["bulleted list", "unordered list", "ul"],
+        keyboardShortcut: "-",
         onSelect: () =>
           editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0),
       }),
     },
     {
       category: "basic",
-      option: new ComponentPickerOption("Check List", {
+      option: new ComponentPickerOption("To-do list", {
         icon: <ListTodoIcon className="size-4" />,
-        keywords: ["check list", "todo list"],
-        onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0),
+        keywords: ["check list", "todo list", "checkbox"],
+        keyboardShortcut: "[]",
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0),
       }),
     },
     {
@@ -294,17 +303,15 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): Categorize
           )),
       }),
     },
-    ...(["left", "center", "right", "justify"] as const).map(
-      (alignment) => ({
-        category: "basic" as OptionCategory,
-        option: new ComponentPickerOption(`Align ${alignment}`, {
-          icon: <AlignIcons alignment={alignment} />,
-          keywords: ["align", "justify", alignment],
-          onSelect: () =>
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, alignment),
-        }),
+    ...(["left", "center", "right", "justify"] as const).map((alignment) => ({
+      category: "basic" as OptionCategory,
+      option: new ComponentPickerOption(`Align ${alignment}`, {
+        icon: <AlignIcons alignment={alignment} />,
+        keywords: ["align", "justify", alignment],
+        onSelect: () =>
+          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, alignment),
       }),
-    ),
+    })),
 
     // Media
     {
@@ -336,23 +343,24 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): Categorize
         keywords: ["file", "attachment", "pdf", "docx", "xlsx", "pptx", "zip"],
         onSelect: () =>
           showModal("Insert File Attachment", (onClose) => (
-            <InsertFileAttachmentDialog activeEditor={editor} onClose={onClose} />
+            <InsertFileAttachmentDialog
+              activeEditor={editor}
+              onClose={onClose}
+            />
           )),
       }),
     },
 
     // Embeds
-    ...EmbedConfigs.map(
-      (embedConfig) => ({
-        category: "embeds" as OptionCategory,
-        option: new ComponentPickerOption(`Embed ${embedConfig.contentName}`, {
-          icon: embedConfig.icon,
-          keywords: [...embedConfig.keywords, "embed"],
-          onSelect: () =>
-            editor.dispatchCommand(INSERT_EMBED_COMMAND, embedConfig.type),
-        }),
+    ...EmbedConfigs.map((embedConfig) => ({
+      category: "embeds" as OptionCategory,
+      option: new ComponentPickerOption(`Embed ${embedConfig.contentName}`, {
+        icon: embedConfig.icon,
+        keywords: [...embedConfig.keywords, "embed"],
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_EMBED_COMMAND, embedConfig.type),
       }),
-    ),
+    })),
 
     // Advanced
     {
@@ -376,7 +384,8 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): Categorize
       option: new ComponentPickerOption("Excalidraw", {
         icon: <FrameIcon className="size-4" />,
         keywords: ["excalidraw", "diagram", "drawing"],
-        onSelect: () => editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, void 0),
+        onSelect: () =>
+          editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, void 0),
       }),
     },
     {
@@ -407,7 +416,7 @@ function getBaseOptions(editor: LexicalEditor, showModal: ShowModal): Categorize
 }
 
 const CATEGORY_LABELS: Record<OptionCategory, string> = {
-  basic: "Basic Blocks",
+  basic: "Basic blocks",
   media: "Media",
   embeds: "Embeds",
   advanced: "Advanced",
@@ -417,6 +426,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [modal, showModal] = useEditorModal();
   const [queryString, setQueryString] = useState<string | null>(null);
+  const [, setIsComponentPickerOpen] = useComponentPickerContext();
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
     minLength: 0,
@@ -424,7 +434,6 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
   const options = useMemo(() => {
     const categorizedOptions = getBaseOptions(editor, showModal);
-    const baseOptions = categorizedOptions.map((item) => item.option);
 
     if (!queryString) {
       return categorizedOptions;
@@ -470,9 +479,9 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
       advanced: [],
     };
 
-    options.forEach((item) => {
+    for (const item of options) {
       groups[item.category].push(item);
-    });
+    }
 
     return groups;
   }, [options]);
@@ -482,11 +491,194 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
     return options.map((item) => item.option);
   }, [options]);
 
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Refs to access latest state in Lexical update listener (registered once)
+  const isMenuOpenRef = useRef(isMenuOpen);
+  const queryStringRef = useRef(queryString);
+
+  // Track when menu opens/closes
+  const handleQueryChange = useCallback(
+    (query: string | null) => {
+      const isOpen = query !== null;
+      setQueryString(query);
+      setIsMenuOpen(isOpen);
+
+      // Keep refs in sync immediately so Lexical listeners don't lag behind React.
+      queryStringRef.current = query;
+      isMenuOpenRef.current = isOpen;
+
+      // Publish menu state to context
+      setIsComponentPickerOpen(isOpen);
+    },
+    [setIsComponentPickerOpen],
+  );
+
+  const styledElementRef = useRef<HTMLElement | null>(null);
+  const styledKeyRef = useRef<string | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+
+  const CLASS_NAME = "lexical-slash-trigger";
+  const VAR_CONTENT = "--pseudoAfter--content";
+  const VAR_COLOR = "--pseudoAfter--color";
+  const FILTER_COLOR = "rgb(156, 163, 175)";
+
+  const clearStyled = useCallback(() => {
+    if (rafIdRef.current != null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    const el = styledElementRef.current;
+    if (el) {
+      el.classList.remove(CLASS_NAME);
+      el.style.removeProperty(VAR_CONTENT);
+      el.style.removeProperty(VAR_COLOR);
+    }
+    styledElementRef.current = null;
+    styledKeyRef.current = null;
+  }, []);
+
+  const scheduleApplyStyled = useCallback(
+    (nextKey: string, shouldShowFilter: boolean) => {
+      // Style after Lexical commits the DOM for the current update.
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null;
+
+        if (!isMenuOpenRef.current) {
+          clearStyled();
+          return;
+        }
+
+        const nextEl = editor.getElementByKey(nextKey);
+        if (!nextEl) {
+          // DOM might not be ready yet for this key; next update / state change will retry.
+          return;
+        }
+
+        if (styledKeyRef.current !== nextKey) {
+          clearStyled();
+        }
+
+        nextEl.classList.add(CLASS_NAME);
+        if (shouldShowFilter) {
+          nextEl.style.setProperty(VAR_CONTENT, '"Filter..."');
+          nextEl.style.setProperty(VAR_COLOR, FILTER_COLOR);
+        } else {
+          nextEl.style.removeProperty(VAR_CONTENT);
+          nextEl.style.removeProperty(VAR_COLOR);
+        }
+
+        styledElementRef.current = nextEl;
+        styledKeyRef.current = nextKey;
+      });
+    },
+    [clearStyled, editor],
+  );
+
+  const refreshSlashStyling = useCallback(
+    (editorState: EditorState) => {
+      if (!isMenuOpenRef.current) {
+        clearStyled();
+        return;
+      }
+
+      const currentQuery = queryStringRef.current;
+      const shouldShowFilter =
+        currentQuery == null || currentQuery === "" || currentQuery === "/";
+
+      let nextKey: string | null = null;
+
+      editorState.read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+          return;
+        }
+
+        const query = currentQuery ?? "";
+        const anchorNode = selection.anchor.getNode();
+
+        // Prefer styling the text node that contains the "/" trigger relative to caret.
+        if ($isTextNode(anchorNode)) {
+          const text = anchorNode.getTextContent();
+          const anchorOffset = selection.anchor.offset;
+          const slashIndex = anchorOffset - query.length - 1;
+
+          if (slashIndex >= 0 && text.charAt(slashIndex) === "/") {
+            nextKey = anchorNode.getKey();
+            return;
+          }
+
+          // If caret is at the beginning of this text node, the "/" might be in a previous text sibling.
+          if (anchorOffset === 0 && query.length === 0) {
+            const prev = anchorNode.getPreviousSibling();
+            if (prev != null && $isTextNode(prev)) {
+              const prevText = prev.getTextContent();
+              if (prevText.endsWith("/")) {
+                nextKey = prev.getKey();
+              }
+            }
+          }
+        }
+      });
+
+      if (nextKey == null) {
+        clearStyled();
+        return;
+      }
+
+      scheduleApplyStyled(nextKey, shouldShowFilter);
+    },
+    [clearStyled, scheduleApplyStyled],
+  );
+
+  useEffect(() => {
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
+      refreshSlashStyling(editorState);
+    });
+
+    return () => {
+      unregister();
+      clearStyled();
+    };
+  }, [clearStyled, editor, refreshSlashStyling]);
+
+  // React state can flip without a new Lexical update (notably the first "/"),
+  // so also re-evaluate when menu/query changes.
+  useEffect(() => {
+    // Update refs inline before using them in the callback
+    queryStringRef.current = queryString;
+    isMenuOpenRef.current = isMenuOpen;
+    refreshSlashStyling(editor.getEditorState());
+  }, [editor, isMenuOpen, queryString, refreshSlashStyling]);
+
   return (
     <>
       {modal}
+      {/* Add styling for "/Filter..." when menu is active */}
+      <style>
+        {`
+          /* Style the "/" character with background */
+          .lexical-slash-trigger {
+            background-color: rgba(0, 0, 0, 0.04);
+            border-radius: 3px;
+            padding: 2px 4px;
+          }
+          
+          /* Use CSS custom properties for ::after content (like Notion) */
+          .lexical-slash-trigger::after {
+            content: var(--pseudoAfter--content, "");
+            color: var(--pseudoAfter--color, transparent);
+            font-weight: 400;
+          }
+        `}
+      </style>
       <LexicalTypeaheadMenuPlugin<ComponentPickerOption>
-        onQueryChange={setQueryString}
+        onQueryChange={handleQueryChange}
         onSelectOption={onSelectOption}
         triggerFn={checkForTriggerMatch}
         options={flatOptions}
@@ -496,68 +688,81 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
         ) => {
           return anchorElementRef.current && flatOptions.length > 0
             ? createPortal(
-                <div className="fixed w-[calc(100vw-2rem)] sm:w-[280px] max-w-[280px] rounded-lg border border-gray-200 bg-white shadow-lg z-50">
-                  <CommandRoot
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowUp") {
-                        e.preventDefault();
-                        setHighlightedIndex(
-                          selectedIndex === null
-                            ? flatOptions.length - 1
-                            : (selectedIndex - 1 + flatOptions.length) %
-                                flatOptions.length,
-                        );
-                      } else if (e.key === "ArrowDown") {
-                        e.preventDefault();
-                        setHighlightedIndex(
-                          selectedIndex === null
-                            ? 0
-                            : (selectedIndex + 1) % flatOptions.length,
-                        );
-                      }
-                    }}
-                  >
-                    <CommandList className="max-h-[60vh] sm:max-h-[300px] overflow-y-auto p-1">
-                      {queryString ? (
-                        // When searching, show all results without categories
-                        <CommandGroup>
-                          {flatOptions.map((option, index) => (
-                            <CommandItem
-                              key={option.key}
-                              value={option.title}
-                              onSelect={() => {
-                                selectOptionAndCleanUp(option);
-                              }}
-                              className={`flex items-center gap-2 sm:gap-3 rounded-md px-2 sm:px-2 py-2 sm:py-1.5 text-sm transition-colors touch-manipulation ${
-                                selectedIndex === index
-                                  ? "bg-gray-100 text-gray-900"
-                                  : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                              }`}
-                            >
-                              <span className="flex-shrink-0 text-gray-500">
-                                {option.icon}
-                              </span>
-                              <span className="flex-1">{option.title}</span>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      ) : (
-                        // When not searching, show grouped by category
-                        <>
-                          {(Object.keys(groupedOptions) as OptionCategory[]).map(
-                            (category) => {
+                <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
+                  {/* Menu */}
+                  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                    <CommandRoot
+                      onKeyDown={(e) => {
+                        if (e.key === "ArrowUp") {
+                          e.preventDefault();
+                          setHighlightedIndex(
+                            selectedIndex === null
+                              ? flatOptions.length - 1
+                              : (selectedIndex - 1 + flatOptions.length) %
+                                  flatOptions.length,
+                          );
+                        } else if (e.key === "ArrowDown") {
+                          e.preventDefault();
+                          setHighlightedIndex(
+                            selectedIndex === null
+                              ? 0
+                              : (selectedIndex + 1) % flatOptions.length,
+                          );
+                        }
+                      }}
+                    >
+                      <CommandList className="max-h-[60vh] overflow-y-auto p-1 sm:max-h-[400px]">
+                        {queryString ? (
+                          // When searching, show all results without categories
+                          <CommandGroup>
+                            {flatOptions.map((option, index) => (
+                              <CommandItem
+                                key={option.key}
+                                value={option.title}
+                                onSelect={() => {
+                                  selectOptionAndCleanUp(option);
+                                }}
+                                className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+                                  selectedIndex === index
+                                    ? "bg-gray-100 text-gray-900"
+                                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="shrink-0 text-gray-500">
+                                    {option.icon}
+                                  </span>
+                                  <span className="flex-1">{option.title}</span>
+                                </div>
+                                {option.keyboardShortcut && (
+                                  <span className="text-xs text-gray-400">
+                                    {option.keyboardShortcut}
+                                  </span>
+                                )}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        ) : (
+                          // When not searching, show grouped by category
+                          <>
+                            {(
+                              Object.keys(groupedOptions) as OptionCategory[]
+                            ).map((category) => {
                               const categoryOptions = groupedOptions[category];
                               if (categoryOptions.length === 0) return null;
 
                               let categoryStartIndex = 0;
-                              for (const cat of Object.keys(groupedOptions) as OptionCategory[]) {
+                              for (const cat of Object.keys(
+                                groupedOptions,
+                              ) as OptionCategory[]) {
                                 if (cat === category) break;
-                                categoryStartIndex += groupedOptions[cat].length;
+                                categoryStartIndex +=
+                                  groupedOptions[cat].length;
                               }
 
                               return (
                                 <CommandGroup key={category}>
-                                  <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                                  <div className="px-3 py-1.5 text-xs font-medium text-gray-500">
                                     {CATEGORY_LABELS[category]}
                                   </div>
                                   {categoryOptions.map((item, itemIndex) => {
@@ -570,29 +775,44 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                         onSelect={() => {
                                           selectOptionAndCleanUp(item.option);
                                         }}
-                                        className={`flex items-center gap-2 sm:gap-3 rounded-md px-2 sm:px-2 py-2 sm:py-1.5 text-sm transition-colors touch-manipulation ${
+                                        className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                                           selectedIndex === globalIndex
                                             ? "bg-gray-100 text-gray-900"
                                             : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                                         }`}
                                       >
-                                        <span className="flex-shrink-0 text-gray-500">
-                                          {item.option.icon}
-                                        </span>
-                                        <span className="flex-1">
-                                          {item.option.title}
-                                        </span>
+                                        <div className="flex items-center gap-3">
+                                          <span className="shrink-0 text-gray-500">
+                                            {item.option.icon}
+                                          </span>
+                                          <span className="flex-1">
+                                            {item.option.title}
+                                          </span>
+                                        </div>
+                                        {item.option.keyboardShortcut && (
+                                          <span className="text-xs text-gray-400">
+                                            {item.option.keyboardShortcut}
+                                          </span>
+                                        )}
                                       </CommandItem>
                                     );
                                   })}
                                 </CommandGroup>
                               );
-                            },
-                          )}
-                        </>
-                      )}
-                    </CommandList>
-                  </CommandRoot>
+                            })}
+                          </>
+                        )}
+                      </CommandList>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2 text-xs text-gray-400">
+                        <span>Type '' on the page</span>
+                        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">
+                          esc
+                        </span>
+                      </div>
+                    </CommandRoot>
+                  </div>
                 </div>,
                 anchorElementRef.current,
               )

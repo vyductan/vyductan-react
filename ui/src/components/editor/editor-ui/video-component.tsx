@@ -1,10 +1,11 @@
 /**
  * Video Component
- * 
+ *
  * Component để render video element trong editor
  */
 
 import type { NodeKey } from "lexical";
+import { useCallback, useEffect, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { mergeRegister } from "@lexical/utils";
@@ -17,7 +18,6 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
 } from "lexical";
-import { useEffect, useRef } from "react";
 
 import { $isVideoNode } from "../nodes/video-node";
 
@@ -35,7 +35,7 @@ interface VideoComponentProps {
 
 export default function VideoComponent({
   src,
-  altText,
+  altText: _altText,
   width,
   height,
   controls,
@@ -45,20 +45,24 @@ export default function VideoComponent({
   nodeKey,
 }: VideoComponentProps) {
   const [editor] = useLexicalComposerContext();
-  const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
+  const [isSelected, setSelected, clearSelection] =
+    useLexicalNodeSelection(nodeKey);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const onDelete = (event: KeyboardEvent) => {
-    if (isSelected && $isNodeSelection($getSelection())) {
-      event.preventDefault();
-      const node = $getNodeByKey(nodeKey);
-      if ($isVideoNode(node)) {
-        node.remove();
+  const onDelete = useCallback(
+    (event: KeyboardEvent) => {
+      if (isSelected && $isNodeSelection($getSelection())) {
+        event.preventDefault();
+        const node = $getNodeByKey(nodeKey);
+        if ($isVideoNode(node)) {
+          node.remove();
+        }
+        setSelected(false);
       }
-      setSelected(false);
-    }
-    return false;
-  };
+      return false;
+    },
+    [isSelected, nodeKey, setSelected],
+  );
 
   useEffect(() => {
     return mergeRegister(
@@ -90,7 +94,7 @@ export default function VideoComponent({
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [clearSelection, editor, isSelected, setSelected]);
+  }, [clearSelection, editor, isSelected, setSelected, onDelete]);
 
   const style =
     width === "inherit" && height === "inherit"
@@ -108,7 +112,6 @@ export default function VideoComponent({
       <video
         ref={videoRef}
         src={src}
-        alt={altText}
         controls={controls}
         autoPlay={autoplay}
         loop={loop}
@@ -119,4 +122,3 @@ export default function VideoComponent({
     </div>
   );
 }
-

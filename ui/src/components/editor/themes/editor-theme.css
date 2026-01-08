@@ -186,7 +186,9 @@
 
 /* Smooth transitions for all interactive elements */
 .ContentEditable__root [data-lexical-editor="true"] > * {
-  transition: background-color 0.1s ease, color 0.1s ease;
+  transition:
+    background-color 0.1s ease,
+    color 0.1s ease;
 }
 
 /* Better focus ring for accessibility */
@@ -316,8 +318,14 @@
   }
 
   /* Show drag handle on focus for better visibility */
-  .ContentEditable__root [data-lexical-editor="true"] > *:focus-within ~ .draggable-block-menu,
-  .ContentEditable__root [data-lexical-editor="true"] > *:hover ~ .draggable-block-menu {
+  .ContentEditable__root
+    [data-lexical-editor="true"]
+    > *:focus-within
+    ~ .draggable-block-menu,
+  .ContentEditable__root
+    [data-lexical-editor="true"]
+    > *:hover
+    ~ .draggable-block-menu {
     opacity: 1 !important;
   }
 

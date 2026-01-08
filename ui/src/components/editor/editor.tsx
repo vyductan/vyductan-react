@@ -1,15 +1,16 @@
-"use client";
-
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState } from "lexical";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-import { TooltipProvider } from "../tooltip";
-import { FloatingLinkContext } from "./context/floating-link-context";
-import { SharedAutocompleteContext } from "./context/shared-autocomplete-context";
+import type { ImageResolverFn } from "./context/image-resolver-context";
+import type { MentionData } from "./plugins/mentions-plugin";
+import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
+import { WordCountPlugin } from "./plugins/word-count-plugin";
 import { editorTheme } from "./themes/editor-theme";
 
 const editorConfig: InitialConfigType = {
@@ -21,27 +22,81 @@ const editorConfig: InitialConfigType = {
   },
 };
 
-export function Editor({
-  value,
-  onChange,
-  placeholder,
-}: {
+const MarkdownPlugins = dynamic(
+  () => import("./plugins/markdown-plugins").then((mod) => mod.MarkdownPlugins),
+  { ssr: false },
+);
+
+// Discriminated Union for better type safety
+type EditorPropsBase = {
+  placeholder?: string;
+  defaultValue?: string;
+  editable?: boolean;
+  resolveImage?: ImageResolverFn;
+  onImageUpload?: (file: File) => Promise<string>;
+  onStatsChange?: (stats: {
+    wordCount: number;
+    characterCount: number;
+    readingTimeMinutes: number;
+  }) => void;
+  variant?: "default" | "simple";
+  mentionsData?: MentionData[];
+  className?: string;
+  autoFocus?: boolean;
+};
+
+type JsonEditorProps = EditorPropsBase & {
+  mode?: "json";
   value?: string;
   onChange?: (jsonString: string, editorState: EditorState) => void;
-  placeholder?: string;
-}) {
+};
+
+type MarkdownEditorProps = EditorPropsBase & {
+  mode: "markdown";
+  value?: string;
+  onChange?: (markdownString: string, editorState: EditorState) => void;
+};
+
+export type EditorProps = JsonEditorProps | MarkdownEditorProps;
+
+export function Editor({
+  value,
+  defaultValue,
+  onChange,
+  placeholder,
+  editable = true,
+  resolveImage,
+  onImageUpload,
+  onStatsChange,
+  mode = "json",
+  variant = "default",
+  mentionsData,
+  className,
+  autoFocus = true,
+}: EditorProps) {
+  const isMarkdownMode = mode === "markdown";
+
   return (
     <LexicalComposer
       initialConfig={{
         ...editorConfig,
-        editorState: value,
+        editorState: isMarkdownMode ? undefined : (value ?? defaultValue),
+        editable,
       }}
     >
-      <TooltipProvider>
-        <SharedAutocompleteContext>
-          <FloatingLinkContext>
-            <Plugins placeholder={placeholder} />
+      <EditorProviders resolveImage={resolveImage}>
+        <div className="relative">
+          <Plugins
+            placeholder={placeholder}
+            editable={editable}
+            onImageUpload={onImageUpload}
+            variant={variant}
+            mentionsData={mentionsData}
+            className={className}
+            autoFocus={autoFocus}
+          />
 
+          {!isMarkdownMode && (
             <OnChangePlugin
               ignoreSelectionChange={true}
               onChange={(editorState) => {
@@ -49,9 +104,21 @@ export function Editor({
                 onChange?.(jsonString, editorState);
               }}
             />
-          </FloatingLinkContext>
-        </SharedAutocompleteContext>
-      </TooltipProvider>
+          )}
+
+          {isMarkdownMode && (
+            <Suspense fallback={null}>
+              <MarkdownPlugins
+                value={value}
+                defaultValue={defaultValue}
+                onChange={onChange}
+              />
+            </Suspense>
+          )}
+
+          {onStatsChange && <WordCountPlugin onStatsChange={onStatsChange} />}
+        </div>
+      </EditorProviders>
     </LexicalComposer>
   );
 }

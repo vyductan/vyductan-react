@@ -2,12 +2,6 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
 import {
-  SelectContent,
-  SelectItem,
-  SelectRoot,
-  SelectTrigger,
-} from "@acme/ui/components/select";
-import {
   $isCodeNode,
   CODE_LANGUAGE_FRIENDLY_NAME_MAP,
   CODE_LANGUAGE_MAP,
@@ -16,6 +10,13 @@ import {
 import { $isListNode } from "@lexical/list";
 import { $findMatchingParent } from "@lexical/utils";
 import { $getNodeByKey, $isRangeSelection, $isRootOrShadowRoot } from "lexical";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@acme/ui/components/select";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
@@ -88,7 +89,7 @@ export function CodeLanguageToolbarPlugin() {
   );
 
   return (
-    <SelectRoot>
+    <Select>
       <SelectTrigger className="h-8 w-min gap-1">
         <span>{getLanguageFriendlyName(codeLanguage)}</span>
       </SelectTrigger>
@@ -105,6 +106,6 @@ export function CodeLanguageToolbarPlugin() {
           </SelectItem>
         ))}
       </SelectContent>
-    </SelectRoot>
+    </Select>
   );
 }

@@ -1,26 +1,47 @@
 /**
  * Fullscreen Plugin
- * 
+ *
  * Plugin để toggle fullscreen mode cho editor
  * - Toggle fullscreen on/off
  * - Keyboard shortcut: F11 hoặc Cmd/Ctrl+Shift+F
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { mergeRegister } from "@lexical/utils";
+import { COMMAND_PRIORITY_LOW, KEY_MODIFIER_COMMAND } from "lexical";
+import { MaximizeIcon, MinimizeIcon } from "lucide-react";
+
 import { Button } from "@acme/ui/components/button";
 import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
 } from "@acme/ui/components/tooltip";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  KEY_MODIFIER_COMMAND,
-  COMMAND_PRIORITY_LOW,
-} from "lexical";
-import { MaximizeIcon, MinimizeIcon } from "lucide-react";
-import { mergeRegister } from "@lexical/utils";
 
+interface DocumentWithFullscreen extends Omit<Document, "exitFullscreen"> {
+  exitFullscreen?: () => Promise<void>;
+  mozCancelFullScreen?: () => Promise<void>;
+  msExitFullscreen?: () => Promise<void>;
+  webkitExitFullscreen?: () => Promise<void>;
+  mozFullScreenElement?: Element;
+  msFullscreenElement?: Element;
+  webkitFullscreenElement?: Element;
+}
+
+interface HTMLElementWithFullscreen extends Omit<
+  HTMLElement,
+  "requestFullscreen"
+> {
+  requestFullscreen?: () => Promise<void>;
+  mozRequestFullScreen?: () => Promise<void>;
+  msRequestFullscreen?: () => Promise<void>;
+  webkitRequestFullscreen?: () => Promise<void>;
+}
+
+/**
+ * Fullscreen Plugin Component
+ */
 export function FullscreenPlugin({
   containerRef,
 }: {
@@ -28,44 +49,44 @@ export function FullscreenPlugin({
 } = {}) {
   const [editor] = useLexicalComposerContext();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const originalStylesRef = useRef<Record<string, string> | null>(null);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const isNowFullscreen = !!document.fullscreenElement;
+      const doc = document as DocumentWithFullscreen;
+      const isNowFullscreen = !!(
+        doc.fullscreenElement ??
+        doc.webkitFullscreenElement ??
+        doc.mozFullScreenElement ??
+        doc.msFullscreenElement
+      );
       setIsFullscreen(isNowFullscreen);
 
       // If exiting fullscreen, restore styles
       if (!isNowFullscreen) {
         const rootElement = editor.getRootElement();
         if (rootElement) {
-          let container: HTMLElement | null = null;
-          if (containerRef?.current) {
-            container = containerRef.current;
-          } else {
-            container = rootElement.closest(".group.rounded-xl.bg-white") as HTMLElement;
-            if (!container) {
-              container = rootElement.closest(".rounded-xl.bg-white") as HTMLElement;
-            }
-            if (!container) {
-              container = rootElement.closest(".editor-scroll-container")?.parentElement as HTMLElement;
-            }
-            if (!container) {
-              container = rootElement.closest(".relative") as HTMLElement;
-            }
-            if (!container) {
-              container = rootElement.parentElement;
-            }
-          }
+          const container =
+            containerRef?.current ??
+            rootElement.closest<HTMLElement>(".group.rounded-xl.bg-white") ??
+            rootElement.closest<HTMLElement>(".rounded-xl.bg-white") ??
+            rootElement.closest<HTMLElement>(".editor-scroll-container")
+              ?.parentElement ??
+            rootElement.closest<HTMLElement>(".relative") ??
+            rootElement.parentElement;
 
-          if (container && container.dataset.originalStyles) {
-            const styles = JSON.parse(container.dataset.originalStyles);
-            Object.assign(container.style, styles);
-            delete container.dataset.originalStyles;
+          if (container && originalStylesRef.current) {
+            Object.assign(container.style, originalStylesRef.current);
+            originalStylesRef.current = null;
 
             // Restore editor scroll container background
-            const editorScrollContainer = container.querySelector(".editor-scroll-container") as HTMLElement;
+            const editorScrollContainer = container.querySelector(
+              ".editor-scroll-container",
+            ) as unknown as HTMLElement | null;
             if (editorScrollContainer) {
-              editorScrollContainer.style.backgroundColor = "";
+              Object.assign(editorScrollContainer.style, {
+                backgroundColor: "",
+              });
             }
           }
         }
@@ -83,15 +104,21 @@ export function FullscreenPlugin({
         "webkitfullscreenchange",
         handleFullscreenChange,
       );
-      document.removeEventListener("mozfullscreenchange", handleFullscreenChange);
-      document.removeEventListener("MSFullscreenChange", handleFullscreenChange);
+      document.removeEventListener(
+        "mozfullscreenchange",
+        handleFullscreenChange,
+      );
+      document.removeEventListener(
+        "MSFullscreenChange",
+        handleFullscreenChange,
+      );
     };
   }, [editor, containerRef]);
 
   const toggleFullscreen = useCallback(async () => {
     // Use containerRef if provided, otherwise find from editor root
-    let container: HTMLElement | null = null;
 
+    let container: HTMLElement | null = null;
     if (containerRef?.current) {
       container = containerRef.current;
     } else {
@@ -99,23 +126,17 @@ export function FullscreenPlugin({
       if (rootElement) {
         // Try to find the Post Content container (the one with "group rounded-xl bg-white p-6")
         // This is the container that includes label, stats, and editor
-        container = rootElement.closest(".group.rounded-xl.bg-white") as HTMLElement;
         // If not found, try to find the outer editor wrapper (the one with bg-white, rounded-xl)
-        if (!container) {
-          container = rootElement.closest(".rounded-xl.bg-white") as HTMLElement;
-        }
         // If not found, try to find the editor-scroll-container parent
-        if (!container) {
-          container = rootElement.closest(".editor-scroll-container")?.parentElement as HTMLElement;
-        }
         // If still not found, try to find parent with relative class
-        if (!container) {
-          container = rootElement.closest(".relative") as HTMLElement;
-        }
         // Last resort: use parent element
-        if (!container) {
-          container = rootElement.parentElement;
-        }
+        container =
+          rootElement.closest<HTMLElement>(".group.rounded-xl.bg-white") ??
+          rootElement.closest<HTMLElement>(".rounded-xl.bg-white") ??
+          rootElement.closest<HTMLElement>(".editor-scroll-container")
+            ?.parentElement ??
+          rootElement.closest<HTMLElement>(".relative") ??
+          rootElement.parentElement;
       }
     }
 
@@ -124,8 +145,33 @@ export function FullscreenPlugin({
       return;
     }
 
+    const doc = document as DocumentWithFullscreen;
+    const fullscreenEl =
+      doc.fullscreenElement ??
+      doc.webkitFullscreenElement ??
+      doc.mozFullScreenElement ??
+      doc.msFullscreenElement;
+
     try {
-      if (!document.fullscreenElement) {
+      if (fullscreenEl) {
+        // Exit fullscreen
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
+        } else if (doc.mozCancelFullScreen) {
+          await doc.mozCancelFullScreen();
+        } else if (doc.msExitFullscreen) {
+          await doc.msExitFullscreen();
+        }
+
+        // Restore original styles after exiting fullscreen
+        if (originalStylesRef.current) {
+          Object.assign(container.style, originalStylesRef.current);
+          originalStylesRef.current = null;
+        }
+        // State will be updated by fullscreenchange event listener
+      } else {
         // Store original styles to restore later
         const originalStyles = {
           backgroundColor: container.style.backgroundColor,
@@ -134,63 +180,50 @@ export function FullscreenPlugin({
           margin: container.style.margin,
           borderRadius: container.style.borderRadius,
         };
-        container.dataset.originalStyles = JSON.stringify(originalStyles);
+        originalStylesRef.current = originalStyles;
 
         // Add fullscreen styling before entering fullscreen
-        container.style.backgroundColor = "white";
-        container.style.width = "100vw";
-        container.style.height = "100vh";
-        container.style.margin = "0";
-        container.style.borderRadius = "0";
-        container.style.padding = "1rem";
-        container.style.overflow = "auto";
+        Object.assign(container.style, {
+          backgroundColor: "white",
+          width: "100vw",
+          height: "100vh",
+          margin: "0",
+          borderRadius: "0",
+          padding: "1rem",
+          overflow: "auto",
+        });
 
         // Also ensure editor content has white background
-        const editorScrollContainer = container.querySelector(".editor-scroll-container") as HTMLElement;
+        const editorScrollContainer = container.querySelector(
+          ".editor-scroll-container",
+        ) as unknown as HTMLElement | null;
         if (editorScrollContainer) {
-          editorScrollContainer.style.backgroundColor = "white";
+          Object.assign(editorScrollContainer.style, {
+            backgroundColor: "white",
+          });
         }
 
         // Enter fullscreen
-        if (container.requestFullscreen) {
-          await container.requestFullscreen();
-        } else if ((container as any).webkitRequestFullscreen) {
+        const el = container as HTMLElementWithFullscreen;
+        if (el.requestFullscreen) {
+          await el.requestFullscreen();
+        } else if (el.webkitRequestFullscreen) {
           // Safari
-          await (container as any).webkitRequestFullscreen();
-        } else if ((container as any).mozRequestFullScreen) {
+          await el.webkitRequestFullscreen();
+        } else if (el.mozRequestFullScreen) {
           // Firefox
-          await (container as any).mozRequestFullScreen();
-        } else if ((container as any).msRequestFullscreen) {
+          await el.mozRequestFullScreen();
+        } else if (el.msRequestFullscreen) {
           // IE/Edge
-          await (container as any).msRequestFullscreen();
+          await el.msRequestFullscreen();
         } else {
-          console.warn("FullscreenPlugin: Fullscreen API not supported in this browser");
+          console.warn(
+            "FullscreenPlugin: Fullscreen API not supported in this browser",
+          );
           // Restore styles if fullscreen failed
-          if (container.dataset.originalStyles) {
-            const styles = JSON.parse(container.dataset.originalStyles);
-            Object.assign(container.style, styles);
-            delete container.dataset.originalStyles;
-          }
+          Object.assign(container.style, originalStylesRef.current);
+          originalStylesRef.current = null;
           return;
-        }
-        // State will be updated by fullscreenchange event listener
-      } else {
-        // Exit fullscreen
-        if (document.exitFullscreen) {
-          await document.exitFullscreen();
-        } else if ((document as any).webkitExitFullscreen) {
-          await (document as any).webkitExitFullscreen();
-        } else if ((document as any).mozCancelFullScreen) {
-          await (document as any).mozCancelFullScreen();
-        } else if ((document as any).msExitFullscreen) {
-          await (document as any).msExitFullscreen();
-        }
-
-        // Restore original styles after exiting fullscreen
-        if (container.dataset.originalStyles) {
-          const styles = JSON.parse(container.dataset.originalStyles);
-          Object.assign(container.style, styles);
-          delete container.dataset.originalStyles;
         }
         // State will be updated by fullscreenchange event listener
       }
@@ -209,7 +242,7 @@ export function FullscreenPlugin({
       editor.registerCommand(
         KEY_MODIFIER_COMMAND,
         (payload) => {
-          const event = payload as KeyboardEvent;
+          const event = payload;
           if (
             (event.metaKey || event.ctrlKey) &&
             event.shiftKey &&
@@ -255,4 +288,3 @@ export function FullscreenPlugin({
     </TooltipRoot>
   );
 }
-

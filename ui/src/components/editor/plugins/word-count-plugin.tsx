@@ -2,14 +2,13 @@
 
 /**
  * Word Count & Reading Time Plugin
- * 
+ *
  * Tính toán và hiển thị:
  * - Số từ (word count)
  * - Thời gian đọc ước tính (reading time)
- * 
+ *
  * Plugin này expose stats qua callback để component cha có thể hiển thị
  */
-
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot } from "lexical";
@@ -61,4 +60,3 @@ export function WordCountPlugin({
 
   return null;
 }
-

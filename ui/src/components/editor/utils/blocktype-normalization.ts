@@ -1,4 +1,4 @@
-const ZERO_WIDTH_SPACE = "\u200b";
+const ZERO_WIDTH_SPACE = "\u200B";
 
 export const INVALID_BLOCK_TYPE_VALUES = [
   "bullet",
@@ -12,7 +12,7 @@ export const INVALID_BLOCK_TYPE_VALUES = [
   "h3",
 ] as const;
 
-const INVALID_LOOKUP = new Set(INVALID_BLOCK_TYPE_VALUES);
+const INVALID_LOOKUP = new Set<string>(INVALID_BLOCK_TYPE_VALUES);
 
 /**
  * Insert a zero-width space after the first character so the string is no longer
@@ -76,4 +76,3 @@ export const containsInvalidBlockTypeValue = (
 
   return INVALID_LOOKUP.has(value.trim());
 };
-

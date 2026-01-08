@@ -15,14 +15,6 @@ import type {
 } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@acme/ui/components/select";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $findMatchingParent,
@@ -42,6 +34,15 @@ import {
   KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
 } from "lexical";
+
+import { Button } from "@acme/ui/components/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@acme/ui/components/select";
 
 import {
   $createLayoutContainerNode,

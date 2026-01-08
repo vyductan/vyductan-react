@@ -135,4 +135,3 @@ export function getMarkdownFromEditor(editor: LexicalEditor): string {
     return "";
   }
 }
-

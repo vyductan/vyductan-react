@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { TextNode } from "lexical";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { TextNode } from "lexical";
 
 import {
   containsInvalidBlockTypeValue,
@@ -58,4 +58,3 @@ export function BlockTypeNormalizationPlugin(): null {
 
   return null;
 }
-

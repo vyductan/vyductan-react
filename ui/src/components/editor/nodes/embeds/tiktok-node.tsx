@@ -1,6 +1,6 @@
 /**
  * TikTok Embed Node
- * 
+ *
  * Node để embed TikTok videos vào Lexical editor
  * Hỗ trợ TikTok URL: https://www.tiktok.com/@username/video/1234567890
  */
@@ -42,11 +42,11 @@ function TikTokComponent({
 }: TikTokComponentProps) {
   useEffect(() => {
     // Load TikTok embed script
-    if (!window.tiktokEmbed) {
+    if (!globalThis.tiktokEmbed) {
       const script = document.createElement("script");
       script.src = "https://www.tiktok.com/embed.js";
       script.async = true;
-      document.body.appendChild(script);
+      document.body.append(script);
     }
   }, [videoId]);
 
@@ -92,10 +92,10 @@ export type SerializedTikTokNode = Spread<
 function $convertTikTokElement(
   domNode: HTMLElement,
 ): null | DOMConversionOutput {
-  const videoId = domNode.dataset.lexicalTiktok;
-  const username = domNode.dataset.lexicalTiktokUsername;
+  const videoId = domNode.dataset.lexicalTiktok ?? undefined;
+  const username = domNode.dataset.lexicalTiktokUsername ?? undefined;
   if (videoId) {
-    const node = $createTikTokNode(videoId, username || undefined);
+    const node = $createTikTokNode(videoId, username ?? undefined);
     return { node };
   }
   return null;
@@ -110,11 +110,19 @@ export class TikTokNode extends DecoratorBlockNode {
   }
 
   static clone(node: TikTokNode): TikTokNode {
-    return new TikTokNode(node.__id, node.__format, node.__key, node.__username);
+    return new TikTokNode(
+      node.__id,
+      node.__format,
+      node.__key,
+      node.__username,
+    );
   }
 
   static importJSON(serializedNode: SerializedTikTokNode): TikTokNode {
-    const node = $createTikTokNode(serializedNode.videoId, serializedNode.username);
+    const node = $createTikTokNode(
+      serializedNode.videoId,
+      serializedNode.username,
+    );
     node.setFormat(serializedNode.format);
     return node;
   }
@@ -151,7 +159,7 @@ export class TikTokNode extends DecoratorBlockNode {
       ? `https://www.tiktok.com/@${this.__username}/video/${this.__id}`
       : `https://www.tiktok.com/embed/v2/${this.__id}`;
     element.setAttribute("cite", embedUrl);
-    element.setAttribute("data-video-id", this.__id);
+    element.dataset.videoId = this.__id;
     return { element };
   }
 
@@ -223,5 +231,7 @@ declare global {
   interface Window {
     tiktokEmbed?: unknown;
   }
-}
 
+  // Also extend globalThis for better compatibility
+  var tiktokEmbed: unknown;
+}

@@ -3,12 +3,6 @@
 /* eslint-disable unicorn/prefer-global-this */
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import {
-  TooltipContent,
-  TooltipRoot,
-  TooltipTrigger,
-} from "@acme/ui/components/tooltip";
 import {
   editorStateFromSerializedDocument,
   serializedDocumentFromEditorState,
@@ -17,6 +11,13 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { SendIcon } from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@acme/ui/components/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@acme/ui/components/tooltip";
 
 import { docFromHash, docToHash } from "../../utils/doc-serialization";
 
@@ -59,7 +60,7 @@ export function ShareContentPlugin() {
           onClick={() => {
             if (!isClient) return;
 
-            shareDoc(
+            void shareDoc(
               serializedDocumentFromEditorState(editor.getEditorState(), {
                 source: "editor",
               }),

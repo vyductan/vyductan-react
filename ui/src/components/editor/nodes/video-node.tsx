@@ -1,6 +1,6 @@
 /**
  * Video Node
- * 
+ *
  * Node để render video element trong Lexical editor
  * Hỗ trợ video files (upload) và video URLs
  */
@@ -40,16 +40,16 @@ function $convertVideoElement(domNode: Node): null | DOMConversionOutput {
     return null;
   }
   const { src, width, height, controls, autoplay, loop, muted } = video;
-  const altText = video.getAttribute("alt") || "Video";
+  const altText = video.getAttribute("alt") ?? "Video";
   const node = $createVideoNode({
     altText,
     src,
-    width: width || undefined,
-    height: height || undefined,
-    controls: controls !== undefined,
-    autoplay: autoplay !== undefined,
-    loop: loop !== undefined,
-    muted: muted !== undefined,
+    width: width > 0 ? width : undefined,
+    height: height > 0 ? height : undefined,
+    controls,
+    autoplay,
+    loop,
+    muted,
   });
   return { node };
 }
@@ -195,13 +195,16 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     writable.__altText = altText;
   }
 
-  setWidthAndHeight(width: "inherit" | number, height: "inherit" | number): void {
+  setWidthAndHeight(
+    width: "inherit" | number,
+    height: "inherit" | number,
+  ): void {
     const writable = this.getWritable();
     writable.__width = width;
     writable.__height = height;
   }
 
-  decorate(_editor: LexicalEditor, config: EditorConfig): JSX.Element {
+  decorate(_editor: LexicalEditor, _config: EditorConfig): JSX.Element {
     return (
       <Suspense fallback={null}>
         <VideoComponent
@@ -235,7 +238,8 @@ export function $createVideoNode({
   );
 }
 
-export function $isVideoNode(node: LexicalNode | null | undefined): node is VideoNode {
+export function $isVideoNode(
+  node: LexicalNode | null | undefined,
+): node is VideoNode {
   return node instanceof VideoNode;
 }
-

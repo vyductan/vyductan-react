@@ -9,9 +9,6 @@ import type { ListType } from "@lexical/list";
 import type { LexicalEditor } from "lexical";
 import type { Dispatch, JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@acme/ui/components/button";
-import { Separator } from "@acme/ui/components/divider";
-import { Dropdown } from "@acme/ui/components/dropdown";
 import { $createCodeNode, $isCodeHighlightNode } from "@lexical/code";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
@@ -21,12 +18,9 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $patchStyleText, $setBlocksType } from "@lexical/selection";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-} from "@lexical/rich-text";
 import {
   $createParagraphNode,
   $getSelection,
@@ -73,14 +67,19 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
-import { ToggleGroup, ToggleGroupItem } from "@acme/ui/shadcn/toggle-group";
+import type { ItemType } from "@acme/ui/components/menu";
+import { Button } from "@acme/ui/components/button";
+import { Separator } from "@acme/ui/components/divider";
+import { Dropdown } from "@acme/ui/components/dropdown";
+
+import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
 import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
-import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
-import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
 import { setFloatingElemPosition } from "../utils/set-floating-elem-position";
+import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
+import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
 
 function TextFormatFloatingToolbar({
   editor,
@@ -98,6 +97,7 @@ function TextFormatFloatingToolbar({
   onAskAI,
   onComment,
   onMath,
+  variant,
 }: {
   editor: LexicalEditor;
   anchorElem: HTMLElement;
@@ -114,6 +114,7 @@ function TextFormatFloatingToolbar({
   onAskAI: () => void;
   onComment: () => void;
   onMath: () => void;
+  variant: "default" | "simple";
 }): JSX.Element {
   const popupCharStylesEditorRef = useRef<HTMLDivElement | null>(null);
 
@@ -287,21 +288,21 @@ function TextFormatFloatingToolbar({
     [],
   );
 
-const backgroundColors = useMemo(
-  () => [
-    { label: "Default background", value: "default", hex: "#ffffff" },
-    { label: "Gray background", value: "gray", hex: "#F3F4F6" },
-    { label: "Brown background", value: "brown", hex: "#FEF3C7" },
-    { label: "Orange background", value: "orange", hex: "#FFEDD5" },
-    { label: "Yellow background", value: "yellow", hex: "#FEF9C3" },
-    { label: "Green background", value: "green", hex: "#DCFCE7" },
-    { label: "Blue background", value: "blue", hex: "#DBEAFE" },
-    { label: "Purple background", value: "purple", hex: "#EDE9FE" },
-    { label: "Pink background", value: "pink", hex: "#FCE7F3" },
-    { label: "Red background", value: "red", hex: "#FEE2E2" },
-  ],
-  [],
-);
+  const backgroundColors = useMemo(
+    () => [
+      { label: "Default background", value: "default", hex: "#ffffff" },
+      { label: "Gray background", value: "gray", hex: "#F3F4F6" },
+      { label: "Brown background", value: "brown", hex: "#FEF3C7" },
+      { label: "Orange background", value: "orange", hex: "#FFEDD5" },
+      { label: "Yellow background", value: "yellow", hex: "#FEF9C3" },
+      { label: "Green background", value: "green", hex: "#DCFCE7" },
+      { label: "Blue background", value: "blue", hex: "#DBEAFE" },
+      { label: "Purple background", value: "purple", hex: "#EDE9FE" },
+      { label: "Pink background", value: "pink", hex: "#FCE7F3" },
+      { label: "Red background", value: "red", hex: "#FEE2E2" },
+    ],
+    [],
+  );
   const handleTextColorChange = useCallback(
     (colorValue: string) => {
       editor.update(() => {
@@ -323,428 +324,448 @@ const backgroundColors = useMemo(
     [editor, textColors],
   );
 
-const handleBackgroundColorChange = useCallback(
-  (colorValue: string) => {
+  const handleBackgroundColorChange = useCallback(
+    (colorValue: string) => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          const color = backgroundColors.find((c) => c.value === colorValue);
+          if (color) {
+            if (colorValue === "default") {
+              $patchStyleText(selection, { "background-color": "" });
+            } else {
+              $patchStyleText(selection, { "background-color": color.hex });
+            }
+          }
+        }
+      });
+    },
+    [editor, backgroundColors],
+  );
+
+  const handleListFormatChange = useCallback(
+    (style: "default" | "disc" | "circle" | "square") => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return;
+        }
+        const node = getSelectedNode(selection);
+        const listNode =
+          $findMatchingParent(node, $isListNode) ??
+          ($isListNode(node) ? node : null);
+
+        if (!$isListNode(listNode)) {
+          message.info(
+            "Vui lòng đặt con trỏ trong danh sách để đổi định dạng.",
+          );
+          return;
+        }
+
+        const styleValue =
+          style === "default" ? "" : `list-style-type:${style} !important`;
+        listNode.setStyle(styleValue);
+      });
+    },
+    [editor],
+  );
+
+  const applyBlockType = useCallback(
+    (type: "paragraph" | "h1" | "h2" | "h3" | "quote" | "code") => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          return;
+        }
+
+        switch (type) {
+          case "paragraph": {
+            $setBlocksType(selection, () => $createParagraphNode());
+            break;
+          }
+          case "h1": {
+            $setBlocksType(selection, () => $createHeadingNode("h1"));
+            break;
+          }
+          case "h2": {
+            $setBlocksType(selection, () => $createHeadingNode("h2"));
+            break;
+          }
+          case "h3": {
+            $setBlocksType(selection, () => $createHeadingNode("h3"));
+            break;
+          }
+          case "quote": {
+            $setBlocksType(selection, () => $createQuoteNode());
+            break;
+          }
+          case "code": {
+            $setBlocksType(selection, () => $createCodeNode());
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      });
+    },
+    [editor],
+  );
+
+  const handleToggleList = useCallback(() => {
+    editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, void 0);
+  }, [editor]);
+
+  const handleInsertEquationBlock = useCallback(() => {
+    editor.dispatchCommand(INSERT_EQUATION_COMMAND, {
+      equation: "",
+      inline: false,
+    });
+  }, [editor]);
+
+  const handlePageAction = useCallback(() => {
+    message.info("Tính năng tạo Page đang được phát triển.");
+  }, []);
+
+  const handlePageInAction = useCallback(() => {
+    message.info("“Page in” chưa khả dụng trong phiên bản hiện tại.");
+  }, []);
+
+  const handleCalloutAction = useCallback(() => {
+    message.info("Callout đang được phát triển.");
+  }, []);
+
+  const handleCopyLinkToBlock = useCallback(() => {
+    const baseUrl = globalThis.location.href.split("#")[0];
+    const pseudoHash = `block-${Date.now()}`;
+    const url = `${baseUrl}#${pseudoHash}`;
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        message.success("Đã sao chép liên kết khối (giả lập).");
+      })
+      .catch(() => {
+        message.info("Không thể sao chép liên kết, vui lòng thử lại.");
+      });
+  }, []);
+
+  const handleDuplicateSelection = useCallback(() => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) {
+        message.info("Chọn nội dung để nhân đôi.");
+        return;
+      }
+      const text = selection.getTextContent();
+      if (!text) {
+        message.info("Chọn nội dung để nhân đôi.");
+        return;
+      }
+      selection.insertText(`${text}${text}`);
+    });
+  }, [editor]);
+
+  const handleMoveToBlock = useCallback(() => {
+    message.info("Move to đang được phát triển cho module này.");
+  }, []);
+
+  const handleDeleteSelection = useCallback(() => {
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        const color = backgroundColors.find((c) => c.value === colorValue);
-        if (color) {
-          if (colorValue === "default") {
-            $patchStyleText(selection, { "background-color": "" });
-          } else {
-            $patchStyleText(selection, { "background-color": color.hex });
-          }
-        }
+        selection.insertText("");
       }
     });
-  },
-  [editor, backgroundColors],
-);
+    message.success("Đã xóa khối đã chọn.");
+  }, [editor]);
 
-const handleListFormatChange = useCallback(
-  (style: "default" | "disc" | "circle" | "square") => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) {
-        return;
-      }
-      const node = getSelectedNode(selection);
-      const listNode =
-        $findMatchingParent(node, $isListNode) ??
-        ($isListNode(node) ? node : null);
-
-      if (!$isListNode(listNode)) {
-        message.info("Vui lòng đặt con trỏ trong danh sách để đổi định dạng.");
-        return;
-      }
-
-      const styleValue =
-        style === "default" ? "" : `list-style-type:${style} !important`;
-      listNode.setStyle(styleValue);
-    });
-  },
-  [editor],
-);
-
-const applyBlockType = useCallback(
-  (type: "paragraph" | "h1" | "h2" | "h3" | "quote" | "code") => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) {
-        return;
-      }
-
-      switch (type) {
-        case "paragraph":
-          $setBlocksType(selection, () => $createParagraphNode());
-          break;
-        case "h1":
-          $setBlocksType(selection, () => $createHeadingNode("h1"));
-          break;
-        case "h2":
-          $setBlocksType(selection, () => $createHeadingNode("h2"));
-          break;
-        case "h3":
-          $setBlocksType(selection, () => $createHeadingNode("h3"));
-          break;
-        case "quote":
-          $setBlocksType(selection, () => $createQuoteNode());
-          break;
-        case "code":
-          $setBlocksType(selection, () => $createCodeNode());
-          break;
-        default:
-          break;
-      }
-    });
-  },
-  [editor],
-);
-
-const handleToggleList = useCallback(() => {
-  editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined);
-}, [editor]);
-
-const handleInsertEquationBlock = useCallback(() => {
-  editor.dispatchCommand(INSERT_EQUATION_COMMAND, {
-    equation: "",
-    inline: false,
-  });
-}, [editor]);
-
-const handlePageAction = useCallback(() => {
-  message.info("Tính năng tạo Page đang được phát triển.");
-}, []);
-
-const handlePageInAction = useCallback(() => {
-  message.info("“Page in” chưa khả dụng trong phiên bản hiện tại.");
-}, []);
-
-const handleCalloutAction = useCallback(() => {
-  message.info("Callout đang được phát triển.");
-}, []);
-
-const handleCopyLinkToBlock = useCallback(() => {
-  const baseUrl = window.location.href.split("#")[0];
-  const pseudoHash = `block-${Date.now()}`;
-  const url = `${baseUrl}#${pseudoHash}`;
-  navigator.clipboard
-    ?.writeText(url)
-    .then(() => {
-      message.success("Đã sao chép liên kết khối (giả lập).");
-    })
-    .catch(() => {
-      message.info("Không thể sao chép liên kết, vui lòng thử lại.");
-    });
-}, []);
-
-const handleDuplicateSelection = useCallback(() => {
-  editor.update(() => {
-    const selection = $getSelection();
-    if (!$isRangeSelection(selection)) {
-      message.info("Chọn nội dung để nhân đôi.");
-      return;
-    }
-    const text = selection.getTextContent();
-    if (!text) {
-      message.info("Chọn nội dung để nhân đôi.");
-      return;
-    }
-    selection.insertText(`${text}${text}`);
-  });
-}, [editor]);
-
-const handleMoveToBlock = useCallback(() => {
-  message.info("Move to đang được phát triển cho module này.");
-}, []);
-
-const handleDeleteSelection = useCallback(() => {
-  editor.update(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
-      selection.insertText("");
-    }
-  });
-  message.success("Đã xóa khối đã chọn.");
-}, [editor]);
-
-const moreMenu = useMemo(() => {
-  const turnIntoItems = [
-    {
-      type: "item",
-      key: "turn-text",
-      label: "Text",
-      icon: <TypeIcon className="h-4 w-4" />,
-      onClick: () => applyBlockType("paragraph"),
-    },
-    {
-      type: "item",
-      key: "turn-heading1",
-      label: "Heading 1",
-      icon: <Heading1Icon className="h-4 w-4" />,
-      onClick: () => applyBlockType("h1"),
-    },
-    {
-      type: "item",
-      key: "turn-heading2",
-      label: "Heading 2",
-      icon: <Heading2Icon className="h-4 w-4" />,
-      onClick: () => applyBlockType("h2"),
-    },
-    {
-      type: "item",
-      key: "turn-heading3",
-      label: "Heading 3",
-      icon: <Heading3Icon className="h-4 w-4" />,
-      onClick: () => applyBlockType("h3"),
-    },
-    {
-      type: "item",
-      key: "turn-page",
-      label: "Page",
-      icon: <FileIcon className="h-4 w-4" />,
-      onClick: handlePageAction,
-    },
-    {
-      type: "item",
-      key: "turn-page-in",
-      label: "Page in",
-      icon: <FileOutputIcon className="h-4 w-4" />,
-      onClick: handlePageInAction,
-    },
-    {
-      type: "item",
-      key: "turn-bulleted",
-      label: "Bulleted list",
-      icon: <ListIcon className="h-4 w-4" />,
-      onClick: () => onListChange("bullet"),
-    },
-    {
-      type: "item",
-      key: "turn-numbered",
-      label: "Numbered list",
-      icon: <ListOrderedIcon className="h-4 w-4" />,
-      onClick: () => onListChange("number"),
-    },
-    {
-      type: "item",
-      key: "turn-todo",
-      label: "To-do list",
-      icon: <CheckSquareIcon className="h-4 w-4" />,
-      onClick: () => onListChange("check"),
-    },
-    {
-      type: "item",
-      key: "turn-toggle",
-      label: "Toggle list",
-      icon: <ListTreeIcon className="h-4 w-4" />,
-      onClick: handleToggleList,
-    },
-    {
-      type: "item",
-      key: "turn-code",
-      label: "Code",
-      icon: <CodeIcon className="h-4 w-4" />,
-      onClick: () => applyBlockType("code"),
-    },
-    {
-      type: "item",
-      key: "turn-quote",
-      label: "Quote",
-      icon: <QuoteIcon className="h-4 w-4" />,
-      onClick: () => applyBlockType("quote"),
-    },
-    {
-      type: "item",
-      key: "turn-callout",
-      label: "Callout",
-      icon: <BookOpenIcon className="h-4 w-4" />,
-      onClick: handleCalloutAction,
-    },
-    {
-      type: "item",
-      key: "turn-equation",
-      label: "Block equation",
-      icon: <SuperscriptIcon className="h-4 w-4" />,
-      onClick: handleInsertEquationBlock,
-    },
-  ];
-
-  const textColorItems = textColors.map((color) => ({
-    type: "item",
-    key: `menu-text-${color.value}`,
-    label: color.label,
-    icon: (
-      <div
-        className="h-4 w-4 rounded border border-gray-300"
-        style={{ backgroundColor: color.hex }}
-      />
-    ),
-    onClick: () => handleTextColorChange(color.value),
-  }));
-
-  const backgroundColorItems = backgroundColors.map((color) => ({
-    type: "item",
-    key: `menu-bg-${color.value}`,
-    label: color.label,
-    icon: (
-      <div
-        className="h-4 w-4 rounded border border-gray-300"
-        style={{ backgroundColor: color.hex }}
-      />
-    ),
-    onClick: () => handleBackgroundColorChange(color.value),
-  }));
-
-  const listFormatItems = [
-    {
-      key: "list-format-default",
-      label: "Default",
-      icon: <ListIcon className="h-4 w-4" />,
-      value: "default",
-    },
-    {
-      key: "list-format-disc",
-      label: "Disc",
-      icon: <CircleIcon className="h-4 w-4" />,
-      value: "disc",
-    },
-    {
-      key: "list-format-circle",
-      label: "Circle",
-      icon: <CircleIcon className="h-4 w-4" />,
-      value: "circle",
-    },
-    {
-      key: "list-format-square",
-      label: "Square",
-      icon: <SquareIcon className="h-4 w-4" />,
-      value: "square",
-    },
-  ].map((item) => ({
-    type: "item" as const,
-    key: item.key,
-    label: item.label,
-    icon: item.icon,
-    onClick: () =>
-      handleListFormatChange(item.value as "default" | "disc" | "circle" | "square"),
-  }));
-
-  const actionItems = [
-    {
-      type: "item" as const,
-      key: "copy-link",
-      label: "Copy link to block",
-      icon: <LinkIcon className="h-4 w-4" />,
-      extra: "⌘+L",
-      onClick: handleCopyLinkToBlock,
-    },
-    {
-      type: "item" as const,
-      key: "duplicate",
-      label: "Duplicate",
-      icon: <ClipboardCopyIcon className="h-4 w-4" />,
-      extra: "⌘+D",
-      onClick: handleDuplicateSelection,
-    },
-    {
-      type: "item" as const,
-      key: "move-to",
-      label: "Move to",
-      icon: <ArrowUpDownIcon className="h-4 w-4" />,
-      extra: "⌘+P",
-      onClick: handleMoveToBlock,
-    },
-    {
-      type: "item" as const,
-      key: "delete",
-      label: "Delete",
-      icon: <TrashIcon className="h-4 w-4" />,
-      danger: true,
-      extra: "Del",
-      onClick: handleDeleteSelection,
-    },
-    { type: "divider" as const, key: "actions-divider" },
-    {
-      type: "item" as const,
-      key: "comment",
-      label: "Comment",
-      icon: <MessageSquarePlusIcon className="h-4 w-4" />,
-      extra: "⌘+M",
-      onClick: onComment,
-    },
-    {
-      type: "item" as const,
-      key: "ask-ai",
-      label: "Ask AI",
-      icon: <SparklesIcon className="h-4 w-4" />,
-      extra: "⌘+J",
-      onClick: onAskAI,
-    },
-  ];
-
-  return {
-    className: "min-w-[260px]",
-    items: [
+  const moreMenu = useMemo(() => {
+    const turnIntoItems: Array<{
+      type: "item";
+      key: string;
+      label: string;
+      icon: React.ReactElement;
+      onClick: () => void;
+    }> = [
       {
-        type: "submenu",
+        type: "item",
+        key: "turn-text",
+        label: "Text",
+        icon: <TypeIcon className="h-4 w-4" />,
+        onClick: () => applyBlockType("paragraph"),
+      },
+      {
+        type: "item",
+        key: "turn-heading1",
+        label: "Heading 1",
+        icon: <Heading1Icon className="h-4 w-4" />,
+        onClick: () => applyBlockType("h1"),
+      },
+      {
+        type: "item",
+        key: "turn-heading2",
+        label: "Heading 2",
+        icon: <Heading2Icon className="h-4 w-4" />,
+        onClick: () => applyBlockType("h2"),
+      },
+      {
+        type: "item",
+        key: "turn-heading3",
+        label: "Heading 3",
+        icon: <Heading3Icon className="h-4 w-4" />,
+        onClick: () => applyBlockType("h3"),
+      },
+      {
+        type: "item",
+        key: "turn-page",
+        label: "Page",
+        icon: <FileIcon className="h-4 w-4" />,
+        onClick: handlePageAction,
+      },
+      {
+        type: "item",
+        key: "turn-page-in",
+        label: "Page in",
+        icon: <FileOutputIcon className="h-4 w-4" />,
+        onClick: handlePageInAction,
+      },
+      {
+        type: "item",
+        key: "turn-bulleted",
+        label: "Bulleted list",
+        icon: <ListIcon className="h-4 w-4" />,
+        onClick: () => onListChange("bullet"),
+      },
+      {
+        type: "item",
+        key: "turn-numbered",
+        label: "Numbered list",
+        icon: <ListOrderedIcon className="h-4 w-4" />,
+        onClick: () => onListChange("number"),
+      },
+      {
+        type: "item",
+        key: "turn-todo",
+        label: "To-do list",
+        icon: <CheckSquareIcon className="h-4 w-4" />,
+        onClick: () => onListChange("check"),
+      },
+      {
+        type: "item",
+        key: "turn-toggle",
+        label: "Toggle list",
+        icon: <ListTreeIcon className="h-4 w-4" />,
+        onClick: handleToggleList,
+      },
+      {
+        type: "item",
+        key: "turn-code",
+        label: "Code",
+        icon: <CodeIcon className="h-4 w-4" />,
+        onClick: () => applyBlockType("code"),
+      },
+      {
+        type: "item",
+        key: "turn-quote",
+        label: "Quote",
+        icon: <QuoteIcon className="h-4 w-4" />,
+        onClick: () => applyBlockType("quote"),
+      },
+      {
+        type: "item",
+        key: "turn-callout",
+        label: "Callout",
+        icon: <BookOpenIcon className="h-4 w-4" />,
+        onClick: handleCalloutAction,
+      },
+      {
+        type: "item",
+        key: "turn-equation",
+        label: "Block equation",
+        icon: <SuperscriptIcon className="h-4 w-4" />,
+        onClick: handleInsertEquationBlock,
+      },
+    ];
+
+    const textColorItems = textColors.map((color) => ({
+      type: "item",
+      key: `menu-text-${color.value}`,
+      label: color.label,
+      icon: (
+        <div
+          className="h-4 w-4 rounded border border-gray-300"
+          style={{ backgroundColor: color.hex }}
+        />
+      ),
+      onClick: () => handleTextColorChange(color.value),
+    }));
+
+    const backgroundColorItems = backgroundColors.map((color) => ({
+      type: "item",
+      key: `menu-bg-${color.value}`,
+      label: color.label,
+      icon: (
+        <div
+          className="h-4 w-4 rounded border border-gray-300"
+          style={{ backgroundColor: color.hex }}
+        />
+      ),
+      onClick: () => handleBackgroundColorChange(color.value),
+    }));
+
+    const listFormatItems = [
+      {
+        key: "list-format-default",
+        label: "Default",
+        icon: <ListIcon className="h-4 w-4" />,
+        value: "default",
+      },
+      {
+        key: "list-format-disc",
+        label: "Disc",
+        icon: <CircleIcon className="h-4 w-4" />,
+        value: "disc",
+      },
+      {
+        key: "list-format-circle",
+        label: "Circle",
+        icon: <CircleIcon className="h-4 w-4" />,
+        value: "circle",
+      },
+      {
+        key: "list-format-square",
+        label: "Square",
+        icon: <SquareIcon className="h-4 w-4" />,
+        value: "square",
+      },
+    ].map((item) => ({
+      type: "item" as const,
+      key: item.key,
+      label: item.label,
+      icon: item.icon,
+      onClick: () =>
+        handleListFormatChange(
+          item.value as "default" | "disc" | "circle" | "square",
+        ),
+    }));
+
+    const actionItems = [
+      {
+        type: "item" as const,
+        key: "copy-link",
+        label: "Copy link to block",
+        icon: <LinkIcon className="h-4 w-4" />,
+        extra: "⌘+L",
+        onClick: handleCopyLinkToBlock,
+      },
+      {
+        type: "item" as const,
+        key: "duplicate",
+        label: "Duplicate",
+        icon: <ClipboardCopyIcon className="h-4 w-4" />,
+        extra: "⌘+D",
+        onClick: handleDuplicateSelection,
+      },
+      {
+        type: "item" as const,
+        key: "move-to",
+        label: "Move to",
+        icon: <ArrowUpDownIcon className="h-4 w-4" />,
+        extra: "⌘+P",
+        onClick: handleMoveToBlock,
+      },
+      {
+        type: "item" as const,
+        key: "delete",
+        label: "Delete",
+        icon: <TrashIcon className="h-4 w-4" />,
+        danger: true,
+        extra: "Del",
+        onClick: handleDeleteSelection,
+      },
+      { type: "divider" as const, key: "actions-divider" },
+      {
+        type: "item" as const,
+        key: "comment",
+        label: "Comment",
+        icon: <MessageSquarePlusIcon className="h-4 w-4" />,
+        extra: "⌘+M",
+        onClick: onComment,
+      },
+      {
+        type: "item" as const,
+        key: "ask-ai",
+        label: "Ask AI",
+        icon: <SparklesIcon className="h-4 w-4" />,
+        extra: "⌘+J",
+        onClick: onAskAI,
+      },
+    ];
+
+    const items = [
+      {
+        type: "submenu" as const,
         key: "turn-into",
         label: "Turn into",
         icon: <ArrowRightLeftIcon className="h-4 w-4" />,
-        children: turnIntoItems,
+        children: turnIntoItems as ItemType[],
       },
-      {
-        type: "submenu",
+      variant !== "simple" && {
+        type: "submenu" as const,
         key: "color",
         label: "Color",
         icon: <PaletteIcon className="h-4 w-4" />,
         children: [
           {
-            type: "group",
+            type: "group" as const,
             key: "text-color-group",
             label: "Text color",
-            children: textColorItems,
+            children: textColorItems as ItemType[],
           },
           {
-            type: "group",
+            type: "group" as const,
             key: "bg-color-group",
             label: "Background color",
-            children: backgroundColorItems,
+            children: backgroundColorItems as ItemType[],
           },
         ],
       },
-      {
-        type: "submenu",
+      variant !== "simple" && {
+        type: "submenu" as const,
         key: "list-format",
         label: "List format",
         icon: <ListIcon className="h-4 w-4" />,
-        children: listFormatItems,
+        children: listFormatItems as ItemType[],
       },
-      { type: "divider", key: "turn-divider" },
+      variant !== "simple" && { type: "divider" as const, key: "turn-divider" },
       ...actionItems,
-    ],
-  };
-}, [
-  applyBlockType,
-  backgroundColors,
-  handleBackgroundColorChange,
-  handleCalloutAction,
-  handleCopyLinkToBlock,
-  handleDeleteSelection,
-  handleDuplicateSelection,
-  handleInsertEquationBlock,
-  handleListFormatChange,
-  handleMoveToBlock,
-  handlePageAction,
-  handlePageInAction,
-  handleTextColorChange,
-  handleToggleList,
-  onAskAI,
-  onComment,
-  onListChange,
-  textColors,
-]);
+    ].filter(Boolean) as ItemType[];
+
+    return {
+      className: "min-w-[260px]",
+      items,
+    };
+  }, [
+    applyBlockType,
+    backgroundColors,
+    handleBackgroundColorChange,
+    handleCalloutAction,
+    handleCopyLinkToBlock,
+    handleDeleteSelection,
+    handleDuplicateSelection,
+    handleInsertEquationBlock,
+    handleListFormatChange,
+    handleMoveToBlock,
+    handlePageAction,
+    handlePageInAction,
+    handleTextColorChange,
+    handleToggleList,
+    onAskAI,
+    onComment,
+    onListChange,
+    textColors,
+    variant,
+  ]);
 
   return (
     <div
@@ -758,74 +779,82 @@ const moreMenu = useMemo(() => {
       {editor.isEditable() && (
         <>
           <div className="flex items-center gap-1 pr-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 text-xs font-medium sm:h-7"
-              onClick={onExplain}
-            >
-              <CircleHelpIcon className="h-4 w-4" />
-              <span>Explain</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 text-xs font-medium sm:h-7"
-              onClick={onAskAI}
-            >
-              <SparklesIcon className="h-4 w-4" />
-              <span>Ask AI</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 text-xs font-medium sm:h-7"
-              onClick={onComment}
-            >
-              <MessageSquarePlusIcon className="h-4 w-4" />
-              <span>Comment</span>
-            </Button>
+            {variant !== "simple" && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1 text-xs font-medium sm:h-7"
+                  onClick={onExplain}
+                >
+                  <CircleHelpIcon className="h-4 w-4" />
+                  <span>Explain</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1 text-xs font-medium sm:h-7"
+                  onClick={onAskAI}
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                  <span>Ask AI</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1 text-xs font-medium sm:h-7"
+                  onClick={onComment}
+                >
+                  <MessageSquarePlusIcon className="h-4 w-4" />
+                  <span>Comment</span>
+                </Button>
+              </>
+            )}
           </div>
 
-          <Separator orientation="vertical" className="mx-0.5 h-5" />
+          {variant !== "simple" && (
+            <>
+              <Separator orientation="vertical" className="mx-0.5 h-5" />
 
-          <Dropdown
-            menu={{
-              items: [
-                {
-                  key: "paragraph",
-                  label: "Normal text",
-                  onClick: () => onListChange("paragraph"),
-                },
-                {
-                  key: "bullet",
-                  label: "Bulleted list",
-                  onClick: () => onListChange("bullet"),
-                },
-                {
-                  key: "number",
-                  label: "Numbered list",
-                  onClick: () => onListChange("number"),
-                },
-                {
-                  key: "check",
-                  label: "To-do list",
-                  onClick: () => onListChange("check"),
-                },
-              ],
-            }}
-            placement="bottomLeft"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-1 px-2 text-xs font-medium sm:h-7"
-            >
-              <AlignLeftIcon className="h-4 w-4" />
-              <span>{listLabel}</span>
-              <ChevronDownIcon className="h-4 w-4" />
-            </Button>
-          </Dropdown>
+              <Dropdown
+                menu={{
+                  items: [
+                    {
+                      key: "paragraph",
+                      label: "Normal text",
+                      onClick: () => onListChange("paragraph"),
+                    },
+                    {
+                      key: "bullet",
+                      label: "Bulleted list",
+                      onClick: () => onListChange("bullet"),
+                    },
+                    {
+                      key: "number",
+                      label: "Numbered list",
+                      onClick: () => onListChange("number"),
+                    },
+                    {
+                      key: "check",
+                      label: "To-do list",
+                      onClick: () => onListChange("check"),
+                    },
+                  ],
+                }}
+                placement="bottomLeft"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 gap-1 px-2 text-xs font-medium sm:h-7"
+                >
+                  <AlignLeftIcon className="h-4 w-4" />
+                  <span>{listLabel}</span>
+                  <ChevronDownIcon className="h-4 w-4" />
+                </Button>
+              </Dropdown>
+            </>
+          )}
 
           <Separator orientation="vertical" className="mx-0.5 h-5" />
 
@@ -909,51 +938,55 @@ const moreMenu = useMemo(() => {
             </ToggleGroupItem>
           </ToggleGroup>
 
-          <Separator orientation="vertical" className="mx-0.5 h-5" />
+          {variant !== "simple" && (
+            <>
+              <Separator orientation="vertical" className="mx-0.5 h-5" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
-            title="Inline Math"
-            onClick={onMath}
-          >
-            <SuperscriptIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-          </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+                title="Inline Math"
+                onClick={onMath}
+              >
+                <SuperscriptIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+              </Button>
 
-          <Separator orientation="vertical" className="mx-0.5 h-5" />
+              <Separator orientation="vertical" className="mx-0.5 h-5" />
 
-          <Dropdown
-            menu={{
-              items: textColors.map((color) => ({
-                key: color.value,
-                label: (
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="h-4 w-4 rounded border border-gray-300"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                    <span>{color.label}</span>
+              <Dropdown
+                menu={{
+                  items: textColors.map((color) => ({
+                    key: color.value,
+                    label: (
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-4 w-4 rounded border border-gray-300"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <span>{color.label}</span>
+                      </div>
+                    ),
+                    onClick: () => {
+                      handleTextColorChange(color.value);
+                    },
+                  })),
+                }}
+                placement="bottomLeft"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+                  title="Text color"
+                >
+                  <div className="flex h-4 w-4 items-center justify-center sm:h-3.5 sm:w-3.5">
+                    <span className="text-xs font-bold">A</span>
                   </div>
-                ),
-                onClick: () => {
-                  handleTextColorChange(color.value);
-                },
-              })),
-            }}
-            placement="bottomLeft"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
-              title="Text color"
-            >
-              <div className="flex h-4 w-4 items-center justify-center sm:h-3.5 sm:w-3.5">
-                <span className="text-xs font-bold">A</span>
-              </div>
-            </Button>
-          </Dropdown>
+                </Button>
+              </Dropdown>
+            </>
+          )}
 
           <Separator orientation="vertical" className="mx-0.5 h-5 sm:h-5" />
 
@@ -977,6 +1010,7 @@ function useFloatingTextFormatToolbar(
   editor: LexicalEditor,
   anchorElem: HTMLDivElement | null,
   setIsLinkEditMode: Dispatch<boolean>,
+  variant: "default" | "simple" = "default",
 ): JSX.Element | null {
   const [isText, setIsText] = useState(false);
   const [isLink, setIsLink] = useState(false);
@@ -1170,6 +1204,7 @@ function useFloatingTextFormatToolbar(
       onAskAI={handleAskAI}
       onComment={handleComment}
       onMath={handleMath}
+      variant={variant}
     />,
     anchorElem,
   );
@@ -1177,11 +1212,18 @@ function useFloatingTextFormatToolbar(
 
 export function FloatingTextFormatToolbarPlugin({
   anchorElem,
+  variant = "default",
 }: {
   anchorElem: HTMLDivElement | null;
+  variant?: "default" | "simple";
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const { setIsLinkEditMode } = useFloatingLinkContext();
 
-  return useFloatingTextFormatToolbar(editor, anchorElem, setIsLinkEditMode);
+  return useFloatingTextFormatToolbar(
+    editor,
+    anchorElem,
+    setIsLinkEditMode,
+    variant,
+  );
 }

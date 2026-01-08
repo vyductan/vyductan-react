@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@acme/ui/components/button";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
@@ -13,6 +12,8 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { RedoIcon, UndoIcon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { CAN_USE_DOM } from "../../shared/can-use-dom";

@@ -1,6 +1,6 @@
 /**
  * Table of Contents Plugin
- * 
+ *
  * Plugin để insert Table of Contents vào Lexical editor
  * Tự động extract headings và tạo TOC
  */
@@ -9,10 +9,9 @@ import type { LexicalCommand } from "lexical";
 import type { JSX } from "react";
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $insertNodeToNearestRoot, $wrapNodeInElement } from "@lexical/utils";
+import { $wrapNodeInElement } from "@lexical/utils";
 import {
   $createParagraphNode,
-  $getSelection,
   $insertNodes,
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_EDITOR,
@@ -21,9 +20,8 @@ import {
 
 import { $createTOCNode, TOCNode } from "../nodes/toc-node";
 
-export const INSERT_TOC_COMMAND: LexicalCommand<void> = createCommand(
-  "INSERT_TOC_COMMAND",
-);
+export const INSERT_TOC_COMMAND: LexicalCommand<void> =
+  createCommand("INSERT_TOC_COMMAND");
 
 export function TOCPlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
@@ -50,4 +48,3 @@ export function TOCPlugin(): JSX.Element | null {
 
   return null;
 }
-
