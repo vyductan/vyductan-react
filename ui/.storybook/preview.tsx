@@ -1,10 +1,10 @@
 import type { Preview } from "@storybook/nextjs-vite";
-// import { withThemeByClassName } from "@storybook/addon-themes";
-// Ensure React is loaded early to prevent "forwardRef is undefined" errors
-// This ensures React is available before any libraries (like @rc-component/util) try to use it
-// import "react";
 
 import "styles/globals.css";
+
+import { ConfigProvider } from "@acme/ui/components/config-provider";
+
+import { Toaster } from "../src/components/toast/toaster";
 
 const preview: Preview = {
   parameters: {
@@ -24,15 +24,21 @@ const preview: Preview = {
       test: "todo",
     },
   },
-  // decorators: [
-  //   withThemeByClassName({
-  //     themes: {
-  //       light: "light",
-  //       dark: "dark",
-  //     },
-  //     defaultTheme: "light",
-  //   }),
-  // ],
+  decorators: [
+    (Story) => (
+      <ConfigProvider>
+        <Story />
+        <Toaster />
+      </ConfigProvider>
+    ),
+    // withThemeByClassName({
+    //   themes: {
+    //     light: "light",
+    //     dark: "dark",
+    //   },
+    //   defaultTheme: "light",
+    // }),
+  ],
 };
 
 export default preview;

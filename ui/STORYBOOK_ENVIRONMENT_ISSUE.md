@@ -3,6 +3,7 @@
 ## Vấn đề
 
 Khi chạy tests với Storybook addon, có thể gặp tình huống:
+
 - Tests **FAIL** khi chạy trong addon/CLI với Vitest
 - Tests **PASS** khi xem trong Interactions panel (hoặc ngược lại)
 
@@ -14,6 +15,7 @@ Tests chạy trong **2 môi trường khác nhau**:
 2. **Unit tests thông thường**: Chạy trong **jsdom** (Node.js giả lập DOM)
 
 Sự khác biệt về môi trường dẫn đến:
+
 - DOM APIs hoạt động khác nhau
 - Timing và async behavior khác nhau
 - Browser-specific features (IntersectionObserver, ResizeObserver, etc.) có/không có
@@ -48,17 +50,20 @@ export default defineConfig({
 ```
 
 **Ưu điểm:**
+
 - Tests chạy trong môi trường giống production
 - Kết quả nhất quán giữa Storybook và unit tests
 - Phát hiện được browser-specific bugs
 
 **Nhược điểm:**
+
 - Chậm hơn jsdom
 - Cần cài Playwright browsers
 
 ### Cách 2: Tách riêng Unit tests và Integration tests
 
 Giữ nguyên config hiện tại với 2 projects:
+
 - **unit**: Tests nhanh với jsdom
 - **storybook**: Integration tests với browser
 
@@ -89,6 +94,7 @@ export default defineConfig({
 ```
 
 **Chạy tests:**
+
 ```bash
 # Chỉ unit tests (nhanh)
 pnpm vitest --project=unit
@@ -106,7 +112,7 @@ Nếu muốn giữ jsdom, thêm polyfills trong setup file:
 
 ```typescript
 // .storybook/vitest-setup.ts
-import { beforeAll } from 'vitest';
+import { beforeAll } from "vitest";
 
 beforeAll(() => {
   // Mock IntersectionObserver
@@ -114,7 +120,9 @@ beforeAll(() => {
     constructor() {}
     disconnect() {}
     observe() {}
-    takeRecords() { return []; }
+    takeRecords() {
+      return [];
+    }
     unobserve() {}
   };
 
@@ -127,9 +135,9 @@ beforeAll(() => {
   };
 
   // Mock matchMedia
-  Object.defineProperty(window, 'matchMedia', {
+  Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation(query => ({
+    value: vi.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -144,10 +152,12 @@ beforeAll(() => {
 ```
 
 **Ưu điểm:**
+
 - Tests vẫn chạy nhanh
 - Ít phải thay đổi config
 
 **Nhược điểm:**
+
 - Phải maintain mocks
 - Không test được real browser behavior
 - Vẫn có thể có sự khác biệt
@@ -155,6 +165,7 @@ beforeAll(() => {
 ## Khuyến nghị
 
 Dùng **Cách 1** (Browser mode cho tất cả) vì:
+
 1. Storybook đã force browser mode rồi
 2. Đảm bảo consistency
 3. Test được real browser behavior

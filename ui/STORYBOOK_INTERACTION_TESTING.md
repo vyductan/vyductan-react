@@ -38,12 +38,10 @@ export default defineConfig({
         test: {
           name: "storybook",
           browser: {
-            enabled: true,        // Force browser mode
-            headless: true,       // Chạy headless (không hiện UI)
+            enabled: true, // Force browser mode
+            headless: true, // Chạy headless (không hiện UI)
             provider: playwright({}),
-            instances: [
-              { browser: "chromium" }
-            ],
+            instances: [{ browser: "chromium" }],
           },
         },
       },
@@ -60,7 +58,7 @@ export default defineConfig({
 
 ```typescript
 import type { Meta, StoryObj } from "@storybook/react";
-import { expect, fn, userEvent, within, waitFor } from "storybook/test";
+import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 export const InteractionExample: Story = {
   args: {
@@ -102,18 +100,19 @@ Tạo scoped queries chỉ tìm trong story hiện tại.
 const canvas = within(canvasElement);
 
 // Queries (ưu tiên theo thứ tự accessibility)
-canvas.getByRole("button", { name: /submit/i });      // 🏆 Best
-canvas.getByLabelText("Email");                       // 🥈 Forms
-canvas.getByPlaceholderText("Enter email...");        // 🥉 Fallback
-canvas.getByText("Welcome");                          // Nội dung text
-canvas.getByTestId("submit-btn");                     // ❌ Last resort
+canvas.getByRole("button", { name: /submit/i }); // 🏆 Best
+canvas.getByLabelText("Email"); // 🥈 Forms
+canvas.getByPlaceholderText("Enter email..."); // 🥉 Fallback
+canvas.getByText("Welcome"); // Nội dung text
+canvas.getByTestId("submit-btn"); // ❌ Last resort
 
 // Variants
-canvas.queryByRole()  // Returns null nếu không tìm thấy
-canvas.findByRole()   // Async - chờ element xuất hiện
+canvas.queryByRole(); // Returns null nếu không tìm thấy
+canvas.findByRole(); // Async - chờ element xuất hiện
 ```
 
 **Best Practices:**
+
 - Ưu tiên `getByRole` vì test accessibility
 - Dùng `getByLabelText` cho form fields
 - Tránh `getByTestId` trừ khi thật sự cần
@@ -140,7 +139,7 @@ await userEvent.keyboard("Hello{Enter}"); // Type + Enter
 await userEvent.selectOptions(select, "option1");
 
 // Focus
-await userEvent.tab();  // Tab to next focusable element
+await userEvent.tab(); // Tab to next focusable element
 ```
 
 ### 3. `expect` - Assertions
@@ -195,10 +194,13 @@ export const MyStory: Story = {
 
 ```typescript
 // Chờ element xuất hiện
-await waitFor(async () => {
-  const errorMsg = canvas.getByText(/error occurred/i);
-  await expect(errorMsg).toBeInTheDocument();
-}, { timeout: 2000 });
+await waitFor(
+  async () => {
+    const errorMsg = canvas.getByText(/error occurred/i);
+    await expect(errorMsg).toBeInTheDocument();
+  },
+  { timeout: 2000 },
+);
 
 // Chờ loading biến mất
 await waitFor(async () => {
@@ -285,16 +287,22 @@ export const SearchAutocomplete: Story = {
       await userEvent.type(searchInput, "app");
 
       // Chờ loading state
-      await waitFor(async () => {
-        const loading = canvas.queryByText("Loading...");
-        await expect(loading).toBeInTheDocument();
-      }, { timeout: 500 });
+      await waitFor(
+        async () => {
+          const loading = canvas.queryByText("Loading...");
+          await expect(loading).toBeInTheDocument();
+        },
+        { timeout: 500 },
+      );
 
       // Chờ results xuất hiện
-      await waitFor(async () => {
-        const result = canvas.getByRole("option", { name: /apple/i });
-        await expect(result).toBeInTheDocument();
-      }, { timeout: 2000 });
+      await waitFor(
+        async () => {
+          const result = canvas.getByRole("option", { name: /apple/i });
+          await expect(result).toBeInTheDocument();
+        },
+        { timeout: 2000 },
+      );
     });
 
     await step("Click on result", async () => {
@@ -343,7 +351,9 @@ export const TogglePassword: Story = {
     const canvas = within(canvasElement);
 
     await step("Initially password is hidden", async () => {
-      const passwordInput = canvas.getByLabelText(/password/i) as HTMLInputElement;
+      const passwordInput = canvas.getByLabelText(
+        /password/i,
+      ) as HTMLInputElement;
       await expect(passwordInput.type).toBe("password");
     });
 
@@ -351,7 +361,9 @@ export const TogglePassword: Story = {
       const showBtn = canvas.getByLabelText(/show password/i);
       await userEvent.click(showBtn);
 
-      const passwordInput = canvas.getByLabelText(/password/i) as HTMLInputElement;
+      const passwordInput = canvas.getByLabelText(
+        /password/i,
+      ) as HTMLInputElement;
       await expect(passwordInput.type).toBe("text");
     });
   },
@@ -449,9 +461,15 @@ const heading = canvasElement.querySelector("h1");
 
 ```typescript
 // ✅ Good - Clear steps
-await step("Fill form", async () => { /* ... */ });
-await step("Submit form", async () => { /* ... */ });
-await step("Verify success", async () => { /* ... */ });
+await step("Fill form", async () => {
+  /* ... */
+});
+await step("Submit form", async () => {
+  /* ... */
+});
+await step("Verify success", async () => {
+  /* ... */
+});
 
 // ❌ Bad - Monolithic test
 play: async ({ canvasElement }) => {
@@ -467,16 +485,19 @@ await userEvent.click(button);
 await expect(element).toBeInTheDocument();
 
 // ❌ Bad - Missing await
-userEvent.click(button);  // Will cause timing issues
+userEvent.click(button); // Will cause timing issues
 ```
 
 ### 4. Use waitFor cho async state changes
 
 ```typescript
 // ✅ Good - Wait for async changes
-await waitFor(async () => {
-  await expect(errorMsg).toBeInTheDocument();
-}, { timeout: 2000 });
+await waitFor(
+  async () => {
+    await expect(errorMsg).toBeInTheDocument();
+  },
+  { timeout: 2000 },
+);
 
 // ❌ Bad - Immediate assertion on async change
 await expect(errorMsg).toBeInTheDocument(); // Might fail

@@ -1,12 +1,11 @@
 // import { dirname, resolve } from "node:path";
 // import { fileURLToPath } from "node:url";
 import type { StorybookConfig } from "@storybook/nextjs-vite";
-import tailwindcss from "@tailwindcss/vite";
-
 // function getAbsolutePath(value: string): string {
 //   return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
 // }
-import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -30,7 +29,7 @@ const config: StorybookConfig = {
     // If you need story testing, run tests separately with vitest
   ],
 
-  "framework": "@storybook/nextjs-vite",
+  framework: "@storybook/nextjs-vite",
 
   // framework: {
   //   name: getAbsolutePath("@storybook/nextjs-vite"),
@@ -38,41 +37,43 @@ const config: StorybookConfig = {
   // },
 
   async viteFinal(config) {
-  //   const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+    //   const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
-  //   // Add Tailwind CSS v4 Vite plugin
+    //   // Add Tailwind CSS v4 Vite plugin
     config.plugins = [tailwindcss(), nodeResolve(), ...(config.plugins ?? [])];
 
-  //   // Configure aliases for @acme/ui package exports and TypeScript paths
-  //   config.resolve = config.resolve ?? {};
-  //   config.resolve.alias = {
-  //     ...(config.resolve.alias ?? {}),
-  //     "@/lib": resolve(projectRoot, "src/lib"),
-  //     "@/hooks": resolve(projectRoot, "src/hooks"),
-  //     "@/components/ui": resolve(projectRoot, "src/components"),
-  //     "@/components/icons": resolve(projectRoot, "src/icons"),
-  //   };
+    //   // Configure aliases for @acme/ui package exports and TypeScript paths
+    //   config.resolve = config.resolve ?? {};
+    //   config.resolve.alias = {
+    //     ...(config.resolve.alias ?? {}),
+    //     "@/lib": resolve(projectRoot, "src/lib"),
+    //     "@/hooks": resolve(projectRoot, "src/hooks"),
+    //     "@/components/ui": resolve(projectRoot, "src/components"),
+    //     "@/components/icons": resolve(projectRoot, "src/icons"),
+    //   };
 
-  //   // Ensure React is deduplicated
-  //   config.resolve.dedupe = ["react", "react-dom"];
+    //   // Ensure React is deduplicated
+    //   config.resolve.dedupe = ["react", "react-dom"];
 
-  //   // Disable sourcemaps to avoid warnings
+    //   // Disable sourcemaps to avoid warnings
     config.build = config.build ?? {};
     config.build.sourcemap = false;
 
-  //   // Suppress "use client" directive warnings (harmless in Storybook)
+    //   // Suppress "use client" directive warnings (harmless in Storybook)
     config.build.rollupOptions = config.build.rollupOptions ?? {};
-  //   const originalOnWarn = config.build.rollupOptions.onwarn;
+    //   const originalOnWarn = config.build.rollupOptions.onwarn;
     config.build.rollupOptions.onwarn = (warning, warn) => {
       if (
         warning.message.includes('"use client"') ||
-        warning.message.includes("Module level directives cause errors when bundled")||
+        warning.message.includes(
+          "Module level directives cause errors when bundled",
+        ) ||
         warning.message.includes("Can't resolve original location of error.")
       ) {
         return;
       }
 
-        warn(warning);
+      warn(warning);
     };
 
     // Manual chunking to improve code splitting

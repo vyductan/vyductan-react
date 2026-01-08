@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
-  "extends": "@acme/tsconfig/internal-package.json",
+  "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
     "rootDir": ".",
     "lib": ["ESNext", "dom", "dom.iterable"],
@@ -12,7 +12,7 @@
       }
     ],
     "paths": {
-      "@acme/ui/*": ["./*"],
+      "@acme/ui/*": ["./*"]
       // "@acme/ui/shadcn/*": ["./shadcn/*"],
       // "@acme/ui/lib/*": ["./lib/*"],
       // "@acme/ui/icons/*": ["./icons/*"],
@@ -34,11 +34,6 @@
       // "@/components/icons/*": ["./src/icons/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mdx",
-    ".storybook/**/*.ts"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mdx", ".storybook/**/*.ts"],
   "exclude": ["node_modules"]
 }
