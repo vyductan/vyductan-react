@@ -168,7 +168,8 @@ export const InteractionCharacterLimit: Story = {
     });
 
     await step("Verify max length constraint", async () => {
-      const input = canvas.getByPlaceholderText<HTMLInputElement>("Max 10 characters");
+      const input =
+        canvas.getByPlaceholderText<HTMLInputElement>("Max 10 characters");
 
       // Try to exceed limit
       await userEvent.clear(input);
@@ -202,7 +203,6 @@ export const InteractionKeyboard: Story = {
     });
 
     await step("Press Escape to clear", async () => {
-
       await userEvent.keyboard("{Escape}");
       await expect(args.onKeyDown).toHaveBeenCalled();
     });

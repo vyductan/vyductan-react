@@ -20,9 +20,9 @@ import { inputSizeVariants, inputVariants } from "./variants";
 interface InputNumberProps<
   TNumberValue extends NumberValueType = NumberValueType,
 > extends Omit<
-    RcInputNumberProps<TNumberValue>,
-    "ref" | "prefix" | "size" | "controls"
-  > {
+  RcInputNumberProps<TNumberValue>,
+  "ref" | "prefix" | "size" | "controls"
+> {
   ref?: React.Ref<HTMLInputElement>;
 
   addonBefore?: React.ReactNode;
@@ -122,7 +122,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
   return (
-    <RcInputNumber
+    <RcInputNumber<TNumberValue>
       // ref={ref}
       upHandler={upIcon}
       downHandler={downIcon}
@@ -168,7 +168,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
           "border-none outline-hidden",
-          "w-[1px]",
+          "w-px",
           // Add padding when has addon (match Input behavior)
           // hasAddon && addonBefore && "pl-[11px]",
           // hasAddon && addonAfter && "pr-[11px]",
@@ -231,7 +231,8 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
             "End",
           ].includes(e.key) ||
           // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          ((e.metaKey || e.ctrlKey) && ["a", "c", "v", "x"].includes(e.key)) ||
+          ((e.metaKey || e.ctrlKey) &&
+            ["a", "c", "v", "x", "z"].includes(e.key)) ||
           // Allow: numbers, numpad numbers
           /^[0-9]$/.test(e.key) ||
           // Allow: decimal point

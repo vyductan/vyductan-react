@@ -1,9 +1,10 @@
 import type { Dayjs } from "dayjs";
 import type React from "react";
 import { useState } from "react";
+import dayjs from "dayjs";
+
 import { DateRangePicker } from "@acme/ui/components/date-picker";
 import { Space } from "@acme/ui/components/space";
-import dayjs from "dayjs";
 
 const VariantsDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState<

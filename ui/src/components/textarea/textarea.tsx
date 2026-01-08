@@ -4,7 +4,7 @@ import type { TextareaAutosizeProps } from "react-textarea-autosize";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 
-import type { TextareaProps as ShadcnTextareaProps } from "@acme/ui/shadcn/textarea";
+import type { Textarea as ShadcnTextarea } from "@acme/ui/shadcn/textarea";
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea as TextareaShadcn } from "@acme/ui/shadcn/textarea";
 
@@ -26,6 +26,8 @@ const textareaVariants = cva(["text-sm"], {
     size: "default",
   },
 });
+
+type ShadcnTextareaProps = React.ComponentProps<typeof ShadcnTextarea>;
 type TextAreaProps = Omit<ShadcnTextareaProps, "style"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof textareaVariants> &

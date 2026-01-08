@@ -182,11 +182,14 @@ export const LoginFormFlow: Story = {
       await userEvent.type(emailInput, "invalid-email", { delay: 10 });
 
       // Wait for DOM value to be fully set - verify the complete string
-      await waitFor(async () => {
-        const input = emailInput as HTMLInputElement;
-        const value = input.value;
-        await expect(value).toBe("invalid-email");
-      }, { timeout: 2000 });
+      await waitFor(
+        async () => {
+          const input = emailInput as HTMLInputElement;
+          const value = input.value;
+          await expect(value).toBe("invalid-email");
+        },
+        { timeout: 2000 },
+      );
 
       // Additional wait to ensure React state has fully updated after typing completes
       await new Promise((resolve) => setTimeout(resolve, 300));
@@ -196,11 +199,14 @@ export const LoginFormFlow: Story = {
 
       // Wait for validation error to appear
       // The error should be "Email is invalid" since we have a value but it's invalid
-      await waitFor(async () => {
-        const emailError = canvas.getByText(/email is invalid/i);
-        await expect(emailError).toBeTruthy();
-        await expect(emailError.getAttribute("role")).toBe("alert");
-      }, { timeout: 2000 });
+      await waitFor(
+        async () => {
+          const emailError = canvas.getByText(/email is invalid/i);
+          await expect(emailError).toBeTruthy();
+          await expect(emailError.getAttribute("role")).toBe("alert");
+        },
+        { timeout: 2000 },
+      );
     });
 
     await step("Enter short password and verify error", async () => {
@@ -226,9 +232,7 @@ export const LoginFormFlow: Story = {
     });
 
     await step("Toggle password visibility", async () => {
-      const passwordInput = canvas.getByLabelText(
-        /^password$/i,
-      );
+      const passwordInput = canvas.getByLabelText(/^password$/i);
       const toggleButton = canvas.getByLabelText(/show password/i);
 
       // Initially password should be hidden
@@ -378,7 +382,9 @@ export const SearchWithDebounce: StoryObj<SearchFormProps> = {
       await waitFor(
         async () => {
           const appleOption = canvas.getByRole("option", { name: /apple/i });
-          const apricotOption = canvas.getByRole("option", { name: /apricot/i });
+          const apricotOption = canvas.getByRole("option", {
+            name: /apricot/i,
+          });
           await expect(appleOption).toBeTruthy();
           await expect(apricotOption).toBeTruthy();
         },
@@ -394,7 +400,7 @@ export const SearchWithDebounce: StoryObj<SearchFormProps> = {
       // so intermediate calls ("ap") may occur, but the presence of "Apple" and "Apricot"
       // in the results proves the final call was with "app"
       await expect(args.onSearch).toHaveBeenCalled();
-      
+
       // Verify the results match what we'd expect from searching "app"
       // This indirectly confirms "app" was the final query used
       const results = canvas.getAllByRole("option");
@@ -474,9 +480,8 @@ const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
           />
           <Button
             onClick={() => {
-              const username = (
-                document.querySelector<HTMLInputElement>("#username")
-              )?.value;
+              const username =
+                document.querySelector<HTMLInputElement>("#username")?.value;
               if (!username) return;
               handleNext({ username });
             }}
@@ -504,9 +509,8 @@ const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
             </Button>
             <Button
               onClick={() => {
-                const email = (
-                  document.querySelector<HTMLInputElement>("#email")
-                )?.value;
+                const email =
+                  document.querySelector<HTMLInputElement>("#email")?.value;
                 if (!email) return;
                 handleNext({ email });
               }}
@@ -533,9 +537,8 @@ const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
             </Button>
             <Button
               onClick={() => {
-                const phone = (
-                  document.querySelector<HTMLInputElement>("#phone")
-                )?.value;
+                const phone =
+                  document.querySelector<HTMLInputElement>("#phone")?.value;
                 if (!phone) return;
                 handleNext({ phone });
               }}
@@ -594,9 +597,8 @@ export const MultiStepFormFlow: StoryObj<MultiStepFormProps> = {
 
       // Should be on step 2
       await waitFor(async () => {
-        const emailInput = canvas.getByPlaceholderText<HTMLInputElement>(
-          "Email",
-        );
+        const emailInput =
+          canvas.getByPlaceholderText<HTMLInputElement>("Email");
         await expect(emailInput.value).toBe("john@example.com");
       });
 

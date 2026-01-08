@@ -1,11 +1,24 @@
 "use client";
 
 import React from "react";
+import { toast } from "sonner";
 
 import { WarningFilled } from "@acme/ui/icons";
 
 import type { ConfirmConfig } from "../modal";
 import { Modal as InternalModal } from "../modal";
+
+// Notification types
+export interface NotificationConfig {
+  message: string;
+  description?: string;
+  duration?: number;
+  key?: string | number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
 
 // App context interface
 interface AppContextType {
@@ -24,10 +37,11 @@ interface AppContextType {
     info: (content: string) => void;
   };
   notification: {
-    success: (config: { message: string; description?: string }) => void;
-    error: (config: { message: string; description?: string }) => void;
-    warning: (config: { message: string; description?: string }) => void;
-    info: (config: { message: string; description?: string }) => void;
+    success: (config: NotificationConfig) => void;
+    error: (config: NotificationConfig) => void;
+    warning: (config: NotificationConfig) => void;
+    info: (config: NotificationConfig) => void;
+    destroy: (key?: string) => void;
   };
 }
 
@@ -148,24 +162,43 @@ export const App: React.FC<AppProps> & {
     [],
   );
 
-  // Notification functions (placeholder - can be extended later)
+  // Notification functions using sonner
   const notification = React.useMemo(
     () => ({
-      success: (config: { message: string; description?: string }) => {
-        console.log("Notification Success:", config);
-        // TODO: Implement actual notification component
+      success: (config: NotificationConfig) => {
+        toast.success(config.message, {
+          description: config.description,
+          duration: config.duration,
+          id: config.key,
+          action: config.action,
+        });
       },
-      error: (config: { message: string; description?: string }) => {
-        console.error("Notification Error:", config);
-        // TODO: Implement actual notification component
+      error: (config: NotificationConfig) => {
+        toast.error(config.message, {
+          description: config.description,
+          duration: config.duration,
+          id: config.key,
+          action: config.action,
+        });
       },
-      warning: (config: { message: string; description?: string }) => {
-        console.warn("Notification Warning:", config);
-        // TODO: Implement actual notification component
+      warning: (config: NotificationConfig) => {
+        toast.warning(config.message, {
+          description: config.description,
+          duration: config.duration,
+          id: config.key,
+          action: config.action,
+        });
       },
-      info: (config: { message: string; description?: string }) => {
-        console.info("Notification Info:", config);
-        // TODO: Implement actual notification component
+      info: (config: NotificationConfig) => {
+        toast.info(config.message, {
+          description: config.description,
+          duration: config.duration,
+          id: config.key,
+          action: config.action,
+        });
+      },
+      destroy: (key?: string) => {
+        toast.dismiss(key);
       },
     }),
     [],

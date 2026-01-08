@@ -18,7 +18,6 @@ export const FormErrorsNotification = () => {
     ) {
       // Get the required fields from Zod schema
       const requiredFields = Object.keys(formSchema.shape).filter((key) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const field = formSchema.shape[key];
         return !(field instanceof z.ZodOptional);
       });

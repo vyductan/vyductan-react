@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 

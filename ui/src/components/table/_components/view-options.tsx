@@ -4,8 +4,8 @@
 
 import type { Table } from "@tanstack/react-table";
 import React from "react";
-import { Button } from "@acme/ui/components/button";
 
+import { Button } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 

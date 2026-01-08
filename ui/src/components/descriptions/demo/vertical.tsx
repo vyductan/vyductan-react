@@ -1,8 +1,9 @@
-import type { DescriptionsProps } from "@acme/ui/components/descriptions";
 import type React from "react";
+import { Building2 } from "lucide-react";
+
+import type { DescriptionsProps } from "@acme/ui/components/descriptions";
 import { Badge } from "@acme/ui/components/badge";
 import { Descriptions } from "@acme/ui/components/descriptions";
-import { Building2 } from "lucide-react";
 
 const items: DescriptionsProps["items"] = [
   {

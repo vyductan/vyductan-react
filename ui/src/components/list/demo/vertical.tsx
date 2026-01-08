@@ -1,8 +1,9 @@
 import type React from "react";
-import { Icon } from "@acme/ui/icons";
+
 import { Avatar } from "@acme/ui/components/avatar";
 import { List } from "@acme/ui/components/list";
 import { Space } from "@acme/ui/components/space";
+import { Icon } from "@acme/ui/icons";
 
 const data = Array.from({ length: 23 }).map((_, i) => ({
   href: "https://ant.design",
@@ -58,12 +59,14 @@ const App: React.FC = () => (
           />,
         ]}
         extra={
-          <img
-            draggable={false}
-            width={272}
-            alt="logo"
-            src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
-          />
+          <picture>
+            <img
+              draggable={false}
+              width={272}
+              alt="logo"
+              src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+            />
+          </picture>
         }
       >
         <List.Item.Meta

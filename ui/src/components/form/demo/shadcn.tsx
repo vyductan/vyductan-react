@@ -1,5 +1,9 @@
-
 import type * as React from "react";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
 import { Button } from "@acme/ui/components/button";
 import {
   Card,
@@ -31,10 +35,6 @@ import {
   SelectValue,
 } from "@acme/ui/components/select";
 import { Switch } from "@acme/ui/components/switch";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
 
 import { Input } from "../../input";
 
@@ -85,8 +85,8 @@ const formSchema = z.object({
 });
 
 export default function FormRhfComplex() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
+    resolver: standardSchemaResolver(formSchema),
     defaultValues: {
       username: "",
       plan: "basic",

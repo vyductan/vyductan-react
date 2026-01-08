@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable unicorn/prefer-spread */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable unicorn/prefer-ternary */
 import warning from "@rc-component/util/lib/warning";

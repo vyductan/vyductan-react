@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 "use client";
 
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
@@ -22,6 +21,7 @@ import { useHover } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { NumberValueType } from "../number";
 import type { BaseInputProps } from "../types";
 import type { InputFocusOptions } from "../utils/common-utils";
 import type { HolderRef } from "./base-input";
@@ -63,70 +63,71 @@ const getDecimalIfValidate = (value: ValueType) => {
   return decimal.isInvalidate() ? null : decimal;
 };
 
-type InputNumberProps<T extends ValueType = ValueType> = Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
-> & {
-  /** value will show as string */
-  stringMode?: boolean;
+type InputNumberProps<TNumberValue extends NumberValueType = NumberValueType> =
+  Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
+  > & {
+    /** value will show as string */
+    stringMode?: boolean;
 
-  defaultValue?: T;
-  value?: T | null;
+    defaultValue?: TNumberValue;
+    value?: TNumberValue | null;
 
-  onInput?: (text: string) => void;
-  onChange?: (value: T | null) => void;
-  onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
+    onInput?: (text: string) => void;
+    onChange?: (value: TNumberValue | null) => void;
+    onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
 
-  /** Parse display value to validate number */
-  parser?: (displayValue: string | undefined) => T;
-  /** Transform `value` to display value show in input */
-  formatter?: (
-    value: T | undefined,
-    info: { userTyping: boolean; input: string },
-  ) => string;
-  /** Syntactic sugar of `formatter`. Config precision of display. */
-  precision?: number;
-  /** Syntactic sugar of `formatter`. Config decimal separator of display. */
-  decimalSeparator?: string;
+    /** Parse display value to validate number */
+    parser?: (displayValue: string | undefined) => TNumberValue;
+    /** Transform `value` to display value show in input */
+    formatter?: (
+      value: TNumberValue | undefined,
+      info: { userTyping: boolean; input: string },
+    ) => string;
+    /** Syntactic sugar of `formatter`. Config precision of display. */
+    precision?: number;
+    /** Syntactic sugar of `formatter`. Config decimal separator of display. */
+    decimalSeparator?: string;
 
-  min?: T;
-  max?: T;
-  step?: ValueType;
-  onStep?: (
-    value: T,
-    info: {
-      offset: ValueType;
-      type: "up" | "down";
-      emitter: "handler" | "keyboard" | "wheel";
-    },
-  ) => void;
+    min?: TNumberValue;
+    max?: TNumberValue;
+    step?: TNumberValue;
+    onStep?: (
+      value: TNumberValue,
+      info: {
+        offset: TNumberValue;
+        type: "up" | "down";
+        emitter: "handler" | "keyboard" | "wheel";
+      },
+    ) => void;
 
-  /**
-   * Trigger change onBlur event.
-   * If disabled, user must press enter or click handler to confirm the value update
-   */
-  changeOnBlur?: boolean;
+    /**
+     * Trigger change onBlur event.
+     * If disabled, user must press enter or click handler to confirm the value update
+     */
+    changeOnBlur?: boolean;
 
-  // Customize handler node
-  upHandler?: React.ReactNode;
-  downHandler?: React.ReactNode;
-  keyboard?: boolean;
-  changeOnWheel?: boolean;
+    // Customize handler node
+    upHandler?: React.ReactNode;
+    downHandler?: React.ReactNode;
+    keyboard?: boolean;
+    changeOnWheel?: boolean;
 
-  classNames?: BaseInputProps["classNames"] & {
-    input?: string;
+    classNames?: BaseInputProps["classNames"] & {
+      input?: string;
+    };
+    controls?: boolean;
+
+    prefix?: React.ReactNode;
+    suffix?: React.ReactNode;
+    addonBefore?: React.ReactNode;
+    addonAfter?: React.ReactNode;
+    allowClear?: boolean | { clearIcon?: React.ReactNode };
   };
-  controls?: boolean;
 
-  prefix?: React.ReactNode;
-  suffix?: React.ReactNode;
-  addonBefore?: React.ReactNode;
-  addonAfter?: React.ReactNode;
-  allowClear?: boolean | { clearIcon?: React.ReactNode };
-};
-
-type InternalInputNumberProps = Omit<
-  InputNumberProps,
+type InternalInputNumberProps<T extends ValueType = ValueType> = Omit<
+  InputNumberProps<T>,
   "prefix" | "suffix" | "ref"
 > & {
   ref: React.Ref<HTMLInputElement>;
@@ -135,13 +136,13 @@ type InternalInputNumberProps = Omit<
   onDisabledChange?: (upDisabled: boolean, downDisabled: boolean) => void;
 };
 
-const InternalInputNumber = ({
+const InternalInputNumber = <T extends ValueType = ValueType>({
   ref,
   className,
   style,
   min,
   max,
-  step = 1,
+  step = 1 as unknown as T,
   defaultValue,
   value,
   disabled,
@@ -172,7 +173,7 @@ const InternalInputNumber = ({
   onDisabledChange,
 
   ...inputProps
-}: InternalInputNumberProps) => {
+}: InternalInputNumberProps<T>) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const [focus, setFocus] = React.useState(false);
@@ -246,7 +247,7 @@ const InternalInputNumber = ({
   const mergedFormatter = React.useCallback(
     (number: string, userTyping: boolean) => {
       if (formatter) {
-        return formatter(number, {
+        return formatter(number as unknown as T, {
           userTyping,
           input: String(inputValueRef.current),
         });
@@ -416,7 +417,7 @@ const InternalInputNumber = ({
         onChange?.(
           updateValue.isEmpty()
             ? null
-            : getDecimalValue(stringMode, updateValue),
+            : (getDecimalValue(stringMode, updateValue) as T),
         );
 
         // Reformat input if value is not controlled
@@ -508,14 +509,13 @@ const InternalInputNumber = ({
       stepDecimal = stepDecimal.negate();
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const target = (decimalValue || getMiniDecimal(0)).add(
       stepDecimal.toString(),
     );
 
     const updatedValue = triggerValueUpdate(target, false);
-    onStep?.(getDecimalValue(stringMode, updatedValue), {
-      offset: shiftKeyRef.current ? getDecupleSteps(step) : step,
+    onStep?.(getDecimalValue(stringMode, updatedValue) as T, {
+      offset: (shiftKeyRef.current ? getDecupleSteps(step) : step) as T,
       type: up ? "up" : "down",
       emitter,
     });
@@ -700,7 +700,7 @@ const InternalInputNumber = ({
   );
 };
 
-const InputNumber = ({
+const InputNumber = <T extends ValueType = ValueType>({
   disabled,
   style,
   value,
@@ -716,135 +716,132 @@ const InputNumber = ({
   downHandler,
   ref,
   ...rest
-}: InputNumberProps & { ref?: React.Ref<InputNumberRef> }) => {
+}: InputNumberProps<T> & { ref?: React.Ref<InputNumberRef> }) => {
+  const holderRef = React.useRef<HolderRef>(null);
+  const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
+  const inputFocusRef = React.useRef<HTMLInputElement>(null);
+  const isHovering = useHover(inputNumberDomRef);
 
-    const holderRef = React.useRef<HolderRef>(null);
-    const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
-    const inputFocusRef = React.useRef<HTMLInputElement>(null);
-    const isHovering = useHover(inputNumberDomRef);
+  // Track disabled states from InternalInputNumber
+  const [upDisabled, setUpDisabled] = useState(false);
+  const [downDisabled, setDownDisabled] = useState(false);
 
-    // Track disabled states from InternalInputNumber
-    const [upDisabled, setUpDisabled] = useState(false);
-    const [downDisabled, setDownDisabled] = useState(false);
+  const handleDisabledChange = useCallback((up: boolean, down: boolean) => {
+    setUpDisabled(up);
+    setDownDisabled(down);
+  }, []);
 
-    const handleDisabledChange = useCallback((up: boolean, down: boolean) => {
-      setUpDisabled(up);
-      setDownDisabled(down);
-    }, []);
+  const focus = (option?: InputFocusOptions) => {
+    if (inputFocusRef.current) {
+      triggerFocus(inputFocusRef.current, option);
+    }
+  };
 
-    const focus = (option?: InputFocusOptions) => {
-      if (inputFocusRef.current) {
-        triggerFocus(inputFocusRef.current, option);
-      }
-    };
+  const handleReset = () => {
+    rest.onChange?.(null);
+    focus();
+  };
 
-    const handleReset = () => {
-      rest.onChange?.(null);
-      focus();
-    };
+  // Ref to hold onStep function from InternalInputNumber
+  const onStepRef = React.useRef<((up: boolean) => void) | null>(null);
 
-    // Ref to hold onStep function from InternalInputNumber
-    const onStepRef = React.useRef<((up: boolean) => void) | null>(null);
+  // Render clear icon for InputNumber (only show on hover)
+  const clearIcon = !!allowClear && !!value && !!isHovering && (
+    <ClearIcon
+      visible
+      onClick={() => handleReset()}
+      className="relative z-10 order-2 ml-1"
+    />
+  );
 
-    // Render clear icon for InputNumber (only show on hover)
-    const clearIcon = !!allowClear && !!value && !!isHovering && (
-      <ClearIcon
-        visible
-        onClick={() => handleReset()}
-        className="relative z-10 order-2 ml-1"
-      />
-    );
-
-    // Render controls as suffix - override absolute positioning
-    const controlsNode = controls && (
-      <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
-        <StepHandler
-          upNode={upHandler}
-          downNode={downHandler}
-          upDisabled={disabled || upDisabled}
-          downDisabled={disabled || downDisabled}
-          onStep={(up) => {
-            onStepRef.current?.(up);
-            focus();
-          }}
-        />
-      </div>
-    );
-
-    // Combine clear icon and controls as suffix
-    const combinedSuffix = (
-      <>
-        {clearIcon}
-        {controlsNode}
-      </>
-    );
-
-    React.useImperativeHandle(ref, () => {
-      const target = inputFocusRef.current;
-      if (!target) {
-        return {} as InputNumberRef;
-      }
-
-      return proxyObject(target, {
-        focus,
-        // blur: () => target.blur(),
-        nativeElement:
-          holderRef.current?.nativeElement ||
-          inputNumberDomRef.current ||
-          target,
-      });
-    });
-    // React.useImperativeHandle(ref, () =>
-    //   proxyObject(inputFocusRef.current ?? {} as InputNumberRef, {
-    //     focus: () => void 0,
-    //     blur: () => void 0,
-    //     nativeElement:
-    //       holderRef.current?.nativeElement ||
-    //       inputNumberDomRef.current ||
-    //       {} as HTMLInputElement,
-    //     // focus: (option) => focus(option),
-    //     // nativeElement:
-    //     //   holderRef.current?.nativeElement || inputNumberDomRef.current,
-    //   }),
-    // );
-
-    return (
-      <BaseInput
-        className={cn("w-[90px]", className)}
-        triggerFocus={focus}
-        value={value}
-        disabled={disabled}
-        style={style}
-        prefix={prefix}
-        suffix={combinedSuffix}
-        addonAfter={addonAfter}
-        addonBefore={addonBefore}
-        classNames={classNames}
-        components={{
-          affixWrapper: "div",
-          groupWrapper: "div",
-          wrapper: "div",
-          groupAddon: "div",
+  // Render controls as suffix - override absolute positioning
+  const controlsNode = controls && (
+    <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
+      <StepHandler
+        upNode={upHandler}
+        downNode={downHandler}
+        upDisabled={disabled || upDisabled}
+        downDisabled={disabled || downDisabled}
+        onStep={(up) => {
+          onStepRef.current?.(up);
+          focus();
         }}
-        ref={holderRef}
-      >
-        <InternalInputNumber
-          disabled={disabled}
-          ref={inputFocusRef}
-          domRef={inputNumberDomRef}
-          onStepRef={onStepRef}
-          onDisabledChange={handleDisabledChange}
-          upHandler={upHandler}
-          downHandler={downHandler}
-          controls={false}
-          // className={classNames?.input}
-          classNames={{
-            input: classNames?.input,
-          }}
-          {...rest}
-        />
-      </BaseInput>
-    );
+      />
+    </div>
+  );
+
+  // Combine clear icon and controls as suffix
+  const combinedSuffix = (
+    <>
+      {clearIcon}
+      {controlsNode}
+    </>
+  );
+
+  React.useImperativeHandle(ref, () => {
+    const target = inputFocusRef.current;
+    if (!target) {
+      return {} as InputNumberRef;
+    }
+
+    return proxyObject(target, {
+      focus,
+      // blur: () => target.blur(),
+      nativeElement:
+        holderRef.current?.nativeElement || inputNumberDomRef.current || target,
+    });
+  });
+  // React.useImperativeHandle(ref, () =>
+  //   proxyObject(inputFocusRef.current ?? {} as InputNumberRef, {
+  //     focus: () => void 0,
+  //     blur: () => void 0,
+  //     nativeElement:
+  //       holderRef.current?.nativeElement ||
+  //       inputNumberDomRef.current ||
+  //       {} as HTMLInputElement,
+  //     // focus: (option) => focus(option),
+  //     // nativeElement:
+  //     //   holderRef.current?.nativeElement || inputNumberDomRef.current,
+  //   }),
+  // );
+
+  return (
+    <BaseInput
+      className={cn("w-[90px]", className)}
+      triggerFocus={focus}
+      value={value}
+      disabled={disabled}
+      style={style}
+      prefix={prefix}
+      suffix={combinedSuffix}
+      addonAfter={addonAfter}
+      addonBefore={addonBefore}
+      classNames={classNames}
+      components={{
+        affixWrapper: "div",
+        groupWrapper: "div",
+        wrapper: "div",
+        groupAddon: "div",
+      }}
+      ref={holderRef}
+    >
+      <InternalInputNumber
+        disabled={disabled}
+        ref={inputFocusRef}
+        domRef={inputNumberDomRef}
+        onStepRef={onStepRef}
+        onDisabledChange={handleDisabledChange}
+        upHandler={upHandler}
+        downHandler={downHandler}
+        controls={false}
+        // className={classNames?.input}
+        classNames={{
+          input: classNames?.input,
+        }}
+        {...rest}
+      />
+    </BaseInput>
+  );
 };
 export default InputNumber;
 export type { InputNumberProps };

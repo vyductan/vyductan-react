@@ -18,9 +18,12 @@ import type { TooltipProps } from "../tooltip";
 import type { INTERNAL_SELECTION_ITEM } from "./hooks/use-selection";
 
 declare module "@tanstack/react-table" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
-  interface ColumnMeta<TData extends RowData, TValue>
-    extends ColumnType<TData> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface ColumnMeta<
+    TData extends RowData,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    TValue,
+  > extends ColumnType<TData> {}
 }
 
 export type SelectionItemSelectFn = (currentRowKeys: Key[]) => void;
@@ -129,8 +132,10 @@ type ColumnSharedType<TRecord> = {
   ellipsis?: CellEllipsisType;
 };
 
-export interface ColumnGroupType<RecordType = AnyObject>
-  extends Omit<ColumnType<RecordType>, "dataIndex"> {
+export interface ColumnGroupType<RecordType = AnyObject> extends Omit<
+  ColumnType<RecordType>,
+  "dataIndex"
+> {
   children: ColumnsType<RecordType>;
 }
 
@@ -221,15 +226,14 @@ type RenderCellContext<TRecord> = {
 //       };
 //     }[keyof TRecord]
 //   >
-interface CoverableDropdownProps
-  extends Omit<
-    DropdownProps,
-    | "onOpenChange"
-    // === deprecated ===
-    | "overlay"
-    | "visible"
-    | "onVisibleChange"
-  > {
+interface CoverableDropdownProps extends Omit<
+  DropdownProps,
+  | "onOpenChange"
+  // === deprecated ===
+  | "overlay"
+  | "visible"
+  | "onVisibleChange"
+> {
   onOpenChange?: (open: boolean) => void;
 }
 export type ColumnType<TRecord> = ColumnSharedType<TRecord> & {
@@ -657,8 +661,8 @@ export type DeepNamePath<
         : never
     : Store extends any[] // Check if `Store` is `any[]`
       ? // Connect path. e.g. { a: { b: string }[] }
-        // Get: [a] | [ a,number] | [ a ,number , b]
-        | [...ParentNamePath, number]
+          // Get: [a] | [ a,number] | [ a ,number , b]
+          | [...ParentNamePath, number]
           | DeepNamePath<Store[number], [...ParentNamePath, number]>
       : keyof Store extends never // unknown
         ? Store

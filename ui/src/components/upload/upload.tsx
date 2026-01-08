@@ -150,7 +150,15 @@ const Upload = ({
               {render?.image && files[0] ? (
                 render.image(files[0])
               ) : (
-                <img src={files[0]?.url} />
+                <picture>
+                  <img
+                    src={files[0]?.url}
+                    alt={files[0]?.name}
+                    width={width}
+                    height={height}
+                    className="object-cover"
+                  />
+                </picture>
               )}
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">

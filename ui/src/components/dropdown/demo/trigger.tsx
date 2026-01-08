@@ -1,5 +1,6 @@
-import type { MenuProps } from "@acme/ui/components/menu";
 import type React from "react";
+
+import type { MenuProps } from "@acme/ui/components/menu";
 import { Button } from "@acme/ui/components/button";
 import { Dropdown } from "@acme/ui/components/dropdown";
 import { Space } from "@acme/ui/components/space";

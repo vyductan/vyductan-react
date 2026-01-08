@@ -67,7 +67,7 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
 
   return (
     <div
-      className="grid grid-cols-3 gap-1 p-3"
+      className="grid w-[276px] grid-cols-3 gap-1 p-3"
       onMouseLeave={() => onHoverChange?.()}
     >
       {yearGrid.map((year, index) => {

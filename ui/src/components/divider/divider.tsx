@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@acme/ui/lib/utils";
-
 import { Separator } from "@acme/ui/shadcn/separator";
 
 type ShadcnSeparatorProps = React.ComponentProps<typeof Separator>;

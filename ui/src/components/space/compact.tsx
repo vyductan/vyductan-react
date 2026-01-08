@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
+
 import { cn } from "@acme/ui/lib/utils";
+import { ButtonGroup } from "@acme/ui/shadcn/button-group";
 
 import type { DirectionType } from "../config-provider/context";
 import type { SizeType } from "../config-provider/size-context";
-import { ButtonGroup } from "@acme/ui/shadcn/button-group";
 
 export interface SpaceCompactItemContextType {
   compactSize?: SizeType;
@@ -58,8 +59,10 @@ export const useCompactItemContext = (direction: DirectionType) => {
   };
 };
 
-interface SpaceCompactProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+interface SpaceCompactProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   /**
    * Compact size forwarded to items via context
    */

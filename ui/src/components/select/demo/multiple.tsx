@@ -1,5 +1,6 @@
-import type { SelectProps } from "@acme/ui/components/select";
 import type React from "react";
+
+import type { SelectProps } from "@acme/ui/components/select";
 import { Select } from "@acme/ui/components/select";
 import { Space } from "@acme/ui/components/space";
 

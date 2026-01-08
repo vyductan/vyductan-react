@@ -1,10 +1,10 @@
 "use client";
 
+import { useTheme } from "next-themes";
+
 import type { ButtonProps } from "@acme/ui/components/button";
 import { Button } from "@acme/ui/components/button";
 import { Dropdown } from "@acme/ui/components/dropdown";
-import { useTheme } from "next-themes";
-
 import { Icon } from "@acme/ui/icons";
 
 function ThemeSwitcher(props: ButtonProps) {

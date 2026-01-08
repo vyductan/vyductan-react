@@ -1,5 +1,6 @@
-import type { AnyObject } from "@acme/ui/components/_util/type";
 import type * as React from "react";
+
+import type { AnyObject } from "@acme/ui/components/_util/type";
 
 import type { FilterSearchType, TableLocale } from "../../types";
 import { Icon } from "../../../../icons";

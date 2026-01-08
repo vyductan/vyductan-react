@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 "use client";
 
 import * as React from "react";
-import { tagColors } from "@acme/ui/components/tag";
 import { useMergedState } from "@rc-component/util";
 
+import { tagColors } from "@acme/ui/components/tag";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -97,7 +96,6 @@ const AutoComplete = <
   const filter =
     filterProp ??
     ((value, search, _) => {
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const label = (optionsToSearch ?? options)
         .find((item) => item.value === value)
         ?.label?.toString();

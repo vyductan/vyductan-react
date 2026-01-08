@@ -2,10 +2,7 @@ import type { AvatarProps } from "@acme/ui/components/avatar";
 import type { BreadcrumbProps } from "@acme/ui/components/breadcrumb";
 import type { DirectionType } from "@acme/ui/components/config-provider/context";
 import type { TagProps } from "@acme/ui/components/tag";
-import { useContext } from "react";
 import { Avatar } from "@acme/ui/components/avatar";
-import { ConfigContext } from "@acme/ui/components/config-provider";
-
 import { cn } from "@acme/ui/lib/utils";
 
 import { Icon } from "../../icons";
@@ -32,6 +29,7 @@ type PageHeaderProps = {
   };
   backIcon?: React.ReactNode;
   onBack?: React.MouseEventHandler<HTMLElement>;
+  direction?: DirectionType;
 
   render?: (
     originNodes: {
@@ -83,9 +81,15 @@ const getBackIcon = (
 };
 
 const PageHeader = ({ className, render, ...props }: PageHeaderProps) => {
-  const { direction } = useContext(ConfigContext);
-
-  const { title, avatar, subTitle, tags, classNames, onBack } = props;
+  const {
+    title,
+    avatar,
+    subTitle,
+    tags,
+    classNames,
+    onBack,
+    direction = "ltr",
+  } = props;
   const hasHeading = title ?? subTitle ?? tags;
 
   const backIcon = getBackIcon(props, direction);

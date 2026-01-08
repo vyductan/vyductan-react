@@ -5,11 +5,11 @@ import type { AnyObject } from "../_util/type";
 import type { SelectShadcnProps } from "./_components";
 import type { SelectProps } from "./select";
 import type { OptionType, SelectValueType } from "./types";
-import { Select as ShadcnSelect } from "@acme/ui/shadcn/select";
 import {
   SelectContent as Content,
   SelectContent,
   SelectTrigger,
+  Select as ShadcnSelect,
   SelectTrigger as Trigger,
 } from "./_components";
 import { Option } from "./_components/option";
@@ -56,8 +56,17 @@ Select.Trigger = Trigger;
 Select.Content = Content;
 
 export { Select };
-export { Select as SelectRoot } from "@acme/ui/shadcn/select";
 export type { SelectProps } from "./select";
 
-export * from "./_components";
+export {
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+  SelectTrigger,
+  SelectValue,
+} from "./_components";
 export { Option } from "./_components/option";

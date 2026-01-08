@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-irregular-whitespace */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import type { InputProps } from "../input";
 import type { BaseInputProps } from "../types";
 

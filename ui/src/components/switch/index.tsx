@@ -2,25 +2,13 @@ import type React from "react";
 import type { XOR } from "ts-xor";
 
 import { cn } from "@acme/ui/lib/utils";
-
 import { Switch as ShadcnSwitch } from "@acme/ui/shadcn/switch";
+
+import type { OwnSwitchProps } from "./switch";
 import { Switch as InternalSwitch } from "./switch";
 
 type ShadcnSwitchProps = React.ComponentProps<typeof ShadcnSwitch>;
-type OwnSwitchProps = Omit<
-  ShadcnSwitchProps,
-  "onChange" | "onCheckedChange"
-> & {
-  onChange?: (checked: boolean) => void;
-  /** Additional class name for the switch container */
-  className?: string;
-  /** Alias for checked prop */
-  value?: boolean;
-  /** Size of the switch */
-  size?: "small" | "default";
-  /** Loading state of switch */
-  loading?: boolean;
-};
+
 type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
 
 const ConditionSwitch = (props: SwitchProps) => {
@@ -45,4 +33,6 @@ const ConditionSwitch = (props: SwitchProps) => {
 };
 
 export { ConditionSwitch as Switch };
-export type { SwitchProps, OwnSwitchProps, ShadcnSwitchProps };
+export type { SwitchProps, ShadcnSwitchProps };
+
+export { type OwnSwitchProps } from "./switch";

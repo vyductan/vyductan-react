@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import type { VariantProps } from "tailwind-variants";
@@ -128,7 +126,7 @@ export type CommonProgressProps = ProgressAriaProps & {
 };
 type LineProps = CommonProgressProps & {
   type?: "line";
-  status?: ProgressStatus | "active";
+  status?: ProgressStatus;
 };
 
 type ProgressProps = LineProps | CircleProps;

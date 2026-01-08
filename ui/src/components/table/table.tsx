@@ -1,12 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 "use client";
 
 import type {
@@ -101,7 +96,7 @@ interface ChangeEventInfo<RecordType = AnyObject> {
 }
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
-  | (TRecord & {
+  | (Omit<TRecord, "_customRow" | "_customRowClassName"> & {
       _customRow?: undefined;
       _customRowClassName?: undefined;
     })
@@ -159,7 +154,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     /** Row's className */
     rowClassName?: string | ((record: TRecord, index: number) => string);
     /** Row key config */
-    rowKey?: string | keyof TRecord | GetRowKey<TRecord>;
+    rowKey?: (string & {}) | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
     rowSelection?: TableRowSelection<TRecord>;
 

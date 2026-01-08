@@ -1,7 +1,7 @@
-
-import type { RadioChangeEvent } from "@acme/ui/components/radio";
 import type React from "react";
 import { useState } from "react";
+
+import type { RadioChangeEvent } from "@acme/ui/components/radio";
 import { RadioGroup } from "@acme/ui/components/radio";
 
 import type { RadioOptionType } from "../radio-group";

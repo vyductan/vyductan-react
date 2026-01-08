@@ -1,5 +1,5 @@
-
 import type React from "react";
+
 import { Tabs } from "@acme/ui/components/tabs";
 
 const App: React.FC = () => (

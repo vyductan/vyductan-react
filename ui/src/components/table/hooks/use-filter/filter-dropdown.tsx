@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/no-array-for-each */
 import type * as React from "react";
 

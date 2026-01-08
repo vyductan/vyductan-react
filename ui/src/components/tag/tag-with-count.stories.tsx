@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Bell, Mail, ShoppingCart } from "lucide-react";
 
 import { TagWithCount } from "./tag-with-count";

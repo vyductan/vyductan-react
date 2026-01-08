@@ -1,12 +1,13 @@
 import type { XOR } from "ts-xor";
 import React from "react";
 
-import type { EmptyProps } from "./empty";
 import {
   EmptyContent,
   EmptyHeader,
   Empty as ShadcnEmpty,
 } from "@acme/ui/shadcn/empty";
+
+import type { EmptyProps } from "./empty";
 import { Empty as InternalEmpty } from "./empty";
 import SimpleEmptyImg from "./simple";
 

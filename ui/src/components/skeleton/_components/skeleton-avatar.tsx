@@ -3,8 +3,10 @@
 import type { SkeletonElementProps } from "./element";
 import { SkeletonElement } from "./element";
 
-export interface SkeletonAvatarProps
-  extends Omit<SkeletonElementProps, "shape"> {
+export interface SkeletonAvatarProps extends Omit<
+  SkeletonElementProps,
+  "shape"
+> {
   shape?: "circle" | "square";
 }
 

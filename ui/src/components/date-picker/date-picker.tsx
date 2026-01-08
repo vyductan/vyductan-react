@@ -25,6 +25,7 @@ import { Calendar } from "../calendar";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { MonthSelect } from "./month-select";
 import { YearSelect } from "./year-select";
 
 // type DatePickerValueType = "date" | "string" | "number" | "format";
@@ -314,6 +315,59 @@ const DatePicker = (props: DatePickerProps) => {
     [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
   );
 
+  const MonthModeMonthGrid = React.useCallback(
+    (_props: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
+      return (
+        <MonthSelect
+          value={value}
+          onHoverChange={(hoveredMonth) => {
+            if (!hoveredMonth) {
+              setHoverPreview(undefined);
+              return;
+            }
+            if (picker === "month") {
+              setHoverPreview(hoveredMonth.startOf("month"));
+              return;
+            }
+            // Overlay month picker: preview keeping year/day?
+            const base = dayjs(month ?? new Date());
+            let next = base.month(hoveredMonth.month());
+            if (!next.isValid()) {
+              next = base.month(hoveredMonth.month()).startOf("month");
+            }
+            setHoverPreview(next);
+          }}
+          onChange={(selectedMonth) => {
+            if (!selectedMonth) {
+              setPickerMode("date");
+              return;
+            }
+
+            // If DatePicker acts as a pure month picker, commit the selection
+            if (picker === "month") {
+              const m = selectedMonth.startOf("month");
+              setValue(m);
+              setInputValue(m.format(format));
+              setMonth(m.toDate());
+              setOpen(false);
+              setHoverPreview(undefined);
+              return;
+            }
+
+            // Otherwise, only navigate calendar to selected month in CURRENT VIEW YEAR
+            const base = dayjs(month ?? new Date());
+            const next = base.month(selectedMonth.month());
+
+            const newMonthDate = next.startOf("month").toDate();
+            setMonth(newMonthDate);
+            setPickerMode("date");
+          }}
+        />
+      );
+    },
+    [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
+  );
+
   const BaseCaptionLabel = React.useCallback(
     ({
       className,
@@ -325,7 +379,13 @@ const DatePicker = (props: DatePickerProps) => {
       const yearText = m.format("YYYY");
       return (
         <span className={cn("space-x-2", className)} {...props}>
-          <Button variant="outline" tabIndex={-1} aria-hidden="true">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setPickerMode("month");
+            }}
+            aria-label="Select month"
+          >
             {monthText}
           </Button>
           <Button
@@ -350,6 +410,31 @@ const DatePicker = (props: DatePickerProps) => {
       </span>
     ),
     [computedDecadeRange.start, computedDecadeRange.end],
+  );
+
+  const MonthModeCaptionLabel = React.useCallback(
+    ({
+      className,
+      ...props
+    }: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => {
+      const d = month ?? new Date();
+      const m = dayjs(d);
+      const yearText = m.format("YYYY");
+      return (
+        <span className={cn("space-x-2", className)} {...props}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setPickerMode("year");
+            }}
+            aria-label="Select year"
+          >
+            {yearText}
+          </Button>
+        </span>
+      );
+    },
+    [month],
   );
 
   return (
@@ -456,6 +541,12 @@ const DatePicker = (props: DatePickerProps) => {
                   ? {
                       MonthGrid: YearModeMonthGrid,
                       CaptionLabel: YearModeCaptionLabel,
+                    }
+                  : {}),
+                ...(pickerMode === "month"
+                  ? {
+                      MonthGrid: MonthModeMonthGrid,
+                      CaptionLabel: MonthModeCaptionLabel,
                     }
                   : {}),
               }}

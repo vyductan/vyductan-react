@@ -1,5 +1,4 @@
 import { cn } from "@acme/ui/lib/utils";
-
 import { DropdownMenuItem as ShadcnDropdownMenuItem } from "@acme/ui/shadcn/dropdown-menu";
 
 const DropdownMenuItem = ({
@@ -15,7 +14,7 @@ const DropdownMenuItem = ({
     <ShadcnDropdownMenuItem
       className={cn(
         "text-foreground [&_a]:text-foreground",
-        "data-[variant=destructive]:*:[span[role='img']]:!text-destructive [&_span[role='img']:not([class*='text-'])]:text-muted-foreground", // same [&_svg:not([class*='text-'])]:text-muted-foreground
+        "data-[variant=destructive]:*:[span[role='img']]:text-destructive! [&_span[role='img']:not([class*='text-'])]:text-muted-foreground", // same [&_svg:not([class*='text-'])]:text-muted-foreground
         className,
       )}
       inset={inset}

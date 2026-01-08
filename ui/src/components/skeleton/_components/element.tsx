@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "@acme/ui/lib/utils";
 
+import { cn } from "@acme/ui/lib/utils";
 import { Skeleton as SkeletonShadcn } from "@acme/ui/shadcn/skeleton";
 
 import { GenericSlot } from "../../slot";

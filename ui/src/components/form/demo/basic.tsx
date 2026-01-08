@@ -1,10 +1,11 @@
 import type React from "react";
+import { User } from "lucide-react";
+import { z } from "zod";
+
 import { Button } from "@acme/ui/components/button";
 import { Checkbox } from "@acme/ui/components/checkbox";
 import { Form, FormItem, useForm } from "@acme/ui/components/form";
 import { Input } from "@acme/ui/components/input";
-import { User } from "lucide-react";
-import { z } from "zod";
 
 const formSchema = z.object({
   username: z.string().min(1, { message: "Please input your username!" }),

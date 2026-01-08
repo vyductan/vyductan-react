@@ -1,4 +1,5 @@
 import type React from "react";
+
 import { Divider } from "@acme/ui/components/divider";
 
 const App: React.FC = () => (

@@ -187,7 +187,6 @@ export const Pagination = (props: PaginationProps) => {
     ...restParams: any[]
   ) {
     if (event.key === "Enter" || event.code === KeyCode.ENTER.toString()) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       callback(...restParams);
     }
   }

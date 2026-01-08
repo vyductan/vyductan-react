@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
 
-import { Icon } from "../../icons";
-import { cn } from "../../lib/utils";
 import {
   Empty,
   EmptyContent,
@@ -10,6 +8,9 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@acme/ui/shadcn/empty";
+
+import { Icon } from "../../icons";
+import { cn } from "../../lib/utils";
 
 type ResultProps = {
   status?: "success" | "info" | "warning" | "error" | "500" | "404";

@@ -1,8 +1,8 @@
+import type React from "react";
+import { AppWindow, Mail, Settings } from "lucide-react";
 
 import type { ItemType } from "@acme/ui/components/menu";
-import type React from "react";
 import { Menu } from "@acme/ui/components/menu";
-import { AppWindow, Mail, Settings } from "lucide-react";
 
 const items: ItemType[] = [
   {

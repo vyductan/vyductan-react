@@ -1,8 +1,8 @@
 import { cn } from "@acme/ui/lib/utils";
+import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
 
 import type { FormLabelAlign } from "../form";
 import type { ColProps } from "../grid";
-import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
 import { useFormContext } from "../form";
 import { Col } from "../grid";
 
@@ -11,6 +11,7 @@ type FieldLabelProps = React.ComponentProps<typeof ShadFieldLabel> & {
   labelAlign?: FormLabelAlign;
   labelWrap?: boolean;
   colon?: boolean;
+  required?: boolean;
 };
 const FieldLabel = ({
   className,
@@ -18,7 +19,7 @@ const FieldLabel = ({
   labelAlign,
   labelWrap,
   colon,
-  //   required,
+  required,
   children,
   ...props
 }: FieldLabelProps) => {
@@ -44,12 +45,14 @@ const FieldLabel = ({
           "overflow-hidden text-ellipsis whitespace-nowrap",
         className,
       )}
-      colon={mergedColon}
       {...props}
     >
       {children}
+      {mergedColon && ":"}
+      {required && <span className="text-destructive ml-1">*</span>}
     </ShadFieldLabel>
   );
+
   return labelCol ? <Col {...labelCol}>{labelNode}</Col> : labelNode;
 };
 

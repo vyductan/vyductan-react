@@ -11,14 +11,15 @@ The YearPicker component allows users to select a year from a decade-based panel
 ## Import
 
 ```tsx
-import { YearPicker } from "@/components/ui/date-picker";
+import { YearPicker } from "@acme/ui/components/date-picker";
 ```
 
 ## Basic Usage
 
 ```tsx
 import React, { useState } from "react";
-import { YearPicker } from "@/components/ui/date-picker";
+
+import { YearPicker } from "@acme/ui/components/date-picker";
 
 function BasicYearPicker() {
   const [year, setYear] = useState<number>();
@@ -36,7 +37,7 @@ function BasicYearPicker() {
 <ComponentPreview name="year-picker-basic" />
 
 ```tsx
-import { YearPicker } from "@/components/ui/date-picker";
+import { YearPicker } from "@acme/ui/components/date-picker";
 
 <YearPicker
   value={selectedYear}

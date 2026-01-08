@@ -1,4 +1,5 @@
 import type * as React from "react";
+
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ProgressProps } from "..";
@@ -50,63 +51,62 @@ const PtgCircle = ({
   gapDegree,
   ref,
 }: ColorGradientProps & { ref?: React.Ref<SVGCircleElement> }) => {
+  const isGradient = color && typeof color === "object";
 
-    const isGradient = color && typeof color === "object";
+  const stroke = isGradient ? `#FFF` : undefined;
 
-    const stroke = isGradient ? `#FFF` : undefined;
+  // ========================== Circle ==========================
+  const halfSize = size / 2;
 
-    // ========================== Circle ==========================
-    const halfSize = size / 2;
+  const circleNode = (
+    <circle
+      data-slot="circle-path"
+      className={cn(`stroke-(--progress-default-color)`, className)}
+      r={radius}
+      cx={halfSize}
+      cy={halfSize}
+      stroke={stroke}
+      strokeLinecap={strokeLinecap}
+      strokeWidth={strokeWidth}
+      opacity={ptg === 0 ? 0 : 1}
+      style={circleStyleForStack}
+      ref={ref}
+    />
+  );
 
-    const circleNode = (
-      <circle
-        data-slot="circle-path"
-        className={cn(`stroke-(--progress-default-color)`, className)}
-        r={radius}
-        cx={halfSize}
-        cy={halfSize}
-        stroke={stroke}
-        strokeLinecap={strokeLinecap}
-        strokeWidth={strokeWidth}
-        opacity={ptg === 0 ? 0 : 1}
-        style={circleStyleForStack}
-        ref={ref}
-      />
-    );
+  // ========================== Render ==========================
+  if (!isGradient) {
+    return circleNode;
+  }
 
-    // ========================== Render ==========================
-    if (!isGradient) {
-      return circleNode;
-    }
+  const maskId = `${gradientId}-conic`;
 
-    const maskId = `${gradientId}-conic`;
+  const fromDeg = gapDegree ? `${180 + gapDegree / 2}deg` : "0deg";
 
-    const fromDeg = gapDegree ? `${180 + gapDegree / 2}deg` : "0deg";
+  const conicColors = getPtgColors(color, (360 - gapDegree) / 360);
+  const linearColors = getPtgColors(color, 1);
 
-    const conicColors = getPtgColors(color, (360 - gapDegree) / 360);
-    const linearColors = getPtgColors(color, 1);
+  const conicColorBg = `conic-gradient(from ${fromDeg}, ${conicColors.join(", ")})`;
+  const linearColorBg = `linear-gradient(to ${gapDegree ? "bottom" : "top"}, ${linearColors.join(
+    ", ",
+  )})`;
 
-    const conicColorBg = `conic-gradient(from ${fromDeg}, ${conicColors.join(", ")})`;
-    const linearColorBg = `linear-gradient(to ${gapDegree ? "bottom" : "top"}, ${linearColors.join(
-      ", ",
-    )})`;
-
-    return (
-      <>
-        <mask id={maskId}>{circleNode}</mask>
-        <foreignObject
-          x={0}
-          y={0}
-          width={size}
-          height={size}
-          mask={`url(#${maskId})`}
-        >
-          <Block bg={linearColorBg}>
-            <Block bg={conicColorBg} />
-          </Block>
-        </foreignObject>
-      </>
-    );
+  return (
+    <>
+      <mask id={maskId}>{circleNode}</mask>
+      <foreignObject
+        x={0}
+        y={0}
+        width={size}
+        height={size}
+        mask={`url(#${maskId})`}
+      >
+        <Block bg={linearColorBg}>
+          <Block bg={conicColorBg} />
+        </Block>
+      </foreignObject>
+    </>
+  );
 };
 
 if (process.env.NODE_ENV !== "production") {

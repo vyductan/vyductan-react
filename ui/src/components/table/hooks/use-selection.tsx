@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
 /* eslint-disable unicorn/no-array-callback-reference */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/prefer-spread */
 /* eslint-disable unicorn/no-array-reduce */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import React, { useCallback, useMemo } from "react";
 import { useMergedState } from "@rc-component/util";

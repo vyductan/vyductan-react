@@ -1,6 +1,6 @@
+import type React from "react";
 
 import type { TableColumnsType, TableProps } from "@acme/ui/components/table";
-import type React from "react";
 import { Table } from "@acme/ui/components/table";
 
 interface DataType {

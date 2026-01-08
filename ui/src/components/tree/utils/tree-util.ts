@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable @typescript-eslint/prefer-for-of */
@@ -10,8 +8,7 @@
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable @typescript-eslint/consistent-generic-constructors */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import type * as React from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
 import omit from "@rc-component/util/lib/omit";

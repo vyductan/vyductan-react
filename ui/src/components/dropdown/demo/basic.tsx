@@ -1,8 +1,9 @@
-import type { MenuProps } from "@acme/ui/components/menu";
 import type React from "react";
-import { Icon } from "@acme/ui/icons";
+
+import type { MenuProps } from "@acme/ui/components/menu";
 import { Dropdown } from "@acme/ui/components/dropdown";
 import { Space } from "@acme/ui/components/space";
+import { Icon } from "@acme/ui/icons";
 
 const items: MenuProps["items"] = [
   {

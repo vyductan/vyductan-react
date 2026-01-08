@@ -1,8 +1,9 @@
 import React from "react";
+
 import { cn } from "@acme/ui/lib/utils";
+import { SelectItem } from "@acme/ui/shadcn/select";
 
 import type { SelectValueType } from "../types";
-import { SelectItem } from "@acme/ui/shadcn/select";
 import { SelectContext } from "../context";
 
 type OptionProps = {
@@ -36,7 +37,6 @@ const Option: React.FC<OptionProps> = ({ value, children, className }) => {
           ctx.triggerChange(value);
         }
       }}
-      isActive={isActive}
     >
       {children}
     </SelectItem>

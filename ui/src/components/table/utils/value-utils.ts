@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/no-array-for-each */
 import type { DataIndex, Key } from "../types";
 

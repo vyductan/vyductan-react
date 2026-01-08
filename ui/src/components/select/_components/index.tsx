@@ -1,9 +1,9 @@
 import type React from "react";
 import type { VariantProps } from "tailwind-variants";
 import { useMemo } from "react";
-import { cn } from "@acme/ui/lib/utils";
 
 import type { Select as ShadcnSelect } from "@acme/ui/shadcn/select";
+import { cn } from "@acme/ui/lib/utils";
 import { SelectTrigger as ShacnSelectTrigger } from "@acme/ui/shadcn/select";
 
 import type { inputSizeVariants } from "../../input";
@@ -109,7 +109,7 @@ export type { SelectShadcnProps };
 export { SelectTrigger };
 
 export {
-  SelectRoot,
+  Select,
   SelectContent,
   SelectGroup,
   SelectItem,

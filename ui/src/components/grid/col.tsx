@@ -1,9 +1,8 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
+
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint } from "../_util/responsive-observer";
@@ -26,7 +25,8 @@ export interface ColSize {
 }
 
 export interface ColProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     Partial<Record<Breakpoint, ColSpanType | ColSize>> {
   flex?: FlexType;
   span?: ColSpanType;

@@ -1,15 +1,13 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable unicorn/no-negated-condition */
 /* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
+
 /* eslint-disable unicorn/no-array-reduce */
 import React from "react";
 

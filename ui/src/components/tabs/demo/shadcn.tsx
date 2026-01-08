@@ -1,6 +1,11 @@
-
 import type React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/components/tabs";
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@acme/ui/components/tabs";
 
 const App: React.FC = () => (
   <Tabs defaultValue="account" className="w-full">

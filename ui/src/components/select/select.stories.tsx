@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import type { OptionType } from "./types";
 import { Select } from "./select";
@@ -38,7 +38,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const basicOptions: OptionType[] = [
+const basicOptions: OptionType<string>[] = [
   { label: "Option 1", value: "1" },
   { label: "Option 2", value: "2" },
   { label: "Option 3", value: "3" },
@@ -54,53 +54,63 @@ export const Default: Story = {
 };
 
 export const Variants: Story = {
-  render: (args) => (
-    <div className="flex w-[300px] flex-col gap-4">
-      <Select
-        {...args}
-        variant="outlined"
-        placeholder="Outlined"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        variant="filled"
-        placeholder="Filled"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        variant="borderless"
-        placeholder="Borderless"
-        options={basicOptions}
-      />
-    </div>
-  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render: (args: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { mode, value, defaultValue, options, ...rest } = args;
+    return (
+      <div className="flex w-[300px] flex-col gap-4">
+        <Select
+          {...rest}
+          variant="outlined"
+          placeholder="Outlined"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          variant="filled"
+          placeholder="Filled"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          variant="borderless"
+          placeholder="Borderless"
+          options={basicOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const Sizes: Story = {
-  render: (args) => (
-    <div className="flex w-[300px] flex-col gap-4">
-      <Select
-        {...args}
-        size="small"
-        placeholder="Small"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        size="middle"
-        placeholder="Middle"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        size="large"
-        placeholder="Large"
-        options={basicOptions}
-      />
-    </div>
-  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render: (args: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { mode, value, defaultValue, options, ...rest } = args;
+    return (
+      <div className="flex w-[300px] flex-col gap-4">
+        <Select
+          {...rest}
+          size="small"
+          placeholder="Small"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          size="middle"
+          placeholder="Middle"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          size="large"
+          placeholder="Large"
+          options={basicOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const Multiple: Story = {
@@ -131,42 +141,52 @@ export const Loading: Story = {
 };
 
 export const Disabled: Story = {
-  render: (args) => (
-    <div className="flex w-[300px] flex-col gap-4">
-      <Select
-        {...args}
-        disabled
-        placeholder="Disabled"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        disabled
-        placeholder="Disabled with value"
-        value="1"
-        options={basicOptions}
-      />
-    </div>
-  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render: (args: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { mode, value, defaultValue, options, ...rest } = args;
+    return (
+      <div className="flex w-[300px] flex-col gap-4">
+        <Select
+          {...rest}
+          disabled
+          placeholder="Disabled"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          disabled
+          placeholder="Disabled with value"
+          value="1"
+          options={basicOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const Status: Story = {
-  render: (args) => (
-    <div className="flex w-[300px] flex-col gap-4">
-      <Select
-        {...args}
-        status="error"
-        placeholder="Error status"
-        options={basicOptions}
-      />
-      <Select
-        {...args}
-        status="warning"
-        placeholder="Warning status"
-        options={basicOptions}
-      />
-    </div>
-  ),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  render: (args: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { mode, value, defaultValue, options, ...rest } = args;
+    return (
+      <div className="flex w-[300px] flex-col gap-4">
+        <Select
+          {...rest}
+          status="error"
+          placeholder="Error status"
+          options={basicOptions}
+        />
+        <Select
+          {...rest}
+          status="warning"
+          placeholder="Warning status"
+          options={basicOptions}
+        />
+      </div>
+    );
+  },
 };
 
 export const Tags: Story = {

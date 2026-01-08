@@ -1,5 +1,6 @@
-import type { CheckboxOptionType } from "@acme/ui/components/checkbox";
 import type React from "react";
+
+import type { CheckboxOptionType } from "@acme/ui/components/checkbox";
 import { Checkbox } from "@acme/ui/components/checkbox";
 
 const onChange = (checkedValues: string[]) => {

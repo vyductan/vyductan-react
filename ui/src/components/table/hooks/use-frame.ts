@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/refs */
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-floating-promises */
+
 import { useEffect, useRef, useState } from "react";
 
 export type Updater<State> = (prev: State) => State;

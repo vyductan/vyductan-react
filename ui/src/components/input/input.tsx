@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 "use client";
 
 import * as React from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { cn } from "@acme/ui/lib/utils";
 import { useMergedState } from "@rc-component/util";
 import omit from "@rc-component/util/lib/omit";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";

@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { Children, Fragment } from "react";
-import { cn } from "@acme/ui/lib/utils";
 
+import { cn } from "@acme/ui/lib/utils";
 import { Item, ItemActions, ItemContent } from "@acme/ui/shadcn/item";
+
 import { useListContext } from "./context";
 import { listVariants } from "./list";
 
@@ -22,7 +23,7 @@ const ListItem = ({ children, actions, extra }: ListItemProps) => {
         result = true;
       }
     });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
     return result && Children.count(children) > 1;
   };
 

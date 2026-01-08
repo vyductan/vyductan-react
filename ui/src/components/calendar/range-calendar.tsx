@@ -4,8 +4,9 @@
 import type { Dayjs } from "dayjs";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { cn } from "@acme/ui/lib/utils";
 import dayjs from "dayjs";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { ShadcnCalendarProps } from "./_components";
 import { CustomCalendar } from "./_components";
@@ -71,8 +72,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
 
       // If start and end are in the same month, show next month
       if (
-        startDate &&
-        startDate.getFullYear() === endDate.getFullYear() &&
+        startDate?.getFullYear() === endDate.getFullYear() &&
         startDate.getMonth() === endDate.getMonth()
       ) {
         return dayjs(endDate).add(1, "month").toDate();
@@ -100,8 +100,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
 
       // If start and end are in the same month, show next month
       if (
-        startDate &&
-        startDate.getFullYear() === endDate.getFullYear() &&
+        startDate?.getFullYear() === endDate.getFullYear() &&
         startDate.getMonth() === endDate.getMonth()
       ) {
         setEndMonth(dayjs(endDate).add(1, "month").toDate());

@@ -128,7 +128,7 @@ The Modal component supports imperative usage through the App context for quick 
 > To use imperative methods, your app must be wrapped with the `App` component:
 >
 > ```tsx
-> import { App } from "@/components/ui/app";
+> import { App } from "@acme/ui/components/app";
 >
 > function Root() {
 >   return (
@@ -144,7 +144,7 @@ The Modal component supports imperative usage through the App context for quick 
 Use `modal.confirm()` for confirmation dialogs with OK and Cancel buttons.
 
 ```tsx
-import { App } from "@/components/ui/app";
+import { App } from "@acme/ui/components/app";
 
 function MyComponent() {
   const { modal } = App.useApp();
@@ -176,7 +176,7 @@ function MyComponent() {
 `modal.warning()` renders a single OK button with a warning icon.
 
 ```tsx
-import { App } from "@/components/ui/app";
+import { App } from "@acme/ui/components/app";
 
 function MyComponent() {
   const { modal } = App.useApp();

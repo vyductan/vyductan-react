@@ -2,8 +2,10 @@ import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-interface SpaceProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+interface SpaceProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   /**
    * The direction of the space
    * @default 'horizontal'
@@ -111,12 +113,7 @@ const Space = ({
   });
 
   return (
-    <div
-      data-slot="space"
-      className={classes}
-      style={mergedStyle}
-      {...props}
-    >
+    <div data-slot="space" className={classes} style={mergedStyle} {...props}>
       {nodes}
     </div>
   );

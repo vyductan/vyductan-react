@@ -1,8 +1,8 @@
 /* eslint-disable unicorn/prefer-includes */
-/* eslint-disable @typescript-eslint/prefer-includes */
+
 /* eslint-disable unicorn/consistent-existence-index-check */
 /* eslint-disable unicorn/prefer-spread */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import type { Key } from "./types";
 
 export function arrDel(list: Key[], value: Key) {

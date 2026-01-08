@@ -1,11 +1,11 @@
 import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
-import type { BadgeProps } from "@acme/ui/shadcn/badge";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { Badge } from "@acme/ui/shadcn/badge";
 
+import type { BadgeProps } from "../badge";
 import { useComponentConfig } from "../config-provider";
 
 // Based on Vercel

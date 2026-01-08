@@ -13,7 +13,7 @@ Tree component với API tương tự Ant Design, hỗ trợ hiển thị dữ l
 ## Installation
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
+import { Tree } from "@acme/ui/components/tree";
 ```
 
 ## Basic Usage
@@ -21,7 +21,7 @@ import { Tree } from "@/components/ui/tree";
 ### Simple Tree
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
+import { Tree } from "@acme/ui/components/tree";
 
 const treeData = [
   {
@@ -61,7 +61,7 @@ export function BasicTreeExample() {
 ### Tree with Connecting Lines
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
+import { Tree } from "@acme/ui/components/tree";
 
 export function TreeWithLinesExample() {
   return <Tree treeData={treeData} showLine />;
@@ -81,8 +81,9 @@ export function TreeWithLinesExample() {
 ### Tree with Custom Icons
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
 import { FileIcon, FolderIcon, ImageIcon, VideoIcon } from "lucide-react";
+
+import { Tree } from "@acme/ui/components/tree";
 
 const treeDataWithIcons = [
   {
@@ -133,7 +134,7 @@ export function TreeWithIconsExample() {
 ### Tree with Disabled Nodes
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
+import { Tree } from "@acme/ui/components/tree";
 
 const treeDataWithDisabled = [
   {
@@ -176,7 +177,8 @@ export function TreeWithDisabledExample() {
 
 ```tsx
 import { useState } from "react";
-import { Tree } from "@/components/ui/tree";
+
+import { Tree } from "@acme/ui/components/tree";
 
 export function TreeWithSelectionExample() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -210,7 +212,8 @@ export function TreeWithSelectionExample() {
 
 ```tsx
 import { useState } from "react";
-import { Tree } from "@/components/ui/tree";
+
+import { Tree } from "@acme/ui/components/tree";
 
 export function ControlledSelectionExample() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -240,7 +243,8 @@ export function ControlledSelectionExample() {
 
 ```tsx
 import { useState } from "react";
-import { Tree } from "@/components/ui/tree";
+
+import { Tree } from "@acme/ui/components/tree";
 
 export function ControlledExpansionExample() {
   const [expandedKeys, setExpandedKeys] = useState<string[]>(["1"]);
@@ -282,7 +286,8 @@ export function ControlledExpansionExample() {
 
 ```tsx
 import { useState } from "react";
-import { Tree } from "@/components/ui/tree";
+
+import { Tree } from "@acme/ui/components/tree";
 
 export function CheckableTreeExample() {
   const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
@@ -312,7 +317,6 @@ export function CheckableTreeExample() {
 ### File Explorer Example
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
 import {
   ArchiveIcon,
   FileIcon,
@@ -322,6 +326,8 @@ import {
   MusicIcon,
   VideoIcon,
 } from "lucide-react";
+
+import { Tree } from "@acme/ui/components/tree";
 
 const getFileIcon = (fileName: string) => {
   const ext = fileName.split(".").pop()?.toLowerCase();
@@ -423,8 +429,9 @@ export function FileExplorerExample() {
 ### Organization Chart Example
 
 ```tsx
-import { Tree } from "@/components/ui/tree";
 import { UserIcon, UsersIcon } from "lucide-react";
+
+import { Tree } from "@acme/ui/components/tree";
 
 const orgChartData = [
   {

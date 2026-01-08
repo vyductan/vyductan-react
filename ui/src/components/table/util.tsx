@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { Row, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 

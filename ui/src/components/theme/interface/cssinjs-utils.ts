@@ -6,14 +6,15 @@ import type { ComponentTokenMap } from "./components";
 type TokenType = object;
 type TokenMap = Record<PropertyKey, any>;
 type GlobalTokenTypeUtil<
-  CompTokenMap extends TokenMap,
-  AliasToken extends TokenType,
-> = AliasToken & CompTokenMap;
+  TCompTokenMap extends TokenMap,
+  TAliasToken extends TokenType,
+> = TAliasToken & TCompTokenMap;
 type OverrideTokenTypeUtil<
-  CompTokenMap extends TokenMap,
-  AliasToken extends TokenType,
+  TCompTokenMap extends TokenMap,
+  TAliasToken extends TokenType,
 > = {
-  [key in keyof CompTokenMap]: Partial<CompTokenMap[key]> & Partial<AliasToken>;
+  [key in keyof TCompTokenMap]: Partial<TCompTokenMap[key]> &
+    Partial<TAliasToken>;
 };
 
 /** Final token which contains the components level override */

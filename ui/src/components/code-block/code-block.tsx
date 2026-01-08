@@ -59,11 +59,10 @@ export const CodeBlock = memo(
             lang,
             theme: "github-light",
           });
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+
           if (cancelled) return;
           setHtml(highlighted);
         } catch {
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (cancelled) return;
           setHtml(
             `<pre class="shiki"><code>${children

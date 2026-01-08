@@ -1,5 +1,6 @@
-import type { DescriptionsProps } from "@acme/ui/components/descriptions";
 import type React from "react";
+
+import type { DescriptionsProps } from "@acme/ui/components/descriptions";
 import { Descriptions } from "@acme/ui/components/descriptions";
 
 const items: DescriptionsProps["items"] = [

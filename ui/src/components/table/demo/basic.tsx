@@ -1,6 +1,6 @@
+import type React from "react";
 
 import type { TableProps } from "@acme/ui/components/table";
-import type React from "react";
 import { Space } from "@acme/ui/components/space";
 import { Table } from "@acme/ui/components/table";
 import { Tag } from "@acme/ui/components/tag";

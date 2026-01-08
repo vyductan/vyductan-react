@@ -1,6 +1,6 @@
+import type React from "react";
 
 import type { CheckboxProps } from "@acme/ui/components/checkbox";
-import type React from "react";
 import { Checkbox } from "@acme/ui/components/checkbox";
 
 const onChange: CheckboxProps["onChange"] = (e) => {
