@@ -1,30 +1,42 @@
-name: Chromatic
+name: "Chromatic"
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - "@acme/ui/**"
   pull_request:
-    branches: [main]
+    paths:
+      - "@acme/ui/**"
 
 jobs:
   chromatic:
-    name: chromatic
+    name: Run Chromatic
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup
-        uses: ./github/setup
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-      - name: Build Storybook (verify build works)
-        working-directory: ui
-        run: pnpm storybook:build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
 
-      - name: Publish to Chromatic
-        working-directory: ui
-        env:
-          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-        run: pnpm chromatic -- --exit-once-uploaded
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Chromatic
+        uses: chromaui/action@v11
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: "@acme/ui"
+          exitZeroOnChanges: true 
