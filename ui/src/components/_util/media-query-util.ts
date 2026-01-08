@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable unicorn/no-typeof-undefined */
 type MQListenerHandler = (
   mql: MediaQueryList,

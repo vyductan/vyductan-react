@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable unicorn/no-negated-condition */
 import * as React from "react";
 import rcWarning, { resetWarned as rcResetWarned } from "rc-util/lib/warning";

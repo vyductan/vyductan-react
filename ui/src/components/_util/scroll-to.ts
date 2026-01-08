@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable unicorn/prefer-math-min-max */
 /* eslint-disable unicorn/prefer-global-this */
 import raf from "rc-util/lib/raf";
