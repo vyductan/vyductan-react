@@ -164,7 +164,7 @@ export const buttonColorVariants = tv({
       variant: "solid",
       color: "cyan",
       className: [
-          "border-cyan-600 bg-cyan-600",
+        "border-cyan-600 bg-cyan-600",
         "hover:border-cyan-500 hover:bg-cyan-500",
         "active:border-cyan-700 active:bg-cyan-700",
       ],
@@ -612,7 +612,7 @@ export const buttonColorVariants = tv({
       variant: "filled",
       color: "link",
       className: [
-        "text-blue-600 bg-blue-50",
+        "bg-blue-50 text-blue-600",
         "hover:bg-blue-100 hover:text-blue-600",
         "active:bg-blue-200 active:text-blue-700",
       ],

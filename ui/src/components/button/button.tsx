@@ -2,10 +2,10 @@
 
 import type * as React from "react";
 import type { PartialDeep } from "type-fest";
-import { GenericSlot } from "@acme/ui/components/slot";
 import { Slot } from "@radix-ui/react-slot";
 
 import type { IconProps } from "@acme/ui/icons";
+import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ButtonColorVariants, ButtonVariants } from "./button-variants";
@@ -92,21 +92,26 @@ const Button = ({
   const isIconOnly = (!!icon || loading) && !children && !srOnly;
   const hasAccessibleName = !!props["aria-label"] || props["aria-labelledby"];
 
-  if (process.env.NODE_ENV !== "production" && isIconOnly && !hasAccessibleName) {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    isIconOnly &&
+    !hasAccessibleName
+  ) {
     console.warn(
-      "Button: Icon-only buttons must have an accessible name. Please provide either 'aria-label' or 'aria-labelledby' prop."
+      "Button: Icon-only buttons must have an accessible name. Please provide either 'aria-label' or 'aria-labelledby' prop.",
     );
   }
 
   const size = sizeProp ?? sizeConfig;
 
-  const type = typeProp ?? typeConfig ?? "default";
+  const defaultType = variantProp ? "default" : "primary";
+  const type = typeProp ?? typeConfig ?? defaultType;
   const isHtmlType = type === "submit" || type === "reset" || type === "button";
   const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
   // Map type to [color, variant] using ButtonTypeMap
   // Default to "default" type if no button type is provided (Ant Design behavior)
-  const buttonType: ButtonType = isHtmlType ? "default" : type;
+  const buttonType: ButtonType = isHtmlType ? defaultType : type;
 
   let color = colorProp ?? colorConfig;
   let variant = variantProp ?? variantConfig;
