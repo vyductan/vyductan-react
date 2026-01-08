@@ -11,20 +11,17 @@
 @plugin "@iconify/tailwind4";
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
   html {
     @apply scroll-smooth;
   }
   body {
-    @apply bg-background text-foreground overscroll-none font-sans antialiased;
+    @apply overscroll-none font-sans antialiased;
     /* font-feature-settings: "rlig" 1, "calt" 1; */
     font-synthesis-weight: none;
     text-rendering: optimizeLegibility;
   }
 
-  a {
+  a:not([data-slot]) {
     @apply text-primary hover:text-primary-hover active:text-primary-active cursor-pointer;
   }
 
