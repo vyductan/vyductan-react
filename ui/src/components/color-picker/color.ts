@@ -1,7 +1,26 @@
-import type { ColorTypes } from "colorjs.io";
-import ColorjsColor from "colorjs.io";
+// Tree-shakable imports from colorjs.io/fn
+import type { PlainColorObject } from "colorjs.io";
+import {
+  ColorSpace,
+  HSL,
+  OKLab,
+  OKLCH,
+  parse,
+  serialize,
+  sRGB,
+  sRGB_Linear,
+  to,
+} from "colorjs.io/fn";
 
 import type { ColorGenInput, Colors } from "./types";
+
+// Explicitly register color spaces for the tree-shakable API
+// This is required for parse() to recognize color formats
+ColorSpace.register(sRGB_Linear);
+ColorSpace.register(sRGB);
+ColorSpace.register(HSL);
+ColorSpace.register(OKLab);
+ColorSpace.register(OKLCH);
 
 export const toHexFormat = (value?: string, alpha?: boolean) =>
   value?.replaceAll(/[^\w/]/g, "").slice(0, alpha ? 8 : 6) ?? "";
@@ -14,8 +33,16 @@ export type GradientColor = {
   percent: number;
 }[];
 
+// OKLCH color type
+export interface OKLCHColor {
+  l: number;
+  c: number;
+  h: number;
+  alpha?: number;
+}
+
 export class Color {
-  private colorTypes: ColorTypes;
+  private colorObject: PlainColorObject;
   public a: number;
   public r: number;
   public g: number;
@@ -25,15 +52,18 @@ export class Color {
   public l: number;
 
   constructor(color: ColorGenInput) {
-    // console.log("color", color);
-
-    // Convert color input to a format that colorjs.io can understand
-    let colorTypes: ColorTypes;
+    // Parse color input
+    let colorObj: PlainColorObject;
 
     if (Array.isArray(color)) {
-      colorTypes = "";
+      // Handle array input - create a default black color
+      colorObj = {
+        space: "srgb",
+        coords: [0, 0, 0],
+        alpha: 1,
+      } as unknown as PlainColorObject;
     } else if (typeof color === "number") {
-      colorTypes = color.toString();
+      colorObj = parse(color.toString()) as unknown as PlainColorObject;
     } else if (typeof color === "object") {
       // Handle RGB/RGBA objects
       if ("r" in color && "g" in color && "b" in color) {
@@ -49,9 +79,13 @@ export class Color {
               ? Number.parseFloat(color.a)
               : color.a
             : undefined;
-        colorTypes = { space: "srgb", coords: [r, g, b], alpha: a };
+        colorObj = {
+          space: "srgb",
+          coords: [r, g, b],
+          alpha: a,
+        } as unknown as PlainColorObject;
       }
-      // Handle HSB/HSBA objects
+      // Handle HSL/HSLA objects
       else {
         const h: number =
           typeof color.h === "string" ? Number.parseFloat(color.h) : color.h;
@@ -65,40 +99,54 @@ export class Color {
               ? Number.parseFloat(color.a)
               : color.a
             : undefined;
-        colorTypes = { space: "hsl", coords: [h, s, b], alpha: a };
+        colorObj = {
+          space: "hsl",
+          coords: [h, s, b],
+          alpha: a,
+        } as unknown as PlainColorObject;
       }
     } else {
-      colorTypes = color;
+      colorObj = parse(color) as unknown as PlainColorObject;
     }
-    const _color = new ColorjsColor(colorTypes);
-    this.colorTypes = colorTypes;
-    this.a = _color.a;
-    this.r = _color.r;
-    this.g = _color.g;
-    this.b = _color.b;
-    this.h = _color.h;
-    this.s = _color.s;
-    this.l = _color.l;
+
+    this.colorObject = colorObj;
+
+    // Convert to sRGB to get RGB values
+    const rgb = to(colorObj, "srgb");
+    this.r = rgb.coords[0] ?? 0;
+    this.g = rgb.coords[1] ?? 0;
+    this.b = rgb.coords[2] ?? 0;
+
+    // Convert to HSL to get HSL values
+    const hsl = to(colorObj, "hsl");
+    this.h = hsl.coords[0] ?? 0;
+    this.s = hsl.coords[1] ?? 0;
+    this.l = hsl.coords[2] ?? 0;
+
+    this.a = colorObj.alpha ?? 1;
+    this.a = colorObj.alpha ?? 1;
   }
 
   clone(): Color {
-    return this;
+    return new Color(serialize(this.colorObject));
   }
 
   setA(a: number) {
     this.a = a;
+    this.colorObject = { ...this.colorObject, alpha: a };
     return this;
   }
 
   toHexString(): string {
-    const hex = new ColorjsColor(this.colorTypes).toString({
-      format: "hex",
-    });
+    const hex = serialize(this.colorObject, { format: "hex" });
     return hex.length === 4
-      ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        "#" + hex[1]!.repeat(2) + hex[2]!.repeat(2) + hex[3]!.repeat(2)
+      ? "#" +
+          (hex[1] ?? "").repeat(2) +
+          (hex[2] ?? "").repeat(2) +
+          (hex[3] ?? "").repeat(2)
       : hex;
   }
+
   toRgb(): {
     r: number;
     g: number;
@@ -112,8 +160,9 @@ export class Color {
       a: this.a,
     };
   }
+
   toRgbString(): string {
-    return new ColorjsColor(this.colorTypes).toString({ format: "rgb" });
+    return serialize(this.colorObject, { format: "rgb" });
   }
 
   toHsb(): {
@@ -129,8 +178,32 @@ export class Color {
       a: this.a,
     };
   }
+
   toHsbString(): string {
-    return new ColorjsColor(this.colorTypes).toString({ format: "hsb" });
+    return serialize(to(this.colorObject, "hsl"), { format: "hsl" });
+  }
+
+  toOKLCH(): OKLCHColor {
+    const oklch = to(this.colorObject, "oklch");
+    return {
+      l: oklch.coords[0] ?? 0,
+      c: oklch.coords[1] ?? 0,
+      h: oklch.coords[2] ?? 0,
+      alpha: oklch.alpha ?? undefined,
+    };
+  }
+
+  toOKLCHString(): string {
+    return serialize(to(this.colorObject, "oklch"));
+  }
+
+  static fromOKLCH(oklch: OKLCHColor): Color {
+    const colorObj: PlainColorObject = {
+      space: "oklch",
+      coords: [oklch.l, oklch.c, oklch.h],
+      alpha: oklch.alpha,
+    } as unknown as PlainColorObject;
+    return new Color(serialize(colorObj));
   }
 }
 
@@ -163,7 +236,7 @@ export class AggregationColor {
         percent,
       }));
       if (this.colors[0]) {
-        this.metaColor = new Color(this.colors[0].color.metaColor);
+        this.metaColor = new Color(this.colors[0].color.toHexString());
       }
     } else {
       this.metaColor = new Color(isArray ? "" : color);
@@ -199,6 +272,18 @@ export class AggregationColor {
     return this.metaColor.toRgbString();
   }
 
+  toOKLCH() {
+    return this.metaColor.toOKLCH();
+  }
+
+  toOKLCHString() {
+    return this.metaColor.toOKLCHString();
+  }
+
+  static fromOKLCH(oklch: OKLCHColor): AggregationColor {
+    return new AggregationColor(Color.fromOKLCH(oklch).toHexString());
+  }
+
   isGradient(): boolean {
     return !!this.colors && !this.cleared;
   }
@@ -222,7 +307,7 @@ export class AggregationColor {
   }
 
   equals(color: AggregationColor | null): boolean {
-    if (!color || this.isGradient() !== color.isGradient()) {
+    if (this.isGradient() !== color?.isGradient()) {
       return false;
     }
 
