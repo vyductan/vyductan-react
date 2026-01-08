@@ -56,7 +56,5 @@ coverage
 # vercel
 .vercel
 
-ROADMAP.mdx
-
 *storybook.log
 storybook-static
