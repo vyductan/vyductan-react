@@ -1,5 +1,7 @@
+import type React from "react";
+import { useContext } from "react";
+
 import type { ButtonProps } from "@acme/ui/components/button";
-import React, { useContext } from "react";
 import { Button } from "@acme/ui/components/button";
 
 import type { TagWithCountProps } from "../tag/tag-with-count";
@@ -48,7 +50,7 @@ export const FloatButton = ({
     </div>
   );
 
-  if (badge && Object.keys(badge).length > 0) {
+  if (Object.keys(badge).length > 0) {
     buttonNode = <TagWithCount {...badge}>{buttonNode}</TagWithCount>;
   }
 
