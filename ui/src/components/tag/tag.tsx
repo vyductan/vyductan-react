@@ -57,13 +57,10 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
-    "[&>svg]:pointer-events-none [&>svg]:size-3",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border font-medium whitespace-nowrap transition-[color,box-shadow]",
+    "[&>svg]:pointer-events-none",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-
-    "px-[7px]",
-    // "px-2.5",
   ],
   variants: {
     variant: {
@@ -78,6 +75,11 @@ const tagVariants = tv({
       // own
       solid: "text-white",
     },
+    size: {
+      small: "px-1.5 py-0 text-[11px] [&>svg]:size-2.5",
+      middle: "px-[7px] py-0.5 text-xs [&>svg]:size-3",
+      large: "px-2.5 py-1 text-sm [&>svg]:size-3.5",
+    },
     color,
     bordered: {
       true: "",
@@ -86,6 +88,7 @@ const tagVariants = tv({
   },
   defaultVariants: {
     variant: "default",
+    size: "middle",
     color: "default",
     bordered: true,
   },
@@ -118,11 +121,13 @@ type TagProps = BadgeProps &
     icon?: React.ReactNode;
     closeIcon?: React.ReactNode;
     onClose?: () => void;
+    size?: "small" | "middle" | "large";
   };
 
 const Tag = ({
   className,
   variant,
+  size,
   color,
   bordered: borderedProp,
   icon,
@@ -142,6 +147,7 @@ const Tag = ({
       className={cn(
         tagVariants({
           variant,
+          size,
           color: isHexColor ? undefined : color,
           bordered,
         }),
