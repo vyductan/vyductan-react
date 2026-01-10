@@ -1,11 +1,10 @@
-"use client";
-
-import type { TableColumnsType, TableProps } from "@/components/ui/table";
 import type React from "react";
 import { useState } from "react";
-import { Space } from "@/components/ui/space";
-import { Switch } from "@/components/ui/switch";
-import { Table } from "@/components/ui/table";
+
+import type { TableColumnsType, TableProps } from "@acme/ui/components/table";
+import { Space } from "@acme/ui/components/space";
+import { Switch } from "@acme/ui/components/switch";
+import { Table } from "@acme/ui/components/table";
 
 type TableRowSelection<T extends object = object> =
   TableProps<T>["rowSelection"];

@@ -1,8 +1,12 @@
-"use client";
-
 import type React from "react";
-import { Space } from "@/components/ui/space";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Space } from "@acme/ui/components/space";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@acme/ui/components/tabs";
 
 const App: React.FC = () => (
   <Space direction="vertical" size="large" className="w-full">

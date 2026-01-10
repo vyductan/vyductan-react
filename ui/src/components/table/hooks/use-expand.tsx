@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";
 import * as React from "react";
 import { useMergedState } from "@rc-component/util";
@@ -55,26 +53,55 @@ export default function useExpand<TRecord extends AnyObject>(
   } = expandableConfig;
 
   // ========================= Tanstack Table State =========================
-  const [expandedState, setExpandedState] = useMergedState<ExpandedState>(
-    defaultExpandAllRows ? true : {},
-    // expandable?.expandedRowKeys.
-    // expandable?.expandedRowKeys
-    //   ? expandable.expandedRowKeys.reduce((acc, key) => {
-    //       acc[key.toString()] = true;
-    //       return acc;
-    //     }, {} as ExpandedStateList)
-    //   : {},
-    // {
-    //   value: mergedExpandedKeysToExpandedState(
-    //     expandable?.expandedRowKeys ?? [],
-    //   ),
-    //   // onChange: (value) => {
-    //   //   // if (typeof value === "boolean") return;
-    //   //   // const expandedRowKeys = Object.keys(value).filter((key) => value[key]);
-    //   //   // expandable?.onExpand?.(expandedRowKeys, {});
-    //   // },
-    // },
+  // Convert expandedRowKeys to TanStack Table's ExpandedState format
+  const getExpandedStateFromKeys = React.useCallback(
+    (keys: readonly Key[] | undefined): ExpandedState => {
+      if (!keys || keys.length === 0) {
+        return defaultExpandAllRows ? true : {};
+      }
+      const expandedState: Record<string, boolean> = {};
+      for (const key of keys) {
+        expandedState[key.toString()] = true;
+      }
+      return expandedState;
+    },
+    [defaultExpandAllRows],
   );
+
+  const [expandedState, setExpandedStateInternal] =
+    useMergedState<ExpandedState>(
+      () => getExpandedStateFromKeys(defaultExpandedRowKeys),
+      {
+        value: expandedRowKeys
+          ? getExpandedStateFromKeys(expandedRowKeys)
+          : undefined,
+      },
+    );
+
+  // Wrap setExpandedState to also notify parent via onExpandedRowsChange
+  const setExpandedState: React.Dispatch<React.SetStateAction<ExpandedState>> =
+    React.useCallback(
+      (updaterOrValue) => {
+        setExpandedStateInternal((prev) => {
+          const newState =
+            typeof updaterOrValue === "function"
+              ? updaterOrValue(prev)
+              : updaterOrValue;
+
+          // Convert ExpandedState back to key array and notify parent
+          if (onExpandedRowsChange && typeof newState === "object") {
+            const keys = Object.entries(newState)
+              .filter(([, isExpanded]) => isExpanded)
+              .map(([key]) => key);
+            // Use setTimeout to avoid calling during render
+            setTimeout(() => onExpandedRowsChange(keys), 0);
+          }
+
+          return newState;
+        });
+      },
+      [setExpandedStateInternal, onExpandedRowsChange],
+    );
 
   const mergedExpandIcon = expandIcon || renderExpandIcon;
   const mergedChildrenColumnName = childrenColumnName || "children";
