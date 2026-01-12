@@ -1,19 +1,20 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
-  "extends": "@acme/tsconfig/internal-package.json",
+  "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": ".",
+    "baseUrl": "src/",
     "paths": {
-      "@/lib/*": ["./src/lib/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/components/ui": ["./src/components/index.ts"],
-      "@/components/ui/*": ["./src/components/*"],
-      "@/components/icons": ["./src/icons/index.ts"],
-      "@/components/icons/*": ["./src/icons/*"]
+      "@acme/ui/*": ["./*"],
+      "@/lib/*": ["lib/*"],
+      "@/hooks/*": ["hooks/*"],
+      "@/components/ui": ["components/ui/index.ts"],
+      "@/components/ui/*": ["components/ui/*", "shadcn/*"],
+      "@/components/icons": ["components/icons/index.ts"],
+      "@/components/icons/*": ["components/icons/*"]
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "./src/shadcn/*.tsx"]
+  "exclude": ["node_modules"]
 }
