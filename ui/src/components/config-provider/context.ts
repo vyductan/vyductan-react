@@ -12,9 +12,10 @@ import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
 import type { PaginationProps } from "../pagination";
-import type { ResultProps } from "../result";
+// import type { ResultProps } from "../result";
 import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
+import type { TagProps } from "../tag";
 import type { TextAreaProps } from "../textarea";
 import type {
   AliasToken,
@@ -88,7 +89,22 @@ export type SelectConfig = ComponentStyleConfig &
 export type PaginationConfig = ComponentStyleConfig &
   Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
 
-export type ResultConfig = ComponentStyleConfig & Pick<ResultProps, "icons">;
+export interface ResultStatusConfig {
+  icon?: React.ReactNode;
+  title?: React.ReactNode;
+  subTitle?: React.ReactNode;
+}
+
+export interface ResultConfig extends ComponentStyleConfig {
+  status?: {
+    success?: ResultStatusConfig;
+    info?: ResultStatusConfig;
+    warning?: ResultStatusConfig;
+    error?: ResultStatusConfig;
+    "500"?: ResultStatusConfig;
+    "404"?: ResultStatusConfig;
+  };
+}
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {
@@ -96,11 +112,22 @@ export interface TableConfig extends ComponentStyleConfig {
   };
 }
 
+export type TagConfig = ComponentStyleConfig &
+  Pick<TagProps, "bordered" | "variant" | "color" | "size">;
+
 export type TextAreaConfig = ComponentStyleConfig &
   Pick<
     TextAreaProps,
     "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
   >;
+
+export interface PageContainerConfig {
+  loadingRender?: React.ReactNode;
+}
+
+export interface LayoutConfig extends ComponentStyleConfig {
+  pageContainer?: PageContainerConfig;
+}
 
 export type PopupOverflow = "viewport" | "scroll";
 
@@ -154,11 +181,12 @@ export interface ConfigComponentProps {
   // steps?: ComponentStyleConfig;
   // statistic?: ComponentStyleConfig;
   // image?: ImageConfig;
-  // layout?: ComponentStyleConfig;
+  layout?: LayoutConfig;
   // list?: ListConfig;
   // modal?: ModalConfig;
   progress?: ComponentStyleConfig;
-  // result?: ComponentStyleConfig;
+  result?: ResultConfig;
+  // slider?: SliderConfig;
   // slider?: SliderConfig;
   // breadcrumb?: ComponentStyleConfig;
   // menu?: MenuConfig;
@@ -170,7 +198,7 @@ export interface ConfigComponentProps {
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // message?: ComponentStyleConfig;
-  // tag?: TagConfig;
+  tag?: TagConfig;
   table?: TableConfig;
   textArea?: TextAreaConfig;
   // card?: CardConfig;

@@ -4,7 +4,8 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
 import * as React from "react";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint, ScreenMap } from "../_util/responsive-observer";
 import type { RowContextState } from "./row-context";
@@ -78,18 +79,16 @@ function useMergedPropByScreen(
   return prop;
 }
 
-const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
-  const {
-    justify,
-    align,
-    className,
-    style,
-    children,
-    gutter = 0,
-    wrap,
-    ...others
-  } = props;
-
+const Row = ({
+  justify,
+  align,
+  className,
+  style,
+  children,
+  gutter = 0,
+  wrap,
+  ...others
+}: RowProps & { ref?: React.Ref<HTMLDivElement> }) => {
   const { direction } = React.useContext(ConfigContext);
 
   const screens = useBreakpoint(true, null);
@@ -144,13 +143,12 @@ const Row = React.forwardRef<HTMLDivElement, RowProps>((props, ref) => {
         {...others}
         className={classes}
         style={{ ...rowStyle, ...style }}
-        ref={ref}
       >
         {children}
       </div>
     </RowContext.Provider>
   );
-});
+};
 
 if (process.env.NODE_ENV !== "production") {
   Row.displayName = "Row";

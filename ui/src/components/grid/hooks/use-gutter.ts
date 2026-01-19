@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable unicorn/no-array-for-each */

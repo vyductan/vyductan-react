@@ -1,7 +1,7 @@
 import type { Dayjs } from "dayjs";
 import React from "react";
-import { useMergedState } from "@rc-component/util";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -12,27 +12,29 @@ import { Input } from "../input";
 import { Popover } from "../popover";
 import { TimeSelect } from "./_components/time-select";
 
+dayjs.extend(customParseFormat);
+
 export type DateType = Dayjs | null | undefined;
 
-type TimePickerProps = Omit<
-  React.ComponentProps<"div">,
-  "onBlur" | "onChange"
-> &
-  Pick<
-    InputProps,
-    "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
-  > & {
-    ref?: React.Ref<PickerRef>;
-    id?: string;
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
-    format?: string;
-    showNow?: boolean;
-    defaultValue?: DateType;
-    value?: DateType;
-    onChange?: (time: DateType, timeString: string | undefined) => void;
-  };
-const TimePicker = (props: TimePickerProps) => {
+type TimePickerProps<TValue extends Dayjs | string | null | undefined = Dayjs> =
+  Omit<React.ComponentProps<"div">, "onBlur" | "onChange" | "defaultValue"> &
+    Pick<
+      InputProps,
+      "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
+    > & {
+      ref?: React.Ref<PickerRef>;
+      id?: string;
+      open?: boolean;
+      onOpenChange?: (open: boolean) => void;
+      format?: string;
+      showNow?: boolean;
+      defaultValue?: TValue;
+      value?: TValue;
+      onChange?: (time: TValue, timeString: string | undefined) => void;
+    };
+const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
+  props: TimePickerProps<TValue>,
+) => {
   const {
     id: inputId,
     open: openProp,
@@ -40,7 +42,7 @@ const TimePicker = (props: TimePickerProps) => {
     className,
 
     // picker props
-    format = "HH:mm",
+    format = "HH:mm:ss",
     defaultValue = null,
     value,
     onChange,
@@ -60,31 +62,61 @@ const TimePicker = (props: TimePickerProps) => {
     ...restProps
   } = props;
 
-  const [open, setOpen] = useMergedState(false, {
-    value: openProp,
-    onChange: onOpenChange,
-  });
+  const [open, setOpen] = React.useState(openProp ?? false);
+
+  // Sync controlled open prop
+  React.useEffect(() => {
+    if (openProp !== undefined) {
+      setOpen(openProp);
+    }
+  }, [openProp]);
+
+  // Handle open change
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      setOpen(newOpen);
+      onOpenChange?.(newOpen);
+    },
+    [onOpenChange],
+  );
 
   // ====================== Value =======================
-  const [localValue, setLocalValue] = useMergedState<DateType>(defaultValue, {
-    value,
+  const [localValue, setLocalValue] = React.useState<TValue>(
+    (value ?? defaultValue) as TValue,
+  );
+
+  // Sync controlled value prop
+  React.useEffect(() => {
+    if (value !== undefined) {
+      setLocalValue(value);
+    }
+  }, [value]);
+
+  // Track input display value separately from parsed value
+  const [inputValue, setInputValue] = React.useState(() => {
+    if (typeof localValue === "string") return localValue;
+    return formatDateValue(localValue, format);
   });
 
-  // console.log("lllll", localValue, restProps);
-  // Track input display value separately from parsed value
-  const [inputValue, setInputValue] = React.useState(() =>
-    formatDateValue(localValue, format),
-  );
+  // Hover preview state for showing preview in input
+  const [hoverPreview, setHoverPreview] = React.useState<DateType>(null);
 
   // Update input value when localValue changes externally
   React.useEffect(() => {
-    setInputValue(formatDateValue(localValue, format));
+    if (typeof localValue === "string") {
+      setInputValue(localValue);
+    } else {
+      setInputValue(formatDateValue(localValue, format));
+    }
   }, [localValue, format]);
 
-  const handleChange = (newValue: DateType) => {
-    setLocalValue(newValue);
-    onChange?.(newValue, formatDateValue(newValue, format));
-  };
+  const handleChange = React.useCallback(
+    (newValue: DateType) => {
+      setLocalValue(newValue as TValue);
+      onChange?.(newValue as TValue, formatDateValue(newValue, format));
+    },
+    [format, onChange],
+  );
 
   // ========================= Refs =========================
   const rootRef = React.useRef<HTMLDivElement>(null);
@@ -125,6 +157,48 @@ const TimePicker = (props: TimePickerProps) => {
     }
   };
 
+  const handleHoverChange = React.useCallback((value: DateType) => {
+    setHoverPreview(value);
+  }, []);
+
+  const handleOk = React.useCallback(() => {
+    handleOpenChange(false);
+  }, [handleOpenChange]);
+
+  const handleNow = React.useCallback(() => {
+    const now = dayjs();
+    handleChange(now);
+    handleOk();
+  }, [handleChange, handleOk]);
+
+  const timeSelectContent = React.useMemo(() => {
+    // Convert string to DateType if needed
+    const dateValue: DateType =
+      typeof localValue === "string"
+        ? dayjs(localValue, format)
+        : (localValue as DateType);
+
+    return (
+      <div className="flex flex-col">
+        <TimeSelect
+          value={dateValue}
+          format={format}
+          onChange={handleChange}
+          onHoverChange={handleHoverChange}
+          onOk={handleOk}
+          onNow={handleNow}
+        />
+      </div>
+    );
+  }, [
+    localValue,
+    format,
+    handleChange,
+    handleHoverChange,
+    handleOk,
+    handleNow,
+  ]);
+
   return (
     <>
       <Popover
@@ -138,31 +212,19 @@ const TimePicker = (props: TimePickerProps) => {
             "id" in event.target &&
             event.target.id !== inputId
           ) {
-            setOpen(false);
+            handleOpenChange(false);
           }
         }}
         onOpenAutoFocus={(event) => {
           event.preventDefault();
         }}
-        content={
-          <div className="flex flex-col">
-            <TimeSelect
-              value={localValue}
-              format={format}
-              onChange={(value) => {
-                handleChange(value);
-                // setOpen(false);
-              }}
-              onOk={() => setOpen(false)}
-            />
-          </div>
-        }
+        content={timeSelectContent}
       >
         <div
           ref={rootRef}
           onClick={(e) => {
             e.stopPropagation();
-            if (!open) setOpen(true);
+            if (!open) handleOpenChange(true);
           }}
           {...restProps}
           data-slot="time-picker"
@@ -170,12 +232,26 @@ const TimePicker = (props: TimePickerProps) => {
         >
           <Input
             ref={inputRef}
-            type="time"
+            type="text"
             id={inputId}
             name={name}
             autoComplete="off"
-            value={inputValue}
+            value={
+              open && hoverPreview
+                ? formatDateValue(hoverPreview, format)
+                : inputValue
+            }
             onChange={handleInputChange}
+            classNames={{
+              input: cn(
+                open &&
+                  hoverPreview &&
+                  localValue &&
+                  typeof localValue !== "string" &&
+                  !localValue.isSame(hoverPreview, "minute") &&
+                  "text-muted-foreground",
+              ),
+            }}
             onFocus={(e) => {
               // Select all text on focus for better UX
               e.target.select();
@@ -202,7 +278,7 @@ const TimePicker = (props: TimePickerProps) => {
             onKeyUp={(event) => {
               event.stopPropagation();
               if (event.key === "Enter" || event.key === "Escape") {
-                setOpen(false);
+                handleOpenChange(false);
               }
             }}
             onBlur={onBlur}
@@ -219,6 +295,9 @@ export { TimePicker };
 
 // Format the date for display
 const formatDateValue = (date: DateType, format: string): string => {
-  if (!date?.isValid()) return "";
-  return date.format(format);
+  if (!date) return "";
+  if (typeof date === "object" && "isValid" in date && date.isValid()) {
+    return date.format(format);
+  }
+  return "";
 };

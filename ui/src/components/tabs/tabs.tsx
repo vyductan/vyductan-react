@@ -23,33 +23,36 @@ type TabsProps = {
   defaultValue?: never;
   onValueChange?: never;
   children?: never;
-} & {
-  type?: TabsType;
-  style?: React.CSSProperties;
-  className?: string;
-  classNames?: {
-    root?: string;
-    list?: string;
-    trigger?: string;
+} & Omit<
+  TabsRootProps,
+  "value" | "defaultValue" | "onValueChange" | "children" | "onChange"
+> & {
+    type?: TabsType;
+    style?: React.CSSProperties;
+    className?: string;
+    classNames?: {
+      root?: string;
+      list?: string;
+      trigger?: string;
+    };
+    /**
+     * Initial active TabPane's key, if activeKey is not set
+     */
+    defaultActiveKey?: TabsRootProps["defaultValue"];
+    activeKey?: TabsRootProps["value"];
+    items: TabItemDef[];
+    onChange?: (activeKey: string) => void;
+
+    /**
+     * Extras content (left|right)
+     */
+    tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
+    tabBarStyle?: React.CSSProperties;
+
+    // styles
+    // list
+    listProps?: TabsListProps;
   };
-  /**
-   * Initial active TabPane's key, if activeKey is not set
-   */
-  defaultActiveKey?: TabsRootProps["defaultValue"];
-  activeKey?: TabsRootProps["value"];
-  items: TabItemDef[];
-  onChange?: (activeKey: string) => void;
-
-  /**
-   * Extras content (left|right)
-   */
-  tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
-  tabBarStyle?: React.CSSProperties;
-
-  // styles
-  // list
-  listProps?: TabsListProps;
-};
 
 const Tabs = (props: TabsProps) => {
   const {

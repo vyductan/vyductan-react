@@ -9,7 +9,7 @@ import { LoadingIcon } from "../button/loading-icon";
 
 export type OwnSwitchProps = Omit<
   React.ComponentProps<typeof SwitchPrimitive.Root>,
-  "onChange" | "onCheckedChange"
+  "onChange" | "onCheckedChange" | "value"
 > & {
   onChange?: (checked: boolean) => void;
   /** Additional class name for the switch container */

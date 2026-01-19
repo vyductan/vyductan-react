@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { Avatar } from "@/components/ui/avatar";
+
+import { Avatar } from "@acme/ui/components/avatar";
 
 interface ListItemMetaProps {
   avatar?: ReactNode;
@@ -17,7 +18,7 @@ const ListItemMeta = ({
   return (
     <div data-slot="list-item-meta" className="flex items-start gap-3">
       {avatar && (
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {typeof avatar === "string" ? <Avatar src={avatar} /> : avatar}
         </div>
       )}

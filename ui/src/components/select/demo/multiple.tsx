@@ -1,7 +1,8 @@
-import type { SelectProps } from "@/components/ui/select";
 import type React from "react";
-import { Select } from "@/components/ui/select";
-import { Space } from "@/components/ui/space";
+
+import type { SelectProps } from "@acme/ui/components/select";
+import { Select } from "@acme/ui/components/select";
+import { Space } from "@acme/ui/components/space";
 
 const options: SelectProps["options"] = [];
 

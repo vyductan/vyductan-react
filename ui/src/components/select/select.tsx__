@@ -15,7 +15,7 @@ import type {
   FlattenOptionData,
   SelectValueType,
 } from "./types";
-import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
+import { SelectContent, SelectItem, Select } from "../../shadcn/select";
 import { Empty } from "../empty";
 import { SelectTrigger, SelectValue } from "./_components";
 import { SelectMultiple } from "./_components/select-input/content/multiple-content";
@@ -354,7 +354,7 @@ const Select = <
   const ContentComp = dropdownRender ? dropdownRender(content) : content;
 
   return (
-    <SelectRoot
+    <Select
       key={key}
       defaultValue={
         isDefault ? (defaultValue as string | undefined) : undefined
@@ -437,7 +437,7 @@ const Select = <
       >
         {ContentComp}
       </SelectContent>
-    </SelectRoot>
+    </Select>
   );
 };
 

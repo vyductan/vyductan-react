@@ -118,7 +118,9 @@ export const SwiperPreview = ({
                   <div
                   // className="swiper-zoom-container"
                   >
-                    <img {...imgProps} />
+                    <picture>
+                      <img alt="swiper preview" {...imgProps} />
+                    </picture>
                   </div>
                 </SwiperSlide>
               ))}
@@ -140,7 +142,9 @@ export const SwiperPreview = ({
                   <div
                   // className="swiper-zoom-container"
                   >
-                    <img {...imgProps} />
+                    <picture>
+                      <img alt="swiper thumb" {...imgProps} />
+                    </picture>
                   </div>
                 </SwiperSlide>
               ))}

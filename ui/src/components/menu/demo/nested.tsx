@@ -1,9 +1,8 @@
-"use client";
-
-import type { ItemType } from "@/components/ui/menu";
 import type React from "react";
-import { Menu } from "@/components/ui/menu";
 import { AppWindow, Mail, Settings } from "lucide-react";
+
+import type { ItemType } from "@acme/ui/components/menu";
+import { Menu } from "@acme/ui/components/menu";
 
 const items: ItemType[] = [
   {

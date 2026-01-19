@@ -221,11 +221,13 @@ const Dragger = ({
         {...props}
       >
         {preview && showUploadList ? (
-          <img
-            src={preview}
-            alt="Preview"
-            className="h-full w-full object-contain"
-          />
+          <picture>
+            <img
+              src={preview}
+              alt="Preview"
+              className="h-full w-full object-contain"
+            />
+          </picture>
         ) : children ? (
           <div>{children(fileInputRef, reset)}</div>
         ) : (

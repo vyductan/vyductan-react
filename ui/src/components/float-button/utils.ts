@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import raf from "@rc-component/util/lib/raf";
 
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 export function isWindow(object: any): object is Window {
   return object !== null && object !== undefined && object === object.window;
 }

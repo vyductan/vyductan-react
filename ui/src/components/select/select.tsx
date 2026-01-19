@@ -2,18 +2,23 @@
 
 import type { VariantProps } from "class-variance-authority";
 import React from "react";
-import { tagColors } from "@/components/ui/tag";
 import useControlledState from "@rc-component/util/lib/hooks/useControlledState";
 
+import { tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { SelectShadcnProps } from "./_components";
 import type { FlattenOptionData, OptionType, SelectValueType } from "./types";
-import { SelectContent, SelectItem, SelectRoot } from "../../shadcn/select";
 import { Empty } from "../empty";
-import { SelectTrigger, SelectValue } from "./_components";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Select as ShadcnSelect,
+} from "./_components";
 import { SelectMultipleContent } from "./_components/select-multiple-content";
 import { SelectContext } from "./context";
 
@@ -38,7 +43,7 @@ type SelectMultipleOrTagsProps<
   mode: "multiple" | "tags";
 
   defaultValue?: TValue[];
-  value?: TValue;
+  value?: TValue[];
   onChange?: (value: TValue[], option?: OptionType<TValue, TRecord>[]) => void;
 };
 
@@ -82,7 +87,7 @@ type SelectProps<
     // Base
     showSearch?: boolean;
     children?: React.ReactNode;
-  };
+  } & React.AriaAttributes;
 
 const Select = <
   TValue extends SelectValueType = SelectValueType,
@@ -121,6 +126,7 @@ const Select = <
     value,
     onChange,
     children,
+    showSearch: _showSearch, // Destructure to prevent it from being passed to DOM
     ...triggerProps
   } = props;
 
@@ -211,7 +217,6 @@ const Select = <
                     triggerChange(o.value);
                   }
                 }}
-                isActive={selectedValues.includes(o.value)}
               >
                 {optionContent}
               </SelectItem>
@@ -231,7 +236,7 @@ const Select = <
         triggerChange: triggerChange as (value?: SelectValueType) => void,
       }}
     >
-      <SelectRoot
+      <ShadcnSelect
         key={key}
         defaultValue={
           isDefault ? (defaultValue as string | undefined) : undefined
@@ -248,6 +253,7 @@ const Select = <
       >
         <SelectTrigger
           id={id}
+          aria-label={placeholder}
           loading={loading}
           disabled={disabled}
           className={cn(
@@ -302,7 +308,7 @@ const Select = <
         >
           {ContentComp}
         </SelectContent>
-      </SelectRoot>
+      </ShadcnSelect>
     </SelectContext.Provider>
   );
 };

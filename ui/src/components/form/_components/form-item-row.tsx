@@ -1,12 +1,12 @@
-import { cn } from "@/lib/utils";
-
-import type { ColProps } from "../../grid";
-import type { FormLabelAlign, FormLayout } from "../types";
+import { cn } from "@acme/ui/lib/utils";
 import {
   FieldError,
   Field as ShadcnField,
   FieldDescription as ShadcnFieldDescription,
-} from "../../../shadcn/field";
+} from "@acme/ui/shadcn/field";
+
+import type { ColProps } from "../../grid";
+import type { FormLabelAlign, FormLayout } from "../types";
 import { FieldLabel } from "../../field";
 import { Col, Row } from "../../grid";
 
@@ -109,9 +109,6 @@ const FormItemRow = ({
         >
           {label ? (
             <Col
-              data-slot={
-                labelCol ? `col-${labelCol.span}-form-item-label` : undefined
-              }
               className={cn(
                 "pr-3 text-end",
                 layout === "vertical" && "text-start",
@@ -126,12 +123,10 @@ const FormItemRow = ({
             </Col>
           ) : null}
           <Col
-            data-slot={
-              wrapperCol
-                ? `col-${wrapperCol.span}-form-item-control`
-                : undefined
-            }
-            className={cn("flex-1", !label && "ml-auto")}
+            className={cn(
+              "flex-1",
+              !label && layout !== "vertical" && "ml-auto",
+            )}
             style={{
               width: label ? undefined : "100%",
             }}

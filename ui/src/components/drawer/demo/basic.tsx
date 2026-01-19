@@ -1,9 +1,8 @@
-"use client";
-
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Drawer } from "@/components/ui/drawer";
+
+import { Button } from "@acme/ui/components/button";
+import { Drawer } from "@acme/ui/components/drawer";
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);

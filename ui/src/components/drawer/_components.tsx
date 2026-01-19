@@ -132,4 +132,4 @@ export {
   DrawerTrigger,
   DrawerClose,
   DrawerPortal,
-} from "../../shadcn/drawer";
+} from "@acme/ui/shadcn/drawer";

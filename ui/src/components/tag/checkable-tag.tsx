@@ -5,8 +5,10 @@ import { cn } from "@acme/ui/lib/utils";
 import type { TagProps } from "./tag";
 import { Tag } from "./tag";
 
-export interface CheckableTagProps
-  extends Omit<TagProps, "checked" | "onClose" | "closeIcon" | "onChange"> {
+export interface CheckableTagProps extends Omit<
+  TagProps,
+  "checked" | "onClose" | "closeIcon" | "onChange"
+> {
   checked?: boolean;
   onChange?: (checked: boolean) => void;
 }

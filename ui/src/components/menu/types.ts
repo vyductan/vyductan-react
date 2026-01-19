@@ -12,8 +12,9 @@ interface ItemSharedProps {
   className?: string;
 }
 
-export interface SubMenuType<T extends MenuItemType = MenuItemType>
-  extends ItemSharedProps {
+export interface SubMenuType<
+  T extends MenuItemType = MenuItemType,
+> extends ItemSharedProps {
   icon?: React.ReactNode;
   theme?: "dark" | "filled";
   children: ItemType<T>[];
@@ -50,8 +51,9 @@ export interface MenuItemType extends ItemSharedProps {
   onClick?: MenuClickEventHandler;
 }
 
-export interface MenuItemGroupType<T extends MenuItemType = MenuItemType>
-  extends ItemSharedProps {
+export interface MenuItemGroupType<
+  T extends MenuItemType = MenuItemType,
+> extends ItemSharedProps {
   type: "group";
   label?: React.ReactNode;
   children?: ItemType<T>[];

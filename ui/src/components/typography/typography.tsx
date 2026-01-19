@@ -116,7 +116,7 @@ type TitleProps = BaseTypographyProps & {
 };
 
 const Title = ({ level = 1, className, children, ...props }: TitleProps) => {
-  const Component = `h${level}` as keyof React.JSX.IntrinsicElements;
+  const Component = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5";
 
   const sizeClasses = {
     1: "text-4xl font-bold tracking-tight",
@@ -184,11 +184,7 @@ const Paragraph = ({
   return (
     <Typography
       asChild
-      className={cn(
-        "leading-7 [&:not(:first-child)]:mt-6",
-        spacingClasses,
-        className,
-      )}
+      className={cn("not-first:mt-6", spacingClasses, className)}
       {...props}
     >
       <p />

@@ -11,13 +11,11 @@ export function triggerNativeEventFor<T>(
   }: { event: keyof HTMLElementEventMap; [key: string]: string | undefined },
 ) {
   if (!(element instanceof Element)) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     throw new TypeError(`Expected an Element but received ${element} instead!`);
   }
 
   const [prop, value] = Object.entries(valueObject)[0] ?? [];
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const prototype = Object.getPrototypeOf(element);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const desc = Object.getOwnPropertyDescriptor(prototype, prop!);

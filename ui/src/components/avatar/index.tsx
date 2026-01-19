@@ -1,7 +1,7 @@
 import type { XOR } from "ts-xor";
 import React from "react";
 
-import type { BadgeProps as ShadcnBadgeProps } from "@acme/ui/shadcn/badge";
+import type { Badge as ShadcnBadge } from "@acme/ui/shadcn/badge";
 import {
   AvatarFallback,
   AvatarImage,
@@ -11,6 +11,7 @@ import {
 import type { OwnAvatarProps } from "./avatar";
 import { InternalAvatar } from "./avatar";
 
+type ShadcnBadgeProps = React.ComponentProps<typeof ShadcnBadge>;
 type AvatarProps = XOR<OwnAvatarProps, ShadcnBadgeProps>;
 const Avatar = (props: AvatarProps) => {
   const isAvatarShadcn = React.Children.toArray(props.children).some(

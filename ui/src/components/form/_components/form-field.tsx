@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -31,17 +30,13 @@ import { FieldMessage } from "./form-message";
 type FieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-  TTransformedValues = TFieldValues,
-> = Omit<
-  ControllerProps<TFieldValues, TName, TTransformedValues>,
-  "render" | "name"
-> &
+> = Omit<ControllerProps<TFieldValues, TName>, "render" | "name"> &
   Pick<
     FormItemLabelProps,
     "layout" | "labelAlign" | "labelCol" | "required"
   > & {
     ref?: React.ForwardedRef<HTMLDivElement>;
-    name?: ControllerProps<TFieldValues, TName, TTransformedValues>["name"];
+    name?: ControllerProps<TFieldValues, TName>["name"];
     label?: string | React.JSX.Element;
     description?: React.ReactNode;
     className?: string;
@@ -49,9 +44,7 @@ type FieldProps<
     help?:
       | React.ReactNode
       | ((
-          ctx: Parameters<
-            ControllerProps<TFieldValues, TName, TTransformedValues>["render"]
-          >[0],
+          ctx: Parameters<ControllerProps<TFieldValues, TName>["render"]>[0],
         ) => React.ReactNode);
     validateStatus?: "success" | "warning" | "error" | "validating";
 
@@ -66,14 +59,13 @@ type FieldProps<
 
     children?:
       | React.ReactElement
-      | ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
+      | ControllerProps<TFieldValues, TName>["render"];
 
-    render?: ControllerProps<TFieldValues, TName, TTransformedValues>["render"];
+    render?: ControllerProps<TFieldValues, TName>["render"];
   };
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
-  TTransformedValues = TFieldValues,
 >({
   control,
   name,
@@ -101,7 +93,7 @@ const FormField = <
   valuePropName,
 
   ...props
-}: FieldProps<TFieldValues, TName, TTransformedValues>) => {
+}: FieldProps<TFieldValues, TName>) => {
   const formContext = useFormContext<TFieldValues, any, TFieldValues>();
   const mergedLayout = layout ?? formContext?.layout;
   const classNames = formContext?.classNames;

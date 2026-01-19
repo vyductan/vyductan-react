@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 // Jun 15, 2024
 import * as React from "react";
 import raf from "@rc-component/util/lib/raf";

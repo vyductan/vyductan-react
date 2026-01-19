@@ -1,11 +1,12 @@
-import { Icon } from "../../icons";
-import { cn } from "../../lib/utils";
 import {
   SheetContent as ShadcnSheetContent,
   SheetHeader as ShadcnSheetHeader,
   SheetTitle as ShadcnSheetTitle,
   SheetClose,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";
+
+import { Icon } from "../../icons";
+import { cn } from "../../lib/utils";
 import { Button } from "../button";
 
 type SheetContentProps = React.ComponentProps<typeof ShadcnSheetContent>;
@@ -79,4 +80,4 @@ export {
   SheetDescription,
   Sheet as SheetRoot,
   SheetTrigger,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";
