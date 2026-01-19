@@ -12,9 +12,13 @@ import type {
   NodeKey,
 } from "lexical";
 import type { JSX } from "react";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { HashtagNode } from "@lexical/hashtag";
-import { LinkNode } from "@lexical/link";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
@@ -29,7 +33,6 @@ import {
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
-  $isRangeSelection,
   $setSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
@@ -39,80 +42,26 @@ import {
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
-  LineBreakNode,
-  ParagraphNode,
-  RootNode,
   SELECTION_CHANGE_COMMAND,
-  TextNode,
 } from "lexical";
 
+import {
+  clearImageCache,
+  useSuspenseImage,
+} from "../editor-hooks/use-suspense-image";
 import { ContentEditable } from "../editor-ui/content-editable";
+import { ImageContextMenu } from "../editor-ui/image-context-menu";
 import { ImageResizer } from "../editor-ui/image-resizer";
-import { EmojiNode } from "../nodes/emoji-node";
 import { $isImageNode } from "../nodes/image-node";
-import { KeywordNode } from "../nodes/keyword-node";
 // import brokenImage from '../images/image-broken.svg';
 import { EmojisPlugin } from "../plugins/emojis-plugin";
 import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { LinkPlugin } from "../plugins/link-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
-
-const loadedImageCache = new Set<string>();
-const pendingImageCache = new Map<string, Promise<void>>();
-const failedImageCache = new Map<string, Error>();
+import { ImagePreview } from "./image-preview";
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
   createCommand("RIGHT_CLICK_IMAGE_COMMAND");
-
-function useSuspenseImage(src: string) {
-  if (loadedImageCache.has(src)) {
-    return;
-  }
-
-  const pending = pendingImageCache.get(src);
-  if (pending) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error -- React Suspense expects a Promise to be thrown
-    throw pending;
-  }
-
-  const failed = failedImageCache.get(src);
-  if (failed) {
-    throw failed;
-  }
-
-  const promise = new Promise<void>((resolve, reject) => {
-    const img = new Image();
-
-    const cleanup = () => {
-      img.removeEventListener("load", onLoad);
-      img.removeEventListener("error", onError);
-    };
-
-    const onLoad = () => {
-      cleanup();
-      pendingImageCache.delete(src);
-      failedImageCache.delete(src);
-      loadedImageCache.add(src);
-      resolve();
-    };
-
-    const onError = () => {
-      cleanup();
-      pendingImageCache.delete(src);
-      const error = new Error(`Image failed to load: ${src}`);
-      failedImageCache.set(src, error);
-      reject(error);
-    };
-
-    img.addEventListener("load", onLoad);
-    img.addEventListener("error", onError);
-    img.src = src;
-  });
-
-  pendingImageCache.set(src, promise);
-  // eslint-disable-next-line @typescript-eslint/only-throw-error -- React Suspense expects a Promise to be thrown
-  throw promise;
-}
 
 function LazyImage({
   altText,
@@ -121,8 +70,10 @@ function LazyImage({
   src,
   width,
   height,
-  maxWidth,
+  maxWidth: _maxWidth,
   onError,
+  onContextMenu,
+  onDoubleClick,
 }: {
   altText: string;
   className: string | null;
@@ -132,37 +83,89 @@ function LazyImage({
   src: string;
   width: "inherit" | number;
   onError: () => void;
+  onContextMenu: (e: React.MouseEvent) => void;
+  onDoubleClick: (e: React.MouseEvent) => void;
 }): JSX.Element {
-  useSuspenseImage(src);
+  const resolvedSrc = useSuspenseImage(src);
   return (
-    <img
-      className={className ?? undefined}
-      src={src}
-      alt={altText}
-      ref={imageRef}
-      style={{
-        height,
-        maxWidth,
-        width,
-      }}
-      onError={onError}
-      draggable="false"
-    />
+    <picture>
+      <img
+        className={className ?? undefined}
+        src={resolvedSrc}
+        alt={altText}
+        ref={imageRef}
+        style={{
+          height: height === "inherit" ? "auto" : height,
+          maxWidth: "100%",
+          width: width === "inherit" ? "100%" : width,
+          objectFit: "contain",
+        }}
+        onError={onError}
+        draggable="false"
+        onContextMenu={onContextMenu}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          // Prevent other double click handlers
+          onDoubleClick(e);
+        }}
+      />
+    </picture>
   );
 }
 
 function BrokenImage(): JSX.Element {
   return (
-    <img
-      src={""}
+    <div
+      className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-100"
       style={{
         height: 200,
-        opacity: 0.2,
         width: 200,
       }}
-      draggable="false"
-    />
+    >
+      <div className="flex flex-col items-center gap-2 p-4 text-center">
+        <svg
+          className="h-12 w-12 text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={1}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        <span className="text-sm text-gray-500">Image failed to load</span>
+      </div>
+    </div>
   );
+}
+
+class ImageErrorBoundary extends React.Component<
+  {
+    children: JSX.Element;
+    fallback: JSX.Element;
+    onError?: (error: unknown) => void;
+  },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    this.props.onError?.(error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
 }
 
 export default function ImageComponent({
@@ -176,6 +179,7 @@ export default function ImageComponent({
   showCaption,
   caption,
   captionsEnabled,
+  loading,
 }: {
   altText: string;
   caption: LexicalEditor;
@@ -187,6 +191,7 @@ export default function ImageComponent({
   src: string;
   width: "inherit" | number;
   captionsEnabled: boolean;
+  loading?: boolean;
 }): JSX.Element {
   const imageRef = useRef<null | HTMLImageElement>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -197,6 +202,13 @@ export default function ImageComponent({
   const [selection, setSelection] = useState<BaseSelection | null>(null);
   const activeEditorRef = useRef<LexicalEditor | null>(null);
   const [isLoadError, setIsLoadError] = useState<boolean>(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{
+    isOpen: boolean;
+    position: { x: number; y: number };
+  } | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const isEditable = useLexicalEditable();
 
   const $onDelete = useCallback(
@@ -291,25 +303,23 @@ export default function ImageComponent({
   );
 
   const onRightClick = useCallback(
-    (event: MouseEvent): void => {
-      editor.getEditorState().read(() => {
-        const latestSelection = $getSelection();
-        const domElement = event.target as HTMLElement;
-        if (
-          domElement.tagName === "IMG" &&
-          $isRangeSelection(latestSelection) &&
-          latestSelection.getNodes().length === 1
-        ) {
-          editor.dispatchCommand(RIGHT_CLICK_IMAGE_COMMAND, event);
-        }
+    (
+      event: React.MouseEvent<HTMLDivElement> | React.MouseEvent<Element>,
+    ): void => {
+      event.preventDefault();
+      setContextMenu({
+        isOpen: true,
+        position: { x: event.clientX, y: event.clientY },
       });
     },
-    [editor],
+    [],
   );
+
+  // Attach contextmenu event listener to prevent default browser menu
 
   useEffect(() => {
     let isMounted = true;
-    const rootElement = editor.getRootElement();
+    // const rootElement = editor.getRootElement();
     const unregister = mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
         if (isMounted) {
@@ -365,12 +375,9 @@ export default function ImageComponent({
       ),
     );
 
-    rootElement?.addEventListener("contextmenu", onRightClick);
-
     return () => {
       isMounted = false;
       unregister();
-      rootElement?.removeEventListener("contextmenu", onRightClick);
     };
   }, [
     clearSelection,
@@ -386,14 +393,14 @@ export default function ImageComponent({
     setSelected,
   ]);
 
-  const setShowCaption = () => {
+  const setShowCaption = useCallback(() => {
     editor.update(() => {
       const node = $getNodeByKey(nodeKey);
       if ($isImageNode(node)) {
         node.setShowCaption(true);
       }
     });
-  };
+  }, [editor, nodeKey]);
 
   const onResizeEnd = (
     nextWidth: "inherit" | number,
@@ -416,81 +423,220 @@ export default function ImageComponent({
     setIsResizing(true);
   };
 
+  // Context menu handlers
+  const handleReplace = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.addEventListener("change", (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // TODO: Upload new image and replace node's src
+        // This requires access to the onImageUpload callback
+        // For now, just create a local URL
+        const reader = new FileReader();
+        reader.addEventListener("load", (event) => {
+          const newSrc = event.target?.result as string;
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isImageNode(node)) {
+              node.setSrc(newSrc);
+            }
+          });
+        });
+        reader.readAsDataURL(file);
+      }
+    });
+    input.click();
+  }, [editor, nodeKey]);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      const response = await fetch(src);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob }),
+      ]);
+    } catch (error) {
+      console.error("Failed to copy image:", error);
+    }
+  }, [src]);
+
+  const handleDownload = useCallback(() => {
+    const link = document.createElement("a");
+    link.href = src;
+    link.download = altText || "image";
+    link.click();
+  }, [src, altText]);
+
+  const handleCaptionToggle = useCallback(() => {
+    setShowCaption();
+  }, [setShowCaption]);
+
+  const handleDelete = useCallback(() => {
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if ($isImageNode(node)) {
+        node.remove();
+      }
+    });
+  }, [editor, nodeKey]);
+
+  const handleImageError = useCallback(() => {
+    if (retryCount < 1) {
+      clearImageCache(src);
+
+      setRetryCount((prev) => prev + 1);
+    } else {
+      setIsLoadError(true);
+    }
+  }, [retryCount, src]);
+
   const draggable = isSelected && $isNodeSelection(selection) && !isResizing;
   const isFocused = (isSelected || isResizing) && isEditable;
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          className="relative overflow-hidden rounded-lg"
+          style={{
+            width: width === "inherit" ? "100%" : width,
+            height: height === "inherit" ? 200 : height,
+            maxWidth,
+            background: "linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%)",
+          }}
+        >
+          {/* Icon in center */}
+          <div className="absolute inset-0 flex animate-pulse items-center justify-center">
+            <svg
+              className="h-16 w-16 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        </div>
+      }
+    >
       <>
-        <div draggable={draggable}>
-          {isLoadError ? (
-            <BrokenImage />
-          ) : (
-            <LazyImage
-              className={`max-w-full cursor-default ${
-                isFocused
-                  ? `${$isNodeSelection(selection) ? "draggable cursor-grab active:cursor-grabbing" : ""} focused ring-primary ring-2 ring-offset-2`
-                  : null
-              }`}
-              src={src}
-              altText={altText}
+        <div
+          className="relative inline-block select-none"
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+        >
+          <div
+            draggable={draggable}
+            className="w-full max-w-full overflow-hidden"
+          >
+            {isLoadError ? (
+              <BrokenImage />
+            ) : (
+              <div className="relative">
+                {loading && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
+                    <div className="flex flex-col items-center gap-2 rounded-lg bg-white/90 p-3 shadow-lg">
+                      <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                      <span className="text-xs font-medium text-gray-700">
+                        Uploading...
+                      </span>
+                    </div>
+                  </div>
+                )}
+                <ImageErrorBoundary
+                  key={`${src}-${retryCount}`}
+                  onError={handleImageError}
+                  fallback={<BrokenImage />}
+                >
+                  <LazyImage
+                    className={`h-auto w-full max-w-full cursor-default object-contain ${
+                      loading ? "opacity-90" : ""
+                    } ${
+                      isFocused
+                        ? `${$isNodeSelection(selection) ? "draggable cursor-grab active:cursor-grabbing" : ""} focused ring-primary ring-2 ring-offset-2`
+                        : null
+                    }`}
+                    src={src}
+                    altText={altText}
+                    imageRef={imageRef}
+                    width={width}
+                    height={height}
+                    maxWidth={maxWidth}
+                    onError={() => setIsLoadError(true)}
+                    onContextMenu={onRightClick}
+                    onDoubleClick={() => setIsPreviewOpen(true)}
+                  />
+                </ImageErrorBoundary>
+              </div>
+            )}
+          </div>
+
+          {showCaption && (
+            <div className="image-caption-container absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t bg-white/90 p-0">
+              <LexicalNestedComposer initialEditor={caption}>
+                <AutoFocusPlugin />
+                <MentionsPlugin />
+                <LinkPlugin />
+                <EmojisPlugin />
+                <HashtagPlugin />
+                <KeywordsPlugin />
+                <HistoryPlugin />
+                <RichTextPlugin
+                  contentEditable={
+                    <ContentEditable
+                      className="ImageNode__contentEditable user-select-text word-break-break-word caret-primary relative block min-h-5 w-[calc(100%-20px)] cursor-text resize-none border-0 p-2.5 text-sm whitespace-pre-wrap outline-none"
+                      placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground overflow-hidden absolute top-2.5 left-2.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
+                      placeholder="Enter a caption..."
+                    />
+                  }
+                  ErrorBoundary={LexicalErrorBoundary}
+                />
+              </LexicalNestedComposer>
+            </div>
+          )}
+          {resizable && isEditable && (isFocused || isHovering) && (
+            <ImageResizer
+              showCaption={showCaption}
+              setShowCaption={setShowCaption}
+              editor={editor}
+              buttonRef={buttonRef}
               imageRef={imageRef}
-              width={width}
-              height={height}
               maxWidth={maxWidth}
-              onError={() => setIsLoadError(true)}
+              onResizeStart={onResizeStart}
+              onResizeEnd={onResizeEnd}
+              captionsEnabled={!isLoadError && captionsEnabled}
             />
           )}
         </div>
-
-        {showCaption && (
-          <div className="image-caption-container absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t bg-white/90 p-0">
-            <LexicalNestedComposer
-              initialEditor={caption}
-              initialNodes={[
-                RootNode,
-                TextNode,
-                LineBreakNode,
-                ParagraphNode,
-                LinkNode,
-                EmojiNode,
-                HashtagNode,
-                KeywordNode,
-              ]}
-            >
-              <AutoFocusPlugin />
-              <MentionsPlugin />
-              <LinkPlugin />
-              <EmojisPlugin />
-              <HashtagPlugin />
-              <KeywordsPlugin />
-              <HistoryPlugin />
-              <RichTextPlugin
-                contentEditable={
-                  <ContentEditable
-                    className="ImageNode__contentEditable user-select-text word-break-break-word caret-primary relative block min-h-5 w-[calc(100%-20px)] cursor-text resize-none border-0 p-2.5 text-sm whitespace-pre-wrap outline-none"
-                    placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground overflow-hidden absolute top-2.5 left-2.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
-                    placeholder="Enter a caption..."
-                  />
-                }
-                ErrorBoundary={LexicalErrorBoundary}
-              />
-            </LexicalNestedComposer>
-          </div>
-        )}
-        {resizable && $isNodeSelection(selection) && isFocused && (
-          <ImageResizer
-            showCaption={showCaption}
-            setShowCaption={setShowCaption}
-            editor={editor}
-            buttonRef={buttonRef}
-            imageRef={imageRef}
-            maxWidth={maxWidth}
-            onResizeStart={onResizeStart}
-            onResizeEnd={onResizeEnd}
-            captionsEnabled={!isLoadError && captionsEnabled}
+        {isPreviewOpen && (
+          <ImagePreview
+            src={src}
+            altText={altText}
+            isOpen={isPreviewOpen}
+            onClose={() => setIsPreviewOpen(false)}
           />
         )}
       </>
+
+      {/* Image Context Menu */}
+      {contextMenu && (
+        <ImageContextMenu
+          isOpen={contextMenu.isOpen}
+          position={contextMenu.position}
+          onReplace={handleReplace}
+          onCopy={handleCopy}
+          onDownload={handleDownload}
+          onCaption={handleCaptionToggle}
+          onDelete={handleDelete}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
     </Suspense>
   );
 }

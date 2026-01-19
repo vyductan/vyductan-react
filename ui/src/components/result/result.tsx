@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
 
-import { Icon } from "../../icons";
-import { cn } from "../../lib/utils";
 import {
   Empty,
   EmptyContent,
@@ -9,7 +7,12 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "../../shadcn/empty";
+} from "@acme/ui/shadcn/empty";
+
+import type { ResultStatusConfig } from "../config-provider/context";
+import { Icon } from "../../icons";
+import { cn } from "../../lib/utils";
+import { useComponentConfig } from "../config-provider";
 
 type ResultProps = {
   status?: "success" | "info" | "warning" | "error" | "500" | "404";
@@ -41,13 +44,20 @@ const Result = ({
   subTitle,
   extra,
   className,
-  icons = defaultIcons,
+  icons: iconsProp,
 }: ResultProps) => {
+  const resultConfig = useComponentConfig("result");
+  const icons = iconsProp ?? defaultIcons;
+
   let icon: ReactNode = <></>;
   let iconColor = "";
   let titleColor = "";
-  let defaultTitle = "";
-  let defaultSubTitle = "";
+  let defaultTitle: React.ReactNode = "";
+  let defaultSubTitle: React.ReactNode = "";
+
+  const statusConfig = resultConfig?.[status as keyof typeof resultConfig] as
+    | ResultStatusConfig
+    | undefined;
 
   switch (status) {
     case "success": {
@@ -92,8 +102,13 @@ const Result = ({
     }
   }
 
-  const displayTitle = title ?? defaultTitle;
-  const displaySubTitle = subTitle ?? defaultSubTitle;
+  // Override icon if defined in config for this status
+  if (statusConfig?.icon) {
+    icon = statusConfig.icon;
+  }
+
+  const displayTitle = title ?? statusConfig?.title ?? defaultTitle;
+  const displaySubTitle = subTitle ?? statusConfig?.subTitle ?? defaultSubTitle;
 
   return (
     <Empty className={cn(className)} role="status" aria-live="polite">

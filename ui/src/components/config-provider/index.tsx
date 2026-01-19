@@ -1,6 +1,7 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from "react";
 import useMemo from "rc-util/lib/hooks/useMemo";
 
@@ -12,18 +13,20 @@ import type {
   FormConfig,
   InputConfig,
   InputNumberConfig,
+  LayoutConfig,
   MentionsConfig,
   PaginationConfig,
   ResultConfig,
   SelectConfig,
+  TableConfig,
+  TagConfig,
   TextAreaConfig,
 } from "./context";
 import { ConfigContext } from "./context";
 
-export { useUiConfig, UiConfigProvider } from "./config-provider";
 export type { Variant } from "./context";
 export { Variants } from "./context";
-export { ConfigContext } from "./context";
+export { ConfigContext, useComponentConfig } from "./context";
 
 export interface ConfigProviderProps {
   locale?: Locale;
@@ -36,6 +39,7 @@ export interface ConfigProviderProps {
   pagination?: PaginationConfig;
   result?: ResultConfig;
   select?: SelectConfig;
+  tag?: TagConfig;
   textArea?: TextAreaConfig;
   // getTargetContainer?: () => HTMLElement | Window;
   // getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;
@@ -89,7 +93,7 @@ export interface ConfigProviderProps {
   // statistic?: ComponentStyleConfig;
   // steps?: ComponentStyleConfig;
   // image?: ImageConfig;
-  // layout?: ComponentStyleConfig;
+  layout?: LayoutConfig;
   // list?: ListConfig;
   // modal?: ModalConfig;
   // progress?: ComponentStyleConfig;
@@ -108,7 +112,7 @@ export interface ConfigProviderProps {
   // treeSelect?: TreeSelectConfig;
   // message?: ComponentStyleConfig;
   // tag?: TagConfig;
-  // table?: TableConfig;
+  table?: TableConfig;
   // card?: CardConfig;
   // tabs?: TabsConfig;
   // timeline?: ComponentStyleConfig;

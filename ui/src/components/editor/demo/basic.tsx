@@ -1,4 +1,4 @@
-import { Editor } from "@/components/ui/editor";
+import { Editor } from "@acme/ui/components/editor";
 
 export default function BasicDemo() {
   return <Editor />;

@@ -1,1 +1,1 @@
-export * from "../../shadcn/aspect-ratio";
+export * from "@acme/ui/shadcn/aspect-ratio";

@@ -1,4 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { CLEAR_EDITOR_COMMAND } from "lexical";
+import { Trash2Icon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
 import {
   DialogClose,
   DialogContent,
@@ -8,15 +12,12 @@ import {
   Dialog as DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/modal";
+} from "@acme/ui/components/modal";
 import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { CLEAR_EDITOR_COMMAND } from "lexical";
-import { Trash2Icon } from "lucide-react";
+} from "@acme/ui/components/tooltip";
 
 export function ClearEditorActionPlugin() {
   const [editor] = useLexicalComposerContext();

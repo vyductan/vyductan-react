@@ -10,7 +10,7 @@ export const getCircleStyle = (
   percent: number,
   rotateDeg: number,
   gapDegree: number,
-  gapPosition: ProgressProps["gapPosition"] | undefined,
+  gapPosition: ProgressProps["gapPosition"],
   strokeColor: StrokeColorType,
   strokeLinecap: ProgressProps["strokeLinecap"],
   strokeWidth: number,

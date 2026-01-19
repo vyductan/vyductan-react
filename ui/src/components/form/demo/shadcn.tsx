@@ -1,7 +1,10 @@
-"use client";
-
 import type * as React from "react";
-import { Button } from "@/components/ui/button";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
@@ -9,8 +12,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@acme/ui/components/card";
+import { Checkbox } from "@acme/ui/components/checkbox";
 import {
   Field,
   FieldContent,
@@ -22,20 +25,16 @@ import {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-} from "@/components/ui/field";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+} from "@acme/ui/components/field";
+import { RadioGroup, RadioGroupItem } from "@acme/ui/components/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
+} from "@acme/ui/components/select";
+import { Switch } from "@acme/ui/components/switch";
 
 import { Input } from "../../input";
 
@@ -86,8 +85,8 @@ const formSchema = z.object({
 });
 
 export default function FormRhfComplex() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
+    resolver: standardSchemaResolver(formSchema),
     defaultValues: {
       username: "",
       plan: "basic",

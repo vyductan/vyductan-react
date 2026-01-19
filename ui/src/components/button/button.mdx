@@ -1,291 +1,128 @@
----
-title: Button
-description: Displays a button or a component that looks like a button.
-featured: true
-component: true
----
+import { ComponentSource } from "@acme/ui/components/mdx";
 
-import { InfoIcon } from "lucide-react";
+import BasicDemo from "./demo/basic";
+import ColorVariantDemo from "./demo/color-variant";
 
-<Callout variant="info" icon={<InfoIcon />}>
-**Updated:** We have updated the button component to add new sizes: `icon-sm` and `icon-lg`. See the
-[changelog](/docs/components/button#changelog) for more details. Follow the
-instructions to update your project.
+# Button
 
-</Callout>
+A versatile button component with multiple variants, sizes, and styles for all your interaction needs.
 
-<ComponentPreview name="button-basic" />
+## Features
 
-### Color & Variant
-
-You can set the `twoToneColor` prop to a specific primary color for two-tone icons.
-
-<ComponentPreview name="button-color-variant" />
-
-```tsx showLineNumbers
-<Button variant="outline">Button</Button>
-<Button variant="outline" size="icon" aria-label="Submit">
-  <ArrowUpIcon />
-</Button>
-```
-
-## Installation
-
-<CodeTabs>
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-```bash
-npx shadcn@latest add button
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Install the following dependencies:</Step>
-
-```bash
-npm install @radix-ui/react-slot
-```
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="button" title="components/ui/button.tsx" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</CodeTabs>
-
-## Usage
-
-```tsx
-import { Button } from "@/components/ui/button";
-```
-
-```tsx
-<Button variant="outline">Button</Button>
-```
-
-## Cursor
-
-Tailwind v4 [switched](https://tailwindcss.com/docs/upgrade-guide#buttons-use-the-default-cursor) from `cursor: pointer` to `cursor: default` for the button component.
-
-If you want to keep the `cursor: pointer` behavior, add the following code to your CSS file:
-
-```css showLineNumbers title="globals.css"
-@layer base {
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
-  }
-}
-```
+- 🎨 **Multiple Variants** - Solid, outlined, dashed, filled, text, and link styles
+- 🎯 **Color Options** - Primary, danger, and custom color support
+- 📏 **Flexible Sizes** - Small, default, large, and icon button sizes
+- ⚡ **Loading State** - Built-in loading indicator support
+- 🔗 **Link Support** - Use as a button or link with `href` prop
+- ♿ **Accessible** - Full keyboard navigation and ARIA support
+- 🎭 **Polymorphic** - Use `asChild` to render as any element
 
 ## Examples
 
-### Size
+### Basic Usage
 
-<ComponentPreview name="button-size" className="mb-4" />
+The simplest way to use Button with different types.
+
+<ComponentSource src="button/demo/basic.tsx" __comp__={BasicDemo} />
+
+### Color & Variant
+
+You can combine different colors and variants to create various button styles.
+
+<ComponentSource
+  src="button/demo/color-variant.tsx"
+  __comp__={ColorVariantDemo}
+/>
+
+### Different Sizes
 
 ```tsx
 // Small
-<Button size="sm" variant="outline">Small</Button>
-<Button size="icon-sm" aria-label="Submit" variant="outline">
-  <ArrowUpRightIcon />
+<Button size="sm" variant="outlined">Small</Button>
+<Button size="icon-sm" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
 </Button>
 
-// Medium
-<Button variant="outline">Default</Button>
-<Button size="icon" aria-label="Submit" variant="outline">
-  <ArrowUpRightIcon />
+// Medium (default)
+<Button variant="outlined">Default</Button>
+<Button size="icon" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
 </Button>
 
 // Large
-<Button size="lg" variant="outline">Large</Button>
-<Button size="icon-lg" aria-label="Submit" variant="outline">
-  <ArrowUpRightIcon />
+<Button size="lg" variant="outlined">Large</Button>
+<Button size="icon-lg" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
 </Button>
 ```
 
-### Default
-
-<ComponentPreview
-  name="button-default"
-  description="A primary button"
-  className="mb-4"
-/>
+### Button Types
 
 ```tsx
-<Button>Button</Button>
+// Primary button
+<Button type="primary">Primary</Button>
+
+// Default button
+<Button>Default</Button>
+
+// Dashed button
+<Button type="dashed">Dashed</Button>
+
+// Text button
+<Button type="text">Text</Button>
+
+// Link button
+<Button type="link">Link</Button>
 ```
 
-### Outline
-
-<ComponentPreview
-  name="button-outline"
-  description="A button using the outline variant."
-  className="mb-4"
-/>
+### Danger Button
 
 ```tsx
-<Button variant="outline">Outline</Button>
+<Button danger>Danger Button</Button>
+<Button danger type="primary">Danger Primary</Button>
+<Button danger type="text">Danger Text</Button>
 ```
 
-### Secondary
-
-<ComponentPreview
-  name="button-secondary"
-  description="A secondary button"
-  className="mb-4"
-/>
+### Disabled State
 
 ```tsx
-<Button variant="secondary">Secondary</Button>
+<Button disabled>Disabled</Button>
+<Button type="primary" disabled>Primary Disabled</Button>
 ```
 
-### Ghost
-
-<ComponentPreview
-  name="button-ghost"
-  description="A button using the ghost variant"
-  className="mb-4"
-/>
+### Loading State
 
 ```tsx
-<Button variant="ghost">Ghost</Button>
-```
-
-### Destructive
-
-<ComponentPreview
-  name="button-destructive"
-  description="A destructive button"
-  className="mb-4"
-/>
-
-```tsx
-<Button variant="destructive">Destructive</Button>
-```
-
-### Link
-
-<ComponentPreview
-  name="button-link"
-  description="A button using the link variant."
-  className="mb-4"
-/>
-
-```tsx
-<Button variant="link">Link</Button>
-```
-
-### Icon
-
-<ComponentPreview
-  name="button-icon"
-  description="An icon button"
-  className="mb-4"
-/>
-
-```tsx showLineNumbers
-<Button variant="outline" size="icon" aria-label="Submit">
-  <CircleFadingArrowUpIcon />
+<Button type="primary" loading>
+  Loading
 </Button>
 ```
 
-### With Icon
-
-The spacing between the icon and the text is automatically adjusted
-based on the size of the button. You do not need any margin on the icon.
-
-<ComponentPreview
-  name="button-with-icon"
-  description="A button with an icon"
-  className="mb-4"
-/>
+### Icon Button
 
 ```tsx
-<Button variant="outline" size="sm">
-  <IconGitBranch /> New Branch
+<Button variant="outlined" size="icon" aria-label="Submit">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
 </Button>
 ```
 
-### Rounded
+### Button with Icon
 
-Use the `rounded-full` class to make the button rounded.
-
-<ComponentPreview name="button-rounded" className="mb-4" />
+The spacing between the icon and the text is automatically adjusted based on the size of the button.
 
 ```tsx
-<Button variant="outline" size="icon" className="rounded-full">
-  <ArrowUpRightIcon />
+<Button variant="outlined" size="sm">
+  <Icon icon="icon-[lucide--git-branch]" /> New Branch
 </Button>
 ```
 
-### Spinner
+### Link as Button
 
-<ComponentPreview
-  name="button-loading"
-  description="A button with a loading state."
-  className="mb-4"
-/>
+You can use the `asChild` prop to make another component look like a button.
 
-```tsx showLineNumbers
-<Button size="sm" variant="outline" disabled>
-  <Spinner />
-  Submit
-</Button>
-```
-
-### Button Group
-
-To create a button group, use the `ButtonGroup` component. See the [Button Group](/docs/components/button-group) documentation for more details.
-
-<ComponentPreview name="button-group-demo" className="mb-4" />
-
-```tsx showLineNumbers
-<ButtonGroup>
-  <ButtonGroup>
-    <Button variant="outline" size="icon" aria-label="Go Back">
-      <ArrowLeftIcon />
-    </Button>
-  </ButtonGroup>
-  <ButtonGroup>
-    <Button variant="outline">Archive</Button>
-    <Button variant="outline">Report</Button>
-  </ButtonGroup>
-  <ButtonGroup>
-    <Button variant="outline">Snooze</Button>
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="More Options">
-          <MoreHorizontalIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent />
-    </DropdownMenu>
-  </ButtonGroup>
-</ButtonGroup>
-```
-
-### Link
-
-You can use the `asChild` prop to make another component look like a button. Here's an example of a link that looks like a button.
-
-```tsx showLineNumbers
+```tsx
 import { Link } from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui";
 
 export function LinkAsButton() {
   return (
@@ -296,33 +133,90 @@ export function LinkAsButton() {
 }
 ```
 
+### Form Integration
+
+```tsx
+import { Button } from "@/components/ui";
+import { z } from "zod";
+
+import { Form, FormItem, useForm } from "@acme/ui/components/form";
+import { Input } from "@acme/ui/components/input";
+
+const formSchema = z.object({
+  username: z.string().min(1, { message: "Please input your username!" }),
+  password: z.string().min(1, { message: "Please input your password!" }),
+});
+
+function FormExample() {
+  const form = useForm({
+    schema: formSchema,
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+    onSubmit: (data) => {
+      console.log("data", data);
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <FormItem name="username" control={form.control} label="Username">
+        <Input />
+      </FormItem>
+      <FormItem name="password" control={form.control} label="Password">
+        <Input.Password />
+      </FormItem>
+      <FormItem>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </FormItem>
+    </Form>
+  );
+}
+```
+
 ## API Reference
 
-### Button
+### Button Props
 
-The `Button` component is a wrapper around the `button` element that adds a variety of styles and functionality.
+| Property    | Type                                                                 | Default     | Description                                                    |
+| ----------- | -------------------------------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| `type`      | `"default" \| "primary" \| "dashed" \| "link" \| "text"`             | `"default"` | Button type (maps to color/variant combination)                |
+| `color`     | `"default" \| "primary" \| "danger" \| "pink" \| "purple" \| "cyan"` | -           | Button color                                                   |
+| `variant`   | `"solid" \| "outlined" \| "dashed" \| "filled" \| "text" \| "link"`  | -           | Button variant style                                           |
+| `size`      | `"sm" \| "default" \| "lg" \| "icon" \| "icon-sm" \| "icon-lg"`      | `"default"` | Button size                                                    |
+| `danger`    | `boolean`                                                            | `false`     | Whether the button represents a dangerous action               |
+| `loading`   | `boolean`                                                            | `false`     | Whether the button is in loading state                         |
+| `disabled`  | `boolean`                                                            | `false`     | Whether the button is disabled                                 |
+| `htmlType`  | `"button" \| "submit" \| "reset"`                                    | `"button"`  | The native HTML button type                                    |
+| `href`      | `string`                                                             | -           | If provided, button will render as a link                      |
+| `asChild`   | `boolean`                                                            | `false`     | Render button as child component (for polymorphic composition) |
+| `icon`      | `React.ReactNode`                                                    | -           | Icon to display in the button                                  |
+| `shape`     | `"default" \| "circle" \| "round"`                                   | `"default"` | Button shape                                                   |
+| `className` | `string`                                                             | -           | Additional CSS classes                                         |
 
-| Prop      | Type                                                                          | Default     |
-| --------- | ----------------------------------------------------------------------------- | ----------- |
-| `variant` | `"default" \| "outline" \| "ghost" \| "destructive" \| "secondary" \| "link"` | `"default"` |
-| `size`    | `"default" \| "sm" \| "lg" \| "icon" \| "icon-sm" \| "icon-lg"`               | `"default"` |
-| `asChild` | `boolean`                                                                     | `false`     |
+## Migration from Ant Design
 
-## Changelog
+```tsx
+// Ant Design
+import { Button } from 'antd';
+<Button type="primary">Primary</Button>
+<Button type="primary" danger>Danger</Button>
+<Button type="primary" loading>Loading</Button>
 
-### 2025-09-24 New sizes
-
-We have added two new sizes to the button component: `icon-sm` and `icon-lg`. These sizes are used to create icon buttons. To add them, edit `button.tsx` and add the following code under `size` in `buttonVariants`:
-
-```tsx showLineNumbers title="components/ui/button.tsx"
-const buttonVariants = cva("...", {
-  variants: {
-    size: {
-      // ...
-      "icon-sm": "size-8",
-      "icon-lg": "size-10",
-      // ...
-    },
-  },
-});
+// @acme/ui Button
+import { Button } from '@/components/ui';
+<Button type="primary">Primary</Button>
+<Button type="primary" danger>Danger</Button>
+<Button type="primary" loading>Loading</Button>
 ```
+
+### Key Differences
+
+- Uses **Tailwind CSS** for styling instead of Less
+- Supports **polymorphic composition** with `asChild` prop
+- **Color and variant** props can be used independently or together
+- **Icon buttons** require `aria-label` for accessibility
+- **Loading state** uses built-in spinner component

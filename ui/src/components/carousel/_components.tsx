@@ -5,4 +5,4 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-} from "../../shadcn/carousel";
+} from "@acme/ui/shadcn/carousel";

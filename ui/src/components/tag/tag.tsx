@@ -1,12 +1,12 @@
 import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
-import type { BadgeProps } from "@acme/ui/shadcn/badge";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { Badge } from "@acme/ui/shadcn/badge";
 
-import { useUiConfig } from "../config-provider/config-provider";
+import type { BadgeProps } from "../badge";
+import { useComponentConfig } from "../config-provider";
 
 // Based on Vercel
 const color: Record<string, string> = {
@@ -58,9 +58,11 @@ const colorBordered: Record<string, string> = {
 const tagVariants = tv({
   base: [
     "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border font-medium whitespace-nowrap transition-[color,box-shadow]",
-    "[&>svg]:pointer-events-none",
+    "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+
+    // "px-2.5",
   ],
   variants: {
     variant: {
@@ -75,22 +77,22 @@ const tagVariants = tv({
       // own
       solid: "text-white",
     },
-    size: {
-      small: "px-1.5 py-0 text-[11px] [&>svg]:size-2.5",
-      middle: "px-[7px] py-0.5 text-xs [&>svg]:size-3",
-      large: "px-2.5 py-1 text-sm [&>svg]:size-3.5",
-    },
     color,
     bordered: {
       true: "",
       false: "border-transparent",
     },
+    size: {
+      default: "px-[7px] py-0.5 text-xs",
+      small: "px-1.5 py-0.5 text-[10px]",
+      large: "px-2.5 py-1 text-sm",
+    },
   },
   defaultVariants: {
     variant: "default",
-    size: "middle",
     color: "default",
     bordered: true,
+    size: "default",
   },
   compoundVariants: [
     {
@@ -121,13 +123,11 @@ type TagProps = BadgeProps &
     icon?: React.ReactNode;
     closeIcon?: React.ReactNode;
     onClose?: () => void;
-    size?: "small" | "middle" | "large";
   };
 
 const Tag = ({
   className,
   variant,
-  size,
   color,
   bordered: borderedProp,
   icon,
@@ -135,32 +135,36 @@ const Tag = ({
   onClose,
   ...props
 }: TagProps) => {
-  const tagConfig = useUiConfig((state) => state.components.tag);
+  const tagConfig = useComponentConfig("tag");
+  const bordered = borderedProp ?? tagConfig.bordered;
+  const finalVariant = variant ?? tagConfig.variant;
+  const finalColor = color ?? tagConfig.color;
 
-  const bordered = borderedProp ?? tagConfig?.bordered;
+  const finalSize = props.size ?? tagConfig.size;
 
   // Check if color is a hex color (starts with #)
-  const isHexColor = color?.startsWith("#");
+  const isHexColor =
+    typeof finalColor === "string" && finalColor.startsWith("#");
 
   return (
     <Badge
       className={cn(
         tagVariants({
-          variant,
-          size,
-          color: isHexColor ? undefined : color,
+          variant: finalVariant,
+          color: isHexColor ? undefined : finalColor,
           bordered,
+          size: finalSize,
         }),
         closeIcon && "pr-1",
         isHexColor && "text-white",
-        tagConfig?.className,
+        tagConfig.className,
         className,
       )}
       style={
         isHexColor
           ? {
-              backgroundColor: color,
-              borderColor: color,
+              backgroundColor: finalColor,
+              borderColor: finalColor,
             }
           : undefined
       }

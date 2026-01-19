@@ -23,7 +23,7 @@ type BreadcrumbItemDef = {
   href?: string;
   icon?: React.ReactNode;
   className?: string;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  onClick?: React.MouseEventHandler<HTMLLIElement>;
 };
 type OwnBreadcrumbProps<TParams extends AnyObject = AnyObject> = {
   items?: BreadcrumbItemDef[];
@@ -36,6 +36,7 @@ type OwnBreadcrumbProps<TParams extends AnyObject = AnyObject> = {
   ) => React.ReactNode;
   className?: string;
   skeleton?: boolean;
+  separator?: React.ReactNode;
 };
 type BreadcrumbProps<TParams extends AnyObject = AnyObject> = XOR<
   ShadcnBreadcrumbProps,
@@ -53,6 +54,7 @@ const Breadcrumb = (props: BreadcrumbProps) => {
     skeleton,
     params,
     itemRender: itemRenderProp,
+    separator,
   } = props;
   return (
     <ShadcnBreadcrumb className={items.length === 1 ? "hidden" : className}>
@@ -97,7 +99,9 @@ const Breadcrumb = (props: BreadcrumbProps) => {
                   <BreadcrumbPage>{itemRender}</BreadcrumbPage>
                 </BreadcrumbItem>
               )}
-              {index < items.length - 1 && <BreadcrumbSeparator />}
+              {index < items.length - 1 && (
+                <BreadcrumbSeparator>{separator}</BreadcrumbSeparator>
+              )}
             </Fragment>
           );
         })}

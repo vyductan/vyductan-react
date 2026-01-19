@@ -1,13 +1,14 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
 import { Minus, Plus } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";

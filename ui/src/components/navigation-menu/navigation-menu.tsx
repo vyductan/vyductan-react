@@ -1,13 +1,14 @@
 import type React from "react";
 import { cva } from "class-variance-authority";
 
-import type { MenuProps } from "../menu";
 import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenu as ShadcnNavigationMenu,
-} from "../../shadcn/navigation-menu";
+} from "@acme/ui/shadcn/navigation-menu";
+
+import type { MenuProps } from "../menu";
 
 const navigationMenuTriggerVariants = cva("", {
   variants: {

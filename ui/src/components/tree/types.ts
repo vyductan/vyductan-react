@@ -104,8 +104,9 @@ export interface Entity {
   children?: Entity[];
 }
 
-export interface DataEntity<TreeDataType extends BasicDataNode = DataNode>
-  extends Omit<Entity, "node" | "parent" | "children"> {
+export interface DataEntity<
+  TreeDataType extends BasicDataNode = DataNode,
+> extends Omit<Entity, "node" | "parent" | "children"> {
   node: TreeDataType;
   nodes: TreeDataType[];
   parent?: DataEntity<TreeDataType>;

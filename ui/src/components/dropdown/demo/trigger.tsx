@@ -1,10 +1,9 @@
-"use client";
-
-import type { MenuProps } from "@/components/ui/menu";
 import type React from "react";
-import { Button } from "@/components/ui/button";
-import { Dropdown } from "@/components/ui/dropdown";
-import { Space } from "@/components/ui/space";
+
+import type { MenuProps } from "@acme/ui/components/menu";
+import { Button } from "@acme/ui/components/button";
+import { Dropdown } from "@acme/ui/components/dropdown";
+import { Space } from "@acme/ui/components/space";
 
 const items: MenuProps["items"] = [
   {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/refs */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/no-array-for-each */
 import { useEffect, useRef } from "react";
 

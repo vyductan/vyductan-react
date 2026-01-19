@@ -6,7 +6,7 @@ import {
   CardContent as ShadcnCardContent,
   CardFooter as ShadcnCardFooter,
   CardHeader as ShadcnCardHeader,
-  CardRoot as ShadcnCardRoot,
+  Card as ShadcnCardRoot,
   CardTitle as ShadcnCardTitle,
 } from "@acme/ui/shadcn/card";
 

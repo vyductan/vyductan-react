@@ -40,7 +40,14 @@ export type ColorValueType =
       percent: number;
     }[];
 
-export type ColorFormat = "hex" | "rgb" | "hsl";
+export type ColorFormat = "hex" | "rgb" | "hsl" | "oklch";
+
+export interface OKLCHColor {
+  l: number;
+  c: number;
+  h: number;
+  alpha?: number;
+}
 export type ColorPickerSize = "small" | "middle" | "large";
 export type ColorPickerTrigger = "click" | "hover";
 
@@ -148,6 +155,38 @@ export interface ColorPickerPanelProps {
    * Preset colors
    */
   presets?: string[];
+
+  /**
+   * Additional CSS class
+   */
+  className?: string;
+}
+
+export interface ColorPickerOKLCHPanelProps {
+  /**
+   * The current OKLCH color value
+   */
+  oklchValue?: OKLCHColor;
+
+  /**
+   * Callback when color changes
+   */
+  onChange?: (oklchValue: OKLCHColor) => void;
+
+  /**
+   * Callback when clear button is clicked
+   */
+  onClear?: () => void;
+
+  /**
+   * Preset colors (as hex or any color format)
+   */
+  presets?: string[];
+
+  /**
+   * Whether to show alpha slider
+   */
+  showAlpha?: boolean;
 
   /**
    * Additional CSS class

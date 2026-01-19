@@ -1,8 +1,7 @@
-"use client";
-
-import type { CheckboxProps } from "@/components/ui/checkbox";
 import type React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+
+import type { CheckboxProps } from "@acme/ui/components/checkbox";
+import { Checkbox } from "@acme/ui/components/checkbox";
 
 const onChange: CheckboxProps["onChange"] = (e) => {
   console.log(`checked = ${e.target.checked}`);

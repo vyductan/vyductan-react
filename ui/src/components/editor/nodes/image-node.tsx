@@ -20,7 +20,20 @@ import type {
 import type { JSX } from "react";
 import * as React from "react";
 import { Suspense } from "react";
-import { $applyNodeReplacement, createEditor, DecoratorNode } from "lexical";
+import { HashtagNode } from "@lexical/hashtag";
+import { LinkNode } from "@lexical/link";
+import {
+  $applyNodeReplacement,
+  createEditor,
+  DecoratorNode,
+  LineBreakNode,
+  ParagraphNode,
+  RootNode,
+  TextNode,
+} from "lexical";
+
+import { EmojiNode } from "./emoji-node";
+import { KeywordNode } from "./keyword-node";
 
 const ImageComponent = React.lazy(() => import("../editor-ui/image-component"));
 
@@ -34,6 +47,7 @@ export interface ImagePayload {
   src: string;
   width?: number;
   captionsEnabled?: boolean;
+  loading?: boolean;
 }
 
 function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
@@ -54,6 +68,7 @@ function $convertImageElement(domNode: Node): null | DOMConversionOutput {
   return { node };
 }
 
+// Fixed syntax error
 export type SerializedImageNode = Spread<
   {
     altText: string;
@@ -63,6 +78,7 @@ export type SerializedImageNode = Spread<
     showCaption: boolean;
     src: string;
     width?: number;
+    loading?: boolean;
   },
   SerializedLexicalNode
 >;
@@ -77,13 +93,14 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __caption: LexicalEditor;
   // Captions cannot yet be used within editor cells
   __captionsEnabled: boolean;
+  __loading: boolean;
 
   static getType(): string {
     return "image";
   }
 
   static clone(node: ImageNode): ImageNode {
-    return new ImageNode(
+    const newNode = new ImageNode(
       node.__src,
       node.__altText,
       node.__maxWidth,
@@ -94,11 +111,21 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__captionsEnabled,
       node.__key,
     );
+    newNode.__loading = node.__loading;
+    return newNode;
   }
 
   static importJSON(serializedNode: SerializedImageNode): ImageNode {
-    const { altText, height, width, maxWidth, caption, src, showCaption } =
-      serializedNode;
+    const {
+      altText,
+      height,
+      width,
+      maxWidth,
+      caption,
+      src,
+      showCaption,
+      loading,
+    } = serializedNode;
     const node = $createImageNode({
       altText,
       height,
@@ -106,6 +133,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       showCaption,
       src,
       width,
+      loading,
     });
     const nestedEditor = node.__caption;
     const editorState = nestedEditor.parseEditorState(caption.editorState);
@@ -143,6 +171,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     caption?: LexicalEditor,
     captionsEnabled?: boolean,
     key?: NodeKey,
+    loading?: boolean,
   ) {
     super(key);
     this.__src = src;
@@ -151,10 +180,20 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     this.__width = width ?? "inherit";
     this.__height = height ?? "inherit";
     this.__showCaption = showCaption ?? false;
+    this.__loading = loading ?? false;
     this.__caption =
       caption ??
       createEditor({
-        nodes: [],
+        nodes: [
+          RootNode,
+          TextNode,
+          LineBreakNode,
+          ParagraphNode,
+          LinkNode,
+          EmojiNode,
+          HashtagNode,
+          KeywordNode,
+        ],
       });
     this.__captionsEnabled = !!captionsEnabled;
   }
@@ -170,6 +209,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       type: "image",
       version: 1,
       width: this.__width === "inherit" ? 0 : this.__width,
+      loading: this.__loading,
     };
   }
 
@@ -185,6 +225,20 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   setShowCaption(showCaption: boolean): void {
     const writable = this.getWritable();
     writable.__showCaption = showCaption;
+  }
+
+  setSrc(src: string): void {
+    const writable = this.getWritable();
+    writable.__src = src;
+  }
+
+  setLoading(loading: boolean): void {
+    const writable = this.getWritable();
+    writable.__loading = loading;
+  }
+
+  isLoading(): boolean {
+    return this.__loading;
   }
 
   // View
@@ -225,6 +279,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
           caption={this.__caption}
           captionsEnabled={this.__captionsEnabled}
           resizable={true}
+          loading={this.__loading}
         />
       </Suspense>
     );
@@ -241,6 +296,7 @@ export function $createImageNode({
   showCaption,
   caption,
   key,
+  loading,
 }: ImagePayload): ImageNode {
   return $applyNodeReplacement(
     new ImageNode(
@@ -253,6 +309,7 @@ export function $createImageNode({
       caption,
       captionsEnabled,
       key,
+      loading,
     ),
   );
 }
