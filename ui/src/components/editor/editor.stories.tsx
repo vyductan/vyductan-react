@@ -160,7 +160,7 @@ Try editing this content!`,
 
 // Interactive markdown editor with state
 export const MarkdownInteractive: MarkdownStory = {
-  render: (args) => {
+  render: () => {
     const [markdown, setMarkdown] = useState(
       `# Interactive Editor
 
@@ -178,11 +178,11 @@ Edit this content and see the markdown output below.
       <div className="space-y-4">
         <div className="rounded-lg border border-gray-200">
           <Editor
-            {...args}
             mode="markdown"
             value={markdown}
             onChange={(markdown) => setMarkdown(markdown)}
             onStatsChange={setStats}
+            placeholder="Type something..."
           />
         </div>
         <div className="space-y-2">
@@ -200,12 +200,6 @@ Edit this content and see the markdown output below.
         </div>
       </div>
     );
-  },
-  args: {
-    value: "",
-    placeholder: "Type something...",
-    onChange: fn(),
-    mode: "markdown",
   },
 };
 

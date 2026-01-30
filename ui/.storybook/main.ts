@@ -20,6 +20,7 @@ const config: StorybookConfig = {
   //   getAbsolutePath("@chromatic-com/storybook"),
   // ],
   addons: [
+    "@storybook/addon-mcp",
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",

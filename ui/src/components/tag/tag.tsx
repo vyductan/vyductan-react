@@ -57,12 +57,11 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 
-    "px-[7px]",
     // "px-2.5",
   ],
   variants: {
@@ -83,11 +82,17 @@ const tagVariants = tv({
       true: "",
       false: "border-transparent",
     },
+    size: {
+      default: "px-[7px] py-0.5 text-xs",
+      small: "px-1.5 py-0.5 text-[10px]",
+      large: "px-2.5 py-1 text-sm",
+    },
   },
   defaultVariants: {
     variant: "default",
     color: "default",
     bordered: true,
+    size: "default",
   },
   compoundVariants: [
     {
@@ -135,6 +140,8 @@ const Tag = ({
   const finalVariant = variant ?? tagConfig.variant;
   const finalColor = color ?? tagConfig.color;
 
+  const finalSize = props.size ?? tagConfig.size;
+
   // Check if color is a hex color (starts with #)
   const isHexColor =
     typeof finalColor === "string" && finalColor.startsWith("#");
@@ -146,6 +153,7 @@ const Tag = ({
           variant: finalVariant,
           color: isHexColor ? undefined : finalColor,
           bordered,
+          size: finalSize,
         }),
         closeIcon && "pr-1",
         isHexColor && "text-white",

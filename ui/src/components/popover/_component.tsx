@@ -22,10 +22,11 @@ const PopoverContent = ({
   onFocusOutside,
   onWheel,
   onTouchMove,
+  forceMount,
   ...props
 }: PopoverContentProps) => {
   return (
-    <PopoverPrimitive.Portal container={container}>
+    <PopoverPrimitive.Portal container={container} forceMount={forceMount}>
       <PopoverPrimitive.Content
         data-slot="popover-content"
         align={align}

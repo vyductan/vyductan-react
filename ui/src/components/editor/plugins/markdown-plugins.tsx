@@ -60,3 +60,6 @@ export function MarkdownPlugins({
     </>
   );
 }
+
+// Default export for dynamic imports
+export default MarkdownPlugins;

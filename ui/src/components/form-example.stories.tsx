@@ -319,9 +319,13 @@ const SearchForm = ({ onSearch, onSelect }: SearchFormProps) => {
       />
 
       {results.length > 0 && (
-        <ul className="divide-y rounded border" role="listbox">
+        <ul
+          className="divide-y rounded border"
+          role="listbox"
+          aria-label="Search results"
+        >
           {results.map((item) => (
-            <li key={item}>
+            <li key={item} role="presentation">
               <button
                 type="button"
                 onClick={() => onSelect(item)}

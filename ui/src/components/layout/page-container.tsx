@@ -1,9 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import type { PageContentProps } from "./page-content";
 import type { PageHeaderProps } from "./page-header";
+import { useComponentConfig } from "../config-provider";
 import { PageContent } from "./page-content";
 import { PageHeader } from "./page-header";
 
@@ -24,9 +27,13 @@ export const PageContainer = ({
   className,
   classNames,
   loading = false,
-  loadingRender = <>Loading...</>,
+  loadingRender,
   exception = false,
 }: PageContainerProps) => {
+  const { pageContainer } = useComponentConfig("layout");
+  const defaultLoadingRender = loadingRender ??
+    pageContainer?.loadingRender ?? <>Loading...</>;
+
   // Check if legacy props are provided to use legacy mode
   // Prioritize legacy mode if header or PageContent-related props are present
   const useLegacyMode =
@@ -46,7 +53,7 @@ export const PageContainer = ({
           <PageContent
             className={classNames?.content}
             loading={loading}
-            loadingRender={loadingRender}
+            loadingRender={defaultLoadingRender}
             exception={exception}
           >
             {children}

@@ -13,10 +13,12 @@ import type {
   FormConfig,
   InputConfig,
   InputNumberConfig,
+  LayoutConfig,
   MentionsConfig,
   PaginationConfig,
   ResultConfig,
   SelectConfig,
+  TableConfig,
   TagConfig,
   TextAreaConfig,
 } from "./context";
@@ -91,7 +93,7 @@ export interface ConfigProviderProps {
   // statistic?: ComponentStyleConfig;
   // steps?: ComponentStyleConfig;
   // image?: ImageConfig;
-  // layout?: ComponentStyleConfig;
+  layout?: LayoutConfig;
   // list?: ListConfig;
   // modal?: ModalConfig;
   // progress?: ComponentStyleConfig;
@@ -110,7 +112,7 @@ export interface ConfigProviderProps {
   // treeSelect?: TreeSelectConfig;
   // message?: ComponentStyleConfig;
   // tag?: TagConfig;
-  // table?: TableConfig;
+  table?: TableConfig;
   // card?: CardConfig;
   // tabs?: TabsConfig;
   // timeline?: ComponentStyleConfig;

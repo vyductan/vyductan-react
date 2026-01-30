@@ -23,10 +23,9 @@ const editorConfig: InitialConfigType = {
   },
 };
 
-const MarkdownPlugins = dynamic(
-  () => import("./plugins/markdown-plugins").then((mod) => mod.MarkdownPlugins),
-  { ssr: false },
-);
+const MarkdownPlugins = dynamic(() => import("./plugins/markdown-plugins"), {
+  ssr: false,
+});
 
 // Discriminated Union for better type safety
 type EditorPropsBase = {

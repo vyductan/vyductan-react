@@ -384,7 +384,7 @@ const DatePicker = (props: DatePickerProps) => {
             onClick={() => {
               setPickerMode("month");
             }}
-            aria-label="Select month"
+            aria-describedby="month-select-description"
           >
             {monthText}
           </Button>
@@ -393,10 +393,17 @@ const DatePicker = (props: DatePickerProps) => {
             onClick={() => {
               setPickerMode("year");
             }}
-            aria-label="Select year"
+            aria-describedby="year-select-description"
           >
             {yearText}
           </Button>
+          {/* Hidden descriptions for screen readers */}
+          <span id="month-select-description" className="sr-only">
+            Select month
+          </span>
+          <span id="year-select-description" className="sr-only">
+            Select year
+          </span>
         </span>
       );
     },
@@ -427,10 +434,14 @@ const DatePicker = (props: DatePickerProps) => {
             onClick={() => {
               setPickerMode("year");
             }}
-            aria-label="Select year"
+            aria-describedby="year-select-description-month-mode"
           >
             {yearText}
           </Button>
+          {/* Hidden description for screen readers */}
+          <span id="year-select-description-month-mode" className="sr-only">
+            Select year
+          </span>
         </span>
       );
     },
@@ -440,7 +451,6 @@ const DatePicker = (props: DatePickerProps) => {
   return (
     <>
       <Popover
-        className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
         align={{
@@ -555,6 +565,7 @@ const DatePicker = (props: DatePickerProps) => {
         }
       >
         <div
+          role="combobox"
           data-slot="picker-input"
           className={cn("inline-flex", className)}
           style={style}
@@ -574,6 +585,7 @@ const DatePicker = (props: DatePickerProps) => {
             disabled={disabled}
             suffix={
               <Icon
+                aria-hidden="true"
                 icon="icon-[mingcute--calendar-2-line]"
                 className="ml-auto size-4 opacity-50"
               />

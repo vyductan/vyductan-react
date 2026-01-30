@@ -137,18 +137,18 @@ export const buttonColorVariants = tv({
       variant: "solid",
       color: "orange",
       className: [
-        "border-orange-600 bg-orange-600",
-        "hover:border-orange-500 hover:bg-orange-500",
-        "active:border-orange-700 active:bg-orange-700",
+        "border-orange-700 bg-orange-700",
+        "hover:border-orange-600 hover:bg-orange-600",
+        "active:border-orange-800 active:bg-orange-800",
       ],
     },
     {
       variant: "solid",
       color: "green",
       className: [
-        "border-green-600 bg-green-600",
-        "hover:border-green-500 hover:bg-green-500",
-        "active:border-green-700 active:bg-green-700",
+        "border-green-700 bg-green-700",
+        "hover:border-green-600 hover:bg-green-600",
+        "active:border-green-800 active:bg-green-800",
       ],
     },
     {
@@ -227,9 +227,9 @@ export const buttonColorVariants = tv({
       variant: "solid",
       color: "success",
       className: [
-        "border-green-600 bg-green-600",
-        "hover:border-green-500 hover:bg-green-500",
-        "active:border-green-700 active:bg-green-700",
+        "border-green-700 bg-green-700",
+        "hover:border-green-600 hover:bg-green-600",
+        "active:border-green-800 active:bg-green-800",
       ],
     },
     {
@@ -531,8 +531,8 @@ export const buttonColorVariants = tv({
       variant: "filled",
       color: "primary",
       className: [
-        "bg-primary-50 text-primary",
-        "hover:bg-primary-100 hover:text-primary",
+        "bg-primary-50 text-primary-700",
+        "hover:bg-primary-100 hover:text-primary-700",
         "active:bg-primary-200 active:text-primary-active",
       ],
     },

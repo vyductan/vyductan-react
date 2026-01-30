@@ -1,5 +1,3 @@
-"use client";
-
 import type * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -20,50 +18,43 @@ type TabItemDef = {
   className?: string;
   triggerProps?: Omit<TabsTriggerProps, "value">;
 };
-type TabsShadcnProps = {
-  type?: never;
-  items?: never;
-} & TabsRootProps;
 
-type TabsOwnProps = {
+type TabsProps = {
   defaultValue?: never;
   onValueChange?: never;
   children?: never;
-} & {
-  type?: TabsType;
-  style?: React.CSSProperties;
-  className?: string;
-  classNames?: {
-    root?: string;
-    list?: string;
-    trigger?: string;
+} & Omit<
+  TabsRootProps,
+  "value" | "defaultValue" | "onValueChange" | "children" | "onChange"
+> & {
+    type?: TabsType;
+    style?: React.CSSProperties;
+    className?: string;
+    classNames?: {
+      root?: string;
+      list?: string;
+      trigger?: string;
+    };
+    /**
+     * Initial active TabPane's key, if activeKey is not set
+     */
+    defaultActiveKey?: TabsRootProps["defaultValue"];
+    activeKey?: TabsRootProps["value"];
+    items: TabItemDef[];
+    onChange?: (activeKey: string) => void;
+
+    /**
+     * Extras content (left|right)
+     */
+    tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
+    tabBarStyle?: React.CSSProperties;
+
+    // styles
+    // list
+    listProps?: TabsListProps;
   };
-  /**
-   * Initial active TabPane's key, if activeKey is not set
-   */
-  defaultActiveKey?: TabsRootProps["defaultValue"];
-  activeKey?: TabsRootProps["value"];
-  items: TabItemDef[];
-  onChange?: (activeKey: string) => void;
 
-  /**
-   * Extras content (left|right)
-   */
-  tabBarExtraContent?: React.ReactNode | TabBarExtraMap;
-  tabBarStyle?: React.CSSProperties;
-
-  // styles
-  // list
-  listProps?: TabsListProps;
-};
-
-type TabsProps = TabsShadcnProps | TabsOwnProps;
 const Tabs = (props: TabsProps) => {
-  const isShadcnTabs = !!props.children && !props.items;
-  if (isShadcnTabs) {
-    return <TabsRoot {...props}>{props.children}</TabsRoot>;
-  }
-
   const {
     type = "line",
     className,
@@ -77,7 +68,7 @@ const Tabs = (props: TabsProps) => {
     tabBarStyle,
     listProps,
     ...restProps
-  } = props as TabsOwnProps;
+  } = props;
 
   // Parse extra
   let assertExtra: TabBarExtraMap = {};

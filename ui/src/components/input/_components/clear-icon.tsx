@@ -30,6 +30,7 @@ export const ClearIcon = ({
         "transition-opacity",
         className,
       )}
+      aria-label="Clear value"
     >
       <Icon
         icon="icon-[ant-design--close-circle-filled]"

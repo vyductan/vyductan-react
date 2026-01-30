@@ -193,6 +193,7 @@ export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
           min={config.min}
           max={config.max}
           step={config.step}
+          ariaLabel={config.label}
           className="**:[[role=slider]]:border-white **:[[role=slider]]:shadow-lg"
         />
       </div>

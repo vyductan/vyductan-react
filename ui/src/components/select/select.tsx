@@ -87,7 +87,7 @@ type SelectProps<
     // Base
     showSearch?: boolean;
     children?: React.ReactNode;
-  };
+  } & React.AriaAttributes;
 
 const Select = <
   TValue extends SelectValueType = SelectValueType,
@@ -253,6 +253,7 @@ const Select = <
       >
         <SelectTrigger
           id={id}
+          aria-label={placeholder}
           loading={loading}
           disabled={disabled}
           className={cn(

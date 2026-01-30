@@ -96,9 +96,8 @@ export function FontFamilyToolbarPlugin() {
         setFontFamily(value);
         handleClick(value);
       }}
-      aria-label={buttonAriaLabel}
     >
-      <SelectTrigger className="h-8 w-min gap-1">
+      <SelectTrigger className="h-8 w-min gap-1" aria-label={buttonAriaLabel}>
         <TypeIcon className="size-4" />
         <span>{fontFamily}</span>
       </SelectTrigger>

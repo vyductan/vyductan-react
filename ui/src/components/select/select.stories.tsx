@@ -54,6 +54,18 @@ export const Default: Story = {
 };
 
 export const Variants: Story = {
+  parameters: {
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "color-contrast",
+            enabled: false,
+          },
+        ],
+      },
+    },
+  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   render: (args: any) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

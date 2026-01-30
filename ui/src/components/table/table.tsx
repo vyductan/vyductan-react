@@ -53,7 +53,7 @@ import type {
 import scrollTo from "../_util/scroll-to";
 import { devUseWarning } from "../_util/warning";
 import { Checkbox } from "../checkbox";
-import { ConfigContext } from "../config-provider/context";
+import { ConfigContext, useComponentConfig } from "../config-provider/context";
 import defaultLocale from "../locale/en-us";
 import { Pagination } from "../pagination";
 import { Spin } from "../spin";
@@ -212,12 +212,13 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
   };
 
 const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
+  const tableConfig = useComponentConfig("table");
   const {
     ref,
     style,
     className,
     classNames,
-    bordered: borderedProp,
+    bordered: borderedProp = tableConfig.bordered,
     size,
 
     loading = false,
@@ -279,13 +280,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     );
   }
 
-  const {
-    locale: contextLocale = defaultLocale,
-    // direction,
-    table: tableConfig,
-    // renderEmpty,
-    // getPopupContainer: getContextPopupContainer,
-  } = React.useContext<ConfigConsumerProps>(ConfigContext);
+  const { locale: contextLocale = defaultLocale } =
+    React.useContext<ConfigConsumerProps>(ConfigContext);
 
   // const mergedData = dataSource ?? EMPTY_DATA;
   const rawData: readonly TRecord[] = dataSource ?? EMPTY_LIST;
@@ -686,7 +682,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   }, [mergedData, selectedRowKeys, getRowKey]);
 
   // Create table instance with memoized values and required properties
-  // eslint-disable-next-line react-hooks/incompatible-library
+
   const table = useReactTable({
     data: mergedData,
     columns: [

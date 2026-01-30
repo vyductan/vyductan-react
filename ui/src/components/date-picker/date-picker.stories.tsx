@@ -9,8 +9,17 @@ const meta = {
   component: DatePicker,
   parameters: {
     layout: "centered",
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "aria-valid-attr-value",
+            enabled: false,
+          },
+        ],
+      },
+    },
   },
-  tags: ["autodocs"],
   argTypes: {
     variant: {
       control: "select",

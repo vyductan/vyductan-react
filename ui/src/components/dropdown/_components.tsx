@@ -28,6 +28,7 @@ export { DropdownMenuItem };
 export {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,

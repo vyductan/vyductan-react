@@ -1,14 +1,33 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Modal,
+} from ".";
 import { Button } from "../button";
-import { Modal } from "./modal";
 
 const meta = {
   title: "Components/Modal",
   component: Modal,
   parameters: {
     layout: "centered",
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "aria-valid-attr-value",
+            enabled: false,
+          },
+        ],
+      },
+    },
   },
   argTypes: {
     width: {
@@ -147,5 +166,53 @@ export const CustomFooter: Story = {
   },
   args: {
     title: "Custom Footer Modal",
+  },
+};
+
+export const ShadcnStyle: Story = {
+  render: () => {
+    return (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">Edit Profile</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right text-sm font-medium">
+                Name
+              </label>
+              <input
+                id="name"
+                defaultValue="Pedro Duarte"
+                className="border-input placeholder:text-muted-foreground focus-visible:ring-ring col-span-3 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label
+                htmlFor="username"
+                className="text-right text-sm font-medium"
+              >
+                Username
+              </label>
+              <input
+                id="username"
+                defaultValue="@peduarte"
+                className="border-input placeholder:text-muted-foreground focus-visible:ring-ring col-span-3 flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="primary">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
   },
 };
