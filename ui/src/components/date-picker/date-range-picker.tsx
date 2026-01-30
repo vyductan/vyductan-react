@@ -359,7 +359,6 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   return (
     <>
       <Popover
-        className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
         align={{
@@ -379,6 +378,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
         content={<div className="flex">{CalendarComponent}</div>}
       >
         <div
+          role="combobox"
           data-slot="picker-input"
           className={cn(
             inputVariants({ variant, disabled, status }),
@@ -689,6 +689,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             </button>
           ) : (
             <Icon
+              aria-hidden="true"
               icon="icon-[mingcute--calendar-2-line]"
               className="ml-auto size-4 shrink-0 opacity-50"
             />

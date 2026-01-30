@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { User } from "lucide-react";
 
-import type { AvatarProps } from "@acme/ui/components/avatar";
 import {
   Avatar,
   AvatarFallback,
@@ -28,7 +27,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args: AvatarProps) => (
+  render: (args) => (
     <Avatar {...args}>
       <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
       <AvatarFallback>CN</AvatarFallback>
