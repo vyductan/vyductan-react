@@ -107,7 +107,6 @@ export function ElementFormatToolbarPlugin() {
       value={elementFormat}
       defaultValue={elementFormat}
       onValueChange={handleValueChange}
-      className="flex gap-1"
     >
       {/* Alignment toggles */}
       {Object.entries(ELEMENT_FORMAT_OPTIONS).map(([value, option]) => (

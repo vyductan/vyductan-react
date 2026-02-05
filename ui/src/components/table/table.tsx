@@ -672,14 +672,28 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
-  // Filter selectedRowKeys to only include keys that exist in mergedData
+  // Filter selectedRowKeys to only include keys that exist in mergedData (including nested children)
   // This prevents TanStack Table from trying to select non-existent rows (e.g., when data is filtered)
   const availableRowKeys = React.useMemo(() => {
-    const keySet = new Set(
-      mergedData.map((item, index) => getRowKey(item, index).toString()),
-    );
+    // Recursively collect all keys including children
+    const collectKeys = (
+      items: readonly TRecord[],
+      startIndex: number,
+    ): string[] => {
+      const keys: string[] = [];
+      items.forEach((item, idx) => {
+        keys.push(getRowKey(item, startIndex + idx).toString());
+        const children = item[childrenColumnName] as TRecord[] | undefined;
+        if (Array.isArray(children) && children.length > 0) {
+          keys.push(...collectKeys(children, 0));
+        }
+      });
+      return keys;
+    };
+
+    const keySet = new Set(collectKeys(mergedData, 0));
     return selectedRowKeys.filter((key) => keySet.has(key.toString()));
-  }, [mergedData, selectedRowKeys, getRowKey]);
+  }, [mergedData, selectedRowKeys, getRowKey, childrenColumnName]);
 
   // Create table instance with memoized values and required properties
 
@@ -687,7 +701,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     data: mergedData,
     columns: [
       ...(rowSelection
-        ? [
+        ? [ 
             {
               id: "__select__",
               size: 50,
@@ -708,15 +722,49 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   className="align-middle"
                 />
               ),
-              cell: ({ row }) => (
-                <Checkbox
-                  checked={row.getIsSelected()}
-                  indeterminate={row.getIsSomeSelected()}
-                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
-                  aria-label="Select row"
-                  className="flex"
-                />
-              ),
+              cell: ({ row, table }) => {
+                // Helper to collect all row IDs recursively (parent + all children)
+                const collectAllRowIds = (r: Row<TRecord>): string[] => {
+                  const ids = [r.id];
+                  if (r.subRows && r.subRows.length > 0) {
+                    for (const subRow of r.subRows) {
+                      ids.push(...collectAllRowIds(subRow));
+                    }
+                  }
+                  return ids;
+                };
+
+                const handleSelectionChange = (selected: boolean) => {
+                  const allIds = collectAllRowIds(row);
+                  const currentSelection = table.getState().rowSelection;
+
+                  if (selected) {
+                    // Add all IDs to selection
+                    const newSelection = { ...currentSelection };
+                    for (const id of allIds) {
+                      newSelection[id] = true;
+                    }
+                    table.setRowSelection(newSelection);
+                  } else {
+                    // Remove all IDs from selection
+                    const newSelection = { ...currentSelection };
+                    for (const id of allIds) {
+                      delete newSelection[id];
+                    }
+                    table.setRowSelection(newSelection);
+                  }
+                };
+
+                return (
+                  <Checkbox
+                    checked={row.getIsSelected()}
+                    indeterminate={row.getIsSomeSelected()}
+                    onChange={(e) => handleSelectionChange(!!e.target.checked)}
+                    aria-label="Select row"
+                    className="flex"
+                  />
+                );
+              },
               enableSorting: false,
               enableHiding: false,
             } as ColumnDef<TRecord, unknown>,

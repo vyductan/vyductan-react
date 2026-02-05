@@ -39,7 +39,7 @@ type EditorPropsBase = {
     characterCount: number;
     readingTimeMinutes: number;
   }) => void;
-  variant?: "default" | "simple";
+  variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
   className?: string;
   contentClassName?: string;
