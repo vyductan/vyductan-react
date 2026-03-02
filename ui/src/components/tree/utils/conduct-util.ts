@@ -266,7 +266,7 @@ export function conductCheck<TreeDataType extends BasicDataNode = DataNode>(
     !warningMissKeys.length,
     `Tree missing follow keys: ${warningMissKeys
       .slice(0, 100)
-      .map((key) => `'${key}'`)
+      .map((key) => `'${String(key)}'`)
       .join(", ")}`,
   );
 

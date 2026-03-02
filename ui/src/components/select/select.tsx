@@ -164,6 +164,7 @@ const Select = <
       setInternalValue(value);
       const returnOption = options.find((o) => value === o.value);
       onChange?.(value, returnOption);
+      setInternalOpen(false);
     } else if (isMultiple) {
       // if(selectedValues.includes(value)){
       //   return;

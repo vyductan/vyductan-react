@@ -128,7 +128,9 @@ export const editorTheme: EditorThemeClasses = {
   mark: "",
   markOverlap: "",
   checkBlock:
-    'relative pl-8 my-1 [&>span[data-lexical-text="true"]]:w-full [&>span[data-lexical-text="true"]]:inline-block before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-1 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded hover:before:bg-muted focus:before:ring-2 focus:before:ring-offset-1 focus:before:ring-primary',
+    'flex items-start gap-2 my-1 [&>[data-lexical-text="true"]]:flex-1 [&>[data-lexical-text="true"]]:min-w-0',
+  checkBlockIcon:
+    "flex-shrink-0 mt-0.5 size-4 cursor-pointer rounded border border-primary hover:bg-muted focus:ring-2 focus:ring-offset-1 focus:ring-primary",
   checkBlockChecked:
-    '[&>span[data-lexical-text="true"]]:line-through text-muted-foreground before:bg-primary hover:before:bg-primary before:bg-no-repeat after:content-[""] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-[7px] after:w-[3px] after:left-[10.5px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
+    '[&>[data-lexical-text="true"]]:line-through [&>[data-lexical-text="true"]]:text-muted-foreground [&>[data-check-icon]]:bg-primary [&>[data-check-icon]]:relative [&>[data-check-icon]]:after:content-[""] [&>[data-check-icon]]:after:absolute [&>[data-check-icon]]:after:top-[3px] [&>[data-check-icon]]:after:left-[5.5px] [&>[data-check-icon]]:after:w-[3px] [&>[data-check-icon]]:after:h-[6px] [&>[data-check-icon]]:after:rotate-45 [&>[data-check-icon]]:after:border-r-2 [&>[data-check-icon]]:after:border-b-2 [&>[data-check-icon]]:after:border-white',
 };

@@ -108,7 +108,7 @@ const MenuVertical = ({
       // Handle group type
       if (item.type === "group") {
         return (
-          <SidebarGroup key={`group-${item.key ?? index}`}>
+          <SidebarGroup key={`group-${String(item.key ?? index)}`}>
             {item.label && <SidebarGroupLabel>{item.label}</SidebarGroupLabel>}
             <SidebarMenu>
               {item.children &&

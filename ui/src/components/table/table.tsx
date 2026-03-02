@@ -606,24 +606,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   // ]);
 
   // ========================== Selections ==========================
-  // const [
-  //   rowSelectionState,
-  //   setRowSelection,
-  //   transformSelectionColumns,
-  //   // selectedKeySet,
-  // ] = useSelection<TRecord>(
-  //   {
-  //     data: mergedData,
-  //     pageData,
-  //     getRowKey,
-  //     getRecordByKey,
-  //     expandType,
-  //     childrenColumnName,
-  //     locale: tableLocale,
-  //     getPopupContainer: getPopupContainer || getContextPopupContainer,
-  //   },
-  //   rowSelection,
-  // );
 
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
     rowSelection?.selectedRowKeys || [],
@@ -672,28 +654,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
-  // Filter selectedRowKeys to only include keys that exist in mergedData (including nested children)
+  // Filter selectedRowKeys to only include keys that exist in mergedData
   // This prevents TanStack Table from trying to select non-existent rows (e.g., when data is filtered)
   const availableRowKeys = React.useMemo(() => {
-    // Recursively collect all keys including children
-    const collectKeys = (
-      items: readonly TRecord[],
-      startIndex: number,
-    ): string[] => {
-      const keys: string[] = [];
-      items.forEach((item, idx) => {
-        keys.push(getRowKey(item, startIndex + idx).toString());
-        const children = item[childrenColumnName] as TRecord[] | undefined;
-        if (Array.isArray(children) && children.length > 0) {
-          keys.push(...collectKeys(children, 0));
-        }
-      });
-      return keys;
-    };
-
-    const keySet = new Set(collectKeys(mergedData, 0));
+    const keySet = new Set(
+      mergedData.map((item, index) => getRowKey(item, index).toString()),
+    );
     return selectedRowKeys.filter((key) => keySet.has(key.toString()));
-  }, [mergedData, selectedRowKeys, getRowKey, childrenColumnName]);
+  }, [mergedData, selectedRowKeys, getRowKey]);
 
   // Create table instance with memoized values and required properties
 
@@ -701,11 +669,17 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     data: mergedData,
     columns: [
       ...(rowSelection
-        ? [ 
+        ? [
             {
               id: "__select__",
-              size: 50,
-              minSize: 50,
+              size:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
+              minSize:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
               enableResizing: false,
               meta: {
                 align: "center",
@@ -719,52 +693,18 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   }
                   aria-label="Select all"
                   skipGroup
-                  className="align-middle"
+                  className="translate-y-[2px] align-middle"
                 />
               ),
-              cell: ({ row, table }) => {
-                // Helper to collect all row IDs recursively (parent + all children)
-                const collectAllRowIds = (r: Row<TRecord>): string[] => {
-                  const ids = [r.id];
-                  if (r.subRows && r.subRows.length > 0) {
-                    for (const subRow of r.subRows) {
-                      ids.push(...collectAllRowIds(subRow));
-                    }
-                  }
-                  return ids;
-                };
-
-                const handleSelectionChange = (selected: boolean) => {
-                  const allIds = collectAllRowIds(row);
-                  const currentSelection = table.getState().rowSelection;
-
-                  if (selected) {
-                    // Add all IDs to selection
-                    const newSelection = { ...currentSelection };
-                    for (const id of allIds) {
-                      newSelection[id] = true;
-                    }
-                    table.setRowSelection(newSelection);
-                  } else {
-                    // Remove all IDs from selection
-                    const newSelection = { ...currentSelection };
-                    for (const id of allIds) {
-                      delete newSelection[id];
-                    }
-                    table.setRowSelection(newSelection);
-                  }
-                };
-
-                return (
-                  <Checkbox
-                    checked={row.getIsSelected()}
-                    indeterminate={row.getIsSomeSelected()}
-                    onChange={(e) => handleSelectionChange(!!e.target.checked)}
-                    aria-label="Select row"
-                    className="flex"
-                  />
-                );
-              },
+              cell: ({ row }) => (
+                <Checkbox
+                  checked={row.getIsSelected()}
+                  indeterminate={row.getIsSomeSelected()}
+                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
+                  aria-label="Select row"
+                  className="flex translate-y-[2px]"
+                />
+              ),
               enableSorting: false,
               enableHiding: false,
             } as ColumnDef<TRecord, unknown>,
@@ -1109,7 +1049,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                 true,
                               ),
                               // selection column
-                              header.id === "selection" && "px-0",
+                              header.id === "__select__" && "px-2",
                               classNames?.head,
                               // column className
                               header.column.columnDef.meta?.className,
@@ -1226,7 +1166,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                       scrollRight: wrapperScrollRight,
                                     }),
                                     // selection column
-                                    cell.id.endsWith("selection") && "px-0",
+                                    (cell.column.id === "__select__" ||
+                                      cell.id.endsWith("selection")) &&
+                                      "px-2",
                                     // column className
                                     classNames?.cell,
                                     cell.column.columnDef.meta?.className,

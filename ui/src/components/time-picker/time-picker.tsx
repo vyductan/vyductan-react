@@ -292,6 +292,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 };
 
 export { TimePicker };
+export type { TimePickerProps };
 
 // Format the date for display
 const formatDateValue = (date: DateType, format: string): string => {

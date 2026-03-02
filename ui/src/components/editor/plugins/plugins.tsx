@@ -149,7 +149,7 @@ export function Plugins({
       `,
         }}
       />
-      {(variant === "default" || variant === "simple") && (
+      {variant === "simple" && (
         <FixedToolbarPlugin containerRef={containerRef} />
       )}
 
@@ -177,7 +177,6 @@ export function Plugins({
       {!isSimple && editable && <BlockCopyPastePlugin />}
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
-      <TablePlugin />
       <TablePlugin />
       {!isSimple && editable && (
         <TableActionsPlugin anchorElem={floatingAnchorElem} />

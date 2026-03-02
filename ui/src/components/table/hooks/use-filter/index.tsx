@@ -157,14 +157,14 @@ const generateFilterInfo = <RecordType extends AnyObject = AnyObject>(
     const keyAsString = key as SafeKey;
     const { filters, filterDropdown } = column;
     if (filterDropdown) {
-      currentFilters[keyAsString] = filteredKeys || null;
+      currentFilters[String(keyAsString)] = filteredKeys || null;
     } else if (Array.isArray(filteredKeys)) {
       const keys = flattenKeys(filters);
-      currentFilters[keyAsString] = keys.filter((originKey) =>
+      currentFilters[String(keyAsString)] = keys.filter((originKey) =>
         filteredKeys.includes(String(originKey)),
       );
     } else {
-      currentFilters[keyAsString] = null;
+      currentFilters[String(keyAsString)] = null;
     }
   });
 

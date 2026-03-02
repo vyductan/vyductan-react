@@ -169,6 +169,9 @@ const Button = ({
   return (
     <Wave component="Button" disabled={loading}>
       <Comp
+        data-slot="button"
+        data-variant={variant}
+        data-size={size}
         className={cn(
           "relative",
           isDashed && "border-dashed",

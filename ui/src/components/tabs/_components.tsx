@@ -50,6 +50,7 @@ function TabsList({ className, type, ...props }: TabsListProps) {
         "relative w-full",
         className,
       )}
+      variant={tabsType === "line" ? "line" : "default"}
       {...props}
     />
   );
@@ -77,9 +78,9 @@ function TabsTrigger({ className, tabsType, ...props }: TabsTriggerProps) {
         type === "line" && [
           "pt-3 pb-[11px]",
           "mx-3 h-[calc(100%+2px)] first:ml-0",
-          "text-muted-foreground rounded-none border-b-2 border-b-transparent bg-transparent font-semibold shadow-none transition-none",
-          "hover:text-primary-400",
-          "data-[state=active]:text-primary-500 data-[state=active]:border-b-primary-500 data-[state=active]:shadow-none",
+          "text-muted-foreground rounded-none bg-transparent font-semibold shadow-none transition-none",
+          "hover:text-primary-hover",
+          "data-[state=active]:text-primary after:bg-primary group-data-[orientation=horizontal]/tabs:after:-bottom-px data-[state=active]:shadow-none",
         ],
         className,
       )}

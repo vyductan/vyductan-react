@@ -47,7 +47,7 @@ export type ShadcnCalendarProps = React.ComponentProps<
 > & {
   onWeeksMouseLeave?: (e: React.MouseEvent<HTMLTableSectionElement>) => void;
 };
-const CustomCalendar = ({
+const Calendar = ({
   fixedWeeks = true,
   classNames,
   onWeeksMouseLeave,
@@ -82,4 +82,4 @@ const CustomCalendar = ({
   );
 };
 
-export { CustomCalendar };
+export { Calendar };

@@ -5,6 +5,7 @@
     "rootDir": ".",
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
+    "types": ["node", "react", "react-dom"],
     "baseUrl": "src/",
     "plugins": [
       {
