@@ -297,6 +297,7 @@ const Select = <
           )}
         </SelectTrigger>
         <SelectContent
+          position={isMultiple ? "popper" : "item-aligned"}
           className={cn(
             "",
             options.some((o) => o.color)
