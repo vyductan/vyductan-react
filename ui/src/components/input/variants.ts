@@ -85,7 +85,7 @@ const inputSizeVariants = tv({
       // default: "h-8 px-[11px] py-[5px]",
       // lg: "px-[11px] py-[9px]",
       // xl: "px-[11px] py-[13px]",
-      small: "h-7 px-2 py-1",
+      small: "h-6 px-2 py-1",
       middle: "h-8 px-3 py-1 text-sm",
       large: "h-10 px-3 py-2 text-base",
       // xl: "px-[11px] py-[13px]",
