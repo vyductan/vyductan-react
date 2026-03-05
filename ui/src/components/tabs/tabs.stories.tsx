@@ -125,7 +125,7 @@ function ControlledRender(args: ControlledStoryProps): JSX.Element {
 
 export const Controlled: Story = {
   render: function render(args): JSX.Element {
-    return <ControlledRender {...args} />;
+    return <ControlledRender {...(args as ControlledStoryProps)} />;
   },
   args: {
     type: "line",
