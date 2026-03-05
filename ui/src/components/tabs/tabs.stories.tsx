@@ -123,23 +123,9 @@ function ControlledRender(args: ControlledStoryProps): JSX.Element {
   );
 }
 
-function toControlledArgs(args: Story["args"]): ControlledStoryProps {
-  const {
-    activeKey: _activeKey,
-    defaultActiveKey: _defaultActiveKey,
-    value: _value,
-    defaultValue: _defaultValue,
-    onValueChange: _onValueChange,
-    children: _children,
-    ...rest
-  } = (args ?? {}) as Record<string, unknown>;
-
-  return rest as ControlledStoryProps;
-}
-
 export const Controlled: Story = {
   render: function render(args): JSX.Element {
-    return <ControlledRender {...toControlledArgs(args)} />;
+    return <ControlledRender {...(args as ControlledStoryProps)} />;
   },
   args: {
     type: "line",
