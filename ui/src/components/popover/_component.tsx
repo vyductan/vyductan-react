@@ -67,5 +67,8 @@ export {
   Popover as PopoverRoot,
   PopoverTrigger,
   PopoverAnchor,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverDescription,
 } from "@acme/ui/shadcn/popover";
 export { PopoverContent, PopoverClose };

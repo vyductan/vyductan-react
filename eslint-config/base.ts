@@ -57,7 +57,7 @@ export const baseConfig = defineConfig(
       ...tseslint.configs.stylistic,
     ],
     rules: {
-      ...turboPlugin.configs.recommended.rules,
+      "turbo/no-undeclared-env-vars": "error",
       /*
        * t3-turbo
        */
@@ -94,6 +94,8 @@ export const baseConfig = defineConfig(
       /*
        * t3
        */
+      // Disabled due to crash with ESLint 10 (isolatedDeclarations undefined)
+      "@typescript-eslint/consistent-generic-constructors": "off",
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
       // "@typescript-eslint/consistent-type-imports": [
@@ -119,6 +121,8 @@ export const baseConfig = defineConfig(
       // "@typescript-eslint/no-explicit-any": "off",
 
       "unicorn/prevent-abbreviations": "off",
+      // Disabled due to crash with ESLint 10 ('text' must be a string)
+      "unicorn/prefer-string-slice": "off",
       "unicorn/no-nested-ternary": "off", // off beause conflict with prettier
       "unicorn/no-null": "off", // off beause sometime backend return null
       "unicorn/filename-case": [

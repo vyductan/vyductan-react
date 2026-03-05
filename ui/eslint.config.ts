@@ -1,5 +1,5 @@
-// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
+// TODO: Re-enable eslint-plugin-storybook when it supports ESLint 10
+// See: https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import { defineConfig } from "eslint/config";
 
 import { baseConfig } from "@acme/eslint-config/base";
@@ -18,7 +18,6 @@ export default defineConfig([
   ...baseConfig,
   ...reactConfig,
   ...nextjsConfig,
-  ...storybook.configs["flat/recommended"],
   {
     rules: {
       "@next/next/no-html-link-for-pages": "off",

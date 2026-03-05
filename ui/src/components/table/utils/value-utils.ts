@@ -27,8 +27,8 @@ export function getColumnsKey<T = any>(
     const { key, dataIndex } = column || {};
 
     let mergedKey = key || toArray(dataIndex).join("-") || INTERNAL_KEY_PREFIX;
-    while (keys[mergedKey as string]) {
-      mergedKey = `${mergedKey}_next`;
+    while (keys[String(mergedKey)]) {
+      mergedKey = `${String(mergedKey)}_next`;
     }
     keys[mergedKey as string] = true;
 

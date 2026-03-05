@@ -238,6 +238,26 @@ export const Disabled: Story = {
   },
 };
 
+export const WithError: Story = {
+  render: (args) => (
+    <div className="flex items-center gap-4">
+      <Button {...args} aria-invalid variant="solid">
+        Solid
+      </Button>
+      <Button {...args} aria-invalid variant="outlined">
+        Outlined
+      </Button>
+      <Button {...args} aria-invalid variant="text">
+        Text
+      </Button>
+    </div>
+  ),
+  args: {
+    children: "Error",
+    color: "primary",
+  },
+};
+
 // Interaction Testing - Test button click behavior
 export const InteractionTest: Story = {
   args: {

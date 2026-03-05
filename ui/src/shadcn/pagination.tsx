@@ -6,7 +6,7 @@ import {
 } from "lucide-react"
 
 import { cn } from "@acme/ui/lib/utils"
-import { Button, buttonVariants } from "@acme/ui/shadcn/button"
+import { buttonVariants, type Button } from "@acme/ui/shadcn/button"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (

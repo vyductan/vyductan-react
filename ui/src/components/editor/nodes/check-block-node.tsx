@@ -41,9 +41,20 @@ export class CheckBlockNode extends ElementNode {
     if (className) {
       div.className = className;
     }
+
+    // Real checkbox icon (non-editable) so it shifts with indent
+    const icon = document.createElement("span");
+    icon.setAttribute("contenteditable", "false");
+    icon.setAttribute("aria-hidden", "true");
+    icon.dataset.checkIcon = "true";
+    const iconClass = theme.checkBlockIcon as string | undefined;
+    if (iconClass) icon.className = iconClass;
+    div.append(icon);
+
     const checkBlockChecked = theme.checkBlockChecked as string | undefined;
     if (this.__checked && checkBlockChecked) {
       div.classList.add(...checkBlockChecked.split(" "));
+      icon.dataset.checked = "true";
     }
     return div;
   }
@@ -55,14 +66,17 @@ export class CheckBlockNode extends ElementNode {
   ): boolean {
     const theme = config.theme;
     const checkedClass = theme.checkBlockChecked as string | undefined;
+    const icon = dom.querySelector<HTMLElement>("[data-check-icon]");
 
     if (prevNode.__checked !== this.__checked && checkedClass) {
       if (this.__checked) {
         dom.classList.add(...checkedClass.split(" "));
         dom.dataset.checked = "true";
+        icon?.setAttribute("data-checked", "true");
       } else {
         dom.classList.remove(...checkedClass.split(" "));
         delete dom.dataset.checked;
+        icon?.removeAttribute("data-checked");
       }
     }
     return false;

@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ShadcnCalendarProps } from "./_components";
-import { CustomCalendar } from "./_components";
+import { Calendar as ShadcnCalendar } from "./_components";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
@@ -352,7 +352,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       onMouseLeave={handleContainerMouseLeave}
     >
       {/* Start Date Calendar */}
-      <CustomCalendar
+      <ShadcnCalendar
         mode="range"
         required
         captionLayout={captionLayout}
@@ -375,7 +375,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       />
 
       {/* End Date Calendar */}
-      <CustomCalendar
+      <ShadcnCalendar
         mode="range"
         required
         captionLayout={captionLayout}

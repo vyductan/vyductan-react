@@ -95,6 +95,26 @@ export const Status: Story = {
   ),
 };
 
+export const WithError: Story = {
+  render: (args) => (
+    <div className="flex w-[300px] flex-col gap-4">
+      <Input {...args} aria-invalid placeholder="Outlined Error" />
+      <Input
+        {...args}
+        aria-invalid
+        variant="filled"
+        placeholder="Filled Error"
+      />
+      <Input
+        {...args}
+        aria-invalid
+        variant="borderless"
+        placeholder="Borderless Error"
+      />
+    </div>
+  ),
+};
+
 export const WithCount: Story = {
   render: (args) => (
     <div className="flex w-[300px] flex-col gap-4">

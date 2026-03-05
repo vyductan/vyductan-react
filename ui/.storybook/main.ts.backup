@@ -1,0 +1,1017 @@
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { StorybookConfig } from "@storybook/nextjs-vite";
+import tailwindcss from "@tailwindcss/vite";
+
+
+function getAbsolutePath(value: string): any {
+  return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
+}
+
+// Manual chunks function for code splitting optimization
+function createManualChunks(id: string): string | undefined {
+  // CRITICAL: Check Storybook FIRST before any other rules
+  // Keep ALL Storybook code in main bundle to ensure __STORYBOOK_MODULE_* resolution works
+  // This MUST be the first check to prevent Storybook from being caught by other vendor rules
+  if (id.includes("/@storybook/") || id.includes("/storybook/")) {
+    return undefined; // Keep in main bundle
+  }
+
+  // Don't split React into a separate chunk for Storybook builds
+  // This ensures React is always available when components use React.forwardRef
+  // React should stay in the main bundle to avoid loading order issues
+  // React core libraries - return undefined to keep in main bundle
+  // Also keep React-dependent libraries in main bundle to prevent "forwardRef is undefined" errors
+  // when they load before React
+  if (
+    id.includes("node_modules/react/") ||
+    id.includes("node_modules/react-dom/") ||
+    id.includes("node_modules/react-is/") ||
+    id.includes("node_modules/scheduler/") ||
+    id.includes("node_modules/@rc-component/") ||
+    id.includes("node_modules/rc-util/") ||
+    // Keep React-dependent scoped packages with React to prevent vendor-misc errors
+    id.includes("node_modules/@lexical/") ||
+    id.includes("node_modules/@tanstack/") ||
+    id.includes("node_modules/@hookform/") ||
+    id.includes("node_modules/@dnd-kit/") ||
+    id.includes("node_modules/@excalidraw/") ||
+    id.includes("node_modules/react-colorful/") ||
+    id.includes("node_modules/react-day-picker/") ||
+    id.includes("node_modules/react-dropzone/") ||
+    id.includes("node_modules/react-hook-form/") ||
+    id.includes("node_modules/react-markdown/") ||
+    id.includes("node_modules/react-resizable-panels/") ||
+    id.includes("node_modules/react-textarea-autosize/") ||
+    id.includes("node_modules/embla-carousel-react/") ||
+    id.includes("node_modules/next-themes/") ||
+    id.includes("node_modules/vaul/") ||
+    id.includes("node_modules/cmdk/") ||
+    id.includes("node_modules/sonner/") ||
+    // Keep lucide-react and @floating-ui/react with React (they use React.forwardRef)
+    id.includes("node_modules/lucide-react/") ||
+    id.includes("node_modules/@floating-ui/react/")
+  ) {
+    return undefined; // Keep React and React-dependent libs in main bundle for Storybook
+  }
+
+  // UI libraries - Radix UI
+  if (id.includes("node_modules/@radix-ui/")) {
+    return "vendor-radix-ui";
+  }
+
+  // UI libraries - Framer Motion
+  if (id.includes("node_modules/framer-motion/")) {
+    return "vendor-framer-motion";
+  }
+
+  // Syntax highlighters - Shiki and related
+  if (
+    id.includes("node_modules/shiki/") ||
+    id.includes("node_modules/@shikijs/") ||
+    id.includes("node_modules/vscode-oniguruma/") ||
+    id.includes("node_modules/vscode-textmate/")
+  ) {
+    return "vendor-syntax";
+  }
+
+  // WebAssembly and large binary dependencies
+  if (
+    id.includes("node_modules/@wasm-tool/") ||
+    id.includes(".wasm") ||
+    id.includes("wasm-tool")
+  ) {
+    return "vendor-wasm";
+  }
+
+  // Accessibility testing - axe-core
+  if (
+    id.includes("node_modules/axe-core/") ||
+    id.includes("node_modules/@axe-core/")
+  ) {
+    return "vendor-axe";
+  }
+
+  // Date/time utilities
+  if (
+    id.includes("node_modules/dayjs/") ||
+    id.includes("node_modules/date-fns/") ||
+    id.includes("node_modules/moment/")
+  ) {
+    return "vendor-date";
+  }
+
+  // Ant Design and other RC components (but not @rc-component/util or rc-util - those are with React)
+  if (
+    id.includes("node_modules/antd/") ||
+    (id.includes("node_modules/rc-") && !id.includes("node_modules/rc-util/"))
+  ) {
+    return "vendor-antd";
+  }
+
+  // Other large vendor libraries
+  if (id.includes("node_modules/")) {
+    // CRITICAL: Skip Storybook packages - they must stay in main bundle
+    // This is a safety check in case the first check didn't catch it
+    if (id.includes("storybook")) {
+      return undefined;
+    }
+
+    // Group other node_modules into vendor chunk
+    // Extract package name from path
+    const match = id.match(/node_modules\/(@?[^/]+)/);
+    if (match) {
+      const packageName = match[1];
+      // Don't put React-dependent packages in vendor-misc - they should be with React
+      // Only put non-React scoped packages and utility libraries in vendor-misc
+      // Exclude lucide-react and @floating-ui/react (they're React-dependent and handled above)
+      if (
+        (packageName.startsWith("@") &&
+          !packageName.includes("floating-ui")) ||
+        (packageName.includes("lucide") && packageName !== "lucide-react") ||
+        packageName.includes("clsx") ||
+        packageName.includes("class-variance-authority")
+      ) {
+        // Double-check: don't put React-dependent packages here (they're already handled above)
+        // This is a fallback for non-React scoped packages
+        return "vendor-misc";
+      }
+    }
+    return "vendor";
+  }
+
+  return undefined;
+}
+
+const config: StorybookConfig = {
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+  addons: [
+    getAbsolutePath("@storybook/addon-links"),
+    getAbsolutePath("@storybook/addon-onboarding"),
+    getAbsolutePath("@storybook/addon-a11y"),
+    getAbsolutePath("@storybook/addon-themes"),
+    getAbsolutePath("@storybook/addon-docs"),
+    // Only include vitest addon in development mode to avoid build issues
+    ...(process.env.NODE_ENV !== "production" &&
+    process.env.STORYBOOK_BUILD !== "true"
+      ? [getAbsolutePath("@storybook/addon-vitest")]
+      : []),
+    getAbsolutePath("@chromatic-com/storybook")
+  ],
+  framework: {
+    name: getAbsolutePath("@storybook/nextjs-vite"),
+    options: {},
+  },
+  async viteFinal(config) {
+    // CRITICAL: Store Storybook's original define configuration FIRST
+    // This is critical for Storybook's internal modules like __STORYBOOK_MODULE_CORE_EVENTS__
+    // Storybook sets up these defines automatically, and we must preserve them
+    // Store both the original and track any Storybook defines that might be added later
+    const originalDefine = config.define ? { ...config.define } : {};
+    
+    // Extract Storybook internal module defines (those starting with __STORYBOOK_MODULE_)
+    // These must be preserved throughout the viteFinal hook and never modified
+    // NOTE: Storybook's framework plugin may set these up later, so we need to ensure
+    // we don't overwrite them and use a plugin to preserve them at the right time
+    const storybookDefines: Record<string, any> = {};
+    if (config.define) {
+      for (const [key, value] of Object.entries(config.define)) {
+        if (key.startsWith("__STORYBOOK_MODULE_")) {
+          storybookDefines[key] = value;
+        }
+      }
+    }
+    
+    // Log Storybook defines for debugging (only in development)
+    if (process.env.NODE_ENV !== "production" && Object.keys(storybookDefines).length > 0) {
+      console.log("[Storybook] Found Storybook module defines:", Object.keys(storybookDefines));
+    }
+
+    // Ensure React is pre-bundled and available
+    // This fixes the "Cannot read properties of undefined (reading 'forwardRef')" error
+    // by ensuring React is properly resolved before components use it
+    config.optimizeDeps = config.optimizeDeps || {};
+    config.optimizeDeps.include = [
+      ...(config.optimizeDeps.include || []),
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      // Pre-bundle React-dependent libraries to ensure React is available when they load
+      "@rc-component/util",
+      "rc-util",
+      // Pre-bundle React-dependent scoped packages to prevent vendor-misc errors
+      // Note: @lexical/react removed due to package.json exports issue
+      "@tanstack/react-table",
+      "react-hook-form",
+      "@dnd-kit/sortable",
+      "@dnd-kit/utilities",
+      "react-colorful",
+      "react-day-picker",
+      "react-dropzone",
+      "react-markdown",
+      "react-resizable-panels",
+      "react-textarea-autosize",
+      "embla-carousel-react",
+      "next-themes",
+      "vaul",
+      "cmdk",
+      "sonner",
+      // Pre-bundle lucide-react and @floating-ui/react to prevent vendor-misc errors
+      "lucide-react",
+      "@floating-ui/react",
+    ];
+
+    // Resolve @acme/ui package exports and TypeScript path aliases to source files
+    const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+    config.resolve = config.resolve || {};
+
+    // Convert alias object to array format for better wildcard support
+    const existingAlias = config.resolve.alias || {};
+    const aliasArray = Array.isArray(existingAlias)
+      ? existingAlias
+      : typeof existingAlias === "object"
+        ? Object.entries(existingAlias).map(([find, replacement]) => ({
+            find,
+            replacement,
+          }))
+        : [];
+
+    // Use object format for aliases - more reliable than array with regex
+    const aliasObj: Record<string, string> = {};
+
+    // Convert existing aliases to object format
+    if (Array.isArray(existingAlias)) {
+      existingAlias.forEach((alias) => {
+        if (typeof alias === "object" && alias.find && alias.replacement) {
+          if (typeof alias.find === "string") {
+            aliasObj[alias.find] = alias.replacement;
+          }
+        }
+      });
+    } else if (typeof existingAlias === "object") {
+      Object.assign(aliasObj, existingAlias);
+    }
+    
+    // CRITICAL: Add alias for Storybook virtual module
+    // This ensures "storybook/internal/preview-errors" can be resolved
+    // Try to find the actual module location
+    try {
+      const frameworkPath = getAbsolutePath("@storybook/nextjs-vite");
+      const possiblePaths = [
+        resolve(frameworkPath, "../core-events/dist/preview-errors.js"),
+        resolve(frameworkPath, "../core-events/preview-errors.js"),
+        resolve(frameworkPath, "dist/preview-errors.js"),
+      ];
+      
+      for (const path of possiblePaths) {
+        if (existsSync(path)) {
+          aliasObj["storybook/internal/preview-errors"] = path;
+          if (process.env.NODE_ENV !== "production") {
+            console.log(`[Storybook] Resolved virtual module to: ${path}`);
+          }
+          break;
+        }
+      }
+    } catch {
+      // If we can't resolve it, the framework plugin should handle it
+    }
+
+    // @acme/ui package exports - only exact matches, let plugin handle wildcards
+    aliasObj["@acme/ui/lib/utils"] = resolve(projectRoot, "src/lib/utils.ts");
+    // Don't add @acme/ui/components here - let plugin handle both exact and wildcard cases
+    // Don't add @acme/ui/icons here - let plugin handle both exact and wildcard cases
+
+    // TypeScript path aliases - only exact matches, let plugin handle wildcards
+    // Don't add @/components/ui here - let plugin handle both exact and wildcard cases
+    // Don't add @/components/icons here - let plugin handle both exact and wildcard cases
+
+    config.resolve.alias = aliasObj;
+
+    // Ensure React is deduplicated - critical for preventing "forwardRef is undefined" errors
+    // This ensures only one React instance is used across all modules
+    config.resolve.dedupe = [
+      ...(config.resolve.dedupe || []),
+      "react",
+      "react-dom",
+    ];
+
+    // Explicitly ensure React resolution - prevent any module resolution issues
+    // This ensures React is always resolved from the same location
+    if (!config.resolve.conditions) {
+      config.resolve.conditions = [];
+    }
+    // Ensure React is resolved with proper conditions
+    config.resolve.conditions = [
+      ...new Set([...config.resolve.conditions, "import", "module", "browser", "default"]),
+    ];
+
+    // Improve sourcemap configuration to resolve original locations
+    // Enable sourcemaps for better error reporting in both dev and build
+    config.build = config.build || {};
+    if (config.build.sourcemap === undefined) {
+      config.build.sourcemap = true;
+    }
+    
+    // Ensure proper module initialization order in production builds
+    // This helps prevent "Cannot access before initialization" errors
+    if (process.env.NODE_ENV === "production" || process.env.STORYBOOK_BUILD === "true") {
+      config.build.modulePreload = config.build.modulePreload ?? false;
+      // Ensure chunks are loaded in proper order
+      if (config.build.rollupOptions?.output) {
+        const output = config.build.rollupOptions.output;
+        if (typeof output === "object" && !Array.isArray(output)) {
+          output.inlineDynamicImports = false; // Keep dynamic imports separate but ensure proper order
+        }
+      }
+      
+      // CRITICAL: Ensure Storybook defines are not stripped during minification
+      // Vite's define option replaces variables at compile time (before minification),
+      // so they should be preserved. However, we ensure the define is set up correctly
+      // in the viteFinal hook to prevent any issues.
+      // 
+      // The key is that defines are replaced during the transform phase, not during minification,
+      // so as long as the define is set up in config.define, it will be replaced correctly.
+      config.build.minify = config.build.minify ?? "esbuild";
+      
+      // Note: No special configuration needed for minification - Vite handles define replacement
+      // before minification occurs. The important part is ensuring the define is set up correctly
+      // in the viteFinal hook (which we do below).
+    }
+
+    // Ensure proper sourcemap generation in rollup
+    config.build.rollupOptions = config.build.rollupOptions || {};
+    
+    // Ensure React is not externalized (should be bundled)
+    // This is critical for Storybook builds to work correctly
+    if (!config.build.rollupOptions.external) {
+      config.build.rollupOptions.external = [];
+    }
+    // Ensure React and React-DOM are not in the external list
+    const external = config.build.rollupOptions.external;
+    if (Array.isArray(external)) {
+      config.build.rollupOptions.external = external.filter(
+        (id) => {
+          if (typeof id === "string") {
+            return id !== "react" && id !== "react-dom" && !id.startsWith("react/");
+          }
+          // Keep RegExp patterns as they might match other modules
+          return true;
+        },
+      );
+    } else if (typeof external === "function") {
+      const originalExternal = external as (
+        id: string,
+        importer?: string,
+        isResolved?: boolean,
+      ) => boolean | void;
+      config.build.rollupOptions.external = (
+        id: string,
+        importer?: string,
+        isResolved?: boolean,
+      ) => {
+        // Don't externalize React
+        if (
+          typeof id === "string" &&
+          (id === "react" || id === "react-dom" || id.startsWith("react/"))
+        ) {
+          return false;
+        }
+        // Call original external function with proper arguments
+        return originalExternal(id, importer, isResolved);
+      };
+    }
+
+    if (!config.build.rollupOptions.output) {
+      config.build.rollupOptions.output = {};
+    }
+
+    // Configure code splitting for output
+    // Note: Vite doesn't support rollupOptions.output.sourcemap, use build.sourcemap instead
+    // For production builds (like Chromatic), use a more conservative chunking strategy
+    // to prevent "Cannot access before initialization" errors
+    const isProductionBuild = process.env.NODE_ENV === "production" || process.env.STORYBOOK_BUILD === "true";
+    
+    // Conservative chunking function for production builds
+    // Keeps all component code together to avoid initialization order issues
+    function createConservativeChunks(id: string): string | undefined {
+      // Keep Storybook code in main bundle
+      if (id.includes("/@storybook/") || id.includes("/storybook/")) {
+        return undefined;
+      }
+      
+      // Keep React and React-dependent code in main bundle
+      if (
+        id.includes("node_modules/react/") ||
+        id.includes("node_modules/react-dom/") ||
+        id.includes("node_modules/react-is/") ||
+        id.includes("node_modules/scheduler/") ||
+        id.includes("node_modules/@rc-component/") ||
+        id.includes("node_modules/rc-util/") ||
+        id.includes("node_modules/@lexical/") ||
+        id.includes("node_modules/@tanstack/") ||
+        id.includes("node_modules/@hookform/") ||
+        id.includes("node_modules/@dnd-kit/") ||
+        id.includes("node_modules/@excalidraw/") ||
+        id.includes("node_modules/react-colorful/") ||
+        id.includes("node_modules/react-day-picker/") ||
+        id.includes("node_modules/react-dropzone/") ||
+        id.includes("node_modules/react-hook-form/") ||
+        id.includes("node_modules/react-markdown/") ||
+        id.includes("node_modules/react-resizable-panels/") ||
+        id.includes("node_modules/react-textarea-autosize/") ||
+        id.includes("node_modules/embla-carousel-react/") ||
+        id.includes("node_modules/next-themes/") ||
+        id.includes("node_modules/vaul/") ||
+        id.includes("node_modules/cmdk/") ||
+        id.includes("node_modules/sonner/") ||
+        id.includes("node_modules/lucide-react/") ||
+        id.includes("node_modules/@floating-ui/react/")
+      ) {
+        return undefined;
+      }
+      
+      // Keep all source code (components) in main bundle to avoid circular dependency issues
+      if (id.includes("/src/") || !id.includes("node_modules/")) {
+        return undefined;
+      }
+      
+      // Only split large vendor libraries
+      if (id.includes("node_modules/@radix-ui/")) {
+        return "vendor-radix-ui";
+      }
+      if (id.includes("node_modules/framer-motion/")) {
+        return "vendor-framer-motion";
+      }
+      if (id.includes("node_modules/antd/")) {
+        return "vendor-antd";
+      }
+      
+      // Group other large vendors
+      if (id.includes("node_modules/")) {
+        return "vendor";
+      }
+      
+      return undefined;
+    }
+    
+
+    if (Array.isArray(config.build.rollupOptions.output)) {
+      config.build.rollupOptions.output = config.build.rollupOptions.output.map(
+        (output) => ({
+          ...output,
+          manualChunks: isProductionBuild 
+            ? createConservativeChunks // Use conservative chunking for production
+            : (output.manualChunks || createManualChunks),
+        }),
+      );
+    } else if (typeof config.build.rollupOptions.output === "object") {
+      config.build.rollupOptions.output = {
+        ...config.build.rollupOptions.output,
+        manualChunks: isProductionBuild
+          ? createConservativeChunks // Use conservative chunking for production
+          : (config.build.rollupOptions.output.manualChunks || createManualChunks),
+      };
+    }
+
+    // Configure sourcemap for dev server (where warnings occur)
+    config.server = config.server || {};
+    config.server.sourcemapIgnoreList =
+      config.server.sourcemapIgnoreList || false;
+
+    // Suppress harmless warnings in Storybook build
+    config.build = config.build || {};
+    config.build.rollupOptions = config.build.rollupOptions || {};
+    const originalOnWarn = config.build.rollupOptions.onwarn;
+    config.build.rollupOptions.onwarn = (warning, warn) => {
+      // Suppress "use client" directive warnings - these are harmless in Storybook
+      // Component files need "use client" for Next.js but it's ignored in Storybook
+      if (
+        warning.message?.includes('"use client"') ||
+        warning.message?.includes(
+          "Module level directives cause errors when bundled",
+        )
+      ) {
+        return;
+      }
+      // Suppress sourcemap resolution errors - these don't affect functionality
+      if (
+        warning.message?.includes(
+          "Error when using sourcemap for reporting an error",
+        ) ||
+        warning.message?.includes("Can't resolve original location of error")
+      ) {
+        return;
+      }
+      // Call original warn handler for other warnings
+      if (originalOnWarn) {
+        originalOnWarn(warning, warn);
+      } else {
+        warn(warning);
+      }
+    };
+
+    // Suppress harmless warnings by configuring log level filter
+    // Note: These warnings are harmless - "use client" is needed for Next.js
+    // but ignored in Storybook, and sourcemap errors don't affect functionality
+    if (!config.logLevel || config.logLevel === "info") {
+      // Keep info level but we'll filter specific warnings via onwarn
+    }
+
+    // Add custom plugin to handle @acme/ui package resolution
+    const originalPlugins = config.plugins || [];
+    config.plugins = [
+      // Add Tailwind CSS v4 Vite plugin
+      tailwindcss(),
+      // Plugin to ensure Storybook defines are preserved throughout the build
+      // This plugin runs at different stages to capture defines set up by Storybook's framework plugin
+      {
+        name: "preserve-storybook-defines",
+        enforce: "pre",
+        configResolved(resolvedConfig) {
+          // Verify Storybook defines are present after all config resolution
+          // Storybook's framework plugin should have set them up by this point
+          const defines = resolvedConfig.define || {};
+          const storybookDefines = Object.keys(defines).filter(key => 
+            key.startsWith("__STORYBOOK_MODULE_")
+          );
+          if (storybookDefines.length === 0) {
+            console.warn("[Storybook] Warning: No Storybook module defines found. This may cause runtime errors.");
+          } else if (process.env.NODE_ENV !== "production") {
+            console.log("[Storybook] Found Storybook module defines after config resolution:", storybookDefines);
+          }
+        },
+      },
+      ...originalPlugins,
+      // Add a plugin that runs AFTER Storybook's framework plugin to ensure defines are preserved
+      // This plugin verifies defines are present and logs warnings
+      {
+        name: "ensure-storybook-defines",
+        enforce: "post", // Run after other plugins including framework plugin
+        configResolved(resolvedConfig) {
+          // At this point, Storybook's framework plugin should have set up all defines
+          const defines = resolvedConfig.define || {};
+          const missingDefines: string[] = [];
+          
+          // Check for required defines
+          if (!("__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__" in defines)) {
+            missingDefines.push("__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__");
+          }
+          
+          if (missingDefines.length > 0) {
+            if (process.env.NODE_ENV !== "production") {
+              console.warn(
+                "[Storybook] Missing required defines:",
+                missingDefines,
+                "\nAvailable defines:",
+                Object.keys(defines).filter(k => k.startsWith("__STORYBOOK_MODULE_"))
+              );
+            }
+          }
+        },
+      },
+      // Plugin to resolve Storybook virtual module "storybook/internal/preview-errors"
+      // This ensures the virtual module is resolved to an actual module that can be imported
+      {
+        name: "resolve-storybook-preview-errors",
+        enforce: "pre",
+        resolveId(id) {
+          if (id === "storybook/internal/preview-errors") {
+            // Try to resolve to the actual module
+            // Storybook's framework should handle this, but if it doesn't, we provide a fallback
+            // Return the id to let Storybook's framework plugin handle it first
+            // If that fails, we'll need to find the actual module
+            return null; // Let other plugins handle it first
+          }
+          return null;
+        },
+      },
+      // Production build plugin: ensures defines are set up before code transformation
+      // This runs at buildStart to set up defines if they're missing in production builds
+      {
+        name: "production-storybook-define-fix",
+        enforce: "post", // Run after framework plugin
+        buildStart() {
+          // This hook runs before code transformation
+          // We'll set up the define in the configResolved hook instead
+        },
+        configResolved(resolvedConfig) {
+          // In production builds, verify and set up the define if missing
+          const isProduction = process.env.NODE_ENV === "production" || process.env.STORYBOOK_BUILD === "true";
+          
+          if (isProduction) {
+            const defines = resolvedConfig.define || {};
+            
+            // Check if the critical define is missing
+            if (!("__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__" in defines)) {
+              // Try to resolve the module path
+              try {
+                // The define should point to the module that exports preview-errors
+                // Storybook uses this pattern: JSON.stringify(modulePath)
+                const frameworkPath = getAbsolutePath("@storybook/nextjs-vite");
+                
+                // Try to find the preview-errors module
+                // Common locations in Storybook packages
+                const possiblePaths = [
+                  resolve(frameworkPath, "dist/preview-errors.js"),
+                  resolve(frameworkPath, "preview-errors.js"),
+                  resolve(frameworkPath, "../core-events/dist/preview-errors.js"),
+                ];
+                
+                let resolvedPath: string | null = null;
+                for (const path of possiblePaths) {
+                  if (existsSync(path)) {
+                    resolvedPath = path;
+                    break;
+                  }
+                }
+                
+                // If we found a path, set up the define
+                // Note: We can't modify resolvedConfig.define here, but we can log
+                // The actual fix will be in viteFinal
+                if (resolvedPath) {
+                  console.log(
+                    `[Storybook Production] Found preview-errors at: ${resolvedPath}`
+                  );
+                } else {
+                  console.warn(
+                    "[Storybook Production] Could not find preview-errors module. " +
+                    "The define will be set up in viteFinal hook."
+                  );
+                }
+              } catch (error) {
+                console.warn(
+                  "[Storybook Production] Error resolving preview-errors module:",
+                  error
+                );
+              }
+            }
+          }
+        },
+      },
+      {
+        name: "ensure-react-available",
+        enforce: "pre",
+        buildStart() {
+          // This plugin ensures React is always available
+          // It doesn't modify code but helps with module resolution
+        },
+        resolveId(id) {
+          // Ensure React resolves correctly
+          if (id === "react" || id === "react-dom") {
+            return null; // Let Vite handle it normally, but ensure it's not externalized
+          }
+          return null;
+        },
+      },
+      {
+        name: "resolve-acme-ui",
+        enforce: "pre",
+        resolveId(id, importer) {
+          // Handle @acme/ui/lib/utils and other lib exports
+          if (id === "@acme/ui/lib/utils") {
+            const resolved = resolve(projectRoot, "src/lib/utils.ts");
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          if (id.startsWith("@acme/ui/lib/")) {
+            const path = id.replace("@acme/ui/lib/", "");
+            const resolved = resolve(projectRoot, `src/lib/${path}.ts`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Also handle relative paths that might be incorrectly resolved
+          if (importer) {
+            // Handle ui/lib/utils relative paths (any number of ../)
+            if (id.includes("ui/lib/utils")) {
+              const match = id.match(/\.\.\/+ui\/lib\/utils$/);
+              if (match || id.endsWith("ui/lib/utils")) {
+                const resolved = resolve(projectRoot, "src/lib/utils.ts");
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+              }
+            }
+            // Handle ui/shadcn/* relative paths (any number of ../)
+            if (id.includes("ui/shadcn/")) {
+              const match = id.match(/\.\.\/+ui\/shadcn\/(.+)$/);
+              if (match) {
+                const path = match[1];
+                const resolved = resolve(projectRoot, `src/shadcn/${path}.tsx`);
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+              }
+            }
+            // Handle ui/components/* relative paths (any number of ../)
+            if (id.includes("ui/components/")) {
+              const match = id.match(/\.\.\/+ui\/components\/(.+)$/);
+              if (match) {
+                const path = match[1];
+                // Try index.ts first
+                const resolved = resolve(
+                  projectRoot,
+                  `src/components/${path}/index.ts`,
+                );
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+                // Try index.tsx
+                const resolvedTsx = resolve(
+                  projectRoot,
+                  `src/components/${path}/index.tsx`,
+                );
+                if (existsSync(resolvedTsx)) {
+                  return resolvedTsx;
+                }
+              }
+            }
+            // Handle ui/icons relative paths (exact match, any number of ../)
+            if (id.includes("ui/icons") && !id.includes("ui/icons/")) {
+              const match = id.match(/\.\.\/+ui\/icons$/);
+              if (match || id.endsWith("ui/icons")) {
+                const resolved = resolve(projectRoot, "src/icons/index.ts");
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+              }
+            }
+            // Handle ui/icons/* relative paths (any number of ../)
+            if (id.includes("ui/icons/")) {
+              const match = id.match(/\.\.\/+ui\/icons\/(.+)$/);
+              if (match) {
+                const path = match[1];
+                const resolved = resolve(projectRoot, `src/icons/${path}.tsx`);
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+              }
+            }
+            // Handle ui/ui/* relative paths (any number of ../)
+            if (id.includes("ui/ui/")) {
+              const match = id.match(/\.\.\/+ui\/ui\/(.+)$/);
+              if (match) {
+                const path = match[1];
+                const resolved = resolve(projectRoot, `src/ui/${path}.tsx`);
+                if (existsSync(resolved)) {
+                  return resolved;
+                }
+              }
+            }
+          }
+          // Handle @acme/ui/components (exact match)
+          if (id === "@acme/ui/components") {
+            const resolved = resolve(projectRoot, "src/components/index.ts");
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @acme/ui/components/* (wildcard - must come after exact check)
+          if (id.startsWith("@acme/ui/components/")) {
+            const path = id.replace("@acme/ui/components/", "");
+            // Try index.ts first
+            const resolved = resolve(
+              projectRoot,
+              `src/components/${path}/index.ts`,
+            );
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+            // Try index.tsx
+            const resolvedTsx = resolve(
+              projectRoot,
+              `src/components/${path}/index.tsx`,
+            );
+            if (existsSync(resolvedTsx)) {
+              return resolvedTsx;
+            }
+            // Try direct file name (for cases where component is not in a folder)
+            const resolvedDirect = resolve(
+              projectRoot,
+              `src/components/${path}.tsx`,
+            );
+            if (existsSync(resolvedDirect)) {
+              return resolvedDirect;
+            }
+          }
+          // Handle @acme/ui/icons
+          if (id === "@acme/ui/icons") {
+            const resolved = resolve(projectRoot, "src/icons/index.ts");
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @acme/ui/icons/*
+          if (id.startsWith("@acme/ui/icons/")) {
+            const path = id.replace("@acme/ui/icons/", "");
+            const resolved = resolve(projectRoot, `src/icons/${path}.tsx`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @acme/ui/ui/*
+          if (id.startsWith("@acme/ui/ui/")) {
+            const path = id.replace("@acme/ui/ui/", "");
+            const resolved = resolve(projectRoot, `src/ui/${path}.tsx`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @acme/ui/shadcn/*
+          if (id.startsWith("@acme/ui/shadcn/")) {
+            const path = id.replace("@acme/ui/shadcn/", "");
+            const resolved = resolve(projectRoot, `src/shadcn/${path}.tsx`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @/components/ui (exact match)
+          if (id === "@/components/ui") {
+            const resolved = resolve(projectRoot, "src/components/index.ts");
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @/components/ui/* (wildcard)
+          if (id.startsWith("@/components/ui/")) {
+            const path = id.replace("@/components/ui/", "");
+            // Try index.ts first
+            const resolved = resolve(
+              projectRoot,
+              `src/components/${path}/index.ts`,
+            );
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+            // Try index.tsx
+            const resolvedTsx = resolve(
+              projectRoot,
+              `src/components/${path}/index.tsx`,
+            );
+            if (existsSync(resolvedTsx)) {
+              return resolvedTsx;
+            }
+            // Try direct file name
+            const resolvedDirect = resolve(
+              projectRoot,
+              `src/components/${path}.tsx`,
+            );
+            if (existsSync(resolvedDirect)) {
+              return resolvedDirect;
+            }
+          }
+          // Handle @/components/icons (exact match)
+          if (id === "@/components/icons") {
+            const resolved = resolve(projectRoot, "src/icons/index.ts");
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @/components/icons/* (wildcard)
+          if (id.startsWith("@/components/icons/")) {
+            const path = id.replace("@/components/icons/", "");
+            const resolved = resolve(projectRoot, `src/icons/${path}.tsx`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          // Handle @/lib/* (wildcard)
+          if (id.startsWith("@/lib/")) {
+            const path = id.replace("@/lib/", "");
+            const resolved = resolve(projectRoot, `src/lib/${path}`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+            // Try with .ts extension
+            const resolvedTs = resolve(projectRoot, `src/lib/${path}.ts`);
+            if (existsSync(resolvedTs)) {
+              return resolvedTs;
+            }
+          }
+          // Handle @/hooks/* (wildcard)
+          if (id.startsWith("@/hooks/")) {
+            const path = id.replace("@/hooks/", "");
+            const resolved = resolve(projectRoot, `src/hooks/${path}`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+            // Try with .ts extension
+            const resolvedTs = resolve(projectRoot, `src/hooks/${path}.ts`);
+            if (existsSync(resolvedTs)) {
+              return resolvedTs;
+            }
+          }
+          // Handle @acme/hooks/* (workspace package)
+          // @acme/hooks exports: "./*": "./src/*/index.ts"
+          // So @acme/hooks/use-responsive -> @acme/hooks/src/use-responsive/index.ts
+          if (id.startsWith("@acme/hooks/")) {
+            const hooksRoot = resolve(projectRoot, "../hooks");
+            const path = id.replace("@acme/hooks/", "");
+            // Resolve to src/{path}/index.ts based on export pattern
+            const resolved = resolve(hooksRoot, `src/${path}/index.ts`);
+            if (existsSync(resolved)) {
+              return resolved;
+            }
+          }
+          return null;
+        },
+      },
+    ];
+
+    // CRITICAL: Ensure Storybook's framework plugin can set up defines correctly
+    // Storybook's framework plugin (@storybook/nextjs-vite) sets up internal module defines
+    // like __STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__ during the build process.
+    // 
+    // The framework plugin runs AFTER viteFinal, so it will merge its defines into config.define.
+    // We need to ensure config.define is an object (not undefined) so the framework plugin can merge.
+    // 
+    // Strategy:
+    // 1. Always ensure config.define is an object so framework plugin can merge
+    // 2. Preserve any existing defines and any Storybook defines we found
+    // 3. Never overwrite - always merge to preserve what framework plugin will add
+    // 4. If critical defines are missing, try to set them up as a fallback
+    const currentDefine = config.define || {};
+    
+    // Always ensure config.define is an object so Storybook's framework plugin can merge its defines
+    // We merge any existing defines with any Storybook defines we found
+    // This ensures the framework plugin has a proper object to merge into
+    const mergedDefine = {
+      ...currentDefine,
+      ...storybookDefines, // Preserve any Storybook defines we found
+    };
+    
+    // CRITICAL: In production builds, if the framework plugin didn't set up the define,
+    // we need to set it up manually as a fallback
+    const isProduction = process.env.NODE_ENV === "production" || process.env.STORYBOOK_BUILD === "true";
+    
+    if (!("__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__" in mergedDefine)) {
+      if (isProduction) {
+        // In production, try to set up the define manually
+        try {
+          // Try to resolve the preview-errors module from Storybook packages
+          // The define should be a JSON-stringified module path that Vite can resolve
+          const frameworkPath = getAbsolutePath("@storybook/nextjs-vite");
+          
+          // Try common locations for the preview-errors module
+          const possiblePaths = [
+            resolve(frameworkPath, "dist/preview-errors.js"),
+            resolve(frameworkPath, "preview-errors.js"),
+            resolve(frameworkPath, "../core-events/dist/preview-errors.js"),
+            resolve(frameworkPath, "../core-events/preview-errors.js"),
+          ];
+          
+          let resolvedPath: string | null = null;
+          for (const path of possiblePaths) {
+            if (existsSync(path)) {
+              resolvedPath = path;
+              break;
+            }
+          }
+          
+          if (resolvedPath) {
+            // Set up the define with the resolved module path
+            // Vite expects defines to be JSON-stringified module paths
+            mergedDefine["__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__"] = JSON.stringify(resolvedPath);
+            console.log(
+              `[Storybook Production] Set up __STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__ fallback: ${resolvedPath}`
+            );
+          } else {
+            // If we can't find the file, use the virtual module path that Storybook expects
+            // Storybook uses virtual modules like "storybook/internal/preview-errors"
+            // The define should point to this virtual module path
+            const virtualModulePath = "storybook/internal/preview-errors";
+            mergedDefine["__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__"] = JSON.stringify(virtualModulePath);
+            console.warn(
+              `[Storybook Production] Could not find preview-errors file, using virtual module: ${virtualModulePath}`
+            );
+          }
+        } catch (error) {
+          // If we can't resolve it, use the virtual module path as final fallback
+          const virtualModulePath = "storybook/internal/preview-errors";
+          mergedDefine["__STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__"] = JSON.stringify(virtualModulePath);
+          console.warn(
+            `[Storybook Production] Error resolving preview-errors, using virtual module: ${virtualModulePath}`,
+            error
+          );
+        }
+      } else if (process.env.NODE_ENV !== "production") {
+        // In development, just log a warning
+        console.warn(
+          "[Storybook] __STORYBOOK_MODULE_CORE_EVENTS_PREVIEW_ERRORS__ not found in viteFinal. " +
+          "The framework plugin should set this up. If errors persist:\n" +
+          "1. Clear caches: rm -rf node_modules/.cache storybook-static\n" +
+          "2. Reinstall: pnpm install\n" +
+          "3. Check Storybook GitHub for known issues with version 10.1.0"
+        );
+      }
+    }
+    
+    config.define = mergedDefine;
+
+    return config;
+  },
+};
+
+export default config;
