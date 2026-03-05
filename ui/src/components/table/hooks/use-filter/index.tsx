@@ -157,7 +157,7 @@ const generateFilterInfo = <RecordType extends AnyObject = AnyObject>(
     const keyAsString = key as SafeKey;
     const { filters, filterDropdown } = column;
     if (filterDropdown) {
-      currentFilters[String(keyAsString)] = filteredKeys || null;
+      currentFilters[String(keyAsString)] = filteredKeys ?? null;
     } else if (Array.isArray(filteredKeys)) {
       const keys = flattenKeys(filters);
       currentFilters[String(keyAsString)] = keys.filter((originKey) =>

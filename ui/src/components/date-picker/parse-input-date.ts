@@ -31,7 +31,9 @@ export const parseInputDate = (rawValue: string, preferredFormat: string) => {
     return null;
   }
 
-  const uniqueFormats = [...new Set([preferredFormat, ...FALLBACK_DATE_FORMATS])];
+  const uniqueFormats = [
+    ...new Set([preferredFormat, ...FALLBACK_DATE_FORMATS]),
+  ];
   for (const format of uniqueFormats) {
     const parsed = dayjs(value, format, true);
     if (parsed.isValid()) {

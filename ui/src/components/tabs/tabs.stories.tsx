@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import * as React from "react";
+import type { JSX } from "react";
+import { useState } from "react";
 import { fn } from "storybook/test";
 
+import type { TabsProps } from "./tabs";
 import { Tabs } from "./index";
 
 const items = [
@@ -96,34 +98,34 @@ export const WithExtraContent: Story = {
   },
 };
 
-// With Controlled State
+type ControlledStoryProps = Omit<TabsProps, "activeKey" | "defaultActiveKey">;
+
+function ControlledRender(args: ControlledStoryProps): JSX.Element {
+  const [activeKey, setActiveKey] = useState("1");
+
+  function handleChange(key: string): void {
+    setActiveKey(key);
+    args.onChange?.(key);
+  }
+
+  const controlledItems = items.map((item) => ({
+    ...item,
+    children: `Current active key: ${activeKey}. ${item.children}`,
+  }));
+
+  return (
+    <Tabs
+      {...args}
+      activeKey={activeKey}
+      onChange={handleChange}
+      items={controlledItems}
+    />
+  );
+}
+
 export const Controlled: Story = {
-  render: (args) => {
-    const [activeKey, setActiveKey] = React.useState("1");
-    const {
-      value: _value,
-      defaultValue: _defaultValue,
-      onValueChange: _onValueChange,
-      children: _children,
-      ...rest
-    } = args;
-
-    const handleChange = (key: string) => {
-      setActiveKey(key);
-      args.onChange?.(key);
-    };
-
-    return (
-      <Tabs
-        {...rest}
-        activeKey={activeKey}
-        onChange={handleChange}
-        items={items.map((item) => ({
-          ...item,
-          children: `Current active key: ${activeKey}. ${item.children}`,
-        }))}
-      />
-    );
+  render: function render(args): JSX.Element {
+    return <ControlledRender {...args} />;
   },
   args: {
     type: "line",

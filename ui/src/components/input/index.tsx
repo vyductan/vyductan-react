@@ -73,8 +73,8 @@ const ConditionTypeInput = <
         onChange={(_, timeStr) => {
           if (onChange) {
             const mockEvent = {
-              target: { value: timeStr || "" },
-              currentTarget: { value: timeStr || "" },
+              target: { value: timeStr ?? "" },
+              currentTarget: { value: timeStr ?? "" },
             };
             onChange(mockEvent as React.ChangeEvent<HTMLInputElement>);
           }

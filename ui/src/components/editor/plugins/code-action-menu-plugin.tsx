@@ -176,7 +176,7 @@ function CodeActionMenuContainer({
                 className="hover:bg-muted/50 flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors"
                 title="Select language"
               >
-                {codeFriendlyName || "Plain Text"}
+                {codeFriendlyName ?? "Plain Text"}
                 <ChevronDown className="h-3 w-3 opacity-50" />
               </button>
             </PopoverTrigger>
