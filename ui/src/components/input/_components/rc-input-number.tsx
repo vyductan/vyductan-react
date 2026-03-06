@@ -775,6 +775,11 @@ const InputNumber = <T extends ValueType = ValueType>({
     <>
       {clearIcon}
       {controlsNode}
+      {_suffix && (
+        <span className="mx-1 flex items-center">
+          {_suffix}
+        </span>
+      )}
     </>
   );
 
@@ -807,7 +812,7 @@ const InputNumber = <T extends ValueType = ValueType>({
 
   return (
     <BaseInput
-      className={cn("w-[90px]", className)}
+      className={cn("w-full", className)}
       triggerFocus={focus}
       value={value}
       disabled={disabled}
