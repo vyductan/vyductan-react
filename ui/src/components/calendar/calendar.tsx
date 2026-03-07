@@ -3,10 +3,7 @@ import type { Modifiers } from "react-day-picker";
 import dayjs from "dayjs";
 
 import type { ShadcnCalendarProps } from "./_components";
-import {
-  CustomCalendarDayButton,
-  Calendar as ShadcnCalendar,
-} from "./_components";
+import { CustomCalendar, CustomCalendarDayButton } from "./_components";
 
 type CalendarSingleValueProps = Omit<
   ShadcnCalendarProps,
@@ -87,10 +84,11 @@ const Calendar = (props: CalendarProps) => {
 
   if ("selected" in props) {
     return (
-      <ShadcnCalendar
+      <CustomCalendar
         components={{
           DayButton: CustomCalendarDayButton,
         }}
+        fixedWeeks={true}
         {...(props as ShadcnCalendarProps)}
       />
     );
@@ -106,7 +104,7 @@ const Calendar = (props: CalendarProps) => {
     const { value, onSelect, disabledDate, ...rest } = props;
     const disabled = composeDisabled(rest.disabled, disabledDate);
     return (
-      <ShadcnCalendar
+      <CustomCalendar
         {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
         mode="single"
         disabled={disabled}
@@ -117,6 +115,7 @@ const Calendar = (props: CalendarProps) => {
         components={{
           DayButton: CustomCalendarDayButton,
         }}
+        fixedWeeks={true}
       />
     );
   }
@@ -131,7 +130,7 @@ const Calendar = (props: CalendarProps) => {
 
     // Range mode: single calendar with 2 panels
     return (
-      <ShadcnCalendar
+      <CustomCalendar
         {...restWithoutClassName}
         className={className}
         mode="range"
@@ -160,7 +159,7 @@ const Calendar = (props: CalendarProps) => {
   const { className, ...restWithoutClassName } = rest;
 
   return (
-    <ShadcnCalendar
+    <CustomCalendar
       {...restWithoutClassName}
       className={className}
       mode="multiple"

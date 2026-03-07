@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ShadcnCalendarProps } from "./_components";
-import { Calendar as ShadcnCalendar } from "./_components";
+import { CustomCalendar } from "./_components";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
@@ -140,7 +140,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
   );
 
   const handleStartSelect = React.useCallback(
-    (dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
+    (_dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
       const selectedDate = dayjs(triggerDate);
       const startDate = value?.[0] ?? null;
       const endDate = value?.[1] ?? null;
@@ -182,7 +182,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
   );
 
   const handleEndSelect = React.useCallback(
-    (dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
+    (_dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
       const selectedDate = dayjs(triggerDate);
       const startDate = value?.[0] ?? null;
       const endDate = value?.[1] ?? null;
@@ -352,7 +352,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       onMouseLeave={handleContainerMouseLeave}
     >
       {/* Start Date Calendar */}
-      <ShadcnCalendar
+      <CustomCalendar
         mode="range"
         required
         captionLayout={captionLayout}
@@ -375,7 +375,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       />
 
       {/* End Date Calendar */}
-      <ShadcnCalendar
+      <CustomCalendar
         mode="range"
         required
         captionLayout={captionLayout}

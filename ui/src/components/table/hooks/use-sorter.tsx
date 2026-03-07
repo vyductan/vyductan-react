@@ -132,7 +132,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
   tableShowSorterTooltip?: boolean | SorterTooltipProps,
   pos?: string,
 ): ColumnsType<RecordType> => {
-  const _finalColumns = (columns || []).map((column, index) => {
+  return (columns || []).map((column, index) => {
     const columnPos = getColumnPos(index, pos);
     let newColumn: ColumnsType<RecordType>[number] = column;
     if (newColumn.sorter) {
@@ -294,7 +294,6 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
 
     return newColumn;
   });
-  return columns;
 };
 
 const stateToInfo = <RecordType extends AnyObject = AnyObject>(
