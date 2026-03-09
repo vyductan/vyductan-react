@@ -339,20 +339,25 @@ const Select = <
           {...triggerProps} // for form-control
         >
           {isMultiple ? (
-            <SelectMultipleContent
-              mode={mode}
-              onInputClick={() => {
-                handleOpenChange(true);
-              }}
-              selectedValues={selectedValues}
-              onAdd={(value) => {
-                triggerChange(value);
-              }}
-              onRemove={(value) => {
-                triggerChange(value);
-              }}
-              placeholder={placeholder}
-            />
+            <>
+              <SelectMultipleContent
+                mode={mode}
+                onInputClick={() => {
+                  handleOpenChange(true);
+                }}
+                selectedValues={selectedValues}
+                onAdd={(value) => {
+                  triggerChange(value);
+                }}
+                onRemove={(value) => {
+                  triggerChange(value);
+                }}
+                placeholder={placeholder}
+              />
+              <div className="sr-only">
+                <SelectValue placeholder={placeholder} />
+              </div>
+            </>
           ) : (
             <SelectValue placeholder={placeholder} className="h-5" />
           )}
