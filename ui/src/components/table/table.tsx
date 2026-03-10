@@ -693,7 +693,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   }
                   aria-label="Select all"
                   skipGroup
-                  className="translate-y-[2px] align-middle"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               cell: ({ row }) => (
@@ -702,7 +702,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   indeterminate={row.getIsSomeSelected()}
                   onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
-                  className="flex translate-y-[2px]"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               enableSorting: false,
