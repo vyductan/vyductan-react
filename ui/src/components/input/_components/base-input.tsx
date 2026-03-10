@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import type { CSSProperties, ReactElement, ReactNode, Ref } from "react";

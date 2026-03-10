@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 
 "use client";
 
@@ -534,8 +533,8 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     const formatValue: DecimalClass = parsedValue.isNaN()
       ? triggerValueUpdate(decimalValue, userTyping)
       : // Only validate value or empty value can be re-fill to inputValue
-        // Reassign the formatValue within ranged of trigger control
-        triggerValueUpdate(parsedValue, userTyping);
+      // Reassign the formatValue within ranged of trigger control
+      triggerValueUpdate(parsedValue, userTyping);
 
     if (value !== undefined) {
       // Reset back with controlled value first

@@ -178,7 +178,6 @@ const DatePicker = (props: DatePickerProps) => {
 
   const inputRef = React.useRef<InputRef>(null);
 
-  // eslint-disable-next-line react-hooks/refs
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (value.trim()) {

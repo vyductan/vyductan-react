@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 
 /* eslint-disable unicorn/no-array-callback-reference */
 
@@ -529,7 +528,7 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
             <div>
               <Dropdown
                 menu={menu}
-                // getPopupContainer={getPopupContainer}
+              // getPopupContainer={getPopupContainer}
               >
                 <span>
                   <Icon icon="icon-[ant-design--down-outlined]" />

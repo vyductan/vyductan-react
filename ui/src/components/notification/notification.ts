@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExternalToast } from "sonner";
 
 import type { PromiseData, PromiseT } from "../toast/types";

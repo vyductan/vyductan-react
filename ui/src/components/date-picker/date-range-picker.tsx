@@ -149,7 +149,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   const startInputRef = React.useRef<InputRef>(null);
   const endInputRef = React.useRef<InputRef>(null);
 
-  // eslint-disable-next-line react-hooks/refs
+
   const composedStartRef = ref ? composeRef(ref, startInputRef) : startInputRef;
 
   const handleStartInputChange = (inputValue: string) => {
@@ -269,9 +269,9 @@ const DateRangePicker = (props: DateRangePickerProps) => {
         selected={
           value
             ? {
-                from: value[0] ? value[0].toDate() : undefined,
-                to: value[1] ? value[1].toDate() : undefined,
-              }
+              from: value[0] ? value[0].toDate() : undefined,
+              to: value[1] ? value[1].toDate() : undefined,
+            }
             : undefined
         }
         onSelect={(_selected, triggerDate) => {
@@ -411,10 +411,10 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 input: cn(
                   "border-0 shadow-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0",
                   open &&
-                    hoverPreview &&
-                    activeInput === "start" &&
-                    !value?.[0]?.isSame(hoverPreview, "day") &&
-                    "text-muted-foreground",
+                  hoverPreview &&
+                  activeInput === "start" &&
+                  !value?.[0]?.isSame(hoverPreview, "day") &&
+                  "text-muted-foreground",
                 ),
               }}
               onClick={(e) => {
@@ -548,10 +548,10 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 input: cn(
                   "border-0 shadow-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0",
                   open &&
-                    hoverPreview &&
-                    activeInput === "end" &&
-                    !value?.[1]?.isSame(hoverPreview, "day") &&
-                    "text-muted-foreground",
+                  hoverPreview &&
+                  activeInput === "end" &&
+                  !value?.[1]?.isSame(hoverPreview, "day") &&
+                  "text-muted-foreground",
                 ),
               }}
               onClick={(e) => {

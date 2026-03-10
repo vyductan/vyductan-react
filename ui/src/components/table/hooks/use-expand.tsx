@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -29,16 +28,16 @@ export default function useExpand<TRecord extends AnyObject>(
   mergedData: readonly TRecord[],
   getRowKey: GetRowKey<TRecord>,
 ): [
-  ExpandedState,
-  OnChangeFn<ExpandedState>,
+    ExpandedState,
+    OnChangeFn<ExpandedState>,
 
-  ExpandableConfig<TRecord>,
-  expandableType: ExpandableType,
-  expandedKeys: Set<Key>,
-  expandIcon: RenderExpandIcon<TRecord>,
-  childrenColumnName: string,
-  onTriggerExpand: TriggerEventHandler<TRecord>,
-] {
+    ExpandableConfig<TRecord>,
+    expandableType: ExpandableType,
+    expandedKeys: Set<Key>,
+    expandIcon: RenderExpandIcon<TRecord>,
+    childrenColumnName: string,
+    onTriggerExpand: TriggerEventHandler<TRecord>,
+  ] {
   const expandableConfig = props.expandable ?? {};
 
   const {

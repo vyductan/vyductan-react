@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import type { ReactNode } from "react";
@@ -71,11 +70,11 @@ type FormProps<
 > &
   (
     | (FormConfigProps<TFieldValues, TContext, TTransformedValues> & {
-        children: ReactNode;
-      })
+      children: ReactNode;
+    })
     | (WithFormProp<TFieldValues, TContext, TTransformedValues> & {
-        children: ReactNode;
-      })
+      children: ReactNode;
+    })
   );
 
 const Form = <

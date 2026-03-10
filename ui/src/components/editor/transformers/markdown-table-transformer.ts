@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
 import {

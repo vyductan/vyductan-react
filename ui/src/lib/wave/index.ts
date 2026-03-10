@@ -55,11 +55,9 @@ const Wave: React.FC<WaveProps> = (props) => {
   }
 
   const ref = supportRef(children)
-    ? // eslint-disable-next-line react-hooks/refs
-      composeRef(getNodeRef(children), containerRef)
+    ? composeRef(getNodeRef(children), containerRef)
     : containerRef;
 
-  // eslint-disable-next-line react-hooks/refs, @typescript-eslint/no-explicit-any
   return cloneElement<any>(children, { ref });
 };
 

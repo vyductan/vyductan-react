@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable react-hooks/set-state-in-effect */
+
+
 
 "use client";
 
@@ -62,16 +62,16 @@ const LENGTH_LIMIT = 75;
 
 const AtSignMentionsRegex = new RegExp(
   String.raw`(^|\s|\()(` +
-    "[" +
-    TRIGGERS +
-    "]" +
-    "((?:" +
-    VALID_CHARS +
-    VALID_JOINS +
-    "){0," +
-    LENGTH_LIMIT +
-    "})" +
-    ")$",
+  "[" +
+  TRIGGERS +
+  "]" +
+  "((?:" +
+  VALID_CHARS +
+  VALID_JOINS +
+  "){0," +
+  LENGTH_LIMIT +
+  "})" +
+  ")$",
 );
 
 // 50 is the longest alias length limit.
@@ -80,15 +80,15 @@ const ALIAS_LENGTH_LIMIT = 50;
 // Regex used to match alias.
 const AtSignMentionsRegexAliasRegex = new RegExp(
   String.raw`(^|\s|\()(` +
-    "[" +
-    TRIGGERS +
-    "]" +
-    "((?:" +
-    VALID_CHARS +
-    "){0," +
-    ALIAS_LENGTH_LIMIT +
-    "})" +
-    ")$",
+  "[" +
+  TRIGGERS +
+  "]" +
+  "((?:" +
+  VALID_CHARS +
+  "){0," +
+  ALIAS_LENGTH_LIMIT +
+  "})" +
+  ")$",
 );
 
 // At most, 5 suggestions are shown in the popup.
@@ -256,52 +256,51 @@ export function MentionsPlugin({
       ) => {
         return anchorElementRef.current && results.length > 0
           ? createPortal(
-              <div className="fixed z-10 w-[200px] rounded-md shadow-md">
-                <Command
-                  onKeyDown={(e) => {
-                    if (e.key === "ArrowUp") {
-                      e.preventDefault();
-                      setHighlightedIndex(
-                        selectedIndex === null
-                          ? options.length - 1
-                          : (selectedIndex - 1 + options.length) %
-                              options.length,
-                      );
-                    } else if (e.key === "ArrowDown") {
-                      e.preventDefault();
-                      setHighlightedIndex(
-                        selectedIndex === null
-                          ? 0
-                          : (selectedIndex + 1) % options.length,
-                      );
-                    }
-                  }}
-                >
-                  <CommandList>
-                    <CommandGroup>
-                      {options.map((option, index) => (
-                        <CommandItem
-                          key={option.key}
-                          value={option.name}
-                          onSelect={() => {
-                            selectOptionAndCleanUp(option);
-                          }}
-                          className={`flex items-center gap-2 ${
-                            selectedIndex === index
-                              ? "bg-accent"
-                              : "bg-transparent!"
+            <div className="fixed z-10 w-[200px] rounded-md shadow-md">
+              <Command
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setHighlightedIndex(
+                      selectedIndex === null
+                        ? options.length - 1
+                        : (selectedIndex - 1 + options.length) %
+                        options.length,
+                    );
+                  } else if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    setHighlightedIndex(
+                      selectedIndex === null
+                        ? 0
+                        : (selectedIndex + 1) % options.length,
+                    );
+                  }
+                }}
+              >
+                <CommandList>
+                  <CommandGroup>
+                    {options.map((option, index) => (
+                      <CommandItem
+                        key={option.key}
+                        value={option.name}
+                        onSelect={() => {
+                          selectOptionAndCleanUp(option);
+                        }}
+                        className={`flex items-center gap-2 ${selectedIndex === index
+                          ? "bg-accent"
+                          : "bg-transparent!"
                           }`}
-                        >
-                          {option.picture}
-                          {option.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </div>,
-              anchorElementRef.current,
-            )
+                      >
+                        {option.picture}
+                        {option.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </div>,
+            anchorElementRef.current,
+          )
           : null;
       }}
     />
