@@ -59,22 +59,38 @@ const ConditionTypeInput = <
       onChange,
       value,
       defaultValue,
+      name,
       ...restProps
     } = props as {
       type: "time";
     } & InputProps;
+    const hasValueProp = Object.prototype.hasOwnProperty.call(props, "value");
+    const hasDefaultValueProp = Object.prototype.hasOwnProperty.call(
+      props,
+      "defaultValue",
+    );
+    const normalizedValue =
+      value === null || value === undefined ? "" : String(value);
+    const normalizedDefaultValue =
+      defaultValue === null || defaultValue === undefined
+        ? ""
+        : String(defaultValue);
 
     return (
       <TimePicker
         {...(restProps as TimePickerProps)}
-        value={value ? String(value) : undefined}
-        defaultValue={defaultValue ? String(defaultValue) : undefined}
+        {...(hasValueProp ? { value: normalizedValue } : {})}
+        {...(hasDefaultValueProp
+          ? { defaultValue: normalizedDefaultValue }
+          : {})}
         format="HH:mm"
         onChange={(_, timeStr) => {
           if (onChange) {
+            const nextValue = timeStr ?? "";
             const mockEvent = {
-              target: { value: timeStr ?? "" },
-              currentTarget: { value: timeStr ?? "" },
+              type: "change",
+              target: { name, value: nextValue },
+              currentTarget: { name, value: nextValue },
             };
             onChange(mockEvent as React.ChangeEvent<HTMLInputElement>);
           }
