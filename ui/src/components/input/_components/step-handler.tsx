@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/refs */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
 import useMobile from "@rc-component/util/lib/hooks/useMobile";
@@ -108,7 +107,7 @@ export default function StepHandler({
         {upNode ?? (
           <span
             unselectable="on"
-            //    className={`-handler-up-inner`}
+          //    className={`-handler-up-inner`}
           />
         )}
       </span>
@@ -124,7 +123,7 @@ export default function StepHandler({
         {downNode ?? (
           <span
             unselectable="on"
-            //    className={`-handler-down-inner`}
+          //    className={`-handler-down-inner`}
           />
         )}
       </span>

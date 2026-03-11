@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable unicorn/prefer-spread */
 
 /* eslint-disable unicorn/explicit-length-check */

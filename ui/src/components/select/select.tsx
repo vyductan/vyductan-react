@@ -10,11 +10,13 @@ import { cn } from "@acme/ui/lib/utils";
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { SelectShadcnProps } from "./_components";
-import type { FlattenOptionData, OptionType, SelectValueType } from "./types";
+import type { FlattenOptionData, GroupOptionType, OptionType, SelectOption, SelectValueType } from "./types";
 import { Empty } from "../empty";
 import {
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
   Select as ShadcnSelect,
@@ -58,7 +60,7 @@ type SelectProps<
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     id?: string;
-    options?: OptionType<TValue, TRecord>[];
+    options?: SelectOption<TValue, TRecord>[];
     placeholder?: string;
     allowClear?: boolean;
 
@@ -162,21 +164,27 @@ const Select = <
     } else if (isDefault) {
       // const newValue = [value];
       setInternalValue(value);
-      const returnOption = options.find((o) => value === o.value);
+      const returnOption = flatOptions.find((o) => value === o.value);
       onChange?.(value, returnOption);
       setInternalOpen(false);
     } else if (isMultiple) {
-      // if(selectedValues.includes(value)){
-      //   return;
-      // }
       const newValue = selectedValues.includes(value)
         ? selectedValues.filter((v) => v !== value)
         : [...selectedValues, value];
       setInternalValue(newValue);
-      const returnOptions = options.filter((o) => newValue.includes(o.value));
+      const returnOptions = flatOptions.filter((o) => newValue.includes(o.value));
       onChange?.(newValue, returnOptions);
     }
   };
+
+  // Helper: is this a group option?
+  const isGroup = (o: SelectOption): o is GroupOptionType =>
+    "options" in o && Array.isArray((o as GroupOptionType).options);
+
+  // Flatten all options (including those inside groups) for value lookup
+  const flatOptions = options.flatMap((o) =>
+    isGroup(o) ? o.options : [o as OptionType<TValue, TRecord>],
+  );
 
   // Content for dropdown
   const content = (
@@ -184,6 +192,59 @@ const Select = <
       {children ??
         (options.length > 0 ? (
           options.map((o, oIndex) => {
+            // ─── Group ───────────────────────────────────────────
+            if (isGroup(o)) {
+              return (
+                <SelectGroup key={`group-${oIndex}`}>
+                  {o.label && (
+                    <SelectLabel className="text-muted-foreground text-[10px] font-semibold uppercase tracking-widest">
+                      {o.label}
+                    </SelectLabel>
+                  )}
+                  {o.options.map((item, itemIndex) => {
+                    const optionContent = optionRender
+                      ? optionRender(
+                          {
+                            label: item.label,
+                            data: item,
+                            key: String(item.value),
+                            value: item.value,
+                          },
+                          { index: itemIndex },
+                        )
+                      : item.label;
+                    return (
+                      <SelectItem
+                        key={String(item.value)}
+                        value={item.value as string}
+                        className={cn(
+                          selectedValues.includes(item.value)
+                            ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+                            : "",
+                          item.color && tagColors[item.color],
+                        )}
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          triggerChange(item.value);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            triggerChange(item.value);
+                          }
+                        }}
+                      >
+                        {optionContent}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              );
+            }
+
+            // ─── Flat option ─────────────────────────────────────
             const optionContent = optionRender
               ? optionRender(
                   {
@@ -260,7 +321,7 @@ const Select = <
           className={cn(
             "w-full",
             isMultiple && "pl-[3px]",
-            tagColors[options.find((o) => o.value === value)?.color ?? ""],
+            tagColors[flatOptions.find((o) => o.value === value)?.color ?? ""],
             className,
           )}
           variant={variant}
@@ -278,29 +339,33 @@ const Select = <
           {...triggerProps} // for form-control
         >
           {isMultiple ? (
-            <SelectMultipleContent
-              mode={mode}
-              onInputClick={() => {
-                handleOpenChange(true);
-              }}
-              selectedValues={selectedValues}
-              onAdd={(value) => {
-                triggerChange(value);
-              }}
-              onRemove={(value) => {
-                triggerChange(value);
-              }}
-              placeholder={placeholder}
-            />
+            <>
+              <SelectMultipleContent
+                mode={mode}
+                onInputClick={() => {
+                  handleOpenChange(true);
+                }}
+                selectedValues={selectedValues}
+                onAdd={(value) => {
+                  triggerChange(value);
+                }}
+                onRemove={(value) => {
+                  triggerChange(value);
+                }}
+                placeholder={placeholder}
+              />
+              <div className="sr-only">
+                <SelectValue placeholder={placeholder} />
+              </div>
+            </>
           ) : (
             <SelectValue placeholder={placeholder} className="h-5" />
           )}
         </SelectTrigger>
         <SelectContent
-          position={isMultiple ? "popper" : "item-aligned"}
           className={cn(
             "",
-            options.some((o) => o.color)
+            flatOptions.some((o) => o.color)
               ? "data-radix-select-viewport:space-y-2"
               : "",
           )}

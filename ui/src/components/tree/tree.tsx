@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
@@ -282,8 +281,8 @@ function TreeNode({
   const nodeContentStyle: React.CSSProperties =
     showLine && depth > 0
       ? {
-          marginLeft: "6px", // Add margin to account for the horizontal line
-        }
+        marginLeft: "6px", // Add margin to account for the horizontal line
+      }
       : {};
 
   if (!hasChildren) {

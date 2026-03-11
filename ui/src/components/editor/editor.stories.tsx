@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type React from "react";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
@@ -43,30 +42,29 @@ export const WithPlaceholder: Story = {
 };
 
 // Interactive editor with state management
-const InteractiveRender = (args: React.ComponentProps<typeof Editor>) => {
-  const [editorContent, setEditorContent] = useState<string>("");
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-lg border border-gray-200">
-        <Editor
-          {...args}
-          onChange={(jsonString) => {
-            setEditorContent(jsonString);
-          }}
-        />
-      </div>
-      <div className="space-y-2">
-        <div className="text-sm font-semibold">Editor State (JSON):</div>
-        <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs">
-          {editorContent || "No content yet"}
-        </pre>
-      </div>
-    </div>
-  );
-};
 export const Interactive: Story = {
-  render: (args) => <InteractiveRender {...args} />,
+  render: (args) => {
+    const [editorContent, setEditorContent] = useState<string>("");
+
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-gray-200">
+          <Editor
+            {...args}
+            onChange={(jsonString) => {
+              setEditorContent(jsonString);
+            }}
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Editor State (JSON):</div>
+          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs">
+            {editorContent || "No content yet"}
+          </pre>
+        </div>
+      </div>
+    );
+  },
   args: {
     placeholder: "Type something to see the editor state...",
   },
@@ -161,85 +159,83 @@ Try editing this content!`,
 };
 
 // Interactive markdown editor with state
-const MarkdownInteractiveRender = () => {
-  const [markdown, setMarkdown] = useState(
-    `# Interactive Editor
+export const MarkdownInteractive: MarkdownStory = {
+  render: () => {
+    const [markdown, setMarkdown] = useState(
+      `# Interactive Editor
 
 Edit this content and see the markdown output below.
 
 **Bold text** and *italic text* are supported.`,
-  );
-  const [stats, setStats] = useState({
-    wordCount: 0,
-    characterCount: 0,
-    readingTimeMinutes: 0,
-  });
+    );
+    const [stats, setStats] = useState({
+      wordCount: 0,
+      characterCount: 0,
+      readingTimeMinutes: 0,
+    });
 
-  return (
-    <div className="space-y-4">
-      <div className="rounded-lg border border-gray-200">
-        <Editor
-          format="markdown"
-          value={markdown}
-          onChange={(markdown) => setMarkdown(markdown)}
-          onStatsChange={setStats}
-          placeholder="Type something..."
-        />
-      </div>
-      <div className="space-y-2">
-        <div className="flex gap-4 text-sm text-gray-600">
-          <span>Words: {stats.wordCount}</span>
-          <span>Characters: {stats.characterCount}</span>
-          <span>Reading time: {stats.readingTimeMinutes} min</span>
-        </div>
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">Markdown Output:</div>
-          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs">
-            {markdown || "No content yet"}
-          </pre>
-        </div>
-      </div>
-    </div>
-  );
-};
-export const MarkdownInteractive: MarkdownStory = {
-  render: () => <MarkdownInteractiveRender />,
-};
-
-// Markdown editor with sync demonstration
-const MarkdownSyncRender = (args: React.ComponentProps<typeof Editor>) => {
-  const [markdown, setMarkdown] = useState(
-    String.raw`# Hello World\n\nThis is a test.`,
-  );
-
-  return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="text-sm font-semibold">Edit markdown directly:</div>
-        <textarea
-          className="w-full rounded border border-gray-300 p-3 font-mono text-sm"
-          rows={6}
-          value={markdown}
-          onChange={(e) => setMarkdown(e.target.value)}
-          placeholder="Enter markdown here..."
-        />
-      </div>
-      <div className="space-y-2">
-        <div className="text-sm font-semibold">Preview:</div>
-        <div className="rounded border border-gray-200">
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-gray-200">
           <Editor
-            {...args}
             format="markdown"
             value={markdown}
             onChange={(markdown) => setMarkdown(markdown)}
+            onStatsChange={setStats}
+            placeholder="Type something..."
           />
         </div>
+        <div className="space-y-2">
+          <div className="flex gap-4 text-sm text-gray-600">
+            <span>Words: {stats.wordCount}</span>
+            <span>Characters: {stats.characterCount}</span>
+            <span>Reading time: {stats.readingTimeMinutes} min</span>
+          </div>
+          <div className="space-y-2">
+            <div className="text-sm font-semibold">Markdown Output:</div>
+            <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs">
+              {markdown || "No content yet"}
+            </pre>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  },
 };
+
+// Markdown editor with sync demonstration
 export const MarkdownSync: MarkdownStory = {
-  render: (args) => <MarkdownSyncRender {...args} />,
+  render: (args) => {
+    const [markdown, setMarkdown] = useState(
+      String.raw`# Hello World\n\nThis is a test.`,
+    );
+
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Edit markdown directly:</div>
+          <textarea
+            className="w-full rounded border border-gray-300 p-3 font-mono text-sm"
+            rows={6}
+            value={markdown}
+            onChange={(e) => setMarkdown(e.target.value)}
+            placeholder="Enter markdown here..."
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Preview:</div>
+          <div className="rounded border border-gray-200">
+            <Editor
+              {...args}
+              format="markdown"
+              value={markdown}
+              onChange={(markdown) => setMarkdown(markdown)}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  },
   args: {
     value: String.raw`# Hello World\n\nThis is a test.`,
     placeholder: "Type something...",
@@ -249,11 +245,10 @@ export const MarkdownSync: MarkdownStory = {
 };
 
 // Markdown editor with full features
-const MarkdownFullFeaturesRender = (
-  args: React.ComponentProps<typeof Editor>,
-) => {
-  const [markdown, setMarkdown] = useState(
-    `# Full Featured Editor
+export const MarkdownFullFeatures: MarkdownStory = {
+  render: (args) => {
+    const [markdown, setMarkdown] = useState(
+      `# Full Featured Editor
 
 ## Rich Text Features
 
@@ -280,33 +275,31 @@ interface User {
 > It can span multiple lines.
 
 Try editing to see all features in action!`,
-  );
+    );
 
-  return (
-    <div className="mx-auto max-w-4xl">
-      <div className="rounded-xl border-2 border-gray-200 bg-white shadow-lg">
-        <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Markdown Editor
-          </h3>
-          <p className="text-sm text-gray-600">
-            Full-featured editor with markdown support
-          </p>
-        </div>
-        <div className="p-6">
-          <Editor
-            {...args}
-            format="markdown"
-            value={markdown}
-            onChange={(markdown) => setMarkdown(markdown)}
-          />
+    return (
+      <div className="mx-auto max-w-4xl">
+        <div className="rounded-xl border-2 border-gray-200 bg-white shadow-lg">
+          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Markdown Editor
+            </h3>
+            <p className="text-sm text-gray-600">
+              Full-featured editor with markdown support
+            </p>
+          </div>
+          <div className="p-6">
+            <Editor
+              {...args}
+              format="markdown"
+              value={markdown}
+              onChange={(markdown) => setMarkdown(markdown)}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-export const MarkdownFullFeatures: MarkdownStory = {
-  render: (args) => <MarkdownFullFeaturesRender {...args} />,
+    );
+  },
   args: {
     value: "",
     placeholder: "Start typing...",
@@ -359,32 +352,31 @@ export const HtmlWithContent: HtmlStory = {
   render: (args) => <Editor {...args} format="html" />,
 };
 
-const HtmlInteractiveRender = () => {
-  const [html, setHtml] = useState(
-    `<h1>Interactive Editor</h1><p>Edit this content and see the HTML output below.</p><p><b>Bold text</b> and <i>italic text</i> are supported.</p>`,
-  );
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-lg border border-gray-200">
-        <Editor
-          format="html"
-          value={html}
-          onChange={(html) => setHtml(html)}
-          placeholder="Type something..."
-        />
-      </div>
-      <div className="space-y-2">
-        <div className="text-sm font-semibold">HTML Output:</div>
-        <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs whitespace-pre-wrap">
-          {html ?? "No content yet"}
-        </pre>
-      </div>
-    </div>
-  );
-};
 export const HtmlInteractive: HtmlStory = {
-  render: () => <HtmlInteractiveRender />,
+  render: () => {
+    const [html, setHtml] = useState(
+      `<h1>Interactive Editor</h1><p>Edit this content and see the HTML output below.</p><p><b>Bold text</b> and <i>italic text</i> are supported.</p>`,
+    );
+
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-gray-200">
+          <Editor
+            format="html"
+            value={html}
+            onChange={(html) => setHtml(html)}
+            placeholder="Type something..."
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">HTML Output:</div>
+          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs whitespace-pre-wrap">
+            {html || "No content yet"}
+          </pre>
+        </div>
+      </div>
+    );
+  },
 };
 
 export const HtmlEditorMeta = htmlMeta;

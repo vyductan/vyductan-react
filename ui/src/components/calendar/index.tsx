@@ -10,8 +10,8 @@ import type {
 import type { XOR } from "ts-xor";
 
 import type { CalendarProps as OwnCalendarProps } from "./calendar";
-import { Calendar as ShadcnCalendar } from "./_components";
-import { Calendar as InternalCalendar } from "./calendar";
+import { CustomCalendar } from "./_components";
+import { Calendar as CalendarComponent } from "./calendar";
 
 type ShadcnCalendarProps = PropsBase &
   (
@@ -30,10 +30,10 @@ type ConditionalProps = XOR<OwnCalendarProps, ShadcnCalendarProps>;
 
 const Calendar = (props: ConditionalProps) => {
   if ("selected" in props) {
-    return <ShadcnCalendar {...(props as ShadcnCalendarProps)} />;
+    return <CustomCalendar {...(props as ShadcnCalendarProps)} />;
   }
 
-  return <InternalCalendar {...(props as OwnCalendarProps)} />;
+  return <CalendarComponent {...(props as OwnCalendarProps)} />;
 };
 
 export { Calendar };

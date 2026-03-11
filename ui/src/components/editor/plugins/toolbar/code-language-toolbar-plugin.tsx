@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
 import {
@@ -49,9 +49,9 @@ export function CodeLanguageToolbarPlugin() {
         anchorNode.getKey() === "root"
           ? anchorNode
           : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent();
-              return parent !== null && $isRootOrShadowRoot(parent);
-            });
+            const parent = e.getParent();
+            return parent !== null && $isRootOrShadowRoot(parent);
+          });
 
       element ??= anchorNode.getTopLevelElementOrThrow();
 

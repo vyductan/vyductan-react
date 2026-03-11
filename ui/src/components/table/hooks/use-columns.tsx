@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 
@@ -170,10 +169,10 @@ export const useColumns = <TRecord extends AnyObject>(
     | null
     | ((columns: ColumnsType<TRecord>) => ColumnsType<TRecord>),
 ): [
-  columns: ColumnsType<TRecord>,
-  columnsForTTTable: TTColumnDef<TRecord>[],
-  flattenColumns: readonly ColumnType<TRecord>[],
-] => {
+    columns: ColumnsType<TRecord>,
+    columnsForTTTable: TTColumnDef<TRecord>[],
+    flattenColumns: readonly ColumnType<TRecord>[],
+  ] => {
   const baseColumns = React.useMemo<ColumnsType<TRecord>>(() => {
     const newColumns = columns || convertChildrenToColumns(children) || [];
 

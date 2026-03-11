@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/prefer-ternary */
 
 /* eslint-disable unicorn/no-array-callback-reference */
@@ -132,7 +132,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
   tableShowSorterTooltip?: boolean | SorterTooltipProps,
   pos?: string,
 ): ColumnsType<RecordType> => {
-  const _finalColumns = (columns || []).map((column, index) => {
+  return (columns || []).map((column, index) => {
     const columnPos = getColumnPos(index, pos);
     let newColumn: ColumnsType<RecordType>[number] = column;
     if (newColumn.sorter) {
@@ -192,9 +192,9 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
       const tooltipProps: TooltipProps =
         typeof showSorterTooltip === "object"
           ? {
-              title: sortTip,
-              ...showSorterTooltip,
-            }
+            title: sortTip,
+            ...showSorterTooltip,
+          }
           : { title: sortTip };
       newColumn = {
         ...newColumn,
@@ -294,7 +294,6 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
 
     return newColumn;
   });
-  return columns;
 };
 
 const stateToInfo = <RecordType extends AnyObject = AnyObject>(
@@ -349,13 +348,13 @@ interface SorterConfig<RecordType = AnyObject> {
 export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
   props: SorterConfig<RecordType>,
 ): [
-  SortingState,
-  OnChangeFn<SortingState>,
-  TransformColumns<RecordType>,
-  SortState<RecordType>[],
-  ColumnTitleProps<RecordType>,
-  () => SorterResult<RecordType> | SorterResult<RecordType>[],
-] => {
+    SortingState,
+    OnChangeFn<SortingState>,
+    TransformColumns<RecordType>,
+    SortState<RecordType>[],
+    ColumnTitleProps<RecordType>,
+    () => SorterResult<RecordType> | SorterResult<RecordType>[],
+  ] => {
   const {
     mergedColumns,
     sortDirections,

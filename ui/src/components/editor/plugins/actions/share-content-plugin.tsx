@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable unicorn/prefer-type-error */
-/* eslint-disable unicorn/prefer-global-this */
+
+
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect, useState } from "react";
 import {
@@ -22,8 +21,8 @@ import {
 import { docFromHash, docToHash } from "../../utils/doc-serialization";
 
 async function shareDoc(doc: SerializedDocument): Promise<void> {
-  if (typeof window === "undefined") {
-    throw new Error("shareDoc can only be called on the client side");
+  if (globalThis.window === undefined) {
+    throw new TypeError("shareDoc can only be called on the client side");
   }
 
   const url = new URL(globalThis.location.toString());

@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type { ComponentProps, JSX } from "react";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
@@ -28,8 +27,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const onColorChange = fn();
-
 // Default story with basic OKLCH picker
 export const Default: Story = {
   args: {
@@ -39,7 +36,7 @@ export const Default: Story = {
       h: 180,
       alpha: 1,
     },
-    onChange: onColorChange,
+    onChange: fn(),
   },
 };
 
@@ -53,7 +50,7 @@ export const WithAlpha: Story = {
       alpha: 0.7,
     },
     showAlpha: true,
-    onChange: onColorChange,
+    onChange: fn(),
   },
 };
 
@@ -76,7 +73,7 @@ export const WithPresets: Story = {
       "#9400D3", // Violet
       "#FF1493", // Pink
     ],
-    onChange: onColorChange,
+    onChange: fn(),
   },
 };
 
@@ -90,45 +87,47 @@ export const WithClear: Story = {
       alpha: 1,
     },
     onClear: fn(),
-    onChange: onColorChange,
+    onChange: fn(),
   },
 };
 
-function InteractiveRender(
-  args: ComponentProps<typeof ColorPickerOKLCHPanel>,
-): JSX.Element {
-  const [color, setColor] = useState<OKLCHColor>({
-    l: 0.6,
-    c: 0.15,
-    h: 180,
-    alpha: 1,
-  });
-
-  return (
-    <div className="space-y-4">
-      <div className="text-sm">
-        <div className="font-semibold">Current OKLCH Values:</div>
-        <div className="text-muted-foreground font-mono">
-          L: {Math.round(color.l * 100)}%
-        </div>
-        <div className="text-muted-foreground font-mono">
-          C: {color.c.toFixed(3)}
-        </div>
-        <div className="text-muted-foreground font-mono">
-          H: {Math.round(color.h)}°
-        </div>
-        {args.showAlpha && (
-          <div className="text-muted-foreground font-mono">
-            Alpha: {Math.round((color.alpha ?? 1) * 100)}%
-          </div>
-        )}
-      </div>
-      <ColorPickerOKLCHPanel {...args} oklchValue={color} onChange={setColor} />
-    </div>
-  );
-}
+// Interactive story demonstrating color updates
 export const Interactive: Story = {
-  render: (args) => <InteractiveRender {...args} />,
+  render: (args) => {
+    const [color, setColor] = useState<OKLCHColor>({
+      l: 0.6,
+      c: 0.15,
+      h: 180,
+      alpha: 1,
+    });
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm">
+          <div className="font-semibold">Current OKLCH Values:</div>
+          <div className="text-muted-foreground font-mono">
+            L: {Math.round(color.l * 100)}%
+          </div>
+          <div className="text-muted-foreground font-mono">
+            C: {color.c.toFixed(3)}
+          </div>
+          <div className="text-muted-foreground font-mono">
+            H: {Math.round(color.h)}°
+          </div>
+          {args.showAlpha && (
+            <div className="text-muted-foreground font-mono">
+              Alpha: {Math.round((color.alpha ?? 1) * 100)}%
+            </div>
+          )}
+        </div>
+        <ColorPickerOKLCHPanel
+          {...args}
+          oklchValue={color}
+          onChange={setColor}
+        />
+      </div>
+    );
+  },
   args: {
     showAlpha: true,
     presets: ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"],
@@ -151,10 +150,7 @@ export const ColorVariations: Story = {
         {colors.map(({ name, value }) => (
           <div key={name} className="space-y-2">
             <div className="text-sm font-medium">{name}</div>
-            <ColorPickerOKLCHPanel
-              oklchValue={value}
-              onChange={onColorChange}
-            />
+            <ColorPickerOKLCHPanel oklchValue={value} onChange={fn()} />
           </div>
         ))}
       </div>
@@ -171,14 +167,14 @@ export const ChromaComparison: Story = {
           <div className="text-sm font-medium">Low Chroma (Muted)</div>
           <ColorPickerOKLCHPanel
             oklchValue={{ l: 0.6, c: 0.05, h: 180, alpha: 1 }}
-            onChange={onColorChange}
+            onChange={fn()}
           />
         </div>
         <div className="space-y-2">
           <div className="text-sm font-medium">High Chroma (Vibrant)</div>
           <ColorPickerOKLCHPanel
             oklchValue={{ l: 0.6, c: 0.25, h: 180, alpha: 1 }}
-            onChange={onColorChange}
+            onChange={fn()}
           />
         </div>
       </div>
@@ -195,21 +191,21 @@ export const LightnessComparison: Story = {
           <div className="text-sm font-medium">Dark (L: 30%)</div>
           <ColorPickerOKLCHPanel
             oklchValue={{ l: 0.3, c: 0.15, h: 180, alpha: 1 }}
-            onChange={onColorChange}
+            onChange={fn()}
           />
         </div>
         <div className="space-y-2">
           <div className="text-sm font-medium">Medium (L: 60%)</div>
           <ColorPickerOKLCHPanel
             oklchValue={{ l: 0.6, c: 0.15, h: 180, alpha: 1 }}
-            onChange={onColorChange}
+            onChange={fn()}
           />
         </div>
         <div className="space-y-2">
           <div className="text-sm font-medium">Light (L: 90%)</div>
           <ColorPickerOKLCHPanel
             oklchValue={{ l: 0.9, c: 0.15, h: 180, alpha: 1 }}
-            onChange={onColorChange}
+            onChange={fn()}
           />
         </div>
       </div>

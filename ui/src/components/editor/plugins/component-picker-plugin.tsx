@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -688,134 +688,132 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
         ) => {
           return anchorElementRef.current && flatOptions.length > 0
             ? createPortal(
-                <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
-                  {/* Menu */}
-                  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
-                    <CommandRoot
-                      onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                          e.preventDefault();
-                          setHighlightedIndex(
-                            selectedIndex === null
-                              ? flatOptions.length - 1
-                              : (selectedIndex - 1 + flatOptions.length) %
-                                  flatOptions.length,
-                          );
-                        } else if (e.key === "ArrowDown") {
-                          e.preventDefault();
-                          setHighlightedIndex(
-                            selectedIndex === null
-                              ? 0
-                              : (selectedIndex + 1) % flatOptions.length,
-                          );
-                        }
-                      }}
-                    >
-                      <CommandList className="max-h-[60vh] overflow-y-auto p-1 sm:max-h-[400px]">
-                        {queryString ? (
-                          // When searching, show all results without categories
-                          <CommandGroup>
-                            {flatOptions.map((option, index) => (
-                              <CommandItem
-                                key={option.key}
-                                value={option.title}
-                                onSelect={() => {
-                                  selectOptionAndCleanUp(option);
-                                }}
-                                className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                                  selectedIndex === index
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+              <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
+                {/* Menu */}
+                <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <CommandRoot
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex === null
+                            ? flatOptions.length - 1
+                            : (selectedIndex - 1 + flatOptions.length) %
+                            flatOptions.length,
+                        );
+                      } else if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex === null
+                            ? 0
+                            : (selectedIndex + 1) % flatOptions.length,
+                        );
+                      }
+                    }}
+                  >
+                    <CommandList className="max-h-[60vh] overflow-y-auto p-1 sm:max-h-[400px]">
+                      {queryString ? (
+                        // When searching, show all results without categories
+                        <CommandGroup>
+                          {flatOptions.map((option, index) => (
+                            <CommandItem
+                              key={option.key}
+                              value={option.title}
+                              onSelect={() => {
+                                selectOptionAndCleanUp(option);
+                              }}
+                              className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${selectedIndex === index
+                                  ? "bg-gray-100 text-gray-900"
+                                  : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                                 }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="shrink-0 text-gray-500">
-                                    {option.icon}
-                                  </span>
-                                  <span className="flex-1">{option.title}</span>
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="shrink-0 text-gray-500">
+                                  {option.icon}
+                                </span>
+                                <span className="flex-1">{option.title}</span>
+                              </div>
+                              {option.keyboardShortcut && (
+                                <span className="text-xs text-gray-400">
+                                  {option.keyboardShortcut}
+                                </span>
+                              )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ) : (
+                        // When not searching, show grouped by category
+                        <>
+                          {(
+                            Object.keys(groupedOptions) as OptionCategory[]
+                          ).map((category) => {
+                            const categoryOptions = groupedOptions[category];
+                            if (categoryOptions.length === 0) return null;
+
+                            let categoryStartIndex = 0;
+                            for (const cat of Object.keys(
+                              groupedOptions,
+                            ) as OptionCategory[]) {
+                              if (cat === category) break;
+                              categoryStartIndex +=
+                                groupedOptions[cat].length;
+                            }
+
+                            return (
+                              <CommandGroup key={category}>
+                                <div className="px-3 py-1.5 text-xs font-medium text-gray-500">
+                                  {CATEGORY_LABELS[category]}
                                 </div>
-                                {option.keyboardShortcut && (
-                                  <span className="text-xs text-gray-400">
-                                    {option.keyboardShortcut}
-                                  </span>
-                                )}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        ) : (
-                          // When not searching, show grouped by category
-                          <>
-                            {(
-                              Object.keys(groupedOptions) as OptionCategory[]
-                            ).map((category) => {
-                              const categoryOptions = groupedOptions[category];
-                              if (categoryOptions.length === 0) return null;
-
-                              let categoryStartIndex = 0;
-                              for (const cat of Object.keys(
-                                groupedOptions,
-                              ) as OptionCategory[]) {
-                                if (cat === category) break;
-                                categoryStartIndex +=
-                                  groupedOptions[cat].length;
-                              }
-
-                              return (
-                                <CommandGroup key={category}>
-                                  <div className="px-3 py-1.5 text-xs font-medium text-gray-500">
-                                    {CATEGORY_LABELS[category]}
-                                  </div>
-                                  {categoryOptions.map((item, itemIndex) => {
-                                    const globalIndex =
-                                      categoryStartIndex + itemIndex;
-                                    return (
-                                      <CommandItem
-                                        key={item.option.key}
-                                        value={item.option.title}
-                                        onSelect={() => {
-                                          selectOptionAndCleanUp(item.option);
-                                        }}
-                                        className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
-                                          selectedIndex === globalIndex
-                                            ? "bg-gray-100 text-gray-900"
-                                            : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                {categoryOptions.map((item, itemIndex) => {
+                                  const globalIndex =
+                                    categoryStartIndex + itemIndex;
+                                  return (
+                                    <CommandItem
+                                      key={item.option.key}
+                                      value={item.option.title}
+                                      onSelect={() => {
+                                        selectOptionAndCleanUp(item.option);
+                                      }}
+                                      className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${selectedIndex === globalIndex
+                                          ? "bg-gray-100 text-gray-900"
+                                          : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                                         }`}
-                                      >
-                                        <div className="flex items-center gap-3">
-                                          <span className="shrink-0 text-gray-500">
-                                            {item.option.icon}
-                                          </span>
-                                          <span className="flex-1">
-                                            {item.option.title}
-                                          </span>
-                                        </div>
-                                        {item.option.keyboardShortcut && (
-                                          <span className="text-xs text-gray-400">
-                                            {item.option.keyboardShortcut}
-                                          </span>
-                                        )}
-                                      </CommandItem>
-                                    );
-                                  })}
-                                </CommandGroup>
-                              );
-                            })}
-                          </>
-                        )}
-                      </CommandList>
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <span className="shrink-0 text-gray-500">
+                                          {item.option.icon}
+                                        </span>
+                                        <span className="flex-1">
+                                          {item.option.title}
+                                        </span>
+                                      </div>
+                                      {item.option.keyboardShortcut && (
+                                        <span className="text-xs text-gray-400">
+                                          {item.option.keyboardShortcut}
+                                        </span>
+                                      )}
+                                    </CommandItem>
+                                  );
+                                })}
+                              </CommandGroup>
+                            );
+                          })}
+                        </>
+                      )}
+                    </CommandList>
 
-                      {/* Footer */}
-                      <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2 text-xs text-gray-400">
-                        <span>Type '' on the page</span>
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">
-                          esc
-                        </span>
-                      </div>
-                    </CommandRoot>
-                  </div>
-                </div>,
-                anchorElementRef.current,
-              )
+                    {/* Footer */}
+                    <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2 text-xs text-gray-400">
+                      <span>Type '' on the page</span>
+                      <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">
+                        esc
+                      </span>
+                    </div>
+                  </CommandRoot>
+                </div>
+              </div>,
+              anchorElementRef.current,
+            )
             : null;
         }}
       />

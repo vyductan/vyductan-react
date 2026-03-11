@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-new-array */
 
 /* eslint-disable unicorn/prefer-at */

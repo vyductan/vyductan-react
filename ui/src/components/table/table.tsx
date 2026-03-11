@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
@@ -97,15 +97,15 @@ interface ChangeEventInfo<RecordType = AnyObject> {
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
   | (Omit<TRecord, "_customRow" | "_customRowClassName"> & {
-      _customRow?: undefined;
-      _customRowClassName?: undefined;
-    })
+    _customRow?: undefined;
+    _customRowClassName?: undefined;
+  })
   | (Partial<TRecord> & {
-      _customRow: React.ReactNode;
-      _customRowClassName?: string;
-      _customCellClassName?: string;
-      _customRowStyle?: React.CSSProperties;
-    });
+    _customRow: React.ReactNode;
+    _customRowClassName?: string;
+    _customCellClassName?: string;
+    _customRowStyle?: React.CSSProperties;
+  });
 type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
   React.ComponentProps<"table">,
   "title" | "onChange" | "summary"
@@ -116,11 +116,11 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
 
     extra?: React.ReactNode;
     alertRender?:
-      | React.ReactNode
-      | ((args?: {
-          selectedRowKeys: Key[];
-          selectedRows: TRecord[];
-        }) => React.ReactNode);
+    | React.ReactNode
+    | ((args?: {
+      selectedRowKeys: Key[];
+      selectedRows: TRecord[];
+    }) => React.ReactNode);
 
     bordered?: boolean | "around";
     classNames?: {
@@ -163,12 +163,12 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     skeleton?: boolean;
     /** Set sticky header and scroll bar */
     sticky?:
-      | boolean
-      | {
-          offsetHeader?: number;
-          offsetScroll?: number;
-          getContainer?: () => HTMLElement;
-        };
+    | boolean
+    | {
+      offsetHeader?: number;
+      offsetScroll?: number;
+      getContainer?: () => HTMLElement;
+    };
     size?: SizeType;
     /** Whether the table can be scrollable */
     scroll?: {
@@ -670,45 +670,45 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     columns: [
       ...(rowSelection
         ? [
-            {
-              id: "__select__",
-              size:
-                typeof rowSelection.columnWidth === "number"
-                  ? rowSelection.columnWidth
-                  : 32,
-              minSize:
-                typeof rowSelection.columnWidth === "number"
-                  ? rowSelection.columnWidth
-                  : 32,
-              enableResizing: false,
-              meta: {
-                align: "center",
-              },
-              header: ({ table }) => (
-                <Checkbox
-                  checked={table.getIsAllPageRowsSelected()}
-                  indeterminate={table.getIsSomePageRowsSelected()}
-                  onChange={(e) =>
-                    table.toggleAllPageRowsSelected(!!e.target.checked)
-                  }
-                  aria-label="Select all"
-                  skipGroup
-                  className="translate-y-[2px] align-middle"
-                />
-              ),
-              cell: ({ row }) => (
-                <Checkbox
-                  checked={row.getIsSelected()}
-                  indeterminate={row.getIsSomeSelected()}
-                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
-                  aria-label="Select row"
-                  className="flex translate-y-[2px]"
-                />
-              ),
-              enableSorting: false,
-              enableHiding: false,
-            } as ColumnDef<TRecord, unknown>,
-          ]
+          {
+            id: "__select__",
+            size:
+              typeof rowSelection.columnWidth === "number"
+                ? rowSelection.columnWidth
+                : 32,
+            minSize:
+              typeof rowSelection.columnWidth === "number"
+                ? rowSelection.columnWidth
+                : 32,
+            enableResizing: false,
+            meta: {
+              align: "center",
+            },
+            header: ({ table }) => (
+              <Checkbox
+                checked={table.getIsAllPageRowsSelected()}
+                indeterminate={table.getIsSomePageRowsSelected()}
+                onChange={(e) =>
+                  table.toggleAllPageRowsSelected(!!e.target.checked)
+                }
+                aria-label="Select all"
+                skipGroup
+                className="mx-auto flex items-center justify-center"
+              />
+            ),
+            cell: ({ row }) => (
+              <Checkbox
+                checked={row.getIsSelected()}
+                indeterminate={row.getIsSomeSelected()}
+                onChange={(e) => row.toggleSelected(!!e.target.checked)}
+                aria-label="Select row"
+                className="mx-auto flex items-center justify-center"
+              />
+            ),
+            enableSorting: false,
+            enableHiding: false,
+          } as ColumnDef<TRecord, unknown>,
+        ]
         : []),
       ...columnsForTTTable,
     ],
@@ -825,8 +825,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
   const TableHeaderComp =
     components?.header &&
-    "wrapper" in components.header &&
-    components.header.wrapper
+      "wrapper" in components.header &&
+      components.header.wrapper
       ? components.header.wrapper
       : TableHeader;
   const TableBodyComp =
@@ -921,9 +921,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               // "[&_table]:border-separate",
               // "[&>table]:border-spacing-0 [&>table]:rounded-md [&>table]:border",
               typeof bordered === "boolean" &&
-                "[&_th]:border-e [&_th:last-child]:border-e-0",
+              "[&_th]:border-e [&_th:last-child]:border-e-0",
               typeof bordered === "boolean" &&
-                "[&_td]:border-e [&_td:last-child]:border-e-0",
+              "[&_td]:border-e [&_td:last-child]:border-e-0",
             ],
             (!bordered || bordered === "around") && [
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
@@ -951,7 +951,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               <TableWrapperHeader bordered={bordered} size={size}>
                 <div
                   data-slot="table-title"
-                  // className="font-semibold tracking-tight"
+                // className="font-semibold tracking-tight"
                 >
                   {title?.(mergedData)}
                 </div>
@@ -973,12 +973,12 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               style={{
                 ...(scroll?.x
                   ? {
-                      width: scroll.x,
-                      tableLayout: "fixed",
-                      minWidth: "100%",
-                    }
+                    width: scroll.x,
+                    tableLayout: "fixed",
+                    minWidth: "100%",
+                  }
                   : // Set tableLayout="fixed" when we have fixed-width columns (selection, expand)
-                    rowSelection || expandType === "nest"
+                  rowSelection || expandType === "nest"
                     ? { tableLayout: "fixed" }
                     : {}),
               }}
@@ -1025,19 +1025,19 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                               header.column.columnDef.meta?.align === "end"
                                 ? "right"
                                 : header.column.columnDef.meta?.align ===
-                                    "start"
+                                  "start"
                                   ? "left"
                                   : header.column.columnDef.meta?.align ===
-                                      "match-parent"
+                                    "match-parent"
                                     ? undefined
                                     : header.column.columnDef.meta?.align
                             }
                             className={cn(
                               // align
                               header.column.columnDef.meta?.align ===
-                                "center" && "text-center",
+                              "center" && "text-center",
                               header.column.columnDef.meta?.align === "right" &&
-                                "text-right",
+                              "text-right",
                               // pinning
                               // scroll?.x &&
                               getCommonPinningClassName(
@@ -1060,9 +1060,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                             {header.isPlaceholder
                               ? undefined
                               : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
                           </TableHeadAdvanced>
                         );
                       })}
@@ -1156,9 +1156,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                   className={cn(
                                     // align
                                     cell.column.columnDef.meta?.align ===
-                                      "center" && "text-center",
+                                    "center" && "text-center",
                                     cell.column.columnDef.meta?.align ===
-                                      "right" && "text-right",
+                                    "right" && "text-right",
                                     // pinning
                                     // scroll?.x &&
                                     getCommonPinningClassName(cell.column, {
@@ -1168,7 +1168,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                     // selection column
                                     (cell.column.id === "__select__" ||
                                       cell.id.endsWith("selection")) &&
-                                      "px-2",
+                                    "px-2",
                                     // column className
                                     classNames?.cell,
                                     cell.column.columnDef.meta?.className,
@@ -1180,13 +1180,13 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                     ...(typeof cell.column.columnDef.meta
                                       ?.styles?.cell === "function"
                                       ? cell.column.columnDef.meta.styles.cell({
-                                          record: row.original,
-                                          index: row.index,
-                                          row,
-                                          column: cell.column,
-                                        })
+                                        record: row.original,
+                                        index: row.index,
+                                        row,
+                                        column: cell.column,
+                                      })
                                       : cell.column.columnDef.meta?.styles
-                                          ?.cell),
+                                        ?.cell),
                                   }}
                                 >
                                   {flexRender(

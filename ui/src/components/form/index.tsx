@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FieldValues } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
