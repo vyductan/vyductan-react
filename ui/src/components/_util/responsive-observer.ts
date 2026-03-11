@@ -1,5 +1,3 @@
-
-
 import React from "react";
 
 import type { GlobalToken } from "../theme/internal";

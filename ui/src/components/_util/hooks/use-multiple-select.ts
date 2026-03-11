@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from "react";
 
 export type PrevSelectedIndex = null | number;

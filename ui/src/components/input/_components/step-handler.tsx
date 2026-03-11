@@ -107,7 +107,7 @@ export default function StepHandler({
         {upNode ?? (
           <span
             unselectable="on"
-          //    className={`-handler-up-inner`}
+            //    className={`-handler-up-inner`}
           />
         )}
       </span>
@@ -123,7 +123,7 @@ export default function StepHandler({
         {downNode ?? (
           <span
             unselectable="on"
-          //    className={`-handler-down-inner`}
+            //    className={`-handler-down-inner`}
           />
         )}
       </span>

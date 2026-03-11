@@ -1,5 +1,3 @@
-
-
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect, useState } from "react";
 import {

@@ -1,7 +1,5 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
 
-
-
 /* eslint-disable unicorn/no-array-for-each */
 
 /* eslint-disable unicorn/no-negated-condition */
@@ -239,10 +237,10 @@ const getMergedColumns = <RecordType extends AnyObject = AnyObject>(
 const useFilter = <RecordType extends AnyObject = AnyObject>(
   props: FilterConfig<RecordType>,
 ): [
-    TransformColumns<RecordType>,
-    FilterState<RecordType>[],
-    Record<string, FilterValue | null>,
-  ] => {
+  TransformColumns<RecordType>,
+  FilterState<RecordType>[],
+  Record<string, FilterValue | null>,
+] => {
   const {
     mergedColumns: rawMergedColumns,
     onFilterChange,

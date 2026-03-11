@@ -10,7 +10,13 @@ import { cn } from "@acme/ui/lib/utils";
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
 import type { SelectShadcnProps } from "./_components";
-import type { FlattenOptionData, GroupOptionType, OptionType, SelectOption, SelectValueType } from "./types";
+import type {
+  FlattenOptionData,
+  GroupOptionType,
+  OptionType,
+  SelectOption,
+  SelectValueType,
+} from "./types";
 import { Empty } from "../empty";
 import {
   SelectContent,
@@ -172,7 +178,9 @@ const Select = <
         ? selectedValues.filter((v) => v !== value)
         : [...selectedValues, value];
       setInternalValue(newValue);
-      const returnOptions = flatOptions.filter((o) => newValue.includes(o.value));
+      const returnOptions = flatOptions.filter((o) =>
+        newValue.includes(o.value),
+      );
       onChange?.(newValue, returnOptions);
     }
   };
@@ -197,7 +205,7 @@ const Select = <
               return (
                 <SelectGroup key={`group-${oIndex}`}>
                   {o.label && (
-                    <SelectLabel className="text-muted-foreground text-[10px] font-semibold uppercase tracking-widest">
+                    <SelectLabel className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
                       {o.label}
                     </SelectLabel>
                   )}
