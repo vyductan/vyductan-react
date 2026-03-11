@@ -70,11 +70,11 @@ type FormProps<
 > &
   (
     | (FormConfigProps<TFieldValues, TContext, TTransformedValues> & {
-      children: ReactNode;
-    })
+        children: ReactNode;
+      })
     | (WithFormProp<TFieldValues, TContext, TTransformedValues> & {
-      children: ReactNode;
-    })
+        children: ReactNode;
+      })
   );
 
 const Form = <

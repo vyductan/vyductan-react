@@ -13,13 +13,12 @@ export type OptionType<
   onSelect?: () => void;
 } & TRecord;
 
-export type GroupOptionType<
-  TValue extends SelectValueType = SelectValueType,
-> = {
-  label: React.ReactNode;
-  title?: string;
-  options: OptionType<TValue>[];
-};
+export type GroupOptionType<TValue extends SelectValueType = SelectValueType> =
+  {
+    label: React.ReactNode;
+    title?: string;
+    options: OptionType<TValue>[];
+  };
 
 /** A single option or a group of options */
 export type SelectOption<

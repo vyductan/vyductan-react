@@ -52,7 +52,7 @@ export function GalleryLightbox({
 
   const [prevOpen, setPrevOpen] = useState(open);
 
-  // Sync internal state with initialIndex during render when Lightbox opens 
+  // Sync internal state with initialIndex during render when Lightbox opens
   // (React 18+ recommended pattern to avoid cascading renders)
   if (open && !prevOpen) {
     setPrevOpen(true);

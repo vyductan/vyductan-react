@@ -1,4 +1,3 @@
-
 // https://github.com/ant-design/ant-design/tree/master/components/input-number
 // Dec 30, 2024
 // https://github.com/ant-design/ant-design/commit/39d9c1c6bfb3f2b40eaff9d4c12ba6532139f96f
@@ -153,7 +152,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
         cn(
           // Only apply variant to outer element when no addon
           !hasAddon &&
-          inputVariants({ status: mergedStatus, variant: customVariant }),
+            inputVariants({ status: mergedStatus, variant: customVariant }),
           // Only apply size (padding) when no addon
           !hasAddon && inputSizeVariants({ size: mergedSize }),
           className,
@@ -178,7 +177,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
         // When has addon, apply variant and size to wrapper instead
         variant: cn(
           hasAddon &&
-          inputVariants({ status: mergedStatus, variant: customVariant }),
+            inputVariants({ status: mergedStatus, variant: customVariant }),
           hasAddon && inputSizeVariants({ size: mergedSize }),
           readOnly && "cursor-default bg-muted",
         ),

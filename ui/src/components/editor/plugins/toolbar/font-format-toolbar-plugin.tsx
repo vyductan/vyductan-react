@@ -1,4 +1,3 @@
-
 import type { BaseSelection, TextFormatType } from "lexical";
 import { useState } from "react";
 import { $isTableSelection } from "@lexical/table";

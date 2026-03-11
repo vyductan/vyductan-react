@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
@@ -533,8 +530,8 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     const formatValue: DecimalClass = parsedValue.isNaN()
       ? triggerValueUpdate(decimalValue, userTyping)
       : // Only validate value or empty value can be re-fill to inputValue
-      // Reassign the formatValue within ranged of trigger control
-      triggerValueUpdate(parsedValue, userTyping);
+        // Reassign the formatValue within ranged of trigger control
+        triggerValueUpdate(parsedValue, userTyping);
 
     if (value !== undefined) {
       // Reset back with controlled value first
@@ -774,11 +771,7 @@ const InputNumber = <T extends ValueType = ValueType>({
     <>
       {clearIcon}
       {controlsNode}
-      {suffix && (
-        <span className="mx-1 flex items-center">
-          {suffix}
-        </span>
-      )}
+      {suffix && <span className="mx-1 flex items-center">{suffix}</span>}
     </>
   );
 
