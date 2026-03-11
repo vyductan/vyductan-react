@@ -126,9 +126,9 @@ export const MarkdownDefault: MarkdownStory = {
     placeholder: "Start typing in markdown...",
 
     onChange: fn(),
-    mode: "markdown",
+    format: "markdown",
   },
-  render: (args) => <Editor {...args} mode="markdown" />,
+  render: (args) => <Editor {...args} format="markdown" />,
 };
 
 // Markdown editor with initial content
@@ -153,9 +153,9 @@ Try editing this content!`,
     placeholder: "Start typing...",
 
     onChange: fn(),
-    mode: "markdown",
+    format: "markdown",
   },
-  render: (args) => <Editor {...args} mode="markdown" />,
+  render: (args) => <Editor {...args} format="markdown" />,
 };
 
 // Interactive markdown editor with state
@@ -178,7 +178,7 @@ Edit this content and see the markdown output below.
       <div className="space-y-4">
         <div className="rounded-lg border border-gray-200">
           <Editor
-            mode="markdown"
+            format="markdown"
             value={markdown}
             onChange={(markdown) => setMarkdown(markdown)}
             onStatsChange={setStats}
@@ -227,7 +227,7 @@ export const MarkdownSync: MarkdownStory = {
           <div className="rounded border border-gray-200">
             <Editor
               {...args}
-              mode="markdown"
+              format="markdown"
               value={markdown}
               onChange={(markdown) => setMarkdown(markdown)}
             />
@@ -240,7 +240,7 @@ export const MarkdownSync: MarkdownStory = {
     value: String.raw`# Hello World\n\nThis is a test.`,
     placeholder: "Type something...",
     onChange: fn(),
-    mode: "markdown",
+    format: "markdown",
   },
 };
 
@@ -291,7 +291,7 @@ Try editing to see all features in action!`,
           <div className="p-6">
             <Editor
               {...args}
-              mode="markdown"
+              format="markdown"
               value={markdown}
               onChange={(markdown) => setMarkdown(markdown)}
             />
@@ -304,8 +304,79 @@ Try editing to see all features in action!`,
     value: "",
     placeholder: "Start typing...",
     onChange: fn(),
-    mode: "markdown",
+    format: "markdown",
   },
 };
 
 export const MarkdownEditorMeta = markdownMeta;
+
+// HTML Editor Stories
+const htmlMeta = {
+  title: "Components/Editor/With HTML",
+  component: Editor,
+  parameters: {
+    layout: "padded",
+  },
+  argTypes: {
+    placeholder: {
+      control: "text",
+      description: "Placeholder text for the editor",
+    },
+    value: {
+      control: "text",
+      description: "HTML content",
+    },
+  },
+  tags: ["autodocs"],
+} satisfies Meta<typeof Editor>;
+
+type HtmlStory = StoryObj<typeof htmlMeta>;
+
+export const HtmlDefault: HtmlStory = {
+  args: {
+    value: "",
+    placeholder: "Start typing in html...",
+    onChange: fn(),
+    format: "html",
+  },
+  render: (args) => <Editor {...args} format="html" />,
+};
+
+export const HtmlWithContent: HtmlStory = {
+  args: {
+    value: `<h1>Welcome to the Editor</h1><p>This is a <b>rich text editor</b> with <i>HTML</i> support.</p><ul><li>Easy to use</li><li>HTML compatible</li><li>Rich formatting options</li></ul><p>Try editing this content!</p>`,
+    placeholder: "Start typing...",
+    onChange: fn(),
+    format: "html",
+  },
+  render: (args) => <Editor {...args} format="html" />,
+};
+
+export const HtmlInteractive: HtmlStory = {
+  render: () => {
+    const [html, setHtml] = useState(
+      `<h1>Interactive Editor</h1><p>Edit this content and see the HTML output below.</p><p><b>Bold text</b> and <i>italic text</i> are supported.</p>`,
+    );
+
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-gray-200">
+          <Editor
+            format="html"
+            value={html}
+            onChange={(html) => setHtml(html)}
+            placeholder="Type something..."
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">HTML Output:</div>
+          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs whitespace-pre-wrap">
+            {html || "No content yet"}
+          </pre>
+        </div>
+      </div>
+    );
+  },
+};
+
+export const HtmlEditorMeta = htmlMeta;

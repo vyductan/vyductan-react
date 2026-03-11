@@ -7,7 +7,6 @@
 /* eslint-disable unicorn/explicit-length-check */
 /* eslint-disable @typescript-eslint/no-inferrable-types */
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/consistent-generic-constructors */
 
 import type * as React from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
@@ -176,7 +175,7 @@ export function flattenTreeData<TreeDataType extends BasicDataNode = DataNode>(
         omit(treeNode, [...fieldTitles, fieldKey, fieldChildren] as any),
         {
           title: mergedTitle,
-          key: mergedKey,
+          key: mergedKey as Key,
           parent,
           pos,
           children: null as unknown as FlattenNode<TreeDataType>[],
@@ -233,13 +232,8 @@ export function traverseDataNodes(
   // To avoid too many params, let use config instead of origin param
   config?: TraverseDataNodesConfig | string,
 ) {
-  let mergedConfig: TraverseDataNodesConfig = {};
-  if (typeof config === "object") {
-    mergedConfig = config;
-  } else {
-    mergedConfig = { externalGetKey: config };
-  }
-  mergedConfig = mergedConfig || {};
+  const mergedConfig: TraverseDataNodesConfig =
+    typeof config === "object" ? config : { externalGetKey: config };
 
   // Init config
   const { childrenPropName, externalGetKey, fieldNames } = mergedConfig;
@@ -281,7 +275,7 @@ export function traverseDataNodes(
         node,
         index: index!,
         pos,
-        key,
+        key: key as Key,
         parentPos: (parent!.node ? parent!.pos : null) as string | number,
         level: parent!.level + 1,
         nodes: connectNodes,
@@ -342,7 +336,7 @@ export function convertDataToEntities(
   const mergedExternalGetKey = externalGetKey || legacyExternalGetKey;
 
   const posEntities: Record<string, DataEntity> = {};
-  const keyEntities: Record<SafeKey, DataEntity> = {};
+  const keyEntities = {} as Record<SafeKey, DataEntity>;
   let wrapper: Wrapper = {
     posEntities,
     keyEntities,

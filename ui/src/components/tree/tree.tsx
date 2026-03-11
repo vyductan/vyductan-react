@@ -262,11 +262,15 @@ function TreeNode({
 
   const handleClick = () => {
     if (onSelect) {
-      const newSelectedKeys = isSelected
-        ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
-        : // : [...(selectedKeys || []), item.key];
-          [item.key];
-      onSelect(newSelectedKeys, { selected: !isSelected, node: item as any });
+      const newSelectedKeys = (
+        isSelected
+          ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
+          : [item.key]
+      ) as Key[];
+      onSelect(newSelectedKeys, {
+        selected: !isSelected,
+        node: item as any,
+      });
     }
   };
 

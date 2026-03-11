@@ -27,6 +27,10 @@ const MarkdownPlugins = dynamic(() => import("./plugins/markdown-plugins"), {
   ssr: false,
 });
 
+const HtmlPlugins = dynamic(() => import("./plugins/html-plugins"), {
+  ssr: false,
+});
+
 // Discriminated Union for better type safety
 type EditorPropsBase = {
   placeholder?: string;
@@ -39,7 +43,7 @@ type EditorPropsBase = {
     characterCount: number;
     readingTimeMinutes: number;
   }) => void;
-  variant?: "default" | "simple";
+  variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
   className?: string;
   contentClassName?: string;
@@ -49,18 +53,27 @@ type EditorPropsBase = {
 };
 
 type JsonEditorProps = EditorPropsBase & {
-  mode?: "json";
+  format?: "json";
   value?: string;
   onChange?: (jsonString: string, editorState: EditorState) => void;
 };
 
 type MarkdownEditorProps = EditorPropsBase & {
-  mode: "markdown";
+  format: "markdown";
   value?: string;
   onChange?: (markdownString: string, editorState: EditorState) => void;
 };
 
-export type EditorProps = JsonEditorProps | MarkdownEditorProps;
+type HtmlEditorProps = EditorPropsBase & {
+  format: "html";
+  value?: string;
+  onChange?: (htmlString: string, editorState: EditorState) => void;
+};
+
+export type EditorProps =
+  | JsonEditorProps
+  | MarkdownEditorProps
+  | HtmlEditorProps;
 
 export function Editor({
   value,
@@ -71,7 +84,7 @@ export function Editor({
   resolveImage,
   onImageUpload,
   onStatsChange,
-  mode = "json",
+  format = "json",
   variant = "default",
   mentionsData,
   className,
@@ -80,13 +93,36 @@ export function Editor({
   autoFocus = true,
   size = "middle",
 }: EditorProps) {
-  const isMarkdownMode = mode === "markdown";
+  const isMarkdownMode = format === "markdown";
+  const isHtmlMode = format === "html";
+
+  const rawEditorState =
+    isMarkdownMode || isHtmlMode ? undefined : (value ?? defaultValue);
+  let initialEditorState: string | undefined;
+  if (typeof rawEditorState === "string") {
+    if (rawEditorState.trim()) {
+      try {
+        JSON.parse(rawEditorState);
+        initialEditorState = rawEditorState;
+      } catch (error) {
+        console.error(
+          "Editor: invalid JSON in editorState, ignoring value",
+          error,
+        );
+        initialEditorState = undefined;
+      }
+    } else {
+      initialEditorState = undefined;
+    }
+  } else {
+    initialEditorState = rawEditorState;
+  }
 
   return (
     <LexicalComposer
       initialConfig={{
         ...editorConfig,
-        editorState: isMarkdownMode ? undefined : (value ?? defaultValue),
+        editorState: initialEditorState,
         editable,
       }}
     >
@@ -105,7 +141,7 @@ export function Editor({
             size={size}
           />
 
-          {!isMarkdownMode && (
+          {!isMarkdownMode && !isHtmlMode && (
             <OnChangePlugin
               ignoreSelectionChange={true}
               onChange={(editorState) => {
@@ -118,6 +154,16 @@ export function Editor({
           {isMarkdownMode && (
             <Suspense fallback={null}>
               <MarkdownPlugins
+                value={value}
+                defaultValue={defaultValue}
+                onChange={onChange}
+              />
+            </Suspense>
+          )}
+
+          {isHtmlMode && (
+            <Suspense fallback={null}>
+              <HtmlPlugins
                 value={value}
                 defaultValue={defaultValue}
                 onChange={onChange}

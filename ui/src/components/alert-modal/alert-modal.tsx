@@ -14,6 +14,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./_components";
@@ -21,6 +22,7 @@ import {
 export type AlertModalProps = Omit<ModalProps, "onOk"> & {
   onConfirm?: () => void;
   type?: "confirm" | "warning" | "info" | "success" | "error";
+  media?: React.ReactNode;
 };
 
 export const AlertModal = ({
@@ -38,6 +40,7 @@ export const AlertModal = ({
   type = "confirm",
   children,
   okButtonProps,
+  media,
   ...rest
 }: AlertModalProps) => {
   const handleOpenChange = React.useCallback(
@@ -103,6 +106,7 @@ export const AlertModal = ({
     <AlertDialog onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
+        {media && <AlertDialogMedia>{media}</AlertDialogMedia>}
         {iconConfig && (
           <div className="flex justify-center">
             <div

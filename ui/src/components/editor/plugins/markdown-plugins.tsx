@@ -52,7 +52,6 @@ export function MarkdownPlugins({
         onChange={(editorState) => {
           editorState.read(() => {
             const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
-            console.log("[MarkdownPlugins] Converted markdown:", markdown);
             onChange?.(markdown, editorState);
           });
         }}

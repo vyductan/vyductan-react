@@ -110,7 +110,7 @@ const Menu = ({
       if (item.type === "group") {
         return (
           <li
-            key={`group-${item.key ?? index}`}
+            key={`group-${String(item.key ?? index)}`}
             role="presentation"
             className="my-1 text-left"
           >

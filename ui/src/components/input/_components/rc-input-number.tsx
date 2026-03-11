@@ -705,7 +705,7 @@ const InputNumber = <T extends ValueType = ValueType>({
   style,
   value,
   prefix,
-  suffix: _suffix,
+  suffix,
   addonBefore,
   addonAfter,
   className,
@@ -775,6 +775,11 @@ const InputNumber = <T extends ValueType = ValueType>({
     <>
       {clearIcon}
       {controlsNode}
+      {suffix && (
+        <span className="mx-1 flex items-center">
+          {suffix}
+        </span>
+      )}
     </>
   );
 

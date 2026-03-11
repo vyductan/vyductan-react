@@ -13,19 +13,7 @@
   tab-size: 2;
   color: rgba(55, 53, 47, 0.9);
 }
-.EditorTheme__code:before {
-  content: attr(data-gutter);
-  position: absolute;
-  background-color: transparent;
-  border-right: 1px solid rgba(55, 53, 47, 0.09);
-  left: 0;
-  top: 0;
-  padding: 16px 8px;
-  color: rgba(55, 53, 47, 0.4);
-  white-space: pre-wrap;
-  text-align: right;
-  min-width: 25px;
-}
+
 .EditorTheme__table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -377,10 +365,4 @@
 /* Improve table row hover */
 .EditorTheme__table tbody tr:hover {
   background-color: rgba(55, 53, 47, 0.03);
-}
-
-/* Better code block line numbers if present */
-.EditorTheme__code:before {
-  color: rgba(55, 53, 47, 0.4);
-  border-right-color: rgba(55, 53, 47, 0.09);
 }

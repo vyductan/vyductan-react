@@ -64,6 +64,7 @@ export {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
+  AlertDialogMedia,
 } from "@acme/ui/shadcn/alert-dialog";
 
 export { AlertDialogAction };

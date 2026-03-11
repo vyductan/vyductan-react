@@ -606,24 +606,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   // ]);
 
   // ========================== Selections ==========================
-  // const [
-  //   rowSelectionState,
-  //   setRowSelection,
-  //   transformSelectionColumns,
-  //   // selectedKeySet,
-  // ] = useSelection<TRecord>(
-  //   {
-  //     data: mergedData,
-  //     pageData,
-  //     getRowKey,
-  //     getRecordByKey,
-  //     expandType,
-  //     childrenColumnName,
-  //     locale: tableLocale,
-  //     getPopupContainer: getPopupContainer || getContextPopupContainer,
-  //   },
-  //   rowSelection,
-  // );
 
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
     rowSelection?.selectedRowKeys || [],
@@ -690,8 +672,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         ? [
             {
               id: "__select__",
-              size: 50,
-              minSize: 50,
+              size:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
+              minSize:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
               enableResizing: false,
               meta: {
                 align: "center",
@@ -705,7 +693,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   }
                   aria-label="Select all"
                   skipGroup
-                  className="align-middle"
+                  className="translate-y-[2px] align-middle"
                 />
               ),
               cell: ({ row }) => (
@@ -714,7 +702,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   indeterminate={row.getIsSomeSelected()}
                   onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
-                  className="flex"
+                  className="flex translate-y-[2px]"
                 />
               ),
               enableSorting: false,
@@ -1061,7 +1049,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                 true,
                               ),
                               // selection column
-                              header.id === "selection" && "px-0",
+                              header.id === "__select__" && "px-2",
                               classNames?.head,
                               // column className
                               header.column.columnDef.meta?.className,
@@ -1178,7 +1166,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                       scrollRight: wrapperScrollRight,
                                     }),
                                     // selection column
-                                    cell.id.endsWith("selection") && "px-0",
+                                    (cell.column.id === "__select__" ||
+                                      cell.id.endsWith("selection")) &&
+                                      "px-2",
                                     // column className
                                     classNames?.cell,
                                     cell.column.columnDef.meta?.className,
