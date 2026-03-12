@@ -1,4 +1,3 @@
-
 /* eslint-disable unicorn/prefer-ternary */
 
 /* eslint-disable unicorn/no-array-callback-reference */
@@ -192,9 +191,9 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
       const tooltipProps: TooltipProps =
         typeof showSorterTooltip === "object"
           ? {
-            title: sortTip,
-            ...showSorterTooltip,
-          }
+              title: sortTip,
+              ...showSorterTooltip,
+            }
           : { title: sortTip };
       newColumn = {
         ...newColumn,
@@ -348,13 +347,13 @@ interface SorterConfig<RecordType = AnyObject> {
 export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
   props: SorterConfig<RecordType>,
 ): [
-    SortingState,
-    OnChangeFn<SortingState>,
-    TransformColumns<RecordType>,
-    SortState<RecordType>[],
-    ColumnTitleProps<RecordType>,
-    () => SorterResult<RecordType> | SorterResult<RecordType>[],
-  ] => {
+  SortingState,
+  OnChangeFn<SortingState>,
+  TransformColumns<RecordType>,
+  SortState<RecordType>[],
+  ColumnTitleProps<RecordType>,
+  () => SorterResult<RecordType> | SorterResult<RecordType>[],
+] => {
   const {
     mergedColumns,
     sortDirections,

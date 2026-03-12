@@ -1,4 +1,3 @@
-
 /* eslint-disable unicorn/no-new-array */
 
 /* eslint-disable unicorn/prefer-at */

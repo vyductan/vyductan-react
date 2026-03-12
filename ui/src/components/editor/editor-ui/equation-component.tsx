@@ -1,4 +1,3 @@
-
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -71,45 +70,45 @@ export default function EquationComponent({
     }
     return showEquationEditor
       ? mergeRegister(
-        editor.registerCommand(
-          SELECTION_CHANGE_COMMAND,
-          () => {
-            const activeElement = document.activeElement;
-            const inputElem = inputRef.current;
-            if (inputElem !== activeElement) {
-              onHide();
-            }
-            return false;
-          },
-          COMMAND_PRIORITY_HIGH,
-        ),
-        editor.registerCommand(
-          KEY_ESCAPE_COMMAND,
-          () => {
-            const activeElement = document.activeElement;
-            const inputElem = inputRef.current;
-            if (inputElem === activeElement) {
-              onHide(true);
-              return true;
-            }
-            return false;
-          },
-          COMMAND_PRIORITY_HIGH,
-        ),
-      )
+          editor.registerCommand(
+            SELECTION_CHANGE_COMMAND,
+            () => {
+              const activeElement = document.activeElement;
+              const inputElem = inputRef.current;
+              if (inputElem !== activeElement) {
+                onHide();
+              }
+              return false;
+            },
+            COMMAND_PRIORITY_HIGH,
+          ),
+          editor.registerCommand(
+            KEY_ESCAPE_COMMAND,
+            () => {
+              const activeElement = document.activeElement;
+              const inputElem = inputRef.current;
+              if (inputElem === activeElement) {
+                onHide(true);
+                return true;
+              }
+              return false;
+            },
+            COMMAND_PRIORITY_HIGH,
+          ),
+        )
       : editor.registerUpdateListener(({ editorState }) => {
-        const isSelected = editorState.read(() => {
-          const selection = $getSelection();
-          return (
-            $isNodeSelection(selection) &&
-            selection.has(nodeKey) &&
-            selection.getNodes().length === 1
-          );
+          const isSelected = editorState.read(() => {
+            const selection = $getSelection();
+            return (
+              $isNodeSelection(selection) &&
+              selection.has(nodeKey) &&
+              selection.getNodes().length === 1
+            );
+          });
+          if (isSelected) {
+            setShowEquationEditor(true);
+          }
         });
-        if (isSelected) {
-          setShowEquationEditor(true);
-        }
-      });
   }, [editor, nodeKey, onHide, showEquationEditor, isEditable]);
 
   return (
