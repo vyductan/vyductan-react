@@ -322,7 +322,7 @@ const parseDateValue = (
 
   const knownFormats = options?.strictFormatOnly
     ? [format]
-    : Array.from(new Set([format, "HH:mm:ss", "HH:mm", "H:m:s", "H:m"]));
+    : [...new Set([format, "HH:mm:ss", "HH:mm", "H:m:s", "H:m"])];
 
   for (const knownFormat of knownFormats) {
     const parsed = dayjs(normalizedValue, knownFormat, true);

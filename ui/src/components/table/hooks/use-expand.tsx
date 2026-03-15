@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";

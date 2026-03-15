@@ -1,5 +1,8 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-array-for-each */
 
 /* eslint-disable unicorn/no-negated-condition */

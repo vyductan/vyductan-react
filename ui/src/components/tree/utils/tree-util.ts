@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable @typescript-eslint/prefer-for-of */

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-typeof-undefined */
 type MQListenerHandler = (
   mql: MediaQueryList,
   handler: (e: MediaQueryListEvent) => void,

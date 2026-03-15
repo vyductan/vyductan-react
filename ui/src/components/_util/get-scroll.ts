@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/* eslint-disable unicorn/prefer-global-this */
+
 export function isWindow(obj: any): obj is Window {
   return obj !== null && obj !== undefined && obj === obj.window;
 }

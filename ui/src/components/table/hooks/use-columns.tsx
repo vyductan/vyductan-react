@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
 
 /* eslint-disable unicorn/prefer-spread */

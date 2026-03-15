@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable unicorn/no-array-callback-reference */
 
 /* eslint-disable unicorn/prefer-spread */

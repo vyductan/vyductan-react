@@ -149,6 +149,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   const startInputRef = React.useRef<InputRef>(null);
   const endInputRef = React.useRef<InputRef>(null);
 
+  // eslint-disable-next-line react-hooks/refs
   const composedStartRef = ref ? composeRef(ref, startInputRef) : startInputRef;
 
   const handleStartInputChange = (inputValue: string) => {

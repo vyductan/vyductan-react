@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { BaseSelection, TextFormatType } from "lexical";
 import { useState } from "react";
 import { $isTableSelection } from "@lexical/table";

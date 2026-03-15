@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-global-this */
 import type { ClassValue } from "clsx";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";

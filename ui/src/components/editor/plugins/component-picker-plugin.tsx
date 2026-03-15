@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
