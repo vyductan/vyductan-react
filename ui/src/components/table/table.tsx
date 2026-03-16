@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-
 "use client";
 
 import type {
@@ -333,8 +331,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       }
 
       // Trigger pagination events
-      if (pagination) {
-        pagination.onChange?.(1, changeInfo.pagination?.pageSize!);
+      const changedPageSize = changeInfo.pagination?.pageSize;
+      if (pagination && changedPageSize !== undefined) {
+        pagination.onChange?.(1, changedPageSize);
       }
     }
 
@@ -348,24 +347,23 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       });
     }
 
-    onChange?.(
-      changeInfo.pagination!,
-      changeInfo.filters!,
-      Array.isArray(changeInfo.sorter)
-        ? changeInfo.sorter
-        : changeInfo.sorter
-          ? [changeInfo.sorter]
-          : [],
-      {
-        // currentDataSource: getFilterData(
-        //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
-        //   changeInfo.filterStates!,
-        //   childrenColumnName,
-        // ),
-        currentDataSource: [],
-        action,
-      },
-    );
+    const paginationInfo = changeInfo.pagination ?? {};
+    const filterInfo = changeInfo.filters ?? {};
+    const sorterInfo = Array.isArray(changeInfo.sorter)
+      ? changeInfo.sorter
+      : changeInfo.sorter
+        ? [changeInfo.sorter]
+        : [];
+
+    onChange?.(paginationInfo, filterInfo, sorterInfo, {
+      // currentDataSource: getFilterData(
+      //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
+      //   changeInfo.filterStates!,
+      //   childrenColumnName,
+      // ),
+      currentDataSource: [],
+      action,
+    });
   };
 
   // ========================== Expandable ==========================

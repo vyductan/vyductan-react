@@ -59,6 +59,24 @@ const getDecimalIfValidate = (value: ValueType) => {
   return decimal.isInvalidate() ? null : decimal;
 };
 
+const parseAriaNumber = (value: ValueType | null | undefined) => {
+  if (typeof value === "number") {
+    return Number.isNaN(value) ? undefined : value;
+  }
+
+  if (typeof value === "string") {
+    const trimmedValue = value.trim();
+    if (trimmedValue === "") {
+      return;
+    }
+
+    const parsedValue = Number(trimmedValue);
+    return Number.isNaN(parsedValue) ? undefined : parsedValue;
+  }
+
+  return;
+};
+
 type InputNumberProps<TNumberValue extends NumberValueType = NumberValueType> =
   Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
@@ -254,14 +272,11 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
       // User typing will not auto format with precision directly
       if (!userTyping) {
         const mergedPrecision = getPrecision(str, userTyping);
+        const hasPrecision =
+          mergedPrecision !== undefined && mergedPrecision >= 0;
 
-        if (
-          validateNumber(str) &&
-          (decimalSeparator || mergedPrecision! >= 0)
-        ) {
-          // Separator
+        if (validateNumber(str) && (decimalSeparator || hasPrecision)) {
           const separatorString = decimalSeparator ?? ".";
-
           str = toFixed(str, separatorString, mergedPrecision);
         }
       }
@@ -474,7 +489,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   const onCompositionEnd = () => {
     compositionRef.current = false;
 
-    collectInputValue(inputRef.current!.value);
+    const input = inputRef.current;
+    if (!input) {
+      return;
+    }
+
+    collectInputValue(input.value);
   };
 
   // >>> Input
@@ -653,6 +673,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     }
   }, [inputValue]);
 
+  const ariaValueMin = parseAriaNumber(min);
+  const ariaValueMax = parseAriaNumber(max);
+  const ariaValueNow = decimalValue.isInvalidate()
+    ? undefined
+    : parseAriaNumber(decimalValue.toString());
+
   // ============================ Render ============================
   return (
     <div
@@ -676,13 +702,9 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
       <input
         autoComplete="off"
         role="spinbutton"
-        aria-valuemin={min as any}
-        aria-valuemax={max as any}
-        aria-valuenow={
-          decimalValue.isInvalidate()
-            ? undefined
-            : (decimalValue.toString() as any)
-        }
+        aria-valuemin={ariaValueMin}
+        aria-valuemax={ariaValueMax}
+        aria-valuenow={ariaValueNow}
         step={step}
         {...inputProps}
         ref={ref ? composeRef(ref, inputRef) : inputRef}

@@ -1,5 +1,5 @@
 import type { SerializedDocument } from "@lexical/file";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   editorStateFromSerializedDocument,
   serializedDocumentFromEditorState,
@@ -32,21 +32,21 @@ async function shareDoc(doc: SerializedDocument): Promise<void> {
 
 export function ShareContentPlugin() {
   const [editor] = useLexicalComposerContext();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = globalThis.window !== undefined;
 
   useEffect(() => {
     if (!isClient) return;
 
-    void docFromHash(globalThis.location.hash).then((doc) => {
-      if (doc?.source === "editor") {
-        editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
-        editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
-      }
-    });
+    void docFromHash(globalThis.location.hash)
+      .then((doc) => {
+        if (doc?.source === "editor") {
+          editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
+          editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
+        }
+      })
+      .catch(() => {
+        // Ignore invalid or malformed share hashes.
+      });
   }, [editor, isClient]);
 
   return (
