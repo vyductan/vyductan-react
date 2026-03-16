@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-for-loop */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable unicorn/no-array-for-each */

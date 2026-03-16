@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-typeof-undefined */
 
 /* eslint-disable unicorn/prefer-switch */

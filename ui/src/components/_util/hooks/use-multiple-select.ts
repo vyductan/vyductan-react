@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable unicorn/no-array-for-each */
 import { useCallback, useState } from "react";
 
 export type PrevSelectedIndex = null | number;

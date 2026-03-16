@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { FieldValues } from "react-hook-form";
 import { FormProvider as RHFormProvider } from "react-hook-form";
 

@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/* eslint-disable unicorn/no-array-for-each */
 // copied https://github.com/ant-design/ant-design-mobile/blob/d3b3bae/src/utils/with-default-props.tsx
 function mergeProps<A, B>(a: A, b: B): B & A;
 function mergeProps<A, B, C>(a: A, b: B, c: C): C & B & A;

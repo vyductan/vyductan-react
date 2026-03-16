@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { XOR } from "ts-xor";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 

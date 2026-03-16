@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-useless-fallback-in-spread */
 
 import * as React from "react";
