@@ -61,6 +61,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     // trigger props
     ...restProps
   } = props;
+  const isControlled = Object.prototype.hasOwnProperty.call(props, "value");
 
   const [open, setOpen] = React.useState(openProp ?? false);
 
@@ -87,27 +88,23 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 
   // Sync controlled value prop
   React.useEffect(() => {
-    if (value !== undefined) {
-      setLocalValue(value);
+    if (isControlled) {
+      setLocalValue(value as TValue);
     }
-  }, [value]);
+  }, [isControlled, value]);
 
   // Track input display value separately from parsed value
-  const [inputValue, setInputValue] = React.useState(() => {
-    if (typeof localValue === "string") return localValue;
-    return formatDateValue(localValue, format);
-  });
+  const [inputValue, setInputValue] = React.useState(() =>
+    formatDateValue(localValue, format),
+  );
+  const [isInputFocused, setIsInputFocused] = React.useState(false);
 
   // Hover preview state for showing preview in input
   const [hoverPreview, setHoverPreview] = React.useState<DateType>(null);
 
   // Update input value when localValue changes externally
   React.useEffect(() => {
-    if (typeof localValue === "string") {
-      setInputValue(localValue);
-    } else {
-      setInputValue(formatDateValue(localValue, format));
-    }
+    setInputValue(formatDateValue(localValue, format));
   }, [localValue, format]);
 
   const handleChange = React.useCallback(
@@ -140,6 +137,8 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
 
+    // Typing should override hover preview text.
+    setHoverPreview(null);
     setInputValue(rawValue);
 
     if (!rawValue) {
@@ -147,12 +146,11 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
       return;
     }
 
-    // Parse the native time input value (HH:MM format)
-    // Use today's date as base and set the time
-    const today = dayjs().format("YYYY-MM-DD");
-    const parsedDate = dayjs(`${today} ${rawValue}`, `YYYY-MM-DD ${format}`);
+    const parsedDate = parseDateValue(rawValue, format, {
+      strictFormatOnly: true,
+    });
 
-    if (parsedDate.isValid()) {
+    if (parsedDate) {
       handleChange(parsedDate);
     }
   };
@@ -175,7 +173,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     // Convert string to DateType if needed
     const dateValue: DateType =
       typeof localValue === "string"
-        ? dayjs(localValue, format)
+        ? parseDateValue(localValue, format)
         : (localValue as DateType);
 
     return (
@@ -237,7 +235,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
             name={name}
             autoComplete="off"
             value={
-              open && hoverPreview
+              !isInputFocused && open && hoverPreview
                 ? formatDateValue(hoverPreview, format)
                 : inputValue
             }
@@ -253,6 +251,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
               ),
             }}
             onFocus={(e) => {
+              setIsInputFocused(true);
               // Select all text on focus for better UX
               e.target.select();
             }}
@@ -282,6 +281,9 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
               }
             }}
             onBlur={onBlur}
+            onBlurCapture={() => {
+              setIsInputFocused(false);
+            }}
             aria-invalid={ariaInvalid}
             aria-describedby={ariaDescribedBy}
           />
@@ -294,11 +296,53 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 export { TimePicker };
 export type { TimePickerProps };
 
-// Format the date for display
-const formatDateValue = (date: DateType, format: string): string => {
-  if (!date) return "";
-  if (typeof date === "object" && "isValid" in date && date.isValid()) {
-    return date.format(format);
+const parseDateValue = (
+  value: Dayjs | string | null | undefined,
+  format: string,
+  options?: {
+    strictFormatOnly?: boolean;
+  },
+): Dayjs | null => {
+  if (!value) {
+    return null;
   }
+
+  if (typeof value === "object" && "isValid" in value) {
+    return value.isValid() ? value : null;
+  }
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalizedValue = value.trim();
+  if (!normalizedValue) {
+    return null;
+  }
+
+  const knownFormats = options?.strictFormatOnly
+    ? [format]
+    : [...new Set([format, "HH:mm:ss", "HH:mm", "H:m:s", "H:m"])];
+
+  for (const knownFormat of knownFormats) {
+    const parsed = dayjs(normalizedValue, knownFormat, true);
+    if (parsed.isValid()) {
+      return parsed;
+    }
+  }
+
+  return null;
+};
+
+// Format time value for display
+const formatDateValue = (
+  date: Dayjs | string | null | undefined,
+  format: string,
+): string => {
+  const parsed = parseDateValue(date, format);
+  if (parsed) {
+    return parsed.format(format);
+  }
+
   return "";
 };
