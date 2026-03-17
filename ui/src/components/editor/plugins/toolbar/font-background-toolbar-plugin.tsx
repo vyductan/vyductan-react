@@ -11,9 +11,6 @@ import { Button } from "@acme/ui/components/button";
 import { ColorPicker } from "@acme/ui/components/color-picker";
 import { AggregationColor } from "@acme/ui/components/color-picker/color";
 
-import { ColorPicker } from "@acme/ui/components/color-picker";
-import { AggregationColor } from "@acme/ui/components/color-picker/color";
-
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 

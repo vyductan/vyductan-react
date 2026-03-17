@@ -28,23 +28,9 @@ import {
   SelectTrigger,
 } from "@acme/ui/components/select";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectTrigger,
-} from "@acme/ui/components/select";
-
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 import { blockTypeToBlockName } from "../../plugins/toolbar/block-format/block-format-data";
-import { FormatBulletedList } from "./block-format/format-bulleted-list";
-import { FormatCheckList } from "./block-format/format-check-list";
-import { FormatCodeBlock } from "./block-format/format-code-block";
-import { FormatHeading } from "./block-format/format-heading";
-import { FormatNumberedList } from "./block-format/format-numbered-list";
-import { FormatParagraph } from "./block-format/format-paragraph";
-import { FormatQuote } from "./block-format/format-quote";
 
 // Need $isHeadingNode for the check above
 function $isHeadingNode(node: unknown): node is { getTag: () => string } {
