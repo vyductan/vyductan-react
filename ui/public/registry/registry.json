@@ -9,38 +9,6 @@
       "path": "components/form",
       "type": "registry:component",
       "files": [
-        { "path": "components/form/index.tsx", "target": "components/form/index.tsx", "type": "registry:file" },
-        { "path": "components/form/context/index.tsx", "target": "components/form/context/index.tsx", "type": "registry:file" },
-        { "path": "components/form/context/index-v1.tsx", "target": "components/form/context/index-v1.tsx", "type": "registry:file" },
-        { "path": "components/form/utils.ts", "target": "components/form/utils.ts", "type": "registry:file" },
-        { "path": "components/form/types.ts", "target": "components/form/types.ts", "type": "registry:file" },
-        { "path": "components/form/_components/index.tsx", "target": "components/form/_components/index.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-control.tsx", "target": "components/form/_components/form-control.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-item-control-input.tsx", "target": "components/form/_components/form-item-control-input.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-field.tsx", "target": "components/form/_components/form-field.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-item-row.tsx", "target": "components/form/_components/form-item-row.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-label.tsx", "target": "components/form/_components/form-label.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-root.tsx", "target": "components/form/_components/form-root.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-item.tsx", "target": "components/form/_components/form-item.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-message.tsx", "target": "components/form/_components/form-message.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-list.tsx", "target": "components/form/_components/form-list.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-errors-notification.tsx", "target": "components/form/_components/form-errors-notification.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-error-list.tsx", "target": "components/form/_components/form-error-list.tsx", "type": "registry:file" },
-        { "path": "components/form/_components/form-description.tsx", "target": "components/form/_components/form-description.tsx", "type": "registry:file" },
-        { "path": "components/form/hooks/use-extra-props.ts", "target": "components/form/hooks/use-extra-props.ts", "type": "registry:file" },
-        { "path": "components/form/hooks/use-variant.ts", "target": "components/form/hooks/use-variant.ts", "type": "registry:file" },
-        { "path": "components/form/hooks/use-form.ts", "target": "components/form/hooks/use-form.ts", "type": "registry:file" },
-        { "path": "components/form/hooks/use-field-optionality-check.ts", "target": "components/form/hooks/use-field-optionality-check.ts", "type": "registry:file" },
-        { "path": "components/form/hooks/use-form-instance.ts", "target": "components/form/hooks/use-form-instance.ts", "type": "registry:file" },
-        { "path": "components/form/form.tsx", "target": "components/form/form.tsx", "type": "registry:file" }
-      ]
-    },
-    {
-      "name": "tree",
-      "title": "Tree",
-      "path": "components/tree",
-      "type": "registry:component",
-      "files": [
         {
           "path": "components/form/index.tsx",
           "target": "components/form/index.tsx",
