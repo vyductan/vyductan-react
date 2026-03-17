@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable unicorn/no-array-for-each */
 import type { DataIndex, Key } from "../types";
 
@@ -27,8 +27,8 @@ export function getColumnsKey<T = any>(
     const { key, dataIndex } = column || {};
 
     let mergedKey = key || toArray(dataIndex).join("-") || INTERNAL_KEY_PREFIX;
-    while (keys[mergedKey as string]) {
-      mergedKey = `${mergedKey}_next`;
+    while (keys[String(mergedKey)]) {
+      mergedKey = `${String(mergedKey)}_next`;
     }
     keys[mergedKey as string] = true;
 

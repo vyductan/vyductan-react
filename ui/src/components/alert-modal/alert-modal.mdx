@@ -1,0 +1,25 @@
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import AlertModalBasicDemo from "./demo/basic";
+import TypesDemo from "./demo/types";
+
+# AlertModal
+
+A confirmation dialog component that displays an alert message with confirm/cancel actions. Built on top of the AlertDialog primitive components and follows Ant Design API patterns with Shadcn UI styling.
+
+## Examples
+
+### Basic Usage
+
+Display the document sample code for the basic usage of the AlertModal component.
+
+<ComponentSource
+  src="alert-modal/demo/basic.tsx"
+  __comp__={AlertModalBasicDemo}
+/>
+
+### Types
+
+AlertModal supports different types to display different visual styles and icons: `confirm`, `warning`, `info`, `success`, and `error`.
+
+<ComponentSource src="alert-modal/demo/types.tsx" __comp__={TypesDemo} />

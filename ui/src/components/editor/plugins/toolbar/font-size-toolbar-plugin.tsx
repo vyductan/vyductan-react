@@ -1,13 +1,14 @@
 import type { BaseSelection } from "lexical";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
 import { Minus, Plus } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
+import { Input } from "@acme/ui/components/input";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
@@ -55,7 +56,7 @@ export function FontSizeToolbarPlugin() {
     <div className="flex items-center gap-1">
       <div className="flex items-center gap-1">
         <Button
-          variant="outline"
+          variant="outlined"
           shape="icon"
           className="h-8 w-8"
           onClick={() => updateFontSize(fontSize - 1)}
@@ -73,7 +74,7 @@ export function FontSizeToolbarPlugin() {
           max={MAX_FONT_SIZE}
         />
         <Button
-          variant="outline"
+          variant="outlined"
           shape="icon"
           className="h-8 w-8"
           onClick={() => updateFontSize(fontSize + 1)}

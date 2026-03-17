@@ -1,23 +1,24 @@
 import type { JSX } from "react";
-import { Button } from "@/components/ui/button";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { TreeView } from "@lexical/react/LexicalTreeView";
+import { NotebookPenIcon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
 import {
   DialogContent,
   DialogHeader,
   Dialog as DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/modal";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { TreeView } from "@lexical/react/LexicalTreeView";
-import { NotebookPenIcon } from "lucide-react";
+} from "@acme/ui/components/modal";
+import { ScrollArea, ScrollBar } from "@acme/ui/components/scroll-area";
 
 export function TreeViewPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   return (
     <DialogRoot>
       <DialogTrigger asChild>
-        <Button size={"sm"} variant="text" className="p-2">
+        <Button size="small" variant="text" className="p-2">
           <NotebookPenIcon className="h-4 w-4" />
         </Button>
       </DialogTrigger>

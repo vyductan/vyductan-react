@@ -1,7 +1,6 @@
 import type { XOR } from "ts-xor";
 import React from "react";
 
-import type { BadgeProps as ShadcnBadgeProps } from "@acme/ui/shadcn/badge";
 import {
   AvatarFallback,
   AvatarImage,
@@ -11,7 +10,9 @@ import {
 import type { OwnAvatarProps } from "./avatar";
 import { InternalAvatar } from "./avatar";
 
-type AvatarProps = XOR<OwnAvatarProps, ShadcnBadgeProps>;
+type ShadcnAvatarProps = React.ComponentProps<typeof ShadcnAvatar>;
+type AvatarProps = XOR<OwnAvatarProps, ShadcnAvatarProps>;
+
 const Avatar = (props: AvatarProps) => {
   const isAvatarShadcn = React.Children.toArray(props.children).some(
     (child) =>
@@ -19,9 +20,32 @@ const Avatar = (props: AvatarProps) => {
       (child.type === AvatarImage || child.type === AvatarFallback),
   );
 
-  if (isAvatarShadcn) return <ShadcnAvatar {...props} />;
+  if (isAvatarShadcn) {
+    const { size, ...rest } = props as OwnAvatarProps;
+    let shadcnSize: "default" | "sm" | "lg" | undefined;
 
-  return <InternalAvatar {...props} />;
+    switch (size) {
+      case "small": {
+        shadcnSize = "sm";
+        break;
+      }
+      case "large": {
+        shadcnSize = "lg";
+        break;
+      }
+      case "default": {
+        shadcnSize = "default";
+        break;
+      }
+      default: {
+        shadcnSize = undefined;
+      }
+    } // Fallback or handle number? Shadcn doesn't support number directly
+
+    return <ShadcnAvatar size={shadcnSize} {...(rest as ShadcnAvatarProps)} />;
+  }
+
+  return <InternalAvatar {...(props as OwnAvatarProps)} />;
 };
 
 export type { AvatarProps };

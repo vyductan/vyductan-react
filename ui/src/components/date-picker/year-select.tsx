@@ -1,5 +1,5 @@
 import type { Dayjs } from "dayjs";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -25,9 +25,11 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
   );
 
   const computedDecadeRange = useMemo(() => {
+    const firstYear = currentDecadeRange[0];
+    const lastYear = currentDecadeRange.at(-1);
     return {
-      start: currentDecadeRange[0]!.year(),
-      end: currentDecadeRange.at(-1)!.year(),
+      start: firstYear?.year() ?? 0,
+      end: lastYear?.year() ?? 0,
       years: currentDecadeRange,
     };
   }, [currentDecadeRange]);
@@ -65,7 +67,7 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
 
   return (
     <div
-      className="grid grid-cols-3 gap-1 p-3"
+      className="grid w-[276px] grid-cols-3 gap-1 p-3"
       onMouseLeave={() => onHoverChange?.()}
     >
       {yearGrid.map((year, index) => {

@@ -6,15 +6,15 @@
  *
  */
 import type { JSX } from "react";
-import * as React from "react";
 import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundary } from "react-error-boundary";
+
+import { Button } from "@acme/ui/components/button";
+import { Checkbox } from "@acme/ui/components/checkbox";
+import { Input } from "@acme/ui/components/input";
+import { Label } from "@acme/ui/components/label";
+import { Textarea } from "@acme/ui/components/textarea";
 
 import KatexRenderer from "../editor-ui/katex-renderer";
 
@@ -77,7 +77,10 @@ export default function KatexEquationAlterer({
       <div className="space-y-2">
         <Label className="text-sm font-medium">Visualization</Label>
         <div className="bg-muted rounded-md border p-4">
-          <ErrorBoundary onError={(e) => editor._onError(e)} fallback={null}>
+          <ErrorBoundary
+            onError={(e) => editor._onError(e as Error)}
+            fallback={null}
+          >
             <KatexRenderer
               equation={equation}
               inline={false}

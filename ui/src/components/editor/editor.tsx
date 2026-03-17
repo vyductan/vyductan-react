@@ -1,15 +1,17 @@
-"use client";
-
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
-import type { EditorState, SerializedEditorState } from "lexical";
+import type { EditorState } from "lexical";
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-import { TooltipProvider } from "../tooltip";
-import { FloatingLinkContext } from "./context/floating-link-context";
-import { SharedAutocompleteContext } from "./context/shared-autocomplete-context";
+import type { SizeType } from "../config-provider/size-context";
+import type { ImageResolverFn } from "./context/image-resolver-context";
+import type { MentionData } from "./plugins/mentions-plugin";
+import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
+import { WordCountPlugin } from "./plugins/word-count-plugin";
 import { editorTheme } from "./themes/editor-theme";
 
 const editorConfig: InitialConfigType = {
@@ -21,62 +23,157 @@ const editorConfig: InitialConfigType = {
   },
 };
 
-export function Editor({
-  editorState,
-  editorSerializedState,
-  onChange,
-  onSerializedChange,
+const MarkdownPlugins = dynamic(() => import("./plugins/markdown-plugins"), {
+  ssr: false,
+});
 
-  // forFormItem = false,
-  value,
-}: {
-  editorState?: EditorState;
-  editorSerializedState?: SerializedEditorState;
-  onChange?: (editorState: EditorState) => void;
-  onSerializedChange?: (editorSerializedState: SerializedEditorState) => void;
+const HtmlPlugins = dynamic(() => import("./plugins/html-plugins"), {
+  ssr: false,
+});
 
-  // forFormItem?: boolean;
+// Discriminated Union for better type safety
+type EditorPropsBase = {
+  placeholder?: string;
+  defaultValue?: string;
+  editable?: boolean;
+  resolveImage?: ImageResolverFn;
+  onImageUpload?: (file: File) => Promise<string>;
+  onStatsChange?: (stats: {
+    wordCount: number;
+    characterCount: number;
+    readingTimeMinutes: number;
+  }) => void;
+  variant?: "default" | "simple" | "minimal";
+  mentionsData?: MentionData[];
+  className?: string;
+  contentClassName?: string;
+  placeholderClassName?: string;
+  autoFocus?: boolean;
+  size?: SizeType;
+};
+
+type JsonEditorProps = EditorPropsBase & {
+  format?: "json";
   value?: string;
-}) {
-  console.log("vv", value);
-  return (
-    <div className="bg-background overflow-hidden rounded-lg border shadow">
-      <LexicalComposer
-        initialConfig={{
-          ...editorConfig,
-          ...(editorState ? { editorState } : {}),
-          ...(editorSerializedState
-            ? { editorState: JSON.stringify(editorSerializedState) }
-            : {}),
-          // // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          // ...(forFormItem ? { editorState: value || undefined } : {}),
-        }}
-      >
-        <TooltipProvider>
-          <SharedAutocompleteContext>
-            <FloatingLinkContext>
-              <Plugins />
+  onChange?: (jsonString: string, editorState: EditorState) => void;
+};
 
-              <OnChangePlugin
-                ignoreSelectionChange={true}
-                onChange={(editorState) => {
-                  // if (forFormItem) {
-                  //   onChange?.(
-                  //     JSON.stringify(
-                  //       editorState.toJSON(),
-                  //     ) as unknown as EditorState,
-                  //   );
-                  // } else {
-                  //   onChange?.(editorState);
-                  // }
-                  onChange?.(editorState);
-                  onSerializedChange?.(editorState.toJSON());
-                }}
+type MarkdownEditorProps = EditorPropsBase & {
+  format: "markdown";
+  value?: string;
+  onChange?: (markdownString: string, editorState: EditorState) => void;
+};
+
+type HtmlEditorProps = EditorPropsBase & {
+  format: "html";
+  value?: string;
+  onChange?: (htmlString: string, editorState: EditorState) => void;
+};
+
+export type EditorProps =
+  | JsonEditorProps
+  | MarkdownEditorProps
+  | HtmlEditorProps;
+
+export function Editor({
+  value,
+  defaultValue,
+  onChange,
+  placeholder,
+  editable = true,
+  resolveImage,
+  onImageUpload,
+  onStatsChange,
+  format = "json",
+  variant = "default",
+  mentionsData,
+  className,
+  contentClassName,
+  placeholderClassName,
+  autoFocus = true,
+  size = "middle",
+}: EditorProps) {
+  const isMarkdownMode = format === "markdown";
+  const isHtmlMode = format === "html";
+
+  const rawEditorState =
+    isMarkdownMode || isHtmlMode ? undefined : (value ?? defaultValue);
+  let initialEditorState: string | undefined;
+  if (typeof rawEditorState === "string") {
+    if (rawEditorState.trim()) {
+      try {
+        JSON.parse(rawEditorState);
+        initialEditorState = rawEditorState;
+      } catch (error) {
+        console.error(
+          "Editor: invalid JSON in editorState, ignoring value",
+          error,
+        );
+        initialEditorState = undefined;
+      }
+    } else {
+      initialEditorState = undefined;
+    }
+  } else {
+    initialEditorState = rawEditorState;
+  }
+
+  return (
+    <LexicalComposer
+      initialConfig={{
+        ...editorConfig,
+        editorState: initialEditorState,
+        editable,
+      }}
+    >
+      <EditorProviders resolveImage={resolveImage}>
+        <div className="relative">
+          <Plugins
+            placeholder={placeholder}
+            editable={editable}
+            onImageUpload={onImageUpload}
+            variant={variant}
+            mentionsData={mentionsData}
+            className={className}
+            contentClassName={contentClassName}
+            placeholderClassName={placeholderClassName}
+            autoFocus={autoFocus}
+            size={size}
+          />
+
+          {!isMarkdownMode && !isHtmlMode && (
+            <OnChangePlugin
+              ignoreSelectionChange={true}
+              onChange={(editorState) => {
+                const jsonString = JSON.stringify(editorState.toJSON());
+                onChange?.(jsonString, editorState);
+              }}
+            />
+          )}
+
+          {isMarkdownMode && (
+            <Suspense fallback={null}>
+              <MarkdownPlugins
+                value={value}
+                defaultValue={defaultValue}
+                onChange={onChange}
               />
-            </FloatingLinkContext>
-          </SharedAutocompleteContext>
-        </TooltipProvider>
-      </LexicalComposer>
-    </div>
+            </Suspense>
+          )}
+
+          {isHtmlMode && (
+            <Suspense fallback={null}>
+              <HtmlPlugins
+                value={value}
+                defaultValue={defaultValue}
+                onChange={onChange}
+              />
+            </Suspense>
+          )}
+
+          {onStatsChange && <WordCountPlugin onStatsChange={onStatsChange} />}
+        </div>
+      </EditorProviders>
+    </LexicalComposer>
   );
 }

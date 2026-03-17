@@ -7,7 +7,7 @@ import "swiper/css/free-mode";
 import "swiper/css/thumbs";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import {
   FreeMode,
   Keyboard,
@@ -118,7 +118,9 @@ export const SwiperPreview = ({
                   <div
                   // className="swiper-zoom-container"
                   >
-                    <img {...imgProps} />
+                    <picture>
+                      <img alt="swiper preview" {...imgProps} />
+                    </picture>
                   </div>
                 </SwiperSlide>
               ))}
@@ -140,7 +142,9 @@ export const SwiperPreview = ({
                   <div
                   // className="swiper-zoom-container"
                   >
-                    <img {...imgProps} />
+                    <picture>
+                      <img alt="swiper thumb" {...imgProps} />
+                    </picture>
                   </div>
                 </SwiperSlide>
               ))}

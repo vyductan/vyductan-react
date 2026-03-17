@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
 import { useMergedState } from "@rc-component/util";
 import KeyCode from "@rc-component/util/lib/KeyCode";
@@ -185,7 +187,6 @@ export const Pagination = (props: PaginationProps) => {
     ...restParams: any[]
   ) {
     if (event.key === "Enter" || event.code === KeyCode.ENTER.toString()) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       callback(...restParams);
     }
   }

@@ -7,15 +7,34 @@
  */
 // import './index.css';
 import type { JSX } from "react";
+import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import * as React from "react";
-import { $isCodeNode, CodeNode, getLanguageFriendlyName } from "@lexical/code";
+import {
+  $isCodeNode,
+  CODE_LANGUAGE_FRIENDLY_NAME_MAP,
+  CodeNode,
+  getLanguageFriendlyName,
+} from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { useDebounce } from "ahooks";
+import { useDebounceFn } from "ahooks";
 import { $getNearestNodeFromDOMNode } from "lexical";
+import { Check, ChevronDown } from "lucide-react";
 import { createPortal } from "react-dom";
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../../command";
+import { Popover, PopoverContent, PopoverTrigger } from "../../popover";
 import { CopyButton } from "../editor-ui/code-button";
+
+const LANGUAGE_OPTIONS = Object.entries(
+  CODE_LANGUAGE_FRIENDLY_NAME_MAP as Record<string, string>,
+).map(([value, label]) => ({ value, label }));
 
 const CODE_PADDING = 8;
 
@@ -42,14 +61,20 @@ function CodeActionMenuContainer({
   const codeSetRef = useRef<Set<string>>(new Set());
   const codeDOMNodeRef = useRef<HTMLElement | null>(null);
 
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const isSelectOpenRef = useRef(isSelectOpen);
+  useEffect(() => {
+    isSelectOpenRef.current = isSelectOpen;
+  }, [isSelectOpen]);
+
   function getCodeDOMNode(): HTMLElement | null {
     return codeDOMNodeRef.current;
   }
 
-  const debouncedOnMouseMove = useDebounce(
-    (event: MouseEvent) => {
+  const { run: debouncedOnMouseMove } = useDebounceFn(
+    (event: MouseEvent | undefined) => {
       const { codeDOMNode, isOutside } = getMouseInfo(event);
-      if (isOutside) {
+      if (isOutside && !isSelectOpenRef.current) {
         setShown(false);
         return;
       }
@@ -93,12 +118,16 @@ function CodeActionMenuContainer({
       return;
     }
 
-    document.addEventListener("mousemove", debouncedOnMouseMove);
+    const handleMouseMove = (event: MouseEvent) => {
+      debouncedOnMouseMove(event);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       setShown(false);
       // debouncedOnMouseMove.cancel();
-      document.removeEventListener("mousemove", debouncedOnMouseMove);
+      document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [shouldListenMouseMove, debouncedOnMouseMove]);
 
@@ -140,7 +169,53 @@ function CodeActionMenuContainer({
           className="code-action-menu-container user-select-none text-foreground/50 absolute flex h-9 flex-row items-center space-x-1 text-xs"
           style={{ ...position }}
         >
-          <div>{codeFriendlyName}</div>
+          <Popover open={isSelectOpen} onOpenChange={setIsSelectOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="hover:bg-muted/50 flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors"
+                title="Select language"
+              >
+                {codeFriendlyName ?? "Plain Text"}
+                <ChevronDown className="h-3 w-3 opacity-50" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0" align="end">
+              <Command>
+                <CommandInput placeholder="Search for a language..." />
+                <CommandList>
+                  <CommandEmpty>No language found.</CommandEmpty>
+                  <CommandGroup>
+                    {LANGUAGE_OPTIONS.map((option) => (
+                      <CommandItem
+                        key={option.value}
+                        value={option.label}
+                        onSelect={() => {
+                          editor.update(() => {
+                            const codeDOMNode = getCodeDOMNode();
+                            if (!codeDOMNode) return;
+                            const maybeCodeNode =
+                              $getNearestNodeFromDOMNode(codeDOMNode);
+                            if ($isCodeNode(maybeCodeNode)) {
+                              maybeCodeNode.setLanguage(option.value);
+                            }
+                          });
+                          setIsSelectOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={`mr-2 h-4 w-4 ${
+                            lang === option.value ? "opacity-100" : "opacity-0"
+                          }`}
+                        />
+                        {option.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <CopyButton editor={editor} getCodeDOMNode={getCodeDOMNode} />
         </div>
       ) : null}
@@ -148,17 +223,24 @@ function CodeActionMenuContainer({
   );
 }
 
-function getMouseInfo(event: MouseEvent): {
+function getMouseInfo(event: MouseEvent | undefined): {
   codeDOMNode: HTMLElement | null;
   isOutside: boolean;
 } {
+  // Safety check for undefined event
+  if (!event) {
+    return { codeDOMNode: null, isOutside: true };
+  }
+
   const target = event.target;
 
   if (target && target instanceof HTMLElement) {
     const codeDOMNode = target.closest<HTMLElement>("code.EditorTheme__code");
     const isOutside = !(
       codeDOMNode ??
-      target.closest<HTMLElement>("div.code-action-menu-container")
+      target.closest<HTMLElement>("div.code-action-menu-container") ??
+      target.closest<HTMLElement>("[data-radix-popper-content-wrapper]") ??
+      target.closest<HTMLElement>("[cmdk-root]")
     );
 
     return { codeDOMNode, isOutside };

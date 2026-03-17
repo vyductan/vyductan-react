@@ -3,8 +3,8 @@ import { cn } from "@acme/ui/lib/utils";
 import type { UploadFileItem } from "../types";
 import { Card } from "../../card";
 import { Checkbox } from "../../checkbox";
+import { Image } from "../../image";
 import { Progress } from "../../progress";
-import MyImage from "./image";
 
 type Props = {
   url: string;
@@ -40,7 +40,7 @@ export const ImageUploadItem = ({
 
       {/* Media preview */}
       <div className="mb-2 flex aspect-square h-[100px] w-[100px] items-center">
-        <MyImage
+        <Image
           src={url}
           alt={name}
           width={100}

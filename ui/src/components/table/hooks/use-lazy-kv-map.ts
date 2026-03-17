@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import * as React from "react";
 
 import type { AnyObject } from "../../_util/type";
@@ -23,8 +24,7 @@ const useLazyKVMap = <RecordType extends AnyObject = AnyObject>(
 
   function getRecordByKey(key: Key): RecordType {
     if (
-      !mapCacheRef.current ||
-      mapCacheRef.current.data !== data ||
+      mapCacheRef.current?.data !== data ||
       mapCacheRef.current.childrenColumnName !== childrenColumnName ||
       mapCacheRef.current.getRowKey !== getRowKey
     ) {
@@ -33,7 +33,7 @@ const useLazyKVMap = <RecordType extends AnyObject = AnyObject>(
       function dig(records: readonly RecordType[]) {
         records.forEach((record, index) => {
           const rowKey = getRowKey(record, index);
-          kvMap.set(rowKey, record);
+          kvMap.set(rowKey.toString(), record);
 
           if (
             record &&

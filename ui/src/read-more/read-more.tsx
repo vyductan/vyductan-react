@@ -13,9 +13,9 @@ export const ReadMore = ({ children, className }: ReadMoreProps) => {
 
   useLayoutEffect(() => {
     if (ref.current && ref.current.offsetHeight < ref.current.scrollHeight) {
-      setIsTruncated(true);
+      setTimeout(() => setIsTruncated(true), 0);
     } else {
-      setIsTruncated(false);
+      setTimeout(() => setIsTruncated(false), 0);
     }
   }, [ref]);
 

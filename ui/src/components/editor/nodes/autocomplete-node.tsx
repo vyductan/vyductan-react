@@ -14,7 +14,6 @@ import type {
   Spread,
 } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { DecoratorNode } from "lexical";
 
 import { useSharedAutocompleteContext } from "../context/shared-autocomplete-context";

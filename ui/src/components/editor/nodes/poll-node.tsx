@@ -124,9 +124,7 @@ export class PollNode extends DecoratorNode<JSX.Element> {
 
   addOption(option: Option): void {
     const self = this.getWritable();
-    const options = [...self.__options];
-    options.push(option);
-    self.__options = options;
+    self.__options = [...self.__options, option];
   }
 
   deleteOption(option: Option): void {

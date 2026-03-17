@@ -1,4 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { CLEAR_EDITOR_COMMAND } from "lexical";
+import { Trash2Icon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
 import {
   DialogClose,
   DialogContent,
@@ -8,15 +12,12 @@ import {
   Dialog as DialogRoot,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/modal";
+} from "@acme/ui/components/modal";
 import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { CLEAR_EDITOR_COMMAND } from "lexical";
-import { Trash2Icon } from "lucide-react";
+} from "@acme/ui/components/tooltip";
 
 export function ClearEditorActionPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -26,7 +27,7 @@ export function ClearEditorActionPlugin() {
       <TooltipRoot disableHoverableContent>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size={"sm"} variant="text" className="p-2">
+            <Button size="small" variant="text" className="p-2">
               <Trash2Icon className="h-4 w-4" />
             </Button>
           </DialogTrigger>
@@ -43,7 +44,7 @@ export function ClearEditorActionPlugin() {
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outlined">Cancel</Button>
           </DialogClose>
 
           <DialogClose asChild>

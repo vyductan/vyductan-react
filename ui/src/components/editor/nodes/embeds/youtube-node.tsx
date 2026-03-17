@@ -18,7 +18,6 @@ import type {
   Spread,
 } from "lexical";
 import type { JSX } from "react";
-import * as React from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 

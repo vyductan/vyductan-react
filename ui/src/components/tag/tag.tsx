@@ -1,12 +1,12 @@
 import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
-import type { BadgeProps } from "@acme/ui/shadcn/badge";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 import { Badge } from "@acme/ui/shadcn/badge";
 
-import { useUiConfig } from "../config-provider/config-provider";
+import type { BadgeProps } from "../badge";
+import { useComponentConfig } from "../config-provider";
 
 // Based on Vercel
 const color: Record<string, string> = {
@@ -16,14 +16,15 @@ const color: Record<string, string> = {
   processing: "bg-blue-100 text-blue-700 border-blue-300",
   error: "bg-red-100 text-red-700 border-red-300",
   warning: "bg-amber-100 text-amber-700 border-amber-300",
+  orange: "bg-orange-100 text-orange-700 border-orange-300",
   gray: "bg-gray-100 text-gray-600 border-gray-300",
   yellow: "bg-yellow-100 text-yellow-800 border-yellow-300",
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
+  indigo: "bg-indigo-100 text-indigo-700 border-indigo-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
   green: "bg-green-100 text-green-700 border-green-300",
   cyan: "bg-cyan-100 text-cyan-700 border-cyan-300",
-  orange: "bg-orange-100 text-orange-700 border-orange-300",
   red: "bg-red-100 text-red-700 border-red-300",
   rose: "bg-rose-100 text-rose-700 border-rose-300",
   pink: "bg-pink-100 text-pink-700 border-pink-300",
@@ -44,6 +45,8 @@ const colorBordered: Record<string, string> = {
   gray: "bg-gray-200 text-gray-950 border-gray-600",
   amber: "bg-amber-200 text-amber-900 border-amber-600",
   blue: "bg-blue-200 text-blue-900 border-blue-600",
+  indigo: "bg-indigo-200 text-indigo-900 border-indigo-600",
+  orange: "bg-orange-200 text-orange-900 border-orange-600",
   fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
   green: "bg-green-200 text-green-900 border-green-600",
   red: "bg-red-200 text-red-900 border-red-600",
@@ -54,12 +57,11 @@ const colorBordered: Record<string, string> = {
 };
 const tagVariants = tv({
   base: [
-    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow]",
+    "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
 
-    "px-[7px]",
     // "px-2.5",
   ],
   variants: {
@@ -80,11 +82,17 @@ const tagVariants = tv({
       true: "",
       false: "border-transparent",
     },
+    size: {
+      default: "px-[7px] py-0.5 text-xs",
+      small: "px-1.5 py-0.5 text-[10px]",
+      large: "px-2.5 py-1 text-sm",
+    },
   },
   defaultVariants: {
     variant: "default",
     color: "default",
     bordered: true,
+    size: "default",
   },
   compoundVariants: [
     {
@@ -127,21 +135,40 @@ const Tag = ({
   onClose,
   ...props
 }: TagProps) => {
-  const tagConfig = useUiConfig((state) => state.components.tag);
+  const tagConfig = useComponentConfig("tag");
+  const bordered = borderedProp ?? tagConfig.bordered;
+  const finalVariant = variant ?? tagConfig.variant;
+  const finalColor = color ?? tagConfig.color;
 
-  const bordered = borderedProp ?? tagConfig?.bordered;
+  const finalSize = props.size ?? tagConfig.size;
+
+  // Check if color is a hex color (starts with #)
+  const isHexColor =
+    typeof finalColor === "string" && finalColor.startsWith("#");
+
   return (
     <Badge
+      data-slot="tag"
       className={cn(
         tagVariants({
-          variant,
-          color,
+          variant: finalVariant,
+          color: isHexColor ? undefined : finalColor,
           bordered,
+          size: finalSize,
         }),
         closeIcon && "pr-1",
-        tagConfig?.className,
+        isHexColor && "text-white",
+        tagConfig.className,
         className,
       )}
+      style={
+        isHexColor
+          ? {
+              backgroundColor: finalColor,
+              borderColor: finalColor,
+            }
+          : undefined
+      }
       {...props}
     >
       {icon}
@@ -155,8 +182,12 @@ const Tag = ({
           onPointerDown={(e) => {
             e.stopPropagation();
           }}
-          onPointerUp={() => {
+          onPointerUp={(e) => {
+            e.stopPropagation();
             onClose?.();
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
           }}
         />
       ) : (

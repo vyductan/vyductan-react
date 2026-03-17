@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 "use client";
 
 import * as React from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
 import { useMergedState } from "@rc-component/util";
 import omit from "@rc-component/util/lib/omit";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";
@@ -78,7 +77,7 @@ const Input = (props: InputProps) => {
 
     status,
 
-    autoComplete,
+    autoComplete = "off",
     onChange,
     onFocus,
     onBlur,
@@ -220,8 +219,10 @@ const Input = (props: InputProps) => {
     if (keyLockRef.current) {
       keyLockRef.current = false;
     }
-    setFocused((prev) => (prev && disabledFromContext ? false : prev));
-  }, [disabledFromContext]);
+    if (disabledFromContext && focused && inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, [disabledFromContext, focused]);
 
   const triggerChange = (
     e:
@@ -342,12 +343,14 @@ const Input = (props: InputProps) => {
         "styles",
         "classNames",
         "onClear",
+        "status",
       ],
     );
     return (
       <input
         data-slot="input"
         autoComplete={autoComplete}
+        aria-invalid={props["aria-invalid"] ?? status === "error"}
         {...otherProps}
         onChange={onInternalChange}
         onFocus={handleFocus}
@@ -356,7 +359,8 @@ const Input = (props: InputProps) => {
         onKeyUp={handleKeyUp}
         className={cn(
           "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
-          inputSizeVariants({ size: mergedSize }),
+          !hasAffix && inputSizeVariants({ size: mergedSize }),
+          otherProps.readOnly && "bg-muted cursor-default",
           classNames?.input,
         )}
         style={styles?.input}
@@ -375,6 +379,14 @@ const Input = (props: InputProps) => {
       />
     );
   };
+
+  // Check if has affix (prefix/suffix/allowClear)
+  const hasAffix = !!(
+    rest.prefix ||
+    suffix ||
+    rest.allowClear ||
+    countConfig.show
+  );
 
   const getSuffix = () => {
     // Max length value
@@ -429,10 +441,12 @@ const Input = (props: InputProps) => {
       classNames={{
         variant: cn(
           inputVariants({ variant, status, disabled }),
+          rest.readOnly && "cursor-default bg-muted",
           classNames?.variant,
         ),
         affixWrapper: cn(
-          inputSizeVariants({ size: mergedSize }),
+          hasAffix && inputSizeVariants({ size: mergedSize }),
+          rest.readOnly && "cursor-default bg-muted",
           classNames?.affixWrapper,
         ),
       }}

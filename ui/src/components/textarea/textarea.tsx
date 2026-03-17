@@ -1,10 +1,10 @@
 import type { VariantProps } from "class-variance-authority";
+import type * as React from "react";
 import type { TextareaAutosizeProps } from "react-textarea-autosize";
-import * as React from "react";
 import { cva } from "class-variance-authority";
 import TextareaAutosize from "react-textarea-autosize";
 
-import type { TextareaProps as ShadcnTextareaProps } from "@acme/ui/shadcn/textarea";
+import type { Textarea as ShadcnTextarea } from "@acme/ui/shadcn/textarea";
 import { cn } from "@acme/ui/lib/utils";
 import { Textarea as TextareaShadcn } from "@acme/ui/shadcn/textarea";
 
@@ -26,6 +26,8 @@ const textareaVariants = cva(["text-sm"], {
     size: "default",
   },
 });
+
+type ShadcnTextareaProps = React.ComponentProps<typeof ShadcnTextarea>;
 type TextAreaProps = Omit<ShadcnTextareaProps, "style"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof textareaVariants> &
@@ -52,9 +54,12 @@ const Textarea = ({
   size,
   status,
   variant,
+  value,
   ...props
 }: TextAreaProps) => {
   const Comp = autoSize ? TextareaAutosize : TextareaShadcn;
+  // Ensure value is never null - convert null/undefined to empty string
+  const safeValue = value ?? "";
   return (
     <Comp
       className={cn(
@@ -65,6 +70,7 @@ const Textarea = ({
       ref={ref}
       {...(typeof autoSize === "object" ? autoSize : {})}
       {...props}
+      value={safeValue}
     />
   );
 };

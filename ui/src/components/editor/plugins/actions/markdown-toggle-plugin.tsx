@@ -9,6 +9,8 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $createTextNode, $getRoot } from "lexical";
 import { FileTextIcon } from "lucide-react";
 
+import { Button } from "@acme/ui/components/button";
+
 import { MARKDOWN_TRANSFORMERS } from "../../transformers/markdown-transformers";
 
 export function MarkdownTogglePlugin({
@@ -51,7 +53,7 @@ export function MarkdownTogglePlugin({
       onClick={handleMarkdownToggle}
       title="Convert From Markdown"
       aria-label="Convert from markdown"
-      size={"sm"}
+      size="small"
       className="p-2"
     >
       <FileTextIcon className="size-4" />

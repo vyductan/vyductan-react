@@ -1,3 +1,3 @@
 export * from "./upload";
-export * from "./upload-zone";
+export * from "./dragger";
 export * from "./types";

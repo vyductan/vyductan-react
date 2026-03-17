@@ -3,15 +3,20 @@ import { $createCodeNode } from "@lexical/code";
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection, $isRangeSelection } from "lexical";
 
+import { SelectItem } from "@acme/ui/components/select";
+
 import { useToolbarContext } from "../../../context/toolbar-context";
 import { blockTypeToBlockName } from "../../../plugins/toolbar/block-format/block-format-data";
 
 const BLOCK_FORMAT_VALUE = "code";
 
 export function FormatCodeBlock() {
-  const { activeEditor, blockType } = useToolbarContext();
+  const { activeEditor, blockType, formatHandledRef } = useToolbarContext();
 
-  const formatCode = () => {
+  const formatCode = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    formatHandledRef.current = true;
     if (blockType !== "code") {
       activeEditor.update(() => {
         let selection = $getSelection();
@@ -34,7 +39,7 @@ export function FormatCodeBlock() {
   };
 
   return (
-    <SelectItem value="code" onPointerDown={formatCode}>
+    <SelectItem value="code" onSelect={formatCode}>
       <div className="flex items-center gap-1 font-normal">
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.icon}
         {blockTypeToBlockName[BLOCK_FORMAT_VALUE]?.label}

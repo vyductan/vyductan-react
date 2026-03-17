@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
@@ -13,16 +13,23 @@ import {
 } from "lexical";
 import { RedoIcon, UndoIcon } from "lucide-react";
 
+import { Button } from "@acme/ui/components/button";
+
 import { useToolbarContext } from "../../context/toolbar-context";
 import { CAN_USE_DOM } from "../../shared/can-use-dom";
 
 const { navigator: maybeNavigator } = globalThis as Partial<typeof globalThis>;
 
-const IS_APPLE =
-  CAN_USE_DOM &&
-  maybeNavigator !== undefined &&
-  typeof maybeNavigator.platform === "string" &&
-  /Mac|iPod|iPhone|iPad/.test(maybeNavigator.platform);
+// Use a function to determine IS_APPLE to avoid hydration mismatches
+const getIsApple = () => {
+  if (!CAN_USE_DOM || !maybeNavigator) {
+    return false;
+  }
+  return (
+    typeof maybeNavigator.platform === "string" &&
+    /Mac|iPod|iPhone|iPad/.test(maybeNavigator.platform)
+  );
+};
 
 export function HistoryToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -30,6 +37,12 @@ export function HistoryToolbarPlugin() {
   const [isEditable, setIsEditable] = useState(editor.isEditable());
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [isApple, setIsApple] = useState(false);
+
+  useEffect(() => {
+    // Set platform detection after hydration to avoid mismatch
+    setIsApple(getIsApple());
+  }, []);
 
   useEffect(() => {
     return mergeRegister(
@@ -67,7 +80,7 @@ export function HistoryToolbarPlugin() {
         onClick={() => {
           activeEditor.dispatchCommand(UNDO_COMMAND, void 0);
         }}
-        title={IS_APPLE ? "Undo (⌘Z)" : "Undo (Ctrl+Z)"}
+        title={isApple ? "Undo (⌘Z)" : "Undo (Ctrl+Z)"}
         type="button"
         aria-label="Undo"
         size="sm"
@@ -81,7 +94,7 @@ export function HistoryToolbarPlugin() {
         onClick={() => {
           activeEditor.dispatchCommand(REDO_COMMAND, void 0);
         }}
-        title={IS_APPLE ? "Redo (⇧⌘Z)" : "Redo (Ctrl+Y)"}
+        title={isApple ? "Redo (⇧⌘Z)" : "Redo (Ctrl+Y)"}
         type="button"
         aria-label="Redo"
         size="sm"

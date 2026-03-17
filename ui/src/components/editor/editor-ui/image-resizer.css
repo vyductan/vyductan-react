@@ -1,0 +1,58 @@
+.image-resizer {
+  display: block;
+  position: absolute;
+  /* Hit area remains transparent */
+  background-color: transparent;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The visual thin bar */
+.image-resizer::after {
+  content: "";
+  display: block;
+  background-color: rgba(0, 0, 0, 0.5); /* Visible grey/black bar */
+  border-radius: 2px;
+  position: absolute;
+  transition:
+    background-color 0.1s ease,
+    height 0.1s ease,
+    width 0.1s ease;
+}
+
+.image-resizer:hover::after {
+  background-color: rgb(60, 132, 244); /* Blue on hover */
+}
+
+.image-control-wrapper--resizing .image-resizer {
+  background-color: transparent;
+}
+
+/* East / West handles (Vertical Bars) */
+.image-resizer-e,
+.image-resizer-w {
+  top: 0;
+  height: 100%;
+  width: 12px; /* Hit area width */
+}
+
+.image-resizer-e {
+  right: -6px;
+  cursor: e-resize;
+}
+.image-resizer-w {
+  left: -6px;
+  cursor: w-resize;
+}
+
+.image-resizer-e::after,
+.image-resizer-w::after {
+  height: 48px; /* Initial small height, centered? */
+  width: 4px; /* Thin vertical bar */
+}
+
+.image-control-wrapper--resizing {
+  touch-action: none;
+}

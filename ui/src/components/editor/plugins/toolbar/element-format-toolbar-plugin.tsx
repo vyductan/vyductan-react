@@ -1,6 +1,5 @@
 import type { BaseSelection, ElementFormatType } from "lexical";
 import { useState } from "react";
-import { Separator } from "@/components/ui/divider";
 import { $isLinkNode } from "@lexical/link";
 import { $findMatchingParent } from "@lexical/utils";
 import {
@@ -18,6 +17,8 @@ import {
   IndentDecreaseIcon,
   IndentIncreaseIcon,
 } from "lucide-react";
+
+import { Separator } from "@acme/ui/components/divider";
 
 import { ToggleGroup, ToggleGroupItem } from "../../../../shadcn/toggle-group";
 import { useToolbarContext } from "../../context/toolbar-context";
@@ -106,7 +107,6 @@ export function ElementFormatToolbarPlugin() {
       value={elementFormat}
       defaultValue={elementFormat}
       onValueChange={handleValueChange}
-      className="flex gap-1"
     >
       {/* Alignment toggles */}
       {Object.entries(ELEMENT_FORMAT_OPTIONS).map(([value, option]) => (

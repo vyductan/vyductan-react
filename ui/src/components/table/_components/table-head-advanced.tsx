@@ -42,17 +42,22 @@ export function TableHeadAdvanced<TData, TValue>({
     originOnClick?.(event);
   };
 
+  const nextSortOrder = column.getNextSortingOrder();
+  const ariaLabel = column.getIsSorted()
+    ? `Sorted ${column.getIsSorted() === "asc" ? "ascending" : "descending"}. Click to ${
+        nextSortOrder === "asc"
+          ? "sort ascending"
+          : nextSortOrder === "desc"
+            ? "sort descending"
+            : "cancel sort"
+      }.`
+    : `Not sorted. Click to sort ${nextSortOrder === "asc" ? "ascending" : "descending"}.`;
+
   return (
     <TableHead
       size={size}
       className={cn("px-1", className)}
-      aria-label={
-        column.getIsSorted() === "desc"
-          ? "Sorted descending. Click to sort ascending."
-          : column.getIsSorted() === "asc"
-            ? "Sorted ascending. Click to sort descending."
-            : "Not sorted. Click to sort ascending."
-      }
+      aria-label={ariaLabel}
       onClick={onClick}
       {...props}
       {...column.columnDef.meta?.onHeaderCell?.(column.columnDef.meta)}
@@ -60,9 +65,9 @@ export function TableHeadAdvanced<TData, TValue>({
       <Tooltip
         title={
           column.getCanSort()
-            ? column.getNextSortingOrder() === "asc"
+            ? nextSortOrder === "asc"
               ? locale.triggerAsc
-              : column.getNextSortingOrder() === "desc"
+              : nextSortOrder === "desc"
                 ? locale.triggerDesc
                 : locale.cancelSort
             : undefined

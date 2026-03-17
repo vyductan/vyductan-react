@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 /* eslint-disable unicorn/prefer-logical-operator-over-ternary */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable unicorn/prefer-spread */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React, { useMemo } from "react";
 import toArray from "@rc-component/util/lib/Children/toArray";
@@ -16,6 +16,7 @@ import type {
   ColumnGroupType,
   ColumnsType,
   ColumnType,
+  ExpandableConfig,
   FixedType,
   GetRowKey,
   Key,
@@ -134,6 +135,7 @@ export const useColumns = <TRecord extends AnyObject>(
     expandIconColumnIndex,
     expandedRowOffset = 0,
     expandRowByClick,
+    expandedRowRender,
     rowExpandable,
     onTriggerExpand,
 
@@ -152,6 +154,7 @@ export const useColumns = <TRecord extends AnyObject>(
     expandIcon?: RenderExpandIcon<TRecord>;
     expandIconColumnIndex?: number;
     expandRowByClick?: boolean;
+    expandedRowRender: ExpandableConfig<TRecord>["expandedRowRender"];
     rowExpandable?: (record: TRecord) => boolean;
     onTriggerExpand: TriggerEventHandler<TRecord>;
 
@@ -261,48 +264,20 @@ export const useColumns = <TRecord extends AnyObject>(
         title: expandColumnTitle,
         fixed: fixedColumn ?? undefined,
         width: expandColumnWidth ?? 50,
+        minWidth:
+          typeof expandColumnWidth === "number" ? expandColumnWidth : 50,
+        align: "center",
+        enableResizing: false,
         render: (_, record, index, { row }) => {
-          // const record = row.original;
-          // return row.getCanExpand() && row.original.children ? (
-          //   <button
-          //     {...(expandedKeys
-          //       ? {
-          //           onClick: () => {
-          //             if (!expandRowByClick) {
-          //               // row.getToggleExpandedHandler()();
-          //               onTriggerExpand?.(!expanded, record);
-          //             }
-          //           },
-          //         }
-          //       : {
-          //           onClick: () => {
-          //             if (!expandRowByClick) {
-          //               row.getToggleExpandedHandler()();
-          //             }
-          //           },
-          //         })}
-          //     className="flex w-full cursor-pointer items-center justify-center"
-          //   >
-          //     {row.getIsExpanded() ? (
-          //       <Icon icon="icon-[lucide--chevron-down]" />
-          //     ) : (
-          //       <Icon icon="icon-[lucide--chevron-right]" />
-          //     )}
-          //   </button>
-          // ) : undefined;
-          // },
           const rowKey = getRowKey(record, index);
           const expanded = expandedKeys.has(rowKey);
-          // const expanded = row.getIsExpanded();
 
-          const recordExpandable = rowExpandable ? rowExpandable(record) : true;
-          //  (row.getCanExpand() ??
-          //   (mergedChildrenColumnName &&
-          //     !!record[mergedChildrenColumnName]) ??
-          //   true);
+          // Check if row can expand using TanStack Table's logic
+          const recordExpandable = rowExpandable
+            ? rowExpandable(record)
+            : row.getCanExpand();
 
           const icon = expandIcon?.({
-            // prefixCls,
             expanded,
             expandable: recordExpandable,
             record,
@@ -412,14 +387,13 @@ export const useColumns = <TRecord extends AnyObject>(
     return transformColumnDefs(mergedColumns, {
       // rowKey,
       // rowSelection: rowSelectionProp,
-      expandable: childrenColumnName
-        ? {
-            childrenColumnName,
-            expandIcon,
-          }
-        : undefined,
+      expandable: {
+        childrenColumnName,
+        expandIcon,
+        expandedRowRender, // true when there's expandedRowRender (separate expand column)
+      },
     });
-  }, [childrenColumnName, expandIcon, mergedColumns]);
+  }, [childrenColumnName, expandIcon, expandedRowRender, mergedColumns]);
 
   return [mergedColumns, columnsForTTTable, flattenColumns];
 };

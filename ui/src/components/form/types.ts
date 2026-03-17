@@ -1,6 +1,6 @@
 import type { FieldValues, SubmitHandler } from "react-hook-form";
 
-export type ValueType = string | number | boolean;
+export type FormValueType = string | number | boolean;
 
 export type FieldError = {
   path: string[];
@@ -23,3 +23,4 @@ export type OnSubmit<
     : never;
 
 export type FormLayout = "horizontal" | "vertical";
+export type FormLabelAlign = "left" | "right";

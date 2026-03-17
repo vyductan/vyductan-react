@@ -1,15 +1,40 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
-  "extends": "@acme/tsconfig/internal-package.json",
+  "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
+    "rootDir": ".",
     "lib": ["ESNext", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "rootDir": ".",
+    "types": ["node", "react", "react-dom"],
+    "baseUrl": "src/",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/components/ui/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"]
+      "@acme/ui/*": ["./*"]
+      // "@acme/ui/shadcn/*": ["./shadcn/*"],
+      // "@acme/ui/lib/*": ["./lib/*"],
+      // "@acme/ui/icons/*": ["./icons/*"],
+      // "@acme/ui/lib/utils": ["./src/lib/utils.ts"],
+      // "@acme/ui/hooks/*": ["./src/hooks/*"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/components": ["./src/components/index.ts"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/icons/*": ["./src/icons/*"],
+
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@acme/ui/components": ["./src/components/index.ts"],
+      // "@acme/ui/components/*": ["./src/components/*"],
+      // "@/lib/*": ["./src/lib/*"],
+      // "@/hooks/*": ["./src/hooks/*"],
+      // "@/components/ui": ["./src/components/index.ts"],
+      // "@/components/ui/*": ["./src/components/*"],
+      // "@/components/icons": ["./src/icons/index.ts"],
+      // "@/components/icons/*": ["./src/icons/*"]
     }
   },
-  "include": ["src"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mdx", ".storybook/**/*.ts"],
   "exclude": ["node_modules"]
 }

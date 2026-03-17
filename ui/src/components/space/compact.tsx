@@ -1,5 +1,9 @@
+"use client";
+
 import React from "react";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@acme/ui/lib/utils";
+import { ButtonGroup } from "@acme/ui/shadcn/button-group";
 
 import type { DirectionType } from "../config-provider/context";
 import type { SizeType } from "../config-provider/size-context";
@@ -44,7 +48,7 @@ export const useCompactItemContext = (direction: DirectionType) => {
         compactDirection === "vertical" &&
         "rounded-none",
       // Hover/focus states
-      "hover:z-[2] focus:z-[2] focus-visible:z-[2]",
+      "hover:z-2 focus:z-2 focus-visible:z-2",
     );
   }, [direction, compactItemContext]);
 
@@ -54,3 +58,75 @@ export const useCompactItemContext = (direction: DirectionType) => {
     compactItemClassnames,
   };
 };
+
+interface SpaceCompactProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
+  /**
+   * Compact size forwarded to items via context
+   */
+  size?: SizeType;
+  /**
+   * Orientation of the compact group
+   * @default "horizontal"
+   */
+  direction?: "horizontal" | "vertical";
+  /**
+   * Fit width to its parent's width
+   * @default false
+   */
+  block?: boolean;
+  /**
+   * Children to compact
+   */
+  children?: React.ReactNode;
+}
+
+/**
+ * Space.Compact – groups controls tightly with connected borders using ButtonGroup styles.
+ */
+const SpaceCompact = ({
+  size,
+  direction = "horizontal",
+  block = false,
+  className,
+  children,
+  ref,
+  ...props
+}: SpaceCompactProps & { ref?: React.Ref<HTMLDivElement> }) => {
+  const childNodes = React.Children.toArray(children);
+
+  return (
+    <ButtonGroup
+      ref={ref as unknown as React.Ref<HTMLDivElement>}
+      orientation={direction}
+      className={cn(block && "w-full", className)}
+      {...props}
+    >
+      {childNodes.map((child, index) => {
+        const isFirstItem = index === 0;
+        const isLastItem = index === childNodes.length - 1;
+
+        const contextValue: SpaceCompactItemContextType = {
+          compactSize: size,
+          compactDirection: direction,
+          isFirstItem,
+          isLastItem,
+        };
+
+        const key = index;
+
+        return (
+          <SpaceCompactItemContext.Provider value={contextValue} key={key}>
+            {child as React.ReactNode}
+          </SpaceCompactItemContext.Provider>
+        );
+      })}
+    </ButtonGroup>
+  );
+};
+
+SpaceCompact.displayName = "SpaceCompact";
+
+export { SpaceCompact };

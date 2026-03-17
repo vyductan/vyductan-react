@@ -1,21 +1,24 @@
 // https://github.com/vercel/examples/tree/main/storage/blob-starter
 // https://github.com/react-component/upload/blob/master/src/Upload.tsx
 
-import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
-import type { DownloadService, UploadFileItem, UploadService } from "./types";
-
-import { Button } from "../button";
-import { Card } from "../card";
-import { UploadZone } from "./upload-zone";
-import type { UploadZoneProps } from "./upload-zone";
 import { useMergedState } from "@rc-component/util";
 
-type UploadProps = Omit<UploadZoneProps, "defaultValue" | "onChange"> & {
+import type { DraggerProps } from "./dragger";
+import type { DownloadService, UploadFileItem, UploadService } from "./types";
+import { DeleteIcon, DownloadIcon, Icon } from "../../icons";
+import { Button } from "../button";
+import { Card } from "../card";
+import { message } from "../message";
+import { Dragger } from "./dragger";
+
+type UploadProps = Omit<DraggerProps, "defaultValue" | "onChange"> & {
   listType?: "picture-card";
   showZone?: boolean;
   /** show upload zone only (not show list or plus button) */
   showZoneOnly?: boolean;
   showUploadButton?: boolean;
+  /** Maximum number of files that can be uploaded */
+  maxCount?: number;
   // children?: React.ReactNode;
   render?: {
     image: (file: UploadFileItem) => React.ReactNode;
@@ -64,6 +67,7 @@ const Upload = ({
   showZoneOnly = false,
   showUploadButton = true,
   showUploadList = true,
+  maxCount,
   // value,
   ...props
 }: UploadProps) => {
@@ -94,6 +98,21 @@ const Upload = ({
       },
     },
   );
+
+  // Helper function to check if we can add more files
+  const canAddMoreFiles = (currentFiles: UploadFileItem[]) => {
+    if (!maxCount) return true;
+    return currentFiles.length < maxCount;
+  };
+
+  // Helper function to add files with maxCount validation
+  const addFile = (newFile: UploadFileItem) => {
+    if (!canAddMoreFiles(files)) {
+      message.error(`Maximum ${maxCount} file(s) allowed`);
+      return;
+    }
+    setFiles([...files, newFile]);
+  };
 
   //   const [inputFile, setInputFile] = useState<File | null>(null)
   // const [isUploading, setIsUploading] = useState(false);
@@ -128,10 +147,18 @@ const Upload = ({
           {/* <UploadZone style={{ width, height }}>{children}</UploadZone> */}
           {files.length > 0 ? (
             <div className="group relative" style={{ width, height }}>
-              {render?.image ? (
-                render.image(files[0]!)
+              {render?.image && files[0] ? (
+                render.image(files[0])
               ) : (
-                <img src={files[0]?.url} />
+                <picture>
+                  <img
+                    src={files[0]?.url}
+                    alt={files[0]?.name}
+                    width={width}
+                    height={height}
+                    className="object-cover"
+                  />
+                </picture>
               )}
 
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition group-hover:opacity-100">
@@ -147,18 +174,18 @@ const Upload = ({
               </div>
             </div>
           ) : (
-            <UploadZone
+            <Dragger
               // listType={listType}
               // placeholder={placeholder}
               style={{ width, height }}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([file]);
+                addFile(file);
               }}
               overrideClick={overrideClick}
             >
               {children}
-            </UploadZone>
+            </Dragger>
           )}
         </>
       )}
@@ -167,23 +194,41 @@ const Upload = ({
         <>
           <div className="mt-2 flex w-full flex-col gap-2">
             {files.length === 0 ? (
-              <UploadZone
+              <Dragger
                 progress={progress}
                 // listType={listType}
                 // style={{ width, height }}
                 uploadService={uploadService}
                 onUploadSuccess={(file) => {
-                  setFiles([...files, file]);
+                  addFile(file);
                 }}
                 onChange={(file) => {
                   if (file) {
-                    setFiles([...files, file]);
+                    addFile(file);
                   }
                 }}
               >
                 {children}
-              </UploadZone>
-            ) : (
+              </Dragger>
+            ) : canAddMoreFiles(files) ? (
+              <Dragger
+                progress={progress}
+                // listType={listType}
+                // style={{ width, height }}
+                uploadService={uploadService}
+                onUploadSuccess={(file) => {
+                  addFile(file);
+                }}
+                onChange={(file) => {
+                  if (file) {
+                    addFile(file);
+                  }
+                }}
+              >
+                {children}
+              </Dragger>
+            ) : null}
+            {files.length > 0 &&
               files.map((item, index) => (
                 <Card
                   key={index}
@@ -221,8 +266,7 @@ const Upload = ({
                     />
                   </div>
                 </Card>
-              ))
-            )}
+              ))}
           </div>
         </>
       )}
@@ -230,7 +274,7 @@ const Upload = ({
       {props.multiple && listType === "picture-card" && (
         <div className="flex gap-2">
           {showZoneOnly && (
-            <UploadZone
+            <Dragger
               className="cursor-pointer"
               showZoneOnly={showZoneOnly}
               // style={{ width, height }}
@@ -238,37 +282,37 @@ const Upload = ({
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([...files, file]);
+                addFile(file);
               }}
               onChange={(file) => {
                 if (file) {
-                  setFiles([...files, file]);
+                  addFile(file);
                 }
               }}
             >
               {children}
-            </UploadZone>
+            </Dragger>
           )}
           {!showZoneOnly &&
             showUploadList &&
             files.map((file, index) => {
               return (
-                <UploadZone key={index} style={{ width, height }} file={file}>
+                <Dragger key={index} style={{ width, height }} file={file}>
                   {() => {
                     return "+";
                   }}
-                </UploadZone>
+                </Dragger>
               );
             })}
-          {!showZoneOnly && showUploadButton && (
-            <UploadZone
+          {!showZoneOnly && showUploadButton && canAddMoreFiles(files) && (
+            <Dragger
               className="cursor-pointer"
               style={{ width, height }}
               overrideClick={overrideClick}
               progress={progress}
               uploadService={uploadService}
               onUploadSuccess={(file) => {
-                setFiles([...files, file]);
+                addFile(file);
               }}
               // onChange={(file) => {
               // }}
@@ -278,7 +322,7 @@ const Upload = ({
                 : () => {
                     return "+";
                   }}
-            </UploadZone>
+            </Dragger>
           )}
         </div>
       )}

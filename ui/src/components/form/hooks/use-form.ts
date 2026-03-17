@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 /**
@@ -17,7 +18,7 @@ import type {
   UseFormReset,
   UseFormReturn,
 } from "react-hook-form";
-import type { ZodType } from "zod/v4";
+import type { ZodType } from "zod";
 import { useCallback, useEffect, useRef } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";

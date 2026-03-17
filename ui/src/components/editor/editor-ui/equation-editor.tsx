@@ -6,19 +6,20 @@
  *
  */
 import type { ChangeEvent, JSX, Ref, RefObject } from "react";
-import * as React from "react";
-import { forwardRef } from "react";
 
 type BaseEquationEditorProps = {
   equation: string;
   inline: boolean;
   setEquation: (equation: string) => void;
+  ref?: Ref<HTMLInputElement | HTMLTextAreaElement>;
 };
 
-function EquationEditor(
-  { equation, setEquation, inline }: BaseEquationEditorProps,
-  forwardedRef: Ref<HTMLInputElement | HTMLTextAreaElement>,
-): JSX.Element {
+function EquationEditor({
+  equation,
+  setEquation,
+  inline,
+  ref: forwardedRef,
+}: BaseEquationEditorProps): JSX.Element {
   const onChange = (event: ChangeEvent) => {
     setEquation((event.target as HTMLInputElement).value);
   };
@@ -57,4 +58,4 @@ function EquationEditor(
   );
 }
 
-export default forwardRef(EquationEditor);
+export default EquationEditor;

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 
@@ -260,11 +262,15 @@ function TreeNode({
 
   const handleClick = () => {
     if (onSelect) {
-      const newSelectedKeys = isSelected
-        ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
-        : // : [...(selectedKeys || []), item.key];
-          [item.key];
-      onSelect(newSelectedKeys, { selected: !isSelected, node: item as any });
+      const newSelectedKeys = (
+        isSelected
+          ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
+          : [item.key]
+      ) as Key[];
+      onSelect(newSelectedKeys, {
+        selected: !isSelected,
+        node: item as any,
+      });
     }
   };
 
@@ -320,7 +326,7 @@ function TreeNode({
         </span>
         {/* Switcher (noop for leaf, with leaf-line) */}
         <span
-          className="relative flex h-full w-6 flex-shrink-0 items-center justify-center"
+          className="relative flex h-full w-6 shrink-0 items-center justify-center"
           data-slot="switcher-leaf-noop"
           data-depth={depth}
         >
@@ -414,8 +420,8 @@ function TreeNode({
           <CollapsibleTrigger asChild>
             <Button
               variant="text"
-              size="sm"
-              className="hover:bg-accent h-6 w-6 flex-shrink-0 p-0"
+              size="small"
+              className="hover:bg-accent h-6 w-6 shrink-0 p-0"
               onClick={handleToggle}
             >
               <ChevronRight

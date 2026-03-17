@@ -1,26 +1,46 @@
+"use client";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import React from "react";
 import useMemo from "rc-util/lib/hooks/useMemo";
 
+import type { Locale } from "../locale";
 import type {
+  ButtonConfig,
   ConfigConsumerProps,
   DatePickerConfig,
+  FormConfig,
   InputConfig,
   InputNumberConfig,
+  LayoutConfig,
   MentionsConfig,
   PaginationConfig,
+  ResultConfig,
   SelectConfig,
+  TableConfig,
+  TagConfig,
   TextAreaConfig,
 } from "./context";
 import { ConfigContext } from "./context";
 
-export { useUiConfig, UiConfigProvider } from "./config-provider";
 export type { Variant } from "./context";
 export { Variants } from "./context";
-export { ConfigContext } from "./context";
+export { ConfigContext, useComponentConfig } from "./context";
 
 export interface ConfigProviderProps {
+  locale?: Locale;
+  button?: ButtonConfig;
+  datePicker?: DatePickerConfig;
+  form?: FormConfig;
+  input?: InputConfig;
+  inputNumber?: InputNumberConfig;
+  mentions?: MentionsConfig;
+  pagination?: PaginationConfig;
+  result?: ResultConfig;
+  select?: SelectConfig;
+  tag?: TagConfig;
+  textArea?: TextAreaConfig;
   // getTargetContainer?: () => HTMLElement | Window;
   // getPopupContainer?: (triggerNode?: HTMLElement) => HTMLElement;
   // prefixCls?: string;
@@ -31,10 +51,7 @@ export interface ConfigProviderProps {
   // /** @deprecated Please use `{ button: { autoInsertSpace: boolean }}` instead */
   // autoInsertSpaceInButton?: boolean;
   // variant?: Variant;
-  // form?: FormConfig;
-  input?: InputConfig;
-  inputNumber?: InputNumberConfig;
-  textArea?: TextAreaConfig;
+  // colorPicker?: ComponentStyleConfig;
   // /**
   //  * @descEN Language package setting, you can find the packages in `antd/locale`.
   //  */
@@ -62,7 +79,6 @@ export interface ConfigProviderProps {
   // avatar?: ComponentStyleConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;
-  // button?: ButtonConfig;
   // breadcrumb?: ComponentStyleConfig;
   // calendar?: ComponentStyleConfig;
   // carousel?: ComponentStyleConfig;
@@ -77,12 +93,10 @@ export interface ConfigProviderProps {
   // statistic?: ComponentStyleConfig;
   // steps?: ComponentStyleConfig;
   // image?: ImageConfig;
-  // layout?: ComponentStyleConfig;
+  layout?: LayoutConfig;
   // list?: ListConfig;
-  mentions?: MentionsConfig;
   // modal?: ModalConfig;
   // progress?: ComponentStyleConfig;
-  // result?: ComponentStyleConfig;
   // slider?: ComponentStyleConfig;
   // menu?: MenuConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;
@@ -92,23 +106,19 @@ export interface ConfigProviderProps {
   // badge?: BadgeConfig;
   // radio?: ComponentStyleConfig;
   // rate?: ComponentStyleConfig;
-  select?: SelectConfig;
-  pagination?: PaginationConfig;
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // tree?: ComponentStyleConfig;
   // treeSelect?: TreeSelectConfig;
   // message?: ComponentStyleConfig;
   // tag?: TagConfig;
-  // table?: TableConfig;
+  table?: TableConfig;
   // card?: CardConfig;
   // tabs?: TabsConfig;
   // timeline?: ComponentStyleConfig;
   // timePicker?: TimePickerConfig;
   // upload?: ComponentStyleConfig;
   // notification?: NotificationConfig;
-  // colorPicker?: ComponentStyleConfig;
-  datePicker?: DatePickerConfig;
   // rangePicker?: RangePickerConfig;
   // dropdown?: ComponentStyleConfig;
   // flex?: FlexConfig;
@@ -131,8 +141,7 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
   parentContext,
   children,
 
-  datePicker,
-  pagination,
+  ...componentsConfig
 }) => {
   // const context = React.useMemo(() => {
   //   return {
@@ -141,17 +150,15 @@ const ProviderChildren: React.FC<ProviderChildrenProps> = ({
   //   };
   // }, [parentContext, legacyLocale]);
 
-  const baseConfig = {
-    datePicker,
-    pagination,
-  };
   const config: ConfigConsumerProps = {
     ...parentContext,
   };
 
-  for (const key of Object.keys(baseConfig) as (keyof typeof baseConfig)[]) {
-    if (baseConfig[key] !== undefined) {
-      (config as any)[key] = baseConfig[key];
+  for (const key of Object.keys(
+    componentsConfig,
+  ) as (keyof typeof componentsConfig)[]) {
+    if (componentsConfig[key] !== undefined) {
+      (config as any)[key] = componentsConfig[key];
     }
   }
 

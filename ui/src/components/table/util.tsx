@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import type { Row, ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import type { ReactNode } from "react";
 
@@ -105,51 +104,17 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
             }
           : { enableSorting: false }),
         ...restProps,
-      };
-      columnDefMerged.cell = ({ column, row, getValue, table }) => {
-        return (
-          <>
-            {/* Tree Data */}
-            {row.depth > 0 && column.getIndex() === 0 && (
-              <>
-                <span
-                  style={{
-                    paddingLeft: `${row.depth * 2}rem`,
-                  }}
-                />
-              </>
-            )}
-            {props.expandable?.childrenColumnName &&
-              props.expandable.childrenColumnName in row.original &&
-              row.getCanExpand() &&
-              column.getIndex() === 0 && (
-                <>
-                  {props.expandable.expandIcon?.({
-                    record: row.original,
-                    expanded: row.getIsExpanded(),
-                    expandable: row.getCanExpand(),
-                    onExpand: row.getToggleExpandedHandler(),
-                    className: "mb-0.5 mr-2",
-                  })}
-                </>
-              )}
-            {/* {props.childrenColumnName &&
-              row.original[props.childrenColumnName] && (
-                <>
-                  {row.getCanExpand() && row.original.children ? (
-                  <button
-                    onClick={row.getToggleExpandedHandler()}
-                    className="w-5"
-                  >
-                    {row.getIsExpanded() ? "👇" : "👉"}
-                  </button>
-                ) : (
-                  <span className="pl-5" />
-                )}
-                </>
-              )} */}
-            {/* render value*/}
-            {render
+        cell: ({ column, row, getValue, table }) => {
+          // First data column should have expand icon + indent
+          const isFirstDataColumn = columnIndex === 0;
+          const hasTreeData =
+            props.expandable &&
+            !props.expandable.expandedRowRender &&
+            (row.depth > 0 || row.getCanExpand());
+
+          // Cell Content - render function can return ReactNode or RenderedCell
+          const cellContent = (
+            render
               ? typeof dataIndex === "string"
                 ? render(getValue() as never, row.original, row.index, {
                     table,
@@ -161,9 +126,45 @@ export const transformColumnDefs = <TRecord extends AnyObject>(
                     column,
                     row,
                   })
-              : (getValue() as ReactNode)}
-          </>
-        );
+              : (getValue() as ReactNode)
+          ) as React.ReactNode;
+
+          // Only wrap with flex container if first column has tree data
+          if (isFirstDataColumn && hasTreeData) {
+            return (
+              <div
+                data-slot="table-row-content"
+                className="flex items-center gap-1"
+              >
+                {/* Tree Data: Indent (only on first column, only children) */}
+                {row.depth > 0 && (
+                  <span
+                    data-slot={`table-row-indent-level-${row.depth}`}
+                    aria-hidden="true"
+                    style={{
+                      paddingLeft: `${row.depth * (props.expandable?.indentSize ?? 15)}px`,
+                    }}
+                  />
+                )}
+                {/* Tree Data: Expand Icon (only on first column) */}
+                <span className="inline-block w-6">
+                  {row.getCanExpand() && props.expandable?.expandIcon
+                    ? props.expandable.expandIcon({
+                        record: row.original,
+                        expanded: row.getIsExpanded(),
+                        expandable: row.getCanExpand(),
+                        onExpand: row.getToggleExpandedHandler(),
+                      })
+                    : null}
+                </span>
+                {cellContent}
+              </div>
+            );
+          }
+
+          // Regular cell without wrapper
+          return cellContent;
+        },
       };
 
       return columnDefMerged;

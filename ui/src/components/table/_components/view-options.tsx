@@ -4,8 +4,8 @@
 
 import type { Table } from "@tanstack/react-table";
 import React from "react";
-import { Button } from "@/components/ui/button";
 
+import { Button } from "@acme/ui/components/button";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -30,7 +30,7 @@ export function TableViewOptions<TData>({
           ref={triggerRef}
           aria-label="Toggle columns"
           role="combobox"
-          variant="outline"
+          variant="outlined"
           className={cn("ml-auto hidden md:flex", className)}
           icon={<Icon icon="icon-[lucide--settings-2]" />}
         >

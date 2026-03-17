@@ -1,5 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
-import React, { Children, isValidElement } from "react";
+import { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 

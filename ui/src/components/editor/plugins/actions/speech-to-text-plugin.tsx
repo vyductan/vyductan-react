@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -7,12 +8,6 @@
  */
 import type { LexicalCommand, LexicalEditor, RangeSelection } from "lexical";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  TooltipContent,
-  TooltipRoot,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
@@ -23,6 +18,13 @@ import {
   UNDO_COMMAND,
 } from "lexical";
 import { MicIcon } from "lucide-react";
+
+import { Button } from "@acme/ui/components/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@acme/ui/components/tooltip";
 
 import { useReport } from "../../editor-hooks/use-report";
 import { CAN_USE_DOM } from "../../shared/can-use-dom";
@@ -106,9 +108,14 @@ function SpeechToTextPluginImpl() {
   const [editor] = useLexicalComposerContext();
   const [isEnabled, setIsEnabled] = useState<boolean>(false);
   const [isSpeechToText, setIsSpeechToText] = useState<boolean>(false);
+  const [isClient, setIsClient] = useState(false);
   const recognitionConstructor = SPEECH_RECOGNITION_CONSTRUCTOR;
   const recognition = useRef<SpeechRecognition | null>(null);
   const report = useReport();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (recognitionConstructor === null) {
@@ -177,6 +184,11 @@ function SpeechToTextPluginImpl() {
     );
   }, [editor]);
 
+  // Don't render on server side to avoid hydration mismatch
+  if (!isClient) {
+    return null;
+  }
+
   return (
     <TooltipRoot>
       <TooltipTrigger asChild>
@@ -185,11 +197,11 @@ function SpeechToTextPluginImpl() {
             editor.dispatchCommand(SPEECH_TO_TEXT_COMMAND, !isSpeechToText);
             setIsSpeechToText(!isSpeechToText);
           }}
-          variant={isSpeechToText ? "outline" : "text"}
+          variant={isSpeechToText ? "outlined" : "text"}
           title="Speech To Text"
           aria-label={`${isSpeechToText ? "Enable" : "Disable"} speech to text`}
           className="p-2"
-          size={"sm"}
+          size="small"
         >
           <MicIcon className="size-4" />
         </Button>
@@ -199,6 +211,7 @@ function SpeechToTextPluginImpl() {
   );
 }
 
+// Use dynamic rendering to avoid hydration issues
 export const SpeechToTextPlugin = SUPPORT_SPEECH_RECOGNITION
   ? SpeechToTextPluginImpl
   : () => null;

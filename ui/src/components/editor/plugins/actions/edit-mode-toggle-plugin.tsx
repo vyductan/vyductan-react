@@ -8,6 +8,13 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { LockIcon, UnlockIcon } from "lucide-react";
 
+import { Button } from "@acme/ui/components/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@acme/ui/components/tooltip";
+
 export function EditModeTogglePlugin() {
   const [editor] = useLexicalComposerContext();
   const [isEditable, setIsEditable] = useState(() => editor.isEditable());
@@ -23,7 +30,7 @@ export function EditModeTogglePlugin() {
           }}
           title="Read-Only Mode"
           aria-label={`${isEditable ? "Lock" : "Unlock"} read-only mode`}
-          size={"sm"}
+          size="small"
           className="p-2"
         >
           {isEditable ? (

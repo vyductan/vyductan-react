@@ -1,310 +1,328 @@
-export interface RgbaColor {
-  r: number;
-  g: number;
-  b: number;
-  a: number;
-}
+// Tree-shakable imports from colorjs.io/fn
+import type { PlainColorObject } from "colorjs.io";
+import {
+  ColorSpace,
+  HSL,
+  OKLab,
+  OKLCH,
+  parse,
+  serialize,
+  sRGB,
+  sRGB_Linear,
+  to,
+} from "colorjs.io/fn";
 
-export interface HslColor {
-  h: number;
-  s: number;
+import type { ColorGenInput, Colors } from "./types";
+
+// Explicitly register color spaces for the tree-shakable API
+// This is required for parse() to recognize color formats
+ColorSpace.register(sRGB_Linear);
+ColorSpace.register(sRGB);
+ColorSpace.register(HSL);
+ColorSpace.register(OKLab);
+ColorSpace.register(OKLCH);
+
+export const toHexFormat = (value?: string, alpha?: boolean) =>
+  value?.replaceAll(/[^\w/]/g, "").slice(0, alpha ? 8 : 6) ?? "";
+
+export const getHex = (value?: string, alpha?: boolean) =>
+  value ? toHexFormat(value, alpha) : "";
+
+export type GradientColor = {
+  color: AggregationColor;
+  percent: number;
+}[];
+
+// OKLCH color type
+export interface OKLCHColor {
   l: number;
-  a: number;
-}
-
-export interface HslaColor {
+  c: number;
   h: number;
-  s: number;
-  l: number;
-  a: number;
+  alpha?: number;
 }
-
-export type ColorValue = string | RgbaColor | HslColor | HslaColor;
 
 export class Color {
-  private _r: number;
-  private _g: number;
-  private _b: number;
-  private _a: number;
+  private colorObject: PlainColorObject;
+  public a: number;
+  public r: number;
+  public g: number;
+  public b: number;
+  public h: number;
+  public s: number;
+  public l: number;
 
-  constructor(value: ColorValue) {
-    if (typeof value === "string") {
-      const parsed = this.parseString(value);
-      this._r = parsed.r;
-      this._g = parsed.g;
-      this._b = parsed.b;
-      this._a = parsed.a;
-    } else if ("r" in value && "g" in value && "b" in value) {
-      this._r = Math.max(0, Math.min(255, value.r));
-      this._g = Math.max(0, Math.min(255, value.g));
-      this._b = Math.max(0, Math.min(255, value.b));
-      this._a = Math.max(0, Math.min(1, value.a));
-    } else if ("h" in value && "s" in value && "l" in value) {
-      const rgb = this.hslToRgb(value.h, value.s, value.l);
-      this._r = rgb.r;
-      this._g = rgb.g;
-      this._b = rgb.b;
-      this._a = Math.max(0, Math.min(1, value.a));
+  constructor(color: ColorGenInput) {
+    // Parse color input
+    let colorObj: PlainColorObject;
+
+    if (Array.isArray(color)) {
+      // Handle array input - create a default black color
+      colorObj = {
+        space: "srgb",
+        coords: [0, 0, 0],
+        alpha: 1,
+      } as unknown as PlainColorObject;
+    } else if (typeof color === "number") {
+      colorObj = parse(color.toString()) as unknown as PlainColorObject;
+    } else if (typeof color === "object") {
+      // Handle RGB/RGBA objects
+      if ("r" in color && "g" in color && "b" in color) {
+        const r: number =
+          typeof color.r === "string" ? Number.parseFloat(color.r) : color.r;
+        const g: number =
+          typeof color.g === "string" ? Number.parseFloat(color.g) : color.g;
+        const b: number =
+          typeof color.b === "string" ? Number.parseFloat(color.b) : color.b;
+        const a: number | undefined =
+          "a" in color
+            ? typeof color.a === "string"
+              ? Number.parseFloat(color.a)
+              : color.a
+            : undefined;
+        colorObj = {
+          space: "srgb",
+          coords: [r, g, b],
+          alpha: a,
+        } as unknown as PlainColorObject;
+      }
+      // Handle HSL/HSLA objects
+      else {
+        const h: number =
+          typeof color.h === "string" ? Number.parseFloat(color.h) : color.h;
+        const s: number =
+          typeof color.s === "string" ? Number.parseFloat(color.s) : color.s;
+        const b: number =
+          typeof color.b === "string" ? Number.parseFloat(color.b) : color.b;
+        const a: number | undefined =
+          "a" in color
+            ? typeof color.a === "string"
+              ? Number.parseFloat(color.a)
+              : color.a
+            : undefined;
+        colorObj = {
+          space: "hsl",
+          coords: [h, s, b],
+          alpha: a,
+        } as unknown as PlainColorObject;
+      }
     } else {
-      throw new Error("Invalid color value");
-    }
-  }
-
-  private parseString(value: string): RgbaColor {
-    const trimmed = value.trim();
-
-    // Hex format (#rgb, #rrggbb, #rrggbbaa)
-    if (trimmed.startsWith("#")) {
-      return this.parseHex(trimmed);
+      colorObj = parse(color) as unknown as PlainColorObject;
     }
 
-    // RGB/RGBA format
-    if (trimmed.startsWith("rgb")) {
-      return this.parseRgb(trimmed);
-    }
+    this.colorObject = colorObj;
 
-    // HSL/HSLA format
-    if (trimmed.startsWith("hsl")) {
-      return this.parseHsl(trimmed);
-    }
+    // Convert to sRGB to get RGB values
+    const rgb = to(colorObj, "srgb");
+    this.r = rgb.coords[0] ?? 0;
+    this.g = rgb.coords[1] ?? 0;
+    this.b = rgb.coords[2] ?? 0;
 
-    throw new Error(`Unsupported color format: ${value}`);
-  }
+    // Convert to HSL to get HSL values
+    const hsl = to(colorObj, "hsl");
+    this.h = hsl.coords[0] ?? 0;
+    this.s = hsl.coords[1] ?? 0;
+    this.l = hsl.coords[2] ?? 0;
 
-  private parseHex(hex: string): RgbaColor {
-    const clean = hex.slice(1);
-
-    if (clean.length === 3) {
-      return {
-        r: Number.parseInt((clean[0] ?? "0") + (clean[0] ?? "0"), 16),
-        g: Number.parseInt((clean[1] ?? "0") + (clean[1] ?? "0"), 16),
-        b: Number.parseInt((clean[2] ?? "0") + (clean[2] ?? "0"), 16),
-        a: 1,
-      };
-    }
-
-    if (clean.length === 6) {
-      return {
-        r: Number.parseInt(clean.slice(0, 2), 16),
-        g: Number.parseInt(clean.slice(2, 4), 16),
-        b: Number.parseInt(clean.slice(4, 6), 16),
-        a: 1,
-      };
-    }
-
-    if (clean.length === 8) {
-      return {
-        r: Number.parseInt(clean.slice(0, 2), 16),
-        g: Number.parseInt(clean.slice(2, 4), 16),
-        b: Number.parseInt(clean.slice(4, 6), 16),
-        a: Number.parseInt(clean.slice(6, 8), 16) / 255,
-      };
-    }
-
-    throw new Error(`Invalid hex color: ${hex}`);
-  }
-
-  private parseRgb(rgb: string): RgbaColor {
-    const match = /rgba?\(([^)]+)\)/.exec(rgb);
-    if (!match?.[1]) throw new Error(`Invalid RGB color: ${rgb}`);
-
-    const values = match[1].split(",").map((v) => Number.parseFloat(v.trim()));
-
-    if (values.length === 3) {
-      return {
-        r: Math.max(0, Math.min(255, values[0] ?? 0)),
-        g: Math.max(0, Math.min(255, values[1] ?? 0)),
-        b: Math.max(0, Math.min(255, values[2] ?? 0)),
-        a: 1,
-      };
-    }
-
-    if (values.length === 4) {
-      return {
-        r: Math.max(0, Math.min(255, values[0] ?? 0)),
-        g: Math.max(0, Math.min(255, values[1] ?? 0)),
-        b: Math.max(0, Math.min(255, values[2] ?? 0)),
-        a: Math.max(0, Math.min(1, values[3] ?? 0)),
-      };
-    }
-
-    throw new Error(`Invalid RGB color: ${rgb}`);
-  }
-
-  private parseHsl(hsl: string): RgbaColor {
-    const match = /hsla?\(([^)]+)\)/.exec(hsl);
-    if (!match?.[1]) throw new Error(`Invalid HSL color: ${hsl}`);
-
-    const values = match[1].split(",").map((v) => Number.parseFloat(v.trim()));
-
-    if (values.length === 3) {
-      const [h, s, l] = values;
-      if (h === undefined || s === undefined || l === undefined) {
-        throw new Error(`Invalid HSL color: ${hsl}`);
-      }
-
-      const rgb = this.hslToRgb(h, s / 100, l / 100);
-      return { ...rgb, a: 1 };
-    }
-
-    if (values.length === 4) {
-      const [h, s, l, a] = values;
-      if (
-        h === undefined ||
-        s === undefined ||
-        l === undefined ||
-        a === undefined
-      ) {
-        throw new Error(`Invalid HSL color: ${hsl}`);
-      }
-
-      const rgb = this.hslToRgb(h, s / 100, l / 100);
-      return { ...rgb, a: Math.max(0, Math.min(1, a)) };
-    }
-
-    throw new Error(`Invalid HSL color: ${hsl}`);
-  }
-
-  private hslToRgb(
-    h: number,
-    s: number,
-    l: number,
-  ): { r: number; g: number; b: number } {
-    h = h / 360;
-    const a = s * Math.min(l, 1 - l);
-
-    const f = (n: number) => {
-      const k = (n + h * 12) % 12;
-      return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-    };
-
-    return {
-      r: Math.round(f(0) * 255),
-      g: Math.round(f(8) * 255),
-      b: Math.round(f(4) * 255),
-    };
-  }
-
-  private rgbToHsl(
-    r: number,
-    g: number,
-    b: number,
-  ): { h: number; s: number; l: number } {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    const diff = max - min;
-
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-
-    if (diff !== 0) {
-      s = l > 0.5 ? diff / (2 - max - min) : diff / (max + min);
-
-      switch (max) {
-        case r: {
-          h = ((g - b) / diff + (g < b ? 6 : 0)) / 6;
-          break;
-        }
-        case g: {
-          h = ((b - r) / diff + 2) / 6;
-          break;
-        }
-        case b: {
-          h = ((r - g) / diff + 4) / 6;
-          break;
-        }
-      }
-    }
-
-    return {
-      h: h * 360,
-      s: s,
-      l: l,
-    };
-  }
-
-  toRgb(): RgbaColor {
-    return {
-      r: Math.round(this._r),
-      g: Math.round(this._g),
-      b: Math.round(this._b),
-      a: this._a,
-    };
-  }
-
-  toHsl(): HslColor {
-    const hsl = this.rgbToHsl(this._r, this._g, this._b);
-    return {
-      h: hsl.h,
-      s: hsl.s,
-      l: hsl.l,
-      a: this._a,
-    };
-  }
-
-  toHexString(): string {
-    const r = Math.round(this._r).toString(16).padStart(2, "0");
-    const g = Math.round(this._g).toString(16).padStart(2, "0");
-    const b = Math.round(this._b).toString(16).padStart(2, "0");
-    return `#${r}${g}${b}`;
-  }
-
-  toRgbString(): string {
-    const rgb = this.toRgb();
-    if (rgb.a === 1) {
-      return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
-    }
-    return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a})`;
-  }
-
-  toHslString(): string {
-    const hsl = this.toHsl();
-    if (hsl.a === 1) {
-      return `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s * 100)}%, ${Math.round(hsl.l * 100)}%)`;
-    }
-    return `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s * 100)}%, ${Math.round(hsl.l * 100)}%, ${hsl.a})`;
-  }
-
-  toString(format: "hex" | "rgb" | "hsl" = "hex"): string {
-    switch (format) {
-      case "hex": {
-        return this.toHexString();
-      }
-      case "rgb": {
-        return this.toRgbString();
-      }
-      case "hsl": {
-        return this.toHslString();
-      }
-      default: {
-        return this.toHexString();
-      }
-    }
-  }
-
-  get alpha(): number {
-    return this._a;
-  }
-
-  set alpha(value: number) {
-    this._a = Math.max(0, Math.min(1, value));
+    this.a = colorObj.alpha ?? 1;
+    this.a = colorObj.alpha ?? 1;
   }
 
   clone(): Color {
-    return new Color(this.toRgb());
+    return new Color(serialize(this.colorObject));
   }
 
-  equals(other: Color): boolean {
+  setA(a: number) {
+    this.a = a;
+    this.colorObject = { ...this.colorObject, alpha: a };
+    return this;
+  }
+
+  toHexString(): string {
+    const hex = serialize(this.colorObject, { format: "hex" });
+    return hex.length === 4
+      ? "#" +
+          (hex[1] ?? "").repeat(2) +
+          (hex[2] ?? "").repeat(2) +
+          (hex[3] ?? "").repeat(2)
+      : hex;
+  }
+
+  toRgb(): {
+    r: number;
+    g: number;
+    b: number;
+    a: number | undefined;
+  } {
+    return {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+      a: this.a,
+    };
+  }
+
+  toRgbString(): string {
+    return serialize(this.colorObject, { format: "rgb" });
+  }
+
+  toHsb(): {
+    b: number;
+    a: number;
+    h: number;
+    s: number;
+  } {
+    return {
+      h: this.h,
+      s: this.s,
+      b: this.b,
+      a: this.a,
+    };
+  }
+
+  toHsbString(): string {
+    return serialize(to(this.colorObject, "hsl"), { format: "hsl" });
+  }
+
+  toOKLCH(): OKLCHColor {
+    const oklch = to(this.colorObject, "oklch");
+    return {
+      l: oklch.coords[0] ?? 0,
+      c: oklch.coords[1] ?? 0,
+      h: oklch.coords[2] ?? 0,
+      alpha: oklch.alpha ?? undefined,
+    };
+  }
+
+  toOKLCHString(): string {
+    return serialize(to(this.colorObject, "oklch"));
+  }
+
+  static fromOKLCH(oklch: OKLCHColor): Color {
+    const colorObj: PlainColorObject = {
+      space: "oklch",
+      coords: [oklch.l, oklch.c, oklch.h],
+      alpha: oklch.alpha,
+    } as unknown as PlainColorObject;
+    return new Color(serialize(colorObj));
+  }
+}
+
+export class AggregationColor {
+  private metaColor: Color = new Color("#000000");
+
+  private colors: GradientColor | undefined;
+
+  public cleared = false;
+
+  constructor(
+    color: ColorGenInput<AggregationColor> | Colors<AggregationColor>,
+  ) {
+    // Clone from another AggregationColor
+    if (color instanceof AggregationColor) {
+      this.metaColor = color.metaColor.clone();
+      this.colors = color.colors?.map((info) => ({
+        color: new AggregationColor(info.color),
+        percent: info.percent,
+      }));
+      this.cleared = color.cleared;
+      return;
+    }
+
+    const isArray = Array.isArray(color);
+
+    if (isArray && color.length > 0) {
+      this.colors = color.map(({ color: c, percent }) => ({
+        color: new AggregationColor(c),
+        percent,
+      }));
+      if (this.colors[0]) {
+        this.metaColor = new Color(this.colors[0].color.toHexString());
+      }
+    } else {
+      this.metaColor = new Color(isArray ? "" : color);
+    }
+
+    if (!color || (isArray && !this.colors)) {
+      this.metaColor = this.metaColor.setA(0);
+      this.cleared = true;
+    }
+  }
+
+  toHsb() {
+    return this.metaColor.toHsb();
+  }
+
+  toHsbString() {
+    return this.metaColor.toHsbString();
+  }
+
+  toHex() {
+    return getHex(this.toHexString(), this.metaColor.a < 1);
+  }
+
+  toHexString() {
+    return this.metaColor.toHexString();
+  }
+
+  toRgb() {
+    return this.metaColor.toRgb();
+  }
+
+  toRgbString() {
+    return this.metaColor.toRgbString();
+  }
+
+  toOKLCH() {
+    return this.metaColor.toOKLCH();
+  }
+
+  toOKLCHString() {
+    return this.metaColor.toOKLCHString();
+  }
+
+  static fromOKLCH(oklch: OKLCHColor): AggregationColor {
+    return new AggregationColor(Color.fromOKLCH(oklch).toHexString());
+  }
+
+  isGradient(): boolean {
+    return !!this.colors && !this.cleared;
+  }
+
+  getColors(): GradientColor {
+    return this.colors ?? [{ color: this, percent: 0 }];
+  }
+
+  toCssString(): string {
+    const { colors } = this;
+
+    // CSS line-gradient
+    if (colors) {
+      const colorsStr = colors
+        .map((c) => `${c.color.toRgbString()} ${c.percent}%`)
+        .join(", ");
+      return `linear-gradient(90deg, ${colorsStr})`;
+    }
+
+    return this.metaColor.toRgbString();
+  }
+
+  equals(color: AggregationColor | null): boolean {
+    if (this.isGradient() !== color?.isGradient()) {
+      return false;
+    }
+
+    if (!this.isGradient()) {
+      return this.toHexString() === color.toHexString();
+    }
+
     return (
-      Math.round(this._r) === Math.round(other._r) &&
-      Math.round(this._g) === Math.round(other._g) &&
-      Math.round(this._b) === Math.round(other._b) &&
-      Math.abs(this._a - other._a) < 0.001
+      !!this.colors &&
+      !!color.colors &&
+      this.colors.length === color.colors.length &&
+      this.colors.every((c, i) => {
+        const target = color.colors?.[i];
+        return c.percent === target?.percent && c.color.equals(target.color);
+      })
     );
   }
 }

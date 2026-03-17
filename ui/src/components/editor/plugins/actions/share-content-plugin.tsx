@@ -15,9 +15,20 @@ import { CLEAR_HISTORY_COMMAND } from "lexical";
 import { SendIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "@acme/ui/components/button";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@acme/ui/components/tooltip";
+
 import { docFromHash, docToHash } from "../../utils/doc-serialization";
 
 async function shareDoc(doc: SerializedDocument): Promise<void> {
+  if (globalThis.window === undefined) {
+    throw new TypeError("shareDoc can only be called on the client side");
+  }
+
   const url = new URL(globalThis.location.toString());
   url.hash = await docToHash(doc);
   const newUrl = url.toString();
@@ -27,34 +38,43 @@ async function shareDoc(doc: SerializedDocument): Promise<void> {
 
 export function ShareContentPlugin() {
   const [editor] = useLexicalComposerContext();
+  const isClient = globalThis.window !== undefined;
 
   useEffect(() => {
-    void docFromHash(globalThis.location.hash).then((doc) => {
-      if (doc && doc.source === "editor") {
-        editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
-        editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
-      }
-    });
-  }, [editor]);
+    if (!isClient) return;
+
+    void docFromHash(globalThis.location.hash)
+      .then((doc) => {
+        if (doc?.source === "editor") {
+          editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
+          editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
+        }
+      })
+      .catch(() => {
+        // Ignore invalid or malformed share hashes.
+      });
+  }, [editor, isClient]);
 
   return (
     <TooltipRoot>
       <TooltipTrigger asChild>
         <Button
           variant="text"
-          onClick={() =>
-            shareDoc(
+          onClick={() => {
+            if (!isClient) return;
+
+            void shareDoc(
               serializedDocumentFromEditorState(editor.getEditorState(), {
                 source: "editor",
               }),
             ).then(
               () => toast.success("URL copied to clipboard"),
               () => toast.error("URL could not be copied to clipboard"),
-            )
-          }
+            );
+          }}
           title="Share"
           aria-label="Share Playground link to current editor state"
-          size={"sm"}
+          size="small"
           className="p-2"
         >
           <SendIcon className="size-4" />

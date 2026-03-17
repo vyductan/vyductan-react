@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable unicorn/no-array-for-each */
-import * as React from "react";
+import type * as React from "react";
 
 import type { FilterState } from ".";
 import type { AnyObject } from "../../../_util/type";

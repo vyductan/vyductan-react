@@ -1,0 +1,222 @@
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import BasicDemo from "./demo/basic";
+import ColorVariantDemo from "./demo/color-variant";
+
+# Button
+
+A versatile button component with multiple variants, sizes, and styles for all your interaction needs.
+
+## Features
+
+- 🎨 **Multiple Variants** - Solid, outlined, dashed, filled, text, and link styles
+- 🎯 **Color Options** - Primary, danger, and custom color support
+- 📏 **Flexible Sizes** - Small, default, large, and icon button sizes
+- ⚡ **Loading State** - Built-in loading indicator support
+- 🔗 **Link Support** - Use as a button or link with `href` prop
+- ♿ **Accessible** - Full keyboard navigation and ARIA support
+- 🎭 **Polymorphic** - Use `asChild` to render as any element
+
+## Examples
+
+### Basic Usage
+
+The simplest way to use Button with different types.
+
+<ComponentSource src="button/demo/basic.tsx" __comp__={BasicDemo} />
+
+### Color & Variant
+
+You can combine different colors and variants to create various button styles.
+
+<ComponentSource
+  src="button/demo/color-variant.tsx"
+  __comp__={ColorVariantDemo}
+/>
+
+### Different Sizes
+
+```tsx
+// Small
+<Button size="sm" variant="outlined">Small</Button>
+<Button size="icon-sm" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
+</Button>
+
+// Medium (default)
+<Button variant="outlined">Default</Button>
+<Button size="icon" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
+</Button>
+
+// Large
+<Button size="lg" variant="outlined">Large</Button>
+<Button size="icon-lg" aria-label="Submit" variant="outlined">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
+</Button>
+```
+
+### Button Types
+
+```tsx
+// Primary button
+<Button type="primary">Primary</Button>
+
+// Default button
+<Button>Default</Button>
+
+// Dashed button
+<Button type="dashed">Dashed</Button>
+
+// Text button
+<Button type="text">Text</Button>
+
+// Link button
+<Button type="link">Link</Button>
+```
+
+### Danger Button
+
+```tsx
+<Button danger>Danger Button</Button>
+<Button danger type="primary">Danger Primary</Button>
+<Button danger type="text">Danger Text</Button>
+```
+
+### Disabled State
+
+```tsx
+<Button disabled>Disabled</Button>
+<Button type="primary" disabled>Primary Disabled</Button>
+```
+
+### Loading State
+
+```tsx
+<Button type="primary" loading>
+  Loading
+</Button>
+```
+
+### Icon Button
+
+```tsx
+<Button variant="outlined" size="icon" aria-label="Submit">
+  <Icon icon="icon-[lucide--arrow-up-right]" />
+</Button>
+```
+
+### Button with Icon
+
+The spacing between the icon and the text is automatically adjusted based on the size of the button.
+
+```tsx
+<Button variant="outlined" size="sm">
+  <Icon icon="icon-[lucide--git-branch]" /> New Branch
+</Button>
+```
+
+### Link as Button
+
+You can use the `asChild` prop to make another component look like a button.
+
+```tsx
+import { Link } from "next/link";
+import { Button } from "@/components/ui";
+
+export function LinkAsButton() {
+  return (
+    <Button asChild>
+      <Link href="/login">Login</Link>
+    </Button>
+  );
+}
+```
+
+### Form Integration
+
+```tsx
+import { Button } from "@/components/ui";
+import { z } from "zod";
+
+import { Form, FormItem, useForm } from "@acme/ui/components/form";
+import { Input } from "@acme/ui/components/input";
+
+const formSchema = z.object({
+  username: z.string().min(1, { message: "Please input your username!" }),
+  password: z.string().min(1, { message: "Please input your password!" }),
+});
+
+function FormExample() {
+  const form = useForm({
+    schema: formSchema,
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+    onSubmit: (data) => {
+      console.log("data", data);
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <FormItem name="username" control={form.control} label="Username">
+        <Input />
+      </FormItem>
+      <FormItem name="password" control={form.control} label="Password">
+        <Input.Password />
+      </FormItem>
+      <FormItem>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </FormItem>
+    </Form>
+  );
+}
+```
+
+## API Reference
+
+### Button Props
+
+| Property    | Type                                                                 | Default     | Description                                                    |
+| ----------- | -------------------------------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| `type`      | `"default" \| "primary" \| "dashed" \| "link" \| "text"`             | `"default"` | Button type (maps to color/variant combination)                |
+| `color`     | `"default" \| "primary" \| "danger" \| "pink" \| "purple" \| "cyan"` | -           | Button color                                                   |
+| `variant`   | `"solid" \| "outlined" \| "dashed" \| "filled" \| "text" \| "link"`  | -           | Button variant style                                           |
+| `size`      | `"sm" \| "default" \| "lg" \| "icon" \| "icon-sm" \| "icon-lg"`      | `"default"` | Button size                                                    |
+| `danger`    | `boolean`                                                            | `false`     | Whether the button represents a dangerous action               |
+| `loading`   | `boolean`                                                            | `false`     | Whether the button is in loading state                         |
+| `disabled`  | `boolean`                                                            | `false`     | Whether the button is disabled                                 |
+| `htmlType`  | `"button" \| "submit" \| "reset"`                                    | `"button"`  | The native HTML button type                                    |
+| `href`      | `string`                                                             | -           | If provided, button will render as a link                      |
+| `asChild`   | `boolean`                                                            | `false`     | Render button as child component (for polymorphic composition) |
+| `icon`      | `React.ReactNode`                                                    | -           | Icon to display in the button                                  |
+| `shape`     | `"default" \| "circle" \| "round"`                                   | `"default"` | Button shape                                                   |
+| `className` | `string`                                                             | -           | Additional CSS classes                                         |
+
+## Migration from Ant Design
+
+```tsx
+// Ant Design
+import { Button } from 'antd';
+<Button type="primary">Primary</Button>
+<Button type="primary" danger>Danger</Button>
+<Button type="primary" loading>Loading</Button>
+
+// @acme/ui Button
+import { Button } from '@/components/ui';
+<Button type="primary">Primary</Button>
+<Button type="primary" danger>Danger</Button>
+<Button type="primary" loading>Loading</Button>
+```
+
+### Key Differences
+
+- Uses **Tailwind CSS** for styling instead of Less
+- Supports **polymorphic composition** with `asChild` prop
+- **Color and variant** props can be used independently or together
+- **Icon buttons** require `aria-label` for accessibility
+- **Loading state** uses built-in spinner component

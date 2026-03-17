@@ -1,76 +1,91 @@
-import * as React from "react";
+import type * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { ButtonColorVariants } from "../button/button-variants";
 import type { AbstractCheckboxProps } from "../checkbox";
+import type { FormValueType } from "../form";
 import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
-import { Label } from "../label";
-import {
-  radioButtonSolidActiveColors,
-  radioButtonSolidColors,
-  radioColors,
-} from "./colors";
+import { buttonVariants } from "../button";
+import { buttonColorVariants } from "../button/button-variants";
 
-type RadioProps = AbstractCheckboxProps<RadioChangeEvent> & {
-  label?: React.ReactNode;
-  value?: any;
-  color?: string;
-  optionType?: "button";
-  buttonStyle?: "solid";
-  isActive?: boolean;
-  preColor?: string;
-};
+type RadioProps<T extends FormValueType = FormValueType> =
+  AbstractCheckboxProps<RadioChangeEvent<T>, T> & {
+    color?: ButtonColorVariants["color"];
+    optionType?: "default" | "button";
+    buttonStyle?: "outline" | "solid";
+  };
 
-const Radio = ({
+const Radio = <T extends FormValueType = FormValueType>({
   value,
-  label,
+  checked,
+  children,
   disabled,
   className,
   color = "default",
   optionType,
   buttonStyle,
-  isActive,
-  preColor,
   onChange,
   ...props
-}: RadioProps) => {
-  if (optionType === "button" && buttonStyle) {
+}: RadioProps<T>) => {
+  const variant =
+    buttonStyle === "solid"
+      ? checked
+        ? "solid"
+        : "outlined"
+      : checked
+        ? "outlined"
+        : "link";
+  let mergedColor = color;
+  if (checked && buttonStyle === "outline" && color === "default") {
+    mergedColor = "primary";
+  }
+
+  if (optionType === "button") {
     return (
       <label
         className={cn(
-          "ring-offset-background inline-flex cursor-pointer items-center justify-center px-3 py-[5px] text-sm font-medium whitespace-nowrap transition-all",
-          "border border-l-0 first:rounded-s-md first:border-l last:rounded-e-md",
-          "focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden",
-          radioColors[color],
-          disabled && "pointer-events-none cursor-not-allowed opacity-50",
-          radioButtonSolidColors[color],
-          preColor && radioButtonSolidColors[preColor]?.split(" ")[1],
-          isActive &&
-            radioButtonSolidActiveColors[color] +
-              " shadow-xs [&>button]:text-white",
+          "-mr-px",
+          buttonVariants({
+            size: "middle",
+          }),
+          buttonColorVariants({
+            color: mergedColor,
+            variant,
+            disabled,
+          }),
+          buttonStyle === "outline" && !checked && "border-input",
+          buttonStyle === "outline" &&
+            disabled &&
+            "hover:border-input! bg-muted/80",
+
+          // Override rounded for group buttons: first has left rounded, last has right rounded
+          "rounded-none first:rounded-l-md last:rounded-r-md",
+          // Add z-index for active item to ensure it appears above adjacent buttons
+          checked && "relative z-10",
           className,
         )}
       >
         <RadioGroupPrimitive.Item
-          value={value}
+          value={value as string}
           disabled={disabled}
           {...props}
           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             if (disabled) return;
-            const event = {
+            const event: RadioChangeEvent<T> = {
+              type: "change" as const,
               target: {
                 ...props,
-                value,
-                label,
+                value: value as unknown as T,
+                // label: children,
                 disabled,
                 color,
                 optionType,
                 buttonStyle,
-                isActive,
-                preColor,
                 checked: true,
+                type: "radio" as const,
               },
               stopPropagation: () => e.stopPropagation(),
               preventDefault: () => e.preventDefault(),
@@ -80,11 +95,8 @@ const Radio = ({
             props.onClick?.(e);
           }}
         >
-          <Label asChild>
-            <span>{label}</span>
-          </Label>
+          <span>{children}</span>
         </RadioGroupPrimitive.Item>
-        {/* <Label htmlFor={value as string}>{label}</Label> */}
       </label>
     );
   }
@@ -94,34 +106,51 @@ const Radio = ({
       className={cn(
         "flex items-center",
         "cursor-pointer text-sm",
-        radioColors[color],
-        disabled &&
-          "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
+        // disabled &&
+        //   "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
+        buttonVariants({
+          size: "middle",
+        }),
+        buttonColorVariants({
+          variant: "link",
+          color,
+          disabled,
+        }),
+        "size-auto gap-0 p-0",
+        color === "default" && "hover:text-foreground",
         className,
       )}
     >
       <RadioGroupPrimitive.Item
         data-slot="radio-group-item"
-        value={value}
+        value={value as string}
         className={cn(
           "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+          // [
+          //   buttonVariants({
+          //     disabled,
+          //     variant: "link",
+          //     color,
+          //   }),
+          //   "size-auto gap-0 p-0",
+          // ],
         )}
         disabled={disabled}
         {...props}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
           if (disabled) return;
-          const event = {
+          const event: RadioChangeEvent<T> = {
+            type: "change" as const,
             target: {
               ...props,
-              value,
-              label,
+              value: value as unknown as T,
+              // label: children,
               disabled,
               color,
               optionType,
               buttonStyle,
-              isActive,
-              preColor,
               checked: true,
+              type: "radio" as const,
             },
             stopPropagation: () => e.stopPropagation(),
             preventDefault: () => e.preventDefault(),
@@ -133,7 +162,14 @@ const Radio = ({
       >
         <RadioGroupPrimitive.Indicator
           data-slot="radio-group-indicator"
-          className="relative flex items-center justify-center"
+          className={cn("relative flex items-center justify-center", [
+            buttonColorVariants({
+              variant: "link",
+              color,
+              disabled,
+            }),
+            "size-auto gap-0 p-0",
+          ])}
         >
           <Icon
             icon="icon-[bi--circle-fill]"
@@ -141,7 +177,7 @@ const Radio = ({
           />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
-      <span className="px-2">{label}</span>
+      <span className="px-2">{children}</span>
     </label>
   );
 };

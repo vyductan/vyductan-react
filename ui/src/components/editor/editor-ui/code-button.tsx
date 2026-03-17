@@ -6,7 +6,6 @@
  *
  */
 import type { LexicalEditor } from "lexical";
-import * as React from "react";
 import { useState } from "react";
 import { $isCodeNode } from "@lexical/code";
 import { useDebounce } from "ahooks";

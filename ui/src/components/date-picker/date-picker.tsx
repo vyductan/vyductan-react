@@ -22,10 +22,11 @@ import { Button } from "../button";
 import { Calendar } from "../calendar";
 // For typing DayButton props if needed in future (not strictly required below)
 // import type { DayButton as RdpDayButton } from "react-day-picker";
-import { useUiConfig } from "../config-provider/config-provider";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { MonthSelect } from "./month-select";
+import { parseInputDate } from "./parse-input-date";
 import { YearSelect } from "./year-select";
 
 // type DatePickerValueType = "date" | "string" | "number" | "format";
@@ -62,21 +63,22 @@ type DatePickerBaseProps = InputVariants &
 
     // Custom: when selecting a year in overlay, commit that year on close without needing to pick a day
     commitYearOnClose?: boolean;
+
+    minDate?: Dayjs;
+    maxDate?: Dayjs;
   };
 
-type DatePickerPropsDayjs = DatePickerBaseProps & {
+type DatePickerProps = DatePickerBaseProps & {
   ref?: React.Ref<InputRef>;
-  /** Default behavior - uses Dayjs */
-  valueType?: "dayjs";
   defaultValue?: Dayjs | null;
   value?: Dayjs | null;
   onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
   disabledDate?: DisabledDate<Dayjs>;
   placeholder?: string;
-  minDate?: Dayjs;
-  maxDate?: Dayjs;
+
   picker?: PickerMode;
 
+  style?: React.CSSProperties;
   styles?: {
     root?: React.CSSProperties;
   };
@@ -84,29 +86,6 @@ type DatePickerPropsDayjs = DatePickerBaseProps & {
     root?: string;
   };
 };
-
-type DatePickerPropsDate = DatePickerBaseProps & {
-  ref?: React.Ref<InputRef>;
-  /** Explicit Date mode - accepts and emits Date */
-  valueType: "date";
-  defaultValue?: Date | null;
-  value?: Date | null;
-  onChange?: (date: Date | null | undefined, dateString: string) => void;
-  disabledDate?: DisabledDate<Date>;
-  placeholder?: string;
-  minDate?: Date;
-  maxDate?: Date;
-  picker?: PickerMode;
-
-  styles?: {
-    root?: React.CSSProperties;
-  };
-  classNames?: {
-    root?: string;
-  };
-};
-
-type DatePickerProps = DatePickerPropsDayjs | DatePickerPropsDate;
 
 const DatePicker = (props: DatePickerProps) => {
   const {
@@ -125,6 +104,7 @@ const DatePicker = (props: DatePickerProps) => {
     minDate,
     maxDate,
 
+    style,
     classNames: _,
     styles: __,
     disabled,
@@ -138,8 +118,6 @@ const DatePicker = (props: DatePickerProps) => {
     ...rest
   } = props;
 
-  const valueType = props.valueType ?? "dayjs";
-
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
   const [open, setOpen] = useState(false);
@@ -152,41 +130,38 @@ const DatePicker = (props: DatePickerProps) => {
   const commitYearOnClose = commitYearOnCloseProp ?? commitYearOnCloseConfig;
 
   // ====================== Format Date =======================
-  const datePickerConfig = useUiConfig((state) => state.components.datePicker);
+  const { format: datePickerFormat } = useComponentConfig("datePicker");
   const format =
     formatProp ??
     (picker === "year"
       ? "YYYY"
       : showTime
-        ? `${formatConfig ?? datePickerConfig?.format} HH:mm`
-        : (formatConfig ?? datePickerConfig?.format ?? "YYYY-MM-DD"));
+        ? `${formatConfig ?? datePickerFormat} HH:mm`
+        : (formatConfig ?? datePickerFormat ?? "YYYY-MM-DD"));
 
-  // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
-  const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
-    if (!v) return undefined;
-    return dayjs(v as any);
-  };
-  const fromDayjs = (v: Dayjs | undefined): Dayjs | Date | undefined => {
-    if (!v) return undefined;
-    return valueType === "date" ? v.toDate() : v;
-  };
+  // // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
+  // const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
+  //   if (!v) return undefined;
+  //   return dayjs(v);
+  // };
+  // const fromDayjs = (v: Dayjs | undefined): Dayjs | undefined => {
+  //   if (!v) return undefined;
+  //   return v;
+  // };
 
-  const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
-  const defaultDayjsValue = useMemo(
-    () => toDayjs(defaultValue as any),
-    [defaultValue],
-  );
+  // const controlledValue = useMemo(() => toDayjs(valueProp as any), [valueProp]);
+  // const defaultDayjsValue = useMemo(
+  //   () => toDayjs(defaultValue as any),
+  //   [defaultValue],
+  // );
 
   // ====================== Value =======================
-  const [value, setValue] = useMergedState<Dayjs | undefined>(
-    defaultDayjsValue,
-    {
-      value: controlledValue,
-      onChange: (next) => {
-        onChange?.(fromDayjs(next) as any, next ? next.format(format) : "");
-      },
+  const [value, setValue] = useMergedState(defaultValue, {
+    value: valueProp,
+    onChange: (next) => {
+      onChange?.(next, next ? next.format(format) : "");
     },
-  );
+  });
   const preInputValue = value ? value.format(format) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue);
 
@@ -203,11 +178,12 @@ const DatePicker = (props: DatePickerProps) => {
 
   const inputRef = React.useRef<InputRef>(null);
 
+  // eslint-disable-next-line react-hooks/refs
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (value.trim()) {
-      const parsed = dayjs(value, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(value, format);
+      if (parsed) {
         setValue(parsed);
         setInputValue(parsed.format(format));
         setMonth(parsed.toDate());
@@ -242,8 +218,8 @@ const DatePicker = (props: DatePickerProps) => {
   // Sync calendar month and selected date when input value changes
   React.useEffect(() => {
     if (inputValue.trim()) {
-      const parsed = dayjs(inputValue, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(inputValue, format);
+      if (parsed) {
         setMonth(parsed.toDate());
         setTypedDate(parsed.toDate());
       }
@@ -267,9 +243,11 @@ const DatePicker = (props: DatePickerProps) => {
   );
 
   const computedDecadeRange = useMemo(() => {
+    const firstYear = currentDecadeRange[0];
+    const lastYear = currentDecadeRange.at(-1);
     return {
-      start: currentDecadeRange[0]!.year(),
-      end: currentDecadeRange.at(-1)!.year(),
+      start: firstYear?.year() ?? 0,
+      end: lastYear?.year() ?? 0,
       years: currentDecadeRange,
     };
   }, [currentDecadeRange]);
@@ -338,6 +316,59 @@ const DatePicker = (props: DatePickerProps) => {
     [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
   );
 
+  const MonthModeMonthGrid = React.useCallback(
+    (_props: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
+      return (
+        <MonthSelect
+          value={value}
+          onHoverChange={(hoveredMonth) => {
+            if (!hoveredMonth) {
+              setHoverPreview(undefined);
+              return;
+            }
+            if (picker === "month") {
+              setHoverPreview(hoveredMonth.startOf("month"));
+              return;
+            }
+            // Overlay month picker: preview keeping year/day?
+            const base = dayjs(month ?? new Date());
+            let next = base.month(hoveredMonth.month());
+            if (!next.isValid()) {
+              next = base.month(hoveredMonth.month()).startOf("month");
+            }
+            setHoverPreview(next);
+          }}
+          onChange={(selectedMonth) => {
+            if (!selectedMonth) {
+              setPickerMode("date");
+              return;
+            }
+
+            // If DatePicker acts as a pure month picker, commit the selection
+            if (picker === "month") {
+              const m = selectedMonth.startOf("month");
+              setValue(m);
+              setInputValue(m.format(format));
+              setMonth(m.toDate());
+              setOpen(false);
+              setHoverPreview(undefined);
+              return;
+            }
+
+            // Otherwise, only navigate calendar to selected month in CURRENT VIEW YEAR
+            const base = dayjs(month ?? new Date());
+            const next = base.month(selectedMonth.month());
+
+            const newMonthDate = next.startOf("month").toDate();
+            setMonth(newMonthDate);
+            setPickerMode("date");
+          }}
+        />
+      );
+    },
+    [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
+  );
+
   const BaseCaptionLabel = React.useCallback(
     ({
       className,
@@ -349,7 +380,13 @@ const DatePicker = (props: DatePickerProps) => {
       const yearText = m.format("YYYY");
       return (
         <span className={cn("space-x-2", className)} {...props}>
-          <Button variant="outline" tabIndex={-1} aria-hidden="true">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setPickerMode("month");
+            }}
+            aria-describedby="month-select-description"
+          >
             {monthText}
           </Button>
           <Button
@@ -357,10 +394,17 @@ const DatePicker = (props: DatePickerProps) => {
             onClick={() => {
               setPickerMode("year");
             }}
-            aria-label="Select year"
+            aria-describedby="year-select-description"
           >
             {yearText}
           </Button>
+          {/* Hidden descriptions for screen readers */}
+          <span id="month-select-description" className="sr-only">
+            Select month
+          </span>
+          <span id="year-select-description" className="sr-only">
+            Select year
+          </span>
         </span>
       );
     },
@@ -376,10 +420,38 @@ const DatePicker = (props: DatePickerProps) => {
     [computedDecadeRange.start, computedDecadeRange.end],
   );
 
+  const MonthModeCaptionLabel = React.useCallback(
+    ({
+      className,
+      ...props
+    }: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => {
+      const d = month ?? new Date();
+      const m = dayjs(d);
+      const yearText = m.format("YYYY");
+      return (
+        <span className={cn("space-x-2", className)} {...props}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setPickerMode("year");
+            }}
+            aria-describedby="year-select-description-month-mode"
+          >
+            {yearText}
+          </Button>
+          {/* Hidden description for screen readers */}
+          <span id="year-select-description-month-mode" className="sr-only">
+            Select year
+          </span>
+        </span>
+      );
+    },
+    [month],
+  );
+
   return (
     <>
       <Popover
-        className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
         align={{
@@ -444,11 +516,11 @@ const DatePicker = (props: DatePickerProps) => {
               // value={typedDate ? dayjs(typedDate) : (value ?? undefined)}
               selected={typedDate ?? (value ? value.toDate() : undefined)}
               startMonth={
-                (minDate ? dayjs(minDate as any) : undefined)?.toDate() ??
+                minDate?.toDate() ??
                 dayjs().subtract(50, "year").startOf("year").toDate()
               }
               endMonth={
-                (maxDate ? dayjs(maxDate as any) : undefined)?.toDate() ??
+                maxDate?.toDate() ??
                 dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
@@ -467,10 +539,7 @@ const DatePicker = (props: DatePickerProps) => {
               disabled={(date) => {
                 if (disabledDate) {
                   // Pass both the date and the required info object
-                  const currentArg =
-                    valueType === "date"
-                      ? (getDestinationValue(date).toDate() as any)
-                      : (getDestinationValue(date) as any);
+                  const currentArg = getDestinationValue(date);
                   return disabledDate(currentArg, {
                     type: "date",
                   });
@@ -485,12 +554,23 @@ const DatePicker = (props: DatePickerProps) => {
                       CaptionLabel: YearModeCaptionLabel,
                     }
                   : {}),
+                ...(pickerMode === "month"
+                  ? {
+                      MonthGrid: MonthModeMonthGrid,
+                      CaptionLabel: MonthModeCaptionLabel,
+                    }
+                  : {}),
               }}
             />
           </div>
         }
       >
-        <div data-slot="picker-input" className={cn("inline-flex", className)}>
+        <div
+          role="combobox"
+          data-slot="picker-input"
+          className={cn("inline-flex", className)}
+          style={style}
+        >
           <Input
             ref={composedRef}
             id={id}
@@ -506,6 +586,7 @@ const DatePicker = (props: DatePickerProps) => {
             disabled={disabled}
             suffix={
               <Icon
+                aria-hidden="true"
                 icon="icon-[mingcute--calendar-2-line]"
                 className="ml-auto size-4 opacity-50"
               />
@@ -532,8 +613,8 @@ const DatePicker = (props: DatePickerProps) => {
               } else if (event.key === "Escape") {
                 // Only trigger onChange if input is valid, otherwise just close
                 if (inputValue.trim()) {
-                  const parsed = dayjs(inputValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(inputValue, format);
+                  if (parsed) {
                     setValue(parsed);
                     setInputValue(parsed.format(format));
                     setTypedDate(parsed.toDate());
@@ -548,10 +629,17 @@ const DatePicker = (props: DatePickerProps) => {
 
               // Update calendar month and selected date when typing
               if (newValue.trim()) {
-                const parsed = dayjs(newValue, format);
-                if (parsed.isValid()) {
+                const parsed = parseInputDate(newValue, format);
+                if (parsed) {
+                  // Commit immediately so form state is updated even before blur
+                  setValue(parsed);
+                  setTypedDate(parsed.toDate());
                   setMonth(parsed.toDate());
                 }
+              } else {
+                // Keep form state in sync when clearing input
+                setValue(undefined);
+                setTypedDate(undefined);
               }
             }}
             onBlur={(e) => {
@@ -577,8 +665,8 @@ const DatePicker = (props: DatePickerProps) => {
 
               // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
               if (inputValue.trim()) {
-                const parsed = dayjs(inputValue, format);
-                if (parsed.isValid()) {
+                const parsed = parseInputDate(inputValue, format);
+                if (parsed) {
                   setValue(parsed);
                   setInputValue(parsed.format(format));
                   setTypedDate(parsed.toDate());

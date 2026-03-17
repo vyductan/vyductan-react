@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 "use client";
 
 import type {
@@ -14,7 +9,7 @@ import type {
   Row,
   Table as TableDef,
 } from "@tanstack/react-table";
-import React, { Fragment, useRef } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -36,7 +31,6 @@ import type { SortState } from "./hooks/use-sorter";
 import type {
   ColumnsType,
   ExpandableConfig,
-  ExpandType,
   FilterValue,
   GetComponentProps,
   GetPopupContainer,
@@ -57,7 +51,7 @@ import type {
 import scrollTo from "../_util/scroll-to";
 import { devUseWarning } from "../_util/warning";
 import { Checkbox } from "../checkbox";
-import { ConfigContext } from "../config-provider/context";
+import { ConfigContext, useComponentConfig } from "../config-provider/context";
 import defaultLocale from "../locale/en-us";
 import { Pagination } from "../pagination";
 import { Spin } from "../spin";
@@ -68,11 +62,12 @@ import {
   TableHeader,
   TableRoot,
   TableRow,
+  TableWrapperFooter,
+  TableWrapperHeader,
 } from "./_components";
 import { ColGroup } from "./_components/col-group";
-import renderExpandIcon from "./_components/expand-icon";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
-import { convertChildrenToColumns, useColumns } from "./hooks/use-columns";
+import { useColumns } from "./hooks/use-columns";
 import useExpand from "./hooks/use-expand";
 import { getFilterData } from "./hooks/use-filter";
 import useLazyKVMap from "./hooks/use-lazy-kv-map";
@@ -99,7 +94,7 @@ interface ChangeEventInfo<RecordType = AnyObject> {
 }
 
 type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
-  | (TRecord & {
+  | (Omit<TRecord, "_customRow" | "_customRowClassName"> & {
       _customRow?: undefined;
       _customRowClassName?: undefined;
     })
@@ -157,7 +152,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     /** Row's className */
     rowClassName?: string | ((record: TRecord, index: number) => string);
     /** Row key config */
-    rowKey?: string | keyof TRecord | GetRowKey<TRecord>;
+    rowKey?: (string & {}) | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
     rowSelection?: TableRowSelection<TRecord>;
 
@@ -175,7 +170,8 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     size?: SizeType;
     /** Whether the table can be scrollable */
     scroll?: {
-      x: number;
+      x?: number;
+      y?: number;
       scrollToFirstRowOnChange?: boolean;
     };
     /** Translation */
@@ -189,6 +185,8 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     toolbar?: (table: TableDef<TRecord>) => React.JSX.Element;
     /** Summary content */
     summary?: (currentData: TRecord[]) => React.ReactNode;
+    /** Footer content */
+    footer?: (currentData: TRecord[]) => React.ReactNode;
 
     onChange?: (
       pagination: TablePaginationConfig,
@@ -212,20 +210,21 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
   };
 
 const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
+  const tableConfig = useComponentConfig("table");
   const {
     ref,
     style,
     className,
     classNames,
-    bordered: borderedProp,
+    bordered: borderedProp = tableConfig.bordered,
     size,
 
     loading = false,
     skeleton = false,
 
-    columns,
-    children,
-    childrenColumnName: legacyChildrenColumnName,
+    columns: _columns,
+    children: _children,
+    childrenColumnName: _legacyChildrenColumnName,
     dataSource,
     pagination,
 
@@ -243,6 +242,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     toolbar,
     extra,
     alertRender,
+    footer,
 
     // Customize
     showHeader,
@@ -254,11 +254,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     sortDirections,
     showSorterTooltip,
 
-    expandable,
-    expandIcon,
-    expandedRowRender,
-    expandIconColumnIndex,
-    indentSize,
+    expandable: _expandable,
+    expandIcon: _expandIcon,
+    expandedRowRender: _expandedRowRender,
+    expandIconColumnIndex: _expandIconColumnIndex,
+    indentSize: _indentSize,
 
     // getPopupContainer,
 
@@ -278,37 +278,13 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     );
   }
 
-  const {
-    locale: contextLocale = defaultLocale,
-    // direction,
-    table: tableConfig,
-    // renderEmpty,
-    // getPopupContainer: getContextPopupContainer,
-  } = React.useContext<ConfigConsumerProps>(ConfigContext);
+  const { locale: contextLocale = defaultLocale } =
+    React.useContext<ConfigConsumerProps>(ConfigContext);
 
   // const mergedData = dataSource ?? EMPTY_DATA;
   const rawData: readonly TRecord[] = dataSource ?? EMPTY_LIST;
 
   const tableLocale: TableLocale = { ...contextLocale.Table, ...locale };
-
-  const mergedExpandable: ExpandableConfig<TRecord> = {
-    childrenColumnName: legacyChildrenColumnName,
-    expandIconColumnIndex,
-    ...expandable,
-    expandIcon: expandable?.expandIcon ?? tableConfig?.expandable?.expandIcon,
-  };
-  const { childrenColumnName = "children" } = mergedExpandable;
-  const expandType = React.useMemo<ExpandType>(() => {
-    if (rawData.some((item) => item?.[childrenColumnName])) {
-      return "nest";
-    }
-
-    if (expandedRowRender || expandable?.expandedRowRender) {
-      return "row";
-    }
-
-    return null;
-  }, [rawData]);
 
   // =======================
   const internalRefs: NonNullable<RcTableProps["internalRefs"]> = {
@@ -335,8 +311,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     };
   }, [rowKey]);
 
-  const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
-
   // ============================ Events =============================
   const changeEventInfo: Partial<ChangeEventInfo<TRecord>> = {};
 
@@ -359,8 +333,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       }
 
       // Trigger pagination events
-      if (pagination) {
-        pagination.onChange?.(1, changeInfo.pagination?.pageSize!);
+      const changedPageSize = changeInfo.pagination?.pageSize;
+      if (pagination && changedPageSize !== undefined) {
+        pagination.onChange?.(1, changedPageSize);
       }
     }
 
@@ -374,60 +349,35 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       });
     }
 
-    onChange?.(
-      changeInfo.pagination!,
-      changeInfo.filters!,
-      Array.isArray(changeInfo.sorter)
-        ? changeInfo.sorter
-        : changeInfo.sorter
-          ? [changeInfo.sorter]
-          : [],
-      {
-        // currentDataSource: getFilterData(
-        //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
-        //   changeInfo.filterStates!,
-        //   childrenColumnName,
-        // ),
-        currentDataSource: [],
-        action,
-      },
-    );
+    const paginationInfo = changeInfo.pagination ?? {};
+    const filterInfo = changeInfo.filters ?? {};
+    const sorterInfo = Array.isArray(changeInfo.sorter)
+      ? changeInfo.sorter
+      : changeInfo.sorter
+        ? [changeInfo.sorter]
+        : [];
+
+    onChange?.(paginationInfo, filterInfo, sorterInfo, {
+      // currentDataSource: getFilterData(
+      //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
+      //   changeInfo.filterStates!,
+      //   childrenColumnName,
+      // ),
+      currentDataSource: [],
+      action,
+    });
   };
 
   // ========================== Expandable ==========================
-  // Pass origin render status into `rc-table`, this can be removed when refactor with `rc-table`
-  (mergedExpandable as any).__PARENT_RENDER_ICON__ =
-    mergedExpandable.expandIcon;
-
-  // Customize expandable icon
-  mergedExpandable.expandIcon =
-    mergedExpandable.expandIcon || expandIcon || renderExpandIcon(tableLocale!);
-
-  // Adjust expand icon index, no overwrite expandIconColumnIndex if set.
-  if (
-    expandType === "nest" &&
-    mergedExpandable.expandIconColumnIndex === undefined
-  ) {
-    mergedExpandable.expandIconColumnIndex = rowSelection ? 1 : 0;
-  } else if (mergedExpandable.expandIconColumnIndex! > 0 && rowSelection) {
-    mergedExpandable.expandIconColumnIndex! -= 1;
-  }
-
-  // Indent size
-  if (typeof mergedExpandable.indentSize !== "number") {
-    mergedExpandable.indentSize =
-      typeof indentSize === "number" ? indentSize : 15;
-  }
-
   const [
     expandedState,
     setExpandedState,
 
     expandableConfig,
-    _expandableType,
+    expandType,
     mergedExpandedKeys,
     mergedExpandIcon,
-    _mergedChildrenColumnName,
+    childrenColumnName,
     onTriggerExpand,
   ] = useExpand(
     // {
@@ -448,6 +398,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     rawData,
     getRowKey,
   );
+
+  const [getRecordByKey] = useLazyKVMap(rawData, childrenColumnName, getRowKey);
 
   // useEffect(() => {
   //   const expandedRowKeys = expandable?.expandedRowKeys ?? [];
@@ -477,18 +429,46 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   },
   // );
 
-  const baseColumns = React.useMemo(
-    () =>
-      columns || (convertChildrenToColumns(children) as ColumnsType<TRecord>),
-    [columns, children],
-  );
-
   /**
    * Controlled state in `columns` is not a good idea that makes too many code (1000+ line?) to read
    * state out and then put it back to title render. Move these code into `hooks` but still too
    * complex. We should provides Table props like `sorter` & `filter` to handle control in next big
    * version.
    */
+
+  // ====================== Column ======================
+  // TODO: remove flattenColumns
+  const [mergedColumns, columnsForTTTable, _flattenColumns] =
+    useColumns<TRecord>(
+      {
+        ...props,
+        ...expandableConfig,
+        // Only create expand column for custom expandedRowRender (row type)
+        // For tree data (nest type), expand icon renders inline in first data column
+        expandable: !!expandableConfig.expandedRowRender,
+        expandColumnTitle: expandableConfig.columnTitle,
+        expandedKeys: mergedExpandedKeys,
+        getRowKey,
+        // https://github.com/ant-design/ant-design/issues/23894
+        onTriggerExpand,
+        expandIcon: mergedExpandIcon,
+        expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
+        // direction,
+        // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
+        // clientWidth: componentWidth,
+
+        //   expandable ??
+        //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
+        // getRowKey,
+
+        // mergedChildrenColumnName,
+
+        // rowSelection: rowSelection,
+        expandedRowRender: expandableConfig.expandedRowRender,
+      },
+      // transformColumns,
+      null,
+    );
 
   // ============================ Sorter =============================
   const onSorterChange = (
@@ -513,7 +493,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     _sorterTitleProps,
     getSorters,
   ] = useSorter<TRecord>({
-    mergedColumns: baseColumns,
+    mergedColumns: mergedColumns,
     onSorterChange,
     sortDirections: sortDirections ?? ["ascend", "descend"],
     tableLocale,
@@ -624,28 +604,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   // ]);
 
   // ========================== Selections ==========================
-  // const [
-  //   rowSelectionState,
-  //   setRowSelection,
-  //   transformSelectionColumns,
-  //   // selectedKeySet,
-  // ] = useSelection<TRecord>(
-  //   {
-  //     data: mergedData,
-  //     pageData,
-  //     getRowKey,
-  //     getRecordByKey,
-  //     expandType,
-  //     childrenColumnName,
-  //     locale: tableLocale,
-  //     getPopupContainer: getPopupContainer || getContextPopupContainer,
-  //   },
-  //   rowSelection,
-  // );
 
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
     rowSelection?.selectedRowKeys || [],
   );
+  useEffect(() => {
+    setSelectedRowKeys(rowSelection?.selectedRowKeys || []);
+  }, [rowSelection?.selectedRowKeys]);
+
   // const selectedRowKeys = Object.keys(rowSelectionState);
   const selectedRows = selectedRowKeys.map((key) => getRecordByKey(key));
 
@@ -686,43 +652,17 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
-  // ====================== Column ======================
-  const [mergedColumns, columnsForTTTable, flattenColumns] =
-    useColumns<TRecord>(
-      {
-        ...props,
-        ...expandableConfig,
-        // expandable:
-        //   !!expandableConfig.expandedRowRender &&
-        //   (!mergedChildrenColumnName ||
-        //     mergedChildrenColumnName in (dataSource?.[0] ?? {})),
-        // expandable: !!expandableConfig.expandedRowRender ||
-        //   !!expandableConfig.childrenColumnName,
-        expandable: !!expandableConfig.expandedRowRender,
-        expandColumnTitle: expandableConfig.columnTitle,
-        expandedKeys: mergedExpandedKeys,
-        getRowKey,
-        // https://github.com/ant-design/ant-design/issues/23894
-        onTriggerExpand,
-        expandIcon: mergedExpandIcon,
-        expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
-        // direction,
-        // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
-        // clientWidth: componentWidth,
-
-        //   expandable ??
-        //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
-        // getRowKey,
-
-        // mergedChildrenColumnName,
-
-        // rowSelection: rowSelection,
-      },
-      // transformColumns,
-      null,
+  // Filter selectedRowKeys to only include keys that exist in mergedData
+  // This prevents TanStack Table from trying to select non-existent rows (e.g., when data is filtered)
+  const availableRowKeys = React.useMemo(() => {
+    const keySet = new Set(
+      mergedData.map((item, index) => getRowKey(item, index).toString()),
     );
+    return selectedRowKeys.filter((key) => keySet.has(key.toString()));
+  }, [mergedData, selectedRowKeys, getRowKey]);
 
   // Create table instance with memoized values and required properties
+
   const table = useReactTable({
     data: mergedData,
     columns: [
@@ -730,6 +670,18 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         ? [
             {
               id: "__select__",
+              size:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
+              minSize:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
+              enableResizing: false,
+              meta: {
+                align: "center",
+              },
               header: ({ table }) => (
                 <Checkbox
                   checked={table.getIsAllPageRowsSelected()}
@@ -739,14 +691,16 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   }
                   aria-label="Select all"
                   skipGroup
-                  className="align-middle"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               cell: ({ row }) => (
                 <Checkbox
                   checked={row.getIsSelected()}
-                  onCheckedChange={(value) => row.toggleSelected(!!value)}
+                  indeterminate={row.getIsSomeSelected()}
+                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               enableSorting: false,
@@ -759,7 +713,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     state: {
       sorting: sortingState,
       rowSelection: Object.fromEntries(
-        selectedRowKeys.map((key) => [key.toString(), true]),
+        availableRowKeys.map((key) => [key.toString(), true]),
       ),
       expanded: expandedState,
     },
@@ -768,13 +722,23 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     getRowId: (originalRow, index) => getRowKey(originalRow, index).toString(),
     // Expandable rows
     getExpandedRowModel: getExpandedRowModel(),
-    getSubRows: (row) =>
-      row[expandable?.childrenColumnName ?? "children"] ?? [],
-    // Allow expanding detail rows even when there are no subrows
-    getRowCanExpand: () => !!expandable?.expandedRowRender,
+    getSubRows: (row) => row[childrenColumnName] ?? [],
+    // For tree data (nest): only expand if row has children
+    // For custom expandedRowRender: always allow expand
+    getRowCanExpand: (row) => {
+      if (expandableConfig.expandedRowRender) {
+        return true; // Allow expanding for custom detail rows
+      }
+      // For tree data, check if row has children
+      const children = row.original[childrenColumnName];
+      return Array.isArray(children) && children.length > 0;
+    },
     onExpandedChange: handleExpandedChange,
     // Row selection
     enableRowSelection: true,
+    // Enable sub-row selection for tree data (parent/child linked selection)
+    // Unless checkStrictly is true (parent/child selection independent)
+    enableSubRowSelection: rowSelection?.checkStrictly === true ? false : true,
     onRowSelectionChange: (updater) => {
       const newRowSelection =
         typeof updater === "function"
@@ -783,14 +747,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
       const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection).map(
         (stringKey) => {
-          const originalKey = selectedRowKeys.find(
-            (key) => key.toString() === stringKey,
-          );
-          if (originalKey) {
-            return originalKey;
-          }
-          const numKey = Number(stringKey);
-          return Number.isNaN(numKey) ? stringKey : numKey;
+          // console.log("aa", stringKey, mergedData);
+          return getRowKey(getRecordByKey(stringKey), 0);
         },
       );
       // Convert string keys back to React.Key[] by finding the original keys
@@ -812,13 +770,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       setSelectedRowKeys(newSelectedRowKeys);
 
       const selectedRows = mergedData.filter((item, index) =>
-        newSelectedRowKeys.includes(getRowKey(item, index)?.toString()),
-      );
-      console.log(
-        "newRowSelection",
-        newRowSelection,
-        newSelectedRowKeys,
-        selectedRows,
+        newSelectedRowKeys.includes(getRowKey(item, index)),
       );
 
       const info = {
@@ -931,10 +883,25 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   scroll,
   // };
 
+  // Use table.getAllLeafColumns() to include dynamically added columns (selection, etc.)
+  const allLeafColumns = table.getAllLeafColumns();
+
   const bodyColGroup = (
     <ColGroup
-      colWidths={flattenColumns.map(({ width }) => width)}
-      columns={flattenColumns}
+      colWidths={allLeafColumns.map((col) => {
+        // Only return size if explicitly set (not TanStack Table's default 150)
+        const colDef = col.columnDef;
+        // Check if size/minSize was explicitly set or if meta has width
+        const hasExplicitSize =
+          colDef.size !== undefined ||
+          colDef.minSize !== undefined ||
+          (colDef.meta &&
+            typeof colDef.meta === "object" &&
+            "width" in colDef.meta);
+
+        return hasExplicitSize ? col.getSize() : undefined;
+      })}
+      columCount={allLeafColumns.length}
     />
   );
 
@@ -944,8 +911,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         <div
           data-slot="table-container"
           className={cn(
-            "relative w-full space-y-3 overflow-x-auto",
-            scroll?.x && "overflow-x-auto overflow-y-hidden",
+            "relative w-full space-y-3",
+            scroll?.x && "overflow-x-auto",
+            !scroll?.y && "overflow-y-auto",
             bordered && [
               // "border rounded-lg",
               // "[&_table]:border-separate",
@@ -959,300 +927,330 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             // bordered === "around" && [
-            "[&_table]:border-separate [&_table]:rounded-md",
+            // "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md",
             // ],
             className,
           )}
           style={style}
         >
           {TableToolbarSection}
-          {title && (
-            <div
-              className={cn(
-                "flex items-center justify-between",
-                bordered ? "mb-4" : "mb-1",
-              )}
-            >
-              <div className="leading-none font-semibold tracking-tight">
-                {title(mergedData)}
-              </div>
-              {extra && <div>{extra}</div>}
-            </div>
-          )}
-          {TableAlertSection}
-          <TableRoot
-            ref={ref}
-            className={cn(
-              !scroll?.x && "w-full",
-              // bordered
-              // bordered &&
-              //   "border-separate border-spacing-0 rounded-md border-s border-t",
-              // size === "small" ? "[&_th]:" : "",
 
-              classNames?.table,
+          {TableAlertSection}
+          <div
+            className={cn(
+              scroll?.y && "overflow-y-auto",
+              // bordered && "rounded-md border",
             )}
             style={{
-              ...(scroll?.x
-                ? {
-                    width: scroll.x,
-                    tableLayout: "fixed",
-                    minWidth: "100%",
-                  }
-                : {}),
+              maxHeight: scroll?.y,
             }}
-            bordered={bordered}
-            {...restProps}
           >
-            {bodyColGroup}
-            {showHeader !== false && (
-              <TableHeaderComp
-                style={{
-                  position: sticky ? "sticky" : undefined,
-                  top: sticky
-                    ? typeof sticky === "boolean"
-                      ? 0
-                      : sticky.offsetHeader
-                    : undefined,
-                  zIndex: sticky ? 11 : undefined,
-                }}
-                className={classNames?.header}
-              >
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className="hover:bg-transparent"
-                  >
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHeadAdvanced
-                          key={header.id}
-                          locale={tableLocale}
-                          column={header.column}
-                          scope="col"
-                          colSpan={header.colSpan}
-                          size={size}
-                          style={getCommonPinningStyles(header.column)}
-                          align={
-                            header.column.columnDef.meta?.align === "end"
-                              ? "right"
-                              : header.column.columnDef.meta?.align === "start"
-                                ? "left"
-                                : header.column.columnDef.meta?.align ===
-                                    "match-parent"
-                                  ? undefined
-                                  : header.column.columnDef.meta?.align
-                          }
-                          className={cn(
-                            // align
-                            header.column.columnDef.meta?.align === "center" &&
-                              "text-center",
-                            header.column.columnDef.meta?.align === "right" &&
-                              "text-right",
-                            // pinning
-                            // scroll?.x &&
-                            getCommonPinningClassName(
-                              header.column,
-                              {
-                                scrollLeft: wrapperScrollLeft,
-                                scrollRight: wrapperScrollRight,
-                              },
-                              true,
-                            ),
-                            // selection column
-                            header.id === "selection" && "px-0",
-                            classNames?.head,
-                            // column className
-                            header.column.columnDef.meta?.className,
-                            header.column.columnDef.meta?.classNames?.head,
-                          )}
-                          {...header.column.columnDef.meta?.headAttributes}
-                        >
-                          {header.isPlaceholder
-                            ? undefined
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHeadAdvanced>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeaderComp>
+            {(title || extra) && (
+              <TableWrapperHeader bordered={bordered} size={size}>
+                <div
+                  data-slot="table-title"
+                  // className="font-semibold tracking-tight"
+                >
+                  {title?.(mergedData)}
+                </div>
+                {extra && <div>{extra}</div>}
+              </TableWrapperHeader>
             )}
-            {/* padding with header [disable if bordered]*/}
-            {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
-            {skeleton ? (
-              <TableBody>
-                {Array.from({ length: mergedPagination?.pageSize ?? 5 })
-                  .fill(0)
-                  .map((_, index) => {
-                    return (
-                      <TableRow key={index} className="hover:bg-transparent">
-                        {table.getVisibleFlatColumns().map((x) => {
-                          return (
-                            <TableCell key={x.id}>
-                              <Skeleton className="h-4 w-full" />
-                            </TableCell>
-                          );
-                        })}
-                      </TableRow>
-                    );
-                  })}
-              </TableBody>
-            ) : (
-              <TableBodyComp className={classNames?.body}>
-                {table.getRowModel().rows.length > 0 ? (
-                  table.getRowModel().rows.map((row, rowIndex) =>
-                    "_customRow" in row.original ? (
-                      <TableRow
-                        key={row.id}
-                        className={cn(
-                          getRowClassName(row, rowIndex),
-                          row.original._customRowClassName,
-                        )}
-                        style={
-                          row.original._customRowStyle as React.CSSProperties
-                        }
-                      >
-                        <TableCell
-                          colSpan={mergedColumns.length}
-                          size={size}
-                          className={cn(
-                            row.original._customCellClassName as string,
-                          )}
-                        >
-                          {row.original._customRow}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      <Fragment key={row.id}>
-                        <TableRowComp
-                          data-state={row.getIsSelected() && "selected"}
-                          data-row-key={getRowKey(row.original, rowIndex)}
-                          className={cn(
-                            // row.getIsExpanded() && "bg-gray-50",
-                            // row.getIsExpanded() && bordered === false
-                            //   ? "border-x"
-                            //   : "",
-                            getRowClassName(row, rowIndex),
-                          )}
-                          onClick={(e: React.MouseEvent) => {
-                            onRow?.(row.original).onClick?.(e);
-                            // onRow?.({
-                            //   record: row.original,
-                            //   row,
-                            //   table,
-                            //   event: e,
-                            // });
-
-                            if (expandable?.expandRowByClick) {
-                              const selection = globalThis.getSelection();
-                              if (selection?.type === "Range") {
-                                return;
-                              }
-                              row.getToggleExpandedHandler()();
-                              // row.getToggleExpandedHandler()();
+            <TableRoot
+              ref={ref}
+              className={cn(
+                !scroll?.x && "w-full",
+                // bordered
+                // bordered &&
+                //   "border-separate border-spacing-0 rounded-md border-s border-t",
+                // size === "small" ? "[&_th]:" : "",
+                (title || extra) && "rounded-t-none",
+                footer && "rounded-b-none",
+                classNames?.table,
+              )}
+              style={{
+                ...(scroll?.x
+                  ? {
+                      width: scroll.x,
+                      tableLayout: "fixed",
+                      minWidth: "100%",
+                    }
+                  : // Set tableLayout="fixed" when we have fixed-width columns (selection, expand)
+                    rowSelection || expandType === "nest"
+                    ? { tableLayout: "fixed" }
+                    : {}),
+              }}
+              bordered={bordered}
+              {...restProps}
+            >
+              {bodyColGroup}
+              {showHeader !== false && (
+                <TableHeaderComp
+                  style={{
+                    // Auto sticky when scroll.y is set
+                    position: sticky || scroll?.y ? "sticky" : undefined,
+                    top: sticky
+                      ? typeof sticky === "boolean"
+                        ? 0
+                        : sticky.offsetHeader
+                      : scroll?.y
+                        ? 0
+                        : undefined,
+                    zIndex: sticky || scroll?.y ? 11 : undefined,
+                    backgroundColor:
+                      sticky || scroll?.y
+                        ? "hsl(var(--background))"
+                        : undefined,
+                  }}
+                  className={classNames?.header}
+                >
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow
+                      key={headerGroup.id}
+                      className="hover:bg-transparent"
+                    >
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHeadAdvanced
+                            key={header.id}
+                            locale={tableLocale}
+                            column={header.column}
+                            scope="col"
+                            colSpan={header.colSpan}
+                            size={size}
+                            style={getCommonPinningStyles(header.column)}
+                            align={
+                              header.column.columnDef.meta?.align === "end"
+                                ? "right"
+                                : header.column.columnDef.meta?.align ===
+                                    "start"
+                                  ? "left"
+                                  : header.column.columnDef.meta?.align ===
+                                      "match-parent"
+                                    ? undefined
+                                    : header.column.columnDef.meta?.align
                             }
-                            // e.preventDefault();
-                            // e.stopPropagation();
-                          }}
-                        >
-                          {row.getVisibleCells().map((cell) => {
+                            className={cn(
+                              // align
+                              header.column.columnDef.meta?.align ===
+                                "center" && "text-center",
+                              header.column.columnDef.meta?.align === "right" &&
+                                "text-right",
+                              // pinning
+                              // scroll?.x &&
+                              getCommonPinningClassName(
+                                header.column,
+                                {
+                                  scrollLeft: wrapperScrollLeft,
+                                  scrollRight: wrapperScrollRight,
+                                },
+                                true,
+                              ),
+                              // selection column
+                              header.id === "__select__" && "px-2",
+                              classNames?.head,
+                              // column className
+                              header.column.columnDef.meta?.className,
+                              header.column.columnDef.meta?.classNames?.head,
+                            )}
+                            {...header.column.columnDef.meta?.headAttributes}
+                          >
+                            {header.isPlaceholder
+                              ? undefined
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </TableHeadAdvanced>
+                        );
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeaderComp>
+              )}
+              {/* padding with header [disable if bordered]*/}
+              {/* {!bordered && <tbody aria-hidden="true" className="h-3"></tbody>} */}
+              {skeleton ? (
+                <TableBody>
+                  {Array.from({ length: mergedPagination?.pageSize ?? 5 })
+                    .fill(0)
+                    .map((_, index) => {
+                      return (
+                        <TableRow key={index} className="hover:bg-transparent">
+                          {table.getVisibleFlatColumns().map((x) => {
                             return (
-                              <TableCell
-                                key={cell.id}
-                                size={size}
-                                className={cn(
-                                  // align
-                                  cell.column.columnDef.meta?.align ===
-                                    "center" && "text-center",
-                                  cell.column.columnDef.meta?.align ===
-                                    "right" && "text-right",
-                                  // pinning
-                                  // scroll?.x &&
-                                  getCommonPinningClassName(cell.column, {
-                                    scrollLeft: wrapperScrollLeft,
-                                    scrollRight: wrapperScrollRight,
-                                  }),
-                                  // selection column
-                                  cell.id.endsWith("selection") && "px-0",
-                                  // column className
-                                  classNames?.cell,
-                                  cell.column.columnDef.meta?.className,
-                                  cell.column.columnDef.meta?.classNames?.cell,
-                                )}
-                                style={{
-                                  ...getCommonPinningStyles(cell.column),
-                                  ...(typeof cell.column.columnDef.meta?.styles
-                                    ?.cell === "function"
-                                    ? cell.column.columnDef.meta.styles.cell({
-                                        record: row.original,
-                                        index: row.index,
-                                        row,
-                                        column: cell.column,
-                                      })
-                                    : cell.column.columnDef.meta?.styles?.cell),
-                                }}
-                              >
-                                {flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                )}
+                              <TableCell key={x.id}>
+                                <Skeleton className="h-4 w-full" />
                               </TableCell>
                             );
                           })}
-                        </TableRowComp>
-                        {row.getIsExpanded() &&
-                          expandable?.expandedRowRender && (
-                            <TableRow className="bg-gray-50 hover:bg-gray-50">
-                              {/* 2nd row is a custom 1 cell row */}
-                              <TableCell
-                                colSpan={row.getVisibleCells().length}
-                                size={size}
-                                className={cn(
-                                  // "px-4 text-[13px]",
-                                  bordered === false ? "border-b" : "",
-                                )}
-                              >
-                                {expandable.expandedRowRender(
-                                  row.original,
-                                  row.index,
-                                  row.index,
-                                  row.getIsExpanded(),
-                                )}
-                              </TableCell>
-                            </TableRow>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              ) : (
+                <TableBodyComp className={classNames?.body}>
+                  {table.getRowModel().rows.length > 0 ? (
+                    table.getRowModel().rows.map((row, rowIndex) =>
+                      "_customRow" in row.original ? (
+                        <TableRow
+                          key={row.id}
+                          className={cn(
+                            getRowClassName(row, rowIndex),
+                            row.original._customRowClassName,
                           )}
-                      </Fragment>
-                    ),
-                  )
-                ) : (
-                  <TableRow
-                    className={cn("hover:bg-transparent", classNames?.empty)}
-                  >
-                    <TableCell
-                      colSpan={mergedColumns.length}
-                      className={cn(
-                        "text-muted-foreground h-48 text-center",
-                        bordered && "border-e",
-                      )}
+                          style={
+                            row.original._customRowStyle as React.CSSProperties
+                          }
+                        >
+                          <TableCell
+                            colSpan={allLeafColumns.length}
+                            size={size}
+                            className={cn(
+                              row.original._customCellClassName as string,
+                            )}
+                          >
+                            {row.original._customRow}
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        <Fragment key={row.id}>
+                          <TableRowComp
+                            data-state={row.getIsSelected() && "selected"}
+                            data-row-key={getRowKey(row.original, rowIndex)}
+                            className={cn(
+                              // row.getIsExpanded() && "bg-gray-50",
+                              // row.getIsExpanded() && bordered === false
+                              //   ? "border-x"
+                              //   : "",
+                              getRowClassName(row, rowIndex),
+                            )}
+                            onClick={(e: React.MouseEvent) => {
+                              onRow?.(row.original).onClick?.(e);
+                              // onRow?.({
+                              //   record: row.original,
+                              //   row,
+                              //   table,
+                              //   event: e,
+                              // });
+
+                              if (expandableConfig.expandRowByClick) {
+                                const selection = globalThis.getSelection();
+                                if (selection?.type === "Range") {
+                                  return;
+                                }
+                                row.getToggleExpandedHandler()();
+                                // row.getToggleExpandedHandler()();
+                              }
+                              // e.preventDefault();
+                              // e.stopPropagation();
+                            }}
+                          >
+                            {row.getVisibleCells().map((cell) => {
+                              return (
+                                <TableCell
+                                  key={cell.id}
+                                  size={size}
+                                  className={cn(
+                                    // align
+                                    cell.column.columnDef.meta?.align ===
+                                      "center" && "text-center",
+                                    cell.column.columnDef.meta?.align ===
+                                      "right" && "text-right",
+                                    // pinning
+                                    // scroll?.x &&
+                                    getCommonPinningClassName(cell.column, {
+                                      scrollLeft: wrapperScrollLeft,
+                                      scrollRight: wrapperScrollRight,
+                                    }),
+                                    // selection column
+                                    (cell.column.id === "__select__" ||
+                                      cell.id.endsWith("selection")) &&
+                                      "px-2",
+                                    // column className
+                                    classNames?.cell,
+                                    cell.column.columnDef.meta?.className,
+                                    cell.column.columnDef.meta?.classNames
+                                      ?.cell,
+                                  )}
+                                  style={{
+                                    ...getCommonPinningStyles(cell.column),
+                                    ...(typeof cell.column.columnDef.meta
+                                      ?.styles?.cell === "function"
+                                      ? cell.column.columnDef.meta.styles.cell({
+                                          record: row.original,
+                                          index: row.index,
+                                          row,
+                                          column: cell.column,
+                                        })
+                                      : cell.column.columnDef.meta?.styles
+                                          ?.cell),
+                                  }}
+                                >
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </TableCell>
+                              );
+                            })}
+                          </TableRowComp>
+                          {row.getIsExpanded() &&
+                            expandableConfig.expandedRowRender && (
+                              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                                {/* 2nd row is a custom 1 cell row */}
+                                <TableCell
+                                  colSpan={row.getVisibleCells().length}
+                                  size={size}
+                                  className={cn(
+                                    // "px-4 text-[13px]",
+                                    bordered === false ? "border-b" : "",
+                                  )}
+                                >
+                                  {expandableConfig.expandedRowRender(
+                                    row.original,
+                                    row.index,
+                                    row.index,
+                                    row.getIsExpanded(),
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            )}
+                        </Fragment>
+                      ),
+                    )
+                  ) : (
+                    <TableRow
+                      className={cn("hover:bg-transparent", classNames?.empty)}
                     >
-                      {!loading &&
-                        (typeof tableLocale.emptyText === "function"
-                          ? tableLocale.emptyText()
-                          : tableLocale.emptyText)}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBodyComp>
+                      <TableCell
+                        colSpan={allLeafColumns.length}
+                        className={cn(
+                          "text-muted-foreground h-48 text-center",
+                          bordered && "border-e",
+                        )}
+                      >
+                        {!loading &&
+                          (typeof tableLocale.emptyText === "function"
+                            ? tableLocale.emptyText()
+                            : tableLocale.emptyText)}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBodyComp>
+              )}
+              {summary && (
+                <TableFooter className={classNames?.footer}>
+                  {summary(mergedData)}
+                </TableFooter>
+              )}
+            </TableRoot>
+            {footer && (
+              <TableWrapperFooter bordered={bordered} size={size}>
+                {footer(mergedData)}
+              </TableWrapperFooter>
             )}
-            {summary && (
-              <TableFooter className={classNames?.footer}>
-                {summary(mergedData)}
-              </TableFooter>
-            )}
-          </TableRoot>
+          </div>
           {pagination && (
             <Pagination
               className="my-4 justify-end"
@@ -1265,7 +1263,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     </TableStoreProvider>
   );
 };
-
 export { OwnTable };
 
 export type { TableProps as OwnTableProps, RecordWithCustomRow };

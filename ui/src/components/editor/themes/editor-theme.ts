@@ -2,36 +2,33 @@ import type { EditorThemeClasses } from "lexical";
 
 import "./editor-theme.css";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@acme/ui/lib/utils";
 
 export const editorTheme: EditorThemeClasses = {
   ltr: "text-left",
   rtl: "text-right",
   heading: {
-    h1: "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
-    h2: "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
-    h3: "scroll-m-20 text-2xl font-semibold tracking-tight",
-    h4: "scroll-m-20 text-xl font-semibold tracking-tight",
-    h5: "scroll-m-20 text-lg font-semibold tracking-tight",
-    h6: "scroll-m-20 text-base font-semibold tracking-tight",
+    h1: "scroll-m-20 text-3xl font-bold tracking-tight leading-[44px]",
+    h2: "scroll-m-20 text-2xl font-semibold tracking-tight leading-[36px]",
+    h3: "scroll-m-20 text-xl font-semibold tracking-tight leading-[32px]",
+    h4: "scroll-m-20 text-lg font-semibold tracking-tight leading-[28px]",
+    h5: "scroll-m-20 text-base font-semibold tracking-tight leading-[24px]",
+    h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px]",
   },
-  paragraph: cn(
-    "leading-7 my-px",
-    // "[&:not(:first-child)]:mt-6"
-  ),
-  quote: "mt-6 border-l-2 pl-6 italic",
-  link: "text-blue-600 hover:underline hover:cursor-pointer",
+  paragraph: cn("leading-[24px]"),
+  quote: "border-l-[3px] border-gray-300 pl-3.5 pr-0 my-1 italic text-gray-600",
+  link: "text-inherit underline decoration-[rgba(55,53,47,0.4)] underline-offset-2 hover:decoration-[rgba(55,53,47,0.6)] transition-colors cursor-pointer",
   list: {
-    checklist: "relative",
-    listitem: "mx-8",
+    checklist: "relative !list-none p-0",
+    listitem: "mx-0",
     listitemChecked:
-      'relative mx-2 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
+      'relative mx-0 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:cursor-pointer after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
     listitemUnchecked:
-      'relative mx-2 px-6 list-none outline-none before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded',
+      'relative mx-0 px-6 list-none outline-none before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:cursor-pointer before:block before:bg-cover before:absolute before:border before:border-primary before:rounded',
     nested: {
       listitem: "list-none before:hidden after:hidden",
     },
-    ol: "my-6 ml-6 list-decimal [&>li]:mt-2",
+    ol: "my-1 ml-6 list-decimal [&>li]:mt-1",
     olDepth: [
       "list-outside !list-decimal",
       "list-outside !list-[upper-roman]",
@@ -39,17 +36,22 @@ export const editorTheme: EditorThemeClasses = {
       "list-outside !list-[upper-alpha]",
       "list-outside !list-[lower-alpha]",
     ],
-    ul: "m-0 p-0 list-outside",
+    ul: "my-1 ml-6 list-disc [&>li]:mt-1",
+    ulDepth: [
+      "list-outside !list-disc",
+      "list-outside !list-[circle]",
+      "list-outside !list-[square]",
+    ],
   },
   hashtag: "text-blue-600 bg-blue-100 rounded-md px-1",
   text: {
-    bold: "font-bold",
-    code: "bg-gray-100 p-1 rounded-md",
+    bold: "font-semibold",
+    code: "bg-[rgba(247,246,243,1)] text-[#eb5757] px-1 py-0.5 rounded text-[85%] font-mono",
     italic: "italic",
     strikethrough: "line-through",
     subscript: "sub",
     superscript: "sup",
-    underline: "underline",
+    underline: "underline decoration-[rgba(55,53,47,0.4)] underline-offset-2",
     underlineStrikethrough: "underline line-through",
   },
   image: "relative inline-block user-select-none cursor-default editor-image",
@@ -106,7 +108,7 @@ export const editorTheme: EditorThemeClasses = {
     "EditorTheme__tableCellResizer absolute -right-1 h-full w-2 cursor-ew-resize z-10 top-0",
   tableCellSelected: "EditorTheme__tableCellSelected bg-muted",
   tableCellSortedIndicator:
-    "EditorTheme__tableCellSortedIndicator block opacity-50 bsolute bottom-0 left-0 w-full h-1 bg-muted",
+    "EditorTheme__tableCellSortedIndicator block opacity-50 absolute bottom-0 left-0 w-full h-1 bg-muted",
   tableResizeRuler:
     "EditorTheme__tableCellResizeRuler block absolute w-[1px] h-full bg-primary top-0",
   tableRowStriping:
@@ -121,8 +123,14 @@ export const editorTheme: EditorThemeClasses = {
     base: "user-select-none",
     focus: "ring-2 ring-primary ring-offset-2",
   },
-  hr: 'p-0.5 border-none my-1 mx-0 cursor-pointer after:content-[""] after:block after:h-0.5 after:bg-muted selected:ring-2 selected:ring-primary selected:ring-offset-2 selected:user-select-none',
+  hr: 'border-none my-2 mx-0 cursor-pointer after:content-[""] after:block after:h-px after:bg-[rgba(55,53,47,0.09)] selected:ring-2 selected:ring-primary selected:ring-offset-2 selected:user-select-none',
   indent: "[--lexical-indent-base-value:40px]",
   mark: "",
   markOverlap: "",
+  checkBlock:
+    'flex items-start gap-2 my-1 [&>[data-lexical-text="true"]]:flex-1 [&>[data-lexical-text="true"]]:min-w-0',
+  checkBlockIcon:
+    "flex-shrink-0 mt-0.5 size-4 cursor-pointer rounded border border-primary hover:bg-muted focus:ring-2 focus:ring-offset-1 focus:ring-primary",
+  checkBlockChecked:
+    '[&>[data-lexical-text="true"]]:line-through [&>[data-lexical-text="true"]]:text-muted-foreground [&>[data-check-icon]]:bg-primary [&>[data-check-icon]]:relative [&>[data-check-icon]]:after:content-[""] [&>[data-check-icon]]:after:absolute [&>[data-check-icon]]:after:top-[3px] [&>[data-check-icon]]:after:left-[5.5px] [&>[data-check-icon]]:after:w-[3px] [&>[data-check-icon]]:after:h-[6px] [&>[data-check-icon]]:after:rotate-45 [&>[data-check-icon]]:after:border-r-2 [&>[data-check-icon]]:after:border-b-2 [&>[data-check-icon]]:after:border-white',
 };

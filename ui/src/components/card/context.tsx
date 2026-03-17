@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 
-import type { SizeType } from "@acme/ui/types";
+import type { SizeType } from "../config-provider/size-context";
 
 type CardContextValue = {
   size?: SizeType;

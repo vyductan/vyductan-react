@@ -1,25 +1,32 @@
-// import * as React from "react";
+import type * as React from "react";
 
-// import { cn } from "@acme/ui/lib/utils";
-// import {
-//   DialogFooter as ShadcnDialogFooter,
-//   DialogHeader as ShadcnDialogHeader,
-// } from "@acme/ui/shadcn/dialog";
+import { DialogContent as ShadcnDialogContent } from "@acme/ui/shadcn/dialog";
 
-// function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
-//   return <ShadcnDialogHeader className={cn("px-6", className)} {...props} />;
-// }
+function DialogContent({
+  onInteractOutside,
+  ...props
+}: React.ComponentProps<typeof ShadcnDialogContent>) {
+  return (
+    <ShadcnDialogContent
+      // Prevent dialog from closing when clicking on toast notifications (Sonner)
+      onInteractOutside={(e) => {
+        if (
+          e.target instanceof Element &&
+          e.target.closest("[data-sonner-toast]")
+        ) {
+          e.preventDefault();
+        }
+        onInteractOutside?.(e);
+      }}
+      {...props}
+    />
+  );
+}
 
-// function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
-//   return <ShadcnDialogFooter className={cn("px-6", className)} {...props} />;
-// }
-
-// export { DialogHeader, DialogFooter };
-
+export { DialogContent };
 export {
   Dialog,
   DialogClose,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,

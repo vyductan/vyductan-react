@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-typeof-undefined */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable unicorn/prefer-switch */
 import type { CircleProps } from "./circle";
 import type { ProgressProps } from "./progress";
@@ -44,7 +45,7 @@ export const getPercentage = ({
 export const getStrokeColor = ({
   success = {},
   strokeColor,
-}: Partial<CircleProps>): (string | Record<PropertyKey, string>)[] => {
+}: Partial<CircleProps>) => {
   const { strokeColor: successColor } = success;
   return [successColor || "var(--color-green-600)", strokeColor || null!];
 };

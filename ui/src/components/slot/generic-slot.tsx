@@ -1,5 +1,5 @@
 import type { SlotProps } from "@radix-ui/react-slot";
-import React from "react";
+import type React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
 type GenericSlotProps<P = React.HTMLAttributes<HTMLElement>> = SlotProps & P;

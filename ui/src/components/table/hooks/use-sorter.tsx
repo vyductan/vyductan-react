@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable unicorn/prefer-ternary */
-/* eslint-disable @typescript-eslint/no-base-to-string */
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
+
 /* eslint-disable unicorn/no-array-callback-reference */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import React from "react";
 import KeyCode from "@rc-component/util/lib/KeyCode";
@@ -132,7 +132,7 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
   tableShowSorterTooltip?: boolean | SorterTooltipProps,
   pos?: string,
 ): ColumnsType<RecordType> => {
-  const _finalColumns = (columns || []).map((column, index) => {
+  return (columns || []).map((column, index) => {
     const columnPos = getColumnPos(index, pos);
     let newColumn: ColumnsType<RecordType>[number] = column;
     if (newColumn.sorter) {
@@ -294,7 +294,6 @@ const injectSorter = <RecordType extends AnyObject = AnyObject>(
 
     return newColumn;
   });
-  return columns;
 };
 
 const stateToInfo = <RecordType extends AnyObject = AnyObject>(

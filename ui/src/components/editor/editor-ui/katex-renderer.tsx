@@ -6,7 +6,6 @@
  *
  */
 import type { JSX } from "react";
-import * as React from "react";
 import { useEffect, useRef } from "react";
 import katex from "katex";
 
@@ -41,14 +40,18 @@ export default function KatexRenderer({
     // inner text from Katex. There didn't seem to be any other way of making this work,
     // without having a physical space.
     <>
-      <img src="#" alt="" />
+      <picture>
+        <img src="#" alt="" />
+      </picture>
       <span
         role="button"
         tabIndex={-1}
         onDoubleClick={onDoubleClick}
         ref={katexElementRef}
       />
-      <img src="#" alt="" />
+      <picture>
+        <img src="#" alt="" />
+      </picture>
     </>
   );
 }
