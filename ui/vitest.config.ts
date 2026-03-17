@@ -10,6 +10,18 @@ const dirname =
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@acme/ui": resolve(dirname, "./src"),
+      "@acme/ui/shadcn": resolve(dirname, "./src/shadcn"),
+      "@acme/ui/lib": resolve(dirname, "./src/lib"),
+      "@acme/ui/lib/utils": resolve(dirname, "./src/lib/utils.ts"),
+      "@acme/ui/shadcn/button-group": resolve(
+        dirname,
+        "./src/shadcn/button-group.tsx",
+      ),
+    },
+  },
   test: {
     // globals: true,
     // environment: "jsdom",
@@ -20,6 +32,14 @@ export default defineConfig({
     //   reporter: ["text", "json", "html"],
     // },
     projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          environment: "jsdom",
+          include: ["src/**/*.{test,spec}.{ts,tsx}"],
+        },
+      },
       {
         extends: true,
         // Don't extend root config to avoid inheriting include pattern

@@ -78,6 +78,8 @@ const inputVariants = tv({
     disabled: false,
   },
 });
+const inputInlineInsetClassName = "pl-3";
+
 const inputSizeVariants = tv({
   variants: {
     size: {
@@ -101,4 +103,9 @@ type InputVariant = VariantProps<typeof inputVariants>["variant"];
 type InputStatus = VariantProps<typeof inputVariants>["status"];
 
 export type { InputVariants, InputSizeVariants, InputVariant, InputStatus };
-export { inputVariants, inputDisabledVariants, inputSizeVariants };
+export {
+  inputVariants,
+  inputDisabledVariants,
+  inputInlineInsetClassName,
+  inputSizeVariants,
+};
