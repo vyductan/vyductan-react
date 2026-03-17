@@ -104,7 +104,11 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 
   // Update input value when localValue changes externally
   React.useEffect(() => {
-    setInputValue(formatDateValue(localValue, format));
+    if (typeof localValue === "string") {
+      setInputValue(localValue);
+    } else {
+      setInputValue(formatDateValue(localValue, format));
+    }
   }, [localValue, format]);
 
   const handleChange = React.useCallback(
