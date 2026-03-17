@@ -8,7 +8,14 @@ import { cn } from "@acme/ui/lib/utils";
 import type { AlignType } from "../../types";
 import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
-import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_component";
+import {
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./_component";
 
 export type PopoverProps = AbstractTooltipProps &
   PopoverRootProps &
@@ -17,6 +24,8 @@ export type PopoverProps = AbstractTooltipProps &
     content?: React.ReactNode;
 
     align?: AlignType;
+    title?: React.ReactNode;
+    description?: React.ReactNode;
 
     arrow?: boolean;
   };
@@ -43,6 +52,8 @@ export const Popover = (props: PopoverProps) => {
     children,
     trigger = "hover",
     content,
+    title,
+    description,
     open: _open,
     onOpenChange: _onOpenChange,
 
@@ -112,8 +123,18 @@ export const Popover = (props: PopoverProps) => {
         {...restProps}
       >
         {arrow && <PopoverArrow className="fill-white" />}
+        {(title || description) && (
+          <PopoverHeader>
+            {title && <PopoverTitle>{title}</PopoverTitle>}
+            {description && (
+              <PopoverDescription>{description}</PopoverDescription>
+            )}
+          </PopoverHeader>
+        )}
         {content}
       </PopoverContent>
     </PopoverRoot>
   );
 };
+
+export { PopoverHeader, PopoverTitle, PopoverDescription } from "./_component";

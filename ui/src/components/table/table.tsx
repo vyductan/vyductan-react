@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
 "use client";
@@ -335,8 +333,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       }
 
       // Trigger pagination events
-      if (pagination) {
-        pagination.onChange?.(1, changeInfo.pagination?.pageSize!);
+      const changedPageSize = changeInfo.pagination?.pageSize;
+      if (pagination && changedPageSize !== undefined) {
+        pagination.onChange?.(1, changedPageSize);
       }
     }
 
@@ -350,24 +349,23 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       });
     }
 
-    onChange?.(
-      changeInfo.pagination!,
-      changeInfo.filters!,
-      Array.isArray(changeInfo.sorter)
-        ? changeInfo.sorter
-        : changeInfo.sorter
-          ? [changeInfo.sorter]
-          : [],
-      {
-        // currentDataSource: getFilterData(
-        //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
-        //   changeInfo.filterStates!,
-        //   childrenColumnName,
-        // ),
-        currentDataSource: [],
-        action,
-      },
-    );
+    const paginationInfo = changeInfo.pagination ?? {};
+    const filterInfo = changeInfo.filters ?? {};
+    const sorterInfo = Array.isArray(changeInfo.sorter)
+      ? changeInfo.sorter
+      : changeInfo.sorter
+        ? [changeInfo.sorter]
+        : [];
+
+    onChange?.(paginationInfo, filterInfo, sorterInfo, {
+      // currentDataSource: getFilterData(
+      //   getSortData(rawData, changeInfo.sorterStates!, childrenColumnName),
+      //   changeInfo.filterStates!,
+      //   childrenColumnName,
+      // ),
+      currentDataSource: [],
+      action,
+    });
   };
 
   // ========================== Expandable ==========================
@@ -606,24 +604,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   // ]);
 
   // ========================== Selections ==========================
-  // const [
-  //   rowSelectionState,
-  //   setRowSelection,
-  //   transformSelectionColumns,
-  //   // selectedKeySet,
-  // ] = useSelection<TRecord>(
-  //   {
-  //     data: mergedData,
-  //     pageData,
-  //     getRowKey,
-  //     getRecordByKey,
-  //     expandType,
-  //     childrenColumnName,
-  //     locale: tableLocale,
-  //     getPopupContainer: getPopupContainer || getContextPopupContainer,
-  //   },
-  //   rowSelection,
-  // );
 
   const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
     rowSelection?.selectedRowKeys || [],
@@ -690,8 +670,14 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
         ? [
             {
               id: "__select__",
-              size: 50,
-              minSize: 50,
+              size:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
+              minSize:
+                typeof rowSelection.columnWidth === "number"
+                  ? rowSelection.columnWidth
+                  : 32,
               enableResizing: false,
               meta: {
                 align: "center",
@@ -705,7 +691,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   }
                   aria-label="Select all"
                   skipGroup
-                  className="align-middle"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               cell: ({ row }) => (
@@ -714,7 +700,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                   indeterminate={row.getIsSomeSelected()}
                   onChange={(e) => row.toggleSelected(!!e.target.checked)}
                   aria-label="Select row"
-                  className="flex"
+                  className="mx-auto flex items-center justify-center"
                 />
               ),
               enableSorting: false,
@@ -1061,7 +1047,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                 true,
                               ),
                               // selection column
-                              header.id === "selection" && "px-0",
+                              header.id === "__select__" && "px-2",
                               classNames?.head,
                               // column className
                               header.column.columnDef.meta?.className,
@@ -1178,7 +1164,9 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                                       scrollRight: wrapperScrollRight,
                                     }),
                                     // selection column
-                                    cell.id.endsWith("selection") && "px-0",
+                                    (cell.column.id === "__select__" ||
+                                      cell.id.endsWith("selection")) &&
+                                      "px-2",
                                     // column className
                                     classNames?.cell,
                                     cell.column.columnDef.meta?.className,

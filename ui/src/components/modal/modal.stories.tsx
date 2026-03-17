@@ -18,6 +18,16 @@ const meta = {
   component: Modal,
   parameters: {
     layout: "centered",
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "aria-valid-attr-value",
+            enabled: false,
+          },
+        ],
+      },
+    },
   },
   argTypes: {
     width: {
@@ -160,18 +170,6 @@ export const CustomFooter: Story = {
 };
 
 export const ShadcnStyle: Story = {
-  parameters: {
-    a11y: {
-      config: {
-        rules: [
-          {
-            id: "aria-valid-attr-value",
-            enabled: false,
-          },
-        ],
-      },
-    },
-  },
   render: () => {
     return (
       <Dialog>

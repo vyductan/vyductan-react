@@ -57,8 +57,11 @@ import { TableActionsPlugin } from "../plugins/table-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
 import { VideoPlugin } from "../plugins/video-plugin";
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
-
 // import { EditorDebugViewPlugin } from "./actions/editor-debug-view-plugin";
+
+import { FixedToolbarPlugin } from "./fixed-toolbar-plugin";
+
+// ...
 
 export function Plugins({
   placeholder = "Write, press ‘space’ for AI, ‘/’ for commands…",
@@ -75,7 +78,7 @@ export function Plugins({
   placeholder?: string;
   onImageUpload?: (file: File) => Promise<string>;
   editable?: boolean;
-  variant?: "default" | "simple";
+  variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
   className?: string;
   contentClassName?: string;
@@ -91,6 +94,8 @@ export function Plugins({
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const isSimple = variant === "simple" || variant === "minimal";
 
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
     if (_floatingAnchorElem !== null) {
@@ -144,8 +149,9 @@ export function Plugins({
       `,
         }}
       />
-      {/* <FixedToolbarPlugin containerRef={containerRef} /> */}
-      {/* <FixedToolbarPlugin containerRef={containerRef} /> */}
+      {variant === "simple" && (
+        <FixedToolbarPlugin containerRef={containerRef} />
+      )}
 
       {autoFocus && editable && <AutoFocusPlugin />}
       <RichTextPlugin
@@ -168,46 +174,45 @@ export function Plugins({
 
       <ClickableLinkPlugin />
       <CheckListPlugin />
-      {variant !== "simple" && editable && <BlockCopyPastePlugin />}
+      {!isSimple && editable && <BlockCopyPastePlugin />}
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
-      <TablePlugin />
-      {variant !== "simple" && editable && (
+      {!isSimple && editable && (
         <TableActionsPlugin anchorElem={floatingAnchorElem} />
       )}
       <TOCPlugin />
       <ListPlugin />
       <TabIndentationPlugin />
-      {variant !== "simple" && <HashtagPlugin />}
+      {!isSimple && <HashtagPlugin />}
       <HistoryPlugin />
       <BlockTypeNormalizationPlugin />
 
       <MentionsPlugin mentionsData={mentionsData} />
-      {variant !== "simple" && <PageBreakPlugin />}
-      {variant !== "simple" && editable && (
+      {!isSimple && <PageBreakPlugin />}
+      {!isSimple && editable && (
         <DraggableBlockPlugin anchorElem={floatingAnchorElem} size={size} />
       )}
-      {variant !== "simple" && <KeywordsPlugin />}
+      {!isSimple && <KeywordsPlugin />}
       <EmojisPlugin />
-      {variant !== "simple" && <ImagesPlugin />}
-      {variant !== "simple" && <VideoPlugin />}
-      {variant !== "simple" && <FileAttachmentPlugin />}
-      {variant !== "simple" && <ExcalidrawPlugin />}
-      {variant !== "simple" && <PollPlugin />}
-      {variant !== "simple" && <LayoutPlugin />}
-      {variant !== "simple" && <EquationsPlugin />}
-      {variant !== "simple" && <CollapsiblePlugin />}
+      {variant !== "minimal" && <ImagesPlugin />}
+      {!isSimple && <VideoPlugin />}
+      {!isSimple && <FileAttachmentPlugin />}
+      {!isSimple && <ExcalidrawPlugin />}
+      {!isSimple && <PollPlugin />}
+      {!isSimple && <LayoutPlugin />}
+      {!isSimple && <EquationsPlugin />}
+      {!isSimple && <CollapsiblePlugin />}
 
-      {variant !== "simple" && <AutoEmbedPlugin />}
-      {variant !== "simple" && <FigmaPlugin />}
-      {variant !== "simple" && <YouTubePlugin />}
-      {variant !== "simple" && <TwitterPlugin />}
-      {variant !== "simple" && <InstagramPlugin />}
-      {variant !== "simple" && <TikTokPlugin />}
+      {!isSimple && <AutoEmbedPlugin />}
+      {!isSimple && <FigmaPlugin />}
+      {!isSimple && <YouTubePlugin />}
+      {!isSimple && <TwitterPlugin />}
+      {!isSimple && <InstagramPlugin />}
+      {!isSimple && <TikTokPlugin />}
 
       <CodeHighlightPlugin />
-      {variant !== "simple" && editable && (
+      {!isSimple && editable && (
         <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
       )}
 
@@ -220,9 +225,9 @@ export function Plugins({
       <FindReplacePlugin />
 
       {/* ComponentPickerMenuPlugin - Slash commands like Not ion */}
-      {variant !== "simple" && editable && <ComponentPickerMenuPlugin />}
+      {!isSimple && editable && <ComponentPickerMenuPlugin />}
       {/* <ContextMenuPlugin /> */}
-      {variant !== "simple" && editable && (
+      {!isSimple && editable && (
         <DragDropPastePlugin
           onImageUpload={onImageUpload}
           anchorElem={floatingAnchorElem ?? undefined}
@@ -232,10 +237,10 @@ export function Plugins({
       {editable && <EmojiPickerPlugin />}
 
       {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />}
-      {editable && (
+      {editable && variant !== "simple" && (
         <FloatingTextFormatToolbarPlugin
           anchorElem={floatingAnchorElem}
-          variant={variant}
+          variant={isSimple ? "simple" : "default"}
         />
       )}
 

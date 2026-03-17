@@ -1,10 +1,32 @@
 "use client";
 
+import type { HeadingTagType } from "@lexical/rich-text";
 import type { BaseSelection } from "lexical";
-import { $isListNode, ListNode } from "@lexical/list";
-import { $isHeadingNode } from "@lexical/rich-text";
+import { $createCodeNode } from "@lexical/code";
+import {
+  $isListNode,
+  INSERT_CHECK_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListNode,
+} from "@lexical/list";
+import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
+import { $setBlocksType } from "@lexical/selection";
 import { $findMatchingParent, $getNearestNodeOfType } from "@lexical/utils";
-import { $isRangeSelection, $isRootOrShadowRoot } from "lexical";
+import {
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+  $isRootOrShadowRoot,
+} from "lexical";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+} from "@acme/ui/components/select";
 
 import {
   Select,
@@ -24,13 +46,18 @@ import { FormatNumberedList } from "./block-format/format-numbered-list";
 import { FormatParagraph } from "./block-format/format-paragraph";
 import { FormatQuote } from "./block-format/format-quote";
 
-export function BlockFormatDropDown({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const { activeEditor, blockType, setBlockType, formatHandledRef } =
-    useToolbarContext();
+// Need $isHeadingNode for the check above
+function $isHeadingNode(node: unknown): node is { getTag: () => string } {
+  return (
+    typeof node === "object" &&
+    node !== null &&
+    "__type" in node &&
+    (node as { __type: string }).__type === "heading"
+  );
+}
+
+export function BlockFormatDropDown() {
+  const { activeEditor, blockType, setBlockType } = useToolbarContext();
 
   function $updateToolbar(selection: BaseSelection) {
     if ($isRangeSelection(selection)) {
@@ -45,11 +72,9 @@ export function BlockFormatDropDown({
 
       element ??= anchorNode.getTopLevelElementOrThrow();
 
-      const elementKey = element.getKey();
-      const elementDOM = activeEditor.getElementByKey(elementKey);
+      const elementDOM = activeEditor.getElementByKey(element.getKey());
 
       if (elementDOM !== null) {
-        // setSelectedElementKey(elementKey);
         if ($isListNode(element)) {
           const parentList = $getNearestNodeOfType<ListNode>(
             anchorNode,
@@ -57,10 +82,10 @@ export function BlockFormatDropDown({
           );
           const type = parentList
             ? parentList.getListType()
-            : element.getListType();
+            : (element as ListNode).getListType();
           setBlockType(type);
         } else {
-          const type = $isHeadingNode(element)
+          const type = $isHeadingNode(element) // Check if import is available or use generic check
             ? element.getTag()
             : element.getType();
           if (type in blockTypeToBlockName) {
@@ -73,45 +98,133 @@ export function BlockFormatDropDown({
 
   useUpdateToolbarHandler($updateToolbar);
 
+  const formatParagraph = () => {
+    activeEditor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        $setBlocksType(selection, () => $createParagraphNode());
+      }
+    });
+  };
+
+  const handleBlockTypeChange = (value: string) => {
+    // If format was already handled by onSelect (if we used it), don't update blockType
+    // But we are moving logic here, so we process it.
+
+    // Validate that value is a valid blockType before updating
+    const validBlockTypes = [
+      "paragraph",
+      "h1",
+      "h2",
+      "h3",
+      "bullet",
+      "number",
+      "check",
+      "code",
+      "quote",
+    ];
+    if (!validBlockTypes.includes(value)) {
+      return;
+    }
+
+    setBlockType(value);
+
+    switch (value) {
+      case "paragraph": {
+        formatParagraph();
+        break;
+      }
+      case "h1":
+      case "h2":
+      case "h3": {
+        activeEditor.update(() => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            $setBlocksType(selection, () =>
+              $createHeadingNode(value as HeadingTagType),
+            );
+          }
+        });
+        break;
+      }
+      case "bullet": {
+        if (blockType === "bullet") {
+          formatParagraph();
+        } else {
+          activeEditor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0);
+        }
+        break;
+      }
+      case "number": {
+        if (blockType === "number") {
+          formatParagraph();
+        } else {
+          activeEditor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0);
+        }
+        break;
+      }
+      case "check": {
+        if (blockType === "check") {
+          formatParagraph();
+        } else {
+          activeEditor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
+        }
+        break;
+      }
+      case "quote": {
+        activeEditor.update(() => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            $setBlocksType(selection, () => $createQuoteNode());
+          }
+        });
+        break;
+      }
+      case "code": {
+        activeEditor.update(() => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            $setBlocksType(selection, () => $createCodeNode());
+          }
+        });
+        break;
+      }
+    }
+  };
+
+  // Only show Paragraph and Headings
+  const allowedBlockTypes = new Set([
+    "paragraph",
+    "h1",
+    "h2",
+    "h3",
+    "bullet",
+    "number",
+    "check",
+    "code",
+    "quote",
+  ]);
+
   return (
-    <Select
-      value={blockType}
-      onValueChange={(value) => {
-        // If format was already handled by onSelect, don't update blockType
-        // This prevents the value "bullet" from being set when user clicks on SelectItem
-        if (formatHandledRef.current) {
-          formatHandledRef.current = false;
-          return;
-        }
-
-        // Validate that value is a valid blockType before updating
-        const validBlockTypes = [
-          "paragraph",
-          "h1",
-          "h2",
-          "h3",
-          "bullet",
-          "number",
-          "check",
-          "code",
-          "quote",
-        ];
-        if (!validBlockTypes.includes(value)) {
-          return;
-        }
-
-        // Only update blockType if it's different from current value
-        if (value !== blockType) {
-          setBlockType(value);
-        }
-      }}
-    >
+    <Select value={blockType} onValueChange={handleBlockTypeChange}>
       <SelectTrigger className="h-8 w-min gap-1">
         {blockTypeToBlockName[blockType]?.icon}
         <span>{blockTypeToBlockName[blockType]?.label}</span>
       </SelectTrigger>
       <SelectContent>
-        <SelectGroup>{children}</SelectGroup>
+        <SelectGroup>
+          {/* Inline items instead of children */}
+          {Object.entries(blockTypeToBlockName)
+            .filter(([key]) => allowedBlockTypes.has(key))
+            .map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                <div className="flex items-center gap-1 font-normal">
+                  {value.icon}
+                  {value.label}
+                </div>
+              </SelectItem>
+            ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   );
@@ -126,15 +239,5 @@ export function BlockFormatToolbarPlugin({
 }: {
   blockType: string;
 }) {
-  return (
-    <BlockFormatDropDown>
-      <FormatParagraph />
-      <FormatHeading levels={["h1", "h2", "h3"]} />
-      <FormatBulletedList />
-      <FormatNumberedList />
-      <FormatCheckList />
-      <FormatCodeBlock />
-      <FormatQuote />
-    </BlockFormatDropDown>
-  );
+  return <BlockFormatDropDown />;
 }

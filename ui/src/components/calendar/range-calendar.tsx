@@ -140,7 +140,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
   );
 
   const handleStartSelect = React.useCallback(
-    (dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
+    (_dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
       const selectedDate = dayjs(triggerDate);
       const startDate = value?.[0] ?? null;
       const endDate = value?.[1] ?? null;
@@ -182,7 +182,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
   );
 
   const handleEndSelect = React.useCallback(
-    (dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
+    (_dateRange: { from?: Date; to?: Date } | undefined, triggerDate: Date) => {
       const selectedDate = dayjs(triggerDate);
       const startDate = value?.[0] ?? null;
       const endDate = value?.[1] ?? null;

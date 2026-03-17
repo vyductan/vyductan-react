@@ -24,6 +24,10 @@ const ConditionButton = ({
   let mergedShape: ButtonProps["shape"] = shape;
 
   switch (size) {
+    case "xs": {
+      mergedSize = "small";
+      break;
+    }
     case "sm": {
       mergedSize = "small";
 
@@ -36,6 +40,12 @@ const ConditionButton = ({
     }
     case "icon": {
       mergedShape = "icon";
+
+      break;
+    }
+    case "icon-xs": {
+      mergedShape = "icon";
+      mergedSize = "small";
 
       break;
     }

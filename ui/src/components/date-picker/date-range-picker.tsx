@@ -18,6 +18,7 @@ import { useComponentConfig } from "../config-provider/context";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { parseInputDate } from "./parse-input-date";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
@@ -154,8 +155,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   const handleStartInputChange = (inputValue: string) => {
     setStartInputValue(inputValue);
     if (inputValue.trim()) {
-      const parsed = dayjs(inputValue, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(inputValue, format);
+      if (parsed) {
         const endDate = value?.[1] ?? null;
         // If end date exists and parsed start date is after end date, swap them
         if (endDate && parsed.isAfter(endDate)) {
@@ -175,8 +176,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   const handleEndInputChange = (inputValue: string) => {
     setEndInputValue(inputValue);
     if (inputValue.trim()) {
-      const parsed = dayjs(inputValue, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(inputValue, format);
+      if (parsed) {
         const startDate = value?.[0] ?? null;
         // If start date exists and parsed end date is before start date, swap them
         if (startDate && parsed.isBefore(startDate)) {
@@ -359,7 +360,6 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   return (
     <>
       <Popover
-        className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
         align={{
@@ -379,6 +379,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
         content={<div className="flex">{CalendarComponent}</div>}
       >
         <div
+          role="combobox"
           data-slot="picker-input"
           className={cn(
             inputVariants({ variant, disabled, status }),
@@ -461,8 +462,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 const newValue = event.currentTarget.value;
                 setStartInputValue(newValue);
                 if (newValue.trim()) {
-                  const parsed = dayjs(newValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(newValue, format);
+                  if (parsed) {
                     const endDate = value?.[1] ?? null;
                     // If end date exists and parsed start date is after end date, swap them
                     if (endDate && parsed.isAfter(endDate)) {
@@ -499,8 +500,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 }
 
                 if (startInputValue.trim()) {
-                  const parsed = dayjs(startInputValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(startInputValue, format);
+                  if (parsed) {
                     const endDate = value?.[1] ?? null;
                     // If end date exists and parsed start date is after end date, swap them
                     if (endDate && parsed.isAfter(endDate)) {
@@ -608,8 +609,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 const newValue = event.currentTarget.value;
                 setEndInputValue(newValue);
                 if (newValue.trim()) {
-                  const parsed = dayjs(newValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(newValue, format);
+                  if (parsed) {
                     const startDate = value?.[0] ?? null;
                     // If start date exists and parsed end date is before start date, swap them
                     if (startDate && parsed.isBefore(startDate)) {
@@ -646,8 +647,8 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 }
 
                 if (endInputValue.trim()) {
-                  const parsed = dayjs(endInputValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(endInputValue, format);
+                  if (parsed) {
                     const startDate = value?.[0] ?? null;
                     // If start date exists and parsed end date is before start date, swap them
                     if (startDate && parsed.isBefore(startDate)) {
@@ -689,6 +690,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             </button>
           ) : (
             <Icon
+              aria-hidden="true"
               icon="icon-[mingcute--calendar-2-line]"
               className="ml-auto size-4 shrink-0 opacity-50"
             />

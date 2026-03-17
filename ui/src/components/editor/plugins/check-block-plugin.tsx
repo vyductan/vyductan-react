@@ -8,8 +8,11 @@ import {
   $isTextNode,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
+  INDENT_CONTENT_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_ENTER_COMMAND,
+  KEY_TAB_COMMAND,
+  OUTDENT_CONTENT_COMMAND,
 } from "lexical";
 
 import {
@@ -96,6 +99,29 @@ export function CheckBlockPlugin() {
       COMMAND_PRIORITY_LOW,
     );
 
+    const unregisterTab = editor.registerCommand(
+      KEY_TAB_COMMAND,
+      (event) => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+
+        const node = selection.anchor.getNode();
+        const block = node.getTopLevelElementOrThrow();
+
+        if ($isCheckBlockNode(block)) {
+          if (event) event.preventDefault();
+          if (event?.shiftKey) {
+            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, void 0);
+          } else {
+            editor.dispatchCommand(INDENT_CONTENT_COMMAND, void 0);
+          }
+          return true;
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+
     const unregisterBackspace = editor.registerCommand(
       KEY_BACKSPACE_COMMAND,
       (event) => {
@@ -129,28 +155,15 @@ export function CheckBlockPlugin() {
       CLICK_COMMAND,
       (event) => {
         const target = event.target as HTMLElement;
-        // Check if we clicked the checkbox area.
-        // My default DOM is `div.check-block`.
-        // User clicks anywhere?
-        // Usually checkbox is absolute/before.
-        // If I use styling `before`, the click target is the div.
-        // I need to determine if click coordinate is in "checkbox zone".
-        // e.g. x < 24px relative to block.
-
-        // Getting the nearest CheckBlockNode
-        const node = $getNearestNodeFromDOMNode(target);
-        if ($isCheckBlockNode(node)) {
-          const rect = target.getBoundingClientRect();
-          const x = event.clientX - rect.left;
-          // Assume checkbox is on left, ~24px width
-          if (x >= 0 && x <= 24) {
+        // Click on the real checkbox icon span
+        if (target.dataset.checkIcon === "true") {
+          const node = target.parentElement
+            ? $getNearestNodeFromDOMNode(target.parentElement)
+            : null;
+          if ($isCheckBlockNode(node)) {
             editor.update(() => {
               node.toggle();
             });
-            // Prevent default? Maybe default selection.
-            // If we toggle, we probably don't want to move caret?
-            // Actually, clicking checkbox usually doesn't move caret or focus.
-            // event.preventDefault();
             return true;
           }
         }
@@ -161,6 +174,7 @@ export function CheckBlockPlugin() {
 
     return () => {
       unregisterEnter();
+      unregisterTab();
       unregisterBackspace();
       unregisterClick();
     };

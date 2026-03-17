@@ -26,6 +26,7 @@ import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
 import { MonthSelect } from "./month-select";
+import { parseInputDate } from "./parse-input-date";
 import { YearSelect } from "./year-select";
 
 // type DatePickerValueType = "date" | "string" | "number" | "format";
@@ -181,8 +182,8 @@ const DatePicker = (props: DatePickerProps) => {
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
   const handleChangeInput = (value: string) => {
     if (value.trim()) {
-      const parsed = dayjs(value, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(value, format);
+      if (parsed) {
         setValue(parsed);
         setInputValue(parsed.format(format));
         setMonth(parsed.toDate());
@@ -217,8 +218,8 @@ const DatePicker = (props: DatePickerProps) => {
   // Sync calendar month and selected date when input value changes
   React.useEffect(() => {
     if (inputValue.trim()) {
-      const parsed = dayjs(inputValue, format);
-      if (parsed.isValid()) {
+      const parsed = parseInputDate(inputValue, format);
+      if (parsed) {
         setMonth(parsed.toDate());
         setTypedDate(parsed.toDate());
       }
@@ -451,7 +452,6 @@ const DatePicker = (props: DatePickerProps) => {
   return (
     <>
       <Popover
-        className="w-auto p-0"
         trigger="click"
         placement="bottomLeft"
         align={{
@@ -566,6 +566,7 @@ const DatePicker = (props: DatePickerProps) => {
         }
       >
         <div
+          role="combobox"
           data-slot="picker-input"
           className={cn("inline-flex", className)}
           style={style}
@@ -585,6 +586,7 @@ const DatePicker = (props: DatePickerProps) => {
             disabled={disabled}
             suffix={
               <Icon
+                aria-hidden="true"
                 icon="icon-[mingcute--calendar-2-line]"
                 className="ml-auto size-4 opacity-50"
               />
@@ -611,8 +613,8 @@ const DatePicker = (props: DatePickerProps) => {
               } else if (event.key === "Escape") {
                 // Only trigger onChange if input is valid, otherwise just close
                 if (inputValue.trim()) {
-                  const parsed = dayjs(inputValue, format);
-                  if (parsed.isValid()) {
+                  const parsed = parseInputDate(inputValue, format);
+                  if (parsed) {
                     setValue(parsed);
                     setInputValue(parsed.format(format));
                     setTypedDate(parsed.toDate());
@@ -627,10 +629,17 @@ const DatePicker = (props: DatePickerProps) => {
 
               // Update calendar month and selected date when typing
               if (newValue.trim()) {
-                const parsed = dayjs(newValue, format);
-                if (parsed.isValid()) {
+                const parsed = parseInputDate(newValue, format);
+                if (parsed) {
+                  // Commit immediately so form state is updated even before blur
+                  setValue(parsed);
+                  setTypedDate(parsed.toDate());
                   setMonth(parsed.toDate());
                 }
+              } else {
+                // Keep form state in sync when clearing input
+                setValue(undefined);
+                setTypedDate(undefined);
               }
             }}
             onBlur={(e) => {
@@ -656,8 +665,8 @@ const DatePicker = (props: DatePickerProps) => {
 
               // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
               if (inputValue.trim()) {
-                const parsed = dayjs(inputValue, format);
-                if (parsed.isValid()) {
+                const parsed = parseInputDate(inputValue, format);
+                if (parsed) {
                   setValue(parsed);
                   setInputValue(parsed.format(format));
                   setTypedDate(parsed.toDate());

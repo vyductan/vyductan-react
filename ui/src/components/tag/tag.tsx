@@ -148,6 +148,7 @@ const Tag = ({
 
   return (
     <Badge
+      data-slot="tag"
       className={cn(
         tagVariants({
           variant: finalVariant,

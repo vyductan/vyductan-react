@@ -60,9 +60,8 @@ const PageSizeOptions = ({
   };
 
   // ============== render ==============
-  let changeSelect: React.ReactNode = <></>;
   // >>>>> Size Changer
-  changeSelect = sizeChangerRender ? (
+  const changeSelect = sizeChangerRender ? (
     sizeChangerRender({
       disabled,
       size: pageSize,

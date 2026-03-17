@@ -343,12 +343,14 @@ const Input = (props: InputProps) => {
         "styles",
         "classNames",
         "onClear",
+        "status",
       ],
     );
     return (
       <input
         data-slot="input"
         autoComplete={autoComplete}
+        aria-invalid={props["aria-invalid"] ?? status === "error"}
         {...otherProps}
         onChange={onInternalChange}
         onFocus={handleFocus}

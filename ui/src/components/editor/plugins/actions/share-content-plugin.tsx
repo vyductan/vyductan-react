@@ -1,8 +1,5 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable unicorn/prefer-type-error */
-/* eslint-disable unicorn/prefer-global-this */
 import type { SerializedDocument } from "@lexical/file";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   editorStateFromSerializedDocument,
   serializedDocumentFromEditorState,
@@ -22,8 +19,8 @@ import {
 import { docFromHash, docToHash } from "../../utils/doc-serialization";
 
 async function shareDoc(doc: SerializedDocument): Promise<void> {
-  if (typeof window === "undefined") {
-    throw new Error("shareDoc can only be called on the client side");
+  if (globalThis.window === undefined) {
+    throw new TypeError("shareDoc can only be called on the client side");
   }
 
   const url = new URL(globalThis.location.toString());
@@ -35,21 +32,21 @@ async function shareDoc(doc: SerializedDocument): Promise<void> {
 
 export function ShareContentPlugin() {
   const [editor] = useLexicalComposerContext();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = globalThis.window !== undefined;
 
   useEffect(() => {
     if (!isClient) return;
 
-    void docFromHash(globalThis.location.hash).then((doc) => {
-      if (doc?.source === "editor") {
-        editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
-        editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
-      }
-    });
+    void docFromHash(globalThis.location.hash)
+      .then((doc) => {
+        if (doc?.source === "editor") {
+          editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
+          editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
+        }
+      })
+      .catch(() => {
+        // Ignore invalid or malformed share hashes.
+      });
   }, [editor, isClient]);
 
   return (
