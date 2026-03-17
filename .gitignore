@@ -48,10 +48,16 @@ coverage
 
 # typescript
 *.tsbuildinfo
+.cache
 
 # turbo
 .turbo
 
+# worktrees
+.worktrees
+
 # vercel
 .vercel
 
+*storybook.log
+storybook-static

@@ -1,15 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import type {
-  FieldPath,
-  FieldValues,
-  FormProviderProps as RHFormProviderProps,
-} from "react-hook-form";
+import type { FieldPath, FieldValues } from "react-hook-form";
 import * as React from "react";
 import { createContext, useContext } from "react";
 
 import type { Variant } from "../../config-provider";
+import type { ColProps } from "../../grid";
 import type { FormInstance } from "../hooks/use-form";
+import type { FormLabelAlign, FormLayout } from "../types";
 
 /* FormField */
 type FormFieldContextValue<
@@ -35,17 +34,21 @@ type FormProviderProps<
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
   TTransformedValues = FieldValues,
-> = RHFormProviderProps<TFieldValues, TContext, TTransformedValues> &
-  Pick<
-    FormInstance<TFieldValues, TContext, TTransformedValues>,
-    "resetFields" | "setFieldsValue" | "schema" | "submit"
-  > & {
-    form?: FormInstance<TFieldValues, TContext, TTransformedValues>;
-    layout?: "vertical" | "horizontal";
-    classNames?: {
-      label?: string;
-    };
+> = {
+  id: string;
+  form?: FormInstance<TFieldValues, TContext, TTransformedValues>;
+  layout?: FormLayout;
+  labelAlign?: FormLabelAlign;
+  labelCol?: ColProps;
+  labelWrap?: boolean;
+  wrapperCol?: ColProps;
+  colon?: boolean;
+  classNames?: {
+    label?: string;
   };
+
+  children: React.ReactNode;
+};
 
 const FormContext = createContext<FormProviderProps>({} as FormProviderProps);
 const Provider = FormContext.Provider;

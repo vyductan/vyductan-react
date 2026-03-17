@@ -5,17 +5,27 @@ import { useDebounce } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { AlignType, Placement } from "../../types";
+import type { AlignType } from "../../types";
+import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
-import { PopoverContent, PopoverRoot, PopoverTrigger } from "./_component";
+import {
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverRoot,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./_component";
 
-export type PopoverProps = PopoverRootProps &
+export type PopoverProps = AbstractTooltipProps &
+  PopoverRootProps &
   Omit<PopoverContentProps, "content" | "sideOffset" | "align"> & {
     trigger?: "click" | "hover" | "focus";
     content?: React.ReactNode;
 
     align?: AlignType;
-    placement?: Placement;
+    title?: React.ReactNode;
+    description?: React.ReactNode;
 
     arrow?: boolean;
   };
@@ -29,15 +39,11 @@ export const Popover = (props: PopoverProps) => {
   });
 
   const isShadcnPopover = React.Children.toArray(props.children).some(
-    (child) => {
-      if (React.isValidElement(child)) {
-        const type =
-          typeof child.type === "string" ? child.type : child.type.name;
-        return type === "PopoverContent";
-      }
-      return false;
-    },
+    (child) =>
+      React.isValidElement(child) &&
+      (child.type === PopoverContent || child.type === PopoverTrigger),
   );
+
   if (isShadcnPopover) {
     return <PopoverRoot {...props} />;
   }
@@ -46,6 +52,8 @@ export const Popover = (props: PopoverProps) => {
     children,
     trigger = "hover",
     content,
+    title,
+    description,
     open: _open,
     onOpenChange: _onOpenChange,
 
@@ -76,7 +84,10 @@ export const Popover = (props: PopoverProps) => {
   const sideOffset = domAlign?.offset?.[1];
 
   return (
-    <PopoverRoot open={debouncedOpen} onOpenChange={setOpen}>
+    <PopoverRoot
+      open={trigger === "hover" ? debouncedOpen : open}
+      onOpenChange={setOpen}
+    >
       <PopoverTrigger
         asChild
         {...(trigger === "hover"
@@ -98,7 +109,7 @@ export const Popover = (props: PopoverProps) => {
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
-        className={cn(arrow ? "border-none" : "", className)}
+        className={cn(arrow ? "border-none" : "", "w-auto", className)}
         {...(trigger === "hover"
           ? {
               onMouseOver: () => {
@@ -112,8 +123,18 @@ export const Popover = (props: PopoverProps) => {
         {...restProps}
       >
         {arrow && <PopoverArrow className="fill-white" />}
+        {(title || description) && (
+          <PopoverHeader>
+            {title && <PopoverTitle>{title}</PopoverTitle>}
+            {description && (
+              <PopoverDescription>{description}</PopoverDescription>
+            )}
+          </PopoverHeader>
+        )}
         {content}
       </PopoverContent>
     </PopoverRoot>
   );
 };
+
+export { PopoverHeader, PopoverTitle, PopoverDescription } from "./_component";

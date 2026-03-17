@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 /**
@@ -10,13 +11,14 @@ import type {
   UseFormProps as __UseFormProps,
   DeepPartial,
   DefaultValues,
+  FieldPath,
   FieldValues,
   KeepStateOptions,
   SubmitHandler,
   UseFormReset,
   UseFormReturn,
 } from "react-hook-form";
-import type { ZodType } from "zod/v4";
+import type { ZodType } from "zod";
 import { useCallback, useEffect, useRef } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";
@@ -40,6 +42,9 @@ type FormInstance<
   ) => Promise<void>;
   setFieldsValue: UseFormReset<TFieldValues>;
   resetFields: (keepStateOptions?: KeepStateOptions) => void;
+  validateFields: (
+    nameList?: FieldPath<TFieldValues> | FieldPath<TFieldValues>[],
+  ) => Promise<DeepPartial<TFieldValues>>;
 };
 
 type UseFormProps<
@@ -54,6 +59,25 @@ type UseFormProps<
     values: DeepPartial<TFieldValues>,
   ) => void;
 } & __UseFormProps<TFieldValues, TContext, TTransformedValues>;
+
+type ErrorField = { name: string[]; errors: string[] };
+
+class ValidateFieldsError<TFieldValues> extends Error {
+  values: DeepPartial<TFieldValues>;
+  errorFields: ErrorField[];
+
+  constructor(
+    message: string,
+    values: DeepPartial<TFieldValues>,
+    errorFields: ErrorField[],
+  ) {
+    super(message);
+    this.name = "ValidateFieldsError";
+    this.values = values;
+    this.errorFields = errorFields;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
 const useForm = <
   TFieldValues extends FieldValues = FieldValues,
   TContext = any,
@@ -118,6 +142,69 @@ const useForm = <
   const _formControl =
     useRef<FormInstance<TFieldValues, TContext, TTransformedValues>>(null);
 
+  const validateFields = useCallback(
+    async (
+      nameList?: FieldPath<TFieldValues> | FieldPath<TFieldValues>[],
+    ): Promise<DeepPartial<TFieldValues>> => {
+      const names = Array.isArray(nameList)
+        ? nameList
+        : nameList
+          ? [nameList]
+          : undefined;
+
+      const isValid = await methods.trigger(names as any);
+
+      if (isValid) {
+        return methods.getValues() as unknown as DeepPartial<TFieldValues>;
+      }
+
+      // Build AntD-like errorFields
+      const buildErrorFields = (obj: unknown, path: string[] = []) => {
+        const acc: { name: string[]; errors: string[] }[] = [];
+        if (!obj || typeof obj !== "object") return acc;
+        for (const [key, value] of Object.entries(
+          obj as Record<string, unknown>,
+        )) {
+          const nextPath = [...path, key];
+          if (value && typeof value === "object") {
+            // FieldError has message; nested errors are objects
+            const maybeMsg = (value as { message?: unknown }).message;
+            if (typeof maybeMsg === "string" && maybeMsg) {
+              acc.push({ name: nextPath, errors: [maybeMsg] });
+            }
+            const children = buildErrorFields(value, nextPath);
+            if (children.length > 0) acc.push(...children);
+          }
+        }
+        return acc;
+      };
+
+      const errorFieldsAll = buildErrorFields(methods.formState.errors);
+      const errorFields = names
+        ? errorFieldsAll.filter((e) =>
+            names.some((n) => e.name.join(".") === String(n)),
+          )
+        : errorFieldsAll;
+
+      // Focus first error field if possible
+      if (errorFields.length > 0) {
+        const firstError = errorFields[0];
+        if (firstError) {
+          methods.setFocus(firstError.name.join(".") as any);
+        }
+      }
+
+      const values =
+        methods.getValues() as unknown as DeepPartial<TFieldValues>;
+      throw new ValidateFieldsError<TFieldValues>(
+        "Validation failed",
+        values,
+        errorFields,
+      );
+    },
+    [methods],
+  );
+
   const submit = useCallback(
     (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
       return onSubmit
@@ -134,6 +221,7 @@ const useForm = <
     submit,
     resetFields,
     setFieldsValue,
+    validateFields,
   };
 
   const { onValuesChange } = props ?? {};
@@ -152,9 +240,10 @@ const useForm = <
 
   _formControl.current.submit = submit;
   _formControl.current.formState = methods.formState;
+  _formControl.current.validateFields = validateFields;
 
   return _formControl.current;
 };
 
-export { useForm };
+export { useForm, ValidateFieldsError };
 export type { UseFormProps, FormInstance };

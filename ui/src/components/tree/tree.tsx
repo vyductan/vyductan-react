@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 
@@ -30,8 +32,7 @@ function TreeTitle({
   showIcon,
 }: TreeTitleProps) {
   return (
-    <Button
-      type="text"
+    <div
       tabIndex={0}
       className={cn(
         "flex min-w-0 flex-1 items-center gap-2 truncate rounded px-2 py-1 pl-1 text-sm font-normal transition outline-none",
@@ -41,15 +42,19 @@ function TreeTitle({
         !isDisabled && "hover:bg-accent hover:text-accent-foreground",
       )}
       style={style}
-      disabled={isDisabled}
+      // disabled={isDisabled}
       onClick={isDisabled ? undefined : onClick}
       data-slot="tree-node-content"
     >
       {showIcon && icon && (
         <span className="flex h-4 w-4 items-center justify-center">{icon}</span>
       )}
-      <span className="truncate">{title}</span>
-    </Button>
+      {typeof title === "string" ? (
+        <span className="truncate">{title}</span>
+      ) : (
+        title
+      )}
+    </div>
   );
 }
 
@@ -257,11 +262,15 @@ function TreeNode({
 
   const handleClick = () => {
     if (onSelect) {
-      const newSelectedKeys = isSelected
-        ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
-        : // : [...(selectedKeys || []), item.key];
-          [item.key];
-      onSelect(newSelectedKeys, { selected: !isSelected, node: item as any });
+      const newSelectedKeys = (
+        isSelected
+          ? (selectedKeys?.filter((key) => key !== item.key) ?? [])
+          : [item.key]
+      ) as Key[];
+      onSelect(newSelectedKeys, {
+        selected: !isSelected,
+        node: item as any,
+      });
     }
   };
 
@@ -317,7 +326,7 @@ function TreeNode({
         </span>
         {/* Switcher (noop for leaf, with leaf-line) */}
         <span
-          className="relative flex h-full w-6 flex-shrink-0 items-center justify-center"
+          className="relative flex h-full w-6 shrink-0 items-center justify-center"
           data-slot="switcher-leaf-noop"
           data-depth={depth}
         >
@@ -410,9 +419,9 @@ function TreeNode({
           </span>
           <CollapsibleTrigger asChild>
             <Button
-              variant="ghost"
-              size="sm"
-              className="hover:bg-accent h-6 w-6 flex-shrink-0 p-0"
+              variant="text"
+              size="small"
+              className="hover:bg-accent h-6 w-6 shrink-0 p-0"
               onClick={handleToggle}
             >
               <ChevronRight
@@ -483,5 +492,7 @@ function TreeNode({
     </div>
   );
 }
+
+export type { TreeProps };
 
 export { Tree };

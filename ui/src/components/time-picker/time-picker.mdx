@@ -1,0 +1,114 @@
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import BasicDemo from "./demo/basic";
+import HourMinuteDemo from "./demo/hour-minute";
+
+# TimePicker
+
+A time input component with native browser support and custom visual picker.
+
+## Features
+
+- 🕒 **Infinite Scroll** - Seamlessly scroll through hours, minutes, and seconds
+- ⚡ **Smart Scrolling** - Instant scroll on open, smooth scroll on selection
+- 🎨 **Customizable Format** - Support for HH:mm, HH:mm:ss, and more
+- ⌨️ **Input Support** - Type time directly or use visual picker
+- 📱 **Mobile Friendly** - Works seamlessly on all devices
+- ♿ **Accessible** - Full keyboard navigation support
+
+## Examples
+
+### Basic Usage
+
+The simplest way to use TimePicker with state management.
+
+<ComponentSource src="time-picker/demo/basic.tsx" __comp__={BasicDemo} />
+
+### Hour and Minute
+
+While part of `format` is omitted, the corresponding column in panel will disappear, too.
+
+<ComponentSource
+  src="time-picker/demo/hour-minute.tsx"
+  __comp__={HourMinuteDemo}
+/>
+
+### Form Integration
+
+```tsx
+import { TimePicker } from "@/components/ui";
+import dayjs from "dayjs";
+
+import { Field, Form, useForm } from "@acme/ui/components/form";
+
+function FormExample() {
+  const form = useForm({
+    defaultValues: {
+      startTime: "09:00:00",
+    },
+  });
+
+  return (
+    <Form form={form}>
+      <Field
+        control={form.control}
+        name="startTime"
+        normalize={(value: dayjs.Dayjs) => value.format("HH:mm:ss")}
+        getValueProps={(value: string | undefined) => ({
+          value: value ? dayjs(value, "HH:mm:ss") : undefined,
+        })}
+      >
+        <TimePicker placeholder="Select start time" />
+      </Field>
+    </Form>
+  );
+}
+```
+
+### Different Formats
+
+```tsx
+// 24-hour format (default)
+<TimePicker format="HH:mm" />
+
+// With seconds
+<TimePicker format="HH:mm:ss" />
+
+// 12-hour format (if supported)
+<TimePicker format="hh:mm A" />
+```
+
+## API Reference
+
+### TimePicker Props
+
+| Property       | Type                                                             | Default         | Description                             |
+| -------------- | ---------------------------------------------------------------- | --------------- | --------------------------------------- |
+| `value`        | `Dayjs \| string \| null \| undefined`                           | -               | The current time value                  |
+| `defaultValue` | `Dayjs \| string \| null \| undefined`                           | -               | The default time value                  |
+| `onChange`     | `(time: Dayjs \| null, timeString: string \| undefined) => void` | -               | Callback when time changes              |
+| `format`       | `string`                                                         | `"HH:mm:ss"`    | The time format                         |
+| `placeholder`  | `string`                                                         | `"Select time"` | Placeholder text                        |
+| `open`         | `boolean`                                                        | -               | Whether the picker is open (controlled) |
+| `onOpenChange` | `(open: boolean) => void`                                        | -               | Callback when open state changes        |
+| `disabled`     | `boolean`                                                        | `false`         | Whether the time picker is disabled     |
+| `status`       | `"error" \| "warning"`                                           | -               | Validation status                       |
+
+## Migration from Ant Design
+
+```tsx
+// Ant Design
+import { TimePicker } from 'antd';
+<TimePicker value={moment('12:08', 'HH:mm')} format="HH:mm" />
+
+// @acme/ui TimePicker
+import { TimePicker } from '@/components/ui';
+<TimePicker value={dayjs('12:08', 'HH:mm')} format="HH:mm" />
+```
+
+### Key Differences
+
+- Uses **Dayjs** instead of Moment.js
+- **Native input** behavior by default
+- **Infinite scroll** with seamless boundary reset
+- **"Now" button** for quick current time selection

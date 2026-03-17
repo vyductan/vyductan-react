@@ -1,26 +1,8 @@
 import { cn } from "@acme/ui/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogAction as ShadcnAlertDialogAction,
-  AlertDialogCancel as ShadcnAlertDialogCancel,
-  AlertDialogContent as ShadcnAlertDialogContent,
-  AlertDialogDescription as ShadcnAlertDialogDescription,
-  AlertDialogFooter as ShadcnAlertDialogFooter,
-  AlertDialogHeader as ShadcnAlertDialogHeader,
-  AlertDialogTitle as ShadcnAlertDialogTitle,
-  AlertDialogTrigger as ShadcnAlertDialogTrigger,
-} from "@acme/ui/shadcn/alert-dialog";
+import { AlertDialogAction as ShadcnAlertDialogAction } from "@acme/ui/shadcn/alert-dialog";
 
 import { buttonVariants } from "../button";
-
-const AlertDialogRoot = AlertDialog;
-const AlertDialogCancel = ShadcnAlertDialogCancel;
-const AlertDialogContent = ShadcnAlertDialogContent;
-const AlertDialogDescription = ShadcnAlertDialogDescription;
-const AlertDialogFooter = ShadcnAlertDialogFooter;
-const AlertDialogHeader = ShadcnAlertDialogHeader;
-const AlertDialogTitle = ShadcnAlertDialogTitle;
-const AlertDialogTrigger = ShadcnAlertDialogTrigger;
+import { buttonColorVariants } from "../button/button-variants";
 
 const AlertDialogAction = (
   props: React.ComponentProps<typeof ShadcnAlertDialogAction> & {
@@ -32,6 +14,9 @@ const AlertDialogAction = (
     <ShadcnAlertDialogAction
       className={cn(
         buttonVariants({
+          size: "middle",
+        }),
+        buttonColorVariants({
           color: isOpenControlled ? "danger" : "default",
         }),
         className,
@@ -39,18 +24,6 @@ const AlertDialogAction = (
       {...restProps}
     />
   );
-};
-
-export {
-  AlertDialogRoot,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
 };
 
 // function AlertDialogAction({
@@ -81,3 +54,17 @@ export {
 //       </AlertDialogPrimitive.Action>
 //     );
 //   }
+
+export {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogMedia,
+} from "@acme/ui/shadcn/alert-dialog";
+
+export { AlertDialogAction };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 // https://github.com/ant-design/ant-design/tree/master/components/input-number
 // Dec 30, 2024
 // https://github.com/ant-design/ant-design/commit/39d9c1c6bfb3f2b40eaff9d4c12ba6532139f96f
@@ -6,7 +7,7 @@ import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { SizeType } from "../../types";
+import type { SizeType } from "../config-provider/size-context";
 import type {
   ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProps,
@@ -19,9 +20,9 @@ import { inputSizeVariants, inputVariants } from "./variants";
 interface InputNumberProps<
   TNumberValue extends NumberValueType = NumberValueType,
 > extends Omit<
-    RcInputNumberProps<TNumberValue>,
-    "ref" | "prefix" | "size" | "controls"
-  > {
+  RcInputNumberProps<TNumberValue>,
+  "ref" | "prefix" | "size" | "controls"
+> {
   ref?: React.Ref<HTMLInputElement>;
 
   addonBefore?: React.ReactNode;
@@ -37,6 +38,7 @@ interface InputNumberProps<
    * @default "outlined"
    */
   variant?: InputVariant;
+  allowClear?: boolean | { clearIcon?: React.ReactNode };
 }
 
 const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
@@ -59,6 +61,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
     status: customStatus,
     controls,
     variant: customVariant,
+    allowClear,
 
     onKeyDown,
     onChange,
@@ -110,10 +113,16 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
   // ===================== Disabled =====================
   const mergedDisabled = customDisabled;
 
+  // Check if has addon to conditionally apply variant
+  const hasAddon = !!(addonBefore ?? addonAfter);
+
+  // Check if has affix (prefix/suffix/allowClear) - when true, affixWrapper is rendered
+  const hasAffix = !!(!!prefix || !!suffix || !!allowClear);
+
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
   return (
-    <RcInputNumber
+    <RcInputNumber<TNumberValue>
       // ref={ref}
       upHandler={upIcon}
       downHandler={downIcon}
@@ -138,12 +147,15 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       //     </ContextIsolator>
       //   )
       // }
-
+      allowClear={allowClear}
       disabled={mergedDisabled}
       className={
         cn(
-          inputVariants({ status: mergedStatus, variant: customVariant }),
-          inputSizeVariants({ size: mergedSize }),
+          // Only apply variant to outer element when no addon
+          !hasAddon &&
+            inputVariants({ status: mergedStatus, variant: customVariant }),
+          // Only apply size (padding) when no addon
+          !hasAddon && inputSizeVariants({ size: mergedSize }),
           className,
         )
         // cssVarCls, rootCls, className, rootClassName, compactItemClassnames
@@ -156,14 +168,28 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
           "border-none outline-hidden",
+          "w-px",
+          // Add padding when has addon (match Input behavior)
+          // hasAddon && addonBefore && "pl-[11px]",
+          // hasAddon && addonAfter && "pr-[11px]",
+          // hasAddon && !addonBefore && "pl-[11px]",
+          // hasAddon && !addonAfter && "pr-[11px]",
         ),
-        // inputSizeVariants({ size: mergedSize })
-        variant: cn(),
+        // When has addon, apply variant and size to wrapper instead
+        variant: cn(
+          hasAddon &&
+            inputVariants({ status: mergedStatus, variant: customVariant }),
+          hasAddon && inputSizeVariants({ size: mergedSize }),
+          readOnly && "cursor-default bg-muted",
+        ),
         // {
         //   [`${prefixCls}-${variant}`]: enableVariantCls,
         // },
         // getStatusClassNames(prefixCls, mergedStatus, hasFeedback),
-        affixWrapper: cn(),
+        affixWrapper: cn(
+          hasAffix && inputSizeVariants({ size: mergedSize }),
+          readOnly && "cursor-default bg-muted",
+        ),
         // {
         //   [`${prefixCls}-affix-wrapper-sm`]: mergedSize === 'small',
         //   [`${prefixCls}-affix-wrapper-lg`]: mergedSize === 'large',
@@ -203,17 +229,17 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
             "ArrowDown",
             "Home",
             "End",
-            "a",
-            "c",
-            "v",
-            "x", // For ctrl/cmd+a/c/v/x
           ].includes(e.key) ||
           // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (e.ctrlKey && ["a", "c", "v", "x"].includes(e.key)) ||
+          ((e.metaKey || e.ctrlKey) &&
+            ["a", "c", "v", "x", "z"].includes(e.key)) ||
           // Allow: numbers, numpad numbers
           /^[0-9]$/.test(e.key) ||
           // Allow: decimal point
-          e.key === "."
+          e.key === "." ||
+          // Allow: minus sign only at the start of input
+          (e.key === "-" &&
+            (!e.currentTarget.value || e.currentTarget.selectionStart === 0))
         ) {
           // Let it happen, don't do anything
           return;

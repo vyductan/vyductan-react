@@ -1,35 +1,24 @@
 import { useMemo } from "react";
-import { cn } from "@/lib/utils";
 
-import type { ValueType } from "../../form";
+import { cn } from "@acme/ui/lib/utils";
+
 import type { RenderNode } from "../types";
 import { Icon } from "../../../icons";
 
 type SelectClearProps = React.ComponentProps<"span"> & {
   allowClear?: boolean | { clearIcon?: RenderNode };
-  /**
-   * Clear all icon
-   * @deprecated Please use `allowClear` instead
-   **/
-  clearIcon?: RenderNode;
-
-  value?: ValueType;
+  showClearIcon?: boolean;
 };
 const SelectClear = ({
   allowClear,
-  clearIcon,
-  value,
-
+  showClearIcon,
   onPointerDown,
 }: SelectClearProps) => {
   const mergedClearIcon = useMemo(() => {
     if (typeof allowClear === "object") {
       return allowClear.clearIcon;
     }
-    if (clearIcon) {
-      return clearIcon;
-    }
-  }, [allowClear, clearIcon]);
+  }, [allowClear]);
 
   const icon =
     typeof mergedClearIcon === "function"
@@ -44,10 +33,14 @@ const SelectClear = ({
         "absolute right-[11px]",
         "flex size-5 items-center justify-center transition-opacity",
         "opacity-0",
-        value && "hover:opacity-50!",
-        value && "group-hover:opacity-30",
+        // When there is no value, make the clear icon non-interactive so it doesn't block the trigger/arrow
+        !showClearIcon && "pointer-events-none",
+        showClearIcon && "hover:opacity-50!",
+        showClearIcon && "group-hover:opacity-30",
       )}
       onPointerDown={(e) => {
+        // If there's no value, don't intercept the click
+        if (!showClearIcon) return;
         e.preventDefault();
         e.stopPropagation();
         onPointerDown?.(e);

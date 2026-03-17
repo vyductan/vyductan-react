@@ -1,5 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
-import React, { Children, isValidElement } from "react";
+import { Children, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -19,6 +21,7 @@ import { CardContext } from "./context";
 type CardProps = Omit<CardRootProps, "title"> & {
   skeleton?: boolean;
   bordered?: boolean;
+  variant?: "default" | "borderless";
   classNames?: {
     header?: string;
     title?: string;
@@ -42,6 +45,8 @@ const Card = ({
   extra,
   footer,
   className,
+  variant,
+  bordered,
 
   ...props
 }: CardProps) => {
@@ -59,24 +64,21 @@ const Card = ({
     );
   }
 
-  const isShadcnCard = Children.toArray(children).some((child) => {
-    if (isValidElement(child)) {
-      const type =
-        typeof child.type === "string" ? child.type : child.type.name;
-      return (
-        type === "CardContent" ||
-        type === "CardHeader" ||
-        type === "CardFooter" ||
-        type === "CardTitle" ||
-        type === "CardDescription"
-      );
-    }
-    return false;
-  });
+  const isShadcnCard = Children.toArray(children).some(
+    (child) =>
+      isValidElement(child) &&
+      (child.type === CardContent ||
+        child.type === CardHeader ||
+        child.type === CardFooter ||
+        child.type === CardTitle ||
+        child.type === CardDescription),
+  );
+
+  const borderedToPass = variant === "borderless" ? false : bordered;
 
   if (isShadcnCard) {
     CardRender = (
-      <CardRoot className={className} {...props}>
+      <CardRoot className={className} bordered={borderedToPass} {...props}>
         {children}
       </CardRoot>
     );
@@ -86,7 +88,7 @@ const Card = ({
     const hasExtra = !!extra;
 
     CardRender = (
-      <CardRoot className={className} {...props}>
+      <CardRoot className={className} bordered={borderedToPass} {...props}>
         {(!!title || !!description || !!extra) && (
           <CardHeader
             className={cn(hasExtra && "items-center", classNames?.header)}

@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+"use client";
+
 /* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint } from "../_util/responsive-observer";
 import type { LiteralUnion } from "../_util/type";
@@ -24,7 +25,8 @@ export interface ColSize {
 }
 
 export interface ColProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends
+    React.HTMLAttributes<HTMLDivElement>,
     Partial<Record<Breakpoint, ColSpanType | ColSize>> {
   flex?: FlexType;
   span?: ColSpanType;
@@ -46,11 +48,37 @@ function parseFlex(flex: FlexType): string {
 
   return flex;
 }
-const sizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
-const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
-  const { direction } = React.useContext(ConfigContext);
-  const { gutter, wrap } = React.useContext(RowContext);
+// Map span values (1-24) to Tailwind classes using fraction notation
+// Tailwind supports arbitrary fractions like 8/24, 12/24, etc.
+const spanToTailwindClass: Record<number, string> = {
+  1: "flex-[0_0_auto] basis-1/24 max-w-1/24",
+  2: "flex-[0_0_auto] basis-2/24 max-w-2/24",
+  3: "flex-[0_0_auto] basis-3/24 max-w-3/24",
+  4: "flex-[0_0_auto] basis-4/24 max-w-4/24",
+  5: "flex-[0_0_auto] basis-5/24 max-w-5/24",
+  6: "flex-[0_0_auto] basis-6/24 max-w-6/24",
+  7: "flex-[0_0_auto] basis-7/24 max-w-7/24",
+  8: "flex-[0_0_auto] basis-8/24 max-w-8/24",
+  9: "flex-[0_0_auto] basis-9/24 max-w-9/24",
+  10: "flex-[0_0_auto] basis-10/24 max-w-10/24",
+  11: "flex-[0_0_auto] basis-11/24 max-w-11/24",
+  12: "flex-[0_0_auto] basis-12/24 max-w-12/24",
+  13: "flex-[0_0_auto] basis-13/24 max-w-13/24",
+  14: "flex-[0_0_auto] basis-14/24 max-w-14/24",
+  15: "flex-[0_0_auto] basis-15/24 max-w-15/24",
+  16: "flex-[0_0_auto] basis-16/24 max-w-16/24",
+  17: "flex-[0_0_auto] basis-17/24 max-w-17/24",
+  18: "flex-[0_0_auto] basis-18/24 max-w-18/24",
+  19: "flex-[0_0_auto] basis-19/24 max-w-19/24",
+  20: "flex-[0_0_auto] basis-20/24 max-w-20/24",
+  21: "flex-[0_0_auto] basis-21/24 max-w-21/24",
+  22: "flex-[0_0_auto] basis-22/24 max-w-22/24",
+  23: "flex-[0_0_auto] basis-23/24 max-w-23/24",
+  24: "flex-[0_0_auto] basis-full max-w-full",
+};
 
+const sizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
+const Col = (props: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
   const {
     span,
     order,
@@ -63,6 +91,8 @@ const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
     style,
     ...others
   } = props;
+  const { direction } = React.useContext(ConfigContext);
+  const { gutter, wrap } = React.useContext(RowContext);
 
   // ===================== Size ======================
   const sizeStyle: Record<string, string> = {};
@@ -98,12 +128,36 @@ const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
       sizeClassObj[`${size}-flex`] = true;
       sizeStyle[`--${size}-flex`] = parseFlex(sizeProps.flex);
     }
+
+    // Responsive span layout - add CSS variable for media queries to use
+    if (sizeProps.span !== undefined) {
+      const spanValue =
+        typeof sizeProps.span === "number"
+          ? sizeProps.span
+          : Number.parseFloat(String(sizeProps.span));
+      if (!Number.isNaN(spanValue)) {
+        const percentage = (spanValue / 24) * 100;
+        // Store the percentage as CSS variable that can be used in media queries
+        sizeStyle[`--${size}-span-width`] = `${percentage}%`;
+      }
+    }
   });
 
   // ==================== Normal =====================
+  // Calculate span classes for Tailwind CSS using predefined map
+  let spanClasses = "";
+  if (span !== undefined) {
+    const spanValue =
+      typeof span === "number" ? span : Number.parseInt(String(span), 10);
+    if (!Number.isNaN(spanValue) && spanValue >= 1 && spanValue <= 24) {
+      spanClasses = spanToTailwindClass[spanValue] || "";
+    }
+  }
+
   const classes = cn(
+    spanClasses,
     {
-      [`${span}`]: span !== undefined,
+      // [`${span}`]: span !== undefined,
       [`${order}`]: order,
       [`${offset}`]: offset,
       [`${push}`]: push,
@@ -134,121 +188,18 @@ const Col = React.forwardRef<HTMLDivElement, ColProps>((props, ref) => {
   // ==================== Render =====================
   return (
     <div
+      data-slot={span ? `col-${span}` : undefined}
       {...others}
       style={{ ...mergedStyle, ...style, ...sizeStyle }}
       className={classes}
-      ref={ref}
     >
       {children}
     </div>
   );
-});
+};
 
 if (process.env.NODE_ENV !== "production") {
   Col.displayName = "Col";
 }
 
 export default Col;
-
-// import * as React from "react"
-// import { cn } from "@/lib/utils"
-
-// export type ColSize = {
-//   span?: number
-//   order?: number
-//   offset?: number
-//   push?: number
-//   pull?: number
-// }
-
-// export interface ColProps extends React.HTMLAttributes<HTMLDivElement> {
-//   span?: number
-//   order?: number
-//   offset?: number
-//   push?: number
-//   pull?: number
-//   xs?: number | ColSize
-//   sm?: number | ColSize
-//   md?: number | ColSize
-//   lg?: number | ColSize
-//   xl?: number | ColSize
-//   xxl?: number | ColSize
-//   className?: string
-//   style?: React.CSSProperties
-// }
-
-// const Col = React.forwardRef<HTMLDivElement, ColProps>(
-//   (
-//     {
-//       span,
-//       order,
-//       offset,
-//       push,
-//       pull,
-//       xs,
-//       sm,
-//       md,
-//       lg,
-//       xl,
-//       xxl,
-//       className,
-//       style,
-//       children,
-//       ...props
-//     },
-//     ref
-//   ) => {
-//     const sizeClasses: string[] = []
-//     const sizeProps = { xs, sm, md, lg, xl, xxl }
-
-//     // Handle span, order, offset, push, pull for all sizes
-//     Object.entries(sizeProps).forEach(([size, sizeProp]) => {
-//       if (typeof sizeProp === 'number') {
-//         sizeClasses.push(`col-${size}-${sizeProp}`)
-//       } else if (sizeProp) {
-//         const sizeClass = [`col-${size}-${sizeProp.span || 'auto'}`]
-//         if (sizeProp.offset) sizeClass.push(`col-${size}-offset-${sizeProp.offset}`)
-//         if (sizeProp.order) sizeClass.push(`col-${size}-order-${sizeProp.order}`)
-//         if (sizeProp.push) sizeClass.push(`col-${size}-push-${sizeProp.push}`)
-//         if (sizeProp.pull) sizeClass.push(`col-${size}-pull-${sizeProp.pull}`)
-//         sizeClasses.push(...sizeClass)
-//       }
-//     })
-
-//     // Base grid classes
-//     const baseClasses = []
-//     if (span) {
-//       baseClasses.push(`col-span-${span}`)
-//     } else if (!xs && !sm && !md && !lg && !xl && !xxl) {
-//       // If no size props are provided, default to full width
-//       baseClasses.push('flex-1')
-//     }
-
-//     // Handle order, offset, push, pull for default size
-//     if (order) baseClasses.push(`order-${order}`)
-//     if (offset) baseClasses.push(`ml-${offset}/12`)
-//     if (push) baseClasses.push(`ml-${push}/12`)
-//     if (pull) baseClasses.push(`-ml-${pull}/12`)
-
-//     return (
-//       <div
-//         ref={ref}
-//         className={cn(
-//           'relative min-w-0',
-//           baseClasses,
-//           sizeClasses,
-//           className
-//         )}
-//         style={style}
-//         {...props}
-//       >
-//         {children}
-//       </div>
-//     )
-//   }
-// )
-
-// Col.displayName = 'Col'
-
-// export { Col }
-// export default Col

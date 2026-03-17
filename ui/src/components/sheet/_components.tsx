@@ -1,11 +1,12 @@
-import { Icon } from "../../icons";
-import { cn } from "../../lib/utils";
 import {
   SheetContent as ShadcnSheetContent,
   SheetHeader as ShadcnSheetHeader,
   SheetTitle as ShadcnSheetTitle,
   SheetClose,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";
+
+import { Icon } from "../../icons";
+import { cn } from "../../lib/utils";
 import { Button } from "../button";
 
 type SheetContentProps = React.ComponentProps<typeof ShadcnSheetContent>;
@@ -29,7 +30,10 @@ export const SheetHeader = ({
 }: SheetHeaderProps) => {
   return (
     <ShadcnSheetHeader
-      className={cn("flex border-b px-6 py-4", className)}
+      className={cn(
+        "flex flex-row justify-between border-b px-6 py-4",
+        className,
+      )}
       {...props}
     >
       {children}
@@ -56,7 +60,7 @@ const SheetTitle = ({ children, className, ...props }: SheetTitleProps) => {
       >
         <Button
           size="small"
-          variant="ghost"
+          variant="text"
           shape="icon"
           icon={<Icon icon="icon-[lucide--x]" className="size-5" />}
           className="mr-2"
@@ -76,4 +80,4 @@ export {
   SheetDescription,
   Sheet as SheetRoot,
   SheetTrigger,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";

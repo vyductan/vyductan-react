@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-
 import React, { cloneElement, useRef } from "react";
 import isVisible from "@rc-component/util/lib/Dom/isVisible";
 import { composeRef, getNodeRef, supportRef } from "@rc-component/util/lib/ref";
@@ -23,7 +21,7 @@ const Wave: React.FC<WaveProps> = (props) => {
   // ============================== Effect ==============================
   React.useEffect(() => {
     const node = containerRef.current;
-    if (!node || node.nodeType !== 1 || disabled) {
+    if (node?.nodeType !== 1 || disabled) {
       return;
     }
 
@@ -57,9 +55,11 @@ const Wave: React.FC<WaveProps> = (props) => {
   }
 
   const ref = supportRef(children)
-    ? composeRef(getNodeRef(children), containerRef)
+    ? // eslint-disable-next-line react-hooks/refs
+      composeRef(getNodeRef(children), containerRef)
     : containerRef;
 
+  // eslint-disable-next-line react-hooks/refs, @typescript-eslint/no-explicit-any
   return cloneElement<any>(children, { ref });
 };
 

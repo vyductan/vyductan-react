@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
 import { useMergedState } from "@rc-component/util";
 import KeyCode from "@rc-component/util/lib/KeyCode";
@@ -9,6 +11,7 @@ import type { SizeChangerRender } from "./_components/page-size-options";
 import type { PagerProps } from "./pager";
 import type { PaginationLocale } from "./types";
 import { Icon } from "../../icons";
+import { useComponentConfig } from "../config-provider/context";
 import {
   PaginationContent,
   PaginationEllipsis,
@@ -81,12 +84,18 @@ export const Pagination = (props: PaginationProps) => {
     showSizeChanger = total > totalBoundaryShowSizeChanger,
     sizeChangerRender,
     pageSizeOptions,
-    onShowSizeChange,
+    onShowSizeChange: onShowSizeChangeProp,
 
-    itemRender,
+    itemRender: itemRenderProp,
     // itemRender = defaultItemRender,
     // hrefGenerator,
   } = props;
+  const {
+    itemRender: itemRenderConfig,
+    onShowSizeChange: onShowSizeChangeConfig,
+  } = useComponentConfig("pagination");
+  const itemRender = itemRenderProp ?? itemRenderConfig;
+  const onShowSizeChange = onShowSizeChangeProp ?? onShowSizeChangeConfig;
 
   const [pageSize, setPageSize] = useMergedState<number>(10, {
     value: pageSizeProp,
@@ -178,7 +187,6 @@ export const Pagination = (props: PaginationProps) => {
     ...restParams: any[]
   ) {
     if (event.key === "Enter" || event.code === KeyCode.ENTER.toString()) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       callback(...restParams);
     }
   }

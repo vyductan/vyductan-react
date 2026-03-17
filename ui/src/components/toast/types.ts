@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ToastT } from "sonner";
 
 export type PromiseT<Data = any> = Promise<Data> | (() => Promise<Data>);

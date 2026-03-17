@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 "use client";
 
 import * as React from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
 import { useMergedState } from "@rc-component/util";
 import omit from "@rc-component/util/lib/omit";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";
@@ -39,7 +38,7 @@ type InputProps = Omit<
   "ref" | "size" | "prefix" | "value"
 > &
   CommonInputProps & {
-    ref?: React.ForwardedRef<InputRef>;
+    ref?: React.Ref<InputRef | HTMLInputElement | null>;
 
     onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
     classNames?: Partial<Record<SemanticName, string>>;
@@ -78,7 +77,7 @@ const Input = (props: InputProps) => {
 
     status,
 
-    autoComplete,
+    autoComplete = "off",
     onChange,
     onFocus,
     onBlur,
@@ -145,8 +144,8 @@ const Input = (props: InputProps) => {
   const mergedSize = useSize((ctx) => customSize ?? compactSize ?? ctx);
 
   // ===================== Disabled =====================
-  const disabled = React.useContext(DisabledContext);
-  const mergedDisabled = customDisabled ?? disabled;
+  const disabledFromContext = React.useContext(DisabledContext);
+  const disabled = customDisabled ?? disabledFromContext;
 
   // =================== Select Range ===================
   const [selection, setSelection] = useState<
@@ -161,33 +160,69 @@ const Input = (props: InputProps) => {
   const isOutOfRange = !!mergedMax && valueLength > mergedMax;
 
   // ======================= Ref ========================
-  useImperativeHandle(ref, () => ({
-    focus,
-    blur: () => {
-      inputRef.current?.blur();
-    },
-    setSelectionRange: (
-      start: number,
-      end: number,
-      direction?: "forward" | "backward" | "none",
-    ) => {
-      inputRef.current?.setSelectionRange(start, end, direction);
-    },
-    select: () => {
-      inputRef.current?.select();
-    },
-    setCustomValidity: (msg) => inputRef.current?.setCustomValidity?.(msg),
-    reportValidity: () => inputRef.current?.reportValidity?.(),
-    input: inputRef.current,
-    nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
-  }));
+  useImperativeHandle<
+    InputRef | HTMLInputElement | null,
+    InputRef | HTMLInputElement | null
+  >(ref, () =>
+    inputRef.current
+      ? {
+          ...inputRef.current,
+          focus,
+          blur: () => {
+            inputRef.current?.blur();
+          },
+          setSelectionRange: (
+            start: number,
+            end: number,
+            direction?: "forward" | "backward" | "none",
+          ) => {
+            inputRef.current?.setSelectionRange(start, end, direction);
+          },
+          select: () => {
+            inputRef.current?.select();
+          },
+          setCustomValidity: (msg) =>
+            inputRef.current?.setCustomValidity?.(msg),
+          reportValidity: () => inputRef.current?.reportValidity?.(),
+          input: inputRef.current,
+          nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+        }
+      : null,
+  );
+  // useImperativeHandle(ref, () =>
+  //   typeof ref === "object" && ref?.current && "current" in ref.current
+  //     ? {
+  //         focus,
+  //         blur: () => {
+  //           inputRef.current?.blur();
+  //         },
+  //         setSelectionRange: (
+  //           start: number,
+  //           end: number,
+  //           direction?: "forward" | "backward" | "none",
+  //         ) => {
+  //           inputRef.current?.setSelectionRange(start, end, direction);
+  //         },
+  //         select: () => {
+  //           inputRef.current?.select();
+  //         },
+  //         setCustomValidity: (msg) =>
+  //           inputRef.current?.setCustomValidity?.(msg),
+  //         reportValidity: () => inputRef.current?.reportValidity?.(),
+  //         input: inputRef.current,
+  //         nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+  //       }
+  //     : ref,
+  // );
 
   useEffect(() => {
     if (keyLockRef.current) {
       keyLockRef.current = false;
     }
-    setFocused((prev) => (prev && disabled ? false : prev));
-  }, [disabled]);
+    if (disabledFromContext && focused && inputRef.current) {
+      inputRef.current.blur();
+    }
+  }, [disabledFromContext, focused]);
 
   const triggerChange = (
     e:
@@ -308,12 +343,14 @@ const Input = (props: InputProps) => {
         "styles",
         "classNames",
         "onClear",
+        "status",
       ],
     );
     return (
       <input
         data-slot="input"
         autoComplete={autoComplete}
+        aria-invalid={props["aria-invalid"] ?? status === "error"}
         {...otherProps}
         onChange={onInternalChange}
         onFocus={handleFocus}
@@ -322,7 +359,8 @@ const Input = (props: InputProps) => {
         onKeyUp={handleKeyUp}
         className={cn(
           "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
-          inputSizeVariants({ size: mergedSize }),
+          !hasAffix && inputSizeVariants({ size: mergedSize }),
+          otherProps.readOnly && "bg-muted cursor-default",
           classNames?.input,
         )}
         style={styles?.input}
@@ -341,6 +379,14 @@ const Input = (props: InputProps) => {
       />
     );
   };
+
+  // Check if has affix (prefix/suffix/allowClear)
+  const hasAffix = !!(
+    rest.prefix ||
+    suffix ||
+    rest.allowClear ||
+    countConfig.show
+  );
 
   const getSuffix = () => {
     // Max length value
@@ -389,13 +435,18 @@ const Input = (props: InputProps) => {
       focused={focused}
       triggerFocus={focus}
       suffix={getSuffix()}
-      disabled={mergedDisabled}
+      disabled={disabled}
       styles={styles}
       ref={holderRef}
       classNames={{
-        variant: cn(inputVariants({ variant, status }), classNames?.variant),
+        variant: cn(
+          inputVariants({ variant, status, disabled }),
+          rest.readOnly && "cursor-default bg-muted",
+          classNames?.variant,
+        ),
         affixWrapper: cn(
-          inputSizeVariants({ size: mergedSize }),
+          hasAffix && inputSizeVariants({ size: mergedSize }),
+          rest.readOnly && "cursor-default bg-muted",
           classNames?.affixWrapper,
         ),
       }}

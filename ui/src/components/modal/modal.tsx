@@ -35,28 +35,30 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
     | ((params: {
         originNode: React.ReactNode;
         extra: {
-          OkBtn: React.ReactElement<any>;
-          CancelBtn: React.ReactElement<any>;
+          OkBtn: React.ReactElement<ButtonProps>;
+          CancelBtn: React.ReactElement<ButtonProps>;
         };
       }) => React.ReactNode)
     | React.ReactNode;
   okText?: string;
+  okType?: "default" | "primary" | "danger";
   confirmLoading?: boolean;
   okButtonProps?: ButtonProps;
   cancelText?: string;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   trigger?: React.ReactNode;
   onOk?: React.MouseEventHandler<HTMLButtonElement>;
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
-  width,
+  width = 520,
   className,
   classNames,
   children,
   description,
   footer,
   okText,
+  okType,
   confirmLoading,
   okButtonProps,
   title,
@@ -110,13 +112,34 @@ const Modal = ({
   //   ),
   //   [confirmLoading, okText, onOk],
   // );
-  const footerToRender = footer ? (
-    typeof footer === "function" ? (
+  const footerToRender =
+    footer === undefined ? (
+      <>
+        {/* <CancelBtn /> */}
+        <DialogClose asChild onClick={onCancel}>
+          <Button variant="outline">{cancelText ?? "Cancel"}</Button>
+        </DialogClose>
+        <Button
+          type="primary"
+          loading={confirmLoading}
+          onClick={onOk}
+          {...(okType === "danger" ? { color: "danger" } : {})}
+          {...okButtonProps}
+        >
+          {okText ?? "Ok"}
+        </Button>
+      </>
+    ) : typeof footer === "function" ? (
       footer({
         originNode: undefined,
         extra: {
           OkBtn: (
-            <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
+            <Button
+              type="primary"
+              loading={confirmLoading}
+              onClick={onOk}
+              {...okButtonProps}
+            >
               {okText ?? "Ok"}
             </Button>
           ),
@@ -129,18 +152,7 @@ const Modal = ({
       })
     ) : (
       footer
-    )
-  ) : (
-    <>
-      {/* <CancelBtn /> */}
-      <DialogClose asChild onClick={onCancel}>
-        <Button variant="outline">{cancelText ?? "Cancel"}</Button>
-      </DialogClose>
-      <Button loading={confirmLoading} onClick={onOk} {...okButtonProps}>
-        {okText ?? "Ok"}
-      </Button>
-    </>
-  );
+    );
 
   // ??
   // const ref = React.useRef<HTMLDivElement>(null);
@@ -158,7 +170,12 @@ const Modal = ({
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent
-        className={cn("px-0", className)}
+        className={cn(
+          "px-0 text-sm",
+          "sm:max-w-auto", // override sm:max-w-lg of shadcn
+          numWidth && "w-(--modal-width)", // override max-w-lg of shadcn
+          className,
+        )}
         style={{
           ...(numWidth &&
             ({
@@ -170,12 +187,15 @@ const Modal = ({
       >
         <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
-          <DialogDescription className={classNames?.description}>
+          <DialogDescription
+            className={cn(!description && "hidden", classNames?.description)}
+            asChild={typeof description === "object"}
+          >
             {description}
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 [&>[data-radix-scroll-area-viewport]>div]:block!">
+        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 max-sm:px-2 [&>[data-radix-scroll-area-viewport]>div]:block!">
           {children}
         </ScrollArea>
 

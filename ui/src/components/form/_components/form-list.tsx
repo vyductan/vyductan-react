@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import type { ReactElement } from "react";
@@ -10,14 +11,13 @@ import type {
 } from "react-hook-form";
 import { useFieldArray } from "react-hook-form";
 
-import { useFormContext } from "../context";
-import { useFieldOptionalityCheck } from "../hooks/use-field-optionality-check";
+import { useRequiredFieldCheck } from "../hooks/use-field-optionality-check";
 import { Field } from "./form-field";
 
 type FieldListProps<
   TFieldValues extends FieldValues = FieldValues,
-  TFieldArrayName extends
-    FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
+  TFieldArrayName extends FieldArrayPath<TFieldValues> =
+    FieldArrayPath<TFieldValues>,
 > = {
   control?: Control<TFieldValues>;
   name: TFieldArrayName;
@@ -47,8 +47,8 @@ type FieldListProps<
 };
 const FieldList = <
   TFieldValues extends FieldValues = FieldValues,
-  TFieldArrayName extends
-    FieldArrayPath<TFieldValues> = FieldArrayPath<TFieldValues>,
+  TFieldArrayName extends FieldArrayPath<TFieldValues> =
+    FieldArrayPath<TFieldValues>,
 >({
   control,
   name,
@@ -105,8 +105,7 @@ const FieldList = <
     errors: control?._formState.errors[name],
   };
 
-  const form = useFormContext<TFieldValues>();
-  const isOptional = useFieldOptionalityCheck(name, form?.schema);
+  const isOptional = useRequiredFieldCheck(name);
 
   return (
     <Field

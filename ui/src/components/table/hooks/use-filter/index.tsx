@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
+/* eslint-disable react-hooks/preserve-manual-memoization */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 /* eslint-disable unicorn/no-negated-condition */
 /* eslint-disable unicorn/explicit-length-check */
-/* eslint-disable @typescript-eslint/prefer-optional-chain */
+
 /* eslint-disable unicorn/no-array-reduce */
 import React from "react";
 
 import type { AnyObject } from "../../../_util/type";
-import type { SafeKey } from "../../../tree";
+import type { SafeKey } from "../../../tree/types";
 import type {
   ColumnsType,
   ColumnTitleProps,
@@ -155,14 +157,14 @@ const generateFilterInfo = <RecordType extends AnyObject = AnyObject>(
     const keyAsString = key as SafeKey;
     const { filters, filterDropdown } = column;
     if (filterDropdown) {
-      currentFilters[keyAsString] = filteredKeys || null;
+      currentFilters[String(keyAsString)] = filteredKeys ?? null;
     } else if (Array.isArray(filteredKeys)) {
       const keys = flattenKeys(filters);
-      currentFilters[keyAsString] = keys.filter((originKey) =>
+      currentFilters[String(keyAsString)] = keys.filter((originKey) =>
         filteredKeys.includes(String(originKey)),
       );
     } else {
-      currentFilters[keyAsString] = null;
+      currentFilters[String(keyAsString)] = null;
     }
   });
 

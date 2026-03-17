@@ -1,0 +1,46 @@
+@keyframes progress-active {
+  0% {
+    transform: translateX(-100%) scaleX(0);
+    opacity: 0.1;
+  }
+  20% {
+    transform: translateX(-100%) scaleX(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes progress-active-rtl {
+  0% {
+    transform: translateX(100%) scaleX(0);
+    opacity: 0.1;
+  }
+  20% {
+    transform: translateX(100%) scaleX(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0) scaleX(1);
+    opacity: 0;
+  }
+}
+
+.progress-active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: inherit;
+  opacity: 0;
+  animation: progress-active 2.4s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+}
+
+[dir="rtl"] .progress-active::before {
+  animation-name: progress-active-rtl;
+}

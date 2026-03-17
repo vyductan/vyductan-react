@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";
@@ -22,20 +23,16 @@ export type BackToTopProps = Omit<FloatButtonProps, "target"> & {
   duration?: number;
 };
 
-export const FloatButtonBackToTop = React.forwardRef<
-  FloatButtonRef,
-  BackToTopProps
->((props, ref) => {
-  const {
-    shape = "circle",
-    visibilityHeight = 400,
-    icon = <Icon icon="icon-[ant-design--vertical-align-top-outlined]" />,
-    target,
-    duration = 450,
-    onClick,
-    ...restProps
-  } = props;
-
+export const FloatButtonBackToTop = ({
+  shape = "circle",
+  visibilityHeight = 400,
+  icon = <Icon icon="icon-[ant-design--vertical-align-top-outlined]" />,
+  target,
+  duration = 450,
+  onClick,
+  ref,
+  ...restProps
+}: BackToTopProps & { ref?: React.Ref<FloatButtonRef> }) => {
   const [visible, setVisible] = useState<boolean>(visibilityHeight === 0);
 
   const internalRef = React.useRef<FloatButtonRef["nativeElement"]>(null);
@@ -90,10 +87,10 @@ export const FloatButtonBackToTop = React.forwardRef<
 
   return (
     <motion.div animate={visible ? "visible" : "hidden"} variants={variants}>
-      <FloatButton ref={internalRef} {...contentProps} onClick={scrollToTop} />
+      <FloatButton {...contentProps} onClick={scrollToTop} ref={internalRef} />
     </motion.div>
   );
-});
+};
 
 if (process.env.NODE_ENV !== "production") {
   FloatButtonBackToTop.displayName = "BackTop";

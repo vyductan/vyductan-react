@@ -1,66 +1,97 @@
-import * as React from "react";
+import { useMemo } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { useControlledState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type {
+  AbstractCheckboxGroupProps,
+  CheckboxOptionType,
+} from "../checkbox/checkbox-group";
+import type { FormValueType } from "../form";
 import type { RadioProps } from "./radio";
+import type { RadioChangeEvent } from "./types";
 import { Radio } from "./radio";
 
-type RadioOption = {
-  label: React.ReactNode;
-  value: any;
-  color?: string;
-  disabled?: boolean;
-};
-type RadioGroupProps = Omit<
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>,
-  "defaultValue" | "onChange"
-> &
-  Pick<RadioProps, "optionType" | "buttonStyle"> & {
-    defaultValue?: HTMLInputElement["defaultValue"];
-    options: RadioOption[];
-    onChange?: RadioGroupPrimitive.RadioGroupProps["onValueChange"];
-  };
-const RadioGroupInner = (
-  {
-    className,
-    options,
-    onChange,
-    optionType,
-    buttonStyle,
-    disabled,
-    ...props
-  }: RadioGroupProps,
-  ref: React.ForwardedRef<HTMLDivElement>,
-) => {
+type RadioOptionType<T extends FormValueType = FormValueType> =
+  CheckboxOptionType<T>;
+
+type RadioGroupProps<T extends FormValueType = FormValueType> =
+  AbstractCheckboxGroupProps<T> &
+    Pick<RadioProps, "optionType" | "buttonStyle"> & {
+      defaultValue?: T;
+      value?: T;
+      onChange?: (e: RadioChangeEvent<T>) => void;
+    };
+export const RadioGroup = <T extends FormValueType = FormValueType>({
+  value,
+  defaultValue,
+  className,
+  options,
+  onChange,
+  optionType = "default",
+  buttonStyle = "outline",
+  disabled,
+  ...props
+}: RadioGroupProps<T>) => {
+  const [internalValue, setInternalValue] = useControlledState(
+    defaultValue,
+    value,
+  );
+
+  const isControlled = value !== undefined;
+  const currentValue = isControlled ? value : internalValue;
+
+  const memoizedOptions = useMemo<RadioOptionType<T>[]>(
+    () =>
+      (options ?? []).map((option) => {
+        if (typeof option === "string" || typeof option === "number") {
+          return { label: option, value: option } as RadioOptionType<T>;
+        }
+        return option;
+      }),
+    [options],
+  );
+
   return (
     <RadioGroupPrimitive.Root
-      ref={ref}
-      className={cn(buttonStyle ? "" : "flex gap-2", className)}
-      onValueChange={onChange}
+      className={cn(
+        optionType === "button" ? "inline-flex" : "flex gap-2",
+        className,
+      )}
+      value={currentValue as string | undefined}
+      // onValueChange={handleValueChange}
       disabled={disabled}
       {...props}
     >
-      {options.map((option, index) => (
-        <Radio
-          key={index}
-          {...option}
-          disabled={disabled ?? option.disabled}
-          optionType={optionType}
-          buttonStyle={buttonStyle}
-          isActive={option.value === props.value}
-          preColor={options[index + 1] ? options[index + 1]?.color : undefined}
-        />
-      ))}
+      {memoizedOptions.map((option) => {
+        const isDisabled = option.disabled ?? disabled;
+        return (
+          <Radio
+            key={option.value.toString()}
+            {...option}
+            // value={option.value}
+            checked={option.value === currentValue}
+            disabled={isDisabled}
+            optionType={optionType}
+            buttonStyle={buttonStyle}
+            onChange={(e) => {
+              if (isDisabled) return;
+
+              if (e.target.checked) {
+                setInternalValue(option.value);
+                onChange?.(e);
+              }
+            }}
+          >
+            {option.label}
+          </Radio>
+        );
+      })}
     </RadioGroupPrimitive.Root>
   );
 };
-RadioGroupInner.displayName = RadioGroupPrimitive.Root.displayName;
 
-export type { RadioGroupProps, RadioOption };
+RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
-export const RadioGroup = React.forwardRef(RadioGroupInner) as (
-  props: RadioGroupProps & {
-    ref?: React.ForwardedRef<HTMLUListElement>;
-  },
-) => ReturnType<typeof RadioGroupInner>;
+export type { RadioGroupProps, RadioOptionType };

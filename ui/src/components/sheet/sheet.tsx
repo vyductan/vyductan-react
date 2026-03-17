@@ -74,7 +74,7 @@ const Sheet = (props: SheetProps) => {
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent
         side={placement}
-        className={cn(className, classNames?.content)}
+        className={cn(className, classNames?.content, "sm:max-w-auto")}
       >
         <SheetHeader className={cn(classNames?.header)} extra={extra}>
           <SheetTitle className={classNames?.title}>{title}</SheetTitle>
@@ -118,4 +118,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-} from "../../shadcn/sheet";
+} from "@acme/ui/shadcn/sheet";

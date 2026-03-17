@@ -1,5 +1,6 @@
-import * as React from "react";
-import { cn } from "@/lib/utils";
+import type * as React from "react";
+
+import { cn } from "@acme/ui/lib/utils";
 
 export interface CardMetaProps {
   style?: React.CSSProperties;
@@ -15,7 +16,7 @@ const CardMeta: React.FC<CardMetaProps> = (props) => {
   const classString = cn("flex items-start p-4", className);
 
   const avatarDom: React.ReactNode = avatar ? (
-    <div data-slot="card-meta-avatar" className="mr-4 flex-shrink-0">
+    <div data-slot="card-meta-avatar" className="mr-4 shrink-0">
       {avatar}
     </div>
   ) : null;

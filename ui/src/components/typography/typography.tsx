@@ -47,7 +47,7 @@ const Typography = ({
   disabled = false,
   // editable,
   // ellipsis = false,
-  mark = false,
+  // mark = false,
   onClick,
   strong = false,
   italic = false,
@@ -55,7 +55,7 @@ const Typography = ({
   underline = false,
   ...props
 }: BaseTypographyProps) => {
-  const Tag = del ? "del" : "span";
+  const Comp = del ? "del" : "span";
 
   const getTypeClass = () => {
     if (!type) return "";
@@ -79,10 +79,9 @@ const Typography = ({
   };
 
   const classes = cn(
-    "leading-relaxed",
+    // "leading-relaxed",
     code && "bg-muted relative rounded px-[0.3em] py-[0.2em] font-mono text-sm",
     disabled && "cursor-not-allowed opacity-50",
-    mark && "bg-yellow-100 dark:bg-yellow-900/50",
     strong && "font-semibold",
     italic && "italic",
     underline && "underline",
@@ -101,9 +100,14 @@ const Typography = ({
   }
 
   return (
-    <Tag className={classes} onClick={onClick} {...props}>
+    <Comp
+      data-component="typography"
+      className={classes}
+      onClick={onClick}
+      {...props}
+    >
       {children}
-    </Tag>
+    </Comp>
   );
 };
 
@@ -112,7 +116,7 @@ type TitleProps = BaseTypographyProps & {
 };
 
 const Title = ({ level = 1, className, children, ...props }: TitleProps) => {
-  const Component = `h${level}` as keyof React.JSX.IntrinsicElements;
+  const Component = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5";
 
   const sizeClasses = {
     1: "text-4xl font-bold tracking-tight",
@@ -137,7 +141,13 @@ type TextProps = BaseTypographyProps & {
   keyboard?: boolean;
 };
 
-const Text = ({ className, keyboard = false, ...props }: TextProps) => {
+const Text = ({
+  className,
+  keyboard = false,
+  mark,
+  children,
+  ...props
+}: TextProps) => {
   return (
     <Typography
       className={cn(
@@ -146,7 +156,13 @@ const Text = ({ className, keyboard = false, ...props }: TextProps) => {
         className,
       )}
       {...props}
-    />
+    >
+      {mark ? (
+        <mark className="bg-yellow-100 dark:bg-yellow-900/50">{children}</mark>
+      ) : (
+        children
+      )}
+    </Typography>
   );
 };
 
@@ -168,11 +184,7 @@ const Paragraph = ({
   return (
     <Typography
       asChild
-      className={cn(
-        "leading-7 [&:not(:first-child)]:mt-6",
-        spacingClasses,
-        className,
-      )}
+      className={cn("not-first:mt-6", spacingClasses, className)}
       {...props}
     >
       <p />

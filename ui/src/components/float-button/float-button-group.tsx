@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback, useEffect } from "react";
 import useMergedState from "@rc-component/util/lib/hooks/useMergedState";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 import type { FloatButtonProps } from "./float-button";
 import type { FloatButtonRef } from "./types";
@@ -110,11 +110,11 @@ const FloatButtonGroup: React.FC<FloatButtonGroupProps> = (props) => {
               <motion.div variants={variants}>{children}</motion.div>
             </motion.div>
             <FloatButton
-              ref={floatButtonRef}
               shape={shape}
               icon={open ? closeIcon : icon}
               aria-label={props["aria-label"]}
               {...floatButtonProps}
+              ref={floatButtonRef}
             />
           </>
         ) : (

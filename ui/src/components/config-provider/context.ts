@@ -1,13 +1,21 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
 import type { ShowWaveEffect } from "../../lib/wave/interface";
+import type { ButtonProps } from "../button";
 import type { DatePickerProps } from "../date-picker";
+import type { FormProps } from "../form";
 import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
 import type { MentionsProps } from "../mentions";
-import type { XorSelectProps } from "../select";
+import type { PaginationProps } from "../pagination";
+// import type { ResultProps } from "../result";
+import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
+import type { TagProps } from "../tag";
 import type { TextAreaProps } from "../textarea";
 import type {
   AliasToken,
@@ -43,8 +51,25 @@ export interface ComponentStyleConfig {
   style?: React.CSSProperties;
 }
 
+export type ButtonConfig = ComponentStyleConfig &
+  Pick<ButtonProps, "classNames" | "type" | "variant" | "color" | "size">;
+
 export type DatePickerConfig = ComponentStyleConfig &
-  Pick<DatePickerProps, "variant" | "styles" | "classNames" | "format">;
+  Pick<
+    DatePickerProps,
+    | "variant"
+    | "styles"
+    | "classNames"
+    | "format"
+    | "captionLayout"
+    | "commitYearOnClose"
+  >;
+
+export type FormConfig = ComponentStyleConfig &
+  Pick<
+    FormProps,
+    "layout" | "labelCol" | "wrapperCol" | "labelAlign" | "labelWrap" | "colon"
+  >;
 
 export type InputConfig = ComponentStyleConfig &
   Pick<
@@ -59,8 +84,27 @@ export type MentionsConfig = ComponentStyleConfig &
   Pick<MentionsProps, "variant">;
 
 export type SelectConfig = ComponentStyleConfig &
-  Pick<XorSelectProps, "showSearch" | "variant" | "classNames" | "styles">;
+  Pick<SelectProps, "showSearch" | "variant" | "classNames" | "styles">;
 
+export type PaginationConfig = ComponentStyleConfig &
+  Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
+
+export interface ResultStatusConfig {
+  icon?: React.ReactNode;
+  title?: React.ReactNode;
+  subTitle?: React.ReactNode;
+}
+
+export interface ResultConfig extends ComponentStyleConfig {
+  status?: {
+    success?: ResultStatusConfig;
+    info?: ResultStatusConfig;
+    warning?: ResultStatusConfig;
+    error?: ResultStatusConfig;
+    "500"?: ResultStatusConfig;
+    "404"?: ResultStatusConfig;
+  };
+}
 export interface TableConfig extends ComponentStyleConfig {
   bordered?: TableProps["bordered"];
   expandable?: {
@@ -68,11 +112,22 @@ export interface TableConfig extends ComponentStyleConfig {
   };
 }
 
+export type TagConfig = ComponentStyleConfig &
+  Pick<TagProps, "bordered" | "variant" | "color" | "size">;
+
 export type TextAreaConfig = ComponentStyleConfig &
   Pick<
     TextAreaProps,
     "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
   >;
+
+export interface PageContainerConfig {
+  loadingRender?: React.ReactNode;
+}
+
+export interface LayoutConfig extends ComponentStyleConfig {
+  pageContainer?: PageContainerConfig;
+}
 
 export type PopupOverflow = "viewport" | "scroll";
 
@@ -103,14 +158,13 @@ export interface ConfigComponentProps {
   input?: InputConfig;
   inputNumber?: InputNumberConfig;
   mentions?: MentionsConfig;
-  // pagination?: PaginationConfig;
   // space?: SpaceConfig;
   // splitter?: ComponentStyleConfig;
-  // form?: FormConfig;
+  form?: FormConfig;
   select?: SelectConfig;
   // alert?: AlertConfig;
   // anchor?: ComponentStyleConfig;
-  // button?: ButtonConfig;
+  button?: ButtonConfig;
   // divider?: ComponentStyleConfig;
   // drawer?: DrawerConfig;
   // calendar?: ComponentStyleConfig;
@@ -120,17 +174,19 @@ export interface ConfigComponentProps {
   // collapse?: CollapseConfig;
   // floatButtonGroup?: FloatButtonGroupConfig;
   // typography?: ComponentStyleConfig;
+  pagination?: PaginationConfig;
   skeleton?: ComponentStyleConfig;
   // spin?: SpinConfig;
   // segmented?: ComponentStyleConfig;
   // steps?: ComponentStyleConfig;
   // statistic?: ComponentStyleConfig;
   // image?: ImageConfig;
-  // layout?: ComponentStyleConfig;
+  layout?: LayoutConfig;
   // list?: ListConfig;
   // modal?: ModalConfig;
   progress?: ComponentStyleConfig;
-  // result?: ComponentStyleConfig;
+  result?: ResultConfig;
+  // slider?: SliderConfig;
   // slider?: SliderConfig;
   // breadcrumb?: ComponentStyleConfig;
   // menu?: MenuConfig;
@@ -142,7 +198,7 @@ export interface ConfigComponentProps {
   // switch?: ComponentStyleConfig;
   // transfer?: TransferConfig;
   // message?: ComponentStyleConfig;
-  // tag?: TagConfig;
+  tag?: TagConfig;
   table?: TableConfig;
   textArea?: TextAreaConfig;
   // card?: CardConfig;

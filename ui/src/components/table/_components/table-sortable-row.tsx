@@ -1,3 +1,5 @@
+"use client";
+
 import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import React, { useContext, useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
@@ -22,7 +24,7 @@ const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
   const { setActivatorNodeRef, listeners } = useContext(RowContext);
   return (
     <Button
-      variant="ghost"
+      variant="text"
       size="small"
       icon={<Icon icon="icon-[octicon--grabber-16]" />}
       {...(readOnly ? {} : listeners)}
@@ -32,8 +34,7 @@ const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
   );
 };
 
-interface TableRowSortableProps
-  extends React.HTMLAttributes<HTMLTableRowElement> {
+interface TableRowSortableProps extends React.HTMLAttributes<HTMLTableRowElement> {
   "data-row-key": string;
   asHandle?: boolean;
 }

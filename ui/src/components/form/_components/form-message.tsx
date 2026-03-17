@@ -27,7 +27,7 @@ function FormMessage({
   return (
     <ShadFormMessage
       className={cn(
-        "mb-1",
+        "min-h-[24px] leading-[22px]",
         validateStatusVariants({ validateStatus }),
         className,
       )}

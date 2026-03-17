@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/react-compiler */
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 
@@ -15,8 +14,7 @@ export default function useRemovePasswordTimeout(
     removePasswordTimeoutRef.current.push(
       setTimeout(() => {
         if (
-          inputRef.current?.input &&
-          inputRef.current.input.getAttribute("type") === "password" &&
+          inputRef.current?.input?.getAttribute("type") === "password" &&
           inputRef.current.input.hasAttribute("value")
         ) {
           inputRef.current.input.removeAttribute("value");

@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { notification } from "../../notification";
 import { useFormContext } from "../context";
 
 export const FormErrorsNotification = () => {
-  const form = useFormContext();
-  const formSchema = form?.schema;
-  const formFields = form?.control._fields;
-  const formErrors = form?.formState.errors;
+  const formContext = useFormContext();
+  const formSchema = formContext?.form?.schema;
+  const formFields = formContext?.form?.control._fields;
+  const formErrors = formContext?.form?.formState.errors;
   useEffect(() => {
     if (
       formErrors &&
@@ -18,8 +18,7 @@ export const FormErrorsNotification = () => {
     ) {
       // Get the required fields from Zod schema
       const requiredFields = Object.keys(formSchema.shape).filter((key) => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        const field = formSchema.shape[key as keyof typeof formSchema.shape];
+        const field = formSchema.shape[key];
         return !(field instanceof z.ZodOptional);
       });
       // Get mounted fields from React Hook Form

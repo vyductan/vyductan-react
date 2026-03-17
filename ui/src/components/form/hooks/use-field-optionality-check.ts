@@ -1,7 +1,8 @@
-import type { ZodType } from "zod/v4";
 import { useMemo } from "react";
 import _ from "lodash";
 import { ZodOptional } from "zod";
+
+import { useFormContext } from "../context";
 
 const TEMPORARY_REPLACEMENT_PLACEHOLDER = "__PLACEHOLDER__";
 const ZOD_OBJECT_FIELD_PATH = ".shape.";
@@ -24,11 +25,18 @@ const handleNotFoundField = (fieldName: string) => {
     `Field ${fieldName} not found in schema. Make sure the field exists in the schema or do not pass the schema inside the Form - in this case you could manually set the required property for FormLabel.`,
   );
 };
-export const useFieldOptionalityCheck = (
+export const useRequiredFieldCheck = (
   fieldName: string | undefined,
-  schema?: ZodType,
+  defaultRequired?: boolean,
 ) => {
+  const formContext = useFormContext();
+  const schema = formContext?.form?.schema;
+
   return useMemo(() => {
+    if (defaultRequired !== undefined) {
+      return defaultRequired;
+    }
+
     if (!fieldName || !schema) {
       return;
     }
@@ -39,6 +47,6 @@ export const useFieldOptionalityCheck = (
 
     const zodField = _.get(shape, zodFieldPath);
     if (!zodField) handleNotFoundField(fieldName);
-    return zodField instanceof ZodOptional;
-  }, [fieldName, schema]);
+    return !(zodField instanceof ZodOptional);
+  }, [fieldName, schema, defaultRequired]);
 };

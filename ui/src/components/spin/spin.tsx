@@ -12,16 +12,13 @@ const spinVariants = cva("", {
     size: {
       small: [
         "size-5",
-        "before:bg-[length:4px_4px]! after:bg-[length:6px_6px]!",
+        "before:bg-size-[4px_4px]! after:bg-size-[6px_6px]!",
         "before:m-0.5",
       ],
-      default: [
-        "size-7",
-        "before:bg-[length:5px_5px]! after:bg-[length:8px_8px]!",
-      ],
-      lg: [
+      default: ["size-7", "before:bg-size-[5px_5px]! after:bg-size-[8px_8px]!"],
+      large: [
         "size-12",
-        "before:bg-[length:8px_8px]! after:bg-[length:12px_12px]!",
+        "before:bg-size-[8px_8px]! after:bg-size-[12px_12px]!",
       ],
     },
   },

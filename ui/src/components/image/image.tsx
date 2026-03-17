@@ -61,35 +61,41 @@ const Image = memo(function Image({
           <div className="absolute inset-0">{placeholder}</div>
         )}
         {!error && (
-          <img
-            src={src}
-            // alt={alt}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            onClick={handlePreview}
-            className={`cursor-pointer ${loaded ? "opacity-100" : "opacity-0"}`}
-            style={{ transition: "opacity 0.3s" }}
-            {...props}
-          />
+          <picture>
+            <img
+              src={src}
+              // alt={alt}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              onClick={handlePreview}
+              className={`cursor-pointer ${loaded ? "opacity-100" : "opacity-0"}`}
+              style={{ transition: "opacity 0.3s" }}
+              {...props}
+            />
+          </picture>
         )}
         {error && fallback && (
-          <img
-            src={fallback}
-            alt="fallback"
-            className="cursor-pointer"
-            onClick={handlePreview}
-          />
+          <picture>
+            <img
+              src={fallback}
+              alt="fallback"
+              className="cursor-pointer"
+              onClick={handlePreview}
+            />
+          </picture>
         )}
         {isPreviewOpen && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
             onClick={() => setPreviewOpen(false)}
           >
-            <img
-              src={error && fallback ? fallback : src}
-              // alt={alt}
-              className="max-h-full max-w-full"
-            />
+            <picture>
+              <img
+                src={error && fallback ? fallback : src}
+                // alt={alt}
+                className="max-h-full max-w-full"
+              />
+            </picture>
           </div>
         )}
         {/* <img

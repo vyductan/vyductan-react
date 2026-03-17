@@ -1,17 +1,17 @@
 import type { XOR } from "ts-xor";
 
-import type { BadgeProps as ShadcnBadgeProps } from "@acme/ui/shadcn/badge";
 import { Badge as ShadcnBadge } from "@acme/ui/shadcn/badge";
 
 import type { BadgeProps } from "./badge";
 import { InternalBadge } from "./badge";
 
+type ShadcnBadgeProps = React.ComponentProps<typeof ShadcnBadge>;
 type XORBadgeProps = XOR<BadgeProps, ShadcnBadgeProps>;
-const Badge = ({ count, ...restProps }: XORBadgeProps) => {
-  const isBadgeShadcn = !count;
-  if (isBadgeShadcn) return <ShadcnBadge {...restProps} />;
+const Badge = (props: XORBadgeProps) => {
+  const isBadgeShadcn = !props.count;
+  if (isBadgeShadcn) return <ShadcnBadge {...props} />;
 
-  return <InternalBadge count={count} {...restProps} />;
+  return <InternalBadge count={props.count} {...props} />;
 };
 
 export { Badge };

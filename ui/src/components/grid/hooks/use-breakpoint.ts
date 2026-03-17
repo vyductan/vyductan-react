@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef } from "react";
 import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect";
 
@@ -31,7 +33,6 @@ function useBreakpoint(
     });
 
     return () => responsiveObserver.unsubscribe(token);
-    // eslint-disable-next-line react-hooks/react-compiler
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

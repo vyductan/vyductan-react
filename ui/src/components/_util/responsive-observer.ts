@@ -1,8 +1,8 @@
-/* eslint-disable react-hooks/react-compiler */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import React from "react";
 
 import type { GlobalToken } from "../theme/internal";
@@ -42,7 +42,7 @@ const getResponsiveMap = (token: GlobalToken): BreakpointMap => ({
  */
 const validateBreakpoints = (token: GlobalToken) => {
   const indexableToken: any = token;
-  const revBreakpoints = [...responsiveArray].reverse();
+  const revBreakpoints = responsiveArray.toReversed();
 
   for (const [i, breakpoint] of revBreakpoints.entries()) {
     const breakpointUpper = breakpoint.toUpperCase();

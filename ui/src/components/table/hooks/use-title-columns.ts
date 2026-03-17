@@ -13,18 +13,17 @@ import { renderColumnTitle } from "../util";
 const fillTitle = <RecordType extends AnyObject = AnyObject>(
   columns: ColumnsType<RecordType>,
   columnTitleProps: ColumnTitleProps<RecordType>,
-) => {
+): ColumnsType<RecordType> => {
   const finalColumns = columns.map((column) => {
     const cloneColumn: ColumnGroupType<RecordType> | ColumnType<RecordType> = {
       ...column,
+      title: renderColumnTitle(column.title, columnTitleProps),
+      ...("children" in column
+        ? {
+            children: fillTitle<RecordType>(column.children, columnTitleProps),
+          }
+        : {}),
     };
-    cloneColumn.title = renderColumnTitle(column.title, columnTitleProps);
-    if ("children" in cloneColumn) {
-      cloneColumn.children = fillTitle<RecordType>(
-        cloneColumn.children,
-        columnTitleProps,
-      );
-    }
     return cloneColumn;
   });
   return finalColumns;

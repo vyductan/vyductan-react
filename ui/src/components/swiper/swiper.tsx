@@ -61,7 +61,13 @@ export const Swiper = ({ images }: SwiperProps) => {
             <div
             // className="swiper-zoom-container"
             >
-              <img className="max-h-full rounded-md" {...imgProps} />
+              <picture>
+                <img
+                  className="max-h-full rounded-md"
+                  alt="swiper image"
+                  {...imgProps}
+                />
+              </picture>
             </div>
           </SwiperSlide>
         ))}

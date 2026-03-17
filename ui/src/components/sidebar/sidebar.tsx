@@ -1,13 +1,13 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
-import type { XOR } from "ts-xor";
 import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemType, MenuProps } from "../menu";
 import { Divider } from "../divider";
 import {
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -17,24 +17,24 @@ import {
   SidebarRoot,
 } from "./_component";
 
-type ShadcnSidebarProps = React.ComponentProps<typeof SidebarRoot>;
-
-type OwnSidebarProps = {
+type SidebarProps = {
   className?: string;
   classNames?: {
     header?: string;
+    footer?: string;
     menuButton?: string;
     icon?: string;
   };
 
   itemRender?: (
     item: MenuItemType,
-    classNames: OwnSidebarProps["classNames"],
+    classNames: SidebarProps["classNames"],
     originalNode: ReactNode,
   ) => ReactNode;
   contentRender?: (props: { itemNodes: React.ReactNode }) => React.ReactNode;
 
   header?: ReactNode;
+  footer?: ReactNode;
   items?: MenuProps["items"];
   defaultSelectedKeys?: string[];
   selectedKeys?: string[];
@@ -45,17 +45,10 @@ type OwnSidebarProps = {
   }) => void;
 };
 
-type SidebarProps = XOR<ShadcnSidebarProps, OwnSidebarProps>;
-
 const Sidebar = (props: SidebarProps) => {
   const [selectKeys] = useMergedState(props.defaultSelectedKeys ?? [], {
     value: props.selectedKeys,
   });
-
-  const isShadcnSidebar = !props.items || !props.itemRender;
-  if (isShadcnSidebar) {
-    return <SidebarRoot {...(props as ShadcnSidebarProps)} />;
-  }
 
   const {
     className,
@@ -65,6 +58,7 @@ const Sidebar = (props: SidebarProps) => {
     contentRender,
 
     header,
+    footer,
     items = [],
     defaultSelectedKeys: _defaultSelectedKeys,
     selectedKeys: _selectedKeys,
@@ -90,44 +84,45 @@ const Sidebar = (props: SidebarProps) => {
           </SidebarGroup>
         );
       }
-      if (item.type === "submenu") {
+      if (
+        item.type === "submenu" ||
+        (item.type === undefined && "children" in item)
+      ) {
         return <></>;
       }
 
-      /* Item type Render */
-      // if (item.hidden) {
-      //   return;
-      // }
-      const { key, label, title } = item;
-      const mergedLabel = label ?? title;
-      const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-      let labelToRender: ReactNode = mergedLabel;
-      labelToRender = itemRender
-        ? itemRender(item, classNames, labelToRender)
-        : labelToRender;
+      if (item.type === "item" || !("children" in item)) {
+        const { key, label, title } = item;
+        const mergedLabel = label ?? title;
+        const isActive = selectKeys.some((x) => key.toString().startsWith(x));
+        let labelToRender: ReactNode = mergedLabel;
+        labelToRender = itemRender
+          ? itemRender(item, classNames, labelToRender)
+          : labelToRender;
 
-      return (
-        <SidebarMenuItem
-          key={key}
-          onClick={(event) => {
-            onSelect?.({ item: { key, label: mergedLabel }, key, event });
-          }}
-          onKeyUp={(event) => {
-            onSelect?.({ item: { key, label: mergedLabel }, key, event });
-          }}
-        >
-          <SidebarMenuButton
-            asChild
-            isActive={isActive}
-            tooltip={
-              typeof mergedLabel === "string" ? mergedLabel : key.toString()
-            }
-            className={classNames?.menuButton}
+        return (
+          <SidebarMenuItem
+            key={key}
+            onClick={(event) => {
+              onSelect?.({ item: { key, label: mergedLabel }, key, event });
+            }}
+            onKeyUp={(event) => {
+              onSelect?.({ item: { key, label: mergedLabel }, key, event });
+            }}
           >
-            {labelToRender}
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      );
+            <SidebarMenuButton
+              asChild
+              isActive={isActive}
+              tooltip={
+                typeof mergedLabel === "string" ? mergedLabel : key.toString()
+              }
+              className={classNames?.menuButton}
+            >
+              {labelToRender}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        );
+      }
     });
   };
 
@@ -139,8 +134,10 @@ const Sidebar = (props: SidebarProps) => {
           ? contentRender({ itemNodes: renderItems(items) })
           : renderItems(items)}
       </SidebarContent>
+      <SidebarFooter className={classNames?.footer}>{footer}</SidebarFooter>
     </SidebarRoot>
   );
 };
 
+export type { SidebarProps };
 export { Sidebar };
