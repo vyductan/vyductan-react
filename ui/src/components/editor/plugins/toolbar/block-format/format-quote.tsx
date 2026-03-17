@@ -1,4 +1,3 @@
-import { SelectItem } from "@/components/ui/select";
 import { $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
 import { $getSelection } from "lexical";

@@ -1,11 +1,5 @@
 import type { SerializedDocument } from "@lexical/file";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  TooltipContent,
-  TooltipRoot,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import {
   editorStateFromSerializedDocument,
   serializedDocumentFromEditorState,

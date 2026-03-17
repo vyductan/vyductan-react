@@ -1,4 +1,3 @@
-import { SelectItem } from "@/components/ui/select";
 import { $setBlocksType } from "@lexical/selection";
 import {
   $createParagraphNode,
