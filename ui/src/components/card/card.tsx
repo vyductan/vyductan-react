@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { Children, isValidElement } from "react";
+import type { ReactElement, ReactNode } from "react";
+import { Children, Fragment, isValidElement } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -36,6 +36,21 @@ type CardProps = Omit<CardRootProps, "title"> & {
   extra?: ReactNode;
   footer?: ReactNode;
 };
+
+const flattenCardChildren = (children: ReactNode): ReactElement[] => {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<{ children?: ReactNode }>(child)) {
+      return [];
+    }
+
+    if (child.type === Fragment) {
+      return flattenCardChildren(child.props.children);
+    }
+
+    return [child as ReactElement];
+  });
+};
+
 const Card = ({
   skeleton = false,
   classNames,
@@ -64,14 +79,13 @@ const Card = ({
     );
   }
 
-  const isShadcnCard = Children.toArray(children).some(
+  const isShadcnCard = flattenCardChildren(children).some(
     (child) =>
-      isValidElement(child) &&
-      (child.type === CardContent ||
-        child.type === CardHeader ||
-        child.type === CardFooter ||
-        child.type === CardTitle ||
-        child.type === CardDescription),
+      child.type === CardContent ||
+      child.type === CardHeader ||
+      child.type === CardFooter ||
+      child.type === CardTitle ||
+      child.type === CardDescription,
   );
 
   const borderedToPass = variant === "borderless" ? false : bordered;

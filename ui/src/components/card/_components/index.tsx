@@ -13,7 +13,7 @@ import {
 import type { SizeType } from "../../config-provider/size-context";
 import { CardContext } from "../context";
 
-type CardRootProps = React.ComponentProps<typeof ShadcnCardRoot> & {
+type CardRootProps = Omit<React.ComponentProps<typeof ShadcnCardRoot>, "size"> & {
   size?: SizeType;
   bordered?: boolean;
 };
@@ -25,10 +25,11 @@ const CardRoot = ({
 }: CardRootProps) => {
   return (
     <ShadcnCardRoot
+      data-size={size}
       className={cn(
-        "rounded-md py-3 sm:rounded-lg sm:py-6",
-        size === "small" && "gap-3 rounded-lg py-3 sm:py-3",
-        bordered ? "" : "border-none shadow-none",
+        "group/card gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        size === "small" && "gap-3 py-3 has-data-[slot=card-footer]:pb-0",
+        bordered ? "" : "border-none ring-0 shadow-none",
         className,
       )}
       {...props}
@@ -47,20 +48,30 @@ const CardHeader = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardHeader
-      className={cn(size === "small" && "px-3 sm:px-3", className)}
+      className={cn(
+        "group/card-header gap-1 rounded-t-xl px-4 has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4",
+        size === "small" && "px-3 [.border-b]:pb-3",
+        className,
+      )}
       {...props}
     />
   );
 };
 
 const CardTitle = ({
+  size: sizeProp,
   className,
   ...props
-}: React.ComponentProps<typeof ShadcnCardTitle>) => {
+}: React.ComponentProps<typeof ShadcnCardTitle> & {
+  size?: SizeType;
+}) => {
+  const context = useContext(CardContext);
+  const size = context.size ?? sizeProp;
   return (
     <ShadcnCardTitle
       className={cn(
-        "flex-1", // fix if not has extra the title width not full
+        "text-base leading-snug font-medium",
+        size === "small" && "text-sm",
         className,
       )}
       {...props}
@@ -72,15 +83,7 @@ const CardAction = ({
   className,
   ...props
 }: React.ComponentProps<typeof ShadcnCardAction>) => {
-  return (
-    <ShadcnCardAction
-      className={cn(
-        "row-span-1", // title and extra should same height
-        className,
-      )}
-      {...props}
-    />
-  );
+  return <ShadcnCardAction className={className} {...props} />;
 };
 
 const CardContent = ({
@@ -94,11 +97,7 @@ const CardContent = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardContent
-      className={cn(
-        "px-3 sm:px-6",
-        size === "small" && "px-3 sm:px-3",
-        className,
-      )}
+      className={cn("px-4", size === "small" && "px-3", className)}
       {...props}
     />
   );
@@ -115,7 +114,11 @@ const CardFooter = ({
   const size = context.size ?? sizeProp;
   return (
     <ShadcnCardFooter
-      className={cn(size === "small" && "px-3 sm:px-3", className)}
+      className={cn(
+        "rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3",
+        size === "small" && "p-3",
+        className,
+      )}
       {...props}
     />
   );
