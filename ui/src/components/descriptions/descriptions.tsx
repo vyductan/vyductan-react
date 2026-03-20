@@ -1,19 +1,30 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactElement, ReactNode } from "react";
 import { Fragment } from "react";
 
 import type { Screens } from "@acme/ui/types";
 import { useResponsive } from "@acme/ui/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
+import { responsiveArray } from "../_util/responsive-observer";
+
 import type { SizeType } from "../config-provider/size-context";
 import type { DescriptionsItem, VerticalCell } from "./types";
 import { Skeleton } from "../skeleton";
 import { createHorizontalRows, createVerticalRows } from "./utils";
 
+const DEFAULT_COLUMN_BY_SCREEN: Record<Screens, number> = {
+  xs: 1,
+  sm: 2,
+  md: 3,
+  lg: 3,
+  xl: 4,
+  xxl: 4,
+};
+
 type DescriptionsProps = {
-  title?: React.ReactNode;
+  title?: ReactNode;
   items: DescriptionsItem[];
 
   skeleton?: boolean;
@@ -39,47 +50,48 @@ type DescriptionsProps = {
   colon?: boolean;
   extra?: ReactNode;
 };
-const Descriptions = ({
+
+function Descriptions({
   title,
   items,
   extra,
-
   skeleton = false,
   size,
   className,
-
   classNames,
   labelStyle,
   bordered,
-  column = 3,
+  column,
   layout = "horizontal",
   colon = true,
-  // ...props
-}: DescriptionsProps) => {
+}: DescriptionsProps): ReactElement {
   const responsiveInfo = useResponsive();
 
-  let mergedColumn = 0;
-  if (typeof column === "number") {
-    mergedColumn = column;
-  } else if (typeof column === "object") {
-    const mergedColumnWithScreen: Partial<Record<Screens, number | undefined>> =
-      {};
-    for (const [k] of Object.entries(responsiveInfo)) {
-      mergedColumnWithScreen[k as Screens] =
-        responsiveInfo[k as Screens] && column[k as Screens]
-          ? column[k as Screens]
-          : undefined;
-    }
-    const matched = Object.entries(mergedColumnWithScreen).findLast(
-      ([, v]) => v,
-    )?.[0] as Screens;
-    mergedColumn = column[matched] ?? 0;
-  }
+  const mergedColumn =
+    typeof column === "number"
+      ? column
+      : (() => {
+          const columnByScreen = column ?? DEFAULT_COLUMN_BY_SCREEN;
+          const matched = responsiveArray.find(
+            (screen) =>
+              responsiveInfo[screen] && columnByScreen[screen] !== undefined,
+          );
+          const fallbackColumn =
+            columnByScreen.md ??
+            columnByScreen.sm ??
+            columnByScreen.xs ??
+            columnByScreen.lg ??
+            columnByScreen.xl ??
+            columnByScreen.xxl ??
+            1;
+          return matched ? columnByScreen[matched] ?? fallbackColumn : fallbackColumn;
+        })();
 
-  const rows =
-    layout === "horizontal"
-      ? createHorizontalRows(items, mergedColumn)
-      : createVerticalRows(items, mergedColumn);
+  const isHorizontal = layout === "horizontal";
+  const isHorizontalBorderless = isHorizontal && !bordered;
+  const rows = isHorizontal
+    ? createHorizontalRows(items, mergedColumn)
+    : createVerticalRows(items, mergedColumn);
 
   const headerClassName = cn("mb-4 flex items-center", classNames?.header);
   const viewClassName = cn(
@@ -87,50 +99,54 @@ const Descriptions = ({
     classNames?.view,
   );
   const labelClassName = cn(
-    "text-muted-foreground inline-flex items-center font-medium", // items-center instead of items-baseline to fix <div> label
-    [
+    "text-muted-foreground inline-flex items-center font-medium",
+    isHorizontalBorderless && "shrink-0 whitespace-nowrap",
+    isHorizontalBorderless &&
+      colon !== false &&
       "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
-      layout === "horizontal" && "after:mr-2",
-      colon === false && "after:content-['']",
-    ],
     classNames?.label,
   );
   const childrenClassName = cn(
     "inline-flex items-baseline min-w-[1em]",
+    isHorizontalBorderless && "min-w-0 flex-1",
     classNames?.children,
   );
-  const tbodyClassName = cn(
-    layout === "horizontal" && [
-      bordered &&
-        "[&_tr:last-child>td]:border-b-0 [&_tr:last-child>th]:border-b-0",
-    ],
+  const horizontalBorderlessContentClassName = cn(
+    isHorizontalBorderless && "flex items-baseline",
+    isHorizontalBorderless && colon === false && "gap-2",
   );
+  const tbodyClassName = cn(
+    isHorizontal &&
+      bordered &&
+      "[&_tr:last-child>td]:border-b-0 [&_tr:last-child>th]:border-b-0",
+  );
+  const isSmall = size === "small";
+  const verticalThSpacingClass = isSmall
+    ? "pb-0 pl-3 first:pl-0 last:pr-0"
+    : "pb-2 pl-3 first:pl-0 last:pr-0";
+  const verticalTdSpacingClass = isSmall
+    ? "gap-0 pb-2 pl-3 pr-4 align-top first:pl-0 last:pr-0"
+    : "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0";
   const thClassName = cn(
     "text-start text-sm font-normal",
-    layout === "horizontal" && [
+    isHorizontal && [
       bordered && ["px-6", "border-b border-e bg-surface-secondary"],
-      size === "small" && "py-2",
-      size === "middle" || (!size && "py-3"),
+      isSmall && "py-2",
+      (size === "middle" || !size) && "py-3",
     ],
-    layout === "vertical" && [
-      "pb-1 pl-3 first:pl-0 last:pr-0",
-      bordered && "px-6",
-    ],
+    !isHorizontal && [verticalThSpacingClass, bordered && "px-6"],
     classNames?.th,
   );
   const tdClassName = cn(
     "break-all text-sm",
-    layout === "horizontal" && [
+    isHorizontal && [
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",
       bordered && ["px-6", "border-b border-e"],
-      size === "small" && "pb-2",
-      size === "middle" || (!size && "pb-3"),
+      isSmall && "pb-2",
+      (size === "middle" || !size) && "pb-3",
     ],
-    layout === "vertical" && [
-      "gap-1 pb-4 pl-3 pr-4 align-top first:pl-0 last:pr-0",
-      bordered && "px-6",
-    ],
+    !isHorizontal && [verticalTdSpacingClass, bordered && "px-6"],
     classNames?.td,
   );
 
@@ -201,14 +217,16 @@ const Descriptions = ({
                         )}
                         colSpan={col.span}
                       >
-                        <span className={labelClassName}>{col.label}</span>
-                        {skeleton ? (
-                          <Skeleton />
-                        ) : (
-                          <span className={childrenClassName}>
-                            {col.children}
-                          </span>
-                        )}
+                        <div className={horizontalBorderlessContentClassName}>
+                          <span className={labelClassName}>{col.label}</span>
+                          {skeleton ? (
+                            <Skeleton />
+                          ) : (
+                            <span className={childrenClassName}>
+                              {col.children}
+                            </span>
+                          )}
+                        </div>
                       </td>
                     ) //vertical
                   ) : rowIndex % 2 === 0 ? (
@@ -256,7 +274,7 @@ const Descriptions = ({
       </div>
     </div>
   );
-};
+}
 
 export type { DescriptionsProps };
 export { Descriptions };

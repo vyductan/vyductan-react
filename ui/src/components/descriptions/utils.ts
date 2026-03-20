@@ -2,6 +2,56 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { DescriptionsItem, VerticalCell, VerticalRow } from "./types";
 
+function fillHorizontalRow(
+  row: DescriptionsItem[],
+  columns: number,
+  currentRowSpan: number,
+): DescriptionsItem[] {
+  if (row.length === 0 || currentRowSpan >= columns) {
+    return [...row];
+  }
+
+  const remainingSpan = columns - currentRowSpan;
+  const lastItem = row.at(-1);
+
+  if (!lastItem) {
+    return [...row];
+  }
+
+  return [
+    ...row.slice(0, -1),
+    {
+      ...lastItem,
+      span: (lastItem.span ?? 1) + remainingSpan,
+    },
+  ];
+}
+
+function fillVerticalRow(
+  row: VerticalCell[],
+  columns: number,
+  currentRowSpan: number,
+): VerticalCell[] {
+  if (row.length === 0 || currentRowSpan >= columns) {
+    return [...row];
+  }
+
+  const remainingSpan = columns - currentRowSpan;
+  const lastCell = row.at(-1);
+
+  if (!lastCell) {
+    return [...row];
+  }
+
+  return [
+    ...row.slice(0, -1),
+    {
+      ...lastCell,
+      span: (lastCell.span ?? 1) + remainingSpan,
+    },
+  ];
+}
+
 export function createHorizontalRows(
   data: DescriptionsItem[],
   columns: number,
@@ -10,30 +60,24 @@ export function createHorizontalRows(
   let currentRow: DescriptionsItem[] = [];
   let currentRowSpan = 0;
 
-  // Process each item and create rows based on column spans
   for (const item of data) {
     const itemSpan = item.span ?? 1;
 
-    // If adding this item would exceed the column limit, start new row
     if (currentRowSpan + itemSpan > columns) {
-      // Add the current row if it has content
       if (currentRow.length > 0) {
-        rows.push([...currentRow]);
+        rows.push(fillHorizontalRow(currentRow, columns, currentRowSpan));
       }
 
-      // Reset for new row
       currentRow = [];
       currentRowSpan = 0;
     }
 
-    // Add item to current row
     currentRow.push(item);
     currentRowSpan += itemSpan;
   }
 
-  // Add the last row if it has content
   if (currentRow.length > 0) {
-    rows.push(currentRow);
+    rows.push(fillHorizontalRow(currentRow, columns, currentRowSpan));
   }
 
   return rows;
@@ -48,24 +92,22 @@ export function createVerticalRows(
   let currentRowValues: VerticalCell[] = [];
   let currentRowSpan = 0;
 
-  // Process each item and create rows based on column spans
   for (const item of data) {
     const itemSpan = item.span ?? 1;
 
-    // If adding this item would exceed the column limit, start new rows
     if (currentRowSpan + itemSpan > columns) {
-      // Add the current rows if they have content
       if (currentRowLabels.length > 0) {
-        rows.push([...currentRowLabels], [...currentRowValues]);
+        rows.push(
+          fillVerticalRow(currentRowLabels, columns, currentRowSpan),
+          fillVerticalRow(currentRowValues, columns, currentRowSpan),
+        );
       }
 
-      // Reset for new rows
       currentRowLabels = [];
       currentRowValues = [];
       currentRowSpan = 0;
     }
 
-    // Add item to current rows
     currentRowLabels.push({
       span: itemSpan,
       content: item.label,
@@ -79,19 +121,13 @@ export function createVerticalRows(
     });
 
     currentRowSpan += itemSpan;
-
-    // // If we've reached the column limit, start new rows
-    // if (currentRowSpan >= columns) {
-    //   rows.push([...currentRowLabels], [...currentRowValues]);
-    //   currentRowLabels = [];
-    //   currentRowValues = [];
-    //   currentRowSpan = 0;
-    // }
   }
 
-  // Add the last rows if they have content
   if (currentRowLabels.length > 0) {
-    rows.push(currentRowLabels, currentRowValues);
+    rows.push(
+      fillVerticalRow(currentRowLabels, columns, currentRowSpan),
+      fillVerticalRow(currentRowValues, columns, currentRowSpan),
+    );
   }
 
   return rows;

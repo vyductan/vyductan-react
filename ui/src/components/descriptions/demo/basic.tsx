@@ -21,22 +21,11 @@ const items: DescriptionsProps["items"] = [
   },
   {
     key: "4",
-    label: "First Name",
-    children: "John",
-  },
-  {
-    key: "5",
-    label: "Last Name",
-    children: "Doe",
-    span: 2,
-  },
-  {
-    key: "6",
     label: "Remark",
     children: "empty",
   },
   {
-    key: "7",
+    key: "5",
     label: "Address",
     children: "No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China",
   },
