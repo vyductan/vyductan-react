@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { useEffect } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -58,6 +59,7 @@ const addons = [
 
 const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
   plan: z
     .string({
       error: "Please select a subscription plan",
@@ -84,17 +86,30 @@ const formSchema = z.object({
   emailNotifications: z.boolean(),
 });
 
-export default function FormRhfComplex() {
+type FormRhfComplexProps = {
+  showPasswordError?: boolean;
+};
+
+export default function FormRhfComplex({
+  showPasswordError = false,
+}: FormRhfComplexProps) {
   const form = useForm({
     resolver: standardSchemaResolver(formSchema),
     defaultValues: {
       username: "",
+      password: showPasswordError ? "123" : "",
       plan: "basic",
       billingPeriod: "",
       addons: [],
       emailNotifications: false,
     },
   });
+
+  useEffect(() => {
+    if (showPasswordError) {
+      void form.trigger("password");
+    }
+  }, [form, showPasswordError]);
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     toast("You submitted the following values:", {
@@ -143,6 +158,31 @@ export default function FormRhfComplex() {
                     This is your public display name. Must be between 3 and 10
                     characters. Must only contain letters, numbers, and
                     underscores.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              name="password"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-rhf-input-password">
+                    Password
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-rhf-input-password"
+                    type="password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter password"
+                    autoComplete="new-password"
+                  />
+                  <FieldDescription>
+                    Must be at least 8 characters.
                   </FieldDescription>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

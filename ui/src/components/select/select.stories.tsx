@@ -9,8 +9,9 @@ import {
   within,
 } from "storybook/test";
 
-import type { OptionType } from "./types";
+import type { SelectProps } from "./select";
 import { Select } from "./select";
+import type { OptionType } from "./types";
 
 const meta = {
   title: "Components/Select",
@@ -46,6 +47,20 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+type SingleSelectStoryArgs = Omit<
+  SelectProps<string>,
+  "mode" | "value" | "defaultValue" | "options"
+>;
+
+type SelectPreviewArgs = SingleSelectStoryArgs;
+type SingleSelectComponentProps = Extract<SelectProps<string>, { mode?: never }>;
+
+const SingleSelectPreview = (
+  props: SingleSelectStoryArgs & {
+    options: OptionType<string>[];
+    value?: string;
+  },
+) => <Select<string> {...(props as SingleSelectComponentProps)} />;
 
 const basicOptions: OptionType<string>[] = [
   { label: "Option 1", value: "1" },
@@ -81,26 +96,23 @@ export const Variants: Story = {
       },
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (args: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { mode, value, defaultValue, options, ...rest } = args;
+  render: (args: SelectPreviewArgs) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           variant="outlined"
           placeholder="Outlined"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           variant="filled"
           placeholder="Filled"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           variant="borderless"
           placeholder="Borderless"
           options={basicOptions}
@@ -111,26 +123,23 @@ export const Variants: Story = {
 };
 
 export const Sizes: Story = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (args: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { mode, value, defaultValue, options, ...rest } = args;
+  render: (args: SelectPreviewArgs) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           size="small"
           placeholder="Small"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           size="middle"
           placeholder="Middle"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           size="large"
           placeholder="Large"
           options={basicOptions}
@@ -168,20 +177,17 @@ export const Loading: Story = {
 };
 
 export const Disabled: Story = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (args: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { mode, value, defaultValue, options, ...rest } = args;
+  render: (args: SelectPreviewArgs) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           disabled
           placeholder="Disabled"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           disabled
           placeholder="Disabled with value"
           value="1"
@@ -193,20 +199,17 @@ export const Disabled: Story = {
 };
 
 export const Status: Story = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render: (args: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { mode, value, defaultValue, options, ...rest } = args;
+  render: (args: SelectPreviewArgs) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           status="error"
           placeholder="Error status"
           options={basicOptions}
         />
-        <Select
-          {...rest}
+        <SingleSelectPreview
+          {...args}
           status="warning"
           placeholder="Warning status"
           options={basicOptions}
@@ -228,7 +231,7 @@ export const Tags: Story = {
 
     await step("Empty tags input keeps the same left inset as Input", async () => {
       const input = canvas.getByPlaceholderText("Type to add tags");
-      const styles = window.getComputedStyle(input);
+      const styles = globalThis.getComputedStyle(input);
       const paddingLeft = Number.parseFloat(styles.paddingLeft);
 
       await expect(paddingLeft).toBeGreaterThanOrEqual(11);
@@ -523,7 +526,7 @@ export const DisabledTags: Story = {
       const trigger = input.closest("[data-slot='popover-trigger']");
 
       if (!(trigger instanceof HTMLElement)) {
-        throw new Error("Disabled tags trigger not found");
+        throw new TypeError("Disabled tags trigger not found");
       }
 
       await expect(input).toBeDisabled();

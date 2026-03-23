@@ -12,7 +12,6 @@ type SelectMultipleProps<TValue extends SelectValueType = SelectValueType> = {
   disabled?: boolean;
   selectedValues: TValue[];
   getTagLabel?: (value: TValue) => React.ReactNode;
-  onAdd: (value: TValue) => void;
   onRemove: (value: TValue) => void;
   placeholder?: string;
   onInputClick: (e: React.MouseEvent<HTMLInputElement>) => void;
@@ -30,7 +29,6 @@ export const SelectMultipleContent = <
   disabled,
   selectedValues,
   getTagLabel,
-  onAdd,
   onRemove,
   placeholder,
   onInputClick,
@@ -43,7 +41,7 @@ export const SelectMultipleContent = <
   const isTags = mode === "tags";
   const inputRef = React.useRef<HTMLInputElement>(null);
   const focusInput = () => {
-    requestAnimationFrame(() => {
+    globalThis.requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
   };
@@ -53,11 +51,6 @@ export const SelectMultipleContent = <
       focusInput();
     }
   }, [isTags, open]);
-
-  const addTag = (tag: TValue) => {
-    if (disabled || !tag || selectedValues.includes(tag)) return;
-    onAdd(tag);
-  };
 
   // Remove tag
   const removeTag = (tag: TValue) => {

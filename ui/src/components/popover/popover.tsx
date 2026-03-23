@@ -1,5 +1,5 @@
 import React from "react";
-import { PopoverArrow } from "@radix-ui/react-popover";
+import { Popover as PopoverPrimitive } from "radix-ui";
 import { useMergedState } from "@rc-component/util";
 import { useDebounce } from "ahooks";
 
@@ -122,7 +122,7 @@ export const Popover = (props: PopoverProps) => {
           : {})}
         {...restProps}
       >
-        {arrow && <PopoverArrow className="fill-white" />}
+        {arrow && <PopoverPrimitive.Arrow className="fill-white" />}
         {(title || description) && (
           <PopoverHeader>
             {title && <PopoverTitle>{title}</PopoverTitle>}

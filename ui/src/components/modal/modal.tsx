@@ -172,8 +172,7 @@ const Modal = ({
       <DialogContent
         className={cn(
           "px-0 text-sm",
-          "sm:max-w-auto", // override sm:max-w-lg of shadcn
-          numWidth && "w-(--modal-width)", // override max-w-lg of shadcn
+          numWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],
           className,
         )}
         style={{

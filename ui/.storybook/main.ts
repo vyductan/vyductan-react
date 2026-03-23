@@ -6,6 +6,7 @@ import type { StorybookConfig } from "@storybook/nextjs-vite";
 // }
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import tailwindcss from "@tailwindcss/vite";
+import remarkGfm from "remark-gfm";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -24,7 +25,16 @@ const config: StorybookConfig = {
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
-    "@storybook/addon-docs",
+    {
+      name: "@storybook/addon-docs",
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        },
+      },
+    },
     "@storybook/addon-onboarding",
     // NOTE: @storybook/addon-vitest completely removed to prevent mocker bundle
     // If you need story testing, run tests separately with vitest

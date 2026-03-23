@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import dayjs from "dayjs";
-import { expect, fn, userEvent, within } from "storybook/test";
+import { expect, fireEvent, fn, userEvent, within } from "storybook/test";
 
 import { DatePicker } from "./date-picker";
 
@@ -100,12 +100,81 @@ export const PickerModes: Story = {
   render: (args) => (
     <div className="flex w-[240px] flex-col gap-4">
       <DatePicker {...args} picker="date" placeholder="Date Picker" />
-      <DatePicker {...args} picker="week" placeholder="Week Picker" />
+      <DatePicker
+        {...args}
+        picker="week"
+        placeholder="Week Picker"
+        defaultValue={dayjs("2024-05-15")}
+      />
       <DatePicker {...args} picker="month" placeholder="Month Picker" />
-      <DatePicker {...args} picker="quarter" placeholder="Quarter Picker" />
+      <DatePicker
+        {...args}
+        picker="quarter"
+        placeholder="Quarter Picker"
+        defaultValue={dayjs("2024-08-15")}
+      />
       <DatePicker {...args} picker="year" placeholder="Year Picker" />
     </div>
   ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Week picker previews and commits week start", async () => {
+      const input = canvas.getByPlaceholderText("Week Picker");
+      await userEvent.click(input);
+
+      const day = document.querySelector<HTMLButtonElement>('[data-day="5/16/2024"]');
+      await expect(day).toBeTruthy();
+      if (!day) {
+        throw new Error('Expected day button for 5/16/2024');
+      }
+      await userEvent.hover(day);
+      await expect(input).toHaveValue("2024-05-12");
+
+      const currentDay = document.querySelector<HTMLButtonElement>(
+        '[data-day="5/16/2024"]',
+      );
+      await expect(currentDay).toBeTruthy();
+      if (!currentDay) {
+        throw new Error('Expected current day button for 5/16/2024');
+      }
+      await userEvent.click(currentDay);
+      await userEvent.click(document.body);
+
+      await expect(input).toHaveValue("2024-05-12");
+    });
+
+    await step("Quarter picker commits quarter start", async () => {
+      const input = canvas.getByPlaceholderText("Quarter Picker");
+      await userEvent.click(input);
+
+      const monthButton = await within(document.body).findByRole("button", {
+        name: "Aug",
+      });
+      await userEvent.click(monthButton);
+
+      const mayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
+        (element) => element.textContent?.trim() === "May",
+      );
+      await expect(mayOption).toBeTruthy();
+      if (!mayOption) {
+        throw new Error('Expected month option "May"');
+      }
+      await userEvent.hover(mayOption);
+
+      const currentMayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
+        (element) => element.textContent?.trim() === "May",
+      );
+      await expect(currentMayOption).toBeTruthy();
+      if (!currentMayOption) {
+        throw new Error('Expected current month option "May"');
+      }
+      fireEvent.mouseDown(currentMayOption);
+      await userEvent.click(document.body);
+
+      await expect(input).toHaveValue("2024-Q2");
+    });
+  },
 };
 
 export const WithTime: Story = {

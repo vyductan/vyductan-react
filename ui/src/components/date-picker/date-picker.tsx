@@ -19,6 +19,7 @@ import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
 import { Button } from "../button";
+import { CustomCalendarDayButton } from "../calendar/_components";
 import { Calendar } from "../calendar";
 // For typing DayButton props if needed in future (not strictly required below)
 // import type { DayButton as RdpDayButton } from "react-day-picker";
@@ -120,6 +121,52 @@ const DatePicker = (props: DatePickerProps) => {
 
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
+  const getPeriodStart = React.useCallback(
+    (date: Dayjs, mode: "month" | "year" | "week" | "quarter") => {
+      if (mode === "quarter") {
+        return date.month(Math.floor(date.month() / 3) * 3).startOf("month");
+      }
+
+      return date.startOf(mode);
+    },
+    [],
+  );
+
+  const getPeriodDates = React.useCallback(
+    (date: Dayjs, mode: "month" | "year" | "week" | "quarter") => {
+      const start = getPeriodStart(date, mode);
+      const end =
+        mode === "quarter"
+          ? start.add(2, "month").endOf("month")
+          : start.endOf(mode);
+      const dates: Dayjs[] = [];
+
+      for (let current = start; !current.isAfter(end, "day"); current = current.add(1, "day")) {
+        dates.push(current);
+      }
+
+      return dates;
+    },
+    [getPeriodStart],
+  );
+
+  const isDateAllowed = React.useCallback(
+    (date: Dayjs, mode: PanelMode = picker ?? "date") => {
+      if (minDate && date.isBefore(minDate, "day")) return false;
+      if (maxDate && date.isAfter(maxDate, "day")) return false;
+      if (disabledDate?.(date, { type: mode })) return false;
+      return true;
+    },
+    [disabledDate, maxDate, minDate, picker],
+  );
+
+  const isWholePeriodAllowed = React.useCallback(
+    (date: Dayjs, mode: "month" | "year" | "week" | "quarter") => {
+      return getPeriodDates(date, mode).every((periodDate) => isDateAllowed(periodDate, mode));
+    },
+    [getPeriodDates, isDateAllowed],
+  );
+
   const [open, setOpen] = useState(false);
   const {
     format: formatConfig,
@@ -135,9 +182,22 @@ const DatePicker = (props: DatePickerProps) => {
     formatProp ??
     (picker === "year"
       ? "YYYY"
-      : showTime
-        ? `${formatConfig ?? datePickerFormat} HH:mm`
-        : (formatConfig ?? datePickerFormat ?? "YYYY-MM-DD"));
+      : picker === "quarter"
+        ? "YYYY-[Q]Q"
+        : showTime
+          ? `${formatConfig ?? datePickerFormat} HH:mm`
+          : (formatConfig ?? datePickerFormat ?? "YYYY-MM-DD"));
+
+  const formatValue = React.useCallback(
+    (date: Dayjs) => {
+      if (picker === "quarter") {
+        return `${date.format("YYYY")}-Q${Math.floor(date.month() / 3) + 1}`;
+      }
+
+      return date.format(format);
+    },
+    [format, picker],
+  );
 
   // // Helpers to convert between external value (Date or Dayjs) and internal Dayjs
   // const toDayjs = (v: Dayjs | Date | null | undefined): Dayjs | undefined => {
@@ -159,17 +219,17 @@ const DatePicker = (props: DatePickerProps) => {
   const [value, setValue] = useMergedState(defaultValue, {
     value: valueProp,
     onChange: (next) => {
-      onChange?.(next, next ? next.format(format) : "");
+      onChange?.(next, next ? formatValue(next) : "");
     },
   });
-  const preInputValue = value ? value.format(format) : "";
+  const preInputValue = value ? formatValue(value) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue);
 
   // Sync input value when value changes
   useEffect(() => {
-    const newInputValue = value ? value.format(format) : "";
+    const newInputValue = value ? formatValue(value) : "";
     setInputValue(newInputValue);
-  }, [value, format, setInputValue]);
+  }, [value, formatValue, setInputValue]);
 
   // Convert Day (Date) from calendar to internal Dayjs
   const getDestinationValue = (date: Date): Dayjs => {
@@ -177,6 +237,8 @@ const DatePicker = (props: DatePickerProps) => {
   };
 
   const inputRef = React.useRef<InputRef>(null);
+  const skipBlurCommitRef = React.useRef(false);
+  const interactingInsidePanelRef = React.useRef(false);
 
   // eslint-disable-next-line react-hooks/refs
   const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
@@ -185,7 +247,7 @@ const DatePicker = (props: DatePickerProps) => {
       const parsed = parseInputDate(value, format);
       if (parsed) {
         setValue(parsed);
-        setInputValue(parsed.format(format));
+        setInputValue(formatValue(parsed));
         setMonth(parsed.toDate());
       } else {
         setInputValue(value);
@@ -291,8 +353,12 @@ const DatePicker = (props: DatePickerProps) => {
             // If DatePicker acts as a pure year picker, commit the selection
             if (picker === "year") {
               const y = year.startOf("year");
+              if (!isWholePeriodAllowed(y, "year")) {
+                setHoverPreview(undefined);
+                return;
+              }
               setValue(y);
-              setInputValue(y.format(format));
+              setInputValue(formatValue(y));
               setMonth(y.toDate());
               setOpen(false);
               setHoverPreview(undefined);
@@ -313,7 +379,17 @@ const DatePicker = (props: DatePickerProps) => {
         />
       );
     },
-    [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
+    [
+      formatValue,
+      isWholePeriodAllowed,
+      month,
+      picker,
+      setInputValue,
+      setMonth,
+      setOpen,
+      setValue,
+      value,
+    ],
   );
 
   const MonthModeMonthGrid = React.useCallback(
@@ -328,6 +404,10 @@ const DatePicker = (props: DatePickerProps) => {
             }
             if (picker === "month") {
               setHoverPreview(hoveredMonth.startOf("month"));
+              return;
+            }
+            if (picker === "quarter") {
+              setHoverPreview(getPeriodStart(hoveredMonth, "quarter"));
               return;
             }
             // Overlay month picker: preview keeping year/day?
@@ -347,9 +427,27 @@ const DatePicker = (props: DatePickerProps) => {
             // If DatePicker acts as a pure month picker, commit the selection
             if (picker === "month") {
               const m = selectedMonth.startOf("month");
+              if (!isWholePeriodAllowed(m, "month")) {
+                setHoverPreview(undefined);
+                return;
+              }
               setValue(m);
-              setInputValue(m.format(format));
+              setInputValue(formatValue(m));
               setMonth(m.toDate());
+              setOpen(false);
+              setHoverPreview(undefined);
+              return;
+            }
+
+            if (picker === "quarter") {
+              const q = getPeriodStart(selectedMonth, "quarter");
+              if (!isWholePeriodAllowed(q, "quarter")) {
+                setHoverPreview(undefined);
+                return;
+              }
+              setValue(q);
+              setInputValue(formatValue(q));
+              setMonth(q.toDate());
               setOpen(false);
               setHoverPreview(undefined);
               return;
@@ -366,7 +464,65 @@ const DatePicker = (props: DatePickerProps) => {
         />
       );
     },
-    [value, picker, month, format, setValue, setInputValue, setMonth, setOpen],
+    [
+      formatValue,
+      getPeriodStart,
+      isWholePeriodAllowed,
+      month,
+      picker,
+      setInputValue,
+      setMonth,
+      setOpen,
+      setValue,
+      value,
+    ],
+  );
+
+  const commitCalendarSelection = React.useCallback(
+    (date: Date | Dayjs) => {
+      const dayjsDate = dayjs(date);
+      const nextValue =
+        picker === "week" ? getPeriodStart(dayjsDate, "week") : dayjsDate;
+
+      if (picker === "week" && !isWholePeriodAllowed(nextValue, "week")) {
+        setHoverPreview(undefined);
+        return;
+      }
+
+      setValue(nextValue);
+      setInputValue(formatValue(nextValue));
+      setTypedDate(nextValue.toDate());
+      setMonth(nextValue.toDate());
+      skipBlurCommitRef.current = true;
+      setPendingYearCommit(false);
+      setHoverPreview(undefined);
+      setStickyPreview(undefined);
+      setOpen(false);
+    },
+    [
+      formatValue,
+      getPeriodStart,
+      isWholePeriodAllowed,
+      picker,
+      setInputValue,
+      setMonth,
+      setOpen,
+      setValue,
+    ],
+  );
+
+  const CalendarDayButton = React.useCallback(
+    (props: React.ComponentProps<typeof CustomCalendarDayButton>) => (
+      <CustomCalendarDayButton
+        {...props}
+        onMouseDown={(event) => {
+          interactingInsidePanelRef.current = true;
+          event.preventDefault();
+          props.onMouseDown?.(event);
+        }}
+      />
+    ),
+    [],
   );
 
   const BaseCaptionLabel = React.useCallback(
@@ -474,6 +630,7 @@ const DatePicker = (props: DatePickerProps) => {
               setTypedDate(commit.toDate());
               setMonth(commit.toDate());
             }
+            interactingInsidePanelRef.current = false;
             setPendingYearCommit(false);
             setHoverPreview(undefined);
             setStickyPreview(undefined);
@@ -483,7 +640,12 @@ const DatePicker = (props: DatePickerProps) => {
           event.preventDefault();
         }}
         content={
-          <div className="flex">
+          <div
+            className="flex"
+            onMouseDown={() => {
+              interactingInsidePanelRef.current = true;
+            }}
+          >
             <Calendar
               mode="single"
               required={true}
@@ -503,8 +665,13 @@ const DatePicker = (props: DatePickerProps) => {
               }}
               onDayMouseEnter={(date, modifiers) => {
                 if (!modifiers.disabled) {
+                  const hoveredDate = dayjs(date);
+                  const preview =
+                    picker === "week"
+                      ? getPeriodStart(hoveredDate, "week")
+                      : hoveredDate;
                   setHoverPreview((prev) =>
-                    prev?.isSame(date, "day") ? prev : dayjs(date),
+                    prev?.isSame(preview, "day") ? prev : preview,
                   );
                 }
               }}
@@ -524,17 +691,8 @@ const DatePicker = (props: DatePickerProps) => {
                 dayjs().add(50, "year").endOf("year").toDate()
               }
               onSelect={(date) => {
-                const dayjsDate = getDestinationValue(date);
-                setValue(dayjsDate);
-                setInputValue(dayjsDate.format(format));
-                setMonth(date);
-
-                // setValue(date);
-                // setInputValue(date.format(format));
-                // setMonth(date.toDate());
-                // Selecting a day commits selection; clear any pending year commit
-                setPendingYearCommit(false);
-                setOpen(false);
+                if (!date) return;
+                commitCalendarSelection(date);
               }}
               disabled={(date) => {
                 if (disabledDate) {
@@ -548,6 +706,7 @@ const DatePicker = (props: DatePickerProps) => {
               }}
               components={{
                 CaptionLabel: BaseCaptionLabel,
+                DayButton: CalendarDayButton,
                 ...(pickerMode === "year"
                   ? {
                       MonthGrid: YearModeMonthGrid,
@@ -575,7 +734,7 @@ const DatePicker = (props: DatePickerProps) => {
             ref={composedRef}
             id={id}
             value={
-              open && hoverPreview ? hoverPreview.format(format) : inputValue
+              open && hoverPreview ? formatValue(hoverPreview) : inputValue
             }
             placeholder={placeholder}
             status={status}
@@ -616,7 +775,7 @@ const DatePicker = (props: DatePickerProps) => {
                   const parsed = parseInputDate(inputValue, format);
                   if (parsed) {
                     setValue(parsed);
-                    setInputValue(parsed.format(format));
+                    setInputValue(formatValue(parsed));
                     setTypedDate(parsed.toDate());
                   }
                 }
@@ -643,6 +802,16 @@ const DatePicker = (props: DatePickerProps) => {
               }
             }}
             onBlur={(e) => {
+              if (skipBlurCommitRef.current) {
+                skipBlurCommitRef.current = false;
+                return;
+              }
+
+              if (interactingInsidePanelRef.current) {
+                interactingInsidePanelRef.current = false;
+                return;
+              }
+
               // Check if the focus is moving to an element within the calendar/popover
               const relatedTarget = e.relatedTarget as HTMLElement | undefined;
               const calendarContainer = document.querySelector(
@@ -668,11 +837,11 @@ const DatePicker = (props: DatePickerProps) => {
                 const parsed = parseInputDate(inputValue, format);
                 if (parsed) {
                   setValue(parsed);
-                  setInputValue(parsed.format(format));
+                  setInputValue(formatValue(parsed));
                   setTypedDate(parsed.toDate());
                 } else {
                   // Invalid input - revert to previous value
-                  setInputValue(value ? value.format(format) : "");
+                  setInputValue(value ? formatValue(value) : "");
                   setTypedDate(value ? value.toDate() : undefined);
                 }
               } else {

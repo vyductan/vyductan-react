@@ -20,14 +20,16 @@ function TableRoot({
   ...props
 }: React.ComponentProps<"table"> & { bordered?: OwnTableProps["bordered"] }) {
   return (
-    <ShadcnTable
-      className={cn(
-        "border-separate border-spacing-0",
-        bordered && cn(["rounded-md border border-b-0"]),
-        className,
-      )}
-      {...props}
-    />
+    <div data-slot="table-root" className="relative w-full">
+      <ShadcnTable
+        className={cn(
+          "border-separate border-spacing-0",
+          bordered && cn(["rounded-md border border-b-0"]),
+          className,
+        )}
+        {...props}
+      />
+    </div>
   );
 }
 

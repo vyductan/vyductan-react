@@ -96,7 +96,7 @@ export const CodeBlock = memo(
         </div>
         <div
           {...props}
-          className="no-scrollbar w-full overflow-x-auto px-4 py-6 text-[0.9rem] [--shiki-font-family:var(--font-mono)]"
+          className="sb-unstyled no-scrollbar w-full overflow-x-auto px-4 py-6 text-[0.9rem] [--shiki-font-family:var(--font-mono)]"
           // Shiki returns a full <pre class="shiki"><code>...</code></pre> block
           dangerouslySetInnerHTML={{ __html: html }}
         />

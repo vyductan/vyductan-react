@@ -1,9 +1,8 @@
-import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
 
-import type { inputSizeVariants } from "../input";
+import type { InputSizeVariants } from "../input";
 
-export type SizeType = VariantProps<typeof inputSizeVariants>["size"];
+export type SizeType = InputSizeVariants["size"];
 
 const SizeContext = React.createContext<SizeType>(undefined);
 

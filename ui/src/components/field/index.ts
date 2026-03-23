@@ -1,5 +1,5 @@
 export {
-  Field,
+  // Field,
   // FieldLabel,
   FieldDescription,
   FieldError,
@@ -10,4 +10,5 @@ export {
   FieldContent,
   FieldTitle,
 } from "@acme/ui/shadcn/field";
+export * from "./field";
 export * from "./field-label";

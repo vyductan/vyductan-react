@@ -3,7 +3,6 @@ import storybook from "eslint-plugin-storybook";
 import { defineConfig } from "eslint/config";
 
 import { baseConfig } from "@acme/eslint-config/base";
-import { nextjsConfig } from "@acme/eslint-config/nextjs";
 import { reactConfig } from "@acme/eslint-config/react";
 
 export default defineConfig([
@@ -17,7 +16,6 @@ export default defineConfig([
   },
   ...baseConfig,
   ...reactConfig,
-  ...nextjsConfig,
   ...storybook.configs["flat/recommended"],
   {
     rules: {

@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Card } from "@acme/ui/components/card";
 
 import { CollapsibleCodeBlock } from "./collapsible-code-block";
@@ -7,11 +9,13 @@ type CompDemoProps = {
   __comp__: React.FC;
 };
 
-const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
-  // Component source code display for Storybook
-  // Note: File reading happens at build time via Storybook's source loader addon
-  // The 'src' prop is used for reference/display purposes only
+const demoSourceFiles = import.meta.glob("../**/demo/*.{ts,tsx}", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
 
+const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
   let language = "tsx";
 
   if (typeof src === "string") {
@@ -20,9 +24,7 @@ const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
       extension === "ts" || extension === "tsx" ? "tsx" : (extension ?? "tsx");
   }
 
-  // The actual source code will be provided by Storybook's source addon
-  // For now, use the src path as placeholder content
-  const content = typeof src === "string" ? src : "";
+  const content = typeof src === "string" ? demoSourceFiles[`../${src}`] ?? src : "";
 
   // Dynamic import không thể dùng với biến - cần static string literal
   // Giải pháp: Dùng __comp__ prop đã được pass vào (đơn giản nhất)

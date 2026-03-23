@@ -50,7 +50,7 @@ function DrawerContent({
 
           //
           // "flex flex-col [&>div]:flex-1",
-          "touch-auto! select-text!",
+          "!touch-auto !select-text",
           className,
         )}
         // Prevent drawer from closing when clicking on toast notifications (Sonner)

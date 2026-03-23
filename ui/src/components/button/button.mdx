@@ -1,7 +1,14 @@
-import { ComponentSource } from "@acme/ui/components/mdx";
-
-import BasicDemo from "./demo/basic";
-import ColorVariantDemo from "./demo/color-variant";
+import BasicExample from "./demo/basic.mdx";
+import ColorVariantExample from "./demo/color-variant.mdx";
+import SizesExample from "./demo/sizes.mdx";
+import TypesExample from "./demo/types.mdx";
+import DangerExample from "./demo/danger.mdx";
+import DisabledExample from "./demo/disabled.mdx";
+import LoadingExample from "./demo/loading.mdx";
+import IconExample from "./demo/icon.mdx";
+import WithIconExample from "./demo/with-icon.mdx";
+import LinkAsButtonExample from "./demo/link-as-button.mdx";
+import FormIntegrationExample from "./demo/form-integration.mdx";
 
 # Button
 
@@ -19,163 +26,27 @@ A versatile button component with multiple variants, sizes, and styles for all y
 
 ## Examples
 
-### Basic Usage
+<BasicExample />
 
-The simplest way to use Button with different types.
+<ColorVariantExample />
 
-<ComponentSource src="button/demo/basic.tsx" __comp__={BasicDemo} />
+<SizesExample />
 
-### Color & Variant
+<TypesExample />
 
-You can combine different colors and variants to create various button styles.
+<DangerExample />
 
-<ComponentSource
-  src="button/demo/color-variant.tsx"
-  __comp__={ColorVariantDemo}
-/>
+<DisabledExample />
 
-### Different Sizes
+<LoadingExample />
 
-```tsx
-// Small
-<Button size="sm" variant="outlined">Small</Button>
-<Button size="icon-sm" aria-label="Submit" variant="outlined">
-  <Icon icon="icon-[lucide--arrow-up-right]" />
-</Button>
+<IconExample />
 
-// Medium (default)
-<Button variant="outlined">Default</Button>
-<Button size="icon" aria-label="Submit" variant="outlined">
-  <Icon icon="icon-[lucide--arrow-up-right]" />
-</Button>
+<WithIconExample />
 
-// Large
-<Button size="lg" variant="outlined">Large</Button>
-<Button size="icon-lg" aria-label="Submit" variant="outlined">
-  <Icon icon="icon-[lucide--arrow-up-right]" />
-</Button>
-```
+<LinkAsButtonExample />
 
-### Button Types
-
-```tsx
-// Primary button
-<Button type="primary">Primary</Button>
-
-// Default button
-<Button>Default</Button>
-
-// Dashed button
-<Button type="dashed">Dashed</Button>
-
-// Text button
-<Button type="text">Text</Button>
-
-// Link button
-<Button type="link">Link</Button>
-```
-
-### Danger Button
-
-```tsx
-<Button danger>Danger Button</Button>
-<Button danger type="primary">Danger Primary</Button>
-<Button danger type="text">Danger Text</Button>
-```
-
-### Disabled State
-
-```tsx
-<Button disabled>Disabled</Button>
-<Button type="primary" disabled>Primary Disabled</Button>
-```
-
-### Loading State
-
-```tsx
-<Button type="primary" loading>
-  Loading
-</Button>
-```
-
-### Icon Button
-
-```tsx
-<Button variant="outlined" size="icon" aria-label="Submit">
-  <Icon icon="icon-[lucide--arrow-up-right]" />
-</Button>
-```
-
-### Button with Icon
-
-The spacing between the icon and the text is automatically adjusted based on the size of the button.
-
-```tsx
-<Button variant="outlined" size="sm">
-  <Icon icon="icon-[lucide--git-branch]" /> New Branch
-</Button>
-```
-
-### Link as Button
-
-You can use the `asChild` prop to make another component look like a button.
-
-```tsx
-import { Link } from "next/link";
-import { Button } from "@/components/ui";
-
-export function LinkAsButton() {
-  return (
-    <Button asChild>
-      <Link href="/login">Login</Link>
-    </Button>
-  );
-}
-```
-
-### Form Integration
-
-```tsx
-import { Button } from "@/components/ui";
-import { z } from "zod";
-
-import { Form, FormItem, useForm } from "@acme/ui/components/form";
-import { Input } from "@acme/ui/components/input";
-
-const formSchema = z.object({
-  username: z.string().min(1, { message: "Please input your username!" }),
-  password: z.string().min(1, { message: "Please input your password!" }),
-});
-
-function FormExample() {
-  const form = useForm({
-    schema: formSchema,
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-    onSubmit: (data) => {
-      console.log("data", data);
-    },
-  });
-
-  return (
-    <Form form={form}>
-      <FormItem name="username" control={form.control} label="Username">
-        <Input />
-      </FormItem>
-      <FormItem name="password" control={form.control} label="Password">
-        <Input.Password />
-      </FormItem>
-      <FormItem>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </FormItem>
-    </Form>
-  );
-}
-```
+<FormIntegrationExample />
 
 ## API Reference
 

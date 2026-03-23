@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Plus, Send, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
+import DisabledDemo from "./demo/disabled";
+import IconDemo from "./demo/icon";
+import LoadingDemo from "./demo/loading";
+import SizesDemo from "./demo/sizes";
+import WithIconDemo from "./demo/with-icon";
 import { Button } from "./button";
 
 const meta = {
@@ -138,104 +143,23 @@ export const Colors: Story = {
 };
 
 export const Sizes: Story = {
-  render: (args) => (
-    <div className="flex items-center gap-4">
-      <Button {...args} size="small">
-        Small
-      </Button>
-      <Button {...args} size="middle">
-        Middle
-      </Button>
-      <Button {...args} size="large">
-        Large
-      </Button>
-    </div>
-  ),
-  args: {
-    variant: "solid",
-    color: "default",
-  },
+  render: () => <SizesDemo />,
 };
 
 export const WithIcon: Story = {
-  args: {
-    children: "Add Item",
-    icon: <Plus className="size-4" />,
-    variant: "solid",
-    color: "primary",
-  },
+  render: () => <WithIconDemo />,
 };
 
 export const IconOnly: Story = {
-  render: (args) => (
-    <div className="flex items-center gap-4">
-      <Button {...args} icon={<Plus />} aria-label="Add" />
-      <Button
-        {...args}
-        icon={<Trash2 />}
-        variant="outlined"
-        color="danger"
-        aria-label="Delete"
-      />
-      <Button
-        {...args}
-        icon={<Send />}
-        variant="filled"
-        color="blue"
-        shape="circle"
-        aria-label="Send"
-      />
-    </div>
-  ),
-  args: {
-    variant: "solid",
-    color: "default",
-    shape: "icon",
-  },
+  render: () => <IconDemo />,
 };
 
 export const Loading: Story = {
-  render: (args) => (
-    <div className="flex items-center gap-4">
-      <Button {...args} loading>
-        Loading
-      </Button>
-      <Button {...args} loading icon={<Plus />}>
-        Loading with Icon
-      </Button>
-      <Button
-        {...args}
-        loading
-        shape="circle"
-        icon={<Plus />}
-        aria-label="Loading"
-      />
-    </div>
-  ),
-  args: {
-    variant: "solid",
-    color: "primary",
-  },
+  render: () => <LoadingDemo />,
 };
 
 export const Disabled: Story = {
-  render: (args) => (
-    <div className="flex items-center gap-4">
-      <Button {...args} disabled variant="solid">
-        Solid
-      </Button>
-      <Button {...args} disabled variant="outlined">
-        Outlined
-      </Button>
-      <Button {...args} disabled variant="text">
-        Text
-      </Button>
-    </div>
-  ),
-  args: {
-    children: "Disabled",
-    color: "primary",
-  },
+  render: () => <DisabledDemo />,
 };
 
 export const WithError: Story = {

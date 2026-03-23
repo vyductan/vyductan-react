@@ -8,6 +8,11 @@ import { Toaster } from "../src/components/toast/toaster";
 
 const preview: Preview = {
   parameters: {
+    docs: {
+      toc: {
+        title: "On this page",
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,

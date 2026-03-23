@@ -71,7 +71,7 @@ export const buttonColorVariants = tv({
     variant: {
       solid: ["text-white", "hover:text-white"],
       outlined: [
-        "border-input bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
+        "border-border bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
       ],
       dashed: [],
       filled: ["border-transparent", "hover:bg-background-hover"],

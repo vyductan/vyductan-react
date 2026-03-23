@@ -141,10 +141,12 @@ const Select = <
     value,
     onChange,
     children,
-    showSearch: _showSearch, // Destructure to prevent it from being passed to DOM
+    showSearch, // Destructure to prevent it from being passed to DOM
     empty,
     ...triggerProps
   } = props;
+
+  void showSearch;
 
   // ======================= TAGS/MULTIPLE MODE =======================
   const isDefault = !mode;
@@ -190,7 +192,7 @@ const Select = <
   const findMatchingOption = (rawValue: string) => {
     const normalizedValue = rawValue.trim();
 
-    if (!normalizedValue) return undefined;
+    if (!normalizedValue) return;
 
     return flatOptions.find(
       (option) =>
@@ -199,12 +201,33 @@ const Select = <
     );
   };
 
+  const clearValue = () => {
+    setInternalValue(undefined);
+    setSearchValue("");
+
+    if (isMultiple) {
+      (
+        onChange as
+          | ((value: TValue[], option?: OptionType<TValue, TRecord>[]) => void)
+          | undefined
+      )?.([], []);
+      return;
+    }
+
+    (
+      onChange as
+        | ((value: TValue, option?: OptionType<TValue, TRecord>) => void)
+        | undefined
+    )?.(undefined as unknown as TValue);
+  };
+
   const triggerChange = (value?: TValue) => {
     if (value === undefined) {
-      setInternalValue(undefined);
-      setSearchValue("");
+      clearValue();
       return;
-    } else if (isDefault) {
+    }
+
+    if (isDefault) {
       setInternalValue(value);
       const returnOption = flatOptions.find((o) => value === o.value);
       onChange?.(value, returnOption);
@@ -254,45 +277,42 @@ const Select = <
     );
   };
   const filteredOptions = isTags
-    ? options.reduce<SelectOption<TValue, TRecord>[]>((acc, option) => {
+    ? options.flatMap<SelectOption<TValue, TRecord>>((option) => {
         if (isGroup(option)) {
-          const matchedOptions = option.options.filter(matchesSearch);
+          const matchedOptions = option.options.filter((item) => matchesSearch(item));
 
-          if (matchedOptions.length > 0) {
-            acc.push({
-              ...option,
-              options: matchedOptions,
-            });
-          }
-
-          return acc;
+          return matchedOptions.length > 0
+            ? [
+                {
+                  ...option,
+                  options: matchedOptions,
+                },
+              ]
+            : [];
         }
 
-        if (matchesSearch(option as OptionType<TValue, TRecord>)) {
-          acc.push(option);
-        }
-
-        return acc;
-      }, [])
+        return matchesSearch(option as OptionType<TValue, TRecord>) ? [option] : [];
+      })
     : options;
   const persistedCustomTagOptions = isTags
-    ? selectedValues.reduce<OptionType<TValue, TRecord>[]>((acc, selectedValue) => {
+    ? selectedValues.flatMap<OptionType<TValue, TRecord>>((selectedValue) => {
         const hasExistingOption = flatOptions.some(
           (option) => option.value === selectedValue,
         );
+        const createdOption = createOption(selectedValue);
 
-        if (!hasExistingOption && matchesSearch(createOption(selectedValue))) {
-          acc.push(createOption(selectedValue));
-        }
-
-        return acc;
-      }, [])
+        return !hasExistingOption && matchesSearch(createdOption)
+          ? [createdOption]
+          : [];
+      })
     : [];
   const displayOptions = [
     ...(temporaryTagOption ? [temporaryTagOption] : []),
     ...persistedCustomTagOptions,
     ...filteredOptions,
   ].filter(
+    (option): option is SelectOption<TValue, TRecord> => option !== undefined,
+  ).filter(
     (option, index, array) =>
       array.findIndex((candidate) => {
         if (isGroup(candidate) || isGroup(option)) {
@@ -305,6 +325,9 @@ const Select = <
   const flatDisplayOptions = displayOptions.flatMap((option) =>
     isGroup(option) ? option.options : [option],
   );
+  const firstDisplayOption = flatDisplayOptions.at(0);
+  const lastDisplayOption = flatDisplayOptions.at(-1);
+  const firstSelectedValue = selectedValues.at(0);
 
   React.useEffect(() => {
     if (!isTags || !internalOpen) {
@@ -320,7 +343,7 @@ const Select = <
         return currentValue;
       }
 
-      return undefined;
+      return;
     });
   }, [flatDisplayOptions, internalOpen, isTags]);
 
@@ -344,7 +367,7 @@ const Select = <
   };
 
   const moveActiveTagOption = (direction: 1 | -1) => {
-    if (!flatDisplayOptions.length) return;
+    if (flatDisplayOptions.length === 0) return;
 
     const currentIndex = flatDisplayOptions.findIndex(
       (option) => option.value === activeTagOptionValue,
@@ -367,7 +390,7 @@ const Select = <
       e.preventDefault();
       if (!internalOpen) {
         handleOpenChange(true);
-        setActiveTagOptionValue(flatDisplayOptions[0]?.value);
+        setActiveTagOptionValue(firstDisplayOption?.value);
         return;
       }
 
@@ -379,9 +402,7 @@ const Select = <
       e.preventDefault();
       if (!internalOpen) {
         handleOpenChange(true);
-        setActiveTagOptionValue(
-          flatDisplayOptions[flatDisplayOptions.length - 1]?.value,
-        );
+        setActiveTagOptionValue(lastDisplayOption?.value);
         return;
       }
 
@@ -735,10 +756,6 @@ const Select = <
                   }}
                   selectedValues={selectedValues}
                   getTagLabel={getTagLabel}
-                  onAdd={(value) => {
-                    if (disabled) return;
-                    triggerChange(value);
-                  }}
                   onRemove={(value) => {
                     if (disabled) return;
                     triggerChange(value);
@@ -766,7 +783,7 @@ const Select = <
                     if (disabled) return;
 
                     if (allowClear) {
-                      triggerChange();
+                      clearValue();
                     }
 
                     setKey(+Date.now());
@@ -803,13 +820,7 @@ const Select = <
         defaultValue={
           isDefault ? (defaultValue as string | undefined) : undefined
         }
-        value={
-          isDefault
-            ? (selectedValues[0] as string | undefined)
-            : isMultiple
-              ? undefined
-              : undefined
-        }
+        value={isDefault ? (firstSelectedValue as string | undefined) : undefined}
         open={internalOpen}
         onOpenChange={handleOpenChange}
       >
@@ -831,7 +842,7 @@ const Select = <
           showClearIcon={selectedValues.length > 0}
           onClear={() => {
             if (allowClear) {
-              triggerChange();
+              clearValue();
             }
 
             setKey(+Date.now());
@@ -841,30 +852,15 @@ const Select = <
           {isMultiple ? (
             <>
               <SelectMultipleContent
-                mode={mode}
+                mode="multiple"
                 open={internalOpen}
                 onInputClick={() => {
                   handleOpenChange(true);
                 }}
                 selectedValues={selectedValues}
-                onAdd={(value) => {
-                  triggerChange(value);
-                }}
                 onRemove={(value) => {
                   triggerChange(value);
                 }}
-                inputValue={isTags ? searchValue : undefined}
-                onInputValueChange={isTags ? setSearchValue : undefined}
-                onInputSubmit={
-                  isTags
-                    ? () => {
-                        const nextValue = searchValue.trim();
-                        if (nextValue) {
-                          triggerChange(nextValue as TValue);
-                        }
-                      }
-                    : undefined
-                }
                 placeholder={placeholder}
               />
               <div className="sr-only">

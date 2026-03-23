@@ -3,6 +3,7 @@ import { AppWindow, Mail, Settings } from "lucide-react";
 
 import type { ItemType } from "@acme/ui/components/menu";
 import { Menu } from "@acme/ui/components/menu";
+import { SidebarProvider } from "@acme/ui/components/sidebar";
 
 const items: ItemType[] = [
   {
@@ -64,17 +65,19 @@ const items: ItemType[] = [
   },
 ];
 
-const App: React.FC = () => {
+function App(): React.JSX.Element {
   return (
-    <Menu
-      onSelect={(args) => {
-        console.log("click", args);
-      }}
-      className="w-64"
-      mode="vertical"
-      items={items}
-    />
+    <SidebarProvider>
+      <Menu
+        onSelect={(args) => {
+          console.log("click", args);
+        }}
+        className="w-64"
+        mode="vertical"
+        items={items}
+      />
+    </SidebarProvider>
   );
-};
+}
 
 export default App;
