@@ -1,0 +1,32 @@
+{
+  "name": "acme-manager",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --config src/vite.config.ts",
+    "preview": "vite preview",
+    "tauri": "pnpm dlx @tauri-apps/cli"
+  },
+  "dependencies": {
+    "@acme/ui": "workspace:*",
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-dialog": "^2.4.0",
+    "@tauri-apps/plugin-shell": "^2.3.1",
+    "lucide-react": "catalog:",
+    "react": "catalog:react19",
+    "react-diff-view": "^3.2.0",
+    "react-dom": "catalog:react19",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.10.1",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
+    "@vitejs/plugin-react": "^4.3.4",
+    "rollup": "^4.59.0",
+    "typescript": "catalog:",
+    "vite": "^7.3.1"
+  }
+}

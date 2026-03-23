@@ -1,44 +1,9 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # dependencies
 node_modules
 .pnp
 .pnp.js
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-*.pem
-
-# Local files
-*.local
-
-# next.js
-.next/
-out/
-next-env.d.ts
-# expo
-.expo/
-dist/
-expo-env.d.ts
-apps/expo/.gitignore
-# tauri
-dist
-dist-ssr
 
 # production
 build
@@ -46,18 +11,45 @@ build
 # testing
 coverage
 
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# misc
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env*.local
+
+# next.js
+.next/
+out/
+next-env.d.ts
+# expo
+.expo/
+expo-env.d.ts
+apps/expo/.gitignore
+apps/expo/ios
+apps/expo/android
+# tauri
+dist-ssr
+
+# vercel
+.vercel
+
 # typescript
-*.tsbuildinfo
+dist/
 .cache
 
 # turbo
 .turbo
 
-# worktrees
-.worktrees
-
-# vercel
-.vercel
+# intlayer
+.intlayer/
 
 *storybook.log
 storybook-static

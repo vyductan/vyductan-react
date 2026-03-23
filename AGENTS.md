@@ -1,18 +1,37 @@
-# Shared Packages
+# Repository Overview
 
-Shared packages and configurations used across the workspace.
+Monorepo for the Vyductan React project using TurboRepo, managing web and mobile applications with shared UI and API packages.
 
 ## Navigation
 
-| Directory                                                                                             | Description                  | When to read                                |
-| :---------------------------------------------------------------------------------------------------- | :--------------------------- | :------------------------------------------ |
-| [`eslint-config/`](file:///Users/vyductan/Developer/vyductan-react/@acme/eslint-config/AGENTS.md)     | ESLint configuration         | adjusting linting rules or parser settings  |
-| [`github/`](file:///Users/vyductan/Developer/vyductan-react/@acme/github/AGENTS.md)                   | GitHub actions and workflows | configuring CI/CD pipelines and automations |
-| [`prettier-config/`](file:///Users/vyductan/Developer/vyductan-react/@acme/prettier-config/AGENTS.md) | Prettier configuration       | formatting rules                            |
-| [`tsconfig/`](file:///Users/vyductan/Developer/vyductan-react/@acme/tsconfig/AGENTS.md)               | TypeScript configuration     | adjusting TS compiler options               |
-| [`ui/`](file:///Users/vyductan/Developer/vyductan-react/@acme/ui/AGENTS.md)                           | UI component library         | developing reusable UI components           |
+| Directory                                                                   | Description                           | When to read                                                              |
+| :-------------------------------------------------------------------------- | :------------------------------------ | :------------------------------------------------------------------------ |
+| [`apps/`](file:///Users/vyductan/Developer/vyductan-react/apps/AGENTS.md)   | Application source code (Web, Mobile) | Implementing features, fixing bugs in specific apps, managing deployments |
+| [`@acme/`](file:///Users/vyductan/Developer/vyductan-react/@acme/AGENTS.md) | Shared packages (UI, API, Configs)    | Modifying shared components, updating API logic, changing global configs  |
 
-| File                                                                           | Description             | When to read                                  |
-| :----------------------------------------------------------------------------- | :---------------------- | :-------------------------------------------- |
-| [`README.md`](file:///Users/vyductan/Developer/vyductan-react/@acme/README.md) | Directory documentation | understanding architecture of shared packages |
-| `context7.json`                                                                | Context configuration   | context tracking settings                     |
+| File                  | Description                | When to read                                                   |
+| :-------------------- | :------------------------- | :------------------------------------------------------------- |
+| `CHECKLIST.mdx`       | Project checklist          | Tracking detailed project status and todos                     |
+| `package.json`        | Root package configuration | Managing workspace dependencies, scripts, and project metadata |
+| `turbo.json`          | TurboRepo configuration    | Configuring build pipelines, caching, and task dependencies    |
+| `pnpm-workspace.yaml` | PNPM workspace config      | Managing monorepo workspace structure                          |
+
+## Operational
+
+### Install Dependencies
+
+```bash
+pnpm install
+```
+
+### Build All
+
+```bash
+pnpm build
+```
+
+### Run Dev
+
+```bash
+pnpm dev
+```

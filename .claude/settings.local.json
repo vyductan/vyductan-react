@@ -1,10 +1,36 @@
 {
   "permissions": {
     "allow": [
+      "Bash(for dir in eslint-config github prettier-config tsconfig ui)",
+      "Bash(do echo \"=== $dir ===\")",
+      "Bash(if [ -f \"/Users/vyductan/Developer/vyductan-react/@acme/$dir/AGENTS.md\" ])",
+      "Bash(then echo \"AGENTS.md exists\")",
+      "Bash(else echo \"AGENTS.md missing\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(rsync:*)",
       "Bash(git:*)",
-      "Bash(ls:*)",
-      "Bash(mkdir:*)",
-      "Bash(python3:*)"
+      "Bash(pnpm:*)",
+      "Bash(gh pr:*)",
+      "Bash(gh run:*)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_type",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "WebSearch",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "WebFetch(domain:ant.design)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "mcp__plugin_playwright_playwright__browser_close",
+      "Bash(lsof:*)",
+      "mcp__plugin_playwright_playwright__browser_resize",
+      "Bash(open:*)",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_network_requests",
+      "mcp__plugin_playwright_playwright__browser_run_code",
+      "mcp__plugin_playwright_playwright__browser_snapshot",
+      "Bash(curl:*)",
+      "mcp__plugin_playwright_playwright__browser_tabs",
+      "mcp__plugin_playwright_playwright__browser_install"
     ]
   }
 }
