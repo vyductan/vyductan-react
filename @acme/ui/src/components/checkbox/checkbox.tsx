@@ -73,9 +73,9 @@ type CheckboxProps<TValue extends FormValueType = FormValueType> =
       indeterminate?: boolean;
     };
 
-const Checkbox = <TValue extends FormValueType = FormValueType>(
+function Checkbox<TValue extends FormValueType = FormValueType>(
   props: CheckboxProps<TValue>,
-) => {
+) {
   const {
     // id,
     // "aria-describedby": ariaDescribedBy,
@@ -131,6 +131,14 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
       ? false
       : !!checkboxGroup.value?.includes(value)
     : checked;
+
+  const hasLabelContent = React.Children.toArray(children).some((child) => {
+    if (typeof child === "boolean") {
+      return false;
+    }
+
+    return child !== "";
+  });
 
   // ============================ Event Lock ============================
   const [onLabelClick, onInputClick] = useBubbleLock(restProps.onClick);
@@ -191,18 +199,18 @@ const Checkbox = <TValue extends FormValueType = FormValueType>(
         />
         {loading ? (
           <LoadingIcon />
-        ) : (
+        ) : hasLabelContent ? (
           <span
             data-slot="checkbox-label"
             className={cn("leading-line-height px-2", classNames?.label)}
           >
             {children}
           </span>
-        )}
+        ) : null}
       </label>
     </Wave>
   );
-};
+}
 
 export type { CheckboxProps, AbstractCheckboxProps };
 export { Checkbox };

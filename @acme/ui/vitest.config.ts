@@ -10,6 +10,12 @@ const dirname =
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
+  oxc: {
+    jsx: {
+      runtime: "automatic",
+      importSource: "react",
+    },
+  },
   resolve: {
     alias: {
       "@acme/ui": resolve(dirname, "./src"),
@@ -68,7 +74,6 @@ export default defineConfig({
               },
             ],
           },
-          setupFiles: [".storybook/vitest.setup.ts"],
         },
       },
     ],
