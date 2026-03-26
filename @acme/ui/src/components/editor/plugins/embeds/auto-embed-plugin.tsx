@@ -21,11 +21,11 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { PopoverPortal } from "@radix-ui/react-popover";
 import {
-  FigmaIcon,
-  InstagramIcon,
+  CameraIcon,
+  MessageCircleIcon,
+  MonitorPlayIcon,
   MusicIcon,
-  TwitterIcon,
-  YoutubeIcon,
+  PenToolIcon,
 } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
@@ -73,7 +73,7 @@ export const YoutubeEmbedConfig: PlaygroundEmbedConfig = {
   exampleUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
 
   // Icon for display.
-  icon: <YoutubeIcon className="size-4" />,
+  icon: <MonitorPlayIcon className="size-4" />,
 
   insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
     editor.dispatchCommand(INSERT_YOUTUBE_COMMAND, result.id);
@@ -106,7 +106,7 @@ export const FigmaEmbedConfig: PlaygroundEmbedConfig = {
 
   exampleUrl: "https://www.figma.com/file/LKQ4FJ4bTnCSjedbRpk931/Sample-File",
 
-  icon: <FigmaIcon className="size-4" />,
+  icon: <PenToolIcon className="size-4" />,
 
   insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
     editor.dispatchCommand(INSERT_FIGMA_COMMAND, result.id);
@@ -137,7 +137,7 @@ export const FigmaEmbedConfig: PlaygroundEmbedConfig = {
 export const TwitterEmbedConfig: PlaygroundEmbedConfig = {
   contentName: "Twitter Tweet",
   exampleUrl: "https://twitter.com/elonmusk/status/1234567890",
-  icon: <TwitterIcon className="size-4" />,
+  icon: <MessageCircleIcon className="size-4" />,
   insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
     editor.dispatchCommand(INSERT_TWITTER_COMMAND, result.id);
   },
@@ -162,7 +162,7 @@ export const TwitterEmbedConfig: PlaygroundEmbedConfig = {
 export const InstagramEmbedConfig: PlaygroundEmbedConfig = {
   contentName: "Instagram Post",
   exampleUrl: "https://www.instagram.com/p/ABC123/",
-  icon: <InstagramIcon className="size-4" />,
+  icon: <CameraIcon className="size-4" />,
   insertNode: (editor: LexicalEditor, result: EmbedMatchResult) => {
     editor.dispatchCommand(INSERT_INSTAGRAM_COMMAND, result.id);
   },

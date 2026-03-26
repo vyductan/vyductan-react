@@ -1,11 +1,14 @@
 "use client";
 
+import * as React from "react";
 import type { EditorState } from "lexical";
 import { useEffect, useRef } from "react";
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { $getRoot, $insertNodes } from "lexical";
+import { $getRoot } from "lexical";
+
+import { normalizeHtmlOutput } from "./normalize-html-output";
 
 // Plugin to initialize editor with HTML content
 function InitialHtmlPlugin({ html }: { html: string }) {
@@ -21,9 +24,10 @@ function InitialHtmlPlugin({ html }: { html: string }) {
         const parser = new DOMParser();
         const dom = parser.parseFromString(html, "text/html");
         const nodes = $generateNodesFromDOM(editor, dom);
+        const root = $getRoot();
 
-        $getRoot().select();
-        $insertNodes(nodes);
+        root.clear();
+        root.append(...nodes);
       });
     }
 
@@ -53,7 +57,7 @@ export function HtmlPlugins({
         onChange={(editorState, editor) => {
           editorState.read(() => {
             const htmlString = $generateHtmlFromNodes(editor, null);
-            onChange?.(htmlString, editorState);
+            onChange?.(normalizeHtmlOutput(htmlString), editorState);
           });
         }}
       />

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
+import PlaygroundDemo from "./demo/playground";
 import { Editor } from "./editor";
 
 const meta = {
@@ -95,6 +96,10 @@ export const StyledContainer: Story = {
     placeholder: "Start writing your masterpiece...",
     onChange: fn(),
   },
+};
+
+export const Playground: Story = {
+  render: () => <PlaygroundDemo />,
 };
 
 // Markdown Editor Stories

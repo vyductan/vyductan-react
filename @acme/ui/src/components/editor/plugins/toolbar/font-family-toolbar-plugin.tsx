@@ -101,7 +101,7 @@ export function FontFamilyToolbarPlugin() {
         <TypeIcon className="size-4" />
         <span>{fontFamily}</span>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent position="popper">
         {FONT_FAMILY_OPTIONS.map((option) => (
           <SelectItem key={option} value={option}>
             {option}

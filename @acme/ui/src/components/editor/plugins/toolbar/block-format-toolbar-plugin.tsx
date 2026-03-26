@@ -197,7 +197,7 @@ export function BlockFormatDropDown() {
         {blockTypeToBlockName[blockType]?.icon}
         <span>{blockTypeToBlockName[blockType]?.label}</span>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent position="popper">
         <SelectGroup>
           {/* Inline items instead of children */}
           {Object.entries(blockTypeToBlockName)
