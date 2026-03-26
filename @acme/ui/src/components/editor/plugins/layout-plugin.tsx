@@ -84,7 +84,7 @@ export function InsertLayoutDialog({
         <SelectTrigger className="w-full">
           <SelectValue placeholder={buttonLabel} />
         </SelectTrigger>
-        <SelectContent className="w-full">
+        <SelectContent position="popper" className="w-full">
           {LAYOUTS.map(({ label, value }) => (
             <SelectItem key={value} value={value}>
               {label}

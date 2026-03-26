@@ -51,6 +51,7 @@ import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugi
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
+import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableActionsPlugin } from "../plugins/table-actions-plugin";
@@ -174,7 +175,7 @@ export function Plugins({
 
       <ClickableLinkPlugin />
       <CheckListPlugin />
-      {!isSimple && editable && <BlockCopyPastePlugin />}
+      {editable && <BlockCopyPastePlugin />}
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
@@ -234,6 +235,7 @@ export function Plugins({
         />
       )}
       {editable && <MarkdownPastePlugin />}
+      {editable && <PlainTextLinebreakPastePlugin />}
       {editable && <EmojiPickerPlugin />}
 
       {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />}

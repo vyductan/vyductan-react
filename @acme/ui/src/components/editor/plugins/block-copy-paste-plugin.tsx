@@ -7,6 +7,10 @@
  */
 import type { ElementNode, LexicalNode } from "lexical";
 import { useEffect } from "react";
+import {
+  $getClipboardDataFromSelection,
+  setLexicalClipboardDataTransfer,
+} from "@lexical/clipboard";
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -22,6 +26,102 @@ import {
 } from "lexical";
 
 const BLOCK_COPY_ATTRIBUTE = "data-lexical-block-copy";
+const MULTI_PARAGRAPH_TOP_LEVEL_SELECTOR =
+  "p, div, li, ul, ol, blockquote, pre, h1, h2, h3, h4, h5, h6, table, thead, tbody, tfoot, tr, td, th";
+const SOFT_LINEBREAK_BLOCK_SELECTOR =
+  "div, li, ul, ol, blockquote, pre, h1, h2, h3, h4, h5, h6, table, thead, tbody, tfoot, tr, td, th";
+
+export function getSingleParagraphSoftLineBreakCopyHtml(
+  text: string,
+  html: string,
+): string {
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+  if (
+    !html ||
+    !normalizedText.includes("\n") ||
+    normalizedText.includes("\n\n")
+  ) {
+    return html;
+  }
+
+  const document = new DOMParser().parseFromString(html, "text/html");
+  const root = document.body.firstElementChild;
+
+  if (document.body.children.length === 1 && root?.tagName === "P") {
+    if (
+      !root.querySelector("br") ||
+      root.querySelector(SOFT_LINEBREAK_BLOCK_SELECTOR)
+    ) {
+      return html;
+    }
+  } else if (document.body.children.length === 0) {
+    if (
+      !document.body.querySelector("br") ||
+      document.body.querySelector(SOFT_LINEBREAK_BLOCK_SELECTOR)
+    ) {
+      return html;
+    }
+  } else {
+    const topLevelChildren = Array.from(document.body.children);
+    if (
+      !document.body.querySelector("br") ||
+      document.body.querySelector(SOFT_LINEBREAK_BLOCK_SELECTOR) ||
+      topLevelChildren.some((element) =>
+        element.matches(MULTI_PARAGRAPH_TOP_LEVEL_SELECTOR),
+      )
+    ) {
+      return html;
+    }
+  }
+
+  const container = document.createElement("div");
+  container.style.whiteSpace = "break-spaces";
+  container.style.wordBreak = "break-word";
+  container.textContent = normalizedText;
+
+  return container.outerHTML;
+}
+
+function getClipboardNodePlainText(node: ChildNode): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent?.replace(/\r\n?/g, "\n") ?? "";
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return "";
+  }
+
+  const element = node as HTMLElement;
+  if (element.tagName === "BR") {
+    return "\n";
+  }
+
+  return Array.from(element.childNodes).map(getClipboardNodePlainText).join("");
+}
+
+export function getMultiParagraphCopyPlainText(text: string, html: string): string {
+  if (!html) {
+    return text;
+  }
+
+  const normalizedText = text.replace(/\r\n?/g, "\n");
+  if (!normalizedText.includes("\n") || normalizedText.includes("\n\n")) {
+    return normalizedText;
+  }
+
+  const document = new DOMParser().parseFromString(html, "text/html");
+  const topLevelBlocks = Array.from(document.body.children).filter((element) =>
+    element.matches(MULTI_PARAGRAPH_TOP_LEVEL_SELECTOR),
+  );
+
+  if (topLevelBlocks.length < 2 || topLevelBlocks.length !== document.body.children.length) {
+    return normalizedText;
+  }
+
+  return topLevelBlocks
+    .map((element) => Array.from(element.childNodes).map(getClipboardNodePlainText).join(""))
+    .join("\n\n");
+}
 
 export function BlockCopyPastePlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -31,8 +131,36 @@ export function BlockCopyPastePlugin(): null {
       COPY_COMMAND,
       (event: ClipboardEvent) => {
         const selection = $getSelection();
-        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+        if (!$isRangeSelection(selection)) {
           return false;
+        }
+
+        if (!event.clipboardData) {
+          return false;
+        }
+
+        if (!selection.isCollapsed()) {
+          event.preventDefault();
+
+          editor.update(() => {
+            const currentSelection = $getSelection();
+            if (!$isRangeSelection(currentSelection)) {
+              return;
+            }
+
+            const clipboardData = $getClipboardDataFromSelection(currentSelection);
+            clipboardData["text/html"] = getSingleParagraphSoftLineBreakCopyHtml(
+              clipboardData["text/plain"],
+              clipboardData["text/html"] ?? "",
+            );
+            clipboardData["text/plain"] = getMultiParagraphCopyPlainText(
+              clipboardData["text/plain"],
+              clipboardData["text/html"] ?? "",
+            );
+            setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);
+          });
+
+          return true;
         }
 
         const anchor = selection.anchor;
@@ -73,6 +201,7 @@ export function BlockCopyPastePlugin(): null {
           }
 
           const selectionToSerialize = $getSelection();
+          let text = targetBlock.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
           if ($isListItemNode(targetBlock)) {
@@ -83,13 +212,13 @@ export function BlockCopyPastePlugin(): null {
             }
           }
 
+          html = getSingleParagraphSoftLineBreakCopyHtml(text, html);
+          text = getMultiParagraphCopyPlainText(text, html);
+
           if (event.clipboardData) {
             const wrappedHtml = `<div ${BLOCK_COPY_ATTRIBUTE}="true">${html}</div>`;
             event.clipboardData.setData("text/html", wrappedHtml);
-            event.clipboardData.setData(
-              "text/plain",
-              targetBlock.getTextContent(),
-            );
+            event.clipboardData.setData("text/plain", text);
           }
 
           // Restore cursor position if possible
@@ -120,8 +249,37 @@ export function BlockCopyPastePlugin(): null {
       CUT_COMMAND,
       (event: ClipboardEvent) => {
         const selection = $getSelection();
-        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+        if (!$isRangeSelection(selection)) {
           return false;
+        }
+
+        if (!event.clipboardData) {
+          return false;
+        }
+
+        if (!selection.isCollapsed()) {
+          event.preventDefault();
+
+          editor.update(() => {
+            const currentSelection = $getSelection();
+            if (!$isRangeSelection(currentSelection)) {
+              return;
+            }
+
+            const clipboardData = $getClipboardDataFromSelection(currentSelection);
+            clipboardData["text/html"] = getSingleParagraphSoftLineBreakCopyHtml(
+              clipboardData["text/plain"],
+              clipboardData["text/html"] ?? "",
+            );
+            clipboardData["text/plain"] = getMultiParagraphCopyPlainText(
+              clipboardData["text/plain"],
+              clipboardData["text/html"] ?? "",
+            );
+            setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);
+            currentSelection.removeText();
+          });
+
+          return true;
         }
 
         const anchor = selection.anchor;
@@ -159,6 +317,7 @@ export function BlockCopyPastePlugin(): null {
           }
 
           const selectionToSerialize = $getSelection();
+          let text = targetBlock.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
           if ($isListItemNode(targetBlock)) {
@@ -169,13 +328,13 @@ export function BlockCopyPastePlugin(): null {
             }
           }
 
+          html = getSingleParagraphSoftLineBreakCopyHtml(text, html);
+          text = getMultiParagraphCopyPlainText(text, html);
+
           if (event.clipboardData) {
             const wrappedHtml = `<div ${BLOCK_COPY_ATTRIBUTE}="true">${html}</div>`;
             event.clipboardData.setData("text/html", wrappedHtml);
-            event.clipboardData.setData(
-              "text/plain",
-              targetBlock.getTextContent(),
-            );
+            event.clipboardData.setData("text/plain", text);
           }
 
           // Remove the block after copying
