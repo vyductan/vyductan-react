@@ -18,8 +18,8 @@ import {
 import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
 
-import { cn } from "@acme/ui/lib/utils";
-import { Skeleton } from "@acme/ui/shadcn/skeleton";
+import { cn } from "../../lib/utils";
+import { Skeleton } from "../../shadcn/skeleton";
 
 import type { AnyObject } from "../_util/type";
 import type { ConfigConsumerProps } from "../config-provider/context";
@@ -62,7 +62,7 @@ import {
   TableRow,
   TableWrapperFooter,
   TableWrapperHeader,
-} from "./_components";
+} from "./_components/base";
 import { ColGroup } from "./_components/col-group";
 import { TableHeadAdvanced } from "./_components/table-head-advanced";
 import { useColumns } from "./hooks/use-columns";

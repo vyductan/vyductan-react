@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { InputSizeVariants } from "../input";
+import type { InputSizeVariants } from "../input/variants";
 
 export type SizeType = InputSizeVariants["size"];
 

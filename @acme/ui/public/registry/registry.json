@@ -138,8 +138,637 @@
       "type": "registry:component",
       "files": [
         {
-          "target": "components/tree/tree.tsx",
+          "path": "components/tree/index.ts",
+          "target": "components/tree/index.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "components/tree/tree.tsx",
+          "target": "components/tree/tree.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/types.ts",
+          "target": "components/tree/types.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/util.ts",
+          "target": "components/tree/util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/key-util.ts",
+          "target": "components/tree/utils/key-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/conduct-util.ts",
+          "target": "components/tree/utils/conduct-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/tree-util.ts",
+          "target": "components/tree/utils/tree-util.ts",
+          "type": "registry:file"
+        }
+      ]
+    },
+    {
+      "name": "table-tree-support",
+      "title": "Table Tree Support",
+      "path": "components/tree",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "components/tree/types.ts",
+          "target": "components/tree/types.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/util.ts",
+          "target": "components/tree/util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/key-util.ts",
+          "target": "components/tree/utils/key-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/conduct-util.ts",
+          "target": "components/tree/utils/conduct-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/tree-util.ts",
+          "target": "components/tree/utils/tree-util.ts",
+          "type": "registry:file"
+        }
+      ]
+    },
+    {
+      "name": "table-shared-core",
+      "title": "Table Shared Core",
+      "path": "components/table-shared-core",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "lib/utils.ts",
+          "target": "lib/utils.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/table.tsx",
+          "target": "shadcn/table.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/skeleton.tsx",
+          "target": "shadcn/skeleton.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/type.ts",
+          "target": "components/_util/type.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/scroll-to.ts",
+          "target": "components/_util/scroll-to.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/get-scroll.ts",
+          "target": "components/_util/get-scroll.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/easings.ts",
+          "target": "components/_util/easings.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/warning.ts",
+          "target": "components/_util/warning.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/extends-object.ts",
+          "target": "components/_util/extends-object.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/responsive-observer.ts",
+          "target": "components/_util/responsive-observer.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/media-query-util.ts",
+          "target": "components/_util/media-query-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/hooks/use-force-update.ts",
+          "target": "components/_util/hooks/use-force-update.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/_util/hooks/use-multiple-select.ts",
+          "target": "components/_util/hooks/use-multiple-select.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/context.ts",
+          "target": "components/config-provider/context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/size-context.tsx",
+          "target": "components/config-provider/size-context.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/input/variants.ts",
+          "target": "components/input/variants.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/locale/index.tsx",
+          "target": "components/locale/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/locale/en-us.ts",
+          "target": "components/locale/en-us.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/grid/hooks/use-breakpoint.ts",
+          "target": "components/grid/hooks/use-breakpoint.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/index.ts",
+          "target": "icons/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/icon-component.tsx",
+          "target": "icons/icon-component.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/wrapper.tsx",
+          "target": "icons/wrapper.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-down-filled.tsx",
+          "target": "icons/arrow-down-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-left-outlined.tsx",
+          "target": "icons/arrow-left-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-right-outlined.tsx",
+          "target": "icons/arrow-right-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/check-filled.tsx",
+          "target": "icons/check-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/check-outlined.tsx",
+          "target": "icons/check-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/chevron-right-outlined.tsx",
+          "target": "icons/chevron-right-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/circle-filled.tsx",
+          "target": "icons/circle-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/circle-outlined.tsx",
+          "target": "icons/circle-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/close-outlined.tsx",
+          "target": "icons/close-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/csv-icon.tsx",
+          "target": "icons/csv-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/delete-icon.tsx",
+          "target": "icons/delete-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/download-icon.tsx",
+          "target": "icons/download-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/edit-icon.tsx",
+          "target": "icons/edit-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/info-filled.tsx",
+          "target": "icons/info-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/logout-outlined.tsx",
+          "target": "icons/logout-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/mail-outlined.tsx",
+          "target": "icons/mail-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/user-outlined.tsx",
+          "target": "icons/user-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/warning-filled.tsx",
+          "target": "icons/warning-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "types.ts",
+          "target": "types.ts",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "clsx",
+        "iconify-icon",
+        "rc-util",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "name": "table-tooltip-support",
+      "title": "Table Tooltip Support",
+      "path": "components/tooltip",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/tooltip/index.ts",
+          "target": "components/tooltip/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tooltip/tooltip.tsx",
+          "target": "components/tooltip/tooltip.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tooltip/_components.tsx",
+          "target": "components/tooltip/_components.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/tooltip.tsx",
+          "target": "shadcn/tooltip.tsx",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "@radix-ui/react-tooltip"
+      ]
+    },
+    {
+      "name": "table-spin-support",
+      "title": "Table Spin Support",
+      "path": "components/spin",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/spin/index.ts",
+          "target": "components/spin/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/spin/spin.tsx",
+          "target": "components/spin/spin.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/spin/style.css",
+          "target": "components/spin/style.css",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "name": "table-checkbox-support",
+      "title": "Table Checkbox Support",
+      "path": "components/checkbox",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/checkbox/index.tsx",
+          "target": "components/checkbox/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/checkbox/checkbox.tsx",
+          "target": "components/checkbox/checkbox.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/checkbox/checkbox-group.tsx",
+          "target": "components/checkbox/checkbox-group.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/checkbox/group-context.ts",
+          "target": "components/checkbox/group-context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/checkbox/use-bubble-lock.ts",
+          "target": "components/checkbox/use-bubble-lock.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/button/loading-icon.tsx",
+          "target": "components/button/loading-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/button/button-variants.ts",
+          "target": "components/button/button-variants.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/disabled-context.tsx",
+          "target": "components/config-provider/disabled-context.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/unstable-context.ts",
+          "target": "components/config-provider/unstable-context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/index.ts",
+          "target": "lib/wave/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/interface.ts",
+          "target": "lib/wave/interface.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/use-wave.ts",
+          "target": "lib/wave/use-wave.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/wave-effect.tsx",
+          "target": "lib/wave/wave-effect.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/token.ts",
+          "target": "lib/wave/token.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/util.ts",
+          "target": "lib/wave/util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/checkbox.tsx",
+          "target": "shadcn/checkbox.tsx",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "@radix-ui/react-checkbox",
+        "@rc-component/util",
+        "motion",
+        "ts-xor"
+      ]
+    },
+    {
+      "name": "table-pagination-support",
+      "title": "Table Pagination Support",
+      "path": "components/pagination",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/pagination/index.ts",
+          "target": "components/pagination/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/pagination.tsx",
+          "target": "components/pagination/pagination.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/pager.tsx",
+          "target": "components/pagination/pager.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/types.ts",
+          "target": "components/pagination/types.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/locale/en-us.ts",
+          "target": "components/pagination/locale/en-us.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/_components/index.tsx",
+          "target": "components/pagination/_components/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/_components/page-size-options.tsx",
+          "target": "components/pagination/_components/page-size-options.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/select.tsx",
+          "target": "shadcn/select.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/button/button-variants.ts",
+          "target": "components/button/button-variants.ts",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "@rc-component/util",
+        "lucide-react",
+        "radix-ui",
+        "tailwind-variants"
+      ]
+    },
+    {
+      "name": "table",
+      "title": "Table",
+      "path": "components/table",
+      "type": "registry:component",
+      "dependencies": [
+        "@rc-component/util",
+        "@tanstack/react-table",
+        "ahooks",
+        "lodash",
+        "ts-xor",
+        "zustand"
+      ],
+      "registryDependencies": [
+        "table-tree-support",
+        "table-shared-core",
+        "table-tooltip-support",
+        "table-spin-support",
+        "table-checkbox-support",
+        "table-pagination-support"
+      ],
+      "files": [
+        {
+          "path": "components/table/index.tsx",
+          "target": "components/table/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/table.tsx",
+          "target": "components/table/table.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/types.ts",
+          "target": "components/table/types.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/util.tsx",
+          "target": "components/table/util.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/styles.ts",
+          "target": "components/table/styles.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/constant.ts",
+          "target": "components/table/constant.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/_components/base.tsx",
+          "target": "components/table/_components/base.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/_components/col-group.tsx",
+          "target": "components/table/_components/col-group.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/_components/table-head-advanced.tsx",
+          "target": "components/table/_components/table-head-advanced.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-columns.tsx",
+          "target": "components/table/hooks/use-columns.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-expand.tsx",
+          "target": "components/table/hooks/use-expand.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-filter/index.tsx",
+          "target": "components/table/hooks/use-filter/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-filter/filter-dropdown.tsx",
+          "target": "components/table/hooks/use-filter/filter-dropdown.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-lazy-kv-map.ts",
+          "target": "components/table/hooks/use-lazy-kv-map.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-pagination.ts",
+          "target": "components/table/hooks/use-pagination.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-selection.tsx",
+          "target": "components/table/hooks/use-selection.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-sorter.tsx",
+          "target": "components/table/hooks/use-sorter.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/hooks/use-table.tsx",
+          "target": "components/table/hooks/use-table.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/utils/expand-util.tsx",
+          "target": "components/table/utils/expand-util.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/table/utils/legacy-util.ts",
+          "target": "components/table/utils/legacy-util.ts",
           "type": "registry:file"
         }
       ]

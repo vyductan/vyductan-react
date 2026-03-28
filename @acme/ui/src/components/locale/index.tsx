@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { TransferLocale as TransferLocaleForEmpty } from "../empty";
 import type { PaginationLocale } from "../pagination/types";
 import type { TableLocale } from "../table/types";
 
-export { default as useLocale } from "./use-locale";
+interface EmptyLocale {
+  description: string;
+}
 
 export interface Locale {
   locale: string;
@@ -18,7 +19,7 @@ export interface Locale {
   // Transfer?: TransferLocale;
   Select?: Record<string, any>;
   // Upload?: UploadLocale;
-  Empty?: TransferLocaleForEmpty;
+  Empty?: EmptyLocale;
   global?: {
     placeholder?: string;
     close?: string;

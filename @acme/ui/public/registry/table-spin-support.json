@@ -1,0 +1,32 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "table-spin-support",
+  "title": "Table Spin Support",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "registryDependencies": [
+    "table-shared-core"
+  ],
+  "files": [
+    {
+      "path": "components/spin/index.ts",
+      "content": "export * from \"./spin\";\n",
+      "type": "registry:file",
+      "target": "components/spin/index.ts"
+    },
+    {
+      "path": "components/spin/spin.tsx",
+      "content": "import type { VariantProps } from \"class-variance-authority\";\nimport { cva } from \"class-variance-authority\";\n\nimport { cn } from \"../../lib/utils\";\n\nimport \"./style.css\";\n\nimport type { DetailedHTMLProps, HTMLAttributes, ReactNode } from \"react\";\n\nconst spinVariants = cva(\"\", {\n  variants: {\n    size: {\n      small: [\n        \"size-5\",\n        \"before:bg-size-[4px_4px]! after:bg-size-[6px_6px]!\",\n        \"before:m-0.5\",\n      ],\n      default: [\"size-7\", \"before:bg-size-[5px_5px]! after:bg-size-[8px_8px]!\"],\n      large: [\n        \"size-12\",\n        \"before:bg-size-[8px_8px]! after:bg-size-[12px_12px]!\",\n      ],\n    },\n  },\n  defaultVariants: {\n    size: \"default\",\n  },\n});\nexport type SpinProps = DetailedHTMLProps<\n  HTMLAttributes<HTMLDivElement>,\n  HTMLDivElement\n> &\n  VariantProps<typeof spinVariants> & {\n    spinning?: boolean;\n    tip?: ReactNode;\n  };\nexport const Spin = ({\n  spinning = true,\n  tip,\n  className,\n  size,\n  children,\n  ...props\n}: SpinProps) => {\n  return (\n    <div className={cn(\"relative\", className)} {...props}>\n      {spinning && (\n        <div\n          key=\"loading\"\n          className=\"absolute inset-0 z-10 flex max-h-[400px] flex-col items-center justify-center\"\n        >\n          <div\n            aria-label=\"Loading\"\n            className={cn(\"spin\", spinVariants({ size }))}\n          />\n          {tip && <div className=\"mt-2\">{tip}</div>}\n        </div>\n      )}\n      <div\n        className={cn(\"h-full\", spinning && \"pointer-events-none opacity-50\")}\n      >\n        {children}\n      </div>\n    </div>\n  );\n};\n",
+      "type": "registry:file",
+      "target": "components/spin/spin.tsx"
+    },
+    {
+      "path": "components/spin/style.css",
+      "content": ".spin {\n  aspect-ratio: 1;\n  display: grid;\n}\n.spin::before,\n.spin::after {\n  content: \"\";\n  grid-area: 1/1;\n  --c: no-repeat\n    radial-gradient(farthest-side, var(--color-primary-600) 92%, #0000);\n  background:\n    var(--c) 50% 0,\n    var(--c) 50% 100%,\n    var(--c) 100% 50%,\n    var(--c) 0 50%;\n  animation: l12 1s infinite;\n}\n.spin::before {\n  filter: hue-rotate(45deg);\n  animation-timing-function: linear;\n}\n\n@keyframes l12 {\n  100% {\n    transform: rotate(0.5turn);\n  }\n}\n",
+      "type": "registry:file",
+      "target": "components/spin/style.css"
+    }
+  ],
+  "type": "registry:component"
+}

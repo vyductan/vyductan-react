@@ -1,6 +1,6 @@
 import type * as React from "react";
 
-import { useLocale } from "../locale";
+import useLocale from "../locale/use-locale";
 
 const Simple: React.FC = () => {
   const [locale] = useLocale("Empty");
