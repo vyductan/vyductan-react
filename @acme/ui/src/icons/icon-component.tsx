@@ -2,7 +2,7 @@ import type { DetailedHTMLProps, HTMLAttributes } from "react";
 
 import "iconify-icon";
 
-import { cn } from "@acme/ui/lib/utils";
+import { cn } from "../lib/utils";
 
 declare module "react" {
   // eslint-disable-next-line @typescript-eslint/no-namespace

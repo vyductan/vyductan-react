@@ -1,23 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Icon } from "@acme/ui/icons";
-import { cn } from "@acme/ui/lib/utils";
+import { Icon } from "../../../icons";
+import { cn } from "../../../lib/utils";
 
 import type { GetRowKey, Key, RenderExpandIconProps } from "../types";
-import { Button } from "../../button";
 
 export function renderExpandIcon<RecordType>({
   record,
   onExpand,
   expanded,
   expandable,
-
-  ...props
+  className,
 }: RenderExpandIconProps<RecordType> & {
   className?: string;
-}) {
+}): React.ReactNode {
   if (!expandable) {
-    return <span className={cn("")} />;
+    return <span />;
   }
 
   const onClick: React.MouseEventHandler<HTMLElement> = (event) => {
@@ -26,36 +24,22 @@ export function renderExpandIcon<RecordType>({
   };
 
   return (
-    <Button
-      variant="text"
-      size="small"
-      // {...(expandable.expandedRowKeys
-      //   ? {
-      //       onClick: () => {
-      //         if (!expandable?.expandRowByClick) {
-      //           // row.getToggleExpandedHandler()();
-      //           expandable.onExpand?.(!expanded, record);
-      //         }
-      //       },
-      //     }
-      //   : {
-      //       onClick: () => {
-      //         if (!expandable?.expandRowByClick) {
-      //           row.getToggleExpandedHandler()();
-      //         }
-      //       },
-      //     })}
-      // className="flex w-full cursor-pointer items-center justify-center"
+    <button
+      type="button"
       onClick={onClick}
-      icon={
-        expanded ? (
-          <Icon icon="icon-[lucide--chevron-down]" />
-        ) : (
-          <Icon icon="icon-[lucide--chevron-right]" />
-        )
-      }
-      {...props}
-    />
+      className={cn(
+        "inline-flex size-6 items-center justify-center rounded-sm border border-transparent text-foreground transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        className,
+      )}
+      aria-label={expanded ? "Collapse row" : "Expand row"}
+      aria-expanded={expanded}
+    >
+      {expanded ? (
+        <Icon icon="icon-[lucide--chevron-down]" />
+      ) : (
+        <Icon icon="icon-[lucide--chevron-right]" />
+      )}
+    </button>
   );
 
   // return (

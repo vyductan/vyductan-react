@@ -12,12 +12,20 @@
 
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import React, { useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useMergedState } from "@rc-component/util";
 
+import { cn } from "../../../lib/utils";
+import { Icon } from "../../../icons";
 import type { AnyObject } from "../../_util/type";
+import useMultipleSelect from "../../_util/hooks/use-multiple-select";
+import { devUseWarning } from "../../_util/warning";
+import { Checkbox } from "../../checkbox";
 import type { CheckboxProps } from "../../checkbox";
-import type { DataNode } from "../../tree";
-import type { GetCheckDisabled } from "../../tree/types";
+import type { DataNode, GetCheckDisabled } from "../../tree/types";
+import { arrAdd, arrDel } from "../../tree/util";
+import { conductCheck } from "../../tree/utils/conduct-util";
+import { convertDataToEntities } from "../../tree/utils/tree-util";
 import type {
   ColumnsType,
   ColumnType,
@@ -32,15 +40,6 @@ import type {
   TableRowSelection,
   TransformColumns,
 } from "../types";
-import useMultipleSelect from "../../_util/hooks/use-multiple-select";
-import { devUseWarning } from "../../_util/warning";
-import { Icon } from "../../../icons";
-import { Checkbox } from "../../checkbox";
-import { Dropdown } from "../../dropdown";
-import { Radio } from "../../radio";
-import { arrAdd, arrDel } from "../../tree/util";
-import { conductCheck } from "../../tree/utils/conduct-util";
-import { convertDataToEntities } from "../../tree/utils/tree-util";
 import { INTERNAL_COL_DEFINE } from "../utils/legacy-util";
 
 export const SELECTION_COLUMN = {} as const;
@@ -49,6 +48,226 @@ export const SELECTION_INVERT = "SELECT_INVERT";
 export const SELECTION_NONE = "SELECT_NONE";
 
 const EMPTY_LIST: string[] = [];
+
+type SelectionCheckboxProps = Partial<
+  Omit<CheckboxProps, "checked" | "defaultChecked">
+>;
+type SelectionChangeEvent = Parameters<
+  NonNullable<SelectionCheckboxProps["onChange"]>
+>[0];
+type SelectionMenuItem = {
+  key: React.Key;
+  label: React.ReactNode;
+  onClick?: () => void;
+};
+
+function toRowSelectionState(keys?: readonly Key[]): RowSelectionState {
+  if (!keys || keys.length === 0) {
+    return {};
+  }
+
+  return keys.reduce<RowSelectionState>((state, key) => {
+    state[String(key)] = true;
+    return state;
+  }, {});
+}
+
+function createSelectionChangeEvent(
+  checkboxProps: SelectionCheckboxProps | undefined,
+  checked: boolean,
+  nativeEvent: MouseEvent,
+): SelectionChangeEvent {
+  return {
+    type: "change",
+    target: {
+      ...(checkboxProps ?? {}),
+      checked,
+      indeterminate: false,
+      name: checkboxProps?.name,
+      type: "radio",
+      value: checkboxProps?.value,
+    } as SelectionChangeEvent["target"],
+    nativeEvent,
+    preventDefault: () => {
+      nativeEvent.preventDefault();
+    },
+    stopPropagation: () => {
+      nativeEvent.stopPropagation();
+    },
+  };
+}
+
+function SelectionActionsDropdown({
+  getPopupContainer,
+  items,
+}: {
+  getPopupContainer?: GetPopupContainer;
+  items: SelectionMenuItem[];
+}): React.ReactNode {
+  const [open, setOpen] = React.useState(false);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>();
+  const [popupContainer, setPopupContainer] = React.useState<HTMLElement | null>(
+    null,
+  );
+
+  React.useLayoutEffect(() => {
+    if (!open || !triggerRef.current) {
+      return;
+    }
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const nextPopupContainer = getPopupContainer?.(triggerRef.current) ?? document.body;
+    const containerRect = nextPopupContainer.getBoundingClientRect();
+
+    setPopupContainer(nextPopupContainer);
+    setMenuStyle({
+      position: "absolute",
+      top: triggerRect.bottom - containerRect.top + 4,
+      left: triggerRect.right - containerRect.left,
+      transform: "translateX(-100%)",
+      minWidth: Math.max(triggerRect.width, 128),
+    });
+  }, [getPopupContainer, open]);
+
+  React.useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+
+      if (
+        rootRef.current?.contains(target) ||
+        menuRef.current?.contains(target)
+      ) {
+        return;
+      }
+
+      setOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
+  const menu = open ? (
+    <div
+      ref={menuRef}
+      role="menu"
+      style={menuStyle}
+      className={cn(
+        "z-50 flex min-w-32 flex-col rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10",
+      )}
+    >
+      {items.map((item) => (
+        <button
+          key={item.key}
+          type="button"
+          role="menuitem"
+          className={cn(
+            "flex cursor-pointer items-center rounded-md px-1.5 py-1 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+          )}
+          onClick={(event) => {
+            event.stopPropagation();
+            item.onClick?.();
+            setOpen(false);
+          }}
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  ) : null;
+
+  return (
+    <div ref={rootRef} className="inline-flex">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className={cn(
+          "inline-flex size-6 items-center justify-center rounded-sm border border-transparent text-foreground transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        )}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen((prevOpen) => !prevOpen);
+        }}
+      >
+        <Icon icon="icon-[ant-design--down-outlined]" />
+      </button>
+      {menu && popupContainer ? createPortal(menu, popupContainer) : menu}
+    </div>
+  );
+}
+
+function SelectionRadio({
+  checked,
+  checkboxProps,
+  onChange,
+}: {
+  checked: boolean;
+  checkboxProps?: SelectionCheckboxProps;
+  onChange: (event: SelectionChangeEvent) => void;
+}): React.ReactNode {
+  return (
+    <button
+      type="button"
+      role="radio"
+      id={checkboxProps?.id}
+      name={checkboxProps?.name}
+      value={checkboxProps?.value as string | number | readonly string[] | undefined}
+      disabled={checkboxProps?.disabled}
+      aria-checked={checked}
+      aria-label={checkboxProps?.["aria-label"]}
+      aria-labelledby={checkboxProps?.["aria-labelledby"]}
+      className={cn(
+        "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-background text-primary outline-none transition-colors",
+        "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+        checked && "border-primary",
+        checkboxProps?.className,
+      )}
+      style={checkboxProps?.style}
+      onMouseEnter={checkboxProps?.onMouseEnter}
+      onMouseLeave={checkboxProps?.onMouseLeave}
+      onClick={(event) => {
+        event.stopPropagation();
+        checkboxProps?.onClick?.(event);
+
+        if (checkboxProps?.disabled || checked) {
+          return;
+        }
+
+        onChange(
+          createSelectionChangeEvent(checkboxProps, true, event.nativeEvent),
+        );
+      }}
+    >
+      <span
+        className={cn(
+          "size-2 rounded-full bg-transparent transition-colors",
+          checked && "bg-primary",
+        )}
+      />
+    </button>
+  );
+}
 
 interface UseSelectionConfig<RecordType = AnyObject> {
   pageData: RecordType[];
@@ -132,22 +351,9 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
   // ========================= Tanstack Table State =========================
   const [rowSelectionState, setRowSelectionState] =
     useMergedState<RowSelectionState>(
-      rowSelection?.defaultSelectedRowKeys?.reduce<RowSelectionState>(
-        (acc, key) => {
-          acc[String(key)] = true;
-          return acc;
-        },
-        {},
-      ) || {},
+      toRowSelectionState(rowSelection?.defaultSelectedRowKeys),
       {
-        value:
-          rowSelection?.selectedRowKeys?.reduce<RowSelectionState>(
-            (acc, key) => {
-              acc[String(key)] = true;
-              return acc;
-            },
-            {},
-          ) || {},
+        value: toRowSelectionState(rowSelection?.selectedRowKeys),
         // onChange: (value) => {
         //   if (!onSelectionChange) return;
         //   onSelectionChange(value);
@@ -274,7 +480,7 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
 
   const [derivedSelectedKeys, derivedHalfSelectedKeys] = useMemo(() => {
     if (checkStrictly) {
-      return [mergedSelectedKeys || [], []];
+      return [mergedSelectedKeys, []];
     }
     const { checkedKeys, halfCheckedKeys } = conductCheck(
       mergedSelectedKeys,
@@ -286,11 +492,11 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
   }, [mergedSelectedKeys, checkStrictly, keyEntities, isCheckboxDisabled]);
 
   const derivedSelectedKeySet = useMemo<Set<Key>>(() => {
-    const keys =
-      selectionType === "radio"
-        ? derivedSelectedKeys.slice(0, 1)
-        : derivedSelectedKeys;
-    return new Set(keys);
+    if (selectionType === "radio") {
+      return new Set(derivedSelectedKeys.slice(0, 1));
+    }
+
+    return new Set(derivedSelectedKeys);
   }, [derivedSelectedKeys, selectionType]);
 
   const derivedHalfSelectedKeySet = useMemo<Set<Key>>(
@@ -511,31 +717,22 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
       if (selectionType !== "radio") {
         let customizeSelections: React.ReactNode;
         if (mergedSelections) {
-          const menu = {
-            getPopupContainer,
-            items: mergedSelections.map((selection, index) => {
-              const { key, text, onSelect: onSelectionClick } = selection;
+          const items = mergedSelections.map((selection, index) => {
+            const { key, text, onSelect: onSelectionClick } = selection;
 
-              return {
-                key: key ?? index,
-                onClick: () => {
-                  onSelectionClick?.(recordKeys);
-                },
-                label: text,
-              };
-            }),
-          };
+            return {
+              key: key ?? index,
+              onClick: () => {
+                onSelectionClick?.(recordKeys);
+              },
+              label: text,
+            } satisfies SelectionMenuItem;
+          });
           customizeSelections = (
-            <div>
-              <Dropdown
-                menu={menu}
-                // getPopupContainer={getPopupContainer}
-              >
-                <span>
-                  <Icon icon="icon-[ant-design--down-outlined]" />
-                </span>
-              </Dropdown>
-            </div>
+            <SelectionActionsDropdown
+              getPopupContainer={getPopupContainer}
+              items={items}
+            />
           );
         }
 
@@ -596,13 +793,9 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
           const checkboxProps = checkboxPropsMap.get(key);
           return {
             node: (
-              <Radio
-                {...checkboxProps}
+              <SelectionRadio
                 checked={checked}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  checkboxProps?.onClick?.(e);
-                }}
+                checkboxProps={checkboxProps}
                 onChange={(event) => {
                   if (!keySet.has(key)) {
                     triggerSingleSelection(key, true, [key], event.nativeEvent);

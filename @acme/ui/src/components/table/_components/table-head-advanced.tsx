@@ -2,11 +2,11 @@
 
 import type { Column } from "@tanstack/react-table";
 
-import { cn } from "@acme/ui/lib/utils";
+import { cn } from "../../../lib/utils";
 
-import type { TableHeadProps } from ".";
+import type { TableHeadProps } from "./base";
 import type { TableLocale } from "../types";
-import { TableHead } from ".";
+import { TableHead } from "./base";
 import { Icon } from "../../../icons";
 import { Tooltip } from "../../tooltip";
 

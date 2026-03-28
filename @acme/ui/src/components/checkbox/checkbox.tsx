@@ -1,22 +1,24 @@
 import * as React from "react";
 
-import { cn } from "@acme/ui/lib/utils";
-import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
+import { cn } from "../../lib/utils";
+import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 
-import type { FormValueType } from "../form";
-import type { CheckboxGroupContext } from "./group-context";
+import type {
+  CheckboxGroupContext,
+  CheckboxValueType,
+} from "./group-context";
 import { devUseWarning } from "../_util/warning";
 import Wave from "../../lib/wave";
-import { LoadingIcon } from "../button";
+import { LoadingIcon } from "../button/loading-icon";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
-import { inputDisabledVariants } from "../input";
+import { inputDisabledVariants } from "../input/variants";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
 type AbstractCheckboxProps<
   TChangeEvent,
-  TValue extends FormValueType = FormValueType,
+  TValue extends CheckboxValueType = CheckboxValueType,
 > = {
   id?: string;
   name?: string;
@@ -48,7 +50,7 @@ type AbstractCheckboxProps<
   skipGroup?: boolean;
 };
 export interface CheckboxChangeEventTarget<
-  TValue extends FormValueType = FormValueType,
+  TValue extends CheckboxValueType = CheckboxValueType,
 > extends Omit<CheckboxProps<TValue>, "value"> {
   checked: boolean;
   name?: string;
@@ -57,7 +59,7 @@ export interface CheckboxChangeEventTarget<
 }
 
 export interface CheckboxChangeEvent<
-  TValue extends FormValueType = FormValueType,
+  TValue extends CheckboxValueType = CheckboxValueType,
 > {
   type: "change";
   target: CheckboxChangeEventTarget<TValue>;
@@ -66,14 +68,14 @@ export interface CheckboxChangeEvent<
   nativeEvent: MouseEvent;
 }
 
-type CheckboxProps<TValue extends FormValueType = FormValueType> =
+type CheckboxProps<TValue extends CheckboxValueType = CheckboxValueType> =
   AbstractCheckboxProps<CheckboxChangeEvent<TValue>, TValue> &
     React.AriaAttributes & {
       key?: React.Key; // fix warning when use key (shadcn)
       indeterminate?: boolean;
     };
 
-function Checkbox<TValue extends FormValueType = FormValueType>(
+function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
   props: CheckboxProps<TValue>,
 ) {
   const {

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
+import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
 import type {
   BuiltInSortingFn,
   Column,
@@ -8,11 +9,11 @@ import type {
   Table,
 } from "@tanstack/react-table";
 
-import type { Breakpoint } from "@acme/ui/hooks/use-responsive";
+import type { Placement } from "../../types";
+import type { Breakpoint } from "../_util/responsive-observer";
 
 import type { AnyObject } from "../_util/type";
 import type { CheckboxProps } from "../checkbox";
-import type { DropdownProps } from "../dropdown";
 import type { PaginationProps } from "../pagination";
 import type { TooltipProps } from "../tooltip";
 import type { INTERNAL_SELECTION_ITEM } from "./hooks/use-selection";
@@ -226,14 +227,22 @@ type RenderCellContext<TRecord> = {
 //       };
 //     }[keyof TRecord]
 //   >
-interface CoverableDropdownProps extends Omit<
-  DropdownProps,
-  | "onOpenChange"
-  // === deprecated ===
-  | "overlay"
-  | "visible"
-  | "onVisibleChange"
-> {
+interface CoverableDropdownProps extends DropdownMenuTriggerProps {
+  children?: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  menu?: {
+    getPopupContainer?: GetPopupContainer;
+    items?: Array<{
+      key?: Key;
+      label?: React.ReactNode;
+      onClick?: () => void;
+    }>;
+  };
+  open?: boolean;
+  placement?: Placement;
+  trigger?: ("click" | "hover" | "contextMenu")[];
+  getPopupContainer?: GetPopupContainer;
   onOpenChange?: (open: boolean) => void;
 }
 export type ColumnType<TRecord> = ColumnSharedType<TRecord> & {
@@ -413,24 +422,12 @@ export type TableRowSelection<TRecord> = {
   ) => React.ReactNode;
   onCell?: GetComponentProps<TRecord>;
 
-  /// OWN
+  // Own extensions
   /** Renderer of the `table` header */
   renderHeader?: (args: {
     checked: boolean;
     originNode: React.ReactNode;
   }) => React.ReactNode;
-  /** Renderer of the `table` cell. Same as render in column */
-  // renderCell?: (args: {
-  //   value: boolean;
-  //   record: TRecord;
-  //   index: number;
-  //   originNode: React.ReactNode;
-  // }) => React.ReactNode;
-
-  // columnTitle?: React.ReactNode;
-  // columnWidth?: number;
-  /** Hide the selectAll checkbox and custom selection */
-  // hideSelectAll?: boolean;
 };
 
 export type TransformColumns<RecordType = AnyObject> = (

@@ -1,10 +1,11 @@
 import React from "react";
 
-import type { FormValueType } from "../form";
 import type { CheckboxOptionType } from "./checkbox-group";
 
+export type CheckboxValueType = string | number | boolean;
+
 export interface CheckboxGroupContext<
-  TValue extends FormValueType = FormValueType,
+  TValue extends CheckboxValueType = CheckboxValueType,
 > {
   name?: string;
   toggleOption?: (option: CheckboxOptionType<TValue>) => void;
@@ -15,6 +16,6 @@ export interface CheckboxGroupContext<
 }
 
 const GroupContext =
-  React.createContext<CheckboxGroupContext<FormValueType> | null>(null);
+  React.createContext<CheckboxGroupContext<CheckboxValueType> | null>(null);
 
 export default GroupContext;

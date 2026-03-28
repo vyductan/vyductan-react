@@ -1,5 +1,13 @@
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../shadcn/select";
+
 import type { PaginationLocale } from "../types";
-import { Select } from "../../select";
 
 const defaultPageSizeOptions = [10, 20, 50, 100];
 
@@ -77,17 +85,27 @@ const PageSizeOptions = ({
     })
   ) : (
     <Select
-      value={pageSize}
-      options={getPageSizeOptions().map((opt) => ({
-        label: mergeBuildOptionText(opt),
-        value: opt,
-      }))}
-      onChange={(value) => {
+      disabled={disabled}
+      value={String(pageSize)}
+      onValueChange={(value) => {
         if (value) {
-          changeSize?.(value);
+          changeSize?.(Number(value));
         }
       }}
-    />
+    >
+      <SelectTrigger aria-label={locale.page_size} className="min-w-24">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {getPageSizeOptions().map((opt) => (
+            <SelectItem key={opt} value={String(opt)}>
+              {mergeBuildOptionText(opt)}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
   return <li className="ml-1">{changeSelect}</li>;
 };

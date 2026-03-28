@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "table-tooltip-support",
+  "title": "Table Tooltip Support",
+  "dependencies": [
+    "@radix-ui/react-tooltip"
+  ],
+  "registryDependencies": [
+    "table-shared-core"
+  ],
+  "files": [
+    {
+      "path": "components/tooltip/index.ts",
+      "content": "export * from \"./tooltip\";\nexport * from \"./_components\";\n",
+      "type": "registry:file",
+      "target": "components/tooltip/index.ts"
+    },
+    {
+      "path": "components/tooltip/tooltip.tsx",
+      "content": "\"use client\";\n\nimport type { TooltipProps as RduTooltipProps } from \"@radix-ui/react-tooltip\";\nimport * as React from \"react\";\n\nimport type { AlignType } from \"../../types\";\nimport {\n  TooltipContent,\n  TooltipProvider,\n  TooltipRoot,\n  TooltipTrigger,\n} from \"./_components\";\n\nexport type TooltipPlacement =\n  | \"top\"\n  | \"left\"\n  | \"right\"\n  | \"bottom\"\n  | \"topLeft\"\n  | \"topRight\"\n  | \"bottomLeft\"\n  | \"bottomRight\"\n  | \"leftTop\"\n  | \"leftBottom\"\n  | \"rightTop\"\n  | \"rightBottom\";\nexport type AbstractTooltipProps = {\n  placement?: TooltipPlacement;\n};\n\ntype TooltipProps = AbstractTooltipProps &\n  Omit<RduTooltipProps, \"side\"> & {\n    /**\n     * The text shown in the tooltip\n     */\n    title?: React.ReactNode;\n    placement?: TooltipPlacement;\n    hidden?: boolean;\n    classNames?: {\n      title?: string;\n      arrow?: string;\n    };\n    align?: AlignType;\n  };\nconst Tooltip = (props: TooltipProps) => {\n  const triggerRef = React.useRef(null);\n\n  const isShadcnTooltip = !props.title;\n  if (isShadcnTooltip) return <TooltipRoot {...props} />;\n\n  const {\n    children,\n    title,\n    placement,\n    hidden,\n    classNames,\n    align: domAlign,\n    ...restProps\n  } = props;\n\n  const side = placement?.includes(\"top\")\n    ? \"top\"\n    : placement?.includes(\"right\")\n      ? \"right\"\n      : !placement || placement.includes(\"bottom\")\n        ? \"bottom\"\n        : \"left\";\n  const align = placement?.includes(\"Top\")\n    ? \"start\"\n    : !placement ||\n        (!placement.includes(\"Left\") && !placement.includes(\"Right\"))\n      ? \"center\"\n      : placement.includes(\"Left\")\n        ? \"start\"\n        : \"end\";\n\n  const alignOffset = domAlign?.offset?.[0];\n  const sideOffset = domAlign?.offset?.[1];\n\n  return (\n    <>\n      <TooltipProvider delayDuration={100}>\n        <TooltipRoot {...restProps}>\n          <TooltipTrigger\n            ref={triggerRef}\n            asChild\n            // keep tooltip open when trigger is clicked\n            onClick={(event) => event.preventDefault()}\n          >\n            {children}\n          </TooltipTrigger>\n          <TooltipContent\n            side={side}\n            align={align}\n            alignOffset={alignOffset}\n            sideOffset={sideOffset}\n            hidden={hidden}\n            // keep tooltip open when trigger is clicked\n            onPointerDownOutside={(event) => {\n              if (event.target === triggerRef.current) event.preventDefault();\n            }}\n            className={classNames?.title}\n            classNames={{\n              arrow: classNames?.arrow,\n            }}\n          >\n            {title}\n          </TooltipContent>\n        </TooltipRoot>\n      </TooltipProvider>\n    </>\n  );\n};\n\nexport { Tooltip };\nexport type { TooltipProps };\n",
+      "type": "registry:file",
+      "target": "components/tooltip/tooltip.tsx"
+    },
+    {
+      "path": "components/tooltip/_components.tsx",
+      "content": "import * as TooltipPrimitive from \"@radix-ui/react-tooltip\";\n\nimport { cn } from \"../../lib/utils\";\n\nfunction TooltipContent({\n  className,\n  sideOffset = 4,\n  children,\n  classNames,\n  ...props\n}: React.ComponentProps<typeof TooltipPrimitive.Content> & {\n  classNames?: {\n    arrow?: string;\n  };\n}) {\n  return (\n    <TooltipPrimitive.Portal>\n      <TooltipPrimitive.Content\n        data-slot=\"tooltip-content\"\n        sideOffset={sideOffset}\n        className={cn(\n          \"bg-primary text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-fit origin-(--radix-tooltip-content-transform-origin) rounded-md px-3 py-1.5 text-xs text-balance\",\n          \"bg-foreground text-background\",\n          className,\n        )}\n        {...props}\n      >\n        {children}\n        <TooltipPrimitive.Arrow\n          data-slot=\"tooltip-arrow\"\n          className={cn(\n            \"bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]\",\n            \"fill-foreground bg-foreground\",\n            classNames?.arrow,\n          )}\n        />\n      </TooltipPrimitive.Content>\n    </TooltipPrimitive.Portal>\n  );\n}\n\nexport {\n  TooltipProvider,\n  Tooltip as TooltipRoot,\n  TooltipTrigger,\n} from \"../../shadcn/tooltip\";\n\nexport { TooltipContent };\n",
+      "type": "registry:file",
+      "target": "components/tooltip/_components.tsx"
+    },
+    {
+      "path": "shadcn/tooltip.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { Tooltip as TooltipPrimitive } from \"radix-ui\"\n\nimport { cn } from \"../lib/utils\"\n\nfunction TooltipProvider({\n  delayDuration = 0,\n  ...props\n}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {\n  return (\n    <TooltipPrimitive.Provider\n      data-slot=\"tooltip-provider\"\n      delayDuration={delayDuration}\n      {...props}\n    />\n  )\n}\n\nfunction Tooltip({\n  ...props\n}: React.ComponentProps<typeof TooltipPrimitive.Root>) {\n  return <TooltipPrimitive.Root data-slot=\"tooltip\" {...props} />\n}\n\nfunction TooltipTrigger({\n  ...props\n}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {\n  return <TooltipPrimitive.Trigger data-slot=\"tooltip-trigger\" {...props} />\n}\n\nfunction TooltipContent({\n  className,\n  sideOffset = 0,\n  children,\n  ...props\n}: React.ComponentProps<typeof TooltipPrimitive.Content>) {\n  return (\n    <TooltipPrimitive.Portal>\n      <TooltipPrimitive.Content\n        data-slot=\"tooltip-content\"\n        sideOffset={sideOffset}\n        className={cn(\n          \"z-50 inline-flex w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95\",\n          className\n        )}\n        {...props}\n      >\n        {children}\n        <TooltipPrimitive.Arrow className=\"z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground\" />\n      </TooltipPrimitive.Content>\n    </TooltipPrimitive.Portal>\n  )\n}\n\nexport { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }\n",
+      "type": "registry:file",
+      "target": "shadcn/tooltip.tsx"
+    }
+  ],
+  "type": "registry:component"
+}

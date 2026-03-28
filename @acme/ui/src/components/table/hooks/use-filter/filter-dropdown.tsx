@@ -3,7 +3,7 @@ import type * as React from "react";
 
 import type { FilterState } from ".";
 import type { AnyObject } from "../../../_util/type";
-import type { FieldDataNode } from "../../../tree";
+import type { FieldDataNode } from "../../../tree/types";
 import type {
   ColumnFilterItem,
   ColumnType,
