@@ -13,7 +13,6 @@ const config: StorybookConfig = {
 
   // addons: [
   //   getAbsolutePath("@storybook/addon-links"),
-  //   getAbsolutePath("@storybook/addon-onboarding"),
   //   getAbsolutePath("@storybook/addon-a11y"),
   //   getAbsolutePath("@storybook/addon-themes"),
   //   getAbsolutePath("@storybook/addon-docs"),
@@ -35,7 +34,6 @@ const config: StorybookConfig = {
         },
       },
     },
-    "@storybook/addon-onboarding",
     // NOTE: @storybook/addon-vitest completely removed to prevent mocker bundle
     // If you need story testing, run tests separately with vitest
   ],

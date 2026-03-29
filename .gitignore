@@ -53,3 +53,6 @@ dist/
 
 *storybook.log
 storybook-static
+
+# superpowers
+.superpowers/

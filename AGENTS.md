@@ -1,5 +1,7 @@
 # Repository Overview
 
+> **Agent Instruction**: Do not create or use Git worktrees. Always perform your work directly in the current workspace.
+
 Monorepo for the Vyductan React project using TurboRepo, managing web and mobile applications with shared UI and API packages.
 
 ## Navigation

@@ -24,9 +24,9 @@
     "@tauri-apps/cli": "^2.10.1",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
-    "@vitejs/plugin-react": "^4.3.4",
-    "rollup": "^4.59.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "rollup": "^4.60.0",
     "typescript": "catalog:",
-    "vite": "^7.3.1"
+    "vite": "catalog:"
   }
 }
