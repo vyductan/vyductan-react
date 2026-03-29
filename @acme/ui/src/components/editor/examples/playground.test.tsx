@@ -45,30 +45,32 @@ vi.mock("../editor", async () => {
         });
       }, [draftValue, onStatsChange]);
 
-      return (
-        <div>
-          <output data-testid="editor-props">
-            {JSON.stringify({
-              instanceId: instanceId.current,
-              format,
-              variant,
-              editable,
-              autoFocus,
-              placeholder,
-            })}
-          </output>
-          <textarea
-            aria-label={`${format} editor`}
-            onChange={(event) => {
-              const nextValue = event.target.value;
-              setDraftValue(nextValue);
-              onChange?.(nextValue, {});
-            }}
-            placeholder={placeholder}
-            readOnly={!editable}
-            value={draftValue}
-          />
-        </div>
+      return createElement(
+        "div",
+        undefined,
+        createElement(
+          "output",
+          { "data-testid": "editor-props" },
+          JSON.stringify({
+            instanceId: instanceId.current,
+            format,
+            variant,
+            editable,
+            autoFocus,
+            placeholder,
+          }),
+        ),
+        createElement("textarea", {
+          "aria-label": `${format} editor`,
+          onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const nextValue = event.target.value;
+            setDraftValue(nextValue);
+            onChange?.(nextValue, {});
+          },
+          placeholder,
+          readOnly: !editable,
+          value: draftValue,
+        }),
       );
     },
   };
@@ -207,6 +209,52 @@ describe("PlaygroundDemo", () => {
     });
   });
 
+  test("pretty-prints serialized json output without mutating the editor textbox value", async () => {
+    render(createElement(PlaygroundDemo));
+
+    const minifiedJson = '{"root":{"type":"root","format":"","indent":0,"version":1,"direction":"ltr","children":[{"type":"paragraph","format":"","indent":0,"version":1,"direction":"ltr","children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Minified JSON stays raw in the editor.","type":"text","version":1}]}]}}';
+
+    fireEvent.change(screen.getByRole("textbox", { name: /json editor/i }), {
+      target: { value: minifiedJson },
+    });
+
+    await waitFor(() => {
+      const output = screen.getByLabelText(/serialized output/i).textContent ?? "";
+
+      expect(output).toContain(`{
+  "root": {
+    "type": "root"`);
+      expect(output).toContain("Minified JSON stays raw in the editor.");
+      expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(minifiedJson);
+    });
+  });
+
+  test("pretty-prints cleaned html output without mutating the editor textbox value", async () => {
+    render(createElement(PlaygroundDemo));
+
+    const rawHtml =
+      "<section><h1>Welcome</h1><div><p>Hello</p><ul><li>One</li></ul></div></section>";
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /html editor/i }), {
+      target: { value: rawHtml },
+    });
+
+    await waitFor(() => {
+      const output = screen.getByLabelText(/serialized output/i).textContent ?? "";
+      const divIndent = output.match(/\n(\s+)<div>/)?.[1]?.length ?? 0;
+      const ulIndent = output.match(/\n(\s+)<ul>/)?.[1]?.length ?? 0;
+      const liIndent = output.match(/\n(\s+)<li>One<\/li>/)?.[1]?.length ?? 0;
+
+      expect(output).toContain("<section>");
+      expect(output).toContain("\n");
+      expect(divIndent).toBeGreaterThan(0);
+      expect(ulIndent).toBeGreaterThan(divIndent);
+      expect(liIndent).toBeGreaterThan(ulIndent);
+      expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(rawHtml);
+    });
+  });
+
   test("labels html output as cleaned html", async () => {
     render(createElement(PlaygroundDemo));
 
@@ -220,6 +268,54 @@ describe("PlaygroundDemo", () => {
         screen.getByText(/inspect exactly what the current editor mode emits/i),
       ).toHaveTextContent(/cleaned html output/i);
       expect(screen.getByText("Cleaned")).toBeInTheDocument();
+    });
+  });
+
+  test("preserves format content when switching tabs", async () => {
+    render(createElement(PlaygroundDemo));
+
+    const rawJson =
+      '{"root":{"type":"root","format":"","indent":0,"version":1,"direction":"ltr","children":[{"type":"paragraph","format":"","indent":0,"version":1,"direction":"ltr","children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"JSON draft survives tab switching.","type":"text","version":1}]}]}}';
+    const rawMarkdown = "# Draft markdown";
+    const rawHtml = "<p>Draft html</p>";
+
+    fireEvent.change(screen.getByRole("textbox", { name: /json editor/i }), {
+      target: { value: rawJson },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /markdown editor/i }), {
+      target: { value: rawMarkdown },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /html editor/i }), {
+      target: { value: rawHtml },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "JSON" }));
+    expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(rawJson);
+
+    fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
+    expect(screen.getByRole("textbox", { name: /markdown editor/i })).toHaveValue(rawMarkdown);
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+    expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(rawHtml);
+  });
+
+  test("keeps markdown output raw in the panel", async () => {
+    render(createElement(PlaygroundDemo));
+
+    const rawMarkdown = "# Heading\n\n- one\n- two";
+
+    fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
+    fireEvent.change(screen.getByRole("textbox", { name: /markdown editor/i }), {
+      target: { value: rawMarkdown },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("textbox", { name: /markdown editor/i })).toHaveValue(rawMarkdown);
+      expect(screen.getByLabelText(/serialized output/i).textContent).toBe(rawMarkdown);
     });
   });
 

@@ -48,7 +48,7 @@ export function renderNode(node: EditorRenderNode, key: string, depth = 0): Reac
     case "quote":
       return (
         <blockquote key={key} className={richTextSemanticContract.quote}>
-          {renderInlineChildren(node.children, `${key}-child`)}
+          {node.children.map((child, index) => renderNode(child, `${key}-child-${index}`, depth))}
         </blockquote>
       );
     case "link":
@@ -139,10 +139,11 @@ function renderListNode(node: EditorRenderListNode, key: string, depth: number):
           ],
           node.listType === "check" && richTextSemanticContract.list.checklist,
         );
+  const items = coalesceNestedListItems(node.children);
 
   return (
     <Tag key={key} className={listClassName} start={node.tag === "ol" ? node.start : undefined}>
-      {node.children.map((child, index) => renderListItemNode(child, `${key}-${index}`, depth))}
+      {items.map((child, index) => renderListItemNode(child, `${key}-${index}`, depth))}
     </Tag>
   );
 }
@@ -170,11 +171,7 @@ function renderListItemNode(node: EditorRenderListItemNode, key: string, depth: 
           type="checkbox"
         />
       ) : null}
-      {node.children.map((child, index) =>
-        child.type === "list"
-          ? renderListNode(child, `${key}-${index}`, depth + 1)
-          : renderNode(child, `${key}-${index}`, depth),
-      )}
+      {renderListItemChildren(node.children, key, depth)}
     </li>
   );
 }
@@ -201,6 +198,73 @@ function renderCheckBlockNode(node: EditorRenderCheckBlockNode, key: string): Re
       <span data-lexical-text="true">{renderInlineChildren(node.children, `${key}-child`)}</span>
     </div>
   );
+}
+
+function renderListItemChildren(
+  children: EditorRenderListItemNode["children"],
+  key: string,
+  depth: number,
+): ReactNode[] {
+  const renderedChildren: ReactNode[] = [];
+  let inlineBuffer: EditorRenderInlineNode[] = [];
+
+  const flushInlineBuffer = () => {
+    if (inlineBuffer.length === 0) {
+      return;
+    }
+
+    renderedChildren.push(
+      <p key={`${key}-paragraph-${renderedChildren.length}`} className={richTextSemanticContract.paragraph}>
+        {renderInlineChildren(inlineBuffer, `${key}-inline-${renderedChildren.length}`)}
+      </p>,
+    );
+    inlineBuffer = [];
+  };
+
+  for (const child of children) {
+    if (child.type === "list") {
+      flushInlineBuffer();
+      renderedChildren.push(renderListNode(child, `${key}-list-${renderedChildren.length}`, depth + 1));
+      continue;
+    }
+
+    if (child.type === "paragraph") {
+      flushInlineBuffer();
+      renderedChildren.push(renderNode(child, `${key}-paragraph-${renderedChildren.length}`, depth));
+      continue;
+    }
+
+    inlineBuffer.push(child);
+  }
+
+  flushInlineBuffer();
+  return renderedChildren;
+}
+
+function coalesceNestedListItems(items: EditorRenderListItemNode[]): EditorRenderListItemNode[] {
+  return items.reduce<EditorRenderListItemNode[]>((accumulator, item) => {
+    if (
+      item.children.length === 1 &&
+      item.children[0]?.type === "list" &&
+      accumulator.length > 0
+    ) {
+      const previousItem = accumulator[accumulator.length - 1];
+
+      if (!previousItem) {
+        return accumulator;
+      }
+
+      accumulator[accumulator.length - 1] = {
+        ...previousItem,
+        children: [...previousItem.children, item.children[0]],
+      };
+
+      return accumulator;
+    }
+
+    accumulator.push(item);
+    return accumulator;
+  }, []);
 }
 
 function renderTableCellNode(node: EditorRenderTableCellNode, key: string): ReactNode {
@@ -325,7 +389,11 @@ function getListItemLabel(node: EditorRenderListItemNode): string {
         return getInlineText(child.children);
       }
 
-      return "";
+      if (child.type === "list") {
+        return "";
+      }
+
+      return getInlineText([child]);
     })
     .join(" ")
     .trim();

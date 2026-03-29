@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { $isListItemNode, $isListNode, type ListNode } from "@lexical/list";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -11,9 +12,90 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   PASTE_COMMAND,
+  type LexicalNode,
 } from "lexical";
 
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
+
+const MARKDOWN_PASTE_SYNTAX_REGEXP =
+  /^#{1,6}\s|^\s*\*\s|^\s*-\s|^\s*\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m;
+
+export function hasMarkdownPasteSyntax(text: string): boolean {
+  return MARKDOWN_PASTE_SYNTAX_REGEXP.test(text);
+}
+
+export function normalizeMarkdownPasteForLists(text: string): string {
+  return text
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((line) => {
+      const flattenedNestedBulletMatch = line.match(/^([*-])\s{2,}([*-])\s+(.*)$/);
+      if (!flattenedNestedBulletMatch) {
+        return line;
+      }
+
+      const [, , nestedMarker, content] = flattenedNestedBulletMatch;
+      return `    ${nestedMarker} ${content}`;
+    })
+    .join("\n");
+}
+
+function collapseMarkdownListWrappers(nodes: LexicalNode[]) {
+  for (const node of nodes) {
+    collapseMarkdownListWrappersInNode(node);
+  }
+}
+
+function collapseMarkdownListWrappersInNode(node: LexicalNode) {
+  if ($isListNode(node)) {
+    collapseMarkdownListWrappersInList(node);
+    return;
+  }
+
+  if ($isListItemNode(node)) {
+    for (const child of node.getChildren()) {
+      collapseMarkdownListWrappersInNode(child);
+    }
+  }
+}
+
+function collapseMarkdownListWrappersInList(listNode: ListNode) {
+  let current = listNode.getFirstChild();
+
+  while (current !== null) {
+    const next = current.getNextSibling();
+
+    if ($isListItemNode(current)) {
+      const previous = current.getPreviousSibling();
+      const onlyChild =
+        current.getChildrenSize() === 1 ? current.getFirstChild() : null;
+
+      if ($isListItemNode(previous) && $isListNode(onlyChild)) {
+        const previousLastChild = previous.getLastChild();
+
+        if (
+          $isListNode(previousLastChild) &&
+          previousLastChild.getListType() === onlyChild.getListType()
+        ) {
+          previousLastChild.append(...onlyChild.getChildren());
+          current.remove();
+          collapseMarkdownListWrappersInList(previousLastChild);
+          current = next;
+          continue;
+        }
+
+        previous.append(onlyChild);
+        current.remove();
+        collapseMarkdownListWrappersInList(onlyChild);
+        current = next;
+        continue;
+      }
+    }
+
+    collapseMarkdownListWrappersInNode(current);
+    current = next;
+  }
+}
 
 /**
  * Plugin that converts pasted markdown text to Lexical format
@@ -42,13 +124,9 @@ export function MarkdownPastePlugin(): null {
           return false;
         }
 
-        // Check if the text looks like markdown (has markdown syntax)
-        const hasMarkdownSyntax =
-          /^#{1,6}\s|^\*\s|^-\s|^\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m.test(
-            text,
-          );
+        const normalizedText = normalizeMarkdownPasteForLists(text);
 
-        if (!hasMarkdownSyntax) {
+        if (!hasMarkdownPasteSyntax(normalizedText)) {
           // Not markdown, let default paste handler deal with it
           return false;
         }
@@ -65,27 +143,22 @@ export function MarkdownPastePlugin(): null {
             currentSelection.removeText();
           }
 
-          // Create a temporary paragraph to convert markdown into
           const tempParagraph = $createParagraphNode();
           const root = $getRoot();
 
-          // Temporarily append temp paragraph to root
           root.append(tempParagraph);
 
-          // Convert markdown into the temp paragraph
           $convertFromMarkdownString(
-            text,
+            normalizedText,
             MARKDOWN_TRANSFORMERS,
             tempParagraph,
           );
 
-          // Get all children from temp paragraph
           const children = tempParagraph.getChildren();
-
-          // Remove temp paragraph from root
           tempParagraph.remove();
 
-          // Insert converted nodes at cursor position
+          collapseMarkdownListWrappers(children);
+
           if (children.length > 0) {
             $insertNodes(children);
           }

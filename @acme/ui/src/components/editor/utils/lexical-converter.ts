@@ -3,15 +3,16 @@
  * Used across the application to avoid code duplication
  */
 
-import type { LexicalEditor } from "lexical";
+import { createHeadlessEditor } from "@lexical/headless";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
 } from "@lexical/markdown";
+import type { LexicalEditor } from "lexical";
 import { $getRoot, createEditor } from "lexical";
 
-import type { LexicalEditorContent } from "../types";
 import { nodes } from "../nodes/nodes";
+import type { LexicalEditorContent } from "../types";
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 /**
@@ -52,71 +53,71 @@ export function lexicalContentToMarkdown(
   }
 }
 
+export const EMPTY_LEXICAL_EDITOR_CONTENT: LexicalEditorContent = {
+  root: {
+    type: "root",
+    format: "",
+    indent: 0,
+    version: 1,
+    children: [],
+    direction: "ltr",
+  },
+};
+
+type MarkdownConverterEditorFactory = typeof createHeadlessEditor;
+
+type MarkdownToLexicalContentOptions = {
+  createEditor?: MarkdownConverterEditorFactory;
+};
+
+/**
+ * Convert markdown string to LexicalEditorContent.
+ * Returns null when conversion fails so callers can distinguish actual failures.
+ */
+export function tryMarkdownToLexicalContent(
+  markdown: string,
+  options: MarkdownToLexicalContentOptions = {},
+): LexicalEditorContent | null {
+  if (!markdown.trim()) {
+    return EMPTY_LEXICAL_EDITOR_CONTENT;
+  }
+
+  const createMarkdownEditor = options.createEditor ?? createHeadlessEditor;
+
+  try {
+    const editor = createMarkdownEditor({
+      namespace: "temp-markdown-converter",
+      onError: (error) => {
+        throw error;
+      },
+      nodes: nodes as never,
+    });
+
+    editor.update(
+      () => {
+        const root = $getRoot();
+        root.clear();
+        $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS);
+      },
+      { discrete: true },
+    );
+
+    return editor.getEditorState().toJSON() as LexicalEditorContent;
+  } catch (error) {
+    console.error("Error converting markdown to Lexical:", error);
+    return null;
+  }
+}
+
 /**
  * Convert markdown string to LexicalEditorContent
  * Uses Lexical's markdown converter to properly parse markdown syntax
  */
 export function markdownToLexicalContent(
   markdown: string,
+  options: MarkdownToLexicalContentOptions = {},
 ): LexicalEditorContent {
-  if (!markdown.trim()) {
-    return {
-      root: {
-        type: "root",
-        format: "",
-        indent: 0,
-        version: 1,
-        children: [],
-        direction: "ltr",
-      },
-    };
-  }
-
-  try {
-    // Create a temporary editor instance with proper nodes to convert markdown to Lexical
-    const editor = createEditor({
-      namespace: "temp-markdown-converter",
-      onError: (error) => {
-        console.error(
-          "Lexical editor error during markdown conversion:",
-          error,
-        );
-      },
-      nodes: nodes as never,
-    });
-
-    let lexicalContent: LexicalEditorContent | null = null;
-
-    // Convert markdown to Lexical editor state
-    editor.update(
-      () => {
-        const root = $getRoot();
-        root.clear(); // Clear existing content
-        $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS);
-      },
-      { discrete: true },
-    );
-
-    // Get the editor state immediately after update (update is synchronous)
-    const editorState = editor.getEditorState();
-    const serializedState = editorState.toJSON();
-    lexicalContent = serializedState as LexicalEditorContent;
-
-    return lexicalContent;
-  } catch (error) {
-    console.error("Error converting markdown to Lexical:", error);
-    // Fallback to empty structure on error
-    return {
-      root: {
-        type: "root",
-        format: "",
-        indent: 0,
-        version: 1,
-        children: [],
-        direction: "ltr",
-      },
-    };
-  }
+  return tryMarkdownToLexicalContent(markdown, options) ?? EMPTY_LEXICAL_EDITOR_CONTENT;
 }
 
 /**

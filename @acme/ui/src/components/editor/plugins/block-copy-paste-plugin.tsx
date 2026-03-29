@@ -135,7 +135,8 @@ export function BlockCopyPastePlugin(): null {
           return false;
         }
 
-        if (!event.clipboardData) {
+        const clipboardDataTransfer = event.clipboardData;
+        if (!clipboardDataTransfer) {
           return false;
         }
 
@@ -157,7 +158,7 @@ export function BlockCopyPastePlugin(): null {
               clipboardData["text/plain"],
               clipboardData["text/html"] ?? "",
             );
-            setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);
+            setLexicalClipboardDataTransfer(clipboardDataTransfer, clipboardData);
           });
 
           return true;
@@ -253,7 +254,8 @@ export function BlockCopyPastePlugin(): null {
           return false;
         }
 
-        if (!event.clipboardData) {
+        const clipboardDataTransfer = event.clipboardData;
+        if (!clipboardDataTransfer) {
           return false;
         }
 
@@ -275,7 +277,7 @@ export function BlockCopyPastePlugin(): null {
               clipboardData["text/plain"],
               clipboardData["text/html"] ?? "",
             );
-            setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);
+            setLexicalClipboardDataTransfer(clipboardDataTransfer, clipboardData);
             currentSelection.removeText();
           });
 

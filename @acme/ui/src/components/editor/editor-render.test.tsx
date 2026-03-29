@@ -10,6 +10,7 @@ import * as editorExports from "./index";
 import {
   canonicalEditorRenderFixtureNames,
   editorRenderFixtures,
+  editorRenderSourceFixtures,
   unsupportedEditorRenderFixtureNames,
 } from "./render/render-fixtures";
 import { richTextSemanticContract } from "./themes/rich-text-semantic-contract";
@@ -241,6 +242,174 @@ describe("EditorRender", () => {
     expect(bodyCells).toHaveLength(2);
     expect(screen.getByText("Header A")).toBeInTheDocument();
     expect(screen.getByText("Cell B1")).toBeInTheDocument();
+  });
+
+  test("renders markdown paragraph input semantically", () => {
+    render(
+      <EditorRender
+        format="markdown"
+        value={editorRenderSourceFixtures.paragraph.markdown}
+      />,
+    );
+
+    const paragraphText = screen.getByText("Canonical paragraph content.");
+    const paragraph = paragraphText.closest("p");
+    expect(paragraph).not.toBeNull();
+    expect(paragraph).toHaveClass(richTextSemanticContract.paragraph);
+  });
+
+  test("renders html heading input semantically", () => {
+    render(<EditorRender format="html" value={editorRenderSourceFixtures.heading.html} />);
+
+    const heading = screen.getByRole("heading", { name: "Canonical heading content" });
+    expect(heading.tagName).toBe("H2");
+    expect(heading).toHaveClass(richTextSemanticContract.heading.h2);
+  });
+
+  test("renders markdown nested list input semantically", () => {
+    const { container } = render(
+      <EditorRender
+        format="markdown"
+        value={editorRenderSourceFixtures.bulletList.markdown}
+      />,
+    );
+
+    const bulletList = container.querySelector("ul");
+    expect(bulletList).not.toBeNull();
+    expect(container.querySelector("ul ul")).not.toBeNull();
+    expect(screen.getByText("Nested bullet")).toBeInTheDocument();
+  });
+
+  test("renders html link input semantically", () => {
+    render(<EditorRender format="html" value={editorRenderSourceFixtures.link.html} />);
+
+    const link = screen.getByRole("link", { name: "Canonical link" });
+    expect(link).toHaveAttribute("href", "https://example.com");
+    expect(link).toHaveClass(richTextSemanticContract.link);
+  });
+
+  test("renders html blockquote input semantically", () => {
+    const { container } = render(
+      <EditorRender format="html" value={editorRenderSourceFixtures.blockquote.html} />,
+    );
+
+    const quote = container.querySelector("blockquote");
+    expect(quote).not.toBeNull();
+    expect(quote).toHaveTextContent("Canonical quote content.");
+    expect(quote).toHaveClass(richTextSemanticContract.quote);
+  });
+
+  test("preserves paragraph structure inside html blockquotes", () => {
+    const { container } = render(
+      <EditorRender format="html" value={editorRenderSourceFixtures.blockquoteParagraphs.html} />,
+    );
+
+    const paragraphs = Array.from(container.querySelectorAll("blockquote p")).map((node) =>
+      node.textContent?.trim(),
+    );
+
+    expect(paragraphs).toEqual(["First quote paragraph.", "Second quote paragraph."]);
+  });
+
+  test("renders markdown check-block semantics", () => {
+    render(
+      <EditorRender
+        format="markdown"
+        value={editorRenderSourceFixtures.checkBlock.markdown}
+      />,
+    );
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    expect(checkboxes).toHaveLength(2);
+    expect(checkboxes[0]).not.toBeChecked();
+    expect(checkboxes[1]).toBeChecked();
+    expect(screen.getByText("Unchecked check block")).toBeInTheDocument();
+    expect(screen.getByText("Checked check block")).toBeInTheDocument();
+  });
+
+  test("renders html code block input semantically", () => {
+    const { container } = render(
+      <EditorRender format="html" value={editorRenderSourceFixtures.codeBlock.html} />,
+    );
+
+    const code = container.querySelector("pre code");
+    expect(code).not.toBeNull();
+    expect(code).toHaveTextContent("const answer = 42;");
+    expect(code).toHaveClass(richTextSemanticContract.code);
+  });
+
+  test("renders markdown table input semantically", () => {
+    const { container } = render(
+      <EditorRender format="markdown" value={editorRenderSourceFixtures.table.markdown} />,
+    );
+
+    const table = container.querySelector("table");
+    const rows = container.querySelectorAll("tr");
+    const headerCells = container.querySelectorAll("th");
+    const bodyCells = container.querySelectorAll("td");
+
+    expect(table).not.toBeNull();
+    expect(rows).toHaveLength(2);
+    expect(headerCells).toHaveLength(2);
+    expect(bodyCells).toHaveLength(2);
+    expect(screen.getByText("Header A")).toBeInTheDocument();
+    expect(screen.getByText("Cell B1")).toBeInTheDocument();
+  });
+
+  test("returns null for object input with markdown format", () => {
+    const rendered = render(
+      <EditorRender value={editorRenderFixtures.paragraph.content} format="markdown" />,
+    );
+
+    expect(rendered.container.firstChild).toBeNull();
+  });
+
+  test("returns null for object input with html format", () => {
+    const rendered = render(
+      <EditorRender value={editorRenderFixtures.paragraph.content} format="html" />,
+    );
+
+    expect(rendered.container.firstChild).toBeNull();
+  });
+
+  test("returns null for unsupported markdown and html source inputs", () => {
+    const markdownImage = render(
+      <EditorRender
+        format="markdown"
+        value={editorRenderSourceFixtures.unsupportedImage.markdown}
+      />,
+    );
+    expect(markdownImage.container.firstChild).toBeNull();
+
+    cleanup();
+
+    const { JSDOM } = require("jsdom");
+    const { window } = new JSDOM("<!doctype html><html><body></body></html>");
+    const originalDomParser = globalThis.DOMParser;
+    const originalElement = globalThis.Element;
+    const originalHtmlElement = globalThis.HTMLElement;
+    const originalNode = globalThis.Node;
+
+    Object.assign(globalThis, {
+      DOMParser: window.DOMParser,
+      Element: window.Element,
+      HTMLElement: window.HTMLElement,
+      Node: window.Node,
+    });
+
+    try {
+      const htmlImage = render(
+        <EditorRender format="html" value={editorRenderSourceFixtures.unsupportedImage.html} />,
+      );
+      expect(htmlImage.container.firstChild).toBeNull();
+    } finally {
+      Object.assign(globalThis, {
+        DOMParser: originalDomParser,
+        Element: originalElement,
+        HTMLElement: originalHtmlElement,
+        Node: originalNode,
+      });
+    }
   });
 
   test("keeps the approved canonical fixture set covered by this renderer", () => {

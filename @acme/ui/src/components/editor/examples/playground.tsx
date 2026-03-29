@@ -214,6 +214,111 @@ const INITIAL_EDITOR_RESET_KEYS: Record<EditorFormat, number> = {
   html: 0,
 };
 
+const HTML_BLOCK_TAGS = new Set([
+  "article",
+  "aside",
+  "blockquote",
+  "div",
+  "figcaption",
+  "figure",
+  "footer",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "header",
+  "li",
+  "main",
+  "nav",
+  "ol",
+  "p",
+  "section",
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+  "ul",
+]);
+
+function formatJsonDisplayValue(value: string) {
+  if (!value.trim()) {
+    return value;
+  }
+
+  try {
+    return JSON.stringify(JSON.parse(value), null, 2);
+  } catch {
+    return value;
+  }
+}
+
+function isInlineHtmlNode(node: ChildNode) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return !!node.textContent?.trim();
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return false;
+  }
+
+  return !HTML_BLOCK_TAGS.has((node as Element).tagName.toLowerCase());
+}
+
+function formatHtmlDisplayNode(node: ChildNode, depth: number): string {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent?.trim() ?? "";
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return "";
+  }
+
+  const element = node as Element;
+  const tagName = element.tagName.toLowerCase();
+  const indent = "  ".repeat(depth);
+  const attributes = Array.from(element.attributes)
+    .map((attribute) => ` ${attribute.name}="${attribute.value}"`)
+    .join("");
+  const openingTag = `<${tagName}${attributes}>`;
+  const closingTag = `</${tagName}>`;
+  const renderedChildren = Array.from(element.childNodes)
+    .map((childNode) => formatHtmlDisplayNode(childNode, depth + 1))
+    .filter(Boolean);
+
+  if (renderedChildren.length === 0) {
+    return `${indent}${openingTag}${closingTag}`;
+  }
+
+  if (Array.from(element.childNodes).every(isInlineHtmlNode)) {
+    return `${indent}${openingTag}${renderedChildren.join("")}${closingTag}`;
+  }
+
+  return `${indent}${openingTag}\n${renderedChildren.join("\n")}\n${indent}${closingTag}`;
+}
+
+function formatHtmlDisplayValue(value: string) {
+  if (!value.trim()) {
+    return value;
+  }
+
+  try {
+    const document = new DOMParser().parseFromString(value, "text/html");
+    const formattedValue = Array.from(document.body.childNodes)
+      .map((node) => formatHtmlDisplayNode(node, 0))
+      .filter(Boolean)
+      .join("\n");
+
+    return formattedValue || value;
+  } catch {
+    return value;
+  }
+}
+
 export default function PlaygroundDemo() {
   const [activeFormat, setActiveFormat] = React.useState<EditorFormat>("json");
   const [values, setValues] = React.useState<Record<EditorFormat, string>>(INITIAL_VALUES);
@@ -234,6 +339,17 @@ export default function PlaygroundDemo() {
 
   const activePresets = React.useMemo(() => PRESETS[activeFormat], [activeFormat]);
   const activeValue = values[activeFormat];
+  const displayValue = React.useMemo(() => {
+    if (activeFormat === "json") {
+      return formatJsonDisplayValue(activeValue);
+    }
+
+    if (activeFormat === "html") {
+      return formatHtmlDisplayValue(activeValue);
+    }
+
+    return activeValue;
+  }, [activeFormat, activeValue]);
   const activeEditorResetKey = editorResetKeys[activeFormat];
   const activeStats = statsByFormat[activeFormat];
   const outputTitle = activeFormat === "html" ? "Cleaned HTML Output" : `${FORMAT_LABELS[activeFormat]} Output`;
@@ -493,7 +609,7 @@ export default function PlaygroundDemo() {
               aria-label="Serialized output"
               className="min-h-[320px] overflow-auto rounded-[24px] border border-white/10 bg-black/30 p-4 text-xs leading-6 text-slate-100"
             >
-              {activeValue || "No content yet"}
+              {displayValue || "No content yet"}
             </pre>
           </div>
         </div>

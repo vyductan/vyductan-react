@@ -1,5 +1,3 @@
-import type { LexicalEditorContent } from "../types";
-
 import type {
   EditorRenderBlockNode,
   EditorRenderContent,
@@ -31,9 +29,7 @@ const supportedListTypes = new Set(["bullet", "number", "check"]);
 const supportedHeadingTags = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 const supportedListTags = new Set(["ol", "ul"]);
 
-export function normalizeEditorContent(
-  value: LexicalEditorContent | string,
-): EditorRenderContent | null {
+export function normalizeEditorContent(value: unknown): EditorRenderContent | null {
   if (typeof value === "string") {
     try {
       const parsed = JSON.parse(value) as unknown;
@@ -136,6 +132,7 @@ function isHeadingNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "heading" &&
+    "tag" in node &&
     typeof node.tag === "string" &&
     supportedHeadingTags.has(node.tag) &&
     node.children.every(isInlineNode)
@@ -143,17 +140,31 @@ function isHeadingNode(node: unknown): boolean {
 }
 
 function isQuoteNode(node: unknown): boolean {
-  return isElementNodeBase(node) && node.type === "quote" && node.children.every(isInlineNode);
+  return (
+    isElementNodeBase(node) &&
+    node.type === "quote" &&
+    node.children.every(
+      (child) =>
+        (isNode(child, true) && isRecord(child) && isInlineNode(child)) ||
+        (isNode(child, false) && isRecord(child) && child.type === "paragraph"),
+    )
+  );
 }
 
 function isLinkNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     (node.type === "link" || node.type === "autolink") &&
+    "url" in node &&
     typeof node.url === "string" &&
+    "rel" in node &&
     (node.rel === null || typeof node.rel === "string") &&
+    "target" in node &&
     (node.target === null || typeof node.target === "string") &&
-    (node.title === undefined || node.title === null || typeof node.title === "string") &&
+    (!("title" in node) ||
+      node.title === undefined ||
+      node.title === null ||
+      typeof node.title === "string") &&
     node.children.every(isInlineNode)
   );
 }
@@ -162,9 +173,12 @@ function isListNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "list" &&
+    "listType" in node &&
     typeof node.listType === "string" &&
     supportedListTypes.has(node.listType) &&
+    "start" in node &&
     typeof node.start === "number" &&
+    "tag" in node &&
     typeof node.tag === "string" &&
     supportedListTags.has(node.tag) &&
     node.children.every((child) => isNode(child, true) && isRecord(child) && child.type === "listitem")
@@ -175,13 +189,15 @@ function isListItemNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "listitem" &&
+    "value" in node &&
     typeof node.value === "number" &&
-    (node.checked === undefined || typeof node.checked === "boolean") &&
+    (!("checked" in node) || node.checked === undefined || typeof node.checked === "boolean") &&
     node.children.every(
       (child) =>
-        isNode(child, false) &&
-        isRecord(child) &&
-        (child.type === "paragraph" || child.type === "list"),
+        (isNode(child, false) &&
+          isRecord(child) &&
+          (child.type === "paragraph" || child.type === "list")) ||
+        (isNode(child, true) && isRecord(child) && isInlineNode(child)),
     )
   );
 }
@@ -190,6 +206,7 @@ function isCheckBlockNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "check-block" &&
+    "checked" in node &&
     typeof node.checked === "boolean" &&
     node.children.every(isInlineNode)
   );
@@ -199,7 +216,10 @@ function isCodeNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "code" &&
-    (node.language === null || typeof node.language === "string") &&
+    (!("language" in node) ||
+      node.language === undefined ||
+      node.language === null ||
+      typeof node.language === "string") &&
     node.children.every(
       (child) =>
         isNode(child, true) &&
@@ -247,9 +267,13 @@ function isTableCellNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "tablecell" &&
+    "colSpan" in node &&
     typeof node.colSpan === "number" &&
+    "rowSpan" in node &&
     typeof node.rowSpan === "number" &&
+    "headerState" in node &&
     typeof node.headerState === "number" &&
+    "backgroundColor" in node &&
     (node.backgroundColor === null || typeof node.backgroundColor === "string") &&
     node.children.every(
       (child) => isNode(child, false) && isRecord(child) && child.type === "paragraph",

@@ -53,7 +53,7 @@ export type EditorRenderHeadingNode = Omit<EditorRenderElementNode, "children"> 
 };
 
 export type EditorRenderQuoteNode = Omit<EditorRenderElementNode, "children"> & {
-  children: EditorRenderInlineNode[];
+  children: Array<EditorRenderInlineNode | EditorRenderParagraphNode>;
   type: "quote";
 };
 
@@ -76,7 +76,7 @@ export type EditorRenderListNode = Omit<EditorRenderElementNode, "children"> & {
 
 export type EditorRenderListItemNode = Omit<EditorRenderElementNode, "children"> & {
   checked?: boolean;
-  children: Array<EditorRenderParagraphNode | EditorRenderListNode>;
+  children: Array<EditorRenderParagraphNode | EditorRenderListNode | EditorRenderInlineNode>;
   type: "listitem";
   value: number;
 };
@@ -89,7 +89,7 @@ export type EditorRenderCheckBlockNode = Omit<EditorRenderElementNode, "children
 
 export type EditorRenderCodeNode = Omit<EditorRenderElementNode, "children"> & {
   children: Array<EditorRenderTextNode | EditorRenderLineBreakNode | EditorRenderCodeHighlightNode>;
-  language: null | string;
+  language?: null | string;
   type: "code";
 };
 
