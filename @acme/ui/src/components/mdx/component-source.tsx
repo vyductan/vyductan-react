@@ -1,21 +1,21 @@
-import React from "react";
+import type React from "react";
 
 import { Card } from "@acme/ui/components/card";
 
 import { CollapsibleCodeBlock } from "./collapsible-code-block";
 
-type CompDemoProps = {
+type ComponentSourceProps = {
   src: string;
   __comp__: React.FC;
 };
 
-const demoSourceFiles = import.meta.glob("../**/demo/*.{ts,tsx}", {
+const exampleSourceFiles = import.meta.glob("../**/examples/*.{ts,tsx}", {
   query: "?raw",
   import: "default",
   eager: true,
 }) as Record<string, string>;
 
-const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
+const ComponentSource = ({ src, __comp__ }: ComponentSourceProps) => {
   let language = "tsx";
 
   if (typeof src === "string") {
@@ -24,13 +24,14 @@ const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
       extension === "ts" || extension === "tsx" ? "tsx" : (extension ?? "tsx");
   }
 
-  const content = typeof src === "string" ? demoSourceFiles[`../${src}`] ?? src : "";
+  const content =
+    typeof src === "string" ? (exampleSourceFiles[`../${src}`] ?? src) : "";
 
   // Dynamic import không thể dùng với biến - cần static string literal
   // Giải pháp: Dùng __comp__ prop đã được pass vào (đơn giản nhất)
 
   return (
-    <Card className="mt-6 inline-flex w-full flex-col sm:max-w-3xl">
+    <Card className="sb-unstyled mt-6 inline-flex w-full flex-col sm:max-w-3xl">
       <CollapsibleCodeBlock
         component={<__comp__ />}
         language={language}
@@ -43,8 +44,8 @@ const ComponentSource = ({ src, __comp__ }: CompDemoProps) => {
 // Nếu muốn dùng dynamic import với variable paths, bạn cần tạo mapping như sau:
 // function getComponentLoader(componentPath: string) {
 //   const componentMap: Record<string, () => Promise<{ default: React.FC }>> = {
-//     "@acme/ui/components/alert-modal/demo/basic": () =>
-//       import("@acme/ui/components/alert-modal/demo/basic"),
+//     "@acme/ui/components/alert-modal/examples/basic": () =>
+//       import("@acme/ui/components/alert-modal/examples/basic"),
 //     // Thêm các component khác vào đây với static imports
 //   };
 //   return componentMap[componentPath];
