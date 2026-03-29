@@ -3,7 +3,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 import { useMemo } from "react";
-import { fillRef } from "@rc-component/util/lib/ref";
+import { fillRef } from "@rc-component/util/es/ref";
 
 import { cn } from "@acme/ui/lib/utils";
 

@@ -1,14 +1,18 @@
 import type { XOR } from "ts-xor";
 
 import type { AnyObject } from "../_util/type";
+import {
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRoot,
+  TableRow,
+} from "./_components/base";
 import type { OwnTableProps, RecordWithCustomRow } from "./table";
-import { TableRoot } from "./_components";
 import { OwnTable } from "./table";
-
-export * from "./table";
-export * from "./locale/en-us";
-export * from "./locale/vi-vn";
-export * from "./_components";
 
 type ShadcnTableProps = React.ComponentProps<typeof TableRoot>;
 
@@ -30,9 +34,17 @@ const Table = <TRecord extends RecordWithCustomRow = AnyObject>(
 export type { XORTableProps as TableProps };
 export type {
   ColumnGroupType as TableColumnGroupType,
-  // ColumnProps as TableColumnProps,
   ColumnsType as TableColumnsType,
   ColumnType as TableColumnType,
   TablePaginationConfig,
 } from "./types";
-export { Table };
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+};

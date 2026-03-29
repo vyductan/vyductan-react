@@ -6,8 +6,8 @@
 
 import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React, { useMemo } from "react";
-import toArray from "@rc-component/util/lib/Children/toArray";
-import warning from "@rc-component/util/lib/warning";
+import toArray from "@rc-component/util/es/Children/toArray";
+import warning from "@rc-component/util/es/warning";
 
 import type { Breakpoint } from "../../_util/responsive-observer";
 import type { AnyObject } from "../../_util/type";
