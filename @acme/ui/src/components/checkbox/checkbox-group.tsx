@@ -32,6 +32,7 @@ export interface AbstractCheckboxGroupProps<
     label?: string;
   };
   disabled?: boolean;
+  optionVariant?: "default" | "card";
 }
 
 type CheckboxGroupProps<T extends FormValueType = FormValueType> =
@@ -41,7 +42,8 @@ type CheckboxGroupProps<T extends FormValueType = FormValueType> =
     defaultValue?: T[];
     onChange?: (checkedValues: T[]) => void;
   };
-const CheckboxGroup = <T extends FormValueType = FormValueType>({
+
+function CheckboxGroup<T extends FormValueType = FormValueType>({
   name,
   value,
   defaultValue,
@@ -50,7 +52,8 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
   disabled,
   className,
   classNames,
-}: CheckboxGroupProps<T>) => {
+  optionVariant = "default",
+}: CheckboxGroupProps<T>): React.JSX.Element {
   const [internalValue, setInternalValue] = useControlledState(
     defaultValue,
     value,
@@ -74,28 +77,56 @@ const CheckboxGroup = <T extends FormValueType = FormValueType>({
     >
       {memoizedOptions.map((o) => {
         const isDisabled = o.disabled ?? disabled;
-        return (
+        const isSelected = !!internalValue?.includes(o.value);
+        const optionKey = o.value.toString();
+
+        const checkbox = (
           <Checkbox
-            key={o.value.toString()}
+            key={optionKey}
             name={name}
-            checked={internalValue?.includes(o.value)}
+            checked={isSelected}
             value={o.value as string}
             disabled={isDisabled}
+            variant={optionVariant === "card" ? "card" : "default"}
             onChange={(e) => {
               if (isDisabled) return;
 
-              const newValue = e.target.checked
+              const nextValue = e.target.checked
                 ? [...(internalValue ?? []), o.value]
                 : internalValue?.filter((x) => x !== o.value);
 
-              setInternalValue(newValue);
-              onChange?.(newValue ?? []);
+              setInternalValue(nextValue);
+              onChange?.(nextValue ?? []);
             }}
-            className={cn(classNames?.item, o.className)}
+            className={cn(
+              optionVariant === "card" ? "w-full" : undefined,
+              optionVariant === "card" ? undefined : classNames?.item,
+              o.className,
+            )}
             classNames={classNames}
           >
             {o.label}
           </Checkbox>
+        );
+
+        if (optionVariant !== "card") {
+          return checkbox;
+        }
+
+        return (
+          <div
+            key={optionKey}
+            data-slot="checkbox-group-option"
+            data-option-variant="card"
+            data-selected={isSelected ? "true" : "false"}
+            data-disabled={isDisabled ? "true" : "false"}
+            className={cn(
+              "rounded-lg focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+              classNames?.item,
+            )}
+          >
+            {checkbox}
+          </div>
         );
       })}
     </div>

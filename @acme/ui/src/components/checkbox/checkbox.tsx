@@ -3,14 +3,14 @@ import * as React from "react";
 import { cn } from "@acme/ui/lib/utils";
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
-import type { FormValueType } from "../form";
-import type { CheckboxGroupContext } from "./group-context";
-import { devUseWarning } from "../_util/warning";
 import Wave from "../../lib/wave";
+import { devUseWarning } from "../_util/warning";
 import { LoadingIcon } from "../button";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
+import type { FormValueType } from "../form";
 import { inputDisabledVariants } from "../input";
+import type { CheckboxGroupContext } from "./group-context";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
@@ -40,6 +40,7 @@ type AbstractCheckboxProps<
   classNames?: {
     label?: string;
   };
+  variant?: "default" | "card";
 
   // render
   children?: React.ReactNode;
@@ -94,6 +95,7 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
     style,
     className,
     classNames,
+    variant = "default",
     // render
     children,
 
@@ -126,11 +128,11 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
     );
   }
 
-  const mergedChecked = isGroup
-    ? value === undefined
-      ? false
-      : !!checkboxGroup.value?.includes(value)
-    : checked;
+  let mergedChecked = checked;
+
+  if (isGroup) {
+    mergedChecked = value !== undefined && !!checkboxGroup.value?.includes(value);
+  }
 
   const hasLabelContent = React.Children.toArray(children).some((child) => {
     if (typeof child === "boolean") {
@@ -139,6 +141,30 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
 
     return child !== "";
   });
+  const isCardVariant = variant === "card";
+  const checkboxName = isGroup ? checkboxGroup.name : restProps.name;
+
+  let labelNode: React.ReactNode = null;
+
+  if (loading) {
+    labelNode = <LoadingIcon />;
+  } else if (hasLabelContent) {
+    labelNode = isCardVariant ? (
+      <div
+        data-slot="checkbox-label"
+        className={cn("grid gap-1.5 leading-snug", classNames?.label)}
+      >
+        {children}
+      </div>
+    ) : (
+      <span
+        data-slot="checkbox-label"
+        className={cn("leading-line-height px-2", classNames?.label)}
+      >
+        {children}
+      </span>
+    );
+  }
 
   // ============================ Event Lock ============================
   const [onLabelClick, onInputClick] = useBubbleLock(restProps.onClick);
@@ -147,8 +173,15 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <label
         className={cn(
-          "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
+          "inline-flex shrink-0 cursor-pointer text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
+          isCardVariant
+            ? [
+                "items-start gap-3 rounded-lg border border-border p-3 transition-colors",
+                "hover:bg-accent/50",
+                "has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 dark:has-data-[state=checked]:bg-primary/10",
+              ]
+            : "items-baseline",
           inputDisabledVariants({ disabled: mergedDisabled }),
           className,
         )}
@@ -160,13 +193,13 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
         <ShadcnCheckbox
           className={cn(
             "data-[state=indeterminate]:bg-muted",
-            "self-center",
+            isCardVariant ? "mt-0.5 self-start" : "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
           )}
           value={value as string | undefined}
           checked={indeterminate ? "indeterminate" : mergedChecked}
           defaultChecked={defaultChecked}
-          name={isGroup ? checkboxGroup.name : restProps.name}
+          name={checkboxName}
           disabled={mergedDisabled}
           onClick={onInputClick}
           onCheckedChange={(nextChecked) => {
@@ -174,7 +207,7 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
               type: "change",
               target: {
                 type: "checkbox",
-                name: isGroup ? checkboxGroup.name : restProps.name,
+                name: checkboxName,
                 value: value as unknown as TValue,
                 checked: nextChecked === "indeterminate" ? false : nextChecked,
                 indeterminate,
@@ -197,16 +230,7 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
           }}
           {...restProps}
         />
-        {loading ? (
-          <LoadingIcon />
-        ) : hasLabelContent ? (
-          <span
-            data-slot="checkbox-label"
-            className={cn("leading-line-height px-2", classNames?.label)}
-          >
-            {children}
-          </span>
-        ) : null}
+        {labelNode}
       </label>
     </Wave>
   );

@@ -1,6 +1,44 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { JSX } from "react";
 
-import { Checkbox } from "./checkbox";
+import type { CheckboxOptionType } from "./checkbox-group";
+import { Checkbox } from "./index";
+
+const externalLabelClassName =
+  "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
+
+function createAudienceLabel(title: string, description: string): JSX.Element {
+  return (
+    <div className="grid gap-1">
+      <span className="font-medium">{title}</span>
+      <span className="text-muted-foreground text-sm">{description}</span>
+    </div>
+  );
+}
+
+const audienceOptions: CheckboxOptionType<string>[] = [
+  {
+    label: createAudienceLabel(
+      "Product managers",
+      "Roadmaps, priorities, and launch plans.",
+    ),
+    value: "product-managers",
+  },
+  {
+    label: createAudienceLabel(
+      "Engineers",
+      "APIs, implementation details, and technical updates.",
+    ),
+    value: "engineers",
+  },
+  {
+    label: createAudienceLabel(
+      "Designers",
+      "UX reviews, components, and design system changes.",
+    ),
+    value: "designers",
+  },
+];
 
 const meta = {
   title: "Components/Checkbox",
@@ -16,6 +54,10 @@ const meta = {
     checked: {
       control: "select",
       options: [true, false, "indeterminate"],
+    },
+    variant: {
+      control: "select",
+      options: ["default", "card"],
     },
   },
 } satisfies Meta<typeof Checkbox>;
@@ -36,24 +78,33 @@ export const Checked: Story = {
   },
 };
 
+export const Card: Story = {
+  render: () => (
+    <div className="w-full max-w-sm">
+      <Checkbox defaultChecked variant="card">
+        <div className="grid gap-1.5 font-normal">
+          <p className="text-sm leading-none font-medium">Auto Start</p>
+          <p className="text-muted-foreground text-sm">
+            Starting with your OS.
+          </p>
+        </div>
+      </Checkbox>
+    </div>
+  ),
+};
+
 export const Disabled: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled-unchecked" disabled />
-        <label
-          htmlFor="disabled-unchecked"
-          className="text-muted-foreground text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
+        <label htmlFor="disabled-unchecked" className={externalLabelClassName}>
           Disabled (unchecked)
         </label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled-checked" disabled checked />
-        <label
-          htmlFor="disabled-checked"
-          className="text-muted-foreground text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
+        <label htmlFor="disabled-checked" className={externalLabelClassName}>
           Disabled (checked)
         </label>
       </div>
@@ -77,43 +128,18 @@ export const WithLabel: Story = {
 
 export const CheckboxGroup: Story = {
   render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center space-x-2">
-        <Checkbox id="notifications" />
-        <label
-          htmlFor="notifications"
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Enable notifications
-        </label>
+    <div className="grid gap-3">
+      <div className="grid gap-1">
+        <h3 className="text-sm font-medium">Choose your audience</h3>
+        <p className="text-muted-foreground text-sm">
+          Select the teams that should receive this update.
+        </p>
       </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="marketing" />
-        <label
-          htmlFor="marketing"
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Marketing emails
-        </label>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="security" defaultChecked />
-        <label
-          htmlFor="security"
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Security updates
-        </label>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Checkbox id="product" defaultChecked />
-        <label
-          htmlFor="product"
-          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Product news
-        </label>
-      </div>
+      <Checkbox.Group
+        options={audienceOptions}
+        defaultValue={["engineers"]}
+        className="grid w-full max-w-3xl gap-3 md:grid-cols-3"
+      />
     </div>
   ),
 };
