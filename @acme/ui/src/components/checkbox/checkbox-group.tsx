@@ -109,25 +109,7 @@ function CheckboxGroup<T extends FormValueType = FormValueType>({
           </Checkbox>
         );
 
-        if (optionVariant !== "card") {
-          return checkbox;
-        }
-
-        return (
-          <div
-            key={optionKey}
-            data-slot="checkbox-group-option"
-            data-option-variant="card"
-            data-selected={isSelected ? "true" : "false"}
-            data-disabled={isDisabled ? "true" : "false"}
-            className={cn(
-              "rounded-lg focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
-              classNames?.item,
-            )}
-          >
-            {checkbox}
-          </div>
-        );
+        return checkbox;
       })}
     </div>
   );

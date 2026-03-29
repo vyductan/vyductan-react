@@ -25,6 +25,19 @@ function renderCheckbox(
   return render(React.createElement(Checkbox, props, children));
 }
 
+function renderStory<TArgs extends object, TContext>(story: {
+  args?: Partial<TArgs>;
+  render?: (args: TArgs, context: TContext) => React.ReactNode;
+}): ReturnType<typeof render> {
+  expect(story.render).toBeDefined();
+
+  if (!story.render) {
+    throw new Error("Story is missing a render function");
+  }
+
+  return render(story.render((story.args ?? {}) as TArgs, {} as TContext));
+}
+
 describe("Checkbox rendering", () => {
   test("renders the outer label wrapper", () => {
     const { container } = renderCheckbox({}, "Label");
@@ -119,22 +132,14 @@ describe("Checkbox rendering", () => {
   });
 
   test("Card story renders the primitive card variant", () => {
-    const Story = checkboxStories.Card.render;
-
-    expect(Story).toBeDefined();
-
-    const { container } = render(React.createElement(Story));
+    const { container } = renderStory(checkboxStories.Card);
 
     expect(screen.getByText("Auto Start")).toBeInTheDocument();
     expect(container.querySelector("label")?.className).toContain("rounded-lg");
   });
 
   test("checkbox group story uses the compounded Checkbox export without card option wrappers", () => {
-    const Story = checkboxStories.CheckboxGroup.render;
-
-    expect(Story).toBeDefined();
-
-    const { container } = render(React.createElement(Story));
+    const { container } = renderStory(checkboxStories.CheckboxGroup);
 
     expect(screen.getByText("Choose your audience")).toBeInTheDocument();
     expect(

@@ -3,6 +3,8 @@ import type { JSX } from "react";
 
 import type { CheckboxOptionType } from "./checkbox-group";
 import { Checkbox } from "./index";
+import { ComponentSource } from "../mdx/component-source";
+import BasicExample from "./examples/basic";
 
 const externalLabelClassName =
   "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
@@ -16,7 +18,7 @@ function createAudienceLabel(title: string, description: string): JSX.Element {
   );
 }
 
-const audienceOptions: CheckboxOptionType<string>[] = [
+const audienceOptions: CheckboxOptionType[] = [
   {
     label: createAudienceLabel(
       "Product managers",
@@ -66,17 +68,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    "aria-label": "Accept terms",
-  },
+  render: () => (
+    <ComponentSource
+      src="checkbox/examples/basic.tsx"
+      __comp__={BasicExample}
+    />
+  ),
 };
 
-export const Checked: Story = {
-  args: {
-    checked: true,
-    "aria-label": "Checked checkbox",
-  },
-};
+
 
 export const Card: Story = {
   render: () => (
@@ -126,8 +126,10 @@ export const WithLabel: Story = {
   ),
 };
 
-export const CheckboxGroup: Story = {
-  render: () => (
+type CheckboxGroupStory = StoryObj<typeof Checkbox.Group>;
+
+export const CheckboxGroup: CheckboxGroupStory = {
+  render: (args) => (
     <div className="grid gap-3">
       <div className="grid gap-1">
         <h3 className="text-sm font-medium">Choose your audience</h3>
@@ -136,12 +138,48 @@ export const CheckboxGroup: Story = {
         </p>
       </div>
       <Checkbox.Group
-        options={audienceOptions}
-        defaultValue={["engineers"]}
+        {...args}
         className="grid w-full max-w-3xl gap-3 md:grid-cols-3"
       />
     </div>
   ),
+  args: {
+    options: audienceOptions,
+    defaultValue: ["engineers"],
+    value: undefined,
+    disabled: false,
+    optionVariant: "default",
+  },
+  argTypes: {
+    checked: {
+      table: { disable: true },
+    },
+    variant: {
+      table: { disable: true },
+    },
+    options: {
+      control: false,
+      description: "Checkbox options",
+    },
+    defaultValue: {
+      control: "object",
+      description: "Default selected values (uncontrolled)",
+    },
+    value: {
+      control: "object",
+      description: "Selected values (controlled)",
+    },
+    disabled: {
+      control: "boolean",
+      description: "Disable all checkboxes in the group",
+    },
+    optionVariant: {
+      control: "radio",
+      options: ["default", "card"],
+      description: "Variant of the checkbox options",
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any,
 };
 
 export const WithDescription: Story = {

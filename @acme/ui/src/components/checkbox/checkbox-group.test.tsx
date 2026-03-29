@@ -77,15 +77,27 @@ describe("CheckboxGroup optionVariant", () => {
     expect(getOptionWrapperByLabel("Alpha")).toHaveAttribute("data-selected", "false");
   });
 
-  test("card mode gives unselected options a visible surface while preserving selected emphasis", () => {
+  test("card mode composes the primitive card variant while wrappers keep selection hooks", () => {
     renderCheckboxGroup({
       options: checkboxOptions,
       value: ["beta"],
       optionVariant: "card",
     } as CheckboxGroupStringProps);
 
-    expect(getOptionWrapperByLabel("Alpha").className).toContain("[&>label]:bg-muted/50");
-    expect(getOptionWrapperByLabel("Beta").className).toContain("[&>label]:bg-accent/50");
+    const alphaWrapper = getOptionWrapperByLabel("Alpha");
+    const betaWrapper = getOptionWrapperByLabel("Beta");
+    const alphaLabel = getCheckboxByLabel("Alpha").closest("label");
+    const betaLabel = getCheckboxByLabel("Beta").closest("label");
+
+    expect(alphaWrapper).toHaveAttribute("data-selected", "false");
+    expect(betaWrapper).toHaveAttribute("data-selected", "true");
+    expect(alphaLabel?.className).toContain("rounded-lg");
+    expect(alphaLabel?.className).toContain("border");
+    expect(alphaLabel?.className).toContain("hover:bg-accent/50");
+    expect(betaLabel?.className).toContain("has-data-[state=checked]:border-primary");
+    expect(betaLabel?.className).toContain("has-data-[state=checked]:bg-primary/5");
+    expect(alphaWrapper.className).not.toContain("[&>label]:bg-muted/50");
+    expect(betaWrapper.className).not.toContain("[&>label]:bg-accent/50");
   });
 
   test("disabled card items expose a stable disabled hook", () => {

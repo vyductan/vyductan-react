@@ -3,14 +3,15 @@ import * as React from "react";
 import { cn } from "@acme/ui/lib/utils";
 import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
-import Wave from "../../lib/wave";
+import type { FormValueType } from "../form";
+import type { CheckboxGroupContext } from "./group-context";
 import { devUseWarning } from "../_util/warning";
+import Wave from "../../lib/wave";
 import { LoadingIcon } from "../button";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
-import type { FormValueType } from "../form";
 import { inputDisabledVariants } from "../input";
-import type { CheckboxGroupContext } from "./group-context";
+import { Label } from "../label";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
@@ -131,7 +132,8 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
   let mergedChecked = checked;
 
   if (isGroup) {
-    mergedChecked = value !== undefined && !!checkboxGroup.value?.includes(value);
+    mergedChecked =
+      value !== undefined && !!checkboxGroup.value?.includes(value);
   }
 
   const hasLabelContent = React.Children.toArray(children).some((child) => {
@@ -171,13 +173,13 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
 
   return (
     <Wave component="Checkbox" disabled={mergedDisabled}>
-      <label
+      <Label
         className={cn(
-          "inline-flex shrink-0 cursor-pointer text-sm",
+          // "inline-flex shrink-0 cursor-pointer text-sm font-normal",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           isCardVariant
             ? [
-                "items-start gap-3 rounded-lg border border-border p-3 transition-colors",
+                "border-border items-start gap-3 rounded-lg border p-3 transition-colors",
                 "hover:bg-accent/50",
                 "has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5 dark:has-data-[state=checked]:bg-primary/10",
               ]
@@ -231,7 +233,7 @@ function Checkbox<TValue extends FormValueType = FormValueType>(
           {...restProps}
         />
         {labelNode}
-      </label>
+      </Label>
     </Wave>
   );
 }
