@@ -2,7 +2,7 @@
 
 // Jun 15, 2024
 import * as React from "react";
-import raf from "@rc-component/util/lib/raf";
+import raf from "@rc-component/util/es/raf";
 import { motion } from "motion/react";
 
 import type { UnmountType } from "../../components/config-provider/unstable-context";

@@ -5,7 +5,7 @@
 
 /* eslint-disable unicorn/no-array-for-each */
 /* eslint-disable unicorn/prefer-ternary */
-import warning from "@rc-component/util/lib/warning";
+import warning from "@rc-component/util/es/warning";
 
 import type {
   BasicDataNode,

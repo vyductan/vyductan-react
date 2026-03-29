@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useMergedState } from "@rc-component/util";
-import omit from "@rc-component/util/lib/omit";
+import omit from "@rc-component/util/es/omit";
 
 import { cn } from "@acme/ui/lib/utils";
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useRef } from "react";
-import warning from "@rc-component/util/lib/warning";
+import warning from "@rc-component/util/es/warning";
 
 /**
  * Keep input cursor in the correct position if possible.

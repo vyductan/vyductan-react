@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect";
+import useLayoutEffect from "rc-util/es/hooks/useLayoutEffect";
 
 import type { ScreenMap } from "../../_util/responsive-observer";
 import useForceUpdate from "../../_util/hooks/use-force-update";
