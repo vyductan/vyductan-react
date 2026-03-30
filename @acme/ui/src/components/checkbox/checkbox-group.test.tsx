@@ -16,7 +16,7 @@ afterEach(() => {
 
 type CheckboxGroupStringProps = React.ComponentProps<typeof CheckboxGroup<string>>;
 
-const cardOptions = [
+const structuredOptions = [
   {
     label: (
       <div>
@@ -40,11 +40,10 @@ const cardOptions = [
 const renderCheckboxGroup = (props: CheckboxGroupStringProps = {}) =>
   render(React.createElement(CheckboxGroup<string>, props));
 
-describe("CheckboxGroup card usage", () => {
-  test("card mode still exposes labelled checkboxes for each option", () => {
+describe("CheckboxGroup", () => {
+  test("renders accessible checkboxes for structured option labels", () => {
     renderCheckboxGroup({
-      options: cardOptions as unknown as CheckboxGroupStringProps["options"],
-      optionVariant: "card",
+      options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
     } as CheckboxGroupStringProps);
 
     expect(
@@ -59,14 +58,13 @@ describe("CheckboxGroup card usage", () => {
     ).toBeInTheDocument();
   });
 
-  test("clicking card content preserves CheckboxGroup onChange semantics", async () => {
+  test("clicking structured label content preserves CheckboxGroup onChange semantics", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
     renderCheckboxGroup({
-      options: cardOptions as unknown as CheckboxGroupStringProps["options"],
+      options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
       onChange,
-      optionVariant: "card",
     } as CheckboxGroupStringProps);
 
     await user.click(screen.getByText("Engineers"));
