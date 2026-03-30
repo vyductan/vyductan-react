@@ -1,0 +1,21 @@
+{
+  "extends": "../../@acme/tsconfig/base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./.cache/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "types": ["vite/client", "node"],
+    "paths": {
+      "~/*": ["./src/*"],
+      "@acme/ui/components/*": ["../../@acme/ui/src/components/*"],
+      "@acme/ui/hooks/*": ["../../@acme/ui/src/hooks/*"],
+      "@acme/ui/icons": ["../../@acme/ui/src/icons/index.ts"],
+      "@acme/ui/lib/*": ["../../@acme/ui/src/lib/*"],
+      "@acme/ui/shadcn/*": ["../../@acme/ui/src/shadcn/*"]
+    }
+  },
+  "include": ["src"]
+}

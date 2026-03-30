@@ -48,7 +48,7 @@ Excluded:
 ## Current workspace context
 
 - The workspace already contains a primary Next.js app at [apps/www](../../apps/www).
-- The workspace catalog already includes `vite`, `@vitejs/plugin-react`, `@tailwindcss/vite`, `tailwindcss`, `react`, `react-dom`, and TypeScript in [pnpm-workspace.yaml](../../pnpm-workspace.yaml).
+- The workspace catalog already includes `vite`, `@tailwindcss/vite`, `tailwindcss`, `react`, `react-dom`, and TypeScript in [pnpm-workspace.yaml](../../pnpm-workspace.yaml), and existing apps already use `@vitejs/plugin-react` with a repo-established explicit version.
 - A Vite-based app already exists in the repo at [apps/manager/package.json](../../apps/manager/package.json), but it is Tauri-oriented and not suitable as a clean reusable web template.
 - `@acme/ui` is a Tailwind-based shared UI package, and [apps/www/src/styles/globals.css](../../apps/www/src/styles/globals.css) already proves the current workspace pattern for consuming its shared CSS.
 - Turborepo tasks are already standardized at the workspace root in [turbo.json](../../turbo.json), so the new app should plug into the existing `dev`, `build`, `lint`, and `typecheck` flows instead of inventing parallel commands.
@@ -90,6 +90,7 @@ This keeps the package identity aligned with the folder name and matches the int
 
 ```text
 apps/vite-app/
+  eslint.config.ts
   index.html
   package.json
   tsconfig.json
@@ -136,7 +137,7 @@ Development:
 - `@acme/eslint-config`
 - `@acme/prettier-config`
 - `@acme/tsconfig`
-- `@vitejs/plugin-react`
+- `@vitejs/plugin-react` using the same explicit repo version already used by the existing Vite app
 - `@tailwindcss/vite`
 - `tailwindcss`
 - `vite`
@@ -145,7 +146,7 @@ Development:
 - `eslint`
 - `prettier`
 
-The app should prefer workspace catalog versions where the monorepo already defines them.
+The app should prefer workspace catalog versions where the monorepo already defines them, and follow the repo's established explicit version convention for dependencies like `@vitejs/plugin-react` that are not currently cataloged.
 
 ## TypeScript and alias design
 
@@ -158,14 +159,15 @@ The app should use a split tsconfig layout consistent with modern Vite templates
 Alias decisions:
 
 - `~/*` resolves to `./src/*`
-- do not add extra TypeScript path aliases into `@acme/ui` source internals for this starter
+- app source should use public-style shared UI imports already used elsewhere in the workspace, for example:
+  - `@acme/ui/components/button`
+  - `@acme/ui/components/theme`
+- because the current `@acme/ui` package layout does not publish those subpaths directly from the package root, the starter may reuse the same minimal monorepo-only compatibility bridge that already exists elsewhere in the repo:
+  - TypeScript: `@acme/ui/*` -> `../../@acme/ui/src/*`
+  - Vite: `@acme/ui` -> `../../@acme/ui/src`
+- do not add any broader alias families into `@acme/ui` internals beyond that compatibility bridge
 
-Shared UI consumption should use the same public-style subpath imports already used elsewhere in the workspace, for example:
-
-- `@acme/ui/components/button`
-- `@acme/ui/components/theme`
-
-This keeps the starter aligned with existing app usage and avoids coupling the template to `@acme/ui` source-tree internals.
+This keeps the starter aligned with existing app usage while documenting the current monorepo constraint explicitly instead of inventing a new public export surface for `@acme/ui`. Future cleanup can remove the bridge once `@acme/ui` publishes those subpaths directly.
 
 ## Vite config design
 
@@ -176,6 +178,7 @@ Responsibilities:
 - enable the React plugin
 - enable the Tailwind Vite plugin
 - define alias resolution for `~` to `src`
+- if needed for the documented `@acme/ui` compatibility bridge, add only the minimal `@acme/ui` alias used to make existing public-style subpath imports resolve
 - avoid custom build complexity unless required by monorepo integration
 
 The design should follow the simplicity of [refs/ui/templates/vite-monorepo/apps/web/vite.config.ts](../../../refs/ui/templates/vite-monorepo/apps/web/vite.config.ts) rather than the more special-purpose Tauri setup in [apps/manager/src/vite.config.ts](../../apps/manager/src/vite.config.ts).

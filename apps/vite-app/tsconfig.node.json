@@ -1,0 +1,11 @@
+{
+  "extends": "../../@acme/tsconfig/base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./.cache/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "types": ["node"]
+  },
+  "include": ["vite.config.ts", "eslint.config.ts"]
+}
