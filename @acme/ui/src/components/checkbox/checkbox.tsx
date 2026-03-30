@@ -1,18 +1,16 @@
 import * as React from "react";
 
-import { cn } from "../../lib/utils";
-import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
+import { cn } from "@acme/ui/lib/utils";
+import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
 
-import type {
-  CheckboxGroupContext,
-  CheckboxValueType,
-} from "./group-context";
+import type { CheckboxGroupContext, CheckboxValueType } from "./group-context";
 import { devUseWarning } from "../_util/warning";
 import Wave from "../../lib/wave";
 import { LoadingIcon } from "../button/loading-icon";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
 import { inputDisabledVariants } from "../input/variants";
+import { Label } from "../label/label";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
@@ -73,6 +71,7 @@ type CheckboxProps<TValue extends CheckboxValueType = CheckboxValueType> =
     React.AriaAttributes & {
       key?: React.Key; // fix warning when use key (shadcn)
       indeterminate?: boolean;
+      variant?: "default" | "card";
     };
 
 function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
@@ -96,6 +95,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     style,
     className,
     classNames,
+    variant = "default",
     // render
     children,
 
@@ -147,7 +147,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
 
   return (
     <Wave component="Checkbox" disabled={mergedDisabled}>
-      <label
+      <Label
         className={cn(
           "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
@@ -202,14 +202,23 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
         {loading ? (
           <LoadingIcon />
         ) : hasLabelContent ? (
-          <span
-            data-slot="checkbox-label"
-            className={cn("leading-line-height px-2", classNames?.label)}
-          >
-            {children}
-          </span>
+          variant === "card" ? (
+            <div
+              data-slot="checkbox-label"
+              className={cn("leading-line-height px-2", classNames?.label)}
+            >
+              {children}
+            </div>
+          ) : (
+            <span
+              data-slot="checkbox-label"
+              className={cn("leading-line-height px-2", classNames?.label)}
+            >
+              {children}
+            </span>
+          )
         ) : null}
-      </label>
+      </Label>
     </Wave>
   );
 }

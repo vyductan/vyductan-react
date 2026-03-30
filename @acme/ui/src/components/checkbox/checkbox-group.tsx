@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useControlledState } from "@rc-component/util";
 
 import type { ButtonColorVariants } from "../button/button-variants";
-import type { CheckboxChangeEvent } from "./checkbox";
+import type { CheckboxChangeEvent, CheckboxProps } from "./checkbox";
 import type { CheckboxValueType } from "./group-context";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
@@ -32,6 +32,7 @@ export interface AbstractCheckboxGroupProps<
     label?: string;
   };
   disabled?: boolean;
+  optionVariant?: CheckboxProps["variant"];
 }
 
 type CheckboxGroupProps<T extends CheckboxValueType = CheckboxValueType> =
@@ -50,6 +51,7 @@ const CheckboxGroup = <T extends CheckboxValueType = CheckboxValueType>({
   disabled,
   className,
   classNames,
+  optionVariant,
 }: CheckboxGroupProps<T>) => {
   const [internalValue, setInternalValue] = useControlledState(
     defaultValue,
@@ -93,6 +95,7 @@ const CheckboxGroup = <T extends CheckboxValueType = CheckboxValueType>({
             }}
             className={cn(classNames?.item, o.className)}
             classNames={classNames}
+            variant={optionVariant}
           >
             {o.label}
           </Checkbox>
