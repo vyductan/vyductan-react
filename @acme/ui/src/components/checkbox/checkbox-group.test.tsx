@@ -41,8 +41,8 @@ const renderCheckboxGroup = (props: CheckboxGroupStringProps = {}) =>
   render(React.createElement(CheckboxGroup<string>, props));
 
 describe("CheckboxGroup", () => {
-  test('passing the documented optionVariant="card" input still exposes accessible checkboxes for structured option labels', () => {
-    renderCheckboxGroup({
+  test('passing the documented optionVariant="card" input exposes structured option labels through block label slots', () => {
+    const { container } = renderCheckboxGroup({
       options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
       optionVariant: "card",
     } as CheckboxGroupStringProps);
@@ -57,6 +57,13 @@ describe("CheckboxGroup", () => {
         name: /Engineers APIs, implementation details, and technical updates\./i,
       }),
     ).toBeInTheDocument();
+
+    const labelSlots = container.querySelectorAll('[data-slot="checkbox-label"]');
+
+    expect(labelSlots).toHaveLength(2);
+    labelSlots.forEach((labelSlot) => {
+      expect(labelSlot.tagName).toBe("DIV");
+    });
   });
 
   test('clicking structured label content still preserves CheckboxGroup onChange semantics when optionVariant="card" is used', async () => {

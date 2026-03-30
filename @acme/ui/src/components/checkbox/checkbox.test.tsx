@@ -60,4 +60,24 @@ describe("Checkbox", () => {
       "checkbox-label",
     );
   });
+
+  test("documented variant=card usage renders structured label content through a block label slot", () => {
+    renderCheckbox(
+      { variant: "card" } as React.ComponentProps<typeof Checkbox>,
+      <div>
+        <div>Auto Start</div>
+        <div>Starting with your OS.</div>
+      </div>,
+    );
+
+    const labelContent = screen.getByText("Auto Start").closest('[data-slot="checkbox-label"]');
+
+    expect(labelContent).not.toBeNull();
+    expect(labelContent?.tagName).toBe("DIV");
+    expect(
+      screen.getByRole("checkbox", {
+        name: /Auto Start Starting with your OS\./i,
+      }),
+    ).toBeInTheDocument();
+  });
 });
