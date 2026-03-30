@@ -41,9 +41,10 @@ const renderCheckboxGroup = (props: CheckboxGroupStringProps = {}) =>
   render(React.createElement(CheckboxGroup<string>, props));
 
 describe("CheckboxGroup", () => {
-  test("renders accessible checkboxes for structured option labels", () => {
+  test('passing the documented optionVariant="card" input still exposes accessible checkboxes for structured option labels', () => {
     renderCheckboxGroup({
       options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
+      optionVariant: "card",
     } as CheckboxGroupStringProps);
 
     expect(
@@ -58,13 +59,14 @@ describe("CheckboxGroup", () => {
     ).toBeInTheDocument();
   });
 
-  test("clicking structured label content preserves CheckboxGroup onChange semantics", async () => {
+  test('clicking structured label content still preserves CheckboxGroup onChange semantics when optionVariant="card" is used', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
     renderCheckboxGroup({
       options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
       onChange,
+      optionVariant: "card",
     } as CheckboxGroupStringProps);
 
     await user.click(screen.getByText("Engineers"));
