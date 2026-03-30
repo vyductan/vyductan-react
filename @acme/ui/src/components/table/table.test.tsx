@@ -1,9 +1,10 @@
 import React from "react";
 import "@testing-library/jest-dom/vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
+import * as localeModule from "../locale";
 import useSelection from "./hooks/use-selection";
 import { Table } from "./index";
 import { tableLocale_en } from "./locale/en-us";
@@ -78,6 +79,10 @@ function SelectionDropdownHarness({
 }
 
 describe("Table", () => {
+  test("re-exports locale hook", () => {
+    expect(localeModule).toHaveProperty("useLocale");
+  });
+
   test("uses a single table scroll container for own table mode", () => {
     render(
       <Table
@@ -98,11 +103,11 @@ describe("Table", () => {
       />,
     );
 
-    expect(screen.getByText("John Brown")).toBeInTheDocument();
+    expect(screen.getByText("John Brown")).not.toBeNull();
     expect(document.querySelectorAll('[data-slot="table-container"]')).toHaveLength(1);
   });
 
-  test("selection actions still fire when menu is portaled outside the trigger root", async () => {
+  test("selection actions portal into the requested popup container", async () => {
     const user = userEvent.setup();
     const handleSelect = vi.fn();
     const popupContainer = document.createElement("div");
@@ -123,10 +128,17 @@ describe("Table", () => {
     expect(trigger).not.toBeNull();
 
     await user.click(trigger!);
-    await user.click(await screen.findByRole("menuitem", { name: "Run action" }));
+
+    const portaledMenuItem = within(popupContainer).getByRole("menuitem", {
+      name: "Run action",
+    });
+
+    expect(portaledMenuItem).not.toBeNull();
+    await user.click(portaledMenuItem);
 
     await waitFor(() => {
       expect(handleSelect).toHaveBeenCalledTimes(1);
     });
   });
+
 });

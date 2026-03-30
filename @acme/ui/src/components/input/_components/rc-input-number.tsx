@@ -10,9 +10,9 @@ import getMiniDecimal, {
   toFixed,
   validateNumber,
 } from "@rc-component/mini-decimal";
-import { useLayoutUpdateEffect } from "@rc-component/util/lib/hooks/useLayoutEffect";
-import proxyObject from "@rc-component/util/lib/proxyObject";
-import { composeRef } from "@rc-component/util/lib/ref";
+import { useLayoutUpdateEffect } from "@rc-component/util/es/hooks/useLayoutEffect";
+import proxyObject from "@rc-component/util/es/proxyObject";
+import { composeRef } from "@rc-component/util/es/ref";
 import { useHover } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";

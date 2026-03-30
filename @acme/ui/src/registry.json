@@ -304,6 +304,16 @@
           "type": "registry:file"
         },
         {
+          "path": "components/locale/context.ts",
+          "target": "components/locale/context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/locale/use-locale.ts",
+          "target": "components/locale/use-locale.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "components/grid/hooks/use-breakpoint.ts",
           "target": "components/grid/hooks/use-breakpoint.ts",
           "type": "registry:file"

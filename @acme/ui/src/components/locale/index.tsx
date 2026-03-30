@@ -2,6 +2,8 @@
 import type { PaginationLocale } from "../pagination/types";
 import type { TableLocale } from "../table/types";
 
+export { default as useLocale } from "./use-locale";
+
 interface EmptyLocale {
   description: string;
 }

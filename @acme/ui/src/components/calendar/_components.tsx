@@ -50,28 +50,56 @@ export type ShadcnCalendarProps = React.ComponentProps<
 const CustomCalendar = ({
   fixedWeeks = true,
   classNames,
+  components,
+  formatters,
+  locale,
   onWeeksMouseLeave,
   ...props
 }: ShadcnCalendarProps) => {
+  const DayButtonComponent = components?.DayButton ?? CustomCalendarDayButton;
+  const WeeksComponent = components?.Weeks;
+
   return (
     <ShadcnCalendar
       fixedWeeks={fixedWeeks}
+      locale={locale}
+      formatters={{
+        ...formatters,
+        formatMonthDropdown:
+          formatters?.formatMonthDropdown ??
+          ((date) => date.toLocaleString(locale?.code, { month: "short" })),
+      }}
       classNames={{
         ...classNames,
         range_start: cn("bg-transparent", classNames?.range_start),
         range_end: cn("bg-transparent", classNames?.range_end),
       }}
       components={{
-        DayButton: CustomCalendarDayButton,
-        Weeks: ({ children, onMouseLeave, ...props }) => {
+        ...components,
+        DayButton: (dayButtonProps) => (
+          <DayButtonComponent
+            {...dayButtonProps}
+            data-day={dayButtonProps.day.date.toLocaleDateString(locale?.code)}
+          />
+        ),
+        Weeks: ({ children, onMouseLeave, ...weekProps }) => {
+          const handleMouseLeave = (
+            e: React.MouseEvent<HTMLTableSectionElement>,
+          ) => {
+            onMouseLeave?.(e);
+            onWeeksMouseLeave?.(e);
+          };
+
+          if (WeeksComponent) {
+            return (
+              <WeeksComponent {...weekProps} onMouseLeave={handleMouseLeave}>
+                {children}
+              </WeeksComponent>
+            );
+          }
+
           return (
-            <tbody
-              onMouseLeave={(e) => {
-                onMouseLeave?.(e);
-                onWeeksMouseLeave?.(e);
-              }}
-              {...props}
-            >
+            <tbody onMouseLeave={handleMouseLeave} {...weekProps}>
               {children}
             </tbody>
           );

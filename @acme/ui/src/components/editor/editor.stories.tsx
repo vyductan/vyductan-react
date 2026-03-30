@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
-import PlaygroundDemo from "./demo/playground";
+import PlaygroundDemo from "./examples/playground";
 import { Editor } from "./editor";
 
 const meta = {

@@ -56,7 +56,13 @@ const TableSortableRow: React.FC<TableRowSortableProps> = ({
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    ...(asHandle ? { cursor: "move" } : { cursor: "auto" }),
+    ...(asHandle
+      ? {
+          cursor: "move",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+        }
+      : { cursor: "auto" }),
     ...(isDragging ? { position: "relative", zIndex: 9999 } : {}),
   };
 

@@ -1,46 +1,46 @@
 packages:
   - apps/*
-  - '!apps/macos'
-  - '@acme/*'
+  - "!apps/macos"
+  - "@acme/*"
   - packages/*
-  - '!packages/claude-plugins'
+  - "!packages/claude-plugins"
 
 catalog:
-  '@eslint/js': ^10.0.1
-  '@hookform/resolvers': 5.2.2
-  '@tailwindcss/postcss': ^4.2.1
-  '@tailwindcss/vite': ^4.2.1
-  '@tanstack/react-query': ^5.90.21
-  '@testing-library/react': ^16.3.2
-  '@trpc/client': ^11.10.0
-  '@trpc/server': ^11.10.0
-  '@trpc/tanstack-react-query': ^11.10.0
-  '@types/lodash': ^4.17.24
-  '@types/node': ^25.3.1
-  ahooks: ^3.9.6
+  "@eslint/js": ^10.0.1
+  "@hookform/resolvers": 5.2.2
+  "@tailwindcss/postcss": ^4.2.2
+  "@tailwindcss/vite": ^4.2.2
+  "@tanstack/react-query": ^5.90.21
+  "@testing-library/react": ^16.3.2
+  "@trpc/client": ^11.10.0
+  "@trpc/server": ^11.10.0
+  "@trpc/tanstack-react-query": ^11.10.0
+  "@types/lodash": ^4.17.24
+  "@types/node": ^25.3.1
+  ahooks: ^3.9.7
   colorjs.io: ^0.6.1
-  date-fns: 'catalog:'
+  date-fns: ^4.1.0
   dayjs: ^1.11.19
-  eslint: ^10.0.2
-  jsdom: ^28.1.0
+  eslint: ^10.1.0
+  jsdom: ^29.0.1
   lodash: ^4.17.21
-  lucide-react: 0.577.0
-  next-themes: 'catalog:'
+  lucide-react: 1.0.1
+  next-themes: 0.4.6
   prettier: ^3.8.1
-  react-hook-form: 7.71.2
-  tailwindcss: ^4.2.1
-  type-fest: ^5.4.3
-  typescript: ^5.9.3
+  react-hook-form: 7.72.0
+  tailwindcss: ^4.2.2
+  type-fest: ^5.5.0
+  typescript: ^6.0.2
   usehooks-ts: ^3.1.1
   uuid: ^13.0.0
-  vite: ^7.3.1
+  vite: ^8.0.2
   zod: 4.3.6
   zustand: ^5.0.11
 
 catalogs:
   react19:
-    '@types/react': ^19.2.14
-    '@types/react-dom': ^19.2.3
+    "@types/react": ^19.2.14
+    "@types/react-dom": ^19.2.3
     react: ^19.2.4
     react-dom: ^19.2.4
 
@@ -51,6 +51,3 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - supabase
-
-patchedDependencies:
-  radix-ui@1.4.3: patches/radix-ui@1.4.3.patch

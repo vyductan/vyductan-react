@@ -1,12 +1,12 @@
 import { ComponentSource } from "@acme/ui/components/mdx";
 
-import BasicDemo from "./demo/basic";
-import ConfirmationDemo from "./demo/confirmation";
-import CustomFooterDemo from "./demo/custom-footer";
-import FormDemo from "./demo/form";
-import ScrollableDemo from "./demo/scrollable";
-import TriggerDemo from "./demo/trigger";
-import WidthsDemo from "./demo/widths";
+import BasicDemo from "./examples/basic";
+import ConfirmationDemo from "./examples/confirmation";
+import CustomFooterDemo from "./examples/custom-footer";
+import FormDemo from "./examples/form";
+import ScrollableDemo from "./examples/scrollable";
+import TriggerDemo from "./examples/trigger";
+import WidthsDemo from "./examples/widths";
 
 # Modal
 
@@ -26,13 +26,13 @@ A flexible modal dialog component for displaying content in an overlay window. B
 
 The simplest way to use Modal with state management.
 
-<ComponentSource src="modal/demo/basic.tsx" __comp__={BasicDemo} />
+<ComponentSource src="modal/examples/basic.tsx" __comp__={BasicDemo} />
 
 ### Trigger Prop
 
 Use the `trigger` prop to automatically handle modal opening.
 
-<ComponentSource src="modal/demo/trigger.tsx" __comp__={TriggerDemo} />
+<ComponentSource src="modal/examples/trigger.tsx" __comp__={TriggerDemo} />
 
 ### Custom Footer
 
@@ -43,7 +43,7 @@ Customize the modal footer with either a function or React node.
 - **Null Footer**: Remove the footer entirely
 
 <ComponentSource
-  src="modal/demo/custom-footer.tsx"
+  src="modal/examples/custom-footer.tsx"
   __comp__={CustomFooterDemo}
 />
 
@@ -55,14 +55,14 @@ Control the width of the modal with fixed or responsive values.
 - Percentage width (e.g., `"90%"`)
 - Responsive width with breakpoints (`{ xs: "90%", sm: 400, md: 600, lg: 800 }`)
 
-<ComponentSource src="modal/demo/widths.tsx" __comp__={WidthsDemo} />
+<ComponentSource src="modal/examples/widths.tsx" __comp__={WidthsDemo} />
 
 ### Confirmation Dialogs
 
 Modal with confirmation actions, loading states, and danger variants.
 
 <ComponentSource
-  src="modal/demo/confirmation.tsx"
+  src="modal/examples/confirmation.tsx"
   __comp__={ConfirmationDemo}
 />
 
@@ -70,13 +70,13 @@ Modal with confirmation actions, loading states, and danger variants.
 
 Modal containing form inputs with description.
 
-<ComponentSource src="modal/demo/form.tsx" __comp__={FormDemo} />
+<ComponentSource src="modal/examples/form.tsx" __comp__={FormDemo} />
 
 ### Scrollable Content
 
 Modal with long content that automatically becomes scrollable.
 
-<ComponentSource src="modal/demo/scrollable.tsx" __comp__={ScrollableDemo} />
+<ComponentSource src="modal/examples/scrollable.tsx" __comp__={ScrollableDemo} />
 
 ## API Reference
 

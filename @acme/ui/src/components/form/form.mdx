@@ -6,10 +6,10 @@ component: true
 
 import { ComponentSource } from "@acme/ui/components/mdx";
 
-import AntdDemo from "./demo/antd";
-import BasicDemo from "./demo/basic";
-import LayoutMultipleDemo from "./demo/layout-multiple";
-import ShadcnDemo from "./demo/shadcn";
+import AntdDemo from "./examples/antd";
+import BasicDemo from "./examples/basic";
+import LayoutMultipleDemo from "./examples/layout-multiple";
+import ShadcnDemo from "./examples/shadcn";
 
 # Form
 
@@ -36,20 +36,20 @@ A form component for data collection and validation.
 
 The recommended way to build forms using `zod` schema and `useForm`.
 
-<ComponentSource src="form/demo/basic.tsx" __comp__={BasicDemo} />
+<ComponentSource src="form/examples/basic.tsx" __comp__={BasicDemo} />
 
 ### Complex Form (Shadcn Style)
 
 A complex form example demonstrating various form fields and validation.
 
-<ComponentSource src="form/demo/shadcn.tsx" __comp__={ShadcnDemo} />
+<ComponentSource src="form/examples/shadcn.tsx" __comp__={ShadcnDemo} />
 
 ### Layout Control
 
 Control label layout using `labelCol` and `wrapperCol`, similar to Ant Design. This is useful for horizontal forms.
 
 <ComponentSource
-  src="form/demo/layout-multiple.tsx"
+  src="form/examples/layout-multiple.tsx"
   __comp__={LayoutMultipleDemo}
 />
 
@@ -58,7 +58,7 @@ Control label layout using `labelCol` and `wrapperCol`, similar to Ant Design. T
 > [!WARNING]
 > This style is supported for backward compatibility. Please use the Shadcn style for new forms.
 
-<ComponentSource src="form/demo/antd.tsx" __comp__={AntdDemo} />
+<ComponentSource src="form/examples/antd.tsx" __comp__={AntdDemo} />
 
 ## API Reference
 

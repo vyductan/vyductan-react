@@ -1,7 +1,7 @@
 import { ComponentSource } from "@acme/ui/components/mdx";
 
-import BasicDemo from "./demo/basic";
-import HourMinuteDemo from "./demo/hour-minute";
+import BasicDemo from "./examples/basic";
+import HourMinuteDemo from "./examples/hour-minute";
 
 # TimePicker
 
@@ -22,14 +22,14 @@ A time input component with native browser support and custom visual picker.
 
 The simplest way to use TimePicker with state management.
 
-<ComponentSource src="time-picker/demo/basic.tsx" __comp__={BasicDemo} />
+<ComponentSource src="time-picker/examples/basic.tsx" __comp__={BasicDemo} />
 
 ### Hour and Minute
 
 While part of `format` is omitted, the corresponding column in panel will disappear, too.
 
 <ComponentSource
-  src="time-picker/demo/hour-minute.tsx"
+  src="time-picker/examples/hour-minute.tsx"
   __comp__={HourMinuteDemo}
 />
 

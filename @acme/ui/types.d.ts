@@ -50,3 +50,48 @@ declare module "eslint-plugin-storybook" {
     "flat/recommended": ConfigArray<ConfigWithExtends>;
   };
 }
+
+declare module "*.css";
+declare module "swiper/css";
+declare module "swiper/css/*";
+
+declare module "@lexical/react/LexicalContextMenuPlugin" {
+  import type { LexicalNode } from "lexical";
+  import type { ReactNode, RefObject } from "react";
+
+  export class MenuOption {
+    key: string;
+    ref?: RefObject<HTMLElement | null>;
+    constructor(key: string);
+    setRefElement(element: HTMLElement | null): void;
+  }
+
+  export type LexicalContextMenuPluginProps<TOption extends MenuOption> = {
+    options: TOption[];
+    onSelectOption: (option: TOption, targetNode: LexicalNode | null) => void;
+    onWillOpen?: (event: MouseEvent) => void;
+    onOpen?: () => void;
+    onClose?: () => void;
+    menuRenderFn?: (
+      anchorElementRef: RefObject<HTMLElement | null>,
+      menuContext: {
+        options: TOption[];
+        selectOptionAndCleanUp: (option: TOption) => void;
+      },
+      helpers: {
+        setMenuRef: (element: HTMLElement | null) => void;
+      },
+    ) => ReactNode;
+  };
+
+  export function LexicalContextMenuPlugin<TOption extends MenuOption>(
+    props: LexicalContextMenuPluginProps<TOption>,
+  ): ReactNode;
+}
+
+declare module "jsdom" {
+  export class JSDOM {
+    window: { document: Document };
+    constructor(html?: string);
+  }
+}

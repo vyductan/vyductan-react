@@ -2,7 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import React from "react";
-import useControlledState from "@rc-component/util/lib/hooks/useControlledState";
+import useControlledState from "@rc-component/util/es/hooks/useControlledState";
 
 import { tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
@@ -18,12 +18,8 @@ import type {
   SelectValueType,
 } from "./types";
 import { Empty } from "../empty";
-import {
-  PopoverContent,
-  PopoverRoot,
-  PopoverTrigger,
-} from "../popover";
 import { inputVariants } from "../input";
+import { PopoverContent, PopoverRoot, PopoverTrigger } from "../popover";
 import {
   SelectContent,
   SelectGroup,
@@ -266,7 +262,10 @@ const Select = <
     matchedSearchOption?.value ?? (trimmedSearchValue as TValue);
   const hasSelectedSearchValue = selectedValues.includes(resolvedSearchValue);
   const temporaryTagOption =
-    isTags && trimmedSearchValue && !hasSelectedSearchValue && !matchedSearchOption
+    isTags &&
+    trimmedSearchValue &&
+    !hasSelectedSearchValue &&
+    !matchedSearchOption
       ? createOption(trimmedSearchValue as TValue)
       : undefined;
   const matchesSearch = (option: OptionType<TValue, TRecord>) => {
@@ -279,7 +278,9 @@ const Select = <
   const filteredOptions = isTags
     ? options.flatMap<SelectOption<TValue, TRecord>>((option) => {
         if (isGroup(option)) {
-          const matchedOptions = option.options.filter((item) => matchesSearch(item));
+          const matchedOptions = option.options.filter((item) =>
+            matchesSearch(item),
+          );
 
           return matchedOptions.length > 0
             ? [
@@ -291,7 +292,9 @@ const Select = <
             : [];
         }
 
-        return matchesSearch(option as OptionType<TValue, TRecord>) ? [option] : [];
+        return matchesSearch(option as OptionType<TValue, TRecord>)
+          ? [option]
+          : [];
       })
     : options;
   const persistedCustomTagOptions = isTags
@@ -310,18 +313,20 @@ const Select = <
     ...(temporaryTagOption ? [temporaryTagOption] : []),
     ...persistedCustomTagOptions,
     ...filteredOptions,
-  ].filter(
-    (option): option is SelectOption<TValue, TRecord> => option !== undefined,
-  ).filter(
-    (option, index, array) =>
-      array.findIndex((candidate) => {
-        if (isGroup(candidate) || isGroup(option)) {
-          return candidate === option;
-        }
+  ]
+    .filter(
+      (option): option is SelectOption<TValue, TRecord> => option !== undefined,
+    )
+    .filter(
+      (option, index, array) =>
+        array.findIndex((candidate) => {
+          if (isGroup(candidate) || isGroup(option)) {
+            return candidate === option;
+          }
 
-        return candidate.value === option.value;
-      }) === index,
-  );
+          return candidate.value === option.value;
+        }) === index,
+    );
   const flatDisplayOptions = displayOptions.flatMap((option) =>
     isGroup(option) ? option.options : [option],
   );
@@ -351,7 +356,8 @@ const Select = <
     const nextValue = rawValue.trim();
     if (!nextValue) return;
 
-    const resolvedValue = (findMatchingOption(nextValue)?.value ?? nextValue) as TValue;
+    const resolvedValue = (findMatchingOption(nextValue)?.value ??
+      nextValue) as TValue;
 
     if (selectedValues.includes(resolvedValue)) {
       setSearchValue("");
@@ -410,7 +416,11 @@ const Select = <
       return;
     }
 
-    if (e.key === "Enter" && internalOpen && activeTagOptionValue !== undefined) {
+    if (
+      e.key === "Enter" &&
+      internalOpen &&
+      activeTagOptionValue !== undefined
+    ) {
       e.preventDefault();
       selectActiveTagOption();
       return;
@@ -739,7 +749,7 @@ const Select = <
                 id={id}
                 aria-label={placeholder}
                 className={cn(
-                  "group relative flex w-full min-h-control items-center rounded-md",
+                  "group min-h-control relative flex w-full items-center rounded-md",
                   inputVariants({ variant, status, disabled }),
                   "h-auto py-1 pr-8 pl-[3px]",
                   className,
@@ -796,7 +806,7 @@ const Select = <
             align="start"
             side="bottom"
             sideOffset={4}
-            className="w-[var(--radix-popover-trigger-width)] p-0"
+            className="w-(--radix-popover-trigger-width) p-0"
             onOpenAutoFocus={(event) => {
               event.preventDefault();
             }}
@@ -820,7 +830,9 @@ const Select = <
         defaultValue={
           isDefault ? (defaultValue as string | undefined) : undefined
         }
-        value={isDefault ? (firstSelectedValue as string | undefined) : undefined}
+        value={
+          isDefault ? (firstSelectedValue as string | undefined) : undefined
+        }
         open={internalOpen}
         onOpenChange={handleOpenChange}
       >
@@ -831,7 +843,7 @@ const Select = <
           disabled={disabled}
           className={cn(
             "w-full",
-            isMultiple && "min-h-control h-auto pl-[3px] items-center py-1",
+            isMultiple && "min-h-control h-auto items-center py-1 pl-[3px]",
             tagColors[flatOptions.find((o) => o.value === value)?.color ?? ""],
             className,
           )}

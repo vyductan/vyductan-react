@@ -11,68 +11,68 @@ const buttonExampleInventory: ReadonlyArray<{
 }> = [
   {
     heading: "Basic Usage",
-    sourcePath: "button/demo/basic.tsx",
-    partialImportPath: "./demo/basic.mdx",
+    sourcePath: "button/examples/basic.tsx",
+    partialImportPath: "./examples/basic.mdx",
     partialComponentName: "BasicExample",
   },
   {
     heading: "Color & Variant",
-    sourcePath: "button/demo/color-variant.tsx",
-    partialImportPath: "./demo/color-variant.mdx",
+    sourcePath: "button/examples/color-variant.tsx",
+    partialImportPath: "./examples/color-variant.mdx",
     partialComponentName: "ColorVariantExample",
   },
   {
     heading: "Different Sizes",
-    sourcePath: "button/demo/sizes.tsx",
-    partialImportPath: "./demo/sizes.mdx",
+    sourcePath: "button/examples/sizes.tsx",
+    partialImportPath: "./examples/sizes.mdx",
     partialComponentName: "SizesExample",
   },
   {
     heading: "Button Types",
-    sourcePath: "button/demo/types.tsx",
-    partialImportPath: "./demo/types.mdx",
+    sourcePath: "button/examples/types.tsx",
+    partialImportPath: "./examples/types.mdx",
     partialComponentName: "TypesExample",
   },
   {
     heading: "Danger Button",
-    sourcePath: "button/demo/danger.tsx",
-    partialImportPath: "./demo/danger.mdx",
+    sourcePath: "button/examples/danger.tsx",
+    partialImportPath: "./examples/danger.mdx",
     partialComponentName: "DangerExample",
   },
   {
     heading: "Disabled State",
-    sourcePath: "button/demo/disabled.tsx",
-    partialImportPath: "./demo/disabled.mdx",
+    sourcePath: "button/examples/disabled.tsx",
+    partialImportPath: "./examples/disabled.mdx",
     partialComponentName: "DisabledExample",
   },
   {
     heading: "Loading State",
-    sourcePath: "button/demo/loading.tsx",
-    partialImportPath: "./demo/loading.mdx",
+    sourcePath: "button/examples/loading.tsx",
+    partialImportPath: "./examples/loading.mdx",
     partialComponentName: "LoadingExample",
   },
   {
     heading: "Icon Button",
-    sourcePath: "button/demo/icon.tsx",
-    partialImportPath: "./demo/icon.mdx",
+    sourcePath: "button/examples/icon.tsx",
+    partialImportPath: "./examples/icon.mdx",
     partialComponentName: "IconExample",
   },
   {
     heading: "Button with Icon",
-    sourcePath: "button/demo/with-icon.tsx",
-    partialImportPath: "./demo/with-icon.mdx",
+    sourcePath: "button/examples/with-icon.tsx",
+    partialImportPath: "./examples/with-icon.mdx",
     partialComponentName: "WithIconExample",
   },
   {
     heading: "Link as Button",
-    sourcePath: "button/demo/link-as-button.tsx",
-    partialImportPath: "./demo/link-as-button.mdx",
+    sourcePath: "button/examples/link-as-button.tsx",
+    partialImportPath: "./examples/link-as-button.mdx",
     partialComponentName: "LinkAsButtonExample",
   },
   {
     heading: "Form Integration",
-    sourcePath: "button/demo/form-integration.tsx",
-    partialImportPath: "./demo/form-integration.mdx",
+    sourcePath: "button/examples/form-integration.tsx",
+    partialImportPath: "./examples/form-integration.mdx",
     partialComponentName: "FormIntegrationExample",
   },
 ] as const;
@@ -89,7 +89,16 @@ describe("Button docs Storybook config", () => {
     expect(configSource).toContain("remarkPlugins: [remarkGfm]");
   });
 
-  test("assembles example docs from demo MDX partials instead of raw markdown", () => {
+  test("does not keep addon-onboarding enabled after the workspace is already onboarded", () => {
+    const configSource = readFileSync(
+      resolve(import.meta.dirname, "../../../.storybook/main.ts"),
+      "utf8",
+    );
+
+    expect(configSource).not.toContain('"@storybook/addon-onboarding"');
+  });
+
+  test("assembles example docs from examples MDX partials instead of raw markdown", () => {
     const docsSource = readFileSync(resolve(import.meta.dirname, "./button.mdx"), "utf8");
 
     expect(docsSource).toContain("## Examples");
@@ -104,7 +113,7 @@ describe("Button docs Storybook config", () => {
     }
   });
 
-  test("keeps the visual example sections wired to live ComponentSource demos through the MDX partials", () => {
+  test("keeps the visual example sections wired to live ComponentSource examples through the MDX partials", () => {
     const docsSource = readFileSync(resolve(import.meta.dirname, "./button.mdx"), "utf8");
 
     for (const { partialImportPath, partialComponentName } of buttonExampleInventory) {

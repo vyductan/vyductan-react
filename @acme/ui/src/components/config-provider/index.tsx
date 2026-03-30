@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import useMemo from "rc-util/lib/hooks/useMemo";
+import useMemo from "rc-util/es/hooks/useMemo";
 
 import type { Locale } from "../locale";
 import type {

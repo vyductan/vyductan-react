@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import ShadcnDemo from "./demo/shadcn";
+import ShadcnDemo from "./examples/shadcn";
 
 const meta = {
   title: "Components/Form",

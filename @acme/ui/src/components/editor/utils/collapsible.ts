@@ -7,7 +7,6 @@
  */
 
 export function setDomHiddenUntilFound(dom: HTMLElement): void {
-  // @ts-expect-error -- "until-found" is still experimental in TypeScript DOM lib
   dom.hidden = "until-found";
 }
 

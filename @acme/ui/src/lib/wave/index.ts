@@ -1,6 +1,6 @@
 import React, { cloneElement, useRef } from "react";
-import isVisible from "@rc-component/util/lib/Dom/isVisible";
-import { composeRef, getNodeRef, supportRef } from "@rc-component/util/lib/ref";
+import isVisible from "@rc-component/util/es/Dom/isVisible";
+import { composeRef, getNodeRef, supportRef } from "@rc-component/util/es/ref";
 
 import type { WaveComponent } from "./interface";
 import useWave from "./use-wave";

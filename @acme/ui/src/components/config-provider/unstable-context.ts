@@ -1,4 +1,4 @@
-import { render, unmount } from "@rc-component/util/lib/React/render";
+import { render, unmount } from "@rc-component/util/es/React/render";
 
 // import warning from "../_util/warning";
 

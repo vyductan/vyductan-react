@@ -7,7 +7,7 @@
 
 import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import React from "react";
-import KeyCode from "@rc-component/util/lib/KeyCode";
+import KeyCode from "@rc-component/util/es/KeyCode";
 
 import type { AnyObject } from "../../_util/type";
 import type { TooltipProps } from "../../tooltip";

@@ -910,8 +910,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
           data-slot="table-container"
           className={cn(
             "relative w-full space-y-3",
-            scroll?.x && "overflow-x-auto",
-            !scroll?.y && "overflow-y-auto",
             bordered && [
               // "border rounded-lg",
               // "[&_table]:border-separate",
@@ -935,7 +933,10 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
           {TableAlertSection}
           <div
+            ref={wrapperRef}
+            data-slot="table-scroll-container"
             className={cn(
+              scroll?.x && "overflow-x-auto overflow-y-hidden",
               scroll?.y && "overflow-y-auto",
               // bordered && "rounded-md border",
             )}

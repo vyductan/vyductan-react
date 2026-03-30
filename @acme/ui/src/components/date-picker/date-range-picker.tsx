@@ -4,7 +4,7 @@ import type { Dayjs } from "dayjs";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useMergedState } from "@rc-component/util";
-import { composeRef } from "@rc-component/util/lib/ref";
+import { composeRef } from "@rc-component/util/es/ref";
 import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";

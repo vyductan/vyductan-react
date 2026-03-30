@@ -9,9 +9,9 @@
 /* eslint-disable unicorn/no-array-for-each */
 
 import type * as React from "react";
-import toArray from "@rc-component/util/lib/Children/toArray";
-import omit from "@rc-component/util/lib/omit";
-import warning from "@rc-component/util/lib/warning";
+import toArray from "@rc-component/util/es/Children/toArray";
+import omit from "@rc-component/util/es/omit";
+import warning from "@rc-component/util/es/warning";
 
 import type {
   BasicDataNode,

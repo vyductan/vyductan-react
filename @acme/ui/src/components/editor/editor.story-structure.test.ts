@@ -3,14 +3,14 @@ import { resolve } from "node:path";
 
 import { expect, test } from "vitest";
 
-test("editor stories expose the playground demo as a dedicated story", () => {
+test("editor stories expose the playground example as a dedicated story", () => {
   const storiesSource = readFileSync(
     resolve(import.meta.dirname, "./editor.stories.tsx"),
     "utf8",
   );
 
   expect(storiesSource).toContain(
-    'import PlaygroundDemo from "./demo/playground";',
+    'import PlaygroundDemo from "./examples/playground";',
   );
   expect(storiesSource).toContain("export const Playground: Story = {");
   expect(storiesSource).toContain("render: () => <PlaygroundDemo />");

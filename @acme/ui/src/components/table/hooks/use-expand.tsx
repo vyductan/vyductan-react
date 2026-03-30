@@ -5,7 +5,7 @@
 import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";
 import * as React from "react";
 import { useMergedState } from "@rc-component/util";
-import warning from "@rc-component/util/lib/warning";
+import warning from "@rc-component/util/es/warning";
 
 import type { AnyObject } from "../../_util/type";
 import type { OwnTableProps } from "../table";

@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prefer-math-min-max */
 /* eslint-disable unicorn/prefer-global-this */
-import raf from "rc-util/lib/raf";
+import raf from "rc-util/es/raf";
 
 import { easeInOutCubic } from "./easings";
 import getScroll, { isWindow } from "./get-scroll";

@@ -5,33 +5,33 @@ import { expect, test } from "vitest";
 
 const reusedVisualStories = [
   {
-    importStatement: 'import SizesDemo from "./demo/sizes";',
+    importStatement: 'import SizesDemo from "./examples/sizes";',
     storyName: "Sizes",
     renderPattern: "render: () => <SizesDemo />",
   },
   {
-    importStatement: 'import WithIconDemo from "./demo/with-icon";',
+    importStatement: 'import WithIconDemo from "./examples/with-icon";',
     storyName: "WithIcon",
     renderPattern: "render: () => <WithIconDemo />",
   },
   {
-    importStatement: 'import IconDemo from "./demo/icon";',
+    importStatement: 'import IconDemo from "./examples/icon";',
     storyName: "IconOnly",
     renderPattern: "render: () => <IconDemo />",
   },
   {
-    importStatement: 'import LoadingDemo from "./demo/loading";',
+    importStatement: 'import LoadingDemo from "./examples/loading";',
     storyName: "Loading",
     renderPattern: "render: () => <LoadingDemo />",
   },
   {
-    importStatement: 'import DisabledDemo from "./demo/disabled";',
+    importStatement: 'import DisabledDemo from "./examples/disabled";',
     storyName: "Disabled",
     renderPattern: "render: () => <DisabledDemo />",
   },
 ] as const;
 
-test("button visual stories reuse shared demo components", () => {
+test("button visual stories reuse shared example components", () => {
   const storiesSource = readFileSync(resolve(import.meta.dirname, "./button.stories.tsx"), "utf8");
 
   for (const { importStatement, storyName, renderPattern } of reusedVisualStories) {

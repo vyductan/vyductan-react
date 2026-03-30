@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEvent } from "@rc-component/util";
-import raf from "@rc-component/util/lib/raf";
+import raf from "@rc-component/util/es/raf";
 
 import type { ShowWave, WaveComponent } from "./interface";
 import { useComponentConfig } from "../../components/config-provider/context";

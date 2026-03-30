@@ -5,10 +5,11 @@
 
 @import "./colors.css" layer(base);
 @import "./token.css";
-/* @import "./token.css" layer(base); */
+/* @import ".2/token.css" layer(base); */
 @import "./utilities.css";
 
 @plugin "@iconify/tailwind4";
+@plugin "@tailwindcss/typography";
 
 @layer base {
   html {

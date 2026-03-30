@@ -3,11 +3,14 @@
 import * as React from "react";
 import type { EditorState } from "lexical";
 import { useEffect, useRef } from "react";
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { $getRoot } from "lexical";
 
+import {
+  createBrowserHtmlDocument,
+  importDomIntoEditor,
+} from "../utils/html-converter";
 import { normalizeHtmlOutput } from "./normalize-html-output";
 
 // Plugin to initialize editor with HTML content
@@ -21,13 +24,7 @@ function InitialHtmlPlugin({ html }: { html: string }) {
     // Only initialize if HTML is provided and not empty
     if (html) {
       editor.update(() => {
-        const parser = new DOMParser();
-        const dom = parser.parseFromString(html, "text/html");
-        const nodes = $generateNodesFromDOM(editor, dom);
-        const root = $getRoot();
-
-        root.clear();
-        root.append(...nodes);
+        importDomIntoEditor(editor, createBrowserHtmlDocument(html));
       });
     }
 

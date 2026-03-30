@@ -4,7 +4,7 @@
 /* eslint-disable unicorn/prefer-at */
 
 import React from "react";
-import useId from "@rc-component/util/lib/hooks/useId";
+import useId from "@rc-component/util/es/hooks/useId";
 
 import { cn } from "@acme/ui/lib/utils";
 

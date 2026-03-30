@@ -25,6 +25,15 @@ Shared React component library using Tailwind CSS.
 | `vitest.config.ts`                                                                                                              | Vitest configuration            | setting up unit tests                 |
 | `vitest.shims.d.ts`                                                                                                             | Vitest type shims               | extending test types                  |
 
+## References
+
+When working on UI components, you can refer to the following external repositories for inspiration and best practices:
+
+| Directory                                                                      | Description            | When to read                                 |
+| :----------------------------------------------------------------------------- | :--------------------- | :------------------------------------------- |
+| [`refs/ant-design`](file:///Users/vyductan/Developer/vyductan/refs/ant-design) | Ant Design source code | referring to complex UI patterns             |
+| [`refs/ui`](file:///Users/vyductan/Developer/vyductan/refs/ui)                 | shadcn/ui source code  | referring to shadcn component implementation |
+
 ## Operational
 
 ### Run Storybook
