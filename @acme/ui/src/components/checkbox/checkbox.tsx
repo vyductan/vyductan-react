@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { cn } from "@acme/ui/lib/utils";
-import { Checkbox as ShadcnCheckbox } from "@acme/ui/shadcn/checkbox";
+import { cn } from "../../lib/utils";
+import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 
 import type { CheckboxGroupContext, CheckboxValueType } from "./group-context";
 import { devUseWarning } from "../_util/warning";

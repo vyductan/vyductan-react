@@ -12,6 +12,7 @@ type RegistryItem = {
   name: string;
   files: RegistryFile[];
   registryDependencies?: string[];
+  dependencies?: string[];
 };
 
 const registryDir = resolve(import.meta.dirname, "../../../public/registry");
@@ -101,6 +102,8 @@ function collectRegistryImportIssues(entryName: string) {
   for (const file of files) {
     for (const specifier of extractModuleSpecifiers(file.content)) {
       if (specifier.startsWith("@acme/ui/")) {
+        // Source files can use workspace aliases, but generated registry artifacts are copied
+        // into consumer projects and need to resolve through local relative imports instead.
         aliasLeaks.push(`${file.target} -> ${specifier}`);
         continue;
       }
@@ -177,6 +180,7 @@ test("table registry checkbox support closes narrowed helper and wave imports", 
           "components/checkbox/checkbox.tsx -> ../config-provider/disabled-context" ||
         issue === "components/checkbox/checkbox.tsx -> ../form" ||
         issue === "components/checkbox/checkbox.tsx -> ../input" ||
+        issue === "components/checkbox/checkbox.tsx -> ../label/label" ||
         issue === "components/checkbox/group-context.ts -> ../form",
     ),
   ).toEqual([]);
@@ -189,6 +193,8 @@ test("table registry checkbox support helper artifacts avoid alias leaks", () =>
     aliasLeaks.filter(
       (leak) =>
         leak.startsWith("components/button/loading-icon.tsx ->") ||
+        leak.startsWith("components/label/label.tsx ->") ||
+        leak.startsWith("shadcn/label.tsx ->") ||
         leak.startsWith("lib/wave/index.ts ->") ||
         leak.startsWith("lib/wave/use-wave.ts ->") ||
         leak.startsWith("lib/wave/wave-effect.tsx ->"),
@@ -208,6 +214,12 @@ test("table checkbox support registry keeps button variant types self-contained"
         "components/checkbox/checkbox-group.tsx -> ../button/button-variants",
     ),
   ).toEqual([]);
+});
+
+test("table checkbox support registry declares label shim runtime dependency", () => {
+  const item = readRegistryItem("table-checkbox-support");
+
+  expect(item.dependencies).toContain("radix-ui");
 });
 
 test("table registry table runtime uses local shared skeleton imports", () => {
@@ -230,6 +242,33 @@ test("table registry pagination support uses local shared imports", () => {
       (leak) =>
         leak.startsWith("components/pagination/_components/index.tsx ->") ||
         leak.startsWith("components/pagination/pagination.tsx ->"),
+    ),
+  ).toEqual([]);
+});
+
+test("table registry page-size options use the local select wrapper", () => {
+  const content = readRegistryFileContent(
+    "table",
+    "components/pagination/_components/page-size-options.tsx",
+  );
+
+  expect(content).toContain('from "../../select"');
+});
+
+test("table registry page-size options resolve local select wrapper artifacts", () => {
+  const { aliasLeaks, unresolvedRelativeImports } = collectRegistryImportIssues(
+    "table",
+  );
+
+  expect(
+    aliasLeaks.filter((leak) => leak.startsWith("components/select/")),
+  ).toEqual([]);
+  expect(
+    unresolvedRelativeImports.filter(
+      (issue) =>
+        issue ===
+          "components/pagination/_components/page-size-options.tsx -> ../../select" ||
+        issue.startsWith("components/select/"),
     ),
   ).toEqual([]);
 });
