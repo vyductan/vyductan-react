@@ -559,7 +559,7 @@
           "type": "registry:file"
         },
         {
-          "path": "registry-shims/shadcn-label.tsx",
+          "path": "shadcn/label.tsx",
           "target": "shadcn/label.tsx",
           "type": "registry:file"
         },

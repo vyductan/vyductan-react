@@ -96,18 +96,10 @@ function collectRegistryImportIssues(entryName: string) {
   const files = items.flatMap((item) => item.files);
   const availableTargets = new Set(files.map((file) => file.target));
 
-  const aliasLeaks: string[] = [];
   const unresolvedRelativeImports: string[] = [];
 
   for (const file of files) {
     for (const specifier of extractModuleSpecifiers(file.content)) {
-      if (specifier.startsWith("@acme/ui/")) {
-        // Source files can use workspace aliases, but generated registry artifacts are copied
-        // into consumer projects and need to resolve through local relative imports instead.
-        aliasLeaks.push(`${file.target} -> ${specifier}`);
-        continue;
-      }
-
       if (!specifier.startsWith(".")) {
         continue;
       }
@@ -119,52 +111,41 @@ function collectRegistryImportIssues(entryName: string) {
     }
   }
 
-  return { aliasLeaks, unresolvedRelativeImports };
+  return { unresolvedRelativeImports };
 }
 
-test("table registry types use local shared breakpoint imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry types keep local table dependency imports", () => {
+  const content = readRegistryFileContent("table", "components/table/types.ts");
 
-  expect(
-    aliasLeaks.filter((leak) => leak.startsWith("components/table/types.ts ->")),
-  ).toEqual([]);
+  expect(content).toContain('from "../checkbox"');
+  expect(content).toContain('from "../pagination"');
+  expect(content).toContain('from "../tooltip"');
 });
 
-test("table registry base compose primitives use local shadcn table imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry base compose primitives keep local shadcn table imports", () => {
+  const base = readRegistryFileContent("table", "components/table/_components/base.tsx");
+  const table = readRegistryFileContent("table", "shadcn/table.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/table/_components/base.tsx ->") ||
-        leak.startsWith("shadcn/table.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(base).toContain('from "../../../shadcn/table"');
+  expect(table).toContain('from "@acme/ui/lib/utils"');
 });
 
-test("table registry tooltip support uses local shared imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry tooltip support keeps local shadcn tooltip imports", () => {
+  const components = readRegistryFileContent("table", "components/tooltip/_components.tsx");
+  const tooltip = readRegistryFileContent("table", "shadcn/tooltip.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/tooltip/_components.tsx ->") ||
-        leak.startsWith("shadcn/tooltip.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(components).toContain('from "../../shadcn/tooltip"');
+  expect(tooltip).toContain('from "@acme/ui/lib/utils"');
 });
 
-test("table registry checkbox support uses local shared imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry checkbox support keeps local shadcn checkbox imports", () => {
+  const checkboxComponent = readRegistryFileContent("table", "components/checkbox/checkbox.tsx");
+  const checkboxIndex = readRegistryFileContent("table", "components/checkbox/index.tsx");
+  const checkbox = readRegistryFileContent("table", "shadcn/checkbox.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/checkbox/checkbox.tsx ->") ||
-        leak.startsWith("components/checkbox/index.tsx ->") ||
-        leak.startsWith("shadcn/checkbox.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(checkboxComponent).toContain('from "../../shadcn/checkbox"');
+  expect(checkboxIndex).toContain('from "./checkbox"');
+  expect(checkbox).toContain('from "@acme/ui/lib/utils"');
 });
 
 test("table registry checkbox support closes narrowed helper and wave imports", () => {
@@ -186,20 +167,12 @@ test("table registry checkbox support closes narrowed helper and wave imports", 
   ).toEqual([]);
 });
 
-test("table registry checkbox support helper artifacts avoid alias leaks", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry checkbox support helper artifacts keep local shadcn label imports", () => {
+  const label = readRegistryFileContent("table", "components/label/label.tsx");
+  const shadcnLabel = readRegistryFileContent("table", "shadcn/label.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/button/loading-icon.tsx ->") ||
-        leak.startsWith("components/label/label.tsx ->") ||
-        leak.startsWith("shadcn/label.tsx ->") ||
-        leak.startsWith("lib/wave/index.ts ->") ||
-        leak.startsWith("lib/wave/use-wave.ts ->") ||
-        leak.startsWith("lib/wave/wave-effect.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(label).toContain('from "../../shadcn/label"');
+  expect(shadcnLabel).toContain('from "@acme/ui/lib/utils"');
 });
 
 test("table checkbox support registry keeps button variant types self-contained", () => {
@@ -222,28 +195,21 @@ test("table checkbox support registry declares label shim runtime dependency", (
   expect(item.dependencies).toContain("radix-ui");
 });
 
-test("table registry table runtime uses local shared skeleton imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry table runtime keeps local shadcn skeleton imports", () => {
+  const tableRuntime = readRegistryFileContent("table", "components/table/table.tsx");
+  const skeleton = readRegistryFileContent("table", "shadcn/skeleton.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/table/table.tsx ->") ||
-        leak.startsWith("shadcn/skeleton.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(tableRuntime).toContain('from "../../shadcn/skeleton"');
+  expect(skeleton).toContain('from "@acme/ui/lib/utils"');
 });
 
-test("table registry pagination support uses local shared imports", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry pagination support keeps local pagination imports", () => {
+  const paginationIndex = readRegistryFileContent("table", "components/pagination/_components/index.tsx");
+  const pagination = readRegistryFileContent("table", "components/pagination/pagination.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/pagination/_components/index.tsx ->") ||
-        leak.startsWith("components/pagination/pagination.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(paginationIndex).toContain('from "../../../icons"');
+  expect(pagination).toContain('from "./_components"');
+  expect(pagination).toContain('from "../../icons"');
 });
 
 test("table registry page-size options use the local select wrapper", () => {
@@ -256,13 +222,10 @@ test("table registry page-size options use the local select wrapper", () => {
 });
 
 test("table registry page-size options resolve local select wrapper artifacts", () => {
-  const { aliasLeaks, unresolvedRelativeImports } = collectRegistryImportIssues(
-    "table",
-  );
+  const select = readRegistryFileContent("table", "components/select/index.tsx");
+  const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
-  expect(
-    aliasLeaks.filter((leak) => leak.startsWith("components/select/")),
-  ).toEqual([]);
+  expect(select).toContain('from "../../shadcn/select"');
   expect(
     unresolvedRelativeImports.filter(
       (issue) =>
@@ -273,20 +236,20 @@ test("table registry page-size options resolve local select wrapper artifacts", 
   ).toEqual([]);
 });
 
-test("table registry remaining helper imports use local shared paths", () => {
-  const { aliasLeaks } = collectRegistryImportIssues("table");
+test("table registry remaining helper imports keep expected local paths", () => {
+  const spin = readRegistryFileContent("table", "components/spin/spin.tsx");
+  const head = readRegistryFileContent("table", "components/table/_components/table-head-advanced.tsx");
+  const styles = readRegistryFileContent("table", "components/table/styles.ts");
+  const expand = readRegistryFileContent("table", "components/table/utils/expand-util.tsx");
+  const icon = readRegistryFileContent("table", "icons/icon-component.tsx");
+  const wrapper = readRegistryFileContent("table", "icons/wrapper.tsx");
 
-  expect(
-    aliasLeaks.filter(
-      (leak) =>
-        leak.startsWith("components/spin/spin.tsx ->") ||
-        leak.startsWith("components/table/_components/table-head-advanced.tsx ->") ||
-        leak.startsWith("components/table/styles.ts ->") ||
-        leak.startsWith("components/table/utils/expand-util.tsx ->") ||
-        leak.startsWith("icons/icon-component.tsx ->") ||
-        leak.startsWith("icons/wrapper.tsx ->"),
-    ),
-  ).toEqual([]);
+  expect(spin).toContain('from "class-variance-authority"');
+  expect(head).toContain('from "../../../icons"');
+  expect(styles).toContain('from "../../lib/utils"');
+  expect(expand).toContain('from "../../../icons"');
+  expect(icon).toContain('import "iconify-icon"');
+  expect(wrapper).toContain('from "react"');
 });
 
 test("table registry next closure batch resolves local table barrels and helper artifacts", () => {
@@ -410,6 +373,22 @@ test("table registry responsive observer avoids theme internal fanout", () => {
   ).toEqual([]);
 });
 
+test("table registry shadcn artifacts preserve workspace utility imports", () => {
+  const checkbox = readRegistryFileContent("table", "shadcn/checkbox.tsx");
+  const select = readRegistryFileContent("table", "shadcn/select.tsx");
+  const skeleton = readRegistryFileContent("table", "shadcn/skeleton.tsx");
+  const table = readRegistryFileContent("table", "shadcn/table.tsx");
+  const tooltip = readRegistryFileContent("table", "shadcn/tooltip.tsx");
+
+  expect(checkbox).toContain('from "@acme/ui/lib/utils"');
+  expect(checkbox).toContain("data-[state=checked]:border-primary");
+
+  expect(select).toContain('from "@acme/ui/lib/utils"');
+  expect(skeleton).toContain('from "@acme/ui/lib/utils"');
+  expect(table).toContain('from "@acme/ui/lib/utils"');
+  expect(tooltip).toContain('from "@acme/ui/lib/utils"');
+});
+
 test("table registry shared core avoids responsive config and locale fanout", () => {
   const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
@@ -437,9 +416,8 @@ test("table registry shared core avoids responsive config and locale fanout", ()
   ).toEqual([]);
 });
 
-test("table registry artifacts stay self-contained across transitive registry dependencies", () => {
-  const { aliasLeaks, unresolvedRelativeImports } = collectRegistryImportIssues("table");
+test("table registry artifacts resolve transitive registry dependencies", () => {
+  const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
-  expect(aliasLeaks.sort()).toEqual([]);
   expect(unresolvedRelativeImports.sort()).toEqual([]);
 });
