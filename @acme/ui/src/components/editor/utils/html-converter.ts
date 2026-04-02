@@ -2,8 +2,8 @@ import { createHeadlessEditor } from "@lexical/headless";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $getRoot } from "lexical";
 
-import { nodes } from "../nodes/nodes";
 import type { LexicalEditorContent } from "../types";
+import { nodes } from "../nodes/nodes";
 
 export function createBrowserHtmlDocument(html: string): Document {
   return new DOMParser().parseFromString(html, "text/html");
@@ -30,14 +30,14 @@ type HtmlConverterOptions = {
   createDocument?: (html: string) => HtmlDocumentFactoryResult;
 };
 
-async function defaultCreateServerHtmlDocument(html: string): Promise<Document> {
+async function defaultCreateServerHtmlDocument(
+  html: string,
+): Promise<Document> {
   const { JSDOM } = await import("jsdom");
   return new JSDOM(html).window.document;
 }
 
-function resolveDocument(
-  value: Awaited<HtmlDocumentFactoryResult>,
-): Document {
+function resolveDocument(value: Awaited<HtmlDocumentFactoryResult>): Document {
   if ("window" in value) {
     return value.window.document;
   }

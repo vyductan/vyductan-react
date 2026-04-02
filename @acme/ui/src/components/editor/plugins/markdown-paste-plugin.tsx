@@ -1,7 +1,9 @@
 "use client";
 
+import type { ListNode } from "@lexical/list";
+import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
-import { $isListItemNode, $isListNode, type ListNode } from "@lexical/list";
+import { $isListItemNode, $isListNode } from "@lexical/list";
 import { $convertFromMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -12,7 +14,6 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   PASTE_COMMAND,
-  type LexicalNode,
 } from "lexical";
 
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
@@ -26,15 +27,23 @@ export function hasMarkdownPasteSyntax(text: string): boolean {
 
 export function normalizeMarkdownPasteForLists(text: string): string {
   return text
-    .replace(/\r\n?/g, "\n")
+    .replaceAll(/\r\n?/g, "\n")
     .split("\n")
     .map((line) => {
-      const flattenedNestedBulletMatch = line.match(/^([*-])\s{2,}([*-])\s+(.*)$/);
+      const flattenedNestedBulletMatch = line.match(
+        /^([*-])\s{2,}([*-])\s+(.*)$/,
+      );
       if (!flattenedNestedBulletMatch) {
         return line;
       }
 
-      const [, , nestedMarker, content] = flattenedNestedBulletMatch;
+      const nestedMarker = flattenedNestedBulletMatch[2];
+      const content = flattenedNestedBulletMatch[3];
+
+      if (!nestedMarker || content === undefined) {
+        return line;
+      }
+
       return `    ${nestedMarker} ${content}`;
     })
     .join("\n");

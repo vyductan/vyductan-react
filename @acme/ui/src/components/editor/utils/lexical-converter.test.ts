@@ -8,7 +8,9 @@ import {
 
 describe("tryMarkdownToLexicalContent", () => {
   test("returns a valid empty root for empty markdown", () => {
-    expect(tryMarkdownToLexicalContent("")).toEqual(EMPTY_LEXICAL_EDITOR_CONTENT);
+    expect(tryMarkdownToLexicalContent("")).toEqual(
+      EMPTY_LEXICAL_EDITOR_CONTENT,
+    );
   });
 
   test("returns lexical JSON with a root node for headings", () => {
@@ -32,18 +34,19 @@ describe("tryMarkdownToLexicalContent", () => {
   test("returns null when the editor reports a runtime error through onError", () => {
     expect(
       tryMarkdownToLexicalContent("## Heading", {
-        createEditor: (config) => ({
-          update: () => {
-            if (!config?.onError) {
-              throw new Error("missing onError");
-            }
+        createEditor: (config) =>
+          ({
+            update: () => {
+              if (!config?.onError) {
+                throw new Error("missing onError");
+              }
 
-            config.onError(new Error("runtime boom"));
-          },
-          getEditorState: () => ({
-            toJSON: () => EMPTY_LEXICAL_EDITOR_CONTENT,
-          }),
-        }) as never,
+              config.onError(new Error("runtime boom"));
+            },
+            getEditorState: () => ({
+              toJSON: () => EMPTY_LEXICAL_EDITOR_CONTENT,
+            }),
+          }) as never,
       }),
     ).toBeNull();
   });

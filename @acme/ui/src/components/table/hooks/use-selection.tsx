@@ -12,20 +12,12 @@
 
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import React, { useCallback, useMemo } from "react";
-import { createPortal } from "react-dom";
 import { useMergedState } from "@rc-component/util";
+import { createPortal } from "react-dom";
 
-import { cn } from "../../../lib/utils";
-import { Icon } from "../../../icons";
 import type { AnyObject } from "../../_util/type";
-import useMultipleSelect from "../../_util/hooks/use-multiple-select";
-import { devUseWarning } from "../../_util/warning";
-import { Checkbox } from "../../checkbox";
 import type { CheckboxProps } from "../../checkbox";
 import type { DataNode, GetCheckDisabled } from "../../tree/types";
-import { arrAdd, arrDel } from "../../tree/util";
-import { conductCheck } from "../../tree/utils/conduct-util";
-import { convertDataToEntities } from "../../tree/utils/tree-util";
 import type {
   ColumnsType,
   ColumnType,
@@ -40,6 +32,14 @@ import type {
   TableRowSelection,
   TransformColumns,
 } from "../types";
+import useMultipleSelect from "../../_util/hooks/use-multiple-select";
+import { devUseWarning } from "../../_util/warning";
+import { Icon } from "../../../icons";
+import { cn } from "../../../lib/utils";
+import { Checkbox } from "../../checkbox";
+import { arrAdd, arrDel } from "../../tree/util";
+import { conductCheck } from "../../tree/utils/conduct-util";
+import { convertDataToEntities } from "../../tree/utils/tree-util";
 import { INTERNAL_COL_DEFINE } from "../utils/legacy-util";
 
 export const SELECTION_COLUMN = {} as const;
@@ -80,7 +80,7 @@ function createSelectionChangeEvent(
   return {
     type: "change",
     target: {
-      ...(checkboxProps ?? {}),
+      ...checkboxProps,
       checked,
       indeterminate: false,
       name: checkboxProps?.name,
@@ -109,9 +109,8 @@ function SelectionActionsDropdown({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>();
-  const [popupContainer, setPopupContainer] = React.useState<HTMLElement | null>(
-    null,
-  );
+  const [popupContainer, setPopupContainer] =
+    React.useState<HTMLElement | null>(null);
 
   React.useLayoutEffect(() => {
     if (!open || !triggerRef.current) {
@@ -119,7 +118,8 @@ function SelectionActionsDropdown({
     }
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
-    const nextPopupContainer = getPopupContainer?.(triggerRef.current) ?? document.body;
+    const nextPopupContainer =
+      getPopupContainer?.(triggerRef.current) ?? document.body;
     const containerRect = nextPopupContainer.getBoundingClientRect();
 
     setPopupContainer(nextPopupContainer);
@@ -171,7 +171,7 @@ function SelectionActionsDropdown({
       role="menu"
       style={menuStyle}
       className={cn(
-        "z-50 flex min-w-32 flex-col rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10",
+        "bg-popover text-popover-foreground ring-foreground/10 z-50 flex min-w-32 flex-col rounded-lg p-1 shadow-md ring-1",
       )}
     >
       {items.map((item) => (
@@ -180,7 +180,7 @@ function SelectionActionsDropdown({
           type="button"
           role="menuitem"
           className={cn(
-            "flex cursor-pointer items-center rounded-md px-1.5 py-1 text-sm outline-hidden select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground flex cursor-pointer items-center rounded-md px-1.5 py-1 text-sm outline-hidden select-none",
           )}
           onClick={(event) => {
             event.stopPropagation();
@@ -202,7 +202,7 @@ function SelectionActionsDropdown({
         aria-expanded={open}
         aria-haspopup="menu"
         className={cn(
-          "inline-flex size-6 items-center justify-center rounded-sm border border-transparent text-foreground transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+          "text-foreground hover:bg-muted focus-visible:border-ring focus-visible:ring-ring/50 inline-flex size-6 items-center justify-center rounded-sm border border-transparent transition-colors focus-visible:ring-3",
         )}
         onClick={(event) => {
           event.preventDefault();
@@ -232,14 +232,16 @@ function SelectionRadio({
       role="radio"
       id={checkboxProps?.id}
       name={checkboxProps?.name}
-      value={checkboxProps?.value as string | number | readonly string[] | undefined}
+      value={
+        checkboxProps?.value as string | number | readonly string[] | undefined
+      }
       disabled={checkboxProps?.disabled}
       aria-checked={checked}
       aria-label={checkboxProps?.["aria-label"]}
       aria-labelledby={checkboxProps?.["aria-labelledby"]}
       className={cn(
-        "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-background text-primary outline-none transition-colors",
-        "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+        "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-full border transition-colors outline-none",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
         checked && "border-primary",
         checkboxProps?.className,
       )}

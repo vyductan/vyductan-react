@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 const buttonExampleInventory: ReadonlyArray<{
@@ -80,7 +79,7 @@ const buttonExampleInventory: ReadonlyArray<{
 describe("Button docs Storybook config", () => {
   test("configures addon-docs with remark-gfm so markdown tables render as tables in MDX docs", () => {
     const configSource = readFileSync(
-      resolve(import.meta.dirname, "../../../.storybook/main.ts"),
+      path.resolve(import.meta.dirname, "../../../.storybook/main.ts"),
       "utf8",
     );
 
@@ -91,7 +90,7 @@ describe("Button docs Storybook config", () => {
 
   test("does not keep addon-onboarding enabled after the workspace is already onboarded", () => {
     const configSource = readFileSync(
-      resolve(import.meta.dirname, "../../../.storybook/main.ts"),
+      path.resolve(import.meta.dirname, "../../../.storybook/main.ts"),
       "utf8",
     );
 
@@ -99,36 +98,64 @@ describe("Button docs Storybook config", () => {
   });
 
   test("assembles example docs from examples MDX partials instead of raw markdown", () => {
-    const docsSource = readFileSync(resolve(import.meta.dirname, "./button.mdx"), "utf8");
+    const docsSource = readFileSync(
+      path.resolve(import.meta.dirname, "./button.mdx"),
+      "utf8",
+    );
 
     expect(docsSource).toContain("## Examples");
-    expect(docsSource).not.toContain('import ReactMarkdown from "react-markdown"');
+    expect(docsSource).not.toContain(
+      'import ReactMarkdown from "react-markdown"',
+    );
     expect(docsSource).not.toContain("?raw");
 
-    for (const { partialImportPath, partialComponentName } of buttonExampleInventory) {
-      expect(docsSource).toContain(`import ${partialComponentName} from "${partialImportPath}"`);
+    for (const {
+      partialImportPath,
+      partialComponentName,
+    } of buttonExampleInventory) {
+      expect(docsSource).toContain(
+        `import ${partialComponentName} from "${partialImportPath}"`,
+      );
       expect(docsSource).toMatch(
-        new RegExp(`## Examples[\\s\\S]*?<${partialComponentName} ?/>`),
+        new RegExp(String.raw`## Examples[\s\S]*?<${partialComponentName} ?/>`),
       );
     }
   });
 
   test("keeps the visual example sections wired to live ComponentSource examples through the MDX partials", () => {
-    const docsSource = readFileSync(resolve(import.meta.dirname, "./button.mdx"), "utf8");
+    const docsSource = readFileSync(
+      path.resolve(import.meta.dirname, "./button.mdx"),
+      "utf8",
+    );
 
-    for (const { partialImportPath, partialComponentName } of buttonExampleInventory) {
-      expect(docsSource).toContain(`import ${partialComponentName} from "${partialImportPath}"`);
+    for (const {
+      partialImportPath,
+      partialComponentName,
+    } of buttonExampleInventory) {
+      expect(docsSource).toContain(
+        `import ${partialComponentName} from "${partialImportPath}"`,
+      );
       expect(docsSource).toContain(`<${partialComponentName} />`);
     }
 
-    for (const { heading, partialImportPath, sourcePath } of buttonExampleInventory) {
-      const partialFilePath = resolve(import.meta.dirname, partialImportPath);
+    for (const {
+      heading,
+      partialImportPath,
+      sourcePath,
+    } of buttonExampleInventory) {
+      const partialFilePath = path.resolve(
+        import.meta.dirname,
+        partialImportPath,
+      );
       const legacyInlineSectionPattern = new RegExp(
-        `### ${heading}[\\s\\S]*?(?=### |## API Reference|## Migration from Ant Design|$)`,
+        String.raw`### ${heading}[\s\S]*?(?=### |## API Reference|## Migration from Ant Design|$)`,
         "s",
       );
 
-      expect(existsSync(partialFilePath), `Expected MDX partial for ${heading} at ${partialImportPath}`).toBe(true);
+      expect(
+        existsSync(partialFilePath),
+        `Expected MDX partial for ${heading} at ${partialImportPath}`,
+      ).toBe(true);
       expect(docsSource).not.toMatch(legacyInlineSectionPattern);
 
       const partialSource = readFileSync(partialFilePath, "utf8");
@@ -137,7 +164,10 @@ describe("Button docs Storybook config", () => {
       expect(partialSource).toContain(`### ${heading}`);
       expect(partialSource).toContain(`src="${sourcePath}"`);
       expect(partialSource).toMatch(
-        new RegExp(`### ${heading}[\\s\\S]*?<ComponentSource[^>]*src="${sourcePath}"`, "s"),
+        new RegExp(
+          String.raw`### ${heading}[\s\S]*?<ComponentSource[^>]*src="${sourcePath}"`,
+          "s",
+        ),
       );
     }
   });

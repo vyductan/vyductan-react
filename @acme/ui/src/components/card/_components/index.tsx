@@ -13,7 +13,10 @@ import {
 import type { SizeType } from "../../config-provider/size-context";
 import { CardContext } from "../context";
 
-type CardRootProps = Omit<React.ComponentProps<typeof ShadcnCardRoot>, "size"> & {
+type CardRootProps = Omit<
+  React.ComponentProps<typeof ShadcnCardRoot>,
+  "size"
+> & {
   size?: SizeType;
   bordered?: boolean;
 };
@@ -27,9 +30,9 @@ const CardRoot = ({
     <ShadcnCardRoot
       data-size={size}
       className={cn(
-        "group/card gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card bg-card text-card-foreground ring-foreground/10 gap-4 overflow-hidden rounded-xl py-4 text-sm ring-1 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         size === "small" && "gap-3 py-3 has-data-[slot=card-footer]:pb-0",
-        bordered ? "" : "border-none ring-0 shadow-none",
+        bordered ? "" : "border-none shadow-none ring-0",
         className,
       )}
       {...props}
@@ -115,7 +118,7 @@ const CardFooter = ({
   return (
     <ShadcnCardFooter
       className={cn(
-        "rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3",
+        "bg-muted/50 rounded-b-xl border-t p-4 group-data-[size=sm]/card:p-3",
         size === "small" && "p-3",
         className,
       )}

@@ -2,8 +2,8 @@ import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { inputInlineInsetClassName } from "../../input";
 import type { SelectValueType } from "../types";
+import { inputInlineInsetClassName } from "../../input";
 import { Tag } from "../../tag";
 
 type SelectMultipleProps<TValue extends SelectValueType = SelectValueType> = {

@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { GetRowKey, Key, RenderExpandIconProps } from "../types";
 import { Icon } from "../../../icons";
 import { cn } from "../../../lib/utils";
-
-import type { GetRowKey, Key, RenderExpandIconProps } from "../types";
 
 export function renderExpandIcon<RecordType>({
   record,
@@ -28,7 +27,7 @@ export function renderExpandIcon<RecordType>({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex size-6 items-center justify-center rounded-sm border border-transparent text-foreground transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+        "text-foreground hover:bg-muted focus-visible:border-ring focus-visible:ring-ring/50 inline-flex size-6 items-center justify-center rounded-sm border border-transparent transition-colors focus-visible:ring-3",
         className,
       )}
       aria-label={expanded ? "Collapse row" : "Expand row"}

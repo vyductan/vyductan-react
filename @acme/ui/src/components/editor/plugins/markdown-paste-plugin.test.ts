@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
 
+import * as markdownPastePlugin from "./markdown-paste-plugin";
+
 vi.mock("../transformers/markdown-transformers", () => ({
   MARKDOWN_TRANSFORMERS: [],
 }));
-
-import * as markdownPastePlugin from "./markdown-paste-plugin";
 
 describe("normalizeMarkdownPasteForLists", () => {
   test("converts flattened nested bullet markers into nested markdown indentation", () => {
@@ -35,12 +35,13 @@ describe("normalizeMarkdownPasteForLists", () => {
 
 describe("hasMarkdownPasteSyntax", () => {
   test("recognizes normalized nested list content as markdown", () => {
-    const hasMarkdownPasteSyntax = (markdownPastePlugin as Record<string, unknown>)
-      .hasMarkdownPasteSyntax as ((text: string) => boolean) | undefined;
+    const hasMarkdownPasteSyntax = (
+      markdownPastePlugin as Record<string, unknown>
+    ).hasMarkdownPasteSyntax as ((text: string) => boolean) | undefined;
 
     expect(hasMarkdownPasteSyntax).toBeTypeOf("function");
-    expect(hasMarkdownPasteSyntax?.("    * Guests with severe allergies.")).toBe(
-      true,
-    );
+    expect(
+      hasMarkdownPasteSyntax?.("    * Guests with severe allergies."),
+    ).toBe(true);
   });
 });

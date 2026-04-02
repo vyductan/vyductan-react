@@ -1,5 +1,7 @@
 import type * as React from "react";
 
+import type { SizeType } from "../../config-provider/size-context";
+import type { OwnTableProps } from "../table";
 import { cn } from "../../../lib/utils";
 import {
   Table as ShadcnTable,
@@ -10,9 +12,6 @@ import {
   TableHeader as ShadcnTableHeader,
   TableRow as ShadcnTableRow,
 } from "../../../shadcn/table";
-
-import type { SizeType } from "../../config-provider/size-context";
-import type { OwnTableProps } from "../table";
 
 function TableRoot({
   className,

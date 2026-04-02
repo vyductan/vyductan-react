@@ -10,8 +10,8 @@ import {
 } from "storybook/test";
 
 import type { SelectProps } from "./select";
-import { Select } from "./select";
 import type { OptionType } from "./types";
+import { Select } from "./select";
 
 const meta = {
   title: "Components/Select",
@@ -53,7 +53,10 @@ type SingleSelectStoryArgs = Omit<
 >;
 
 type SelectPreviewArgs = SingleSelectStoryArgs;
-type SingleSelectComponentProps = Extract<SelectProps<string>, { mode?: never }>;
+type SingleSelectComponentProps = Extract<
+  SelectProps<string>,
+  { mode?: never }
+>;
 
 const SingleSelectPreview = (
   props: SingleSelectStoryArgs & {
@@ -229,41 +232,50 @@ export const Tags: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Empty tags input keeps the same left inset as Input", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
-      const styles = globalThis.getComputedStyle(input);
-      const paddingLeft = Number.parseFloat(styles.paddingLeft);
+    await step(
+      "Empty tags input keeps the same left inset as Input",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
+        const styles = globalThis.getComputedStyle(input);
+        const paddingLeft = Number.parseFloat(styles.paddingLeft);
 
-      await expect(paddingLeft).toBeGreaterThanOrEqual(11);
-      await expect(paddingLeft).toBeLessThanOrEqual(13);
-    });
+        await expect(paddingLeft).toBeGreaterThanOrEqual(11);
+        await expect(paddingLeft).toBeLessThanOrEqual(13);
+      },
+    );
 
-    await step("Type a custom tag and verify it appears as a selected option", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "Type a custom tag and verify it appears as a selected option",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.click(input);
-      await userEvent.type(input, "abc");
+        await userEvent.click(input);
+        await userEvent.type(input, "abc");
 
-      await waitFor(async () => {
-        await expect(input).toHaveValue("abc");
-      });
+        await waitFor(async () => {
+          await expect(input).toHaveValue("abc");
+        });
 
-      const customOption = screen.getByText("abc").closest("button");
-      await expect(customOption).toHaveClass("bg-primary-100");
-      await expect(customOption).toHaveClass("text-primary-600");
-    });
+        const customOption = screen.getByText("abc").closest("button");
+        await expect(customOption).toHaveClass("bg-primary-100");
+        await expect(customOption).toHaveClass("text-primary-600");
+      },
+    );
 
-    await step("Clicking an existing option does not create an extra custom tag from partial input", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "Clicking an existing option does not create an extra custom tag from partial input",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.clear(input);
-      await userEvent.type(input, "Op");
-      await userEvent.click(screen.getByText("Option 1"));
+        await userEvent.clear(input);
+        await userEvent.type(input, "Op");
+        await userEvent.click(screen.getByText("Option 1"));
 
-      await waitFor(async () => {
-        await expect(screen.queryByText("Op")).not.toBeInTheDocument();
-      });
-    });
+        await waitFor(async () => {
+          await expect(screen.queryByText("Op")).not.toBeInTheDocument();
+        });
+      },
+    );
   },
 };
 
@@ -288,30 +300,32 @@ export const TagsKeyboard: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Keyboard navigation can highlight and select the first option from a closed panel", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "Keyboard navigation can highlight and select the first option from a closed panel",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.click(input);
-      await userEvent.keyboard("{Escape}");
-      await expect(input.closest("[data-slot='popover-trigger']")).toHaveAttribute(
-        "aria-expanded",
-        "false",
-      );
+        await userEvent.click(input);
+        await userEvent.keyboard("{Escape}");
+        await expect(
+          input.closest("[data-slot='popover-trigger']"),
+        ).toHaveAttribute("aria-expanded", "false");
 
-      await userEvent.keyboard("{ArrowDown}");
+        await userEvent.keyboard("{ArrowDown}");
 
-      const firstOption = screen.getByRole("button", { name: "Option 1" });
-      await expect(firstOption).toHaveClass("bg-primary-100");
-      await expect(firstOption).toHaveClass("text-primary-600");
+        const firstOption = screen.getByRole("button", { name: "Option 1" });
+        await expect(firstOption).toHaveClass("bg-primary-100");
+        await expect(firstOption).toHaveClass("text-primary-600");
 
-      await userEvent.keyboard("{Enter}");
+        await userEvent.keyboard("{Enter}");
 
-      await waitFor(async () => {
-        await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
-          '["1"]',
-        );
-      });
-    });
+        await waitFor(async () => {
+          await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
+            '["1"]',
+          );
+        });
+      },
+    );
   },
 };
 
@@ -336,21 +350,24 @@ export const TagsLabelValue: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Submitting an exact label uses the existing option value", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "Submitting an exact label uses the existing option value",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.click(input);
-      await userEvent.type(input, "Alpha{Enter}");
+        await userEvent.click(input);
+        await userEvent.type(input, "Alpha{Enter}");
 
-      await waitFor(async () => {
-        await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
-          '["a"]',
-        );
-      });
+        await waitFor(async () => {
+          await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
+            '["a"]',
+          );
+        });
 
-      await expect(canvas.getByText("Alpha")).toBeInTheDocument();
-      await expect(canvas.queryByText(/^a$/)).not.toBeInTheDocument();
-    });
+        await expect(canvas.getByText("Alpha")).toBeInTheDocument();
+        await expect(canvas.queryByText(/^a$/)).not.toBeInTheDocument();
+      },
+    );
   },
 };
 
@@ -378,21 +395,24 @@ export const TagsBlurAfterClick: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Blur still commits a custom tag after clicking an option", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
-      const outsideTarget = canvas.getByTestId("outside-target");
+    await step(
+      "Blur still commits a custom tag after clicking an option",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
+        const outsideTarget = canvas.getByTestId("outside-target");
 
-      await userEvent.click(input);
-      await userEvent.click(screen.getByText("Option 1"));
-      await userEvent.type(input, "xyz");
-      await userEvent.click(outsideTarget);
+        await userEvent.click(input);
+        await userEvent.click(screen.getByText("Option 1"));
+        await userEvent.type(input, "xyz");
+        await userEvent.click(outsideTarget);
 
-      await waitFor(async () => {
-        await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
-          '["1","xyz"]',
-        );
-      });
-    });
+        await waitFor(async () => {
+          await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
+            '["1","xyz"]',
+          );
+        });
+      },
+    );
   },
 };
 
@@ -417,24 +437,27 @@ export const TagsCustomOptionPersistence: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Created custom tags remain visible in the options panel after reopening", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "Created custom tags remain visible in the options panel after reopening",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.click(input);
-      await userEvent.type(input, "xxx{Enter}");
+        await userEvent.click(input);
+        await userEvent.type(input, "xxx{Enter}");
 
-      await waitFor(async () => {
-        await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
-          '["xxx"]',
-        );
-      });
+        await waitFor(async () => {
+          await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
+            '["xxx"]',
+          );
+        });
 
-      await userEvent.click(input);
-      const customOption = screen.getAllByRole("button", { name: "xxx" })[0];
-      await expect(customOption).toBeInTheDocument();
-      await expect(customOption).toHaveClass("bg-primary-100");
-      await expect(customOption).toHaveClass("text-primary-600");
-    });
+        await userEvent.click(input);
+        const customOption = screen.getAllByRole("button", { name: "xxx" })[0];
+        await expect(customOption).toBeInTheDocument();
+        await expect(customOption).toHaveClass("bg-primary-100");
+        await expect(customOption).toHaveClass("text-primary-600");
+      },
+    );
   },
 };
 
@@ -459,18 +482,21 @@ export const TagsResubmitSelected: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("Submitting an already selected tag keeps it selected", async () => {
-      const input = canvas.getByRole("textbox");
+    await step(
+      "Submitting an already selected tag keeps it selected",
+      async () => {
+        const input = canvas.getByRole("textbox");
 
-      await userEvent.click(input);
-      await userEvent.type(input, "xxx{Enter}");
+        await userEvent.click(input);
+        await userEvent.type(input, "xxx{Enter}");
 
-      await waitFor(async () => {
-        await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
-          '["xxx"]',
-        );
-      });
-    });
+        await waitFor(async () => {
+          await expect(canvas.getByTestId("selected-values")).toHaveTextContent(
+            '["xxx"]',
+          );
+        });
+      },
+    );
   },
 };
 
@@ -495,16 +521,19 @@ export const TagsArrowUpFromOpen: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step("ArrowUp from an open panel with no active option highlights the last option", async () => {
-      const input = canvas.getByPlaceholderText("Type to add tags");
+    await step(
+      "ArrowUp from an open panel with no active option highlights the last option",
+      async () => {
+        const input = canvas.getByPlaceholderText("Type to add tags");
 
-      await userEvent.click(input);
-      await userEvent.keyboard("{ArrowUp}");
+        await userEvent.click(input);
+        await userEvent.keyboard("{ArrowUp}");
 
-      const lastOption = screen.getByRole("button", { name: "Option 4" });
-      await expect(lastOption).toHaveClass("bg-primary-100");
-      await expect(lastOption).toHaveClass("text-primary-600");
-    });
+        const lastOption = screen.getByRole("button", { name: "Option 4" });
+        await expect(lastOption).toHaveClass("bg-primary-100");
+        await expect(lastOption).toHaveClass("text-primary-600");
+      },
+    );
   },
 };
 

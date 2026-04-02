@@ -1,11 +1,10 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
+import path from "node:path";
 import { expect, test } from "vitest";
 
 test("full-row sortable rows disable native text selection", () => {
   const source = readFileSync(
-    resolve(import.meta.dirname, "./table-sortable-row.tsx"),
+    path.resolve(import.meta.dirname, "./table-sortable-row.tsx"),
     "utf8",
   );
 

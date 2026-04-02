@@ -1,11 +1,10 @@
 import * as React from "react";
 
-import { cn } from "../../lib/utils";
-import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
-
 import type { CheckboxGroupContext, CheckboxValueType } from "./group-context";
 import { devUseWarning } from "../_util/warning";
+import { cn } from "../../lib/utils";
 import Wave from "../../lib/wave";
+import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 import { LoadingIcon } from "../button/loading-icon";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";

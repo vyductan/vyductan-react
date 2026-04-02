@@ -45,7 +45,7 @@ describe("Checkbox", () => {
       "checkbox-label",
     );
 
-    rerender(React.createElement(Checkbox, {}, undefined));
+    rerender(React.createElement(Checkbox, {}));
     expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
 
     rerender(React.createElement(Checkbox, {}, false));
@@ -70,7 +70,9 @@ describe("Checkbox", () => {
       </div>,
     );
 
-    const labelContent = screen.getByText("Auto Start").closest('[data-slot="checkbox-label"]');
+    const labelContent = screen
+      .getByText("Auto Start")
+      .closest('[data-slot="checkbox-label"]');
 
     expect(labelContent).not.toBeNull();
     expect(labelContent?.tagName).toBe("DIV");

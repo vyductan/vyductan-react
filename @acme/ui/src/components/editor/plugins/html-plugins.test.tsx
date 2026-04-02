@@ -1,15 +1,16 @@
 import "@testing-library/jest-dom/vitest";
-import * as React from "react";
-import { cleanup, render, waitFor } from "@testing-library/react";
 
-Object.assign(globalThis, { React });
-import { afterEach, expect, test } from "vitest";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import * as React from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { cleanup, render, waitFor } from "@testing-library/react";
+import { afterEach, expect, test } from "vitest";
 
 import { HtmlPlugins } from "./html-plugins";
+
+Object.assign(globalThis, { React });
 
 function HtmlPluginsHarness({
   value,

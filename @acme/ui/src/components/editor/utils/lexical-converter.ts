@@ -3,16 +3,16 @@
  * Used across the application to avoid code duplication
  */
 
+import type { LexicalEditor } from "lexical";
 import { createHeadlessEditor } from "@lexical/headless";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
 } from "@lexical/markdown";
-import type { LexicalEditor } from "lexical";
 import { $getRoot, createEditor } from "lexical";
 
-import { nodes } from "../nodes/nodes";
 import type { LexicalEditorContent } from "../types";
+import { nodes } from "../nodes/nodes";
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 /**
@@ -117,7 +117,10 @@ export function markdownToLexicalContent(
   markdown: string,
   options: MarkdownToLexicalContentOptions = {},
 ): LexicalEditorContent {
-  return tryMarkdownToLexicalContent(markdown, options) ?? EMPTY_LEXICAL_EDITOR_CONTENT;
+  return (
+    tryMarkdownToLexicalContent(markdown, options) ??
+    EMPTY_LEXICAL_EDITOR_CONTENT
+  );
 }
 
 /**

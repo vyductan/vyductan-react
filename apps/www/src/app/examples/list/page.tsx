@@ -10,9 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ListBasicDemo from "@/components/ui/list/demo/basic";
-import ListSimpleDemo from "@/components/ui/list/demo/simple";
-import ListVerticalDemo from "@/components/ui/list/demo/vertical";
+import ListBasicDemo from "@/components/ui/list/examples/basic";
+import ListSimpleDemo from "@/components/ui/list/examples/simple";
+import ListVerticalDemo from "@/components/ui/list/examples/vertical";
 import { ArrowLeft } from "lucide-react";
 
 export default function EmptyExamples() {

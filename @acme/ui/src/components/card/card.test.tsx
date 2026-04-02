@@ -1,9 +1,18 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
+
 import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "./index";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./index";
 
 globalThis.React = React;
 
@@ -67,7 +76,9 @@ describe("Card wrapper", () => {
     expect(screen.getByTestId("card-title")).toHaveClass("text-sm");
     expect(screen.getByTestId("card-content")).toHaveClass("px-3");
     expect(screen.getByTestId("card-footer")).toHaveClass("p-3");
-    expect(screen.getByTestId("card-footer")).toHaveClass("group-data-[size=sm]/card:p-3");
+    expect(screen.getByTestId("card-footer")).toHaveClass(
+      "group-data-[size=sm]/card:p-3",
+    );
   });
 
   test("treats fragment-wrapped composed children as a shadcn card", () => {
@@ -101,7 +112,11 @@ describe("Card wrapper", () => {
     render(
       <Card size="small" data-testid="card-root">
         <figure data-testid="card-figure">
-          <img data-testid="card-image" alt="Event cover" src="https://example.com/cover.png" />
+          <img
+            data-testid="card-image"
+            alt="Event cover"
+            src="https://example.com/cover.png"
+          />
         </figure>
         <CardHeader data-testid="card-header">
           <CardTitle data-testid="card-title">Design systems meetup</CardTitle>

@@ -2,13 +2,12 @@
 
 import type { Column } from "@tanstack/react-table";
 
-import { cn } from "../../../lib/utils";
-
-import type { TableHeadProps } from "./base";
 import type { TableLocale } from "../types";
-import { TableHead } from "./base";
+import type { TableHeadProps } from "./base";
 import { Icon } from "../../../icons";
+import { cn } from "../../../lib/utils";
 import { Tooltip } from "../../tooltip";
+import { TableHead } from "./base";
 
 interface TableHeadAdvancedProps<TData, TValue> extends TableHeadProps {
   column: Column<TData, TValue>;

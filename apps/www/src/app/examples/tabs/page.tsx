@@ -10,10 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import TabsBasicDemo from "@/components/ui/tabs/demo/basic";
-import ShadcnDemo from "@/components/ui/tabs/demo/shadcn";
-import ShadcnTypeDemo from "@/components/ui/tabs/demo/shadcn-type";
-import TypeDemo from "@/components/ui/tabs/demo/type";
+import TabsBasicDemo from "@/components/ui/tabs/examples/basic";
+import ShadcnDemo from "@/components/ui/tabs/examples/shadcn";
+import ShadcnTypeDemo from "@/components/ui/tabs/examples/shadcn-type";
+import TypeDemo from "@/components/ui/tabs/examples/type";
 import { ArrowLeft } from "lucide-react";
 
 export default function TabsExamples() {

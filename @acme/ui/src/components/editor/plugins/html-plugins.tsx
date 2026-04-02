@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import type { EditorState } from "lexical";
 import { useEffect, useRef } from "react";
 import { $generateHtmlFromNodes } from "@lexical/html";

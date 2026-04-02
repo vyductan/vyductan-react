@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import EmptyBasicDemo from "@/components/ui/empty/demo/basic";
+import EmptyBasicDemo from "@/components/ui/empty/examples/basic";
 import { ArrowLeft } from "lucide-react";
 
 export default function EmptyExamples() {

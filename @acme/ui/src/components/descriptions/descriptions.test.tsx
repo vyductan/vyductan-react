@@ -1,7 +1,11 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
+
 import { cleanup, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+
+import { Descriptions } from "./descriptions";
 
 const { mockUseResponsive } = vi.hoisted(() => ({
   mockUseResponsive: vi.fn(),
@@ -10,8 +14,6 @@ const { mockUseResponsive } = vi.hoisted(() => ({
 vi.mock("@acme/ui/hooks/use-responsive", () => ({
   useResponsive: mockUseResponsive,
 }));
-
-import { Descriptions } from "./descriptions";
 
 globalThis.React = React;
 
@@ -185,7 +187,9 @@ describe("Descriptions", () => {
     const rows = container.querySelectorAll("tbody tr");
     const labelCell = screen.getByText("Address").closest("th");
     const valueCell = screen
-      .getByText("No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China")
+      .getByText(
+        "No. 18, Wantang Road, Xihu District, Hangzhou, Zhejiang, China",
+      )
       .closest("td");
 
     expect(rows).toHaveLength(2);

@@ -41,24 +41,37 @@ export type EditorRenderElementNode = {
   version: number;
 };
 
-export type EditorRenderParagraphNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderParagraphNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   children: EditorRenderInlineNode[];
   type: "paragraph";
 };
 
-export type EditorRenderHeadingNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderHeadingNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   children: EditorRenderInlineNode[];
   tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   type: "heading";
 };
 
-export type EditorRenderQuoteNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderQuoteNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   children: Array<EditorRenderInlineNode | EditorRenderParagraphNode>;
   type: "quote";
 };
 
 export type EditorRenderLinkNode = Omit<EditorRenderElementNode, "children"> & {
-  children: Array<EditorRenderTextNode | EditorRenderLineBreakNode | EditorRenderCodeHighlightNode>;
+  children: Array<
+    | EditorRenderTextNode
+    | EditorRenderLineBreakNode
+    | EditorRenderCodeHighlightNode
+  >;
   rel: null | string;
   target: null | string;
   title?: null | string;
@@ -74,21 +87,33 @@ export type EditorRenderListNode = Omit<EditorRenderElementNode, "children"> & {
   type: "list";
 };
 
-export type EditorRenderListItemNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderListItemNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   checked?: boolean;
-  children: Array<EditorRenderParagraphNode | EditorRenderListNode | EditorRenderInlineNode>;
+  children: Array<
+    EditorRenderParagraphNode | EditorRenderListNode | EditorRenderInlineNode
+  >;
   type: "listitem";
   value: number;
 };
 
-export type EditorRenderCheckBlockNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderCheckBlockNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   checked: boolean;
   children: EditorRenderInlineNode[];
   type: "check-block";
 };
 
 export type EditorRenderCodeNode = Omit<EditorRenderElementNode, "children"> & {
-  children: Array<EditorRenderTextNode | EditorRenderLineBreakNode | EditorRenderCodeHighlightNode>;
+  children: Array<
+    | EditorRenderTextNode
+    | EditorRenderLineBreakNode
+    | EditorRenderCodeHighlightNode
+  >;
   language?: null | string;
   type: "code";
 };
@@ -109,17 +134,26 @@ export type EditorRenderHorizontalRuleNode = {
   version: number;
 };
 
-export type EditorRenderTableNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderTableNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   children: EditorRenderTableRowNode[];
   type: "table";
 };
 
-export type EditorRenderTableRowNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderTableRowNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   children: EditorRenderTableCellNode[];
   type: "tablerow";
 };
 
-export type EditorRenderTableCellNode = Omit<EditorRenderElementNode, "children"> & {
+export type EditorRenderTableCellNode = Omit<
+  EditorRenderElementNode,
+  "children"
+> & {
   backgroundColor: null | string;
   children: EditorRenderParagraphNode[];
   colSpan: number;

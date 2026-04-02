@@ -29,7 +29,9 @@ const supportedListTypes = new Set(["bullet", "number", "check"]);
 const supportedHeadingTags = new Set(["h1", "h2", "h3", "h4", "h5", "h6"]);
 const supportedListTags = new Set(["ol", "ul"]);
 
-export function normalizeEditorContent(value: unknown): EditorRenderContent | null {
+export function normalizeEditorContent(
+  value: unknown,
+): EditorRenderContent | null {
   if (typeof value === "string") {
     try {
       const parsed = JSON.parse(value) as unknown;
@@ -55,7 +57,7 @@ function isRootNode(node: unknown): node is EditorRenderContent["root"] {
     isElementNodeBase(node) &&
     node.type === "root" &&
     Array.isArray(node.children) &&
-    node.children.every(isBlockNode)
+    node.children.every((child) => isBlockNode(child))
   );
 }
 
@@ -69,39 +71,55 @@ function isNode(node: unknown, allowInline = true): node is EditorRenderNode {
   }
 
   switch (node.type) {
-    case "text":
+    case "text": {
       return isTextNode(node);
-    case "linebreak":
+    }
+    case "linebreak": {
       return isLineBreakNode(node);
-    case "horizontalrule":
+    }
+    case "horizontalrule": {
       return isHorizontalRuleNode(node);
-    case "heading":
+    }
+    case "heading": {
       return !allowInline && isHeadingNode(node);
-    case "paragraph":
+    }
+    case "paragraph": {
       return !allowInline && isParagraphNode(node);
-    case "quote":
+    }
+    case "quote": {
       return !allowInline && isQuoteNode(node);
-    case "list":
+    }
+    case "list": {
       return !allowInline && isListNode(node);
-    case "check-block":
+    }
+    case "check-block": {
       return !allowInline && isCheckBlockNode(node);
-    case "code":
+    }
+    case "code": {
       return !allowInline && isCodeNode(node);
-    case "table":
+    }
+    case "table": {
       return !allowInline && isTableNode(node);
-    case "tablerow":
+    }
+    case "tablerow": {
       return allowInline && isTableRowNode(node);
-    case "tablecell":
+    }
+    case "tablecell": {
       return allowInline && isTableCellNode(node);
-    case "listitem":
+    }
+    case "listitem": {
       return allowInline && isListItemNode(node);
+    }
     case "link":
-    case "autolink":
+    case "autolink": {
       return allowInline && isLinkNode(node);
-    case "code-highlight":
+    }
+    case "code-highlight": {
       return allowInline && isCodeHighlightNode(node);
-    default:
+    }
+    default: {
       return false;
+    }
   }
 }
 
@@ -116,7 +134,9 @@ function isElementNodeBase(node: unknown): node is {
   return (
     isRecord(node) &&
     Array.isArray(node.children) &&
-    (node.direction === null || node.direction === "ltr" || node.direction === "rtl") &&
+    (node.direction === null ||
+      node.direction === "ltr" ||
+      node.direction === "rtl") &&
     (typeof node.format === "string" || typeof node.format === "number") &&
     typeof node.indent === "number" &&
     typeof node.type === "string" &&
@@ -125,7 +145,11 @@ function isElementNodeBase(node: unknown): node is {
 }
 
 function isParagraphNode(node: unknown): boolean {
-  return isElementNodeBase(node) && node.type === "paragraph" && node.children.every(isInlineNode);
+  return (
+    isElementNodeBase(node) &&
+    node.type === "paragraph" &&
+    node.children.every((child) => isInlineNode(child))
+  );
 }
 
 function isHeadingNode(node: unknown): boolean {
@@ -135,7 +159,7 @@ function isHeadingNode(node: unknown): boolean {
     "tag" in node &&
     typeof node.tag === "string" &&
     supportedHeadingTags.has(node.tag) &&
-    node.children.every(isInlineNode)
+    node.children.every((child) => isInlineNode(child))
   );
 }
 
@@ -165,7 +189,7 @@ function isLinkNode(node: unknown): boolean {
       node.title === undefined ||
       node.title === null ||
       typeof node.title === "string") &&
-    node.children.every(isInlineNode)
+    node.children.every((child) => isInlineNode(child))
   );
 }
 
@@ -181,7 +205,10 @@ function isListNode(node: unknown): boolean {
     "tag" in node &&
     typeof node.tag === "string" &&
     supportedListTags.has(node.tag) &&
-    node.children.every((child) => isNode(child, true) && isRecord(child) && child.type === "listitem")
+    node.children.every(
+      (child) =>
+        isNode(child, true) && isRecord(child) && child.type === "listitem",
+    )
   );
 }
 
@@ -191,7 +218,9 @@ function isListItemNode(node: unknown): boolean {
     node.type === "listitem" &&
     "value" in node &&
     typeof node.value === "number" &&
-    (!("checked" in node) || node.checked === undefined || typeof node.checked === "boolean") &&
+    (!("checked" in node) ||
+      node.checked === undefined ||
+      typeof node.checked === "boolean") &&
     node.children.every(
       (child) =>
         (isNode(child, false) &&
@@ -208,7 +237,7 @@ function isCheckBlockNode(node: unknown): boolean {
     node.type === "check-block" &&
     "checked" in node &&
     typeof node.checked === "boolean" &&
-    node.children.every(isInlineNode)
+    node.children.every((child) => isInlineNode(child))
   );
 }
 
@@ -224,7 +253,9 @@ function isCodeNode(node: unknown): boolean {
       (child) =>
         isNode(child, true) &&
         isRecord(child) &&
-        (child.type === "text" || child.type === "linebreak" || child.type === "code-highlight"),
+        (child.type === "text" ||
+          child.type === "linebreak" ||
+          child.type === "code-highlight"),
     )
   );
 }
@@ -244,14 +275,21 @@ function isCodeHighlightNode(node: unknown): boolean {
 }
 
 function isHorizontalRuleNode(node: unknown): boolean {
-  return isRecord(node) && node.type === "horizontalrule" && typeof node.version === "number";
+  return (
+    isRecord(node) &&
+    node.type === "horizontalrule" &&
+    typeof node.version === "number"
+  );
 }
 
 function isTableNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "table" &&
-    node.children.every((child) => isNode(child, true) && isRecord(child) && child.type === "tablerow")
+    node.children.every(
+      (child) =>
+        isNode(child, true) && isRecord(child) && child.type === "tablerow",
+    )
   );
 }
 
@@ -259,7 +297,10 @@ function isTableRowNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "tablerow" &&
-    node.children.every((child) => isNode(child, true) && isRecord(child) && child.type === "tablecell")
+    node.children.every(
+      (child) =>
+        isNode(child, true) && isRecord(child) && child.type === "tablecell",
+    )
   );
 }
 
@@ -274,9 +315,11 @@ function isTableCellNode(node: unknown): boolean {
     "headerState" in node &&
     typeof node.headerState === "number" &&
     "backgroundColor" in node &&
-    (node.backgroundColor === null || typeof node.backgroundColor === "string") &&
+    (node.backgroundColor === null ||
+      typeof node.backgroundColor === "string") &&
     node.children.every(
-      (child) => isNode(child, false) && isRecord(child) && child.type === "paragraph",
+      (child) =>
+        isNode(child, false) && isRecord(child) && child.type === "paragraph",
     )
   );
 }
@@ -295,7 +338,11 @@ function isTextNode(node: unknown): boolean {
 }
 
 function isLineBreakNode(node: unknown): boolean {
-  return isRecord(node) && node.type === "linebreak" && typeof node.version === "number";
+  return (
+    isRecord(node) &&
+    node.type === "linebreak" &&
+    typeof node.version === "number"
+  );
 }
 
 function isBlockNode(node: unknown): node is EditorRenderBlockNode {
@@ -325,6 +372,6 @@ function isInlineNode(node: unknown): node is EditorRenderInlineNode {
   );
 }
 
-function isRecord(value: unknown): value is Record<string, any> {
+function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

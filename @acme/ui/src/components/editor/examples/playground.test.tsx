@@ -1,7 +1,16 @@
 import "@testing-library/jest-dom/vitest";
+
 import { createElement } from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
+
+import PlaygroundDemo from "./playground";
 
 vi.mock("../editor", async () => {
   const React = await import("react");
@@ -76,8 +85,6 @@ vi.mock("../editor", async () => {
   };
 });
 
-import PlaygroundDemo from "./playground";
-
 afterEach(() => {
   cleanup();
 });
@@ -110,7 +117,11 @@ describe("PlaygroundDemo", () => {
         /release checklist/i,
       );
       expect(
-        (screen.getByRole("textbox", { name: /json editor/i }) as HTMLTextAreaElement).value,
+        (
+          screen.getByRole("textbox", {
+            name: /json editor/i,
+          }) as HTMLTextAreaElement
+        ).value,
       ).toMatch(/release checklist/i);
     });
 
@@ -120,7 +131,11 @@ describe("PlaygroundDemo", () => {
       screen.getByRole("heading", { name: /markdown output/i }),
     ).toBeInTheDocument();
     expect(
-      (screen.getByRole("textbox", { name: /markdown editor/i }) as HTMLTextAreaElement).value,
+      (
+        screen.getByRole("textbox", {
+          name: /markdown editor/i,
+        }) as HTMLTextAreaElement
+      ).value,
     ).toMatch(/# notes/i);
 
     fireEvent.click(
@@ -134,7 +149,11 @@ describe("PlaygroundDemo", () => {
         /# api integration guide/i,
       );
       expect(
-        (screen.getByRole("textbox", { name: /markdown editor/i }) as HTMLTextAreaElement).value,
+        (
+          screen.getByRole("textbox", {
+            name: /markdown editor/i,
+          }) as HTMLTextAreaElement
+        ).value,
       ).toMatch(/# api integration guide/i);
     });
   });
@@ -212,20 +231,24 @@ describe("PlaygroundDemo", () => {
   test("pretty-prints serialized json output without mutating the editor textbox value", async () => {
     render(createElement(PlaygroundDemo));
 
-    const minifiedJson = '{"root":{"type":"root","format":"","indent":0,"version":1,"direction":"ltr","children":[{"type":"paragraph","format":"","indent":0,"version":1,"direction":"ltr","children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Minified JSON stays raw in the editor.","type":"text","version":1}]}]}}';
+    const minifiedJson =
+      '{"root":{"type":"root","format":"","indent":0,"version":1,"direction":"ltr","children":[{"type":"paragraph","format":"","indent":0,"version":1,"direction":"ltr","children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Minified JSON stays raw in the editor.","type":"text","version":1}]}]}}';
 
     fireEvent.change(screen.getByRole("textbox", { name: /json editor/i }), {
       target: { value: minifiedJson },
     });
 
     await waitFor(() => {
-      const output = screen.getByLabelText(/serialized output/i).textContent ?? "";
+      const output =
+        screen.getByLabelText(/serialized output/i).textContent ?? "";
 
       expect(output).toContain(`{
   "root": {
     "type": "root"`);
       expect(output).toContain("Minified JSON stays raw in the editor.");
-      expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(minifiedJson);
+      expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(
+        minifiedJson,
+      );
     });
   });
 
@@ -241,7 +264,8 @@ describe("PlaygroundDemo", () => {
     });
 
     await waitFor(() => {
-      const output = screen.getByLabelText(/serialized output/i).textContent ?? "";
+      const output =
+        screen.getByLabelText(/serialized output/i).textContent ?? "";
       const divIndent = output.match(/\n(\s+)<div>/)?.[1]?.length ?? 0;
       const ulIndent = output.match(/\n(\s+)<ul>/)?.[1]?.length ?? 0;
       const liIndent = output.match(/\n(\s+)<li>One<\/li>/)?.[1]?.length ?? 0;
@@ -251,7 +275,9 @@ describe("PlaygroundDemo", () => {
       expect(divIndent).toBeGreaterThan(0);
       expect(ulIndent).toBeGreaterThan(divIndent);
       expect(liIndent).toBeGreaterThan(ulIndent);
-      expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(rawHtml);
+      expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(
+        rawHtml,
+      );
     });
   });
 
@@ -284,9 +310,12 @@ describe("PlaygroundDemo", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
-    fireEvent.change(screen.getByRole("textbox", { name: /markdown editor/i }), {
-      target: { value: rawMarkdown },
-    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: /markdown editor/i }),
+      {
+        target: { value: rawMarkdown },
+      },
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "HTML" }));
     fireEvent.change(screen.getByRole("textbox", { name: /html editor/i }), {
@@ -294,13 +323,19 @@ describe("PlaygroundDemo", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "JSON" }));
-    expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(rawJson);
+    expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveValue(
+      rawJson,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
-    expect(screen.getByRole("textbox", { name: /markdown editor/i })).toHaveValue(rawMarkdown);
+    expect(
+      screen.getByRole("textbox", { name: /markdown editor/i }),
+    ).toHaveValue(rawMarkdown);
 
     fireEvent.click(screen.getByRole("button", { name: "HTML" }));
-    expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(rawHtml);
+    expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(
+      rawHtml,
+    );
   });
 
   test("keeps markdown output raw in the panel", async () => {
@@ -309,13 +344,20 @@ describe("PlaygroundDemo", () => {
     const rawMarkdown = "# Heading\n\n- one\n- two";
 
     fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
-    fireEvent.change(screen.getByRole("textbox", { name: /markdown editor/i }), {
-      target: { value: rawMarkdown },
-    });
+    fireEvent.change(
+      screen.getByRole("textbox", { name: /markdown editor/i }),
+      {
+        target: { value: rawMarkdown },
+      },
+    );
 
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: /markdown editor/i })).toHaveValue(rawMarkdown);
-      expect(screen.getByLabelText(/serialized output/i).textContent).toBe(rawMarkdown);
+      expect(
+        screen.getByRole("textbox", { name: /markdown editor/i }),
+      ).toHaveValue(rawMarkdown);
+      expect(screen.getByLabelText(/serialized output/i).textContent).toBe(
+        rawMarkdown,
+      );
     });
   });
 
@@ -323,15 +365,17 @@ describe("PlaygroundDemo", () => {
     render(createElement(PlaygroundDemo));
 
     const jsonEditor = screen.getByRole("textbox", { name: /json editor/i });
-    const editableCheckbox = screen.getByRole("checkbox", { name: /editable/i });
+    const editableCheckbox = screen.getByRole("checkbox", {
+      name: /editable/i,
+    });
 
     expect(jsonEditor).not.toHaveAttribute("readonly");
 
     fireEvent.click(editableCheckbox);
 
-    expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveAttribute(
-      "readonly",
-    );
+    expect(
+      screen.getByRole("textbox", { name: /json editor/i }),
+    ).toHaveAttribute("readonly");
 
     fireEvent.change(screen.getByLabelText(/placeholder/i), {
       target: { value: "Write something polished..." },
@@ -342,10 +386,9 @@ describe("PlaygroundDemo", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("textbox", { name: /json editor/i })).toHaveAttribute(
-        "placeholder",
-        "Write something polished...",
-      );
+      expect(
+        screen.getByRole("textbox", { name: /json editor/i }),
+      ).toHaveAttribute("placeholder", "Write something polished...");
       expect(screen.getByTestId("editor-props")).toHaveTextContent(
         '"variant":"minimal"',
       );

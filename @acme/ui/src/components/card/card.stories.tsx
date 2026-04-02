@@ -127,13 +127,14 @@ export const WithImage: Story = {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 aspect-video bg-black/35" />
       <CardHeader>
         <CardAction>
-          <span className="inline-flex h-5 w-fit shrink-0 items-center justify-center overflow-hidden rounded-4xl bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+          <span className="bg-secondary text-secondary-foreground inline-flex h-5 w-fit shrink-0 items-center justify-center overflow-hidden rounded-4xl px-2 py-0.5 text-xs font-medium">
             Featured
           </span>
         </CardAction>
         <CardTitle>Design systems meetup</CardTitle>
         <CardDescription>
-          A practical talk on component APIs, accessibility, and shipping faster.
+          A practical talk on component APIs, accessibility, and shipping
+          faster.
         </CardDescription>
       </CardHeader>
       <CardFooter>

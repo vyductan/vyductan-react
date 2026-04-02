@@ -1,14 +1,18 @@
 import "@testing-library/jest-dom/vitest";
+
 import * as React from "react";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
-Object.assign(globalThis, { React });
-
 import { EditorPreview } from "./editor-preview";
 import { EditorRender } from "./editor-render";
-import { editorRenderFixtures, editorRenderSourceFixtures } from "./render/render-fixtures";
+import {
+  editorRenderFixtures,
+  editorRenderSourceFixtures,
+} from "./render/render-fixtures";
 import { richTextSemanticContract } from "./themes/rich-text-semantic-contract";
+
+Object.assign(globalThis, { React });
 
 afterEach(() => {
   cleanup();
@@ -29,15 +33,18 @@ function createHeadingAndParagraphFixture() {
 type PreviewRenderFormat = "json" | "markdown" | "html";
 
 function normalizeTextContent(value: string | null | undefined) {
-  return value?.replace(/\s+/g, " ").trim() ?? "";
+  return value?.replaceAll(/\s+/g, " ").trim() ?? "";
 }
 
 function compressTextContent(value: string | null | undefined) {
-  return normalizeTextContent(value).replace(/ /g, "");
+  return normalizeTextContent(value).replaceAll(" ", "");
 }
 
 function getPreviewTextContent(container: HTMLElement) {
-  return container.querySelector("[data-lexical-editor='true']")?.textContent ?? container.textContent;
+  return (
+    container.querySelector("[data-lexical-editor='true']")?.textContent ??
+    container.textContent
+  );
 }
 
 function getPublishTextContent(container: HTMLElement) {
@@ -49,7 +56,8 @@ function renderPreviewAndPublish(
   expectedText: string,
   format: PreviewRenderFormat = "json",
 ) {
-  const previewValue = format === "json" ? JSON.stringify(value) : String(value);
+  const previewValue =
+    format === "json" ? JSON.stringify(value) : String(value);
   const preview = render(
     <EditorPreview
       autoFocus={false}
@@ -69,12 +77,12 @@ function renderPreviewAndPublish(
   return waitFor(() => {
     const normalizedExpectedText = compressTextContent(expectedText);
 
-    expect(compressTextContent(getPreviewTextContent(preview.container))).toContain(
-      normalizedExpectedText,
-    );
-    expect(compressTextContent(getPublishTextContent(publish.container))).toContain(
-      normalizedExpectedText,
-    );
+    expect(
+      compressTextContent(getPreviewTextContent(preview.container)),
+    ).toContain(normalizedExpectedText);
+    expect(
+      compressTextContent(getPublishTextContent(publish.container)),
+    ).toContain(normalizedExpectedText);
 
     return { preview, publish };
   });
@@ -82,9 +90,17 @@ function renderPreviewAndPublish(
 
 function getInlineMarkSummary(container: HTMLElement) {
   return {
-    boldTexts: Array.from(container.querySelectorAll("strong")).map((node) => node.textContent?.trim()),
-    italicTexts: Array.from(container.querySelectorAll("em")).map((node) => node.textContent?.trim()),
-    underlinedTexts: Array.from(container.querySelectorAll(`.${cssToken(richTextSemanticContract.text.underline)}, u`)).map((node) => node.textContent?.trim()),
+    boldTexts: [...container.querySelectorAll("strong")].map((node) =>
+      node.textContent?.trim(),
+    ),
+    italicTexts: [...container.querySelectorAll("em")].map((node) =>
+      node.textContent?.trim(),
+    ),
+    underlinedTexts: [
+      ...container.querySelectorAll(
+        `.${cssToken(richTextSemanticContract.text.underline)}, u`,
+      ),
+    ].map((node) => node.textContent?.trim()),
   };
 }
 
@@ -92,61 +108,68 @@ function getListSummary(container: HTMLElement) {
   return {
     unorderedListCount: container.querySelectorAll("ul").length,
     orderedListCount: container.querySelectorAll("ol").length,
-    itemTexts: Array.from(container.querySelectorAll("li"))
+    itemTexts: [...container.querySelectorAll("li")]
       .map((node) => {
-        const directParagraph = Array.from(node.children).find((child) => child.tagName === "P");
-        const directTextbox = Array.from(node.children).find(
-          (child) => child.getAttribute("data-lexical-text") === "true",
+        const directParagraph =
+          node.querySelector<HTMLParagraphElement>(":scope > p");
+        const directTextbox = node.querySelector<HTMLElement>(
+          ':scope > [data-lexical-text="true"]',
         );
-        const directText = directParagraph?.textContent ?? directTextbox?.textContent;
+        const directText =
+          directParagraph?.textContent ?? directTextbox?.textContent;
 
         if (!directText && node.querySelector(":scope > ul, :scope > ol")) {
           return null;
         }
 
         return (
-          directText?.replace(/\s+/g, " ").trim() ??
-          node.textContent?.replace(/\s+/g, " ").trim() ??
+          directText?.replaceAll(/\s+/g, " ").trim() ??
+          node.textContent?.replaceAll(/\s+/g, " ").trim() ??
           null
         );
       })
-      .filter((value): value is string => Boolean(value)),
+      .filter(Boolean),
   };
 }
 
 function getCheckboxSummary(container: HTMLElement) {
-  const inputCheckboxes = Array.from(container.querySelectorAll('input[type="checkbox"]')).map((node) => ({
+  const inputCheckboxes = [
+    ...container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'),
+  ].map((node) => ({
     ariaLabel: node.getAttribute("aria-label"),
-    checked: (node as HTMLInputElement).checked,
+    checked: node.checked,
   }));
 
   if (inputCheckboxes.length > 0) {
     return inputCheckboxes;
   }
 
-  return Array.from(container.querySelectorAll("[data-check-icon]")).map((iconNode) => {
-    const rootNode = iconNode.parentElement;
+  return [...container.querySelectorAll<HTMLElement>("[data-check-icon]")].map(
+    (iconNode) => {
+      const rootNode = iconNode.parentElement;
 
-    return {
-      ariaLabel: rootNode?.textContent?.replace(/\s+/g, " ").trim() ?? null,
-      checked:
-        rootNode?.classList.contains("check-block-checked") === true ||
-        rootNode?.getAttribute("data-checked") === "true" ||
-        iconNode.getAttribute("data-checked") === "true",
-    };
-  });
+      return {
+        ariaLabel:
+          rootNode?.textContent?.replaceAll(/\s+/g, " ").trim() ?? null,
+        checked:
+          rootNode?.classList.contains("check-block-checked") === true ||
+          rootNode?.dataset.checked === "true" ||
+          iconNode.dataset.checked === "true",
+      };
+    },
+  );
 }
 
 function getCodeBlockSummary(container: HTMLElement) {
   const semanticCodeToken = cssToken(richTextSemanticContract.code);
   const inlineCodeToken = cssToken(richTextSemanticContract.text.code);
   const semanticCodeNodes = semanticCodeToken
-    ? Array.from(container.querySelectorAll(`.${semanticCodeToken}`))
+    ? [...container.querySelectorAll(`.${semanticCodeToken}`)]
     : [];
   const inlineCodeNodes = inlineCodeToken
-    ? Array.from(container.querySelectorAll(`.${inlineCodeToken}`))
+    ? [...container.querySelectorAll(`.${inlineCodeToken}`)]
     : [];
-  const codeNodes = Array.from(new Set(semanticCodeNodes));
+  const codeNodes = [...new Set(semanticCodeNodes)];
 
   return {
     blockCount: codeNodes.length,
@@ -161,24 +184,26 @@ function getTableSummary(container: HTMLElement) {
   return {
     tableCount: container.querySelectorAll("table").length,
     rowCount: container.querySelectorAll("tr").length,
-    headerTexts: Array.from(container.querySelectorAll("th")).map((node) => node.textContent?.trim()),
-    cellTexts: Array.from(container.querySelectorAll("td")).map((node) => node.textContent?.trim()),
+    headerTexts: [...container.querySelectorAll("th")].map((node) =>
+      node.textContent?.trim(),
+    ),
+    cellTexts: [...container.querySelectorAll("td")].map((node) =>
+      node.textContent?.trim(),
+    ),
   };
 }
 
 function getBlockquoteSummary(container: HTMLElement) {
   return {
     quoteCount: container.querySelectorAll("blockquote").length,
-    quoteTexts: Array.from(container.querySelectorAll("blockquote")).map((node) =>
-      node.textContent?.replace(/\s+/g, " ").trim(),
+    quoteTexts: [...container.querySelectorAll("blockquote")].map((node) =>
+      node.textContent?.replaceAll(/\s+/g, " ").trim(),
     ),
   };
 }
 
 function cssToken(value: string) {
-  return value
-    .split(/\s+/)
-    .find((token) => !/[\[:]/.test(token));
+  return value.split(/\s+/).find((token) => !/[[:]/.test(token));
 }
 
 describe("EditorPreview and EditorRender parity", () => {
@@ -222,8 +247,10 @@ describe("EditorPreview and EditorRender parity", () => {
       publishParagraphs: json.publish.container.querySelectorAll("p").length,
     };
     const markdownSummary = {
-      previewParagraphs: markdown.preview.container.querySelectorAll("p").length,
-      publishParagraphs: markdown.publish.container.querySelectorAll("p").length,
+      previewParagraphs:
+        markdown.preview.container.querySelectorAll("p").length,
+      publishParagraphs:
+        markdown.publish.container.querySelectorAll("p").length,
     };
     const htmlSummary = {
       previewParagraphs: html.preview.container.querySelectorAll("p").length,
@@ -310,8 +337,12 @@ describe("EditorPreview and EditorRender parity", () => {
     );
 
     for (const rendered of [json, markdown, html]) {
-      const previewLink = rendered.preview.container.querySelector('a[href="https://example.com"]');
-      const publishLink = rendered.publish.container.querySelector('a[href="https://example.com"]');
+      const previewLink = rendered.preview.container.querySelector(
+        'a[href="https://example.com"]',
+      );
+      const publishLink = rendered.publish.container.querySelector(
+        'a[href="https://example.com"]',
+      );
 
       expect(previewLink?.textContent).toBe("Canonical link");
       expect(publishLink?.textContent).toBe("Canonical link");
@@ -334,9 +365,14 @@ describe("EditorPreview and EditorRender parity", () => {
     const markdownSummary = getCheckboxSummary(markdown.publish.container);
 
     expect(getCheckboxSummary(json.preview.container)).toEqual(jsonSummary);
-    expect(getCheckboxSummary(markdown.preview.container)).toEqual(markdownSummary);
+    expect(getCheckboxSummary(markdown.preview.container)).toEqual(
+      markdownSummary,
+    );
     expect(jsonSummary).toHaveLength(2);
-    expect(jsonSummary.map((checkbox) => checkbox.checked)).toEqual([false, true]);
+    expect(jsonSummary.map((checkbox) => checkbox.checked)).toEqual([
+      false,
+      true,
+    ]);
     expect(jsonSummary).toEqual(markdownSummary);
   });
 
@@ -362,14 +398,17 @@ describe("EditorPreview and EditorRender parity", () => {
       "html",
     );
 
-    const previewParagraphs = Array.from(preview.container.querySelectorAll("blockquote p")).map((node) =>
-      node.textContent?.trim(),
-    );
-    const publishParagraphs = Array.from(publish.container.querySelectorAll("blockquote p")).map((node) =>
-      node.textContent?.trim(),
-    );
+    const previewParagraphs = [
+      ...preview.container.querySelectorAll("blockquote p"),
+    ].map((node) => node.textContent?.trim());
+    const publishParagraphs = [
+      ...publish.container.querySelectorAll("blockquote p"),
+    ].map((node) => node.textContent?.trim());
 
-    expect(previewParagraphs).toEqual(["First quote paragraph.", "Second quote paragraph."]);
+    expect(previewParagraphs).toEqual([
+      "First quote paragraph.",
+      "Second quote paragraph.",
+    ]);
     expect(publishParagraphs).toEqual(previewParagraphs);
   });
 
@@ -420,7 +459,9 @@ describe("EditorPreview and EditorRender parity", () => {
     const htmlSummary = getTableSummary(html.publish.container);
 
     expect(getTableSummary(json.preview.container)).toEqual(jsonSummary);
-    expect(getTableSummary(markdown.preview.container)).toEqual(markdownSummary);
+    expect(getTableSummary(markdown.preview.container)).toEqual(
+      markdownSummary,
+    );
     expect(getTableSummary(html.preview.container)).toEqual(htmlSummary);
     expect(jsonSummary.tableCount).toBe(1);
     expect(jsonSummary.headerTexts).toEqual(["Header A", "Header B"]);

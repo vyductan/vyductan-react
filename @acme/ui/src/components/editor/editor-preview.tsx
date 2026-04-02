@@ -18,7 +18,10 @@ type EditorPreviewProps =
   | (EditorPreviewBaseProps & { format: "markdown" })
   | (EditorPreviewBaseProps & { format: "html" });
 
-export function EditorPreview({ format = "json", ...props }: EditorPreviewProps) {
+export function EditorPreview({
+  format = "json",
+  ...props
+}: EditorPreviewProps) {
   if (format === "markdown") {
     return <Editor {...props} format="markdown" editable={false} />;
   }

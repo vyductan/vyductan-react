@@ -11,7 +11,7 @@ const HTML_LINEBREAK_STRUCTURE_SELECTOR =
   "br, p, div, li, ul, ol, blockquote, pre, h1, h2, h3, h4, h5, h6, table, thead, tbody, tfoot, tr, td, th";
 
 export function splitPlainTextIntoParagraphs(text: string): string[][] {
-  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const normalizedText = text.replaceAll(/\r\n?/g, "\n");
   const paragraphs = normalizedText
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.split("\n"));
@@ -29,7 +29,7 @@ export function shouldPreferPlainTextLinebreakPaste(
     return false;
   }
 
-  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const normalizedText = text.replaceAll(/\r\n?/g, "\n");
   if (!normalizedText.includes("\n")) {
     return false;
   }
@@ -92,12 +92,12 @@ export function PlainTextLinebreakPastePlugin(): null {
             currentSelection.removeText();
           }
 
-          paragraphs.forEach((lines, paragraphIndex) => {
+          for (const [paragraphIndex, lines] of paragraphs.entries()) {
             if (paragraphIndex > 0) {
               currentSelection.insertParagraph();
             }
 
-            lines.forEach((line, lineIndex) => {
+            for (const [lineIndex, line] of lines.entries()) {
               if (lineIndex > 0) {
                 currentSelection.insertLineBreak();
               }
@@ -105,8 +105,8 @@ export function PlainTextLinebreakPastePlugin(): null {
               if (line.length > 0) {
                 currentSelection.insertText(line);
               }
-            });
-          });
+            }
+          }
         });
 
         return true;

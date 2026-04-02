@@ -48,7 +48,9 @@ export interface SegmentedProps
   disabled?: boolean;
 }
 
-function stringifyValue(value: string | number | undefined): string | undefined {
+function stringifyValue(
+  value: string | number | undefined,
+): string | undefined {
   if (value === undefined) {
     return undefined;
   }
@@ -86,7 +88,7 @@ const Segmented = React.forwardRef<
     },
     ref,
   ) => {
-    const normalizedOptions = options.map(normalizeOption);
+    const normalizedOptions = options.map((option) => normalizeOption(option));
 
     return (
       <TabsPrimitive.Root

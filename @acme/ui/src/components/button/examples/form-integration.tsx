@@ -17,7 +17,9 @@ const App: React.FC = () => {
       username: "",
       password: "",
     },
-    onSubmit: () => {},
+    onSubmit: (values) => {
+      void values;
+    },
   });
 
   return (

@@ -1,22 +1,23 @@
 import "@testing-library/jest-dom/vitest";
-import * as React from "react";
-import { act, cleanup, render, waitFor } from "@testing-library/react";
 
-Object.assign(globalThis, { React });
-import { afterEach, expect, test, vi } from "vitest";
+import type { LexicalEditor } from "lexical";
+import * as React from "react";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ContentEditable } from "@lexical/react/LexicalContentEditable";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import type { LexicalEditor } from "lexical";
+import { act, cleanup, render, waitFor } from "@testing-library/react";
 import { $getRoot, PASTE_COMMAND } from "lexical";
+import { afterEach, expect, test, vi } from "vitest";
 
 import { nodes } from "../nodes/nodes";
 import { MarkdownPastePlugin } from "./markdown-paste-plugin";
 import { normalizeHtmlOutput } from "./normalize-html-output";
+
+Object.assign(globalThis, { React });
 
 function EditorRefPlugin({
   onReady,
@@ -61,7 +62,9 @@ function MarkdownPasteHarness({
         ignoreSelectionChange={true}
         onChange={(editorState, editor) => {
           editorState.read(() => {
-            onChange?.(normalizeHtmlOutput($generateHtmlFromNodes(editor, null)));
+            onChange?.(
+              normalizeHtmlOutput($generateHtmlFromNodes(editor, null)),
+            );
           });
         }}
       />
@@ -113,10 +116,10 @@ test("pastes nested markdown bullets as a nested list inside the preceding paren
   };
 
   act(() => {
-    editor?.dispatchCommand(
-      PASTE_COMMAND,
-      { clipboardData, preventDefault } as unknown as ClipboardEvent,
-    );
+    editor?.dispatchCommand(PASTE_COMMAND, {
+      clipboardData,
+      preventDefault,
+    } as unknown as ClipboardEvent);
   });
 
   await waitFor(() => {
@@ -126,7 +129,7 @@ test("pastes nested markdown bullets as a nested list inside the preceding paren
     const topLevelList = document.body.querySelector("ul");
     expect(topLevelList).not.toBeNull();
 
-    const topLevelItems = Array.from(topLevelList?.children ?? []).filter(
+    const topLevelItems = [...(topLevelList?.children ?? [])].filter(
       (element) => element.tagName === "LI",
     );
 
@@ -135,13 +138,13 @@ test("pastes nested markdown bullets as a nested list inside the preceding paren
     const secondItem = topLevelItems[1];
     expect(secondItem).toBeDefined();
 
-    const nestedList = Array.from(secondItem?.children ?? []).find(
+    const nestedList = [...(secondItem?.children ?? [])].find(
       (element) => element.tagName === "UL",
     );
 
     expect(nestedList).toBeDefined();
 
-    const nestedItems = Array.from(nestedList?.children ?? []).filter(
+    const nestedItems = [...(nestedList?.children ?? [])].filter(
       (element) => element.tagName === "LI",
     );
 

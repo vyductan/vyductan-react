@@ -1,7 +1,7 @@
 import React from "react";
-import { Popover as PopoverPrimitive } from "radix-ui";
 import { useMergedState } from "@rc-component/util";
 import { useDebounce } from "ahooks";
+import { Popover as PopoverPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 

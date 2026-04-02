@@ -10,10 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ProgressCircleDemo from "@/components/ui/progress/demo/circle";
-import ProgressInfoPositionDemo from "@/components/ui/progress/demo/info-position";
-import ProgressLineDemo from "@/components/ui/progress/demo/line";
-import ProgressSizeDemo from "@/components/ui/progress/demo/size";
+import ProgressCircleDemo from "@/components/ui/progress/examples/circle";
+import ProgressInfoPositionDemo from "@/components/ui/progress/examples/info-position";
+import ProgressLineDemo from "@/components/ui/progress/examples/line";
+import ProgressSizeDemo from "@/components/ui/progress/examples/size";
 import { ArrowLeft } from "lucide-react";
 
 export default function DescriptionsExamples() {

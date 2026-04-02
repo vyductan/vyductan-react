@@ -7,10 +7,9 @@ import type { Screens } from "@acme/ui/types";
 import { useResponsive } from "@acme/ui/hooks/use-responsive";
 import { cn } from "@acme/ui/lib/utils";
 
-import { responsiveArray } from "../_util/responsive-observer";
-
 import type { SizeType } from "../config-provider/size-context";
 import type { DescriptionsItem, VerticalCell } from "./types";
+import { responsiveArray } from "../_util/responsive-observer";
 import { Skeleton } from "../skeleton";
 import { createHorizontalRows, createVerticalRows } from "./utils";
 
@@ -84,7 +83,9 @@ function Descriptions({
             columnByScreen.xl ??
             columnByScreen.xxl ??
             1;
-          return matched ? columnByScreen[matched] ?? fallbackColumn : fallbackColumn;
+          return matched
+            ? (columnByScreen[matched] ?? fallbackColumn)
+            : fallbackColumn;
         })();
 
   const isHorizontal = layout === "horizontal";

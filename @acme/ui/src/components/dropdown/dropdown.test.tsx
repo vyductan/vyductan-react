@@ -1,5 +1,7 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
@@ -16,7 +18,10 @@ describe("DropdownMenuItem", () => {
             <svg aria-label="default icon" />
             <span>Default</span>
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive" data-testid="destructive-item">
+          <DropdownMenuItem
+            variant="destructive"
+            data-testid="destructive-item"
+          >
             <svg aria-label="destructive icon" />
             <span>Delete</span>
           </DropdownMenuItem>

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import AlertDescriptionsDemo from "@/components/ui/alert/demo/descriptions";
-import AlertStyleDemo from "@/components/ui/alert/demo/style";
+import AlertDescriptionsDemo from "@/components/ui/alert/examples/descriptions";
+import AlertStyleDemo from "@/components/ui/alert/examples/style";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

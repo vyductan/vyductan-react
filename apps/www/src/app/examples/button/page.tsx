@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import ButtonBasicDemo from "@/components/ui/button/demo/basic";
-import ButtonColorVariantDemo from "@/components/ui/button/demo/color-variant";
-import ButtonDangerDemo from "@/components/ui/button/demo/danger";
-import ButtonDisabledDemo from "@/components/ui/button/demo/disabled";
+import ButtonBasicDemo from "@/components/ui/button/examples/basic";
+import ButtonColorVariantDemo from "@/components/ui/button/examples/color-variant";
+import ButtonDangerDemo from "@/components/ui/button/examples/danger";
+import ButtonDisabledDemo from "@/components/ui/button/examples/disabled";
 import {
   Card,
   CardContent,

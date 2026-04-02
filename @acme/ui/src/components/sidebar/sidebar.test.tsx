@@ -1,5 +1,7 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
@@ -26,7 +28,10 @@ describe("SidebarMenuButton", () => {
     expect(() => {
       render(
         <SidebarProvider>
-          <SidebarMenuButton tooltip="Settings" data-testid="sidebar-menu-button">
+          <SidebarMenuButton
+            tooltip="Settings"
+            data-testid="sidebar-menu-button"
+          >
             <span>Settings</span>
           </SidebarMenuButton>
         </SidebarProvider>,

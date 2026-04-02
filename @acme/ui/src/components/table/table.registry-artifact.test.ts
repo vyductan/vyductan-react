@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
-import { posix, resolve } from "node:path";
-
+import path from "node:path";
 import { expect, test } from "vitest";
 
 type RegistryFile = {
@@ -15,12 +14,15 @@ type RegistryItem = {
   dependencies?: string[];
 };
 
-const registryDir = resolve(import.meta.dirname, "../../../public/registry");
+const registryDir = path.resolve(
+  import.meta.dirname,
+  "../../../public/registry",
+);
 const registryExtensions = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".css"];
 
 function readRegistryItem(name: string): RegistryItem {
   return JSON.parse(
-    readFileSync(resolve(registryDir, `${name}.json`), "utf8"),
+    readFileSync(path.resolve(registryDir, `${name}.json`), "utf8"),
   ) as RegistryItem;
 }
 
@@ -61,7 +63,8 @@ function readRegistryFileContent(entryName: string, target: string): string {
 
 function extractModuleSpecifiers(source: string): string[] {
   const specifiers = new Set<string>();
-  const fromPattern = /\b(?:import|export)\s+(?:type\s+)?[^"']*?\sfrom\s+["']([^"']+)["']/g;
+  const fromPattern =
+    /\b(?:import|export)\s+(?:type\s+)?[^"']*?\sfrom\s+["']([^"']+)["']/g;
   const sideEffectPattern = /\bimport\s+["']([^"']+)["']/g;
 
   for (const pattern of [fromPattern, sideEffectPattern]) {
@@ -76,18 +79,23 @@ function extractModuleSpecifiers(source: string): string[] {
   return [...specifiers];
 }
 
-function resolveImportCandidates(fromTarget: string, specifier: string): string[] {
-  const baseTarget = posix.normalize(
-    posix.join(posix.dirname(fromTarget), specifier),
+function resolveImportCandidates(
+  fromTarget: string,
+  specifier: string,
+): string[] {
+  const baseTarget = path.posix.normalize(
+    path.posix.join(path.posix.dirname(fromTarget), specifier),
   );
 
-  if (posix.extname(baseTarget)) {
+  if (path.posix.extname(baseTarget)) {
     return [baseTarget];
   }
 
   return [
     ...registryExtensions.map((extension) => `${baseTarget}${extension}`),
-    ...registryExtensions.map((extension) => posix.join(baseTarget, `index${extension}`)),
+    ...registryExtensions.map((extension) =>
+      path.posix.join(baseTarget, `index${extension}`),
+    ),
   ];
 }
 
@@ -123,7 +131,10 @@ test("table registry types keep local table dependency imports", () => {
 });
 
 test("table registry base compose primitives keep local shadcn table imports", () => {
-  const base = readRegistryFileContent("table", "components/table/_components/base.tsx");
+  const base = readRegistryFileContent(
+    "table",
+    "components/table/_components/base.tsx",
+  );
   const table = readRegistryFileContent("table", "shadcn/table.tsx");
 
   expect(base).toContain('from "../../../shadcn/table"');
@@ -131,7 +142,10 @@ test("table registry base compose primitives keep local shadcn table imports", (
 });
 
 test("table registry tooltip support keeps local shadcn tooltip imports", () => {
-  const components = readRegistryFileContent("table", "components/tooltip/_components.tsx");
+  const components = readRegistryFileContent(
+    "table",
+    "components/tooltip/_components.tsx",
+  );
   const tooltip = readRegistryFileContent("table", "shadcn/tooltip.tsx");
 
   expect(components).toContain('from "../../shadcn/tooltip"');
@@ -139,8 +153,14 @@ test("table registry tooltip support keeps local shadcn tooltip imports", () => 
 });
 
 test("table registry checkbox support keeps local shadcn checkbox imports", () => {
-  const checkboxComponent = readRegistryFileContent("table", "components/checkbox/checkbox.tsx");
-  const checkboxIndex = readRegistryFileContent("table", "components/checkbox/index.tsx");
+  const checkboxComponent = readRegistryFileContent(
+    "table",
+    "components/checkbox/checkbox.tsx",
+  );
+  const checkboxIndex = readRegistryFileContent(
+    "table",
+    "components/checkbox/index.tsx",
+  );
   const checkbox = readRegistryFileContent("table", "shadcn/checkbox.tsx");
 
   expect(checkboxComponent).toContain('from "../../shadcn/checkbox"');
@@ -196,7 +216,10 @@ test("table checkbox support registry declares label shim runtime dependency", (
 });
 
 test("table registry table runtime keeps local shadcn skeleton imports", () => {
-  const tableRuntime = readRegistryFileContent("table", "components/table/table.tsx");
+  const tableRuntime = readRegistryFileContent(
+    "table",
+    "components/table/table.tsx",
+  );
   const skeleton = readRegistryFileContent("table", "shadcn/skeleton.tsx");
 
   expect(tableRuntime).toContain('from "../../shadcn/skeleton"');
@@ -204,8 +227,14 @@ test("table registry table runtime keeps local shadcn skeleton imports", () => {
 });
 
 test("table registry pagination support keeps local pagination imports", () => {
-  const paginationIndex = readRegistryFileContent("table", "components/pagination/_components/index.tsx");
-  const pagination = readRegistryFileContent("table", "components/pagination/pagination.tsx");
+  const paginationIndex = readRegistryFileContent(
+    "table",
+    "components/pagination/_components/index.tsx",
+  );
+  const pagination = readRegistryFileContent(
+    "table",
+    "components/pagination/pagination.tsx",
+  );
 
   expect(paginationIndex).toContain('from "../../../icons"');
   expect(pagination).toContain('from "./_components"');
@@ -239,9 +268,15 @@ test("table registry page-size options do not emit a select bridge artifact", ()
 
 test("table registry remaining helper imports keep expected local paths", () => {
   const spin = readRegistryFileContent("table", "components/spin/spin.tsx");
-  const head = readRegistryFileContent("table", "components/table/_components/table-head-advanced.tsx");
+  const head = readRegistryFileContent(
+    "table",
+    "components/table/_components/table-head-advanced.tsx",
+  );
   const styles = readRegistryFileContent("table", "components/table/styles.ts");
-  const expand = readRegistryFileContent("table", "components/table/utils/expand-util.tsx");
+  const expand = readRegistryFileContent(
+    "table",
+    "components/table/utils/expand-util.tsx",
+  );
   const icon = readRegistryFileContent("table", "icons/icon-component.tsx");
   const wrapper = readRegistryFileContent("table", "icons/wrapper.tsx");
 
@@ -262,7 +297,8 @@ test("table registry next closure batch resolves local table barrels and helper 
         issue ===
           "components/pagination/pagination.tsx -> ./_components/page-size-options" ||
         issue === "components/table/_components/table-head-advanced.tsx -> ." ||
-        issue === "components/table/hooks/use-pagination.ts -> ../../_util/extends-object" ||
+        issue ===
+          "components/table/hooks/use-pagination.ts -> ../../_util/extends-object" ||
         issue ===
           "components/table/hooks/use-selection.tsx -> ../../_util/hooks/use-multiple-select" ||
         issue === "components/table/table.tsx -> ./_components",
@@ -274,7 +310,9 @@ test("table registry shared icons include local leaf exports", () => {
   const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
   expect(
-    unresolvedRelativeImports.filter((issue) => issue.startsWith("icons/index.ts -> ./")),
+    unresolvedRelativeImports.filter((issue) =>
+      issue.startsWith("icons/index.ts -> ./"),
+    ),
   ).toEqual([]);
 });
 
@@ -296,7 +334,8 @@ test("table registry local control support resolves dropdown radio and button im
   expect(
     unresolvedRelativeImports.filter(
       (issue) =>
-        issue === "components/table/hooks/use-selection.tsx -> ../../dropdown" ||
+        issue ===
+          "components/table/hooks/use-selection.tsx -> ../../dropdown" ||
         issue === "components/table/hooks/use-selection.tsx -> ../../radio" ||
         issue === "components/table/types.ts -> ../dropdown" ||
         issue === "components/table/utils/expand-util.tsx -> ../../button",
@@ -336,7 +375,8 @@ test("table registry size context avoids input barrel fanout", () => {
 
   expect(
     unresolvedRelativeImports.filter(
-      (issue) => issue === "components/config-provider/size-context.tsx -> ../input",
+      (issue) =>
+        issue === "components/config-provider/size-context.tsx -> ../input",
     ),
   ).toEqual([]);
 });
@@ -358,8 +398,10 @@ test("table registry config context avoids broad component and theme fanout", ()
         issue === "components/config-provider/context.ts -> ../select" ||
         issue === "components/config-provider/context.ts -> ../tag" ||
         issue === "components/config-provider/context.ts -> ../textarea" ||
-        issue === "components/config-provider/context.ts -> ../theme/interface" ||
-        issue === "components/config-provider/context.ts -> ./default-render-empty",
+        issue ===
+          "components/config-provider/context.ts -> ../theme/interface" ||
+        issue ===
+          "components/config-provider/context.ts -> ./default-render-empty",
     ),
   ).toEqual([]);
 });
@@ -369,7 +411,9 @@ test("table registry responsive observer avoids theme internal fanout", () => {
 
   expect(
     unresolvedRelativeImports.filter(
-      (issue) => issue === "components/_util/responsive-observer.ts -> ../theme/internal",
+      (issue) =>
+        issue ===
+        "components/_util/responsive-observer.ts -> ../theme/internal",
     ),
   ).toEqual([]);
 });
@@ -396,7 +440,8 @@ test("table registry shared core avoids responsive config and locale fanout", ()
   expect(
     unresolvedRelativeImports.filter(
       (issue) =>
-        issue === "components/_util/responsive-observer.ts -> ../theme/internal" ||
+        issue ===
+          "components/_util/responsive-observer.ts -> ../theme/internal" ||
         issue ===
           "components/config-provider/context.ts -> ../../lib/wave/interface" ||
         issue === "components/config-provider/context.ts -> ../button" ||
@@ -408,8 +453,10 @@ test("table registry shared core avoids responsive config and locale fanout", ()
         issue === "components/config-provider/context.ts -> ../select" ||
         issue === "components/config-provider/context.ts -> ../tag" ||
         issue === "components/config-provider/context.ts -> ../textarea" ||
-        issue === "components/config-provider/context.ts -> ../theme/interface" ||
-        issue === "components/config-provider/context.ts -> ./default-render-empty" ||
+        issue ===
+          "components/config-provider/context.ts -> ../theme/interface" ||
+        issue ===
+          "components/config-provider/context.ts -> ./default-render-empty" ||
         issue === "components/config-provider/size-context.tsx -> ../input" ||
         issue === "components/locale/index.tsx -> ../empty" ||
         issue === "components/locale/index.tsx -> ./use-locale",
@@ -420,5 +467,5 @@ test("table registry shared core avoids responsive config and locale fanout", ()
 test("table registry artifacts resolve transitive registry dependencies", () => {
   const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
-  expect(unresolvedRelativeImports.sort()).toEqual([]);
+  expect(unresolvedRelativeImports.toSorted()).toEqual([]);
 });

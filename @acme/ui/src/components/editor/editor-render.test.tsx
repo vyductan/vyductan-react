@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom/vitest";
+
 import * as React from "react";
 import { cleanup, render, screen, within } from "@testing-library/react";
+import { JSDOM } from "jsdom";
 import { afterEach, describe, expect, test } from "vitest";
-
-Object.assign(globalThis, { React });
 
 import { EditorRender } from "./editor-render";
 import * as editorExports from "./index";
@@ -14,6 +14,8 @@ import {
   unsupportedEditorRenderFixtureNames,
 } from "./render/render-fixtures";
 import { richTextSemanticContract } from "./themes/rich-text-semantic-contract";
+
+Object.assign(globalThis, { React });
 
 afterEach(() => {
   cleanup();
@@ -46,13 +48,17 @@ describe("EditorRender", () => {
   test("renders a heading fixture semantically", () => {
     render(<EditorRender value={editorRenderFixtures.heading.content} />);
 
-    const heading = screen.getByRole("heading", { name: "Canonical heading content" });
+    const heading = screen.getByRole("heading", {
+      name: "Canonical heading content",
+    });
     expect(heading.tagName).toBe("H2");
     expect(heading).toHaveClass(richTextSemanticContract.heading.h2);
   });
 
   test("renders quote, links, and autolinks", () => {
-    const quoteRender = render(<EditorRender value={editorRenderFixtures.quote.content} />);
+    const quoteRender = render(
+      <EditorRender value={editorRenderFixtures.quote.content} />,
+    );
     const quote = quoteRender.container.querySelector("blockquote");
     expect(quote).not.toBeNull();
     expect(quote).toHaveTextContent("Canonical quote content.");
@@ -122,15 +128,21 @@ describe("EditorRender", () => {
       />,
     );
 
-    expect(screen.queryByRole("link", { name: "Unsafe link" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Unsafe link" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Unsafe link")).toBeInTheDocument();
   });
 
   test("renders formatted text, inline code, and soft line breaks", () => {
-    const formatted = render(<EditorRender value={editorRenderFixtures.formattedText.content} />);
+    const formatted = render(
+      <EditorRender value={editorRenderFixtures.formattedText.content} />,
+    );
     expect(screen.getByText("Bold").tagName).toBe("STRONG");
     expect(formatted.container.querySelector("em")).toHaveTextContent(/italic/);
-    expect(formatted.container.querySelector("u")).toHaveTextContent(/underline/);
+    expect(formatted.container.querySelector("u")).toHaveTextContent(
+      /underline/,
+    );
 
     cleanup();
 
@@ -141,14 +153,18 @@ describe("EditorRender", () => {
 
     cleanup();
 
-    const softBreak = render(<EditorRender value={editorRenderFixtures.softBreak.content} />);
+    const softBreak = render(
+      <EditorRender value={editorRenderFixtures.softBreak.content} />,
+    );
     const paragraph = softBreak.container.querySelector("p");
     expect(paragraph?.querySelector("br")).not.toBeNull();
     expect(paragraph).toHaveTextContent("Line oneLine two");
   });
 
   test("renders bullet, number, and checklist list semantics including nesting", () => {
-    const bullet = render(<EditorRender value={editorRenderFixtures.bulletList.content} />);
+    const bullet = render(
+      <EditorRender value={editorRenderFixtures.bulletList.content} />,
+    );
     const bulletList = bullet.container.querySelector("ul");
     expect(bulletList).not.toBeNull();
     expect(bulletList?.querySelector("ul")).not.toBeNull();
@@ -156,15 +172,23 @@ describe("EditorRender", () => {
 
     cleanup();
 
-    const numbered = render(<EditorRender value={editorRenderFixtures.numberList.content} />);
+    const numbered = render(
+      <EditorRender value={editorRenderFixtures.numberList.content} />,
+    );
     const orderedList = numbered.container.querySelector("ol");
     expect(orderedList).not.toBeNull();
-    expect(within(orderedList as HTMLElement).getByText("First item")).toBeInTheDocument();
-    expect(within(orderedList as HTMLElement).getByText("Second item")).toBeInTheDocument();
+    expect(
+      within(orderedList as HTMLElement).getByText("First item"),
+    ).toBeInTheDocument();
+    expect(
+      within(orderedList as HTMLElement).getByText("Second item"),
+    ).toBeInTheDocument();
 
     cleanup();
 
-    const checklist = render(<EditorRender value={editorRenderFixtures.checkList.content} />);
+    const checklist = render(
+      <EditorRender value={editorRenderFixtures.checkList.content} />,
+    );
     const checkboxes = screen.getAllByRole("checkbox");
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).not.toBeChecked();
@@ -184,7 +208,9 @@ describe("EditorRender", () => {
   });
 
   test("keeps semantic checkboxes accessible without rendering an extra visible control", () => {
-    const checklist = render(<EditorRender value={editorRenderFixtures.checkList.content} />);
+    const checklist = render(
+      <EditorRender value={editorRenderFixtures.checkList.content} />,
+    );
     const uncheckedChecklist = screen.getByRole("checkbox", {
       name: "Unchecked checklist item",
     });
@@ -195,11 +221,15 @@ describe("EditorRender", () => {
     expect(checkedChecklist).toBeChecked();
     expect(uncheckedChecklist).toHaveClass("sr-only");
     expect(checkedChecklist).toHaveClass("sr-only");
-    expect(checklist.container.querySelectorAll("input[type='checkbox']")).toHaveLength(2);
+    expect(
+      checklist.container.querySelectorAll("input[type='checkbox']"),
+    ).toHaveLength(2);
 
     cleanup();
 
-    const checkBlock = render(<EditorRender value={editorRenderFixtures.checkBlock.content} />);
+    const checkBlock = render(
+      <EditorRender value={editorRenderFixtures.checkBlock.content} />,
+    );
     const uncheckedCheckBlock = screen.getByRole("checkbox", {
       name: "Unchecked check block",
     });
@@ -210,11 +240,15 @@ describe("EditorRender", () => {
     expect(checkedCheckBlock).toBeChecked();
     expect(uncheckedCheckBlock).toHaveClass("sr-only");
     expect(checkedCheckBlock).toHaveClass("sr-only");
-    expect(checkBlock.container.querySelectorAll("input[type='checkbox']")).toHaveLength(2);
+    expect(
+      checkBlock.container.querySelectorAll("input[type='checkbox']"),
+    ).toHaveLength(2);
   });
 
   test("renders code blocks and horizontal rules", () => {
-    const codeBlock = render(<EditorRender value={editorRenderFixtures.codeBlock.content} />);
+    const codeBlock = render(
+      <EditorRender value={editorRenderFixtures.codeBlock.content} />,
+    );
     const code = codeBlock.container.querySelector("pre code");
     expect(code).not.toBeNull();
     expect(code).toHaveTextContent("const answer = 42;");
@@ -222,14 +256,18 @@ describe("EditorRender", () => {
 
     cleanup();
 
-    const hrRender = render(<EditorRender value={editorRenderFixtures.horizontalRule.content} />);
+    const hrRender = render(
+      <EditorRender value={editorRenderFixtures.horizontalRule.content} />,
+    );
     const hr = hrRender.container.querySelector("hr");
     expect(hr).not.toBeNull();
     expect(hr).toHaveClass(richTextSemanticContract.hr);
   });
 
   test("renders table structure semantically", () => {
-    const { container } = render(<EditorRender value={editorRenderFixtures.table.content} />);
+    const { container } = render(
+      <EditorRender value={editorRenderFixtures.table.content} />,
+    );
 
     const table = container.querySelector("table");
     const rows = container.querySelectorAll("tr");
@@ -259,9 +297,16 @@ describe("EditorRender", () => {
   });
 
   test("renders html heading input semantically", () => {
-    render(<EditorRender format="html" value={editorRenderSourceFixtures.heading.html} />);
+    render(
+      <EditorRender
+        format="html"
+        value={editorRenderSourceFixtures.heading.html}
+      />,
+    );
 
-    const heading = screen.getByRole("heading", { name: "Canonical heading content" });
+    const heading = screen.getByRole("heading", {
+      name: "Canonical heading content",
+    });
     expect(heading.tagName).toBe("H2");
     expect(heading).toHaveClass(richTextSemanticContract.heading.h2);
   });
@@ -281,7 +326,12 @@ describe("EditorRender", () => {
   });
 
   test("renders html link input semantically", () => {
-    render(<EditorRender format="html" value={editorRenderSourceFixtures.link.html} />);
+    render(
+      <EditorRender
+        format="html"
+        value={editorRenderSourceFixtures.link.html}
+      />,
+    );
 
     const link = screen.getByRole("link", { name: "Canonical link" });
     expect(link).toHaveAttribute("href", "https://example.com");
@@ -290,7 +340,10 @@ describe("EditorRender", () => {
 
   test("renders html blockquote input semantically", () => {
     const { container } = render(
-      <EditorRender format="html" value={editorRenderSourceFixtures.blockquote.html} />,
+      <EditorRender
+        format="html"
+        value={editorRenderSourceFixtures.blockquote.html}
+      />,
     );
 
     const quote = container.querySelector("blockquote");
@@ -301,14 +354,20 @@ describe("EditorRender", () => {
 
   test("preserves paragraph structure inside html blockquotes", () => {
     const { container } = render(
-      <EditorRender format="html" value={editorRenderSourceFixtures.blockquoteParagraphs.html} />,
+      <EditorRender
+        format="html"
+        value={editorRenderSourceFixtures.blockquoteParagraphs.html}
+      />,
     );
 
-    const paragraphs = Array.from(container.querySelectorAll("blockquote p")).map((node) =>
-      node.textContent?.trim(),
+    const paragraphs = [...container.querySelectorAll("blockquote p")].map(
+      (node) => node.textContent?.trim(),
     );
 
-    expect(paragraphs).toEqual(["First quote paragraph.", "Second quote paragraph."]);
+    expect(paragraphs).toEqual([
+      "First quote paragraph.",
+      "Second quote paragraph.",
+    ]);
   });
 
   test("renders markdown check-block semantics", () => {
@@ -329,7 +388,10 @@ describe("EditorRender", () => {
 
   test("renders html code block input semantically", () => {
     const { container } = render(
-      <EditorRender format="html" value={editorRenderSourceFixtures.codeBlock.html} />,
+      <EditorRender
+        format="html"
+        value={editorRenderSourceFixtures.codeBlock.html}
+      />,
     );
 
     const code = container.querySelector("pre code");
@@ -340,7 +402,10 @@ describe("EditorRender", () => {
 
   test("renders markdown table input semantically", () => {
     const { container } = render(
-      <EditorRender format="markdown" value={editorRenderSourceFixtures.table.markdown} />,
+      <EditorRender
+        format="markdown"
+        value={editorRenderSourceFixtures.table.markdown}
+      />,
     );
 
     const table = container.querySelector("table");
@@ -358,7 +423,10 @@ describe("EditorRender", () => {
 
   test("returns null for object input with markdown format", () => {
     const rendered = render(
-      <EditorRender value={editorRenderFixtures.paragraph.content} format="markdown" />,
+      <EditorRender
+        value={editorRenderFixtures.paragraph.content}
+        format="markdown"
+      />,
     );
 
     expect(rendered.container.firstChild).toBeNull();
@@ -366,7 +434,10 @@ describe("EditorRender", () => {
 
   test("returns null for object input with html format", () => {
     const rendered = render(
-      <EditorRender value={editorRenderFixtures.paragraph.content} format="html" />,
+      <EditorRender
+        value={editorRenderFixtures.paragraph.content}
+        format="html"
+      />,
     );
 
     expect(rendered.container.firstChild).toBeNull();
@@ -383,8 +454,11 @@ describe("EditorRender", () => {
 
     cleanup();
 
-    const { JSDOM } = require("jsdom");
-    const { window } = new JSDOM("<!doctype html><html><body></body></html>");
+    const { window } = new JSDOM(
+      "<!doctype html><html><body></body></html>",
+    ) as unknown as {
+      window: Window & typeof globalThis;
+    };
     const originalDomParser = globalThis.DOMParser;
     const originalElement = globalThis.Element;
     const originalHtmlElement = globalThis.HTMLElement;
@@ -399,7 +473,10 @@ describe("EditorRender", () => {
 
     try {
       const htmlImage = render(
-        <EditorRender format="html" value={editorRenderSourceFixtures.unsupportedImage.html} />,
+        <EditorRender
+          format="html"
+          value={editorRenderSourceFixtures.unsupportedImage.html}
+        />,
       );
       expect(htmlImage.container.firstChild).toBeNull();
     } finally {

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ColorPickerDemo from "@/components/ui/color-picker/demo/basic";
+import ColorPickerDemo from "@/components/ui/color-picker/examples/basic";
 import { ArrowLeft } from "lucide-react";
 
 export default function SelectExamples() {

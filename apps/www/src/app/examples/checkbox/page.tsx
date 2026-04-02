@@ -11,8 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import CheckboxDemo from "@/components/ui/checkbox/demo/basic";
-import CheckboxGroupDemo from "@/components/ui/checkbox/demo/group";
+import CheckboxDemo from "@/components/ui/checkbox/examples/basic";
+import CheckboxGroupDemo from "@/components/ui/checkbox/examples/group";
 import { ArrowLeft } from "lucide-react";
 
 export default function CheckboxExamples() {

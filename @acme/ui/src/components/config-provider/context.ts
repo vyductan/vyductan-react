@@ -12,15 +12,17 @@ export type AliasToken = Record<PropertyKey, any>;
 export type MappingAlgorithm = (...args: any[]) => AliasToken;
 export type OverrideToken = Record<string, AliasToken>;
 
-export type RenderEmptyHandler = (componentName?:
-  | "Table"
-  | "Table.filter"
-  | "List"
-  | "Select"
-  | "TreeSelect"
-  | "Cascader"
-  | "Transfer"
-  | "Mentions") => React.ReactNode;
+export type RenderEmptyHandler = (
+  componentName?:
+    | "Table"
+    | "Table.filter"
+    | "List"
+    | "Select"
+    | "TreeSelect"
+    | "Cascader"
+    | "Transfer"
+    | "Mentions",
+) => React.ReactNode;
 
 export type WaveComponent = "Tag" | "Button" | "Checkbox" | "Radio" | "Switch";
 export type ShowWaveEffect = (

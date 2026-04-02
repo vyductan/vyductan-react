@@ -281,12 +281,12 @@ function formatHtmlDisplayNode(node: ChildNode, depth: number): string {
   const element = node as Element;
   const tagName = element.tagName.toLowerCase();
   const indent = "  ".repeat(depth);
-  const attributes = Array.from(element.attributes)
+  const attributes = [...element.attributes]
     .map((attribute) => ` ${attribute.name}="${attribute.value}"`)
     .join("");
   const openingTag = `<${tagName}${attributes}>`;
   const closingTag = `</${tagName}>`;
-  const renderedChildren = Array.from(element.childNodes)
+  const renderedChildren = [...element.childNodes]
     .map((childNode) => formatHtmlDisplayNode(childNode, depth + 1))
     .filter(Boolean);
 
@@ -294,7 +294,9 @@ function formatHtmlDisplayNode(node: ChildNode, depth: number): string {
     return `${indent}${openingTag}${closingTag}`;
   }
 
-  if (Array.from(element.childNodes).every(isInlineHtmlNode)) {
+  if (
+    [...element.childNodes].every((childNode) => isInlineHtmlNode(childNode))
+  ) {
     return `${indent}${openingTag}${renderedChildren.join("")}${closingTag}`;
   }
 
@@ -308,7 +310,7 @@ function formatHtmlDisplayValue(value: string) {
 
   try {
     const document = new DOMParser().parseFromString(value, "text/html");
-    const formattedValue = Array.from(document.body.childNodes)
+    const formattedValue = [...document.body.childNodes]
       .map((node) => formatHtmlDisplayNode(node, 0))
       .filter(Boolean)
       .join("\n");
@@ -321,11 +323,14 @@ function formatHtmlDisplayValue(value: string) {
 
 export default function PlaygroundDemo() {
   const [activeFormat, setActiveFormat] = React.useState<EditorFormat>("json");
-  const [values, setValues] = React.useState<Record<EditorFormat, string>>(INITIAL_VALUES);
-  const [editorResetKeys, setEditorResetKeys] = React.useState<Record<EditorFormat, number>>(
-    INITIAL_EDITOR_RESET_KEYS,
-  );
-  const [statsByFormat, setStatsByFormat] = React.useState<Record<EditorFormat, EditorStats>>({
+  const [values, setValues] =
+    React.useState<Record<EditorFormat, string>>(INITIAL_VALUES);
+  const [editorResetKeys, setEditorResetKeys] = React.useState<
+    Record<EditorFormat, number>
+  >(INITIAL_EDITOR_RESET_KEYS);
+  const [statsByFormat, setStatsByFormat] = React.useState<
+    Record<EditorFormat, EditorStats>
+  >({
     json: EMPTY_STATS,
     markdown: EMPTY_STATS,
     html: EMPTY_STATS,
@@ -337,7 +342,10 @@ export default function PlaygroundDemo() {
     "Shape the content, switch formats, and inspect the output below.",
   );
 
-  const activePresets = React.useMemo(() => PRESETS[activeFormat], [activeFormat]);
+  const activePresets = React.useMemo(
+    () => PRESETS[activeFormat],
+    [activeFormat],
+  );
   const activeValue = values[activeFormat];
   const displayValue = React.useMemo(() => {
     if (activeFormat === "json") {
@@ -352,7 +360,10 @@ export default function PlaygroundDemo() {
   }, [activeFormat, activeValue]);
   const activeEditorResetKey = editorResetKeys[activeFormat];
   const activeStats = statsByFormat[activeFormat];
-  const outputTitle = activeFormat === "html" ? "Cleaned HTML Output" : `${FORMAT_LABELS[activeFormat]} Output`;
+  const outputTitle =
+    activeFormat === "html"
+      ? "Cleaned HTML Output"
+      : `${FORMAT_LABELS[activeFormat]} Output`;
 
   const updateActiveValue = React.useCallback(
     (nextValue: string) => {
@@ -393,7 +404,7 @@ export default function PlaygroundDemo() {
       <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-700">
+            <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[11px] font-semibold tracking-[0.2em] text-sky-700 uppercase">
               Editor Playground
             </span>
             <div className="space-y-1">
@@ -401,13 +412,13 @@ export default function PlaygroundDemo() {
                 Explore formats, presets, and live output in one story
               </h2>
               <p className="max-w-3xl text-sm leading-6 text-slate-600">
-                This showcase keeps each format sandbox isolated while surfacing the
-                exact payload and reading stats the editor produces.
+                This showcase keeps each format sandbox isolated while surfacing
+                the exact payload and reading stats the editor produces.
               </p>
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-right">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <div className="text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase">
               Active Mode
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
@@ -444,12 +455,12 @@ export default function PlaygroundDemo() {
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <h3 className="text-sm font-semibold tracking-[0.18em] text-slate-500 uppercase">
                   Presets
                 </h3>
                 <p className="mt-1 text-sm text-slate-600">
-                  Load curated content for the current format without affecting the
-                  other sandboxes.
+                  Load curated content for the current format without affecting
+                  the other sandboxes.
                 </p>
               </div>
             </div>
@@ -474,12 +485,12 @@ export default function PlaygroundDemo() {
 
           <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50/80 p-4">
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <h3 className="text-sm font-semibold tracking-[0.18em] text-slate-500 uppercase">
                 Story Controls
               </h3>
               <p className="mt-1 text-sm text-slate-600">
-                Keep the playground focused with just the controls that change the
-                editing experience the most.
+                Keep the playground focused with just the controls that change
+                the editing experience the most.
               </p>
             </div>
 
@@ -563,12 +574,12 @@ export default function PlaygroundDemo() {
 
         <div className="space-y-6 rounded-3xl border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">
+            <h3 className="text-sm font-semibold tracking-[0.18em] text-slate-300 uppercase">
               Reading Stats
             </h3>
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                <div className="text-xs tracking-[0.18em] text-slate-400 uppercase">
                   Words
                 </div>
                 <div className="mt-2 text-2xl font-semibold text-white">
@@ -576,7 +587,7 @@ export default function PlaygroundDemo() {
                 </div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                <div className="text-xs tracking-[0.18em] text-slate-400 uppercase">
                   Characters
                 </div>
                 <div className="mt-2 text-2xl font-semibold text-white">
@@ -584,7 +595,7 @@ export default function PlaygroundDemo() {
                 </div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                <div className="text-xs tracking-[0.18em] text-slate-400 uppercase">
                   Reading Time
                 </div>
                 <div className="mt-2 text-2xl font-semibold text-white">
@@ -596,14 +607,16 @@ export default function PlaygroundDemo() {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold text-white">{outputTitle}</h3>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-slate-300">
+              <h3 className="text-lg font-semibold text-white">
+                {outputTitle}
+              </h3>
+              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium tracking-[0.18em] text-slate-300 uppercase">
                 {activeFormat === "html" ? "Cleaned" : "Live"}
               </span>
             </div>
             <p className="text-sm leading-6 text-slate-400">
-              Inspect exactly what the current editor mode emits without leaving the
-              story. HTML mode shows cleaned HTML output.
+              Inspect exactly what the current editor mode emits without leaving
+              the story. HTML mode shows cleaned HTML output.
             </p>
             <pre
               aria-label="Serialized output"

@@ -38,8 +38,7 @@ export const richTextSemanticContract = {
     h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px]",
   },
   paragraph: cn("leading-[24px]"),
-  quote:
-    "border-l-[3px] border-gray-300 pl-3.5 pr-0 my-1 italic text-gray-600",
+  quote: "border-l-[3px] border-gray-300 pl-3.5 pr-0 my-1 italic text-gray-600",
   link: "text-inherit underline decoration-[rgba(55,53,47,0.4)] underline-offset-2 hover:decoration-[rgba(55,53,47,0.6)] transition-colors",
   list: {
     checklist: "relative !list-none p-0",
@@ -109,9 +108,10 @@ export const richTextSemanticContract = {
     url: "RichTextSemanticContract__tokenOperator",
     variable: "RichTextSemanticContract__tokenVariable",
   },
-  table: "RichTextSemanticContract__table w-fit overflow-scroll border-collapse",
+  table:
+    "RichTextSemanticContract__table w-fit overflow-scroll border-collapse",
   tableCell:
-    'RichTextSemanticContract__tableCell w-24 relative border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right',
+    "RichTextSemanticContract__tableCell w-24 relative border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
   tableCellHeader:
     "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
   hr: 'border-none my-2 mx-0 after:content-[""] after:block after:h-px after:bg-[rgba(55,53,47,0.09)]',

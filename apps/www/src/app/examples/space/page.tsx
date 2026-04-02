@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import SpaceCompactDemo from "@/components/ui/space/demo/compact";
+import SpaceCompactDemo from "@/components/ui/space/examples/compact";
 import { ArrowLeft } from "lucide-react";
 
 export default function SpaceExamples() {

@@ -1,17 +1,8 @@
 import type { XOR } from "ts-xor";
 
 import type { AnyObject } from "../_util/type";
-import {
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRoot,
-  TableRow,
-} from "./_components/base";
 import type { OwnTableProps, RecordWithCustomRow } from "./table";
+import { TableRoot } from "./_components/base";
 import { OwnTable } from "./table";
 
 type ShadcnTableProps = React.ComponentProps<typeof TableRoot>;
@@ -38,8 +29,9 @@ export type {
   ColumnType as TableColumnType,
   TablePaginationConfig,
 } from "./types";
+export { Table };
+
 export {
-  Table,
   TableBody,
   TableCaption,
   TableCell,
@@ -47,4 +39,4 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-};
+} from "./_components/base";

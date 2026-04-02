@@ -39,7 +39,9 @@ const jsonContent: LexicalEditorContent = {
 
 describe("resolveEditorRenderContentSync", () => {
   test("passes through JSON object input unchanged for format=json", () => {
-    expect(resolveEditorRenderContentSync(jsonContent, "json")).toBe(jsonContent);
+    expect(resolveEditorRenderContentSync(jsonContent, "json")).toBe(
+      jsonContent,
+    );
   });
 
   test("passes through JSON string input unchanged for format=json", () => {
@@ -92,9 +94,12 @@ describe("resolveEditorRenderContentSync", () => {
 
 describe("resolveServerHtmlEditorRenderContent", () => {
   test("returns Lexical JSON when the injected async document factory succeeds", async () => {
-    const result = await resolveServerHtmlEditorRenderContent("<p>Hello server</p>", {
-      createDocument: async (html) => createBrowserHtmlDocument(html),
-    });
+    const result = await resolveServerHtmlEditorRenderContent(
+      "<p>Hello server</p>",
+      {
+        createDocument: async (html) => createBrowserHtmlDocument(html),
+      },
+    );
 
     expect(result).not.toBeNull();
     expect(result).toMatchObject({

@@ -1,6 +1,7 @@
-import { test, expect, chromium } from "playwright/test";
+import { chromium, expect, test } from "playwright/test";
 
-const STORYBOOK_ORIGIN = process.env.STORYBOOK_ORIGIN ?? "http://127.0.0.1:6006";
+const STORYBOOK_ORIGIN =
+  process.env.STORYBOOK_ORIGIN ?? "http://127.0.0.1:6006";
 const STORYBOOK_URL = `${STORYBOOK_ORIGIN}/iframe.html?id=components-editor--playground`;
 const NOTION_PAGE_URL = process.env.NOTION_PAGE_URL;
 const RUN_NOTION_E2E = process.env.RUN_NOTION_E2E === "1";
@@ -23,8 +24,10 @@ async function readClipboard(page) {
 
 async function loadStorybookEditor(page) {
   await page.goto(STORYBOOK_URL, { waitUntil: "networkidle" });
-  const editor = page.locator('[contenteditable="true"][data-lexical-editor="true"]').first();
-  await editor.waitFor({ state: "visible", timeout: 30000 });
+  const editor = page
+    .locator('[contenteditable="true"][data-lexical-editor="true"]')
+    .first();
+  await editor.waitFor({ state: "visible", timeout: 30_000 });
   return editor;
 }
 
@@ -40,7 +43,9 @@ async function typeSoftLineBreakBlock(page, editor) {
   await page.keyboard.press("Shift+Enter");
   await editor.pressSequentially("SOFT_B <Discount> *0-2 yrs old are free");
   await page.keyboard.press("Shift+Enter");
-  await editor.pressSequentially("SOFT_C 3-12 yrs: 2,750 yen disount per child");
+  await editor.pressSequentially(
+    "SOFT_C 3-12 yrs: 2,750 yen disount per child",
+  );
 }
 
 async function typeMultiParagraphBlock(page, editor) {
@@ -49,13 +54,15 @@ async function typeMultiParagraphBlock(page, editor) {
   await page.keyboard.press("Enter");
   await editor.pressSequentially("VERIFY_B <Discount> *0-2 yrs old are free");
   await page.keyboard.press("Enter");
-  await editor.pressSequentially("VERIFY_C 3-12 yrs: 2,750 yen disount per child");
+  await editor.pressSequentially(
+    "VERIFY_C 3-12 yrs: 2,750 yen disount per child",
+  );
 }
 
 async function selectAllContent(editor) {
   await editor.evaluate((element) => {
     element.focus();
-    const selection = window.getSelection();
+    const selection = globalThis.getSelection();
     if (!selection) {
       throw new Error("Selection API unavailable");
     }
@@ -74,14 +81,18 @@ async function copySelection(page, editor) {
 }
 
 async function dismissNotionDialog(page) {
-  const dialogButton = page.getByRole("button", { name: /dismiss|not now|continue in browser/i }).first();
+  const dialogButton = page
+    .getByRole("button", { name: /dismiss|not now|continue in browser/i })
+    .first();
   if (await dialogButton.isVisible().catch(() => false)) {
     await dialogButton.click();
   }
 }
 
 async function getNotionEditableLeaf(page) {
-  const byPlaceholder = page.locator('[data-content-editable-leaf="true"][placeholder*="Press"]').first();
+  const byPlaceholder = page
+    .locator('[data-content-editable-leaf="true"][placeholder*="Press"]')
+    .first();
   if (await byPlaceholder.isVisible().catch(() => false)) {
     return byPlaceholder;
   }
@@ -102,11 +113,15 @@ async function pasteIntoNotionAndCollect(page) {
   await page.waitForTimeout(1000);
 
   return await page.evaluate(() => {
-    const leaves = Array.from(document.querySelectorAll('[data-content-editable-leaf="true"]'));
-    const nonEmptyLeaves = leaves.filter((leaf) => (leaf.textContent ?? "").trim().length > 0);
+    const leaves = [
+      ...document.querySelectorAll('[data-content-editable-leaf="true"]'),
+    ];
+    const nonEmptyLeaves = leaves.filter(
+      (leaf) => (leaf.textContent ?? "").trim().length > 0,
+    );
     const blockIds = new Set(
       nonEmptyLeaves
-        .map((leaf) => leaf.closest('[data-block-id]')?.getAttribute('data-block-id'))
+        .map((leaf) => leaf.closest("[data-block-id]")?.dataset.blockId)
         .filter(Boolean),
     );
 
@@ -132,13 +147,19 @@ test.describe("editor clipboard retest workflow", () => {
 
       await typeSoftLineBreakBlock(page, editor);
       const softPayload = await copySelection(page, editor);
-      expect(softPayload["text/plain"]).toContain("SOFT_A <Age> Any age OK\nSOFT_B <Discount> *0-2 yrs old are free");
-      expect(softPayload["text/plain"]).not.toContain("SOFT_A <Age> Any age OK\n\nSOFT_B");
-      expect(softPayload["text/html"]).toContain('white-space: break-spaces');
+      expect(softPayload["text/plain"]).toContain(
+        "SOFT_A <Age> Any age OK\nSOFT_B <Discount> *0-2 yrs old are free",
+      );
+      expect(softPayload["text/plain"]).not.toContain(
+        "SOFT_A <Age> Any age OK\n\nSOFT_B",
+      );
+      expect(softPayload["text/html"]).toContain("white-space: break-spaces");
 
       await typeMultiParagraphBlock(page, editor);
       const multiPayload = await copySelection(page, editor);
-      expect(multiPayload["text/plain"]).toContain("VERIFY_A <Age> Any age OK\n\nVERIFY_B <Discount> *0-2 yrs old are free\n\nVERIFY_C 3-12 yrs: 2,750 yen disount per child");
+      expect(multiPayload["text/plain"]).toContain(
+        "VERIFY_A <Age> Any age OK\n\nVERIFY_B <Discount> *0-2 yrs old are free\n\nVERIFY_C 3-12 yrs: 2,750 yen disount per child",
+      );
       expect(multiPayload["text/html"]).toContain("<p");
     } finally {
       await browser.close();
@@ -165,7 +186,7 @@ test.describe("editor clipboard retest workflow", () => {
 
       await typeSoftLineBreakBlock(storybookPage, editor);
       const softPayload = await copySelection(storybookPage, editor);
-      expect(softPayload["text/html"]).toContain('white-space: break-spaces');
+      expect(softPayload["text/html"]).toContain("white-space: break-spaces");
 
       await notionPage.goto(NOTION_PAGE_URL, { waitUntil: "domcontentloaded" });
       const softPaste = await pasteIntoNotionAndCollect(notionPage);

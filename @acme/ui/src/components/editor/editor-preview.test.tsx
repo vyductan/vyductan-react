@@ -1,12 +1,13 @@
 import "@testing-library/jest-dom/vitest";
+
 import * as React from "react";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
-Object.assign(globalThis, { React });
-
 import { EditorPreview } from "./editor-preview";
 import * as editorExports from "./index";
+
+Object.assign(globalThis, { React });
 
 const AUTHORED_JSON = JSON.stringify({
   root: {
@@ -58,7 +59,8 @@ const EMPTY_JSON = JSON.stringify({
   },
 });
 
-const AUTHORED_MARKDOWN = "# Markdown preview\n\nRendered through the existing markdown runtime path.";
+const AUTHORED_MARKDOWN =
+  "# Markdown preview\n\nRendered through the existing markdown runtime path.";
 
 const AUTHORED_HTML =
   "<h1>HTML preview</h1><p>Rendered through the existing HTML runtime path.</p>";
@@ -79,7 +81,9 @@ describe("EditorPreview", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText("Preview content rendered through the existing editor runtime."),
+        screen.getByText(
+          "Preview content rendered through the existing editor runtime.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -97,7 +101,9 @@ describe("EditorPreview", () => {
     await waitFor(() => {
       expect(screen.getByText("Markdown preview")).toBeInTheDocument();
       expect(
-        screen.getByText("Rendered through the existing markdown runtime path."),
+        screen.getByText(
+          "Rendered through the existing markdown runtime path.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -136,9 +142,16 @@ describe("EditorPreview", () => {
 
     const editorRoot = container.querySelector('[contenteditable="false"]');
     expect(editorRoot).toBeInTheDocument();
-    expect(container.querySelector('[contenteditable="true"]')).not.toBeInTheDocument();
-    expect(screen.getByRole("textbox")).toHaveAttribute("aria-readonly", "true");
-    expect(screen.queryByText("Write, press space for AI")).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[contenteditable="true"]'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveAttribute(
+      "aria-readonly",
+      "true",
+    );
+    expect(
+      screen.queryByText("Write, press space for AI"),
+    ).not.toBeInTheDocument();
   });
 
   test("does not show the authoring placeholder when read-only content is empty", async () => {
@@ -151,7 +164,9 @@ describe("EditorPreview", () => {
     );
 
     await waitFor(() => {
-      expect(screen.queryByText("Write, press space for AI")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Write, press space for AI"),
+      ).not.toBeInTheDocument();
     });
   });
 

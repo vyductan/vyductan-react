@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Result404Demo from "@/components/ui/result/demo/404";
+import Result404Demo from "@/components/ui/result/examples/404";
 import { ArrowLeft } from "lucide-react";
 
 export default function ResultExamples() {

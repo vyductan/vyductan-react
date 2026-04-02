@@ -1,12 +1,12 @@
 import { describe, expect, test } from "vitest";
 
+import { normalizeEditorContent } from "./normalize-editor-content";
 import {
   canonicalEditorRenderFixtureNames,
   editorRenderFixtures,
   invalidEditorRenderFixtureNames,
   unsupportedEditorRenderFixtureNames,
 } from "./render-fixtures";
-import { normalizeEditorContent } from "./normalize-editor-content";
 
 describe("normalizeEditorContent", () => {
   test("normalizes canonical fixture objects without changing identity", () => {
@@ -21,7 +21,9 @@ describe("normalizeEditorContent", () => {
     for (const fixtureName of canonicalEditorRenderFixtureNames) {
       const fixture = editorRenderFixtures[fixtureName];
 
-      expect(normalizeEditorContent(fixture.serialized)).toEqual(fixture.content);
+      expect(normalizeEditorContent(fixture.serialized)).toEqual(
+        fixture.content,
+      );
     }
   });
 
@@ -107,9 +109,9 @@ describe("normalizeEditorContent", () => {
     ]);
 
     for (const fixtureName of canonicalEditorRenderFixtureNames) {
-      expect(normalizeEditorContent(editorRenderFixtures[fixtureName].content)).toEqual(
-        editorRenderFixtures[fixtureName].content,
-      );
+      expect(
+        normalizeEditorContent(editorRenderFixtures[fixtureName].content),
+      ).toEqual(editorRenderFixtures[fixtureName].content);
     }
   });
 
@@ -142,7 +144,10 @@ describe("normalizeEditorContent", () => {
   });
 
   test("drops explicit invalid fixtures at the boundary by returning null", () => {
-    expect(invalidEditorRenderFixtureNames).toEqual(["invalidJson", "invalidShape"]);
+    expect(invalidEditorRenderFixtureNames).toEqual([
+      "invalidJson",
+      "invalidShape",
+    ]);
 
     for (const fixtureName of invalidEditorRenderFixtureNames) {
       const fixture = editorRenderFixtures[fixtureName];

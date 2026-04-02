@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import EditorDemo from "@/components/ui/editor/demo/basic";
+import EditorDemo from "@/components/ui/editor/examples/basic";
 
 import { PageContainer } from "@acme/ui/components/layout";
 

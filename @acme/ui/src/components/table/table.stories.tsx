@@ -2,10 +2,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fireEvent, fn, waitFor } from "storybook/test";
 
+import type { ColumnsType } from "./types";
 import DragSortingFullRowDemo from "./examples/drag-sorting-full-row";
 import DragSortingWithHandleDemo from "./examples/drag-sorting-with-handle";
 import { OwnTable as Table } from "./table";
-import type { ColumnsType } from "./types";
 
 interface DataType {
   key: string;
@@ -179,8 +179,12 @@ export const DragSortingFullRow: Story = {
     await step(
       "Dragging a row near the bottom edge does not trigger endless wrapper auto-scroll",
       async () => {
-        const container = canvasElement.querySelector('[data-slot="table-container"]');
-        const wrapper = canvasElement.querySelector('[data-slot="table-scroll-container"]');
+        const container = canvasElement.querySelector(
+          '[data-slot="table-container"]',
+        );
+        const wrapper = canvasElement.querySelector(
+          '[data-slot="table-scroll-container"]',
+        );
         const row = container?.querySelector('tbody tr[data-row-key="1"]');
 
         await expect(container).toBeTruthy();
@@ -245,10 +249,16 @@ export const DragSortingFullRow: Story = {
           }
 
           expect(containerScrollTopSamples).toEqual(
-            Array.from({ length: containerScrollTopSamples.length }, () => initialContainerScrollTop),
+            Array.from(
+              { length: containerScrollTopSamples.length },
+              () => initialContainerScrollTop,
+            ),
           );
           expect(wrapperScrollTopSamples).toEqual(
-            Array.from({ length: wrapperScrollTopSamples.length }, () => initialWrapperScrollTop),
+            Array.from(
+              { length: wrapperScrollTopSamples.length },
+              () => initialWrapperScrollTop,
+            ),
           );
         } finally {
           fireEvent.pointerUp(globalThis.document, {

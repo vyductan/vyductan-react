@@ -10,8 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import DescriptionsBasicDemo from "@/components/ui/descriptions/demo/basic";
-import DescriptionsVerticalDemo from "@/components/ui/descriptions/demo/vertical";
+import DescriptionsBasicDemo from "@/components/ui/descriptions/examples/basic";
+import DescriptionsVerticalDemo from "@/components/ui/descriptions/examples/vertical";
 import { ArrowLeft } from "lucide-react";
 
 export default function DescriptionsExamples() {

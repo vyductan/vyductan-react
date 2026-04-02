@@ -18,9 +18,6 @@ import {
 import { useScroll, useSize } from "ahooks";
 import _ from "lodash";
 
-import { cn } from "../../lib/utils";
-import { Skeleton } from "../../shadcn/skeleton";
-
 import type { AnyObject } from "../_util/type";
 import type { ConfigConsumerProps } from "../config-provider/context";
 import type { SizeType } from "../config-provider/size-context";
@@ -48,6 +45,8 @@ import type {
 } from "./types";
 import scrollTo from "../_util/scroll-to";
 import { devUseWarning } from "../_util/warning";
+import { cn } from "../../lib/utils";
+import { Skeleton } from "../../shadcn/skeleton";
 import { Checkbox } from "../checkbox";
 import { ConfigContext, useComponentConfig } from "../config-provider/context";
 import defaultLocale from "../locale/en-us";

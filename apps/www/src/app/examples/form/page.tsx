@@ -10,10 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import FormAntdDemo from "@/components/ui/form/demo/antd";
-import FormBasicDemo from "@/components/ui/form/demo/basic";
-import FormLayoutMultipleDemo from "@/components/ui/form/demo/layout-multiple";
-import FormShadcnDemo from "@/components/ui/form/demo/shadcn";
+import FormAntdDemo from "@/components/ui/form/examples/antd";
+import FormBasicDemo from "@/components/ui/form/examples/basic";
+import FormLayoutMultipleDemo from "@/components/ui/form/examples/layout-multiple";
+import FormShadcnDemo from "@/components/ui/form/examples/shadcn";
 import { ArrowLeft } from "lucide-react";
 
 export default function DescriptionsExamples() {

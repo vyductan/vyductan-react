@@ -2,12 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table-tooltip-support",
   "title": "Table Tooltip Support",
-  "dependencies": [
-    "@radix-ui/react-tooltip"
-  ],
-  "registryDependencies": [
-    "table-shared-core"
-  ],
+  "dependencies": ["@radix-ui/react-tooltip"],
+  "registryDependencies": ["table-shared-core"],
   "files": [
     {
       "path": "components/tooltip/index.ts",

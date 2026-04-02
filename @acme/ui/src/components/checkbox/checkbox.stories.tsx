@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { JSX } from "react";
 
+import type { CheckboxOptionType } from "./checkbox-group";
 import { Label } from "../label";
 import { ComponentSource } from "../mdx/component-source";
-import type { CheckboxOptionType } from "./checkbox-group";
 import BasicExample from "./examples/basic";
 import { Checkbox } from "./index";
 
@@ -76,8 +76,6 @@ export const Default: Story = {
     />
   ),
 };
-
-
 
 export const Card: Story = {
   render: () => (

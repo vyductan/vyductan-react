@@ -10,11 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import SelectBasicDemo from "@/components/ui/select/demo/basic";
-import SelectColorDemo from "@/components/ui/select/demo/color";
-import SelectControlledValueDemo from "@/components/ui/select/demo/controlled-value";
-import SelectMultipleDemo from "@/components/ui/select/demo/multiple";
-import SelectOptionRenderDemo from "@/components/ui/select/demo/option-render";
+import SelectBasicDemo from "@/components/ui/select/examples/basic";
+import SelectColorDemo from "@/components/ui/select/examples/color";
+import SelectControlledValueDemo from "@/components/ui/select/examples/controlled-value";
+import SelectMultipleDemo from "@/components/ui/select/examples/multiple";
+import SelectOptionRenderDemo from "@/components/ui/select/examples/option-render";
 import { ArrowLeft } from "lucide-react";
 
 export default function SelectExamples() {

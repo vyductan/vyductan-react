@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Plus } from "lucide-react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
+import { Button } from "./button";
 import DisabledDemo from "./examples/disabled";
 import IconDemo from "./examples/icon";
 import LoadingDemo from "./examples/loading";
 import SizesDemo from "./examples/sizes";
 import WithIconDemo from "./examples/with-icon";
-import { Button } from "./button";
 
 const meta = {
   title: "Components/Button",

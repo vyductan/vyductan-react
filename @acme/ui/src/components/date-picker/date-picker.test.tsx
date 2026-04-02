@@ -1,6 +1,14 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import dayjs from "dayjs";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -77,12 +85,7 @@ describe("DatePicker period validation", () => {
   test("commits the start of the selected week", async () => {
     const user = userEvent.setup();
 
-    render(
-      <DatePicker
-        picker="week"
-        defaultValue={dayjs("2024-05-15")}
-      />,
-    );
+    render(<DatePicker picker="week" defaultValue={dayjs("2024-05-15")} />);
 
     const input = screen.getByRole("textbox");
 
@@ -94,7 +97,7 @@ describe("DatePicker period validation", () => {
 
     expect(selectedDay).toBeTruthy();
     if (!selectedDay) {
-      throw new Error('Expected day button for 5/16/2024');
+      throw new Error("Expected day button for 5/16/2024");
     }
     expect(selectedDay).not.toHaveAttribute("disabled");
 
@@ -110,7 +113,7 @@ describe("DatePicker period validation", () => {
 
     expect(currentSelectedDay).toBeTruthy();
     if (!currentSelectedDay) {
-      throw new Error('Expected current day button for 5/16/2024');
+      throw new Error("Expected current day button for 5/16/2024");
     }
     await user.click(currentSelectedDay);
     await user.click(document.body);
@@ -123,21 +126,16 @@ describe("DatePicker period validation", () => {
   test("commits the start of the selected quarter", async () => {
     const user = userEvent.setup();
 
-    render(
-      <DatePicker
-        picker="quarter"
-        defaultValue={dayjs("2024-08-15")}
-      />,
-    );
+    render(<DatePicker picker="quarter" defaultValue={dayjs("2024-08-15")} />);
 
     const input = screen.getByRole("textbox");
 
     await user.click(input);
     await user.click(await screen.findByRole("button", { name: "Aug" }));
 
-    const mayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
-      (element) => element.textContent?.trim() === "May",
-    );
+    const mayOption = [
+      ...document.querySelectorAll<HTMLElement>("[role='button']"),
+    ].find((element) => element.textContent?.trim() === "May");
     expect(mayOption).toBeTruthy();
     if (!mayOption) {
       throw new Error('Expected month option "May"');
@@ -145,9 +143,9 @@ describe("DatePicker period validation", () => {
 
     await user.hover(mayOption);
 
-    const currentMayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
-      (element) => element.textContent?.trim() === "May",
-    );
+    const currentMayOption = [
+      ...document.querySelectorAll<HTMLElement>("[role='button']"),
+    ].find((element) => element.textContent?.trim() === "May");
     expect(currentMayOption).toBeTruthy();
     if (!currentMayOption) {
       throw new Error('Expected current month option "May"');

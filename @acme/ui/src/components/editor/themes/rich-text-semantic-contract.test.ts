@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { editorTheme } from "./editor-theme";
@@ -11,11 +10,11 @@ import {
 
 describe("richTextSemanticContract", () => {
   const editorThemeCss = readFileSync(
-    resolve(import.meta.dirname, "./editor-theme.css"),
+    path.resolve(import.meta.dirname, "./editor-theme.css"),
     "utf8",
   );
   const editorRuntimeCss = readFileSync(
-    resolve(import.meta.dirname, "./editor-theme.runtime.css"),
+    path.resolve(import.meta.dirname, "./editor-theme.runtime.css"),
     "utf8",
   );
 
@@ -117,7 +116,9 @@ describe("richTextSemanticContract", () => {
       checkBlockChecked: expect.any(String),
     });
 
-    expect(richTextSemanticContract).not.toHaveProperty("tableCellActionButton");
+    expect(richTextSemanticContract).not.toHaveProperty(
+      "tableCellActionButton",
+    );
     expect(richTextSemanticContract).not.toHaveProperty("tableCellResizer");
     expect(richTextSemanticContract).not.toHaveProperty("tableCellSelected");
     expect(richTextSemanticContract).not.toHaveProperty("tableSelected");
@@ -141,12 +142,16 @@ describe("richTextSemanticContract", () => {
     expect(editorThemeCss).toContain(".RichTextSemanticContract__code");
     expect(editorThemeCss).toContain(".RichTextSemanticContract__table");
     expect(editorThemeCss).toContain(".RichTextSemanticContract__tableCell");
-    expect(editorThemeCss).toContain(".RichTextSemanticContract__tableCellHeader");
+    expect(editorThemeCss).toContain(
+      ".RichTextSemanticContract__tableCellHeader",
+    );
     expect(editorThemeCss).toContain(".RichTextSemanticContract__tokenComment");
-    expect(editorThemeCss).toContain(".RichTextSemanticContract__tokenFunction");
+    expect(editorThemeCss).toContain(
+      ".RichTextSemanticContract__tokenFunction",
+    );
 
     expect(editorThemeCss).not.toContain(
-      ".ContentEditable__root [data-lexical-editor=\"true\"]",
+      '.ContentEditable__root [data-lexical-editor="true"]',
     );
     expect(editorThemeCss).not.toContain(".Collapsible__");
     expect(editorThemeCss).not.toContain(".editor-image");

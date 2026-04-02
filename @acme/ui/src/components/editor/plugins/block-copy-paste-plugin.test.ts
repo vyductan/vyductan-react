@@ -29,7 +29,7 @@ describe("getSingleParagraphSoftLineBreakCopyHtml", () => {
     expect(
       blockCopyPastePlugin.getSingleParagraphSoftLineBreakCopyHtml(
         `<Age> Any age OK\n<Discount> *0-2 yrs old are free\n3-12 yrs: 2,750 yen disount per child`,
-        '<strong>&lt;Age&gt; Any age OK</strong><br><em>&lt;Discount&gt; *0-2 yrs old are free</em><br><code>3-12 yrs: 2,750 yen disount per child</code>',
+        "<strong>&lt;Age&gt; Any age OK</strong><br><em>&lt;Discount&gt; *0-2 yrs old are free</em><br><code>3-12 yrs: 2,750 yen disount per child</code>",
       ),
     ).toBe(
       '<div style="white-space: break-spaces; word-break: break-word;">&lt;Age&gt; Any age OK\n&lt;Discount&gt; *0-2 yrs old are free\n3-12 yrs: 2,750 yen disount per child</div>',

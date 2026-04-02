@@ -19,8 +19,8 @@ import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
 import { Button } from "../button";
-import { CustomCalendarDayButton } from "../calendar/_components";
 import { Calendar } from "../calendar";
+import { CustomCalendarDayButton } from "../calendar/_components";
 // For typing DayButton props if needed in future (not strictly required below)
 // import type { DayButton as RdpDayButton } from "react-day-picker";
 import { useComponentConfig } from "../config-provider/context";
@@ -141,7 +141,11 @@ const DatePicker = (props: DatePickerProps) => {
           : start.endOf(mode);
       const dates: Dayjs[] = [];
 
-      for (let current = start; !current.isAfter(end, "day"); current = current.add(1, "day")) {
+      for (
+        let current = start;
+        !current.isAfter(end, "day");
+        current = current.add(1, "day")
+      ) {
         dates.push(current);
       }
 
@@ -162,7 +166,9 @@ const DatePicker = (props: DatePickerProps) => {
 
   const isWholePeriodAllowed = React.useCallback(
     (date: Dayjs, mode: "month" | "year" | "week" | "quarter") => {
-      return getPeriodDates(date, mode).every((periodDate) => isDateAllowed(periodDate, mode));
+      return getPeriodDates(date, mode).every((periodDate) =>
+        isDateAllowed(periodDate, mode),
+      );
     },
     [getPeriodDates, isDateAllowed],
   );

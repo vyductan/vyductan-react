@@ -1,5 +1,7 @@
 import React from "react";
+
 import "@testing-library/jest-dom/vitest";
+
 import { cleanup, render } from "@testing-library/react";
 import { de } from "date-fns/locale";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -37,11 +39,12 @@ describe("Calendar locale forwarding", () => {
   });
 
   test("uses locale when building day button data attributes", () => {
-    vi.spyOn(Date.prototype, "toLocaleDateString").mockImplementation(
-      function (this: Date, locale?: Intl.LocalesArgument) {
-        return locale === de.code ? "localized-day" : "default-day";
-      },
-    );
+    vi.spyOn(Date.prototype, "toLocaleDateString").mockImplementation(function (
+      this: Date,
+      locale?: Intl.LocalesArgument,
+    ) {
+      return locale === de.code ? "localized-day" : "default-day";
+    });
 
     render(
       <Calendar

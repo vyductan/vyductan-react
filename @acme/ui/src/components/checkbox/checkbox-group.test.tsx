@@ -14,7 +14,9 @@ afterEach(() => {
   cleanup();
 });
 
-type CheckboxGroupStringProps = React.ComponentProps<typeof CheckboxGroup<string>>;
+type CheckboxGroupStringProps = React.ComponentProps<
+  typeof CheckboxGroup<string>
+>;
 
 const structuredOptions = [
   {
@@ -43,7 +45,8 @@ const renderCheckboxGroup = (props: CheckboxGroupStringProps = {}) =>
 describe("CheckboxGroup", () => {
   test('passing the documented optionVariant="card" input exposes structured option labels through block label slots', () => {
     const { container } = renderCheckboxGroup({
-      options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
+      options:
+        structuredOptions as unknown as CheckboxGroupStringProps["options"],
       optionVariant: "card",
     } as CheckboxGroupStringProps);
 
@@ -58,12 +61,14 @@ describe("CheckboxGroup", () => {
       }),
     ).toBeInTheDocument();
 
-    const labelSlots = container.querySelectorAll('[data-slot="checkbox-label"]');
+    const labelSlots = container.querySelectorAll(
+      '[data-slot="checkbox-label"]',
+    );
 
     expect(labelSlots).toHaveLength(2);
-    labelSlots.forEach((labelSlot) => {
+    for (const labelSlot of labelSlots) {
       expect(labelSlot.tagName).toBe("DIV");
-    });
+    }
   });
 
   test('clicking structured label content still preserves CheckboxGroup onChange semantics when optionVariant="card" is used', async () => {
@@ -71,7 +76,8 @@ describe("CheckboxGroup", () => {
     const onChange = vi.fn();
 
     renderCheckboxGroup({
-      options: structuredOptions as unknown as CheckboxGroupStringProps["options"],
+      options:
+        structuredOptions as unknown as CheckboxGroupStringProps["options"],
       onChange,
       optionVariant: "card",
     } as CheckboxGroupStringProps);

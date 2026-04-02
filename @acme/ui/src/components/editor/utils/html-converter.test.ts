@@ -18,7 +18,10 @@ describe("importDomIntoEditor", () => {
         throw error;
       },
     });
-    const document = new DOMParser().parseFromString("<p>Hello world</p>", "text/html");
+    const document = new DOMParser().parseFromString(
+      "<p>Hello world</p>",
+      "text/html",
+    );
 
     editor.update(
       () => {
@@ -56,7 +59,10 @@ describe("createBrowserHtmlDocument", () => {
 
 describe("tryHtmlDocumentToLexicalContent", () => {
   test("converts a provided Document synchronously", () => {
-    const document = new DOMParser().parseFromString("<blockquote>Quoted</blockquote>", "text/html");
+    const document = new DOMParser().parseFromString(
+      "<blockquote>Quoted</blockquote>",
+      "text/html",
+    );
 
     expect(tryHtmlDocumentToLexicalContent(document)).toMatchObject({
       root: {
@@ -66,31 +72,35 @@ describe("tryHtmlDocumentToLexicalContent", () => {
   });
 
   test("returns null when the editor reports a runtime error through onError", () => {
-    const document = new DOMParser().parseFromString("<p>Broken</p>", "text/html");
+    const document = new DOMParser().parseFromString(
+      "<p>Broken</p>",
+      "text/html",
+    );
 
     expect(
       tryHtmlDocumentToLexicalContent(document, {
-        createEditor: (config) => ({
-          update: () => {
-            if (!config?.onError) {
-              throw new Error("missing onError");
-            }
+        createEditor: (config) =>
+          ({
+            update: () => {
+              if (!config?.onError) {
+                throw new Error("missing onError");
+              }
 
-            config.onError(new Error("runtime boom"));
-          },
-          getEditorState: () => ({
-            toJSON: () => ({
-              root: {
-                type: "root",
-                children: [],
-                direction: "ltr",
-                format: "",
-                indent: 0,
-                version: 1,
-              },
+              config.onError(new Error("runtime boom"));
+            },
+            getEditorState: () => ({
+              toJSON: () => ({
+                root: {
+                  type: "root",
+                  children: [],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  version: 1,
+                },
+              }),
             }),
-          }),
-        }) as never,
+          }) as never,
       }),
     ).toBeNull();
   });
@@ -107,7 +117,10 @@ describe("tryHtmlToLexicalContent", () => {
       const result = await tryHtmlToLexicalContent("<p>Server path</p>", {
         createDocument: async (html) => ({
           window: {
-            document: new originalDOMParser().parseFromString(html, "text/html"),
+            document: new originalDOMParser().parseFromString(
+              html,
+              "text/html",
+            ),
           },
         }),
       });
@@ -123,13 +136,16 @@ describe("tryHtmlToLexicalContent", () => {
   });
 
   test("converts valid server HTML through the async HTML-string resolver", async () => {
-    const result = await tryHtmlToLexicalContent("<p>Async server content</p>", {
-      createDocument: async (html) => ({
-        window: {
-          document: new DOMParser().parseFromString(html, "text/html"),
-        },
-      }),
-    });
+    const result = await tryHtmlToLexicalContent(
+      "<p>Async server content</p>",
+      {
+        createDocument: async (html) => ({
+          window: {
+            document: new DOMParser().parseFromString(html, "text/html"),
+          },
+        }),
+      },
+    );
 
     expect(result).toMatchObject({
       root: {

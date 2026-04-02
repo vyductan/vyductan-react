@@ -429,21 +429,14 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": [
-        "clsx",
-        "iconify-icon",
-        "rc-util",
-        "tailwind-merge"
-      ]
+      "dependencies": ["clsx", "iconify-icon", "rc-util", "tailwind-merge"]
     },
     {
       "name": "table-tooltip-support",
       "title": "Table Tooltip Support",
       "path": "components/tooltip",
       "type": "registry:component",
-      "registryDependencies": [
-        "table-shared-core"
-      ],
+      "registryDependencies": ["table-shared-core"],
       "files": [
         {
           "path": "components/tooltip/index.ts",
@@ -466,18 +459,14 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": [
-        "@radix-ui/react-tooltip"
-      ]
+      "dependencies": ["@radix-ui/react-tooltip"]
     },
     {
       "name": "table-spin-support",
       "title": "Table Spin Support",
       "path": "components/spin",
       "type": "registry:component",
-      "registryDependencies": [
-        "table-shared-core"
-      ],
+      "registryDependencies": ["table-shared-core"],
       "files": [
         {
           "path": "components/spin/index.ts",
@@ -495,18 +484,14 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": [
-        "class-variance-authority"
-      ]
+      "dependencies": ["class-variance-authority"]
     },
     {
       "name": "table-checkbox-support",
       "title": "Table Checkbox Support",
       "path": "components/checkbox",
       "type": "registry:component",
-      "registryDependencies": [
-        "table-shared-core"
-      ],
+      "registryDependencies": ["table-shared-core"],
       "files": [
         {
           "path": "components/checkbox/index.tsx",
@@ -612,9 +597,7 @@
       "title": "Table Pagination Support",
       "path": "components/pagination",
       "type": "registry:component",
-      "registryDependencies": [
-        "table-shared-core"
-      ],
+      "registryDependencies": ["table-shared-core"],
       "files": [
         {
           "path": "components/pagination/index.ts",

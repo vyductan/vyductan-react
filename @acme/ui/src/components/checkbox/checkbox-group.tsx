@@ -7,7 +7,9 @@ import type { CheckboxValueType } from "./group-context";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
 
-export interface CheckboxOptionType<T extends CheckboxValueType = CheckboxValueType> {
+export interface CheckboxOptionType<
+  T extends CheckboxValueType = CheckboxValueType,
+> {
   label: React.ReactNode;
   value: T;
   style?: React.CSSProperties;

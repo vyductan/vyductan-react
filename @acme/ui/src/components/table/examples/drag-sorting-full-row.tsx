@@ -1,26 +1,25 @@
 "use client";
 
+import type { DragEndEvent } from "@dnd-kit/core";
+import type { Modifier } from "@dnd-kit/core/dist/modifiers";
 import type React from "react";
 import { useState } from "react";
-
 import {
   closestCenter,
   DndContext,
   PointerSensor,
-  type DragEndEvent,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import type { Modifier } from "@dnd-kit/core/dist/modifiers";
 import {
-  SortableContext,
   arrayMove,
+  SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
+import type { TableProps } from "@acme/ui/components/table";
 import { Space } from "@acme/ui/components/space";
 import { Table } from "@acme/ui/components/table";
-import type { TableProps } from "@acme/ui/components/table";
 import { Tag } from "@acme/ui/components/tag";
 
 import { TableRowSortable } from "../_components/table-sortable-row";
@@ -124,7 +123,9 @@ const App: React.FC = () => {
     }
 
     setDataSource((currentData) => {
-      const activeIndex = currentData.findIndex((item) => item.key === active.id);
+      const activeIndex = currentData.findIndex(
+        (item) => item.key === active.id,
+      );
       const overIndex = currentData.findIndex((item) => item.key === over.id);
 
       if (activeIndex === -1 || overIndex === -1) {

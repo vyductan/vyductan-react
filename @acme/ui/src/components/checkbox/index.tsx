@@ -2,9 +2,8 @@
 
 import type { XOR } from "ts-xor";
 
-import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
-
 import type { CheckboxProps } from "./checkbox";
+import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 import { Checkbox as InternalCheckbox } from "./checkbox";
 import { CheckboxGroup } from "./checkbox-group";
 

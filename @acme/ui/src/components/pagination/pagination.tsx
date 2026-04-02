@@ -4,13 +4,12 @@ import React from "react";
 import { useMergedState } from "@rc-component/util";
 import KeyCode from "@rc-component/util/es/KeyCode";
 
-import { cn } from "../../lib/utils";
-
 import type { PaginationItemProps } from "./_components";
 import type { SizeChangerRender } from "./_components/page-size-options";
 import type { PagerProps } from "./pager";
 import type { PaginationLocale } from "./types";
 import { Icon } from "../../icons";
+import { cn } from "../../lib/utils";
 import { useComponentConfig } from "../config-provider/context";
 import {
   PaginationContent,

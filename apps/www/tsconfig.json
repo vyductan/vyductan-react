@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": ["ES2023", "dom", "dom.iterable"],
     "jsx": "preserve",
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],

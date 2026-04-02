@@ -9,10 +9,9 @@ import type {
   Table,
 } from "@tanstack/react-table";
 
-import type { Placement } from "../../types";
 import type { Breakpoint } from "../_util/responsive-observer";
-
 import type { AnyObject } from "../_util/type";
+import type { Placement } from "../../types";
 import type { CheckboxProps } from "../checkbox";
 import type { PaginationProps } from "../pagination";
 import type { TooltipProps } from "../tooltip";

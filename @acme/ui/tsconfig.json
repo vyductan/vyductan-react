@@ -36,6 +36,12 @@
       // "@/components/icons/*": ["./src/icons/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.mdx", ".storybook/**/*.ts"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mdx",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }

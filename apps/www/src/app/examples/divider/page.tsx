@@ -10,10 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import DividerHorizontalDemo from "@/components/ui/divider/demo/horizontal";
-import DividerPlainDemo from "@/components/ui/divider/demo/plain";
-import DividerSizeDemo from "@/components/ui/divider/demo/size";
-import DividerVerticalDemo from "@/components/ui/divider/demo/vertital";
+import DividerHorizontalDemo from "@/components/ui/divider/examples/horizontal";
+import DividerPlainDemo from "@/components/ui/divider/examples/plain";
+import DividerSizeDemo from "@/components/ui/divider/examples/size";
+import DividerVerticalDemo from "@/components/ui/divider/examples/vertital";
 import { ArrowLeft } from "lucide-react";
 
 export default function EmptyExamples() {

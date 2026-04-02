@@ -1,12 +1,12 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 
+import { Icon } from "../../../icons";
+import { cn } from "../../../lib/utils";
 import {
   buttonColorVariants,
   buttonVariants,
 } from "../../button/button-variants";
-import { Icon } from "../../../icons";
-import { cn } from "../../../lib/utils";
 
 function PaginationRoot({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -43,8 +43,7 @@ type PaginationLinkProps = {
   disabled?: boolean;
   size?: "small" | "middle" | "large";
   shape?: "default" | "icon" | "circle";
-} &
-  React.ComponentProps<"a"> & {
+} & React.ComponentProps<"a"> & {
     asChild?: boolean;
   };
 

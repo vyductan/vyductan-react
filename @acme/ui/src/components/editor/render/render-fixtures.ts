@@ -12,7 +12,9 @@ import type {
   UnsupportedEditorRenderFixtureName,
 } from "./render-types";
 
-const createRoot = (children: EditorRenderContent["root"]["children"]): EditorRenderContent => ({
+const createRoot = (
+  children: EditorRenderContent["root"]["children"],
+): EditorRenderContent => ({
   root: {
     type: "root",
     direction: null,
@@ -59,7 +61,9 @@ const codeHighlight = (value: string, highlightType: string | null) => ({
   version: 1,
 });
 
-const paragraph = (...children: EditorRenderInlineNode[]): EditorRenderParagraphNode => ({
+const paragraph = (
+  ...children: EditorRenderInlineNode[]
+): EditorRenderParagraphNode => ({
   type: "paragraph" as const,
   direction: null,
   format: "",
@@ -68,7 +72,10 @@ const paragraph = (...children: EditorRenderInlineNode[]): EditorRenderParagraph
   children,
 });
 
-const heading = (tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", content: string) => ({
+const heading = (
+  tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
+  content: string,
+) => ({
   type: "heading" as const,
   tag,
   direction: null,
@@ -87,7 +94,11 @@ const quote = (content: string) => ({
   children: [text(content)],
 });
 
-const link = (type: "link" | "autolink", url: string, content: string): EditorRenderLinkNode => ({
+const link = (
+  type: "link" | "autolink",
+  url: string,
+  content: string,
+): EditorRenderLinkNode => ({
   type,
   url,
   rel: null,
@@ -204,7 +215,11 @@ const unsupportedRoot = (type: string) => ({
         format: "",
         indent: 0,
         version: 1,
-        children: [paragraph(text("Unsupported descendant text should not be salvaged."))],
+        children: [
+          paragraph(
+            text("Unsupported descendant text should not be salvaged."),
+          ),
+        ],
       },
     ],
   },
@@ -214,9 +229,17 @@ const canonicalFixtures = {
   paragraph: createRoot([paragraph(text("Canonical paragraph content."))]),
   heading: createRoot([heading("h2", "Canonical heading content")]),
   quote: createRoot([quote("Canonical quote content.")]),
-  link: createRoot([paragraph(link("link", "https://example.com", "Canonical link"))]),
+  link: createRoot([
+    paragraph(link("link", "https://example.com", "Canonical link")),
+  ]),
   autolink: createRoot([
-    paragraph(link("autolink", "https://example.com/autolink", "https://example.com/autolink")),
+    paragraph(
+      link(
+        "autolink",
+        "https://example.com/autolink",
+        "https://example.com/autolink",
+      ),
+    ),
   ]),
   bulletList: createRoot([
     list("bullet", "ul", [
@@ -235,7 +258,9 @@ const canonicalFixtures = {
   ]),
   checkList: createRoot([
     list("check", "ul", [
-      listItem([paragraph(text("Unchecked checklist item"))], { checked: false }),
+      listItem([paragraph(text("Unchecked checklist item"))], {
+        checked: false,
+      }),
       listItem([paragraph(text("Checked checklist item"))], { checked: true }),
     ]),
   ]),
@@ -252,10 +277,19 @@ const canonicalFixtures = {
     ),
   ]),
   formattedText: createRoot([
-    paragraph(text("Bold", 1), text(" italic", 2), text(" underline", 8), text(" plain")),
+    paragraph(
+      text("Bold", 1),
+      text(" italic", 2),
+      text(" underline", 8),
+      text(" plain"),
+    ),
   ]),
-  inlineCode: createRoot([paragraph(text("Prefix "), inlineCode("const value = 1"), text(" suffix"))]),
-  softBreak: createRoot([paragraph(text("Line one"), linebreak(), text("Line two"))]),
+  inlineCode: createRoot([
+    paragraph(text("Prefix "), inlineCode("const value = 1"), text(" suffix")),
+  ]),
+  softBreak: createRoot([
+    paragraph(text("Line one"), linebreak(), text("Line two")),
+  ]),
 } satisfies Record<CanonicalEditorRenderFixtureName, EditorRenderContent>;
 
 const unsupportedFixtures = {
@@ -401,10 +435,8 @@ export const editorRenderSourceFixtures = {
     html: "<pre><code>const answer = 42;</code></pre>",
   },
   table: {
-    markdown:
-      "| Header A | Header B |\n| --- | --- |\n| Cell A1 | Cell B1 |",
-    html:
-      "<table><thead><tr><th>Header A</th><th>Header B</th></tr></thead><tbody><tr><td>Cell A1</td><td>Cell B1</td></tr></tbody></table>",
+    markdown: "| Header A | Header B |\n| --- | --- |\n| Cell A1 | Cell B1 |",
+    html: "<table><thead><tr><th>Header A</th><th>Header B</th></tr></thead><tbody><tr><td>Cell A1</td><td>Cell B1</td></tr></tbody></table>",
   },
   horizontalRule: {
     markdown: "Paragraph before\n\n---\n\nParagraph after",

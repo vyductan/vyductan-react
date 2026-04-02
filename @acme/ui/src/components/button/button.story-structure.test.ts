@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
+import path from "node:path";
 import { expect, test } from "vitest";
 
 const reusedVisualStories = [
@@ -32,9 +31,16 @@ const reusedVisualStories = [
 ] as const;
 
 test("button visual stories reuse shared example components", () => {
-  const storiesSource = readFileSync(resolve(import.meta.dirname, "./button.stories.tsx"), "utf8");
+  const storiesSource = readFileSync(
+    path.resolve(import.meta.dirname, "./button.stories.tsx"),
+    "utf8",
+  );
 
-  for (const { importStatement, storyName, renderPattern } of reusedVisualStories) {
+  for (const {
+    importStatement,
+    storyName,
+    renderPattern,
+  } of reusedVisualStories) {
     expect(storiesSource).toContain(importStatement);
     expect(storiesSource).toContain(`export const ${storyName}: Story = {`);
     expect(storiesSource).toContain(renderPattern);

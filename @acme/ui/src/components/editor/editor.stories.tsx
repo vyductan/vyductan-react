@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { fn } from "storybook/test";
 
-import PlaygroundDemo from "./examples/playground";
 import { Editor } from "./editor";
+import PlaygroundDemo from "./examples/playground";
 
 const meta = {
   title: "Components/Editor",

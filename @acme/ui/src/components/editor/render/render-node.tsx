@@ -1,9 +1,8 @@
-import { Fragment, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { Fragment } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import { sanitizeUrl } from "../utils/url";
-import { richTextSemanticContract } from "../themes/rich-text-semantic-contract";
 import type {
   EditorRenderCheckBlockNode,
   EditorRenderCodeHighlightNode,
@@ -16,6 +15,8 @@ import type {
   EditorRenderTableCellNode,
   EditorRenderTextNode,
 } from "./render-types";
+import { richTextSemanticContract } from "../themes/rich-text-semantic-contract";
+import { sanitizeUrl } from "../utils/url";
 
 const TEXT_FORMAT_BOLD = 1;
 const TEXT_FORMAT_ITALIC = 1 << 1;
@@ -25,18 +26,25 @@ const TEXT_FORMAT_CODE = 1 << 4;
 const TEXT_FORMAT_SUBSCRIPT = 1 << 5;
 const TEXT_FORMAT_SUPERSCRIPT = 1 << 6;
 
-export function renderRootNodes(nodes: EditorRenderContent["root"]["children"]): ReactNode[] {
+export function renderRootNodes(
+  nodes: EditorRenderContent["root"]["children"],
+): ReactNode[] {
   return nodes.map((node, index) => renderNode(node, String(index), 0));
 }
 
-export function renderNode(node: EditorRenderNode, key: string, depth = 0): ReactNode {
+export function renderNode(
+  node: EditorRenderNode,
+  key: string,
+  depth = 0,
+): ReactNode {
   switch (node.type) {
-    case "paragraph":
+    case "paragraph": {
       return (
         <p key={key} className={richTextSemanticContract.paragraph}>
           {renderInlineChildren(node.children, `${key}-child`)}
         </p>
       );
+    }
     case "heading": {
       const Tag = node.tag;
       return (
@@ -45,67 +53,98 @@ export function renderNode(node: EditorRenderNode, key: string, depth = 0): Reac
         </Tag>
       );
     }
-    case "quote":
+    case "quote": {
       return (
         <blockquote key={key} className={richTextSemanticContract.quote}>
-          {node.children.map((child, index) => renderNode(child, `${key}-child-${index}`, depth))}
+          {node.children.map((child, index) =>
+            renderNode(child, `${key}-child-${index}`, depth),
+          )}
         </blockquote>
       );
+    }
     case "link":
-    case "autolink":
+    case "autolink": {
       return renderLinkNode(node, key);
-    case "list":
+    }
+    case "list": {
       return renderListNode(node, key, depth);
-    case "listitem":
+    }
+    case "listitem": {
       return renderListItemNode(node, key, depth);
-    case "check-block":
+    }
+    case "check-block": {
       return renderCheckBlockNode(node, key);
-    case "code":
+    }
+    case "code": {
       return (
         <pre key={key}>
           <code className={richTextSemanticContract.code}>
-            {node.children.map((child, index) => renderCodeChild(child, `${key}-${index}`))}
+            {node.children.map((child, index) =>
+              renderCodeChild(child, `${key}-${index}`),
+            )}
           </code>
         </pre>
       );
-    case "horizontalrule":
+    }
+    case "horizontalrule": {
       return <hr key={key} className={richTextSemanticContract.hr} />;
-    case "table":
+    }
+    case "table": {
       return (
         <table key={key} className={richTextSemanticContract.table}>
           <tbody>
-            {node.children.map((child, index) => renderNode(child, `${key}-${index}`, depth))}
+            {node.children.map((child, index) =>
+              renderNode(child, `${key}-${index}`, depth),
+            )}
           </tbody>
         </table>
       );
-    case "tablerow":
+    }
+    case "tablerow": {
       return (
         <tr key={key}>
-          {node.children.map((child, index) => renderNode(child, `${key}-${index}`, depth))}
+          {node.children.map((child, index) =>
+            renderNode(child, `${key}-${index}`, depth),
+          )}
         </tr>
       );
-    case "tablecell":
+    }
+    case "tablecell": {
       return renderTableCellNode(node, key);
-    case "text":
+    }
+    case "text": {
       return renderTextNode(node, key);
-    case "linebreak":
+    }
+    case "linebreak": {
       return <br key={key} />;
-    case "code-highlight":
+    }
+    case "code-highlight": {
       return renderCodeHighlightNode(node, key);
-    default:
+    }
+    default: {
       return null;
+    }
   }
 }
 
-function renderInlineChildren(children: EditorRenderInlineNode[], keyPrefix: string): ReactNode[] {
-  return children.map((child, index) => renderNode(child, `${keyPrefix}-${index}`));
+function renderInlineChildren(
+  children: EditorRenderInlineNode[],
+  keyPrefix: string,
+): ReactNode[] {
+  return children.map((child, index) =>
+    renderNode(child, `${keyPrefix}-${index}`),
+  );
 }
 
 function renderLinkNode(node: EditorRenderLinkNode, key: string): ReactNode {
   const sanitizedUrl = sanitizeUrl(node.url);
 
   if (sanitizedUrl === "about:blank") {
-    return <Fragment key={key}>{renderInlineChildren(node.children, `${key}-child`)}</Fragment>;
+    return (
+      <Fragment key={key}>
+        {renderInlineChildren(node.children, `${key}-child`)}
+      </Fragment>
+    );
   }
 
   return (
@@ -122,7 +161,11 @@ function renderLinkNode(node: EditorRenderLinkNode, key: string): ReactNode {
   );
 }
 
-function renderListNode(node: EditorRenderListNode, key: string, depth: number): ReactNode {
+function renderListNode(
+  node: EditorRenderListNode,
+  key: string,
+  depth: number,
+): ReactNode {
   const Tag = node.tag;
   const listClassName =
     node.tag === "ol"
@@ -142,13 +185,23 @@ function renderListNode(node: EditorRenderListNode, key: string, depth: number):
   const items = coalesceNestedListItems(node.children);
 
   return (
-    <Tag key={key} className={listClassName} start={node.tag === "ol" ? node.start : undefined}>
-      {items.map((child, index) => renderListItemNode(child, `${key}-${index}`, depth))}
+    <Tag
+      key={key}
+      className={listClassName}
+      start={node.tag === "ol" ? node.start : undefined}
+    >
+      {items.map((child, index) =>
+        renderListItemNode(child, `${key}-${index}`, depth),
+      )}
     </Tag>
   );
 }
 
-function renderListItemNode(node: EditorRenderListItemNode, key: string, depth: number): ReactNode {
+function renderListItemNode(
+  node: EditorRenderListItemNode,
+  key: string,
+  depth: number,
+): ReactNode {
   const isChecklistItem = typeof node.checked === "boolean";
   const checkboxLabel = isChecklistItem ? getListItemLabel(node) : undefined;
   const className = cn(
@@ -176,7 +229,10 @@ function renderListItemNode(node: EditorRenderListItemNode, key: string, depth: 
   );
 }
 
-function renderCheckBlockNode(node: EditorRenderCheckBlockNode, key: string): ReactNode {
+function renderCheckBlockNode(
+  node: EditorRenderCheckBlockNode,
+  key: string,
+): ReactNode {
   const checkboxLabel = getInlineText(node.children);
 
   return (
@@ -194,8 +250,14 @@ function renderCheckBlockNode(node: EditorRenderCheckBlockNode, key: string): Re
         readOnly
         type="checkbox"
       />
-      <span aria-hidden="true" className={richTextSemanticContract.checkBlockIcon} data-check-icon />
-      <span data-lexical-text="true">{renderInlineChildren(node.children, `${key}-child`)}</span>
+      <span
+        aria-hidden="true"
+        className={richTextSemanticContract.checkBlockIcon}
+        data-check-icon
+      />
+      <span data-lexical-text="true">
+        {renderInlineChildren(node.children, `${key}-child`)}
+      </span>
     </div>
   );
 }
@@ -214,8 +276,14 @@ function renderListItemChildren(
     }
 
     renderedChildren.push(
-      <p key={`${key}-paragraph-${renderedChildren.length}`} className={richTextSemanticContract.paragraph}>
-        {renderInlineChildren(inlineBuffer, `${key}-inline-${renderedChildren.length}`)}
+      <p
+        key={`${key}-paragraph-${renderedChildren.length}`}
+        className={richTextSemanticContract.paragraph}
+      >
+        {renderInlineChildren(
+          inlineBuffer,
+          `${key}-inline-${renderedChildren.length}`,
+        )}
       </p>,
     );
     inlineBuffer = [];
@@ -224,13 +292,21 @@ function renderListItemChildren(
   for (const child of children) {
     if (child.type === "list") {
       flushInlineBuffer();
-      renderedChildren.push(renderListNode(child, `${key}-list-${renderedChildren.length}`, depth + 1));
+      renderedChildren.push(
+        renderListNode(
+          child,
+          `${key}-list-${renderedChildren.length}`,
+          depth + 1,
+        ),
+      );
       continue;
     }
 
     if (child.type === "paragraph") {
       flushInlineBuffer();
-      renderedChildren.push(renderNode(child, `${key}-paragraph-${renderedChildren.length}`, depth));
+      renderedChildren.push(
+        renderNode(child, `${key}-paragraph-${renderedChildren.length}`, depth),
+      );
       continue;
     }
 
@@ -241,33 +317,40 @@ function renderListItemChildren(
   return renderedChildren;
 }
 
-function coalesceNestedListItems(items: EditorRenderListItemNode[]): EditorRenderListItemNode[] {
-  return items.reduce<EditorRenderListItemNode[]>((accumulator, item) => {
+function coalesceNestedListItems(
+  items: EditorRenderListItemNode[],
+): EditorRenderListItemNode[] {
+  const coalescedItems: EditorRenderListItemNode[] = [];
+
+  for (const item of items) {
     if (
       item.children.length === 1 &&
       item.children[0]?.type === "list" &&
-      accumulator.length > 0
+      coalescedItems.length > 0
     ) {
-      const previousItem = accumulator[accumulator.length - 1];
+      const previousItem = coalescedItems.at(-1);
 
       if (!previousItem) {
-        return accumulator;
+        continue;
       }
 
-      accumulator[accumulator.length - 1] = {
+      coalescedItems[coalescedItems.length - 1] = {
         ...previousItem,
         children: [...previousItem.children, item.children[0]],
       };
-
-      return accumulator;
+      continue;
     }
 
-    accumulator.push(item);
-    return accumulator;
-  }, []);
+    coalescedItems.push(item);
+  }
+
+  return coalescedItems;
 }
 
-function renderTableCellNode(node: EditorRenderTableCellNode, key: string): ReactNode {
+function renderTableCellNode(
+  node: EditorRenderTableCellNode,
+  key: string,
+): ReactNode {
   const Tag = node.headerState > 0 ? "th" : "td";
   const className =
     node.headerState > 0
@@ -280,15 +363,24 @@ function renderTableCellNode(node: EditorRenderTableCellNode, key: string): Reac
       className={className}
       colSpan={node.colSpan}
       rowSpan={node.rowSpan}
-      style={node.backgroundColor ? { backgroundColor: node.backgroundColor } : undefined}
+      style={
+        node.backgroundColor
+          ? { backgroundColor: node.backgroundColor }
+          : undefined
+      }
     >
-      {node.children.map((child, index) => renderNode(child, `${key}-${index}`))}
+      {node.children.map((child, index) =>
+        renderNode(child, `${key}-${index}`),
+      )}
     </Tag>
   );
 }
 
 function renderCodeChild(
-  child: EditorRenderCodeHighlightNode | EditorRenderTextNode | { type: "linebreak"; version: number },
+  child:
+    | EditorRenderCodeHighlightNode
+    | EditorRenderTextNode
+    | { type: "linebreak"; version: number },
   key: string,
 ): ReactNode {
   if (child.type === "linebreak") {
@@ -302,7 +394,10 @@ function renderCodeChild(
   return <span key={key}>{child.text}</span>;
 }
 
-function renderCodeHighlightNode(node: EditorRenderCodeHighlightNode, key: string): ReactNode {
+function renderCodeHighlightNode(
+  node: EditorRenderCodeHighlightNode,
+  key: string,
+): ReactNode {
   const className = node.highlightType
     ? richTextSemanticContract.codeHighlight[
         node.highlightType as keyof typeof richTextSemanticContract.codeHighlight
@@ -335,7 +430,10 @@ function renderTextNode(node: EditorRenderTextNode, key: string): ReactNode {
   ) {
     hasMarkup = true;
     content = (
-      <span className={richTextSemanticContract.text.underlineStrikethrough} key={`${key}-us`}>
+      <span
+        className={richTextSemanticContract.text.underlineStrikethrough}
+        key={`${key}-us`}
+      >
         {content}
       </span>
     );
@@ -404,15 +502,19 @@ function getInlineText(children: EditorRenderInlineNode[]): string {
     .map((child) => {
       switch (child.type) {
         case "text":
-        case "code-highlight":
+        case "code-highlight": {
           return child.text;
-        case "linebreak":
+        }
+        case "linebreak": {
           return " ";
+        }
         case "link":
-        case "autolink":
+        case "autolink": {
           return getInlineText(child.children);
-        default:
+        }
+        default: {
           return "";
+        }
       }
     })
     .join("")

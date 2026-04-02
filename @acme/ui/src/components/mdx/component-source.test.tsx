@@ -1,10 +1,13 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import React from "react";
+import path from "node:path";
+import type React from "react";
 
 import "@testing-library/jest-dom/vitest";
+
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
+
+import { ComponentSource } from "./component-source";
 
 vi.mock("@acme/ui/components/card", () => ({
   Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -25,15 +28,18 @@ vi.mock("./collapsible-code-block", () => ({
   ),
 }));
 
-import { ComponentSource } from "./component-source";
-
 function ExampleComponent() {
   return <div>example</div>;
 }
 
 describe("ComponentSource", () => {
   test("passes actual source code content to the code block instead of the example file path", () => {
-    render(<ComponentSource src="button/examples/sizes.tsx" __comp__={ExampleComponent} />);
+    render(
+      <ComponentSource
+        src="button/examples/sizes.tsx"
+        __comp__={ExampleComponent}
+      />,
+    );
 
     expect(screen.getByTestId("language")).toHaveTextContent("tsx");
     expect(screen.getByTestId("content").textContent).toContain(
@@ -46,7 +52,7 @@ describe("ComponentSource", () => {
 
   test("table docs reference the renamed expand example source path", () => {
     const tableDocsSource = readFileSync(
-      resolve(import.meta.dirname, "../table/table.mdx"),
+      path.resolve(import.meta.dirname, "../table/table.mdx"),
       "utf8",
     );
 
@@ -54,22 +60,24 @@ describe("ComponentSource", () => {
       'import TableExpandableDemo from "./examples/expand";',
     );
     expect(tableDocsSource).toContain('src="table/examples/expand.tsx"');
-    expect(tableDocsSource).not.toContain('src="table/examples/expandable.tsx"');
+    expect(tableDocsSource).not.toContain(
+      'src="table/examples/expandable.tsx"',
+    );
   });
 
   test("component docs infrastructure no longer references legacy example directories", () => {
-    const componentsRoot = resolve(import.meta.dirname, "..");
+    const componentsRoot = path.resolve(import.meta.dirname, "..");
     const filesToCheck = [
-      resolve(import.meta.dirname, "./component-source.tsx"),
-      resolve(import.meta.dirname, "./component-source.test.tsx"),
-      resolve(componentsRoot, "button/button.docs-config.test.ts"),
-      resolve(componentsRoot, "button/button.story-structure.test.ts"),
-      resolve(componentsRoot, "editor/editor.story-structure.test.ts"),
-      resolve(componentsRoot, "button/button.stories.tsx"),
-      resolve(componentsRoot, "table/table.stories.tsx"),
-      resolve(componentsRoot, "form/form.stories.tsx"),
-      resolve(componentsRoot, "menu/menu.test.tsx"),
-      resolve(componentsRoot, "editor/editor.stories.tsx"),
+      path.resolve(import.meta.dirname, "./component-source.tsx"),
+      path.resolve(import.meta.dirname, "./component-source.test.tsx"),
+      path.resolve(componentsRoot, "button/button.docs-config.test.ts"),
+      path.resolve(componentsRoot, "button/button.story-structure.test.ts"),
+      path.resolve(componentsRoot, "editor/editor.story-structure.test.ts"),
+      path.resolve(componentsRoot, "button/button.stories.tsx"),
+      path.resolve(componentsRoot, "table/table.stories.tsx"),
+      path.resolve(componentsRoot, "form/form.stories.tsx"),
+      path.resolve(componentsRoot, "menu/menu.test.tsx"),
+      path.resolve(componentsRoot, "editor/editor.stories.tsx"),
     ];
 
     const legacyDirectorySegment = `/${"demo"}/`;
@@ -89,7 +97,9 @@ describe("ComponentSource", () => {
       }
 
       expect(entry.name).not.toBe("demo");
-      expect(readdirSync(resolve(componentsRoot, entry.name))).not.toContain("demo");
+      expect(
+        readdirSync(path.resolve(componentsRoot, entry.name)),
+      ).not.toContain("demo");
     }
   });
 });

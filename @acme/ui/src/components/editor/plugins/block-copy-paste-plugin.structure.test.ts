@@ -1,11 +1,10 @@
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 
 describe("BlockCopyPastePlugin structure", () => {
   const pluginSource = readFileSync(
-    resolve(import.meta.dirname, "./block-copy-paste-plugin.tsx"),
+    path.resolve(import.meta.dirname, "./block-copy-paste-plugin.tsx"),
     "utf8",
   );
 
@@ -13,19 +12,19 @@ describe("BlockCopyPastePlugin structure", () => {
     expect(pluginSource).toContain("if (!$isRangeSelection(selection)) {");
     expect(pluginSource).toContain("if (!selection.isCollapsed()) {");
     expect(pluginSource).toContain(
-      'const clipboardData = $getClipboardDataFromSelection(currentSelection);',
+      "const clipboardData = $getClipboardDataFromSelection(currentSelection);",
     );
     expect(pluginSource).toContain(
-      'setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);',
+      "setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);",
     );
   });
 
   test("selected range cut is normalized before removing the selection", () => {
     expect(pluginSource).toContain(
-      'const clipboardData = $getClipboardDataFromSelection(currentSelection);',
+      "const clipboardData = $getClipboardDataFromSelection(currentSelection);",
     );
     expect(pluginSource).toContain(
-      'setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);\n            currentSelection.removeText();',
+      "setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);\n            currentSelection.removeText();",
     );
   });
 });

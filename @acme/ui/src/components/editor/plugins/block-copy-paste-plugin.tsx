@@ -35,7 +35,7 @@ export function getSingleParagraphSoftLineBreakCopyHtml(
   text: string,
   html: string,
 ): string {
-  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const normalizedText = text.replaceAll(/\r\n?/g, "\n");
   if (
     !html ||
     !normalizedText.includes("\n") ||
@@ -62,7 +62,7 @@ export function getSingleParagraphSoftLineBreakCopyHtml(
       return html;
     }
   } else {
-    const topLevelChildren = Array.from(document.body.children);
+    const topLevelChildren = [...document.body.children];
     if (
       !document.body.querySelector("br") ||
       document.body.querySelector(SOFT_LINEBREAK_BLOCK_SELECTOR) ||
@@ -84,7 +84,7 @@ export function getSingleParagraphSoftLineBreakCopyHtml(
 
 function getClipboardNodePlainText(node: ChildNode): string {
   if (node.nodeType === Node.TEXT_NODE) {
-    return node.textContent?.replace(/\r\n?/g, "\n") ?? "";
+    return node.textContent?.replaceAll(/\r\n?/g, "\n") ?? "";
   }
 
   if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -96,30 +96,42 @@ function getClipboardNodePlainText(node: ChildNode): string {
     return "\n";
   }
 
-  return Array.from(element.childNodes).map(getClipboardNodePlainText).join("");
+  return [...element.childNodes]
+    .map((childNode) => getClipboardNodePlainText(childNode))
+    .join("");
 }
 
-export function getMultiParagraphCopyPlainText(text: string, html: string): string {
+export function getMultiParagraphCopyPlainText(
+  text: string,
+  html: string,
+): string {
   if (!html) {
     return text;
   }
 
-  const normalizedText = text.replace(/\r\n?/g, "\n");
+  const normalizedText = text.replaceAll(/\r\n?/g, "\n");
   if (!normalizedText.includes("\n") || normalizedText.includes("\n\n")) {
     return normalizedText;
   }
 
   const document = new DOMParser().parseFromString(html, "text/html");
-  const topLevelBlocks = Array.from(document.body.children).filter((element) =>
+  const topLevelBlocks = [...document.body.children].filter((element) =>
     element.matches(MULTI_PARAGRAPH_TOP_LEVEL_SELECTOR),
   );
 
-  if (topLevelBlocks.length < 2 || topLevelBlocks.length !== document.body.children.length) {
+  if (
+    topLevelBlocks.length < 2 ||
+    topLevelBlocks.length !== document.body.children.length
+  ) {
     return normalizedText;
   }
 
   return topLevelBlocks
-    .map((element) => Array.from(element.childNodes).map(getClipboardNodePlainText).join(""))
+    .map((element) =>
+      [...element.childNodes]
+        .map((childNode) => getClipboardNodePlainText(childNode))
+        .join(""),
+    )
     .join("\n\n");
 }
 
@@ -149,16 +161,21 @@ export function BlockCopyPastePlugin(): null {
               return;
             }
 
-            const clipboardData = $getClipboardDataFromSelection(currentSelection);
-            clipboardData["text/html"] = getSingleParagraphSoftLineBreakCopyHtml(
-              clipboardData["text/plain"],
-              clipboardData["text/html"] ?? "",
-            );
+            const clipboardData =
+              $getClipboardDataFromSelection(currentSelection);
+            clipboardData["text/html"] =
+              getSingleParagraphSoftLineBreakCopyHtml(
+                clipboardData["text/plain"],
+                clipboardData["text/html"] ?? "",
+              );
             clipboardData["text/plain"] = getMultiParagraphCopyPlainText(
               clipboardData["text/plain"],
               clipboardData["text/html"] ?? "",
             );
-            setLexicalClipboardDataTransfer(clipboardDataTransfer, clipboardData);
+            setLexicalClipboardDataTransfer(
+              clipboardDataTransfer,
+              clipboardData,
+            );
           });
 
           return true;
@@ -268,16 +285,21 @@ export function BlockCopyPastePlugin(): null {
               return;
             }
 
-            const clipboardData = $getClipboardDataFromSelection(currentSelection);
-            clipboardData["text/html"] = getSingleParagraphSoftLineBreakCopyHtml(
-              clipboardData["text/plain"],
-              clipboardData["text/html"] ?? "",
-            );
+            const clipboardData =
+              $getClipboardDataFromSelection(currentSelection);
+            clipboardData["text/html"] =
+              getSingleParagraphSoftLineBreakCopyHtml(
+                clipboardData["text/plain"],
+                clipboardData["text/html"] ?? "",
+              );
             clipboardData["text/plain"] = getMultiParagraphCopyPlainText(
               clipboardData["text/plain"],
               clipboardData["text/html"] ?? "",
             );
-            setLexicalClipboardDataTransfer(clipboardDataTransfer, clipboardData);
+            setLexicalClipboardDataTransfer(
+              clipboardDataTransfer,
+              clipboardData,
+            );
             currentSelection.removeText();
           });
 

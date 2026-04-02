@@ -123,10 +123,12 @@ export const PickerModes: Story = {
       const input = canvas.getByPlaceholderText("Week Picker");
       await userEvent.click(input);
 
-      const day = document.querySelector<HTMLButtonElement>('[data-day="5/16/2024"]');
+      const day = document.querySelector<HTMLButtonElement>(
+        '[data-day="5/16/2024"]',
+      );
       await expect(day).toBeTruthy();
       if (!day) {
-        throw new Error('Expected day button for 5/16/2024');
+        throw new Error("Expected day button for 5/16/2024");
       }
       await userEvent.hover(day);
       await expect(input).toHaveValue("2024-05-12");
@@ -136,7 +138,7 @@ export const PickerModes: Story = {
       );
       await expect(currentDay).toBeTruthy();
       if (!currentDay) {
-        throw new Error('Expected current day button for 5/16/2024');
+        throw new Error("Expected current day button for 5/16/2024");
       }
       await userEvent.click(currentDay);
       await userEvent.click(document.body);
@@ -153,18 +155,18 @@ export const PickerModes: Story = {
       });
       await userEvent.click(monthButton);
 
-      const mayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
-        (element) => element.textContent?.trim() === "May",
-      );
+      const mayOption = [
+        ...document.querySelectorAll<HTMLElement>("[role='button']"),
+      ].find((element) => element.textContent?.trim() === "May");
       await expect(mayOption).toBeTruthy();
       if (!mayOption) {
         throw new Error('Expected month option "May"');
       }
       await userEvent.hover(mayOption);
 
-      const currentMayOption = [...document.querySelectorAll<HTMLElement>("[role='button']")].find(
-        (element) => element.textContent?.trim() === "May",
-      );
+      const currentMayOption = [
+        ...document.querySelectorAll<HTMLElement>("[role='button']"),
+      ].find((element) => element.textContent?.trim() === "May");
       await expect(currentMayOption).toBeTruthy();
       if (!currentMayOption) {
         throw new Error('Expected current month option "May"');
