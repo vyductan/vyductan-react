@@ -212,25 +212,26 @@ test("table registry pagination support keeps local pagination imports", () => {
   expect(pagination).toContain('from "../../icons"');
 });
 
-test("table registry page-size options use the local select wrapper", () => {
+test("table registry page-size options use direct shadcn select imports", () => {
   const content = readRegistryFileContent(
     "table",
     "components/pagination/_components/page-size-options.tsx",
   );
 
-  expect(content).toContain('from "../../select"');
+  expect(content).toContain('from "@acme/ui/components/select"');
 });
 
-test("table registry page-size options resolve local select wrapper artifacts", () => {
-  const select = readRegistryFileContent("table", "components/select/index.tsx");
+test("table registry page-size options do not emit a select bridge artifact", () => {
   const { unresolvedRelativeImports } = collectRegistryImportIssues("table");
 
-  expect(select).toContain('from "../../shadcn/select"');
+  expect(() =>
+    readRegistryFileContent("table", "components/select/index.tsx"),
+  ).toThrowError("Missing registry file: components/select/index.tsx");
   expect(
     unresolvedRelativeImports.filter(
       (issue) =>
         issue ===
-          "components/pagination/_components/page-size-options.tsx -> ../../select" ||
+          "components/pagination/_components/page-size-options.tsx -> ../../shadcn/select" ||
         issue.startsWith("components/select/"),
     ),
   ).toEqual([]);

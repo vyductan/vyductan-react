@@ -652,11 +652,6 @@
           "type": "registry:file"
         },
         {
-          "path": "components/select/registry.tsx",
-          "target": "components/select/index.tsx",
-          "type": "registry:file"
-        },
-        {
           "path": "shadcn/select.tsx",
           "target": "shadcn/select.tsx",
           "type": "registry:file"

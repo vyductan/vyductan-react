@@ -1,6 +1,3 @@
-// Keep page-size options on the local components/select entry.
-// The source runtime still uses the full wrapper, while registry artifacts remap this
-// path to a closure-safe primitive export so copied files stay self-contained.
 import {
   Select,
   SelectContent,
@@ -8,7 +5,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../select";
+} from "@acme/ui/components/select";
 
 import type { PaginationLocale } from "../types";
 
