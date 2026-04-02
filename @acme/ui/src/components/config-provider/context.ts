@@ -62,6 +62,10 @@ export interface ComponentStyleConfig {
 type SemanticClassNames = Record<string, string>;
 type SemanticStyles = Record<string, React.CSSProperties>;
 type AllowClearConfig = boolean | { clearIcon?: React.ReactNode };
+
+// Keep these config shapes local instead of deriving them from button/form/tag
+// modules. This context is copied into registry artifacts in isolation, so
+// importing those modules here would reintroduce broader transitive fanout.
 type ButtonTypeConfig =
   | "default"
   | "primary"
@@ -78,15 +82,67 @@ type ButtonVariantConfig =
   | "filled"
   | "link"
   | "text";
-type ButtonColorConfig = string;
+type ButtonColorConfig =
+  | "default"
+  | "primary"
+  | "danger"
+  | "link"
+  | "success"
+  | "gray"
+  | "red"
+  | "orange"
+  | "amber"
+  | "yellow"
+  | "lime"
+  | "green"
+  | "emerald"
+  | "teal"
+  | "cyan"
+  | "sky"
+  | "blue"
+  | "indigo"
+  | "violet"
+  | "purple"
+  | "fuchsia"
+  | "pink"
+  | "rose";
 type ButtonSizeConfig = "small" | "middle" | "large";
 type DatePickerCaptionLayout =
   | "label"
   | "dropdown"
   | "dropdown-months"
   | "dropdown-years";
-type FormLayoutConfig = "horizontal" | "vertical" | "inline";
+type FormLayoutConfig = "horizontal" | "vertical";
 type FormLabelAlignConfig = "left" | "right";
+type TagVariantConfig =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | "solid";
+type TagColorConfig =
+  | "default"
+  | "primary"
+  | "success"
+  | "processing"
+  | "error"
+  | "warning"
+  | "orange"
+  | "gray"
+  | "yellow"
+  | "amber"
+  | "blue"
+  | "indigo"
+  | "fuchsia"
+  | "green"
+  | "cyan"
+  | "red"
+  | "rose"
+  | "pink"
+  | "purple"
+  | "teal"
+  | "green-solid";
+type TagSizeConfig = "small" | "default" | "large";
 
 export type ButtonConfig = ComponentStyleConfig & {
   classNames?: {
@@ -175,9 +231,9 @@ export interface TableConfig extends ComponentStyleConfig {
 
 export type TagConfig = ComponentStyleConfig & {
   bordered?: boolean;
-  variant?: string;
-  color?: string;
-  size?: string;
+  variant?: TagVariantConfig;
+  color?: TagColorConfig;
+  size?: TagSizeConfig;
 };
 
 export type TextAreaConfig = ComponentStyleConfig & {
