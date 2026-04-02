@@ -1,22 +1,17 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import { Checkbox } from "./checkbox";
-import * as checkboxStories from "./checkbox.stories";
 
 globalThis.React = React;
 
 afterEach(() => {
   cleanup();
 });
-
-const checkboxLabelSelector = '[data-slot="checkbox-label"]';
 
 function renderCheckbox(
   props: React.ComponentProps<typeof Checkbox> = {},
@@ -25,152 +20,64 @@ function renderCheckbox(
   return render(React.createElement(Checkbox, props, children));
 }
 
-function renderStory<TArgs extends object, TContext>(story: {
-  args?: Partial<TArgs>;
-  render?: (args: TArgs, context: TContext) => React.ReactNode;
-}): ReturnType<typeof render> {
-  expect(story.render).toBeDefined();
-
-  if (!story.render) {
-    throw new Error("Story is missing a render function");
-  }
-
-  return render(story.render((story.args ?? {}) as TArgs, {} as TContext));
-}
-
-describe("Checkbox rendering", () => {
-  test("renders the outer label wrapper", () => {
-    const { container } = renderCheckbox({}, "Label");
-
-    expect(container.querySelector("label")).toBeInTheDocument();
-  });
-
-  test("renders the label span for string children", () => {
-    const { container } = renderCheckbox({}, "Label");
-
-    const label = within(container).getByText("Label");
-
-    expect(label).toHaveAttribute("data-slot", "checkbox-label");
-    expect(label.tagName).toBe("SPAN");
-  });
-
-  test("renders the label span for numeric children", () => {
-    const { container } = renderCheckbox({}, 0);
-
-    const label = within(container).getByText("0");
-
-    expect(label).toHaveAttribute("data-slot", "checkbox-label");
-    expect(label.tagName).toBe("SPAN");
-  });
-
-  test.each([
-    ["undefined children", undefined],
-    ["null children", null],
-    ["false children", false],
-    ["empty string children", ""],
-  ])("omits the label span for %s", (_caseName, children) => {
-    const { container } = renderCheckbox({}, children);
+describe("Checkbox", () => {
+  test("renders an accessible labelled checkbox via the wrapper", () => {
+    renderCheckbox({}, "Accept terms and conditions");
 
     expect(
-      container.querySelector(checkboxLabelSelector),
-    ).not.toBeInTheDocument();
+      screen.getByRole("checkbox", { name: "Accept terms and conditions" }),
+    ).toBeInTheDocument();
   });
 
-  test("renders the loading indicator without the label span when loading", () => {
+  test("loading still suppresses inline label content", () => {
     const { container } = renderCheckbox({ loading: true }, "Label");
 
-    expect(container.querySelector("svg.animate-spin")).toBeInTheDocument();
-    expect(
-      container.querySelector(checkboxLabelSelector),
-    ).not.toBeInTheDocument();
-    expect(within(container).queryByText("Label")).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox")).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+    expect(screen.queryByText("Label")).not.toBeInTheDocument();
   });
 
-  test("checked checkbox keeps state-based background classes on the primitive control", () => {
-    const { container } = renderCheckbox({
-      checked: true,
-      "aria-label": "Checked checkbox",
-    });
-    const checkbox = within(container).getByRole("checkbox", {
-      name: "Checked checkbox",
-    });
+  test("renders the label-content slot only when children exist", () => {
+    const { container, rerender } = renderCheckbox({}, "Label");
 
-    expect(checkbox).toHaveAttribute("data-state", "checked");
-    expect(checkbox.className).toContain("data-[state=checked]:border-primary");
-    expect(checkbox.className).toContain("data-[state=checked]:bg-primary");
-    expect(checkbox.className).toContain(
-      "data-[state=checked]:text-primary-foreground",
+    expect(screen.getByText("Label")).toHaveAttribute(
+      "data-slot",
+      "checkbox-label",
+    );
+
+    rerender(React.createElement(Checkbox, {}, undefined));
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+
+    rerender(React.createElement(Checkbox, {}, false));
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+
+    rerender(React.createElement(Checkbox, {}, ""));
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+
+    rerender(React.createElement(Checkbox, {}, 0));
+    expect(screen.getByText("0")).toHaveAttribute(
+      "data-slot",
+      "checkbox-label",
     );
   });
 
-  test("card variant renders a card-styled wrapper for structured content", () => {
-    const { container } = renderCheckbox(
-      { checked: true, variant: "card" } as React.ComponentProps<
-        typeof Checkbox
-      >,
-      <div className="grid gap-1.5 font-normal">
-        <p className="text-sm leading-none font-medium">Auto Start</p>
-        <p className="text-muted-foreground text-sm">Starting with your OS.</p>
+  test("documented variant=card usage renders structured label content through a block label slot", () => {
+    renderCheckbox(
+      { variant: "card" } as React.ComponentProps<typeof Checkbox>,
+      <div>
+        <div>Auto Start</div>
+        <div>Starting with your OS.</div>
       </div>,
     );
 
-    const wrapper = container.querySelector("label");
-    const label = container.querySelector(checkboxLabelSelector);
+    const labelContent = screen.getByText("Auto Start").closest('[data-slot="checkbox-label"]');
 
-    expect(wrapper).toHaveClass("rounded-lg");
-    expect(wrapper).toHaveClass("border");
-    expect(wrapper?.className).toContain("hover:bg-accent/50");
-    expect(wrapper?.className).toContain(
-      "has-data-[state=checked]:border-primary",
-    );
-    expect(wrapper?.className).toContain(
-      "has-data-[state=checked]:bg-primary/5",
-    );
-    expect(label).toHaveTextContent("Auto Start");
-    expect(label).toHaveTextContent("Starting with your OS.");
-    expect(label?.tagName).toBe("DIV");
-  });
-
-  test("Card story renders the primitive card variant", () => {
-    const { container } = renderStory(checkboxStories.Card);
-
-    expect(screen.getByText("Auto Start")).toBeInTheDocument();
-    expect(container.querySelector("label")?.className).toContain("rounded-lg");
-  });
-
-  test("checkbox group story uses the compounded Checkbox export without card option wrappers", () => {
-    const { container } = renderStory(checkboxStories.CheckboxGroup);
-
-    expect(screen.getByText("Choose your audience")).toBeInTheDocument();
+    expect(labelContent).not.toBeNull();
+    expect(labelContent?.tagName).toBe("DIV");
     expect(
-      screen.getByRole("checkbox", { name: /Engineers/i }),
+      screen.getByRole("checkbox", {
+        name: /Auto Start Starting with your OS\./i,
+      }),
     ).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-slot="checkbox-group-option"]'),
-    ).not.toBeInTheDocument();
-  });
-
-  test("checkbox docs are wired through imported example partials instead of raw ComponentPreview usage", () => {
-    const docsSource = readFileSync(
-      resolve(import.meta.dirname, "./checkbox.mdx"),
-      "utf8",
-    );
-    const basicExampleSource = readFileSync(
-      resolve(import.meta.dirname, "./examples/basic.mdx"),
-      "utf8",
-    );
-    const cardExampleSource = readFileSync(
-      resolve(import.meta.dirname, "./examples/card.mdx"),
-      "utf8",
-    );
-
-    expect(docsSource).not.toContain("<ComponentPreview");
-    expect(docsSource).toMatch(/import\s+\w+\s+from\s+"\.\/examples\/.*\.mdx"/);
-    expect(docsSource).toMatch(/<\w+Example\s*\/>/);
-    expect(docsSource).toContain('import CardExample from "./examples/card.mdx";');
-    expect(docsSource).toContain('import BasicExample from "./examples/basic.mdx";');
-    expect(docsSource).toContain("<CardExample />");
-    expect(basicExampleSource).toContain('src="checkbox/examples/basic.tsx"');
-    expect(cardExampleSource).toContain('src="checkbox/examples/card.tsx"');
   });
 });

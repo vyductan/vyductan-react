@@ -4,25 +4,33 @@
 import React from "react";
 
 import type { WarningContextProps } from "../_util/warning";
-import type { ShowWaveEffect } from "../../lib/wave/interface";
-import type { ButtonProps } from "../button";
-import type { DatePickerProps } from "../date-picker";
-import type { FormProps } from "../form";
-import type { InputNumberProps, InputProps } from "../input";
 import type { Locale } from "../locale";
-import type { MentionsProps } from "../mentions";
 import type { PaginationProps } from "../pagination";
-// import type { ResultProps } from "../result";
-import type { SelectProps } from "../select";
 import type { TableProps } from "../table";
-import type { TagProps } from "../tag";
-import type { TextAreaProps } from "../textarea";
-import type {
-  AliasToken,
-  MappingAlgorithm,
-  OverrideToken,
-} from "../theme/interface";
-import type { RenderEmptyHandler } from "./default-render-empty";
+
+export type AliasToken = Record<PropertyKey, any>;
+export type MappingAlgorithm = (...args: any[]) => AliasToken;
+export type OverrideToken = Record<string, AliasToken>;
+
+export type RenderEmptyHandler = (componentName?:
+  | "Table"
+  | "Table.filter"
+  | "List"
+  | "Select"
+  | "TreeSelect"
+  | "Cascader"
+  | "Transfer"
+  | "Mentions") => React.ReactNode;
+
+export type WaveComponent = "Tag" | "Button" | "Checkbox" | "Radio" | "Switch";
+export type ShowWaveEffect = (
+  element: HTMLElement,
+  info: {
+    className: string;
+    component?: WaveComponent;
+    event: MouseEvent;
+  },
+) => void;
 
 export interface CSPConfig {
   nonce?: string;
@@ -51,40 +59,149 @@ export interface ComponentStyleConfig {
   style?: React.CSSProperties;
 }
 
-export type ButtonConfig = ComponentStyleConfig &
-  Pick<ButtonProps, "classNames" | "type" | "variant" | "color" | "size">;
+type SemanticClassNames = Record<string, string>;
+type SemanticStyles = Record<string, React.CSSProperties>;
+type AllowClearConfig = boolean | { clearIcon?: React.ReactNode };
 
-export type DatePickerConfig = ComponentStyleConfig &
-  Pick<
-    DatePickerProps,
-    | "variant"
-    | "styles"
-    | "classNames"
-    | "format"
-    | "captionLayout"
-    | "commitYearOnClose"
-  >;
+// Keep these config shapes local instead of deriving them from button/form/tag
+// modules. This context is copied into registry artifacts in isolation, so
+// importing those modules here would reintroduce broader transitive fanout.
+type ButtonTypeConfig =
+  | "default"
+  | "primary"
+  | "dashed"
+  | "link"
+  | "text"
+  | "submit"
+  | "reset"
+  | "button";
+type ButtonVariantConfig =
+  | "solid"
+  | "outlined"
+  | "dashed"
+  | "filled"
+  | "link"
+  | "text";
+type ButtonColorConfig =
+  | "default"
+  | "primary"
+  | "danger"
+  | "link"
+  | "success"
+  | "gray"
+  | "red"
+  | "orange"
+  | "amber"
+  | "yellow"
+  | "lime"
+  | "green"
+  | "emerald"
+  | "teal"
+  | "cyan"
+  | "sky"
+  | "blue"
+  | "indigo"
+  | "violet"
+  | "purple"
+  | "fuchsia"
+  | "pink"
+  | "rose";
+type ButtonSizeConfig = "small" | "middle" | "large";
+type DatePickerCaptionLayout =
+  | "label"
+  | "dropdown"
+  | "dropdown-months"
+  | "dropdown-years";
+type FormLayoutConfig = "horizontal" | "vertical";
+type FormLabelAlignConfig = "left" | "right";
+type TagVariantConfig =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | "solid";
+type TagColorConfig =
+  | "default"
+  | "primary"
+  | "success"
+  | "processing"
+  | "error"
+  | "warning"
+  | "orange"
+  | "gray"
+  | "yellow"
+  | "amber"
+  | "blue"
+  | "indigo"
+  | "fuchsia"
+  | "green"
+  | "cyan"
+  | "red"
+  | "rose"
+  | "pink"
+  | "purple"
+  | "teal"
+  | "green-solid";
+type TagSizeConfig = "small" | "default" | "large";
 
-export type FormConfig = ComponentStyleConfig &
-  Pick<
-    FormProps,
-    "layout" | "labelCol" | "wrapperCol" | "labelAlign" | "labelWrap" | "colon"
-  >;
+export type ButtonConfig = ComponentStyleConfig & {
+  classNames?: {
+    variants?: Record<string, unknown>;
+  };
+  type?: ButtonTypeConfig;
+  variant?: ButtonVariantConfig;
+  color?: ButtonColorConfig;
+  size?: ButtonSizeConfig;
+};
 
-export type InputConfig = ComponentStyleConfig &
-  Pick<
-    InputProps,
-    "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
-  >;
+export type DatePickerConfig = ComponentStyleConfig & {
+  variant?: Variant;
+  styles?: {
+    root?: React.CSSProperties;
+  };
+  classNames?: {
+    root?: string;
+  };
+  format?: string;
+  captionLayout?: DatePickerCaptionLayout;
+  commitYearOnClose?: boolean;
+};
 
-export type InputNumberConfig = ComponentStyleConfig &
-  Pick<InputNumberProps, "variant">;
+export type FormConfig = ComponentStyleConfig & {
+  layout?: FormLayoutConfig;
+  labelCol?: unknown;
+  wrapperCol?: unknown;
+  labelAlign?: FormLabelAlignConfig;
+  labelWrap?: boolean;
+  colon?: boolean;
+};
 
-export type MentionsConfig = ComponentStyleConfig &
-  Pick<MentionsProps, "variant">;
+export type InputConfig = ComponentStyleConfig & {
+  autoComplete?: string;
+  classNames?: SemanticClassNames;
+  styles?: SemanticStyles;
+  allowClear?: AllowClearConfig;
+  variant?: Variant;
+};
 
-export type SelectConfig = ComponentStyleConfig &
-  Pick<SelectProps, "showSearch" | "variant" | "classNames" | "styles">;
+export type InputNumberConfig = ComponentStyleConfig & {
+  variant?: Variant;
+};
+
+export type MentionsConfig = ComponentStyleConfig & {
+  variant?: Variant;
+};
+
+export type SelectConfig = ComponentStyleConfig & {
+  showSearch?: boolean;
+  variant?: Variant;
+  classNames?: SemanticClassNames & {
+    popup?: SemanticClassNames;
+  };
+  styles?: SemanticStyles & {
+    popup?: SemanticStyles;
+  };
+};
 
 export type PaginationConfig = ComponentStyleConfig &
   Pick<PaginationProps, "showSizeChanger" | "itemRender" | "onShowSizeChange">;
@@ -112,14 +229,20 @@ export interface TableConfig extends ComponentStyleConfig {
   };
 }
 
-export type TagConfig = ComponentStyleConfig &
-  Pick<TagProps, "bordered" | "variant" | "color" | "size">;
+export type TagConfig = ComponentStyleConfig & {
+  bordered?: boolean;
+  variant?: TagVariantConfig;
+  color?: TagColorConfig;
+  size?: TagSizeConfig;
+};
 
-export type TextAreaConfig = ComponentStyleConfig &
-  Pick<
-    TextAreaProps,
-    "autoComplete" | "classNames" | "styles" | "allowClear" | "variant"
-  >;
+export type TextAreaConfig = ComponentStyleConfig & {
+  autoComplete?: string;
+  classNames?: SemanticClassNames;
+  styles?: SemanticStyles;
+  allowClear?: AllowClearConfig;
+  variant?: Variant;
+};
 
 export interface PageContainerConfig {
   loadingRender?: React.ReactNode;

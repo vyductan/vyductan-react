@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { useControlledState } from "@rc-component/util";
 
 import type { ButtonColorVariants } from "../button/button-variants";
-import type { FormValueType } from "../form";
-import type { CheckboxChangeEvent } from "./checkbox";
+import type { CheckboxChangeEvent, CheckboxProps } from "./checkbox";
+import type { CheckboxValueType } from "./group-context";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";
 
-export interface CheckboxOptionType<T extends FormValueType = FormValueType> {
+export interface CheckboxOptionType<T extends CheckboxValueType = CheckboxValueType> {
   label: React.ReactNode;
   value: T;
   style?: React.CSSProperties;
@@ -22,7 +22,7 @@ export interface CheckboxOptionType<T extends FormValueType = FormValueType> {
 }
 
 export interface AbstractCheckboxGroupProps<
-  T extends FormValueType = FormValueType,
+  T extends CheckboxValueType = CheckboxValueType,
 > {
   options?: CheckboxOptionType<T>[];
   style?: React.CSSProperties;
@@ -32,18 +32,17 @@ export interface AbstractCheckboxGroupProps<
     label?: string;
   };
   disabled?: boolean;
-  optionVariant?: "default" | "card";
+  optionVariant?: CheckboxProps["variant"];
 }
 
-type CheckboxGroupProps<T extends FormValueType = FormValueType> =
+type CheckboxGroupProps<T extends CheckboxValueType = CheckboxValueType> =
   AbstractCheckboxGroupProps<T> & {
     name?: string;
     value?: T[];
     defaultValue?: T[];
     onChange?: (checkedValues: T[]) => void;
   };
-
-function CheckboxGroup<T extends FormValueType = FormValueType>({
+const CheckboxGroup = <T extends CheckboxValueType = CheckboxValueType>({
   name,
   value,
   defaultValue,
@@ -52,8 +51,8 @@ function CheckboxGroup<T extends FormValueType = FormValueType>({
   disabled,
   className,
   classNames,
-  optionVariant = "default",
-}: CheckboxGroupProps<T>): React.JSX.Element {
+  optionVariant,
+}: CheckboxGroupProps<T>) => {
   const [internalValue, setInternalValue] = useControlledState(
     defaultValue,
     value,
@@ -77,39 +76,30 @@ function CheckboxGroup<T extends FormValueType = FormValueType>({
     >
       {memoizedOptions.map((o) => {
         const isDisabled = o.disabled ?? disabled;
-        const isSelected = !!internalValue?.includes(o.value);
-        const optionKey = o.value.toString();
-
-        const checkbox = (
+        return (
           <Checkbox
-            key={optionKey}
+            key={o.value.toString()}
             name={name}
-            checked={isSelected}
+            checked={internalValue?.includes(o.value)}
             value={o.value as string}
             disabled={isDisabled}
-            variant={optionVariant === "card" ? "card" : "default"}
             onChange={(e) => {
               if (isDisabled) return;
 
-              const nextValue = e.target.checked
+              const newValue = e.target.checked
                 ? [...(internalValue ?? []), o.value]
                 : internalValue?.filter((x) => x !== o.value);
 
-              setInternalValue(nextValue);
-              onChange?.(nextValue ?? []);
+              setInternalValue(newValue);
+              onChange?.(newValue ?? []);
             }}
-            className={cn(
-              optionVariant === "card" ? "w-full" : undefined,
-              optionVariant === "card" ? undefined : classNames?.item,
-              o.className,
-            )}
+            className={cn(classNames?.item, o.className)}
             classNames={classNames}
+            variant={optionVariant}
           >
             {o.label}
           </Checkbox>
         );
-
-        return checkbox;
       })}
     </div>
   );

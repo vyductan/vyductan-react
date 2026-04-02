@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { JSX } from "react";
 
-import type { CheckboxOptionType } from "./checkbox-group";
-import { Checkbox } from "./index";
+import { Label } from "../label";
 import { ComponentSource } from "../mdx/component-source";
+import type { CheckboxOptionType } from "./checkbox-group";
 import BasicExample from "./examples/basic";
+import { Checkbox } from "./index";
 
 const externalLabelClassName =
   "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
@@ -98,15 +99,15 @@ export const Disabled: Story = {
     <div className="flex flex-col gap-4">
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled-unchecked" disabled />
-        <label htmlFor="disabled-unchecked" className={externalLabelClassName}>
+        <Label htmlFor="disabled-unchecked" className={externalLabelClassName}>
           Disabled (unchecked)
-        </label>
+        </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled-checked" disabled checked />
-        <label htmlFor="disabled-checked" className={externalLabelClassName}>
+        <Label htmlFor="disabled-checked" className={externalLabelClassName}>
           Disabled (checked)
-        </label>
+        </Label>
       </div>
     </div>
   ),
@@ -116,12 +117,12 @@ export const WithLabel: Story = {
   render: () => (
     <div className="flex items-center space-x-2">
       <Checkbox id="terms" />
-      <label
+      <Label
         htmlFor="terms"
         className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
       >
         Accept terms and conditions
-      </label>
+      </Label>
     </div>
   ),
 };
@@ -187,12 +188,12 @@ export const WithDescription: Story = {
     <div className="flex items-start space-x-3">
       <Checkbox id="description" className="mt-1" />
       <div className="grid gap-1.5">
-        <label
+        <Label
           htmlFor="description"
           className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           Use different settings for my mobile devices
-        </label>
+        </Label>
         <p className="text-muted-foreground text-sm">
           You can manage your mobile notifications in the mobile settings page.
         </p>

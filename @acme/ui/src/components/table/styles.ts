@@ -1,7 +1,7 @@
 import type { Column } from "@tanstack/react-table";
 import type { CSSProperties } from "react";
 
-import { cn } from "@acme/ui/lib/utils";
+import { cn } from "../../lib/utils";
 
 // export const tableStyles = {
 //   row: {

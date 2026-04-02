@@ -1,6 +1,6 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
-import { cn } from "@acme/ui/lib/utils";
+import { cn } from "../../lib/utils";
 
 function TooltipContent({
   className,
@@ -43,6 +43,6 @@ export {
   TooltipProvider,
   Tooltip as TooltipRoot,
   TooltipTrigger,
-} from "@acme/ui/shadcn/tooltip";
+} from "../../shadcn/tooltip";
 
 export { TooltipContent };

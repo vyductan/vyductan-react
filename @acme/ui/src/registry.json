@@ -175,6 +175,39 @@
       ]
     },
     {
+      "name": "table-tree-support",
+      "title": "Table Tree Support",
+      "path": "components/tree",
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "components/tree/types.ts",
+          "target": "components/tree/types.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/util.ts",
+          "target": "components/tree/util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/key-util.ts",
+          "target": "components/tree/utils/key-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/conduct-util.ts",
+          "target": "components/tree/utils/conduct-util.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/tree/utils/tree-util.ts",
+          "target": "components/tree/utils/tree-util.ts",
+          "type": "registry:file"
+        }
+      ]
+    },
+    {
       "name": "table-shared-core",
       "title": "Table Shared Core",
       "path": "components/table-shared-core",
@@ -221,6 +254,11 @@
           "type": "registry:file"
         },
         {
+          "path": "components/_util/extends-object.ts",
+          "target": "components/_util/extends-object.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "components/_util/responsive-observer.ts",
           "target": "components/_util/responsive-observer.ts",
           "type": "registry:file"
@@ -236,6 +274,11 @@
           "type": "registry:file"
         },
         {
+          "path": "components/_util/hooks/use-multiple-select.ts",
+          "target": "components/_util/hooks/use-multiple-select.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "components/config-provider/context.ts",
           "target": "components/config-provider/context.ts",
           "type": "registry:file"
@@ -246,6 +289,11 @@
           "type": "registry:file"
         },
         {
+          "path": "components/input/variants.ts",
+          "target": "components/input/variants.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "components/locale/index.tsx",
           "target": "components/locale/index.tsx",
           "type": "registry:file"
@@ -253,6 +301,16 @@
         {
           "path": "components/locale/en-us.ts",
           "target": "components/locale/en-us.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/locale/context.ts",
+          "target": "components/locale/context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/locale/use-locale.ts",
+          "target": "components/locale/use-locale.ts",
           "type": "registry:file"
         },
         {
@@ -273,6 +331,96 @@
         {
           "path": "icons/wrapper.tsx",
           "target": "icons/wrapper.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-down-filled.tsx",
+          "target": "icons/arrow-down-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-left-outlined.tsx",
+          "target": "icons/arrow-left-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/arrow-right-outlined.tsx",
+          "target": "icons/arrow-right-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/check-filled.tsx",
+          "target": "icons/check-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/check-outlined.tsx",
+          "target": "icons/check-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/chevron-right-outlined.tsx",
+          "target": "icons/chevron-right-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/circle-filled.tsx",
+          "target": "icons/circle-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/circle-outlined.tsx",
+          "target": "icons/circle-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/close-outlined.tsx",
+          "target": "icons/close-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/csv-icon.tsx",
+          "target": "icons/csv-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/delete-icon.tsx",
+          "target": "icons/delete-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/download-icon.tsx",
+          "target": "icons/download-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/edit-icon.tsx",
+          "target": "icons/edit-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/info-filled.tsx",
+          "target": "icons/info-filled.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/logout-outlined.tsx",
+          "target": "icons/logout-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/mail-outlined.tsx",
+          "target": "icons/mail-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/user-outlined.tsx",
+          "target": "icons/user-outlined.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "icons/warning-filled.tsx",
+          "target": "icons/warning-filled.tsx",
           "type": "registry:file"
         },
         {
@@ -386,6 +534,66 @@
           "type": "registry:file"
         },
         {
+          "path": "components/button/loading-icon.tsx",
+          "target": "components/button/loading-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/button/button-variants.ts",
+          "target": "components/button/button-variants.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/disabled-context.tsx",
+          "target": "components/config-provider/disabled-context.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/config-provider/unstable-context.ts",
+          "target": "components/config-provider/unstable-context.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/label/label.tsx",
+          "target": "components/label/label.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/label.tsx",
+          "target": "shadcn/label.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/index.ts",
+          "target": "lib/wave/index.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/interface.ts",
+          "target": "lib/wave/interface.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/use-wave.ts",
+          "target": "lib/wave/use-wave.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/wave-effect.tsx",
+          "target": "lib/wave/wave-effect.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/token.ts",
+          "target": "lib/wave/token.ts",
+          "type": "registry:file"
+        },
+        {
+          "path": "lib/wave/util.ts",
+          "target": "lib/wave/util.ts",
+          "type": "registry:file"
+        },
+        {
           "path": "shadcn/checkbox.tsx",
           "target": "shadcn/checkbox.tsx",
           "type": "registry:file"
@@ -394,6 +602,8 @@
       "dependencies": [
         "@radix-ui/react-checkbox",
         "@rc-component/util",
+        "motion",
+        "radix-ui",
         "ts-xor"
       ]
     },
@@ -435,11 +645,29 @@
           "path": "components/pagination/_components/index.tsx",
           "target": "components/pagination/_components/index.tsx",
           "type": "registry:file"
+        },
+        {
+          "path": "components/pagination/_components/page-size-options.tsx",
+          "target": "components/pagination/_components/page-size-options.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "shadcn/select.tsx",
+          "target": "shadcn/select.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/button/button-variants.ts",
+          "target": "components/button/button-variants.ts",
+          "type": "registry:file"
         }
       ],
       "dependencies": [
         "@radix-ui/react-slot",
-        "@rc-component/util"
+        "@rc-component/util",
+        "lucide-react",
+        "radix-ui",
+        "tailwind-variants"
       ]
     },
     {
@@ -456,7 +684,7 @@
         "zustand"
       ],
       "registryDependencies": [
-        "tree",
+        "table-tree-support",
         "table-shared-core",
         "table-tooltip-support",
         "table-spin-support",

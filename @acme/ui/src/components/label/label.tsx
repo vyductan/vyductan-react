@@ -1,5 +1,5 @@
-import { cn } from "@acme/ui/lib/utils";
-import { Label as ShadLabel } from "@acme/ui/shadcn/label";
+import { cn } from "../../lib/utils";
+import { Label as ShadLabel } from "../../shadcn/label";
 
 const Label = ({
   className,
