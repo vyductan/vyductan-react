@@ -1,8 +1,63 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { expect, fn, userEvent, within } from "storybook/test";
+import {
+  expect,
+  fireEvent,
+  fn,
+  userEvent,
+  waitFor,
+  within,
+} from "storybook/test";
 
 import { Button } from "../button";
 import { message } from "./message";
+
+function requireToastElement(element: HTMLElement) {
+  const toast = element.closest("[data-sonner-toast]");
+
+  if (!(toast instanceof HTMLElement)) {
+    throw new TypeError("Expected element to be rendered inside a toast");
+  }
+
+  return toast;
+}
+
+function requireSelectableContainer(element: HTMLElement) {
+  const container = element.closest("[data-title],[data-description]");
+
+  if (!(container instanceof HTMLElement)) {
+    throw new TypeError(
+      "Expected element to be rendered inside a selectable toast slot",
+    );
+  }
+
+  return container;
+}
+
+async function findVisibleToastByText(text: string) {
+  let toast: HTMLElement | undefined;
+
+  await waitFor(() => {
+    toast = [
+      ...globalThis.document.querySelectorAll<HTMLElement>(
+        "[data-sonner-toast][data-visible='true']",
+      ),
+    ].find((candidate) => candidate.textContent?.includes(text));
+
+    expect(toast).toBeTruthy();
+  });
+
+  if (!toast) {
+    throw new TypeError(`Toast with text "${text}" not found`);
+  }
+
+  return toast;
+}
+
+async function openVisibleToast(trigger: HTMLElement, text: string) {
+  await userEvent.click(trigger);
+
+  return findVisibleToastByText(text);
+}
 
 const meta = {
   title: "Components/Message",
@@ -121,6 +176,45 @@ export const WithDescription: Story = {
       </Button>
     </div>
   ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step(
+      "Opening the toast renders selectable title and description slots",
+      async () => {
+        const toast = await openVisibleToast(
+          canvas.getByRole("button", { name: /success with description/i }),
+          "Success!",
+        );
+        const title = within(toast).getByText("Success!");
+        const description = within(toast).getByText(
+          "Your operation completed successfully.",
+        );
+
+        await waitFor(async () => {
+          await expect(getComputedStyle(title).userSelect).toBe("text");
+          await expect(getComputedStyle(description).userSelect).toBe("text");
+        });
+      },
+    );
+
+    await step(
+      "Pointerdown on toast text does not start Sonner swipe-dismiss handling",
+      async () => {
+        const toast = await findVisibleToastByText("Success!");
+        const title = within(toast).getByText("Success!");
+        const titleContainer = requireSelectableContainer(title);
+
+        fireEvent.pointerDown(title);
+
+        await expect(requireToastElement(title)).toHaveAttribute(
+          "data-swipe-out",
+          "false",
+        );
+        await expect(titleContainer).toHaveAttribute("data-title", "");
+      },
+    );
+  },
 };
 
 export const WithAction: Story = {
@@ -140,6 +234,25 @@ export const WithAction: Story = {
       Message with Action
     </Button>
   ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("Action toast keeps its action button interactive", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: /message with action/i }),
+      );
+
+      const actionToast = await findVisibleToastByText("New update available");
+      const actionButton = within(actionToast).getByRole("button", {
+        name: /update now/i,
+      });
+
+      await userEvent.click(actionButton);
+
+      const successToast = await findVisibleToastByText("Updating...");
+      await expect(successToast).toHaveAttribute("data-visible", "true");
+    });
+  },
 };
 
 export const Multiple: Story = {
@@ -243,6 +356,29 @@ export const CustomContent: Story = {
       Show Custom Message
     </Button>
   ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step(
+      "Custom toast content still renders through the shared toaster",
+      async () => {
+        await userEvent.click(
+          canvas.getByRole("button", { name: /show custom message/i }),
+        );
+
+        const customToast = await findVisibleToastByText("Custom Toast");
+
+        await expect(
+          within(customToast).getByText("Custom Toast"),
+        ).toBeTruthy();
+        await expect(
+          within(customToast).getByText(
+            "This is a completely custom message with custom styling",
+          ),
+        ).toBeTruthy();
+      },
+    );
+  },
 };
 
 export const AllTypes: Story = {

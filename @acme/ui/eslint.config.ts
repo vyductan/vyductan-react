@@ -15,6 +15,13 @@ export default defineConfig([
     ],
   },
   ...baseConfig,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   ...reactConfig,
   ...storybook.configs["flat/recommended"],
   {
