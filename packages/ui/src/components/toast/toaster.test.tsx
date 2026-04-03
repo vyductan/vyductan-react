@@ -2,10 +2,11 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
+import type { ToasterProps as SonnerToasterProps } from "sonner";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
-import type { ToasterProps as SonnerToasterProps } from "sonner";
+import { Toaster } from "./toaster";
 
 const sonnerPointerDown = vi.fn();
 
@@ -39,7 +40,9 @@ vi.mock("@acme/ui/shadcn/sonner", async () => {
           >
             <div data-title="" data-testid="toast-title">
               Selectable title
-              <span data-testid="toast-title-child">Nested plain message text</span>
+              <span data-testid="toast-title-child">
+                Nested plain message text
+              </span>
               <div data-testid="toast-custom-text">Custom JSX text</div>
             </div>
             <div data-description="" data-testid="toast-description">
@@ -49,7 +52,9 @@ vi.mock("@acme/ui/shadcn/sonner", async () => {
             <button data-button data-action data-testid="toast-action">
               Action
             </button>
-            <button data-close-button data-testid="toast-close">Close</button>
+            <button data-close-button data-testid="toast-close">
+              Close
+            </button>
           </div>
         </div>
       );
@@ -58,8 +63,6 @@ vi.mock("@acme/ui/shadcn/sonner", async () => {
 
   return { Toaster: MockSonner };
 });
-
-import { Toaster } from "./toaster";
 
 globalThis.React = React;
 

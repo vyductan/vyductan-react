@@ -11,7 +11,9 @@ type SliderProps = XOR<OwnSliderProps, ShadcnSliderProps>;
 
 const Slider = (props: SliderProps) => {
   const isShadcnSlider =
-    "onValueChange" in props || "defaultValue" in props || Array.isArray(props.value);
+    "onValueChange" in props ||
+    "defaultValue" in props ||
+    Array.isArray(props.value);
 
   if (isShadcnSlider) {
     const { ariaLabel, ...rootProps } = props as ShadcnSliderProps;

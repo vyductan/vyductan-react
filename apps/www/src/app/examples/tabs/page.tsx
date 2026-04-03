@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import TabsBasicDemo from "@/components/ui/tabs/examples/basic";
-import ShadcnDemo from "@/components/ui/tabs/examples/shadcn";
-import ShadcnTypeDemo from "@/components/ui/tabs/examples/shadcn-type";
-import TypeDemo from "@/components/ui/tabs/examples/type";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import TabsBasicDemo from "@acme/ui/components/tabs/examples/basic";
+import ShadcnDemo from "@acme/ui/components/tabs/examples/shadcn";
+import ShadcnTypeDemo from "@acme/ui/components/tabs/examples/shadcn-type";
+import TypeDemo from "@acme/ui/components/tabs/examples/type";
 
 export default function TabsExamples() {
   return (

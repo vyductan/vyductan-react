@@ -54,12 +54,16 @@ describe("Slider", () => {
       <Slider value={[20, 80]} onValueChange={handleValueChange} />,
     );
 
-    expect(container.querySelectorAll("[data-orientation] [role='slider']")).toHaveLength(2);
+    expect(
+      container.querySelectorAll("[data-orientation] [role='slider']"),
+    ).toHaveLength(2);
   });
 
   test("renders one thumb per defaultValue item for uncontrolled shadcn slider usage", () => {
     const { container } = render(<Slider defaultValue={[20, 80]} />);
 
-    expect(container.querySelectorAll("[data-orientation] [role='slider']")).toHaveLength(2);
+    expect(
+      container.querySelectorAll("[data-orientation] [role='slider']"),
+    ).toHaveLength(2);
   });
 });

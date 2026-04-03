@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import ColorPickerDemo from "@/components/ui/color-picker/examples/basic";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import ColorPickerDemo from "@acme/ui/components/color-picker/examples/basic";
 
 export default function SelectExamples() {
   return (

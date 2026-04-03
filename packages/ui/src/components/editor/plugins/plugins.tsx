@@ -180,12 +180,8 @@ export function Plugins({
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
-      {editable && (
-        <TableActionsPlugin anchorElem={floatingAnchorElem} />
-      )}
-      {editable && (
-        <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />
-      )}
+      {editable && <TableActionsPlugin anchorElem={floatingAnchorElem} />}
+      {editable && <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />}
       <TOCPlugin />
       <ListPlugin />
       <TabIndentationPlugin />

@@ -57,7 +57,7 @@ const config: StorybookConfig = {
     //     ...(config.resolve.alias ?? {}),
     //     "@/lib": resolve(projectRoot, "src/lib"),
     //     "@/hooks": resolve(projectRoot, "src/hooks"),
-    //     "@/components/ui": resolve(projectRoot, "src/components"),
+    //     "@acme/ui/components": resolve(projectRoot, "src/components"),
     //     "@/components/icons": resolve(projectRoot, "src/icons"),
     //   };
 

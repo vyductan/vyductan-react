@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import SpaceCompactDemo from "@/components/ui/space/examples/compact";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import SpaceCompactDemo from "@acme/ui/components/space/examples/compact";
 
 export default function SpaceExamples() {
   return (

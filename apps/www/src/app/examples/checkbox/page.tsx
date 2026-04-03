@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import CheckboxDemo from "@/components/ui/checkbox/examples/basic";
-import CheckboxGroupDemo from "@/components/ui/checkbox/examples/group";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import { Checkbox } from "@acme/ui/components/checkbox";
+import CheckboxDemo from "@acme/ui/components/checkbox/examples/basic";
+import CheckboxGroupDemo from "@acme/ui/components/checkbox/examples/group";
 
 export default function CheckboxExamples() {
   return (

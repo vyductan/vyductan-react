@@ -1,21 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import SelectBasicDemo from "@/components/ui/select/examples/basic";
-import SelectColorDemo from "@/components/ui/select/examples/color";
-import SelectControlledValueDemo from "@/components/ui/select/examples/controlled-value";
-import SelectMultipleDemo from "@/components/ui/select/examples/multiple";
-import SelectOptionRenderDemo from "@/components/ui/select/examples/option-render";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import SelectBasicDemo from "@acme/ui/components/select/examples/basic";
+import SelectColorDemo from "@acme/ui/components/select/examples/color";
+import SelectControlledValueDemo from "@acme/ui/components/select/examples/controlled-value";
+import SelectMultipleDemo from "@acme/ui/components/select/examples/multiple";
+import SelectOptionRenderDemo from "@acme/ui/components/select/examples/option-render";
 
 export default function SelectExamples() {
   return (

@@ -1,5 +1,5 @@
 {
-  "extends": "../../@acme/tsconfig/base.json",
+  "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./.cache/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
@@ -10,11 +10,7 @@
     "types": ["vite/client", "node"],
     "paths": {
       "~/*": ["./src/*"],
-      "@acme/ui/components/*": ["../../@acme/ui/src/components/*"],
-      "@acme/ui/hooks/*": ["../../@acme/ui/src/hooks/*"],
-      "@acme/ui/icons": ["../../@acme/ui/src/icons/index.ts"],
-      "@acme/ui/lib/*": ["../../@acme/ui/src/lib/*"],
-      "@acme/ui/shadcn/*": ["../../@acme/ui/src/shadcn/*"]
+      "@acme/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": ["src"]

@@ -4,16 +4,9 @@
   "compilerOptions": {
     "lib": ["ES2023", "dom", "dom.iterable"],
     "jsx": "preserve",
-    "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "@acme/ui/*": ["../../@acme/ui/src/*"],
-      "@/lib/*": ["../../@acme/ui/src/lib/*"],
-      "@/hooks/*": ["../../@acme/hooks/src/*"],
-      "@/components/ui": ["../../@acme/ui/src/components/index.ts"],
-      "@/components/ui/*": ["../../@acme/ui/src/components/*"],
-      "@/components/icons": ["../../@acme/ui/src/icons/index.ts"],
-      "@/components/*": ["../../@acme/ui/src/icons/*"]
+      "@acme/ui/*": ["../../packages/ui/src/*"]
     },
     "plugins": [
       {
@@ -24,5 +17,5 @@
     "strictNullChecks": true
   },
   "include": [".", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "../../@acme/ui/src/shadcn/calendar.tsx"]
+  "exclude": ["node_modules"]
 }

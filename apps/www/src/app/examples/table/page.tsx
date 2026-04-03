@@ -1,4 +1,4 @@
-import TableMdx from "@/components/ui/table/table.mdx";
+import TableMdx from "@acme/ui/components/table/table.mdx";
 
 export default function TableExamples() {
   return <TableMdx />;

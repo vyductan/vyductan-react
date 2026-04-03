@@ -6,9 +6,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import EditorDemo from "@/components/ui/editor/examples/basic";
-
+} from "@acme/ui/components/card";
+import EditorDemo from "@acme/ui/components/editor/examples/basic";
 import { PageContainer } from "@acme/ui/components/layout";
 
 export default function CheckboxExamples() {

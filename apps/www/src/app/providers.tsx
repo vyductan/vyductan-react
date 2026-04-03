@@ -1,13 +1,12 @@
 "use client";
 
-import { ConfigProvider } from "@/components/ui/config-provider";
-import { Toaster } from "@/components/ui/toast";
-
+import { ConfigProvider } from "@acme/ui/components/config-provider";
 import {
   TailwindIndicator,
   ThemeProvider,
   ThemeToggle,
 } from "@acme/ui/components/theme";
+import { Toaster } from "@acme/ui/components/toast";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (

@@ -1,4 +1,4 @@
-import DateRangePickerMdx from "@/components/ui/date-picker/date-range-picker.mdx";
+import DateRangePickerMdx from "@acme/ui/components/date-picker/date-range-picker.mdx";
 
 export default function DateRangePickerExamples() {
   return <DateRangePickerMdx />;

@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import EmptyBasicDemo from "@/components/ui/empty/examples/basic";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import EmptyBasicDemo from "@acme/ui/components/empty/examples/basic";
 
 export default function EmptyExamples() {
   return (

@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import ProgressCircleDemo from "@/components/ui/progress/examples/circle";
-import ProgressInfoPositionDemo from "@/components/ui/progress/examples/info-position";
-import ProgressLineDemo from "@/components/ui/progress/examples/line";
-import ProgressSizeDemo from "@/components/ui/progress/examples/size";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import ProgressCircleDemo from "@acme/ui/components/progress/examples/circle";
+import ProgressInfoPositionDemo from "@acme/ui/components/progress/examples/info-position";
+import ProgressLineDemo from "@acme/ui/components/progress/examples/line";
+import ProgressSizeDemo from "@acme/ui/components/progress/examples/size";
 
 export default function DescriptionsExamples() {
   return (

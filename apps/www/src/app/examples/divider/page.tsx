@@ -1,20 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import DividerHorizontalDemo from "@/components/ui/divider/examples/horizontal";
-import DividerPlainDemo from "@/components/ui/divider/examples/plain";
-import DividerSizeDemo from "@/components/ui/divider/examples/size";
-import DividerVerticalDemo from "@/components/ui/divider/examples/vertital";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import DividerHorizontalDemo from "@acme/ui/components/divider/examples/horizontal";
+import DividerPlainDemo from "@acme/ui/components/divider/examples/plain";
+import DividerSizeDemo from "@acme/ui/components/divider/examples/size";
+import DividerVerticalDemo from "@acme/ui/components/divider/examples/vertital";
 
 export default function EmptyExamples() {
   return (

@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+
+import { Badge } from "@acme/ui/components/badge";
+import { Button } from "@acme/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import DescriptionsBasicDemo from "@/components/ui/descriptions/examples/basic";
-import DescriptionsVerticalDemo from "@/components/ui/descriptions/examples/vertical";
-import { ArrowLeft } from "lucide-react";
+} from "@acme/ui/components/card";
+import DescriptionsBasicDemo from "@acme/ui/components/descriptions/examples/basic";
+import DescriptionsVerticalDemo from "@acme/ui/components/descriptions/examples/vertical";
 
 export default function DescriptionsExamples() {
   return (

@@ -1,5 +1,6 @@
 import type { MDXComponents } from "mdx/types";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@acme/ui/lib/utils";
 
 import { getIconForLanguageExtension } from "./components/icons";
 
