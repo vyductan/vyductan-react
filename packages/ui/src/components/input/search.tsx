@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import type { InputProps } from "./input";
+import type { InputProps } from ".";
 import type { InputRef } from "./types";
 import { Icon } from "../../icons";
 import { Input } from "./input";
