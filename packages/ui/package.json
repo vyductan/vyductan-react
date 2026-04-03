@@ -5,6 +5,14 @@
   "private": true,
   "license": "MIT",
   "type": "module",
+  "exports": {
+    "./components/*": "./src/components/*/index.*",
+    "./icons": "./src/icons/index.ts",
+    "./icons/*": "./src/icons/*",
+    "./lib/*": "./src/lib/*",
+    "./hooks/*": "./src/hooks/*",
+    "./styles/*": "./src/styles/*"
+  },
   "scripts": {
     "chromatic": "chromatic --project-token=chpt_c9c2d477ce70b1e --exit-zero-on-changes",
     "clean": "git clean -xdf .cache .turbo dist node_modules",

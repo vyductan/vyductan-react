@@ -1,0 +1,90 @@
+<h2>Editor Playground Layout</h2>
+<p class="subtitle">Chọn layout phù hợp nhất cho story playground full showcase</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">A. IDE split</div>
+        <div class="mockup-body" style="display:grid;grid-template-columns:2fr 1fr;gap:12px;min-height:260px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="mock-nav">Toolbar / format switch / presets</div>
+            <div class="mock-content" style="flex:1;min-height:180px;">Editor canvas</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="mock-sidebar" style="min-height:90px;">Stats</div>
+            <div class="mock-sidebar" style="flex:1;min-height:120px;">Raw output</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>IDE split</h3>
+      <p>Editor lớn, panel phải cho stats và serialized output.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">B. Stacked showcase</div>
+        <div class="mockup-body" style="display:flex;flex-direction:column;gap:12px;min-height:260px;">
+          <div class="mock-nav">Toolbar / format switch / preset buttons</div>
+          <div class="mock-content" style="min-height:140px;">Editor canvas</div>
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;">
+            <div class="mock-sidebar" style="min-height:80px;">Stats</div>
+            <div class="mock-sidebar" style="min-height:80px;">Output tabs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Stacked showcase</h3>
+      <p>Cân bằng giữa trải nghiệm gõ và phần giải thích/output bên dưới.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">C. Control sidebar</div>
+        <div class="mockup-body" style="display:grid;grid-template-columns:240px 1fr;gap:12px;min-height:260px;">
+          <div class="mock-sidebar" style="display:flex;flex-direction:column;gap:10px;">
+            <div class="placeholder">Format switch</div>
+            <div class="placeholder">Preset picker</div>
+            <div class="placeholder">Toggle features</div>
+            <div class="placeholder">Stats</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="mock-content" style="min-height:150px;">Editor canvas</div>
+            <div class="mock-sidebar" style="min-height:70px;">Output preview</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Control sidebar</h3>
+      <p>Nhiều knobs hơn, hợp nếu story chủ yếu để test permutations.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Recommendation</h4>
+      <ul>
+        <li><strong>B</strong> dễ đọc nhất trong Storybook</li>
+        <li>Giữ editor là trung tâm nhưng vẫn showcase đủ stats/output</li>
+        <li>Ít cảm giác “developer tool only” hơn A và C</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>Trade-off</h4>
+      <ul>
+        <li>A tận dụng chiều ngang tốt hơn</li>
+        <li>C hợp hơn nếu bạn muốn rất nhiều controls</li>
+      </ul>
+    </div>
+  </div>
+</div>

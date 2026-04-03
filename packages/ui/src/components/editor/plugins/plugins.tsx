@@ -55,6 +55,7 @@ import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-p
 import { PollPlugin } from "../plugins/poll-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableActionsPlugin } from "../plugins/table-actions-plugin";
+import { TableHoverActionsPlugin } from "../plugins/table-hover-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
 import { VideoPlugin } from "../plugins/video-plugin";
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
@@ -179,8 +180,11 @@ export function Plugins({
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
-      {!isSimple && editable && (
+      {editable && (
         <TableActionsPlugin anchorElem={floatingAnchorElem} />
+      )}
+      {editable && (
+        <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />
       )}
       <TOCPlugin />
       <ListPlugin />

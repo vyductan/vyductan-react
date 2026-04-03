@@ -23,6 +23,7 @@ import { HistoryToolbarPlugin } from "./toolbar/history-toolbar-plugin";
 import { ImageToolbarPlugin } from "./toolbar/image-toolbar-plugin";
 import { LinkToolbarPlugin } from "./toolbar/link-toolbar-plugin";
 import { SubSuperToolbarPlugin } from "./toolbar/subsuper-toolbar-plugin";
+import { TableToolbarPlugin } from "./toolbar/table-toolbar-plugin";
 import { ToolbarPlugin } from "./toolbar/toolbar-plugin";
 
 interface FixedToolbarPluginProps {
@@ -74,6 +75,9 @@ export function FixedToolbarPlugin({ containerRef }: FixedToolbarPluginProps) {
 
               {/* Image */}
               <ImageToolbarPlugin />
+
+              {/* Table */}
+              <TableToolbarPlugin />
             </div>
 
             {/* Right aligned items - Sticky to right */}
