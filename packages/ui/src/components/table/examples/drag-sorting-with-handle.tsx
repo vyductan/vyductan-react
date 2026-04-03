@@ -18,14 +18,13 @@ import {
 } from "@dnd-kit/sortable";
 
 import type { TableProps } from "@acme/ui/components/table";
-import { Space } from "@acme/ui/components/space";
-import { Table } from "@acme/ui/components/table";
-import { Tag } from "@acme/ui/components/tag";
-
 import {
   DragHandle,
+  Table,
   TableRowSortable,
-} from "../_components/table-sortable-row";
+} from "@acme/ui/components/table";
+import { Space } from "@acme/ui/components/space";
+import { Tag } from "@acme/ui/components/tag";
 
 interface DataType {
   key: string;

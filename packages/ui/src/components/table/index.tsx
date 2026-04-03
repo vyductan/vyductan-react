@@ -40,3 +40,14 @@ export {
   TableHeader,
   TableRow,
 } from "./_components/base";
+export {
+  DragHandle,
+  TableRowSortable,
+  TableSummary,
+  TableSummaryCell,
+  TableSummaryRow,
+  TableToolbarLeft,
+  TableToolbarRight,
+  TableToolbarRoot,
+  TableViewOptions,
+} from "./_components";

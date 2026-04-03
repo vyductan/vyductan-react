@@ -2,6 +2,8 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
@@ -9,6 +11,7 @@ import { describe, expect, test, vi } from "vitest";
 import type { ColumnsType } from "./types";
 import * as localeModule from "../locale";
 import useSelection from "./hooks/use-selection";
+import * as tableModule from "./index";
 import { Table } from "./index";
 import { tableLocale_en } from "./locale/en-us";
 
@@ -44,6 +47,9 @@ const data: SelectionHarnessRecord[] = [
     name: "John Brown",
   },
 ];
+
+const tableExamplesDir = path.resolve(import.meta.dirname, "./examples");
+const tableDocsPath = path.resolve(import.meta.dirname, "./table.mdx");
 
 function SelectionDropdownHarness({
   getPopupContainer,
@@ -93,6 +99,52 @@ function SelectionDropdownHarness({
 }
 
 describe("Table", () => {
+  test("re-exports useful table subcomponents", () => {
+    expect(tableModule).toHaveProperty("TableToolbarRoot");
+    expect(tableModule).toHaveProperty("TableToolbarLeft");
+    expect(tableModule).toHaveProperty("TableToolbarRight");
+    expect(tableModule).toHaveProperty("TableViewOptions");
+    expect(tableModule).toHaveProperty("TableSummary");
+    expect(tableModule).toHaveProperty("TableSummaryRow");
+    expect(tableModule).toHaveProperty("TableSummaryCell");
+    expect(tableModule).toHaveProperty("TableRowSortable");
+    expect(tableModule).toHaveProperty("DragHandle");
+  });
+
+  test("drag sorting examples import table subcomponents from the public table module", () => {
+    const dragSortingFullRow = readFileSync(
+      path.join(tableExamplesDir, "drag-sorting-full-row.tsx"),
+      "utf8",
+    );
+    const dragSortingWithHandle = readFileSync(
+      path.join(tableExamplesDir, "drag-sorting-with-handle.tsx"),
+      "utf8",
+    );
+
+    expect(dragSortingFullRow).toContain(
+      'from "@acme/ui/components/table"',
+    );
+    expect(dragSortingWithHandle).toContain(
+      'from "@acme/ui/components/table"',
+    );
+    expect(dragSortingFullRow).not.toContain(
+      'from "../_components/table-sortable-row"',
+    );
+    expect(dragSortingWithHandle).not.toContain(
+      'from "../_components/table-sortable-row"',
+    );
+  });
+
+  test("table docs show public API imports for table subcomponents", () => {
+    const tableDocs = readFileSync(tableDocsPath, "utf8");
+
+    expect(tableDocs).toContain('from "@acme/ui/components/table"');
+    expect(tableDocs).toContain("TableViewOptions");
+    expect(tableDocs).toContain("TableSummary");
+    expect(tableDocs).toContain("TableRowSortable");
+    expect(tableDocs).toContain("DragHandle");
+  });
+
   test("re-exports locale hook", () => {
     expect(localeModule).toHaveProperty("useLocale");
   });

@@ -10,6 +10,25 @@ import TableTreeDataDemo from "./examples/tree-data";
 
 Build a Table component with an API compatible with Ant Design, but use @tanstack/react-table internally for processing and rendering.
 
+## Public API imports
+
+```tsx
+import {
+  DragHandle,
+  Table,
+  TableRowSortable,
+  TableSummary,
+  TableSummaryCell,
+  TableSummaryRow,
+  TableToolbarLeft,
+  TableToolbarRight,
+  TableToolbarRoot,
+  TableViewOptions,
+} from "@acme/ui/components/table";
+```
+
+Use these exports instead of importing table subcomponents from private `_components` paths.
+
 ## Inherit from:
 
 ### RC Table
