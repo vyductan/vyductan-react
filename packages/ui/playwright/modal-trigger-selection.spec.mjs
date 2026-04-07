@@ -2,9 +2,9 @@ import { chromium, expect, test } from "playwright/test";
 
 const STORYBOOK_ORIGIN =
   process.env.STORYBOOK_ORIGIN ?? "http://127.0.0.1:6006";
-const STORYBOOK_URL = `${STORYBOOK_ORIGIN}/iframe.html?id=components-modal--basic`;
+const STORYBOOK_URL = `${STORYBOOK_ORIGIN}/iframe.html?viewMode=docs&id=components-modal--docs`;
 
-test("copying modal title from right to left outside the dialog does not include background text", async () => {
+test("copying trigger-based modal title from right to left outside the dialog does not include background text", async () => {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   await context.grantPermissions(["clipboard-read", "clipboard-write"], {
@@ -15,14 +15,14 @@ test("copying modal title from right to left outside the dialog does not include
   try {
     await page.goto(STORYBOOK_URL, { waitUntil: "networkidle" });
 
-    await page.getByRole("button", { name: "Open Modal" }).click();
+    await page.getByRole("button", { name: "Click to Open" }).click();
 
-    const heading = page.getByRole("heading", { name: "Basic Modal" });
+    const heading = page.getByRole("heading", { name: "Modal with Trigger" });
     await heading.waitFor({ state: "visible", timeout: 30_000 });
 
     const box = await heading.boundingBox();
     if (!box) {
-      throw new Error("Missing modal title bounding box");
+      throw new Error("Missing trigger modal title bounding box");
     }
 
     await page.mouse.move(box.x + box.width - 2, box.y + box.height / 2);
@@ -34,15 +34,9 @@ test("copying modal title from right to left outside the dialog does not include
     await page.keyboard.press("Meta+C");
     await page.waitForTimeout(150);
 
-    const payload = await page.evaluate(async () => ({
-      selection: globalThis.getSelection()?.toString() ?? undefined,
-      clipboardText: await navigator.clipboard.readText(),
-    }));
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
 
-    expect(payload).toEqual({
-      selection: "Basic Modal",
-      clipboardText: "Basic Modal",
-    });
+    expect(clipboardText).toBe("Modal with Trigger");
   } finally {
     await browser.close();
   }

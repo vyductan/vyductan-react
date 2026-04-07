@@ -70,26 +70,6 @@ const Modal = ({
   //
   ...rest
 }: ModalProps) => {
-  // Prevent drag-selection from escaping the dialog and copying background text
-  // when the user selects modal title/content from right to left.
-  React.useEffect(() => {
-    if (!rest.open || typeof document === "undefined") {
-      return;
-    }
-
-    const { body } = document;
-    const previousUserSelect = body.style.userSelect;
-    const previousWebkitUserSelect = body.style.webkitUserSelect;
-
-    body.style.userSelect = "none";
-    body.style.webkitUserSelect = "none";
-
-    return () => {
-      body.style.userSelect = previousUserSelect;
-      body.style.webkitUserSelect = previousWebkitUserSelect;
-    };
-  }, [rest.open]);
-
   // =========================== Width ============================
   const [numWidth, responsiveWidth] = React.useMemo<
     [
