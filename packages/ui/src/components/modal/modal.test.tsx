@@ -5,7 +5,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 
-import { Modal } from ".";
+import { Modal } from "./modal";
 
 globalThis.React = React;
 
@@ -26,9 +26,11 @@ globalThis.ResizeObserver ??= class ResizeObserver {
 describe("Modal", () => {
   test("applies a responsive max-width override when width is provided", () => {
     render(
-      <Modal open width={800} title="Custom Width Modal">
-        <div>Body</div>
-      </Modal>,
+      React.createElement(
+        Modal,
+        { open: true, width: 800, title: "Custom Width Modal" },
+        React.createElement("div", null, "Body"),
+      ),
     );
 
     const content = screen.getByRole("dialog");
