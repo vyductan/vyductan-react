@@ -1,49 +1,18 @@
-import { chromium, expect, test } from "playwright/test";
+import { test } from "playwright/test";
 
-const STORYBOOK_ORIGIN =
-  process.env.STORYBOOK_ORIGIN ?? "http://127.0.0.1:6006";
+import {
+  expectReverseDragCopyFromHeading,
+  STORYBOOK_ORIGIN,
+} from "./dialog-selection.helpers.mjs";
+
 const STORYBOOK_URL = `${STORYBOOK_ORIGIN}/iframe.html?id=components-modal--basic`;
 
 test("copying modal title from right to left outside the dialog does not include background text", async () => {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
-  await context.grantPermissions(["clipboard-read", "clipboard-write"], {
-    origin: STORYBOOK_ORIGIN,
+  await expectReverseDragCopyFromHeading({
+    storybookUrl: STORYBOOK_URL,
+    openButtonName: "Open Modal",
+    headingName: "Basic Modal",
+    expectedText: "Basic Modal",
+    missingBoxMessage: "Missing modal title bounding box",
   });
-  const page = await context.newPage();
-
-  try {
-    await page.goto(STORYBOOK_URL, { waitUntil: "networkidle" });
-
-    await page.getByRole("button", { name: "Open Modal" }).click();
-
-    const heading = page.getByRole("heading", { name: "Basic Modal" });
-    await heading.waitFor({ state: "visible", timeout: 30_000 });
-
-    const box = await heading.boundingBox();
-    if (!box) {
-      throw new Error("Missing modal title bounding box");
-    }
-
-    await page.mouse.move(box.x + box.width - 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(box.x - 300, box.y + box.height / 2, {
-      steps: 30,
-    });
-    await page.mouse.up();
-    await page.keyboard.press("Meta+C");
-    await page.waitForTimeout(150);
-
-    const payload = await page.evaluate(async () => ({
-      selection: globalThis.getSelection()?.toString() ?? undefined,
-      clipboardText: await navigator.clipboard.readText(),
-    }));
-
-    expect(payload).toEqual({
-      selection: "Basic Modal",
-      clipboardText: "Basic Modal",
-    });
-  } finally {
-    await browser.close();
-  }
 });
