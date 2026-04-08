@@ -1,0 +1,72 @@
+import AllowClearExample from "./examples/allow-clear.mdx";
+import BasicExample from "./examples/basic.mdx";
+import ComboboxModeExample from "./examples/combobox-mode.mdx";
+import CustomOptionRenderExample from "./examples/custom-option-render.mdx";
+import DisabledExample from "./examples/disabled.mdx";
+import DropdownCustomizationExample from "./examples/dropdown-customization.mdx";
+import InputModeExample from "./examples/input-mode.mdx";
+import LoadingExample from "./examples/loading.mdx";
+import NumericValuesExample from "./examples/numeric-values.mdx";
+import SearchFilterExample from "./examples/search-filter.mdx";
+
+# AutoComplete
+
+AutoComplete helps users search or choose from a known set of options while keeping the input compact.
+
+## Features
+
+- **Two trigger modes** — `combobox` for button-style selection and `input` for free typing with suggestions
+- **Search assistance** — built-in filtering plus custom `filter` logic
+- **State feedback** — supports `allowClear`, `loading`, and `disabled`
+- **Custom rendering** — support for `optionLabelProp`, `optionRender`, and dropdown composition
+- **Composable dropdown** — use footer and dropdown render slots to extend the menu
+
+## Modes
+
+- `combobox` uses the button trigger and is best when users pick one known option.
+- `input` uses the text input trigger and is best when users type first and confirm from suggestions.
+
+## Examples
+
+<BasicExample />
+
+<ComboboxModeExample />
+
+<InputModeExample />
+
+<NumericValuesExample />
+
+<AllowClearExample />
+
+<DisabledExample />
+
+<LoadingExample />
+
+<CustomOptionRenderExample />
+
+<SearchFilterExample />
+
+<DropdownCustomizationExample />
+
+## API Reference
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `"combobox" \| "input"` | `"combobox"` | Chooses between button trigger mode and text input trigger mode. |
+| `value` | `string \| number` | - | Controlled selected option value. |
+| `defaultValue` | `string \| number` | - | Initial selected option value for uncontrolled usage. |
+| `options` | `OptionType[]` | - | Options available to render and select. |
+| `optionsToSearch` | `{ value: string; label: string }[]` | - | Alternative search dataset when display and search data differ. |
+| `optionLabelProp` | `string` | - | Field used as the label when syncing selected text. |
+| `allowClear` | `boolean` | `false` | Shows a clear affordance for removing the current value. |
+| `loading` | `boolean` | `false` | Shows a loading indicator in the trigger. |
+| `disabled` | `boolean` | `false` | Disables interaction. |
+| `placeholder` | `string` | - | Placeholder shown when no value is selected. |
+| `searchPlaceholder` | `string` | - | Placeholder used by the search field inside the dropdown. |
+| `filter` | `(value, search, option?) => number` | built-in accent-insensitive label matcher | Filters options during search. |
+| `optionRender` | `{ label?, icon? }` | - | Customizes how each selected option label or icon is rendered. |
+| `dropdownRender` | `(menu) => React.ReactNode` | - | Customizes the dropdown body around the menu. |
+| `dropdownFooter` | `React.ReactNode` | - | Appends footer content below the options list. |
+| `onChange` | `(value?, option?) => void` | - | Called when the selection changes. |
+| `onOpenChange` | `(open: boolean) => void` | - | Called when the popover open state changes. |
+| `onSearchChange` | `(search: string) => void` | - | Called when the search text changes. |
