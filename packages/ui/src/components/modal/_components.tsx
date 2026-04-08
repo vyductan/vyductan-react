@@ -9,19 +9,27 @@ import {
   DialogTitle as ShadcnDialogTitle,
 } from "@acme/ui/shadcn/dialog";
 
+const INTERACTIVE_SELECTOR = [
+  "button",
+  "[role='button']",
+  "a",
+  "[role='link']",
+  "input",
+  "textarea",
+  "select",
+  "option",
+  "label",
+  "[contenteditable='true']",
+  "[data-slot='dialog-close']",
+].join(", ");
+
 function shouldStartSelectionDrag(target: Element) {
-  if (
-    target.closest(
-      "button, [role='button'], a, input, textarea, select, option, label, [data-slot='dialog-close']",
-    )
-  ) {
+  if (target.closest(INTERACTIVE_SELECTOR)) {
     return false;
   }
 
   return Boolean(
-    target.closest(
-      "[data-slot='dialog-title'], [data-slot='dialog-description'], [data-slot='scroll-area']",
-    ),
+    target.closest("[data-slot='dialog-title'], [data-slot='dialog-description']"),
   );
 }
 
@@ -51,9 +59,11 @@ function DialogContent({
     };
   }, [selectionDragActive]);
 
-  // Prevent drag-selection from escaping the dialog and copying background text
-  // when the user selects dialog title/content from right to left.
   React.useEffect(() => {
+    if (!selectionDragActive) {
+      return;
+    }
+
     const { body } = document;
     const previousUserSelect = body.style.userSelect;
     const previousWebkitUserSelect = body.style.webkitUserSelect;
@@ -65,7 +75,7 @@ function DialogContent({
       body.style.userSelect = previousUserSelect;
       body.style.webkitUserSelect = previousWebkitUserSelect;
     };
-  }, []);
+  }, [selectionDragActive]);
 
   React.useEffect(() => {
     if (!selectionDragActive) {
