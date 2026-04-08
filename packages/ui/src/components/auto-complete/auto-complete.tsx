@@ -97,7 +97,7 @@ const AutoComplete = <
     filterProp ??
     ((value, search, _) => {
       const label = (optionsToSearch ?? options)
-        .find((item) => item.value === value)
+        .find((item) => String(item.value) === String(value))
         ?.label?.toString();
       if (
         label &&
