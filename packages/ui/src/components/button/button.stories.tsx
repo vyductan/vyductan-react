@@ -1,13 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Plus } from "lucide-react";
+import { ArrowUpRight, Download, Mail, Plus, Trash2 } from "lucide-react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
+import { Flex } from "../flex";
 import { Button } from "./button";
-import DisabledDemo from "./examples/disabled";
-import IconDemo from "./examples/icon";
-import LoadingDemo from "./examples/loading";
-import SizesDemo from "./examples/sizes";
-import WithIconDemo from "./examples/with-icon";
 
 const meta = {
   title: "Components/Button",
@@ -143,23 +139,127 @@ export const Colors: Story = {
 };
 
 export const Sizes: Story = {
-  render: () => <SizesDemo />,
+  render: () => (
+    <Flex gap="small" align="center" wrap>
+      <Button type="primary" size="small">
+        Small
+      </Button>
+      <Button type="primary" size="middle">
+        Default
+      </Button>
+      <Button type="primary" size="large">
+        Large
+      </Button>
+    </Flex>
+  ),
 };
 
 export const WithIcon: Story = {
-  render: () => <WithIconDemo />,
+  render: () => (
+    <Flex gap="small" align="center" wrap>
+      <Button type="primary">
+        <Plus className="size-4" />
+        Add Item
+      </Button>
+      <Button>
+        <Download className="size-4" />
+        Download
+      </Button>
+      <Button type="link">
+        <Mail className="size-4" />
+        Send Email
+      </Button>
+    </Flex>
+  ),
 };
 
 export const IconOnly: Story = {
-  render: () => <IconDemo />,
+  render: () => (
+    <Flex gap="small" align="center" wrap>
+      <Button shape="icon" size="small" aria-label="Add item">
+        <Plus className="size-4" />
+      </Button>
+      <Button shape="icon" aria-label="Open link">
+        <ArrowUpRight className="size-4" />
+      </Button>
+      <Button type="primary" shape="icon" size="large" aria-label="Delete item">
+        <Trash2 className="size-4" />
+      </Button>
+    </Flex>
+  ),
 };
 
 export const Loading: Story = {
-  render: () => <LoadingDemo />,
+  render: () => (
+    <Flex gap="small" wrap>
+      <Button type="primary" loading>
+        Loading
+      </Button>
+      <Button loading>Loading default</Button>
+    </Flex>
+  ),
 };
 
 export const Disabled: Story = {
-  render: () => <DisabledDemo />,
+  render: () => (
+    <Flex gap="small" align="flex-start" vertical>
+      <Flex gap="small">
+        <Button type="primary">Primary</Button>
+        <Button type="primary" disabled>
+          Primary(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button>Default</Button>
+        <Button disabled>Default(disabled)</Button>
+      </Flex>
+      <Flex gap="small">
+        <Button type="dashed">Dashed</Button>
+        <Button type="dashed" disabled>
+          Dashed(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button type="text">Text</Button>
+        <Button type="text" disabled>
+          Text(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button type="link">Link</Button>
+        <Button type="link" disabled>
+          Link(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button type="primary" href="https://ant.design/index-cn">
+          Href Primary
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button danger>Danger Default</Button>
+        <Button danger disabled>
+          Danger Default(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button danger type="text">
+          Danger Text
+        </Button>
+        <Button danger type="text" disabled>
+          Danger Text(disabled)
+        </Button>
+      </Flex>
+      <Flex gap="small">
+        <Button type="link" danger>
+          Danger Link
+        </Button>
+        <Button type="link" danger disabled>
+          Danger Link(disabled)
+        </Button>
+      </Flex>
+    </Flex>
+  ),
 };
 
 export const WithError: Story = {

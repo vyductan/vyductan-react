@@ -41,6 +41,7 @@ export const AlertModal = ({
   children,
   okButtonProps,
   media,
+  okType,
   ...rest
 }: AlertModalProps) => {
   const handleOpenChange = React.useCallback(
@@ -170,7 +171,9 @@ export const AlertModal = ({
               }),
               buttonColorVariants({
                 variant: okButtonProps?.variant ?? "solid",
-                color: okButtonProps?.color ?? "primary",
+                color:
+                  okButtonProps?.color ??
+                  (okType === "danger" ? "danger" : "primary"),
               }),
               isSimpleType && "w-full",
             )}

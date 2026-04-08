@@ -25,6 +25,7 @@ const App: React.FC = () => {
         open={open}
         title="Delete Item"
         description="Are you sure you want to delete this item? This action cannot be undone."
+        okType="danger"
         confirmLoading={false}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
