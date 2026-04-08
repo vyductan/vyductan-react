@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, test } from "vitest";
 
-const buttonExampleInventory: ReadonlyArray<{
+const checkboxExampleInventory: ReadonlyArray<{
   heading: string;
   sourcePath: string;
   partialImportPath: string;
@@ -10,73 +10,19 @@ const buttonExampleInventory: ReadonlyArray<{
 }> = [
   {
     heading: "Basic Usage",
-    sourcePath: "button/examples/basic.tsx",
+    sourcePath: "checkbox/examples/basic.tsx",
     partialImportPath: "./examples/basic.mdx",
     partialComponentName: "BasicExample",
   },
   {
-    heading: "Color & Variant",
-    sourcePath: "button/examples/color-variant.tsx",
-    partialImportPath: "./examples/color-variant.mdx",
-    partialComponentName: "ColorVariantExample",
-  },
-  {
-    heading: "Different Sizes",
-    sourcePath: "button/examples/sizes.tsx",
-    partialImportPath: "./examples/sizes.mdx",
-    partialComponentName: "SizesExample",
-  },
-  {
-    heading: "Button Types",
-    sourcePath: "button/examples/types.tsx",
-    partialImportPath: "./examples/types.mdx",
-    partialComponentName: "TypesExample",
-  },
-  {
-    heading: "Danger Button",
-    sourcePath: "button/examples/danger.tsx",
-    partialImportPath: "./examples/danger.mdx",
-    partialComponentName: "DangerExample",
-  },
-  {
-    heading: "Disabled State",
-    sourcePath: "button/examples/disabled.tsx",
-    partialImportPath: "./examples/disabled.mdx",
-    partialComponentName: "DisabledExample",
-  },
-  {
-    heading: "Loading State",
-    sourcePath: "button/examples/loading.tsx",
-    partialImportPath: "./examples/loading.mdx",
-    partialComponentName: "LoadingExample",
-  },
-  {
-    heading: "Icon Button",
-    sourcePath: "button/examples/icon.tsx",
-    partialImportPath: "./examples/icon.mdx",
-    partialComponentName: "IconExample",
-  },
-  {
-    heading: "Button with Icon",
-    sourcePath: "button/examples/with-icon.tsx",
-    partialImportPath: "./examples/with-icon.mdx",
-    partialComponentName: "WithIconExample",
-  },
-  {
-    heading: "Link as Button",
-    sourcePath: "button/examples/link-as-button.tsx",
-    partialImportPath: "./examples/link-as-button.mdx",
-    partialComponentName: "LinkAsButtonExample",
-  },
-  {
-    heading: "Form Integration",
-    sourcePath: "button/examples/form-integration.tsx",
-    partialImportPath: "./examples/form-integration.mdx",
-    partialComponentName: "FormIntegrationExample",
+    heading: "Card Variant",
+    sourcePath: "checkbox/examples/card.tsx",
+    partialImportPath: "./examples/card.mdx",
+    partialComponentName: "CardExample",
   },
 ] as const;
 
-describe("Button docs Storybook config", () => {
+describe("Checkbox docs Storybook config", () => {
   test("configures addon-docs with remark-gfm so markdown tables render as tables in MDX docs", () => {
     const configSource = readFileSync(
       path.resolve(import.meta.dirname, "../../../.storybook/main.ts"),
@@ -89,7 +35,7 @@ describe("Button docs Storybook config", () => {
   });
 
   test("marks examples MDX partials as templates so Storybook does not index them as standalone sidebar entries", () => {
-    for (const { partialImportPath } of buttonExampleInventory) {
+    for (const { partialImportPath } of checkboxExampleInventory) {
       const partialSource = readFileSync(
         path.resolve(import.meta.dirname, partialImportPath),
         "utf8",
@@ -111,32 +57,32 @@ describe("Button docs Storybook config", () => {
     expect(configSource).not.toContain('"@storybook/addon-onboarding"');
   });
 
-  test("attaches MDX docs to the Button stories tree so the sidebar stays grouped", () => {
+  test("attaches MDX docs to the Checkbox stories tree so the sidebar stays grouped", () => {
     const docsSource = readFileSync(
-      path.resolve(import.meta.dirname, "./button.mdx"),
+      path.resolve(import.meta.dirname, "./checkbox.mdx"),
       "utf8",
     );
 
-    expect(docsSource).toContain('import * as ButtonStories from "./button.stories"');
-    expect(docsSource).toContain("<Meta of={ButtonStories} />");
+    expect(docsSource).toContain(
+      'import * as CheckboxStories from "./checkbox.stories"',
+    );
+    expect(docsSource).toContain("<Meta of={CheckboxStories} />");
   });
 
   test("assembles example docs from examples MDX partials instead of raw markdown", () => {
     const docsSource = readFileSync(
-      path.resolve(import.meta.dirname, "./button.mdx"),
+      path.resolve(import.meta.dirname, "./checkbox.mdx"),
       "utf8",
     );
 
     expect(docsSource).toContain("## Examples");
-    expect(docsSource).not.toContain(
-      'import ReactMarkdown from "react-markdown"',
-    );
+    expect(docsSource).not.toContain('import ReactMarkdown from "react-markdown"');
     expect(docsSource).not.toContain("?raw");
 
     for (const {
       partialImportPath,
       partialComponentName,
-    } of buttonExampleInventory) {
+    } of checkboxExampleInventory) {
       expect(docsSource).toContain(
         `import ${partialComponentName} from "${partialImportPath}"`,
       );
@@ -148,14 +94,14 @@ describe("Button docs Storybook config", () => {
 
   test("keeps the visual example sections wired to live ComponentSource examples through the MDX partials", () => {
     const docsSource = readFileSync(
-      path.resolve(import.meta.dirname, "./button.mdx"),
+      path.resolve(import.meta.dirname, "./checkbox.mdx"),
       "utf8",
     );
 
     for (const {
       partialImportPath,
       partialComponentName,
-    } of buttonExampleInventory) {
+    } of checkboxExampleInventory) {
       expect(docsSource).toContain(
         `import ${partialComponentName} from "${partialImportPath}"`,
       );
@@ -166,7 +112,7 @@ describe("Button docs Storybook config", () => {
       heading,
       partialImportPath,
       sourcePath,
-    } of buttonExampleInventory) {
+    } of checkboxExampleInventory) {
       const partialFilePath = path.resolve(
         import.meta.dirname,
         partialImportPath,

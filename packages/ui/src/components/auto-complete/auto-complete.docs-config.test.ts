@@ -71,33 +71,56 @@ const autoCompleteExampleInventory: ReadonlyArray<{
 ] as const;
 
 describe("AutoComplete docs Storybook config", () => {
+  const storybookConfigFilePath = path.resolve(
+    import.meta.dirname,
+    "../../../.storybook/main.ts",
+  );
+  const docsFilePath = path.resolve(import.meta.dirname, "./auto-complete.mdx");
+
+  function readUtf8(filePath: string): string {
+    return readFileSync(filePath, "utf8");
+  }
+
   test("configures addon-docs with remark-gfm so markdown tables render as tables in MDX docs", () => {
-    const configSource = readFileSync(
-      path.resolve(import.meta.dirname, "../../../.storybook/main.ts"),
-      "utf8",
-    );
+    const configSource = readUtf8(storybookConfigFilePath);
 
     expect(configSource).toContain('name: "@storybook/addon-docs"');
     expect(configSource).toContain("mdxPluginOptions");
     expect(configSource).toContain("remarkPlugins: [remarkGfm]");
   });
 
+  test("marks examples MDX partials as templates so Storybook does not index them as standalone sidebar entries", () => {
+    for (const { partialImportPath } of autoCompleteExampleInventory) {
+      const partialSource = readUtf8(
+        path.resolve(import.meta.dirname, partialImportPath),
+      );
+      const templateMarkerIndex = partialSource.indexOf("<Meta isTemplate />");
+
+      expect(partialSource).toContain('import { Meta } from "@storybook/addon-docs/blocks"');
+      expect(templateMarkerIndex).toBeGreaterThan(-1);
+      expect(partialSource.slice(templateMarkerIndex)).not.toContain("\nimport ");
+    }
+  });
+
   test("does not keep addon-onboarding enabled after the workspace is already onboarded", () => {
-    const configSource = readFileSync(
-      path.resolve(import.meta.dirname, "../../../.storybook/main.ts"),
-      "utf8",
-    );
+    const configSource = readUtf8(storybookConfigFilePath);
 
     expect(configSource).not.toContain('"@storybook/addon-onboarding"');
   });
 
-  test("assembles example docs from examples MDX partials instead of raw markdown", () => {
-    const docsSource = readFileSync(
-      path.resolve(import.meta.dirname, "./auto-complete.mdx"),
-      "utf8",
-    );
+  test("attaches MDX docs to the AutoComplete stories tree so the sidebar stays grouped", () => {
+    const docsSource = readUtf8(docsFilePath);
 
-    expect(docsSource).toContain("## Examples");
+    expect(docsSource).toContain(
+      'import * as AutoCompleteStories from "./auto-complete.stories"',
+    );
+    expect(docsSource).toContain("<Meta of={AutoCompleteStories} />");
+  });
+
+  test("assembles example docs from examples MDX partials without an Examples heading", () => {
+    const docsSource = readUtf8(docsFilePath);
+
+    expect(docsSource).not.toContain("## Examples");
     expect(docsSource).not.toContain(
       'import ReactMarkdown from "react-markdown"',
     );
@@ -110,17 +133,12 @@ describe("AutoComplete docs Storybook config", () => {
       expect(docsSource).toContain(
         `import ${partialComponentName} from "${partialImportPath}"`,
       );
-      expect(docsSource).toMatch(
-        new RegExp(String.raw`## Examples[\s\S]*?<${partialComponentName} ?/>`),
-      );
+      expect(docsSource).toContain(`<${partialComponentName} />`);
     }
   });
 
   test("keeps the visual example sections wired to live ComponentSource examples through the MDX partials", () => {
-    const docsSource = readFileSync(
-      path.resolve(import.meta.dirname, "./auto-complete.mdx"),
-      "utf8",
-    );
+    const docsSource = readUtf8(docsFilePath);
 
     for (const {
       partialImportPath,
@@ -152,7 +170,7 @@ describe("AutoComplete docs Storybook config", () => {
       ).toBe(true);
       expect(docsSource).not.toMatch(legacyInlineSectionPattern);
 
-      const partialSource = readFileSync(partialFilePath, "utf8");
+      const partialSource = readUtf8(partialFilePath);
 
       expect(partialSource).toContain("ComponentSource");
       expect(partialSource).toContain(`### ${heading}`);

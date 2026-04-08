@@ -1,3 +1,6 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import * as AutoCompleteStories from "./auto-complete.stories";
 import AllowClearExample from "./examples/allow-clear.mdx";
 import BasicExample from "./examples/basic.mdx";
 import ComboboxModeExample from "./examples/combobox-mode.mdx";
@@ -8,6 +11,8 @@ import InputModeExample from "./examples/input-mode.mdx";
 import LoadingExample from "./examples/loading.mdx";
 import NumericValuesExample from "./examples/numeric-values.mdx";
 import SearchFilterExample from "./examples/search-filter.mdx";
+
+<Meta of={AutoCompleteStories} />
 
 # AutoComplete
 
@@ -25,8 +30,6 @@ AutoComplete helps users search or choose from a known set of options while keep
 
 - `combobox` uses the button trigger and is best when users pick one known option.
 - `input` uses the text input trigger and is best when users type first and confirm from suggestions.
-
-## Examples
 
 <BasicExample />
 
