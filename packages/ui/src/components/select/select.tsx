@@ -206,7 +206,9 @@ const Select = <
   };
 
   const clearValue = () => {
-    setInternalValue(undefined);
+    const emptyValue = undefined;
+
+    setInternalValue(emptyValue);
     setSearchValue("");
 
     if (isMultiple) {
@@ -225,7 +227,7 @@ const Select = <
             option?: OptionType<TValue, TRecord>,
           ) => void)
         | undefined
-    )?.(undefined, undefined);
+    )?.(emptyValue, emptyValue);
   };
 
   const triggerChange = (value?: TValue) => {
