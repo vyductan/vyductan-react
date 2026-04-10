@@ -20,6 +20,26 @@ const checkboxExampleInventory: ReadonlyArray<{
     partialImportPath: "./examples/card.mdx",
     partialComponentName: "CardExample",
   },
+  {
+    heading: "Card Variant",
+    sourcePath: "checkbox/examples/card-composable.tsx",
+    partialImportPath: "./examples/card.mdx",
+    partialComponentName: "CardExample",
+  },
+] as const;
+
+const checkboxCardTabInventory: ReadonlyArray<{
+  label: string;
+  sourcePath: string;
+}> = [
+  {
+    label: "Standard API",
+    sourcePath: "checkbox/examples/card.tsx",
+  },
+  {
+    label: "Composable API",
+    sourcePath: "checkbox/examples/card-composable.tsx",
+  },
 ] as const;
 
 describe("Checkbox docs Storybook config", () => {
@@ -67,6 +87,34 @@ describe("Checkbox docs Storybook config", () => {
       'import * as CheckboxStories from "./checkbox.stories"',
     );
     expect(docsSource).toContain("<Meta of={CheckboxStories} />");
+  });
+
+  test("describes the Card story tabs and source references in storybook docs", () => {
+    const storiesSource = readFileSync(
+      path.resolve(import.meta.dirname, "./checkbox.stories.tsx"),
+      "utf8",
+    );
+
+    expect(storiesSource).toContain("export const Card: Story = {");
+
+    for (const { label, sourcePath } of checkboxCardTabInventory) {
+      expect(storiesSource).toContain(label);
+      expect(storiesSource).toContain(sourcePath);
+    }
+  });
+
+  test("describes the Card MDX partial tabs and source references", () => {
+    const partialSource = readFileSync(
+      path.resolve(import.meta.dirname, "./examples/card.mdx"),
+      "utf8",
+    );
+
+    for (const { label, sourcePath } of checkboxCardTabInventory) {
+      expect(partialSource).toContain(label);
+      expect(partialSource).toContain(sourcePath);
+    }
+
+    expect(partialSource).not.toContain("./examples/card-composable.mdx");
   });
 
   test("assembles example docs from examples MDX partials instead of raw markdown", () => {

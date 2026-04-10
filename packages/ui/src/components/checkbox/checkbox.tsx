@@ -150,6 +150,11 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
         className={cn(
           "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
+          variant === "card" && [
+            "hover:bg-accent/50 items-start gap-2 rounded-lg border p-3",
+            "has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50",
+            "dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950",
+          ],
           inputDisabledVariants({ disabled: mergedDisabled }),
           className,
         )}
@@ -161,8 +166,12 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
         <ShadcnCheckbox
           className={cn(
             "data-[state=indeterminate]:bg-muted",
-            "self-center",
+            variant === "card" ? "self-start" : "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
+            variant === "card" && [
+              "data-[state=checked]:border-primary-600 data-[state=checked]:bg-primary-600 data-[state=checked]:text-white",
+              "dark:data-[state=checked]:border-primary-700 dark:data-[state=checked]:bg-primary-700",
+            ],
           )}
           value={value as string | undefined}
           checked={indeterminate ? "indeterminate" : mergedChecked}
@@ -204,7 +213,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           variant === "card" ? (
             <div
               data-slot="checkbox-label"
-              className={cn("leading-line-height px-2", classNames?.label)}
+              className={cn("leading-line-height", classNames?.label)}
             >
               {children}
             </div>

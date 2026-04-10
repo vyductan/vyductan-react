@@ -1,10 +1,14 @@
+import type * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import type { JSX } from "react";
 
 import type { CheckboxOptionType } from "./checkbox-group";
 import { Label } from "../label";
 import { ComponentSource } from "../mdx/component-source";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import BasicExample from "./examples/basic";
+import CardComposableExample from "./examples/card-composable";
+import CardExample from "./examples/card";
 import { Checkbox } from "./index";
 
 const externalLabelClassName =
@@ -77,18 +81,51 @@ export const Default: Story = {
   ),
 };
 
+function CompareTabs({
+  standardSrc,
+  standardComp,
+  composableSrc,
+  composableComp,
+}: {
+  standardSrc: string;
+  standardComp: React.FC;
+  composableSrc: string;
+  composableComp: React.FC;
+}): React.JSX.Element {
+  return (
+    <div className="mx-auto w-full max-w-sm">
+      <Tabs defaultValue="standard-api" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="standard-api">Standard API</TabsTrigger>
+          <TabsTrigger value="composable-api">Composable API</TabsTrigger>
+        </TabsList>
+        <TabsContent
+          value="standard-api"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
+          <ComponentSource src={standardSrc} __comp__={standardComp} />
+        </TabsContent>
+        <TabsContent
+          value="composable-api"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
+          <ComponentSource src={composableSrc} __comp__={composableComp} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
 export const Card: Story = {
   render: () => (
-    <div className="w-full max-w-sm">
-      <Checkbox defaultChecked variant="card">
-        <div className="grid gap-1.5 font-normal">
-          <p className="text-sm leading-none font-medium">Auto Start</p>
-          <p className="text-muted-foreground text-sm">
-            Starting with your OS.
-          </p>
-        </div>
-      </Checkbox>
-    </div>
+    <CompareTabs
+      standardSrc="checkbox/examples/card.tsx"
+      standardComp={CardExample}
+      composableSrc="checkbox/examples/card-composable.tsx"
+      composableComp={CardComposableExample}
+    />
   ),
 };
 

@@ -1,11 +1,37 @@
 import { Meta } from "@storybook/addon-docs/blocks";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@acme/ui/components/tabs";
 import { ComponentSource } from "@acme/ui/components/mdx";
+import CardComposableExample from "./card-composable";
 import CardExample from "./card";
 
 <Meta isTemplate />
 
 ### Card Variant
 
-Use the card variant to pair the checkbox with richer label content.
+Use the card variant to compare the standard and composable APIs for richer label content.
 
-<ComponentSource src="checkbox/examples/card.tsx" __comp__={CardExample} />
+<Tabs defaultValue="standard-api" className="w-full">
+  <TabsList className="w-full">
+    <TabsTrigger value="standard-api">Standard API</TabsTrigger>
+    <TabsTrigger value="composable-api">Composable API</TabsTrigger>
+  </TabsList>
+  <TabsContent
+    value="standard-api"
+    forceMount
+    className="data-[state=inactive]:hidden"
+  >
+    <ComponentSource src="checkbox/examples/card.tsx" __comp__={CardExample} />
+  </TabsContent>
+  <TabsContent
+    value="composable-api"
+    forceMount
+    className="data-[state=inactive]:hidden"
+  >
+    <ComponentSource src="checkbox/examples/card-composable.tsx" __comp__={CardComposableExample} />
+  </TabsContent>
+</Tabs>
