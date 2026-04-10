@@ -11,7 +11,8 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { PopoverProps } from "../../popover";
 import { Command } from "../../command";
-import { PopoverContent, PopoverRoot, PopoverTrigger } from "../../popover";
+import { PopoverContent, PopoverTrigger } from "../../popover";
+import { Popover } from "../../popover/_component";
 
 type TableViewOptionsProps<TData> = PopoverProps & {
   table: Table<TData>;
@@ -24,7 +25,7 @@ export function TableViewOptions<TData>({
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   return (
-    <PopoverRoot modal>
+    <Popover modal>
       <PopoverTrigger asChild>
         <Button
           ref={triggerRef}
@@ -68,6 +69,6 @@ export function TableViewOptions<TData>({
             }))}
         />
       </PopoverContent>
-    </PopoverRoot>
+    </Popover>
   );
 }

@@ -51,6 +51,8 @@ vi.mock("radix-ui", async () => {
   };
 });
 
+import * as PopoverInternalExports from "./_component";
+import * as PopoverExports from "./index";
 import { Popover } from "./index";
 
 globalThis.React = React;
@@ -103,4 +105,12 @@ describe("Popover", () => {
     );
   });
 
+  test("does not expose PopoverRoot from the public popover API", () => {
+    expect(PopoverExports).not.toHaveProperty("PopoverRoot");
+  });
+
+  test("keeps the internal root export under the Popover name", () => {
+    expect(PopoverInternalExports).toHaveProperty("Popover");
+    expect(PopoverInternalExports).not.toHaveProperty("PopoverRoot");
+  });
 });

@@ -1,16 +1,16 @@
 import { Button } from "@acme/ui/components/button";
 import {
+  Popover,
   PopoverContent,
   PopoverDescription,
   PopoverHeader,
-  PopoverRoot,
   PopoverTitle,
   PopoverTrigger,
 } from "@acme/ui/components/popover";
 
 const BasicShadcnLikeDemo = () => {
   return (
-    <PopoverRoot>
+    <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline">Open popover</Button>
       </PopoverTrigger>
@@ -32,7 +32,7 @@ const BasicShadcnLikeDemo = () => {
           </div>
         </div>
       </PopoverContent>
-    </PopoverRoot>
+    </Popover>
   );
 };
 

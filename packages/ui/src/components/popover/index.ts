@@ -1,2 +1,11 @@
 export * from "./popover";
-export * from "./_component";
+export {
+  PopoverAnchor,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./_component";
+export type { PopoverContentProps } from "./_component";

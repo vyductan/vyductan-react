@@ -19,7 +19,8 @@ import type {
 } from "./types";
 import { Empty } from "../empty";
 import { inputVariants } from "../input";
-import { PopoverContent, PopoverRoot, PopoverTrigger } from "../popover";
+import { PopoverContent, PopoverTrigger } from "../popover";
+import { Popover } from "../popover/_component";
 import {
   SelectContent,
   SelectGroup,
@@ -36,6 +37,10 @@ import { SelectContext } from "./context";
 type SemanticName = "root";
 type PopupSemantic = "root";
 
+type SelectOnChange<TValue, TOption> = {
+  bivarianceHack(value: TValue, option?: TOption): void;
+}["bivarianceHack"];
+
 type SelectDefaultProps<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
@@ -44,7 +49,10 @@ type SelectDefaultProps<
 
   defaultValue?: TValue;
   value?: TValue;
-  onChange?: (value: TValue, option?: OptionType<TValue, TRecord>) => void;
+  onChange?: SelectOnChange<
+    TValue | undefined,
+    OptionType<TValue, TRecord>
+  >;
 };
 
 type SelectMultipleOrTagsProps<
@@ -55,7 +63,7 @@ type SelectMultipleOrTagsProps<
 
   defaultValue?: TValue[];
   value?: TValue[];
-  onChange?: (value: TValue[], option?: OptionType<TValue, TRecord>[]) => void;
+  onChange?: SelectOnChange<TValue[], OptionType<TValue, TRecord>[]>;
 };
 
 type SelectProps<
@@ -212,9 +220,12 @@ const Select = <
 
     (
       onChange as
-        | ((value: TValue, option?: OptionType<TValue, TRecord>) => void)
+        | ((
+            value: TValue | undefined,
+            option?: OptionType<TValue, TRecord>,
+          ) => void)
         | undefined
-    )?.(undefined as unknown as TValue);
+    )?.(undefined, undefined);
   };
 
   const triggerChange = (value?: TValue) => {
@@ -365,6 +376,7 @@ const Select = <
     }
 
     triggerChange(resolvedValue);
+    handleOpenChange(false);
   };
 
   const selectActiveTagOption = () => {
@@ -742,7 +754,7 @@ const Select = <
           triggerChange: triggerChange as (value?: SelectValueType) => void,
         }}
       >
-        <PopoverRoot open={internalOpen} onOpenChange={handleOpenChange}>
+        <Popover open={internalOpen} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
             <div>
               <div
@@ -798,6 +810,15 @@ const Select = <
 
                     setKey(+Date.now());
                   }}
+                  onClear={() => {
+                    if (disabled) return;
+
+                    if (allowClear) {
+                      clearValue();
+                    }
+
+                    setKey(+Date.now());
+                  }}
                 />
               </div>
             </div>
@@ -813,7 +834,7 @@ const Select = <
           >
             {tagsContent}
           </PopoverContent>
-        </PopoverRoot>
+        </Popover>
       </SelectContext.Provider>
     );
   }

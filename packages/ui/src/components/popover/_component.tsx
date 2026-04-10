@@ -64,7 +64,7 @@ const PopoverClose = PopoverPrimitive.Close;
 
 export type { PopoverRootProps, PopoverContentProps };
 export {
-  Popover as PopoverRoot,
+  Popover,
   PopoverTrigger,
   PopoverAnchor,
   PopoverHeader,

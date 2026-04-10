@@ -9,10 +9,10 @@ import type { AlignType } from "../../types";
 import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
 import {
+  Popover as InternalPopover,
   PopoverContent,
   PopoverDescription,
   PopoverHeader,
-  PopoverRoot,
   PopoverTitle,
   PopoverTrigger,
 } from "./_component";
@@ -45,7 +45,7 @@ export const Popover = (props: PopoverProps) => {
   );
 
   if (isShadcnPopover) {
-    return <PopoverRoot {...props} />;
+    return <InternalPopover {...props} />;
   }
 
   const {
@@ -84,7 +84,7 @@ export const Popover = (props: PopoverProps) => {
   const sideOffset = domAlign?.offset?.[1];
 
   return (
-    <PopoverRoot
+    <InternalPopover
       open={trigger === "hover" ? debouncedOpen : open}
       onOpenChange={setOpen}
     >
@@ -133,7 +133,7 @@ export const Popover = (props: PopoverProps) => {
         )}
         {content}
       </PopoverContent>
-    </PopoverRoot>
+    </InternalPopover>
   );
 };
 
