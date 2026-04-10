@@ -1,8 +1,12 @@
----
-title: DatePicker
-description: A date picker component with Dayjs integration and Ant Design compatibility.
-component: true
----
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import * as DatePickerStories from "./date-picker.stories";
+import DateRangePickerBasicDemo from "./examples/range-basic";
+import DateRangePickerVariantsDemo from "./examples/range-variants";
+
+<Meta of={DatePickerStories} />
 
 # DatePicker Component Documentation
 
@@ -397,4 +401,179 @@ test('should trigger onChange on Enter with valid date', () => {
 test("should sync input and calendar", () => {
   // ... test implementation
 });
+```
+
+## RangePicker
+
+A date range picker for selecting a start and end date with the same Dayjs-based API style as DatePicker.
+
+### RangePicker Examples
+
+#### Basic Usage
+
+<ComponentSource
+  src="date-picker/examples/range-basic.tsx"
+  __comp__={DateRangePickerBasicDemo}
+/>
+
+#### Variants
+
+<ComponentSource
+  src="date-picker/examples/range-variants.tsx"
+  __comp__={DateRangePickerVariantsDemo}
+/>
+
+## YearPicker
+
+A year-focused picker that wraps DatePicker with `picker="year"` for Ant Design-style year selection.
+
+### Import
+
+```tsx
+import { YearPicker } from "@acme/ui/components/date-picker";
+```
+
+### Basic Usage
+
+```tsx
+import React, { useState } from "react";
+
+import { YearPicker } from "@acme/ui/components/date-picker";
+
+function BasicYearPicker() {
+  const [year, setYear] = useState<number>();
+
+  return (
+    <YearPicker value={year} onChange={setYear} placeholder="Select year" />
+  );
+}
+```
+
+### Examples
+
+#### Basic Year Picker
+
+<ComponentPreview name="year-picker-basic" />
+
+```tsx
+import { YearPicker } from "@acme/ui/components/date-picker";
+
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  placeholder="Select year"
+/>;
+```
+
+#### With Clear Button
+
+<ComponentPreview name="year-picker-clear" />
+
+```tsx
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  allowClear={true}
+  placeholder="Select year"
+/>
+```
+
+#### Disabled State
+
+<ComponentPreview name="year-picker-disabled" />
+
+```tsx
+<YearPicker value={2024} disabled={true} placeholder="Select year" />
+```
+
+#### Custom Format
+
+<ComponentPreview name="year-picker-format" />
+
+```tsx
+<YearPicker
+  value={selectedYear}
+  onChange={setSelectedYear}
+  format="YY"
+  placeholder="Select year"
+/>
+```
+
+### YearPicker Props
+
+| Property       | Description                      | Type                                | Default         |
+| -------------- | -------------------------------- | ----------------------------------- | --------------- |
+| `value`        | Current selected year            | `number \| Dayjs`                   | -               |
+| `onChange`     | Callback when year is changed    | `(value?: number \| Dayjs) => void` | -               |
+| `placeholder`  | Placeholder text                 | `string`                            | `"Select year"` |
+| `disabled`     | Whether the picker is disabled   | `boolean`                           | `false`         |
+| `allowClear`   | Whether to show clear button     | `boolean`                           | `true`          |
+| `format`       | Format for display               | `string`                            | `"YYYY"`        |
+| `className`    | Additional CSS class             | `string`                            | -               |
+| `open`         | Controlled open state            | `boolean`                           | -               |
+| `onOpenChange` | Callback when open state changes | `(open: boolean) => void`           | -               |
+
+### Features
+
+- **Decade Navigation**: previous/next decade controls and current year highlight.
+- **Year Selection**: 12-year grid with selected/current/boundary states.
+- **Responsive Design**: optimized for both desktop and mobile layouts.
+- **Accessibility**: keyboard navigation, screen reader support, and managed focus.
+
+### Usage Patterns
+
+#### Controlled Component
+
+```tsx
+const [year, setYear] = useState<number>();
+
+<YearPicker value={year} onChange={setYear} />;
+```
+
+#### Uncontrolled Component
+
+```tsx
+<YearPicker defaultValue={2024} onChange={(year) => console.log(year)} />
+```
+
+#### With Form Integration
+
+```tsx
+import { useForm } from "react-hook-form";
+
+function YearForm() {
+  const { control } = useForm();
+
+  return (
+    <Controller
+      name="birthYear"
+      control={control}
+      render={({ field }) => (
+        <YearPicker {...field} placeholder="Select birth year" />
+      )}
+    />
+  );
+}
+```
+
+### Migration from Ant Design
+
+| Ant Design      | @acme/ui                      |
+| --------------- | ----------------------------- |
+| `picker="year"` | Built-in year picker          |
+| `format="YYYY"` | `format="YYYY"` (default)     |
+| `allowClear`    | `allowClear={true}` (default) |
+| `disabled`      | `disabled={false}` (default)  |
+
+```tsx
+// Ant Design
+<DatePicker
+  picker="year"
+  value={value}
+  onChange={onChange}
+  placeholder="Select year"
+/>
+
+// @acme/ui
+<YearPicker value={value} onChange={onChange} placeholder="Select year" />
 ```
