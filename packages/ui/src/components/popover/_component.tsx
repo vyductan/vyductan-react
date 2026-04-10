@@ -16,8 +16,8 @@ const PopoverContent = ({
 
   style,
   className,
-  align,
-  sideOffset,
+  align = "center",
+  sideOffset = 4,
 
   onFocusOutside,
   onWheel,

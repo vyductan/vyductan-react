@@ -616,10 +616,8 @@ const DatePicker = (props: DatePickerProps) => {
       <Popover
         trigger="click"
         placement="bottomLeft"
-        align={{
-          // fix panel offset -  based on input size
-          offset: [-12, 10],
-        }}
+        className="w-auto p-0 max-sm:p-0"
+        arrow={false}
         open={open}
         onOpenChange={(open) => {
           setOpen(open);
