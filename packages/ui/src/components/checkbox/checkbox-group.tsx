@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { useControlledState } from "@rc-component/util";
 
 import type { ButtonColorVariants } from "../button/button-variants";
-import type { CheckboxChangeEvent, CheckboxProps as CheckboxProperties } from "./checkbox";
+import type {
+  CheckboxChangeEvent,
+  CheckboxProps as CheckboxProperties,
+} from "./checkbox";
 import type { CheckboxValueType } from "./group-context";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "./checkbox";

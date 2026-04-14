@@ -153,17 +153,17 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <Label
         className={cn(
-          "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
+          "inline-flex shrink-0 cursor-pointer items-center text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           variant === "card" && [
             "hover:bg-accent/50 items-start gap-2 rounded-md border",
             inputSizeVariants({ size }),
             "h-auto",
             size === "small"
-              ? "py-1.5 px-2.5 min-h-6"
+              ? "min-h-6 px-2.5 py-1.5"
               : size === "large"
-                ? "py-3 px-4 min-h-10"
-                : "py-2 px-3 min-h-8",
+                ? "min-h-10 px-4 py-3"
+                : "min-h-8 px-3 py-2",
             "has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50",
             "dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950",
           ],
@@ -226,7 +226,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
             <div
               data-slot="checkbox-label"
               className={cn(
-                "mt-px flex flex-col gap-0.5 w-full",
+                "mt-px flex w-full flex-col gap-0.5",
                 "leading-none font-medium",
                 classNames?.label,
               )}

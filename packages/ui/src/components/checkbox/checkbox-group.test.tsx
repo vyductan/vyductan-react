@@ -48,9 +48,11 @@ describe("CheckboxGroup", () => {
       style: { justifyContent: "center" },
     });
 
-    expect(container.querySelector('[data-slot="checkbox-group"]')).toHaveStyle({
-      justifyContent: "center",
-    });
+    expect(container.querySelector('[data-slot="checkbox-group"]')).toHaveStyle(
+      {
+        justifyContent: "center",
+      },
+    );
   });
 
   test("forwards option-level props to each rendered checkbox and composes option onChange", async () => {
