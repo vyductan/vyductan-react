@@ -80,3 +80,22 @@ test("emits cleaned html without editor-specific classes and whitespace styles",
     expect(latestHtml).not.toContain('style="white-space: pre-wrap;"');
   });
 });
+
+test("treats plain text html-mode input as a paragraph", async () => {
+  let latestHtml = "";
+
+  render(
+    <HtmlPluginsHarness
+      value="Comfortable walking shoes, sunscreen, and a water bottle."
+      onChange={(htmlString) => {
+        latestHtml = htmlString;
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(latestHtml).toBe(
+      "<p>Comfortable walking shoes, sunscreen, and a water bottle.</p>",
+    );
+  });
+});

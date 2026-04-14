@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import { createHeadlessEditor } from "@lexical/headless";
 import { $generateNodesFromDOM } from "@lexical/html";
-import { $getRoot } from "lexical";
+import { $getRoot, $insertNodes } from "lexical";
 
 import type { LexicalEditorContent } from "../types";
 import { nodes } from "../nodes/nodes";
@@ -18,7 +18,8 @@ export function importDomIntoEditor(
   const root = $getRoot();
 
   root.clear();
-  root.append(...lexicalNodes);
+  root.select();
+  $insertNodes(lexicalNodes);
 }
 
 type HtmlDocumentFactoryResult =
