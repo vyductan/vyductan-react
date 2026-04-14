@@ -1,19 +1,19 @@
 import * as React from "react";
 
 import type { CheckboxGroupContext, CheckboxValueType } from "./group-context";
-import { devUseWarning } from "../_util/warning";
+import { devUseWarning as developmentUseWarning } from "../_util/warning";
 import { cn } from "../../lib/utils";
 import Wave from "../../lib/wave";
 import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 import { LoadingIcon } from "../button/loading-icon";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
-import { inputDisabledVariants } from "../input/variants";
+import { inputDisabledVariants, inputSizeVariants } from "../input/variants";
 import { Label } from "../label/label";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
-type AbstractCheckboxProps<
+type AbstractCheckboxProperties<
   TChangeEvent,
   TValue extends CheckboxValueType = CheckboxValueType,
 > = {
@@ -32,6 +32,7 @@ type AbstractCheckboxProps<
   // state
   disabled?: boolean;
   loading?: boolean;
+  required?: boolean;
 
   // styles
   style?: React.CSSProperties;
@@ -48,7 +49,7 @@ type AbstractCheckboxProps<
 };
 export interface CheckboxChangeEventTarget<
   TValue extends CheckboxValueType = CheckboxValueType,
-> extends Omit<CheckboxProps<TValue>, "value"> {
+> extends Omit<CheckboxProperties<TValue>, "value"> {
   checked: boolean;
   name?: string;
   type: "checkbox" | "radio";
@@ -65,16 +66,17 @@ export interface CheckboxChangeEvent<
   nativeEvent: MouseEvent;
 }
 
-type CheckboxProps<TValue extends CheckboxValueType = CheckboxValueType> =
-  AbstractCheckboxProps<CheckboxChangeEvent<TValue>, TValue> &
+type CheckboxProperties<TValue extends CheckboxValueType = CheckboxValueType> =
+  AbstractCheckboxProperties<CheckboxChangeEvent<TValue>, TValue> &
     React.AriaAttributes & {
       key?: React.Key; // fix warning when use key (shadcn)
       indeterminate?: boolean;
       variant?: "default" | "card";
+      size?: "small" | "middle" | "large";
     };
 
 function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
-  props: CheckboxProps<TValue>,
+  properties: CheckboxProperties<TValue>,
 ) {
   const {
     // id,
@@ -95,6 +97,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     className,
     classNames,
     variant = "default",
+    size = "middle",
     // render
     children,
 
@@ -105,12 +108,14 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     onChange,
     onMouseEnter,
     onMouseLeave,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
 
   const { direction, checkbox } = React.useContext(ConfigContext);
   const checkboxGroup = React.useContext(
-    GroupContext as unknown as React.Context<CheckboxGroupContext<TValue> | null>,
+    GroupContext as unknown as React.Context<
+      CheckboxGroupContext<TValue> | undefined
+    >,
   );
   const contextDisabled = React.useContext(DisabledContext);
   const mergedDisabled = checkboxGroup?.disabled ?? disabled ?? contextDisabled;
@@ -118,7 +123,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
   const isGroup = !!(checkboxGroup && !skipGroup);
 
   if (process.env.NODE_ENV !== "production") {
-    const warning = devUseWarning("Checkbox");
+    const warning = developmentUseWarning("Checkbox");
 
     warning(
       checked !== undefined || !!checkboxGroup || value === undefined,
@@ -142,7 +147,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
   });
 
   // ============================ Event Lock ============================
-  const [onLabelClick, onInputClick] = useBubbleLock(restProps.onClick);
+  const [onLabelClick, onInputClick] = useBubbleLock(restProperties.onClick);
 
   return (
     <Wave component="Checkbox" disabled={mergedDisabled}>
@@ -151,7 +156,14 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           "inline-flex shrink-0 cursor-pointer items-baseline text-sm",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           variant === "card" && [
-            "hover:bg-accent/50 items-start gap-2 rounded-lg border p-3",
+            "hover:bg-accent/50 items-start gap-2 rounded-md border",
+            inputSizeVariants({ size }),
+            "h-auto",
+            size === "small"
+              ? "py-1.5 px-2.5 min-h-6"
+              : size === "large"
+                ? "py-3 px-4 min-h-10"
+                : "py-2 px-3 min-h-8",
             "has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50",
             "dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950",
           ],
@@ -176,7 +188,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           value={value as string | undefined}
           checked={indeterminate ? "indeterminate" : mergedChecked}
           defaultChecked={defaultChecked}
-          name={isGroup ? checkboxGroup.name : restProps.name}
+          name={isGroup ? checkboxGroup.name : restProperties.name}
           disabled={mergedDisabled}
           onClick={onInputClick}
           onCheckedChange={(nextChecked) => {
@@ -184,7 +196,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
               type: "change",
               target: {
                 type: "checkbox",
-                name: isGroup ? checkboxGroup.name : restProps.name,
+                name: isGroup ? checkboxGroup.name : restProperties.name,
                 value: value as unknown as TValue,
                 checked: nextChecked === "indeterminate" ? false : nextChecked,
                 indeterminate,
@@ -205,31 +217,37 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
               checkboxGroup.toggleOption({ label: children, value });
             }
           }}
-          {...restProps}
+          {...restProperties}
         />
-        {loading ? (
-          <LoadingIcon />
-        ) : hasLabelContent ? (
-          variant === "card" ? (
+        {loading ? <LoadingIcon /> : undefined}
+        {!loading &&
+          hasLabelContent &&
+          (variant === "card" ? (
             <div
               data-slot="checkbox-label"
-              className={cn("leading-line-height", classNames?.label)}
+              className={cn(
+                "mt-px flex flex-col gap-0.5 w-full",
+                "leading-none font-medium",
+                classNames?.label,
+              )}
             >
               {children}
             </div>
           ) : (
             <span
               data-slot="checkbox-label"
-              className={cn("leading-line-height px-2", classNames?.label)}
+              className={cn("px-2 leading-none", classNames?.label)}
             >
               {children}
             </span>
-          )
-        ) : null}
+          ))}
       </Label>
     </Wave>
   );
 }
 
-export type { CheckboxProps, AbstractCheckboxProps };
+export type {
+  CheckboxProperties as CheckboxProps,
+  AbstractCheckboxProperties as AbstractCheckboxProps,
+};
 export { Checkbox };

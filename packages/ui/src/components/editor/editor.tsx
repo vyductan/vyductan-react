@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState } from "lexical";
 import { Suspense } from "react";
@@ -6,7 +7,7 @@ import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
 import type { SizeType } from "../config-provider/size-context";
-import type { ImageResolverFn } from "./context/image-resolver-context";
+import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
 import type { MentionData } from "./plugins/mentions-plugin";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
@@ -32,11 +33,11 @@ const HtmlPlugins = dynamic(() => import("./plugins/html-plugins"), {
 });
 
 // Discriminated Union for better type safety
-type EditorPropsBase = {
+type EditorPropertiesBase = {
   placeholder?: string;
   defaultValue?: string;
   editable?: boolean;
-  resolveImage?: ImageResolverFn;
+  resolveImage?: ImageResolverFunction;
   onImageUpload?: (file: File) => Promise<string>;
   onStatsChange?: (stats: {
     wordCount: number;
@@ -52,28 +53,28 @@ type EditorPropsBase = {
   size?: SizeType;
 };
 
-type JsonEditorProps = EditorPropsBase & {
+type JsonEditorProperties = EditorPropertiesBase & {
   format?: "json";
   value?: string;
   onChange?: (jsonString: string, editorState: EditorState) => void;
 };
 
-type MarkdownEditorProps = EditorPropsBase & {
+type MarkdownEditorProperties = EditorPropertiesBase & {
   format: "markdown";
   value?: string;
   onChange?: (markdownString: string, editorState: EditorState) => void;
 };
 
-type HtmlEditorProps = EditorPropsBase & {
+type HtmlEditorProperties = EditorPropertiesBase & {
   format: "html";
   value?: string;
   onChange?: (htmlString: string, editorState: EditorState) => void;
 };
 
 export type EditorProps =
-  | JsonEditorProps
-  | MarkdownEditorProps
-  | HtmlEditorProps;
+  | JsonEditorProperties
+  | MarkdownEditorProperties
+  | HtmlEditorProperties;
 
 export function Editor({
   value,

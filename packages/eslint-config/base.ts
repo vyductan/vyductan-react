@@ -1,4 +1,4 @@
-import * as path from "node:path";
+import path from "node:path";
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
@@ -121,19 +121,25 @@ export const baseConfig = defineConfig(
       // "@typescript-eslint/no-explicit-any": "off",
 
       "unicorn/prevent-abbreviations": "off",
-      // Disabled due to crash with ESLint 10 ('text' must be a string)
-      "unicorn/prefer-string-slice": "off",
+      // // Disabled due to crash with ESLint 10 ('text' must be a string)
+      // "unicorn/prefer-string-slice": "off",
       "unicorn/no-nested-ternary": "off", // off beause conflict with prettier
       "unicorn/no-null": "off", // off beause sometime backend return null
-      "unicorn/filename-case": [
-        "error",
-        {
-          case: "kebabCase",
-          ignore: [
-            "^-[a-z0-9-]+(\\.[a-z0-9-]+)*$", // Allow leading dash
-          ],
-        },
-      ],
+      // "unicorn/filename-case": [
+      //   "error",
+      //   {
+      //     case: "kebabCase",
+      //     ignore: [
+      //       "^-[a-z0-9-]+(\\.[a-z0-9-]+)*$", // Allow leading dash
+      //     ],
+      //   },
+      // ],
+    },
+  },
+  {
+    files: ["**/*.test.*", "**/*.spec.*"],
+    rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
   {

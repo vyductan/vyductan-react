@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from "react";
 import raf from "rc-util/es/raf";
 
@@ -10,23 +9,25 @@ import raf from "rc-util/es/raf";
 export default function useBubbleLock(
   onOriginInputClick?: React.MouseEventHandler<HTMLButtonElement>,
 ) {
-  const labelClickLockRef = React.useRef<number | null>(null);
+  const labelClickLockReference = React.useRef<number | undefined>(undefined);
 
   const clearLock = () => {
-    raf.cancel(labelClickLockRef.current!);
-    labelClickLockRef.current = null;
+    if (labelClickLockReference.current !== undefined) {
+      raf.cancel(labelClickLockReference.current);
+    }
+    labelClickLockReference.current = undefined;
   };
 
   const onLabelClick: React.MouseEventHandler<HTMLLabelElement> = () => {
     clearLock();
 
-    labelClickLockRef.current = raf(() => {
-      labelClickLockRef.current = null;
+    labelClickLockReference.current = raf(() => {
+      labelClickLockReference.current = undefined;
     });
   };
 
   const onInputClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    if (labelClickLockRef.current) {
+    if (labelClickLockReference.current) {
       e.stopPropagation();
       clearLock();
     }

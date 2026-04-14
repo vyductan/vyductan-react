@@ -26,38 +26,26 @@ const optionsWithDisabled: CheckboxOptionType<string>[] = [
 
 const audienceOptions: CheckboxOptionType<string>[] = [
   {
-    label: (
-      <div className="grid gap-1">
-        <span className="font-medium">Product managers</span>
-        <span className="text-muted-foreground text-sm">
-          Roadmaps, priorities, and launch plans.
-        </span>
-      </div>
-    ),
+    label: "Product managers",
+    description: "Roadmaps, priorities, and launch plans.",
     value: "product-managers",
   },
   {
-    label: (
-      <div className="grid gap-1">
-        <span className="font-medium">Engineers</span>
-        <span className="text-muted-foreground text-sm">
-          APIs, implementation details, and technical updates.
-        </span>
-      </div>
-    ),
+    label: "Engineers",
+    description: "APIs, implementation details, and technical updates.",
     value: "engineers",
   },
   {
-    label: (
-      <div className="grid gap-1">
-        <span className="font-medium">Designers</span>
-        <span className="text-muted-foreground text-sm">
-          UX reviews, components, and design system changes.
-        </span>
-      </div>
-    ),
+    label: "Designers",
+    description: "UX reviews, components, and design system changes.",
     value: "designers",
   },
+];
+
+const simpleCardOptions: CheckboxOptionType<string>[] = [
+  { label: "Active", value: "active" },
+  { label: "Pending", value: "pending" },
+  { label: "Archived", value: "archived" },
 ];
 
 const App: React.FC = () => (
@@ -67,14 +55,12 @@ const App: React.FC = () => (
       defaultValue={["Pear"]}
       onChange={onChange}
     />
-
     <Checkbox.Group
       options={optionsWithDisabled}
       disabled
       defaultValue={["Apple"]}
       onChange={onChange}
     />
-
     <div className="grid gap-3">
       <div className="grid gap-1">
         <h3 className="text-sm font-medium">Choose your audience</h3>
@@ -86,6 +72,21 @@ const App: React.FC = () => (
         options={audienceOptions}
         optionVariant="card"
         defaultValue={["engineers"]}
+        className="grid gap-3 md:grid-cols-3"
+        onChange={onChange}
+      />
+    </div>
+    <div className="grid gap-3">
+      <div className="grid gap-1">
+        <h3 className="text-sm font-medium">Status (Simple Card)</h3>
+        <p className="text-muted-foreground text-sm">
+          Filter by current status.
+        </p>
+      </div>
+      <Checkbox.Group
+        options={simpleCardOptions}
+        optionVariant="card"
+        defaultValue={["active"]}
         className="grid gap-3 md:grid-cols-3"
         onChange={onChange}
       />

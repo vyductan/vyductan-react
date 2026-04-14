@@ -62,9 +62,13 @@ describe("Checkbox docs Storybook config", () => {
       );
       const templateMarkerIndex = partialSource.indexOf("<Meta isTemplate />");
 
-      expect(partialSource).toContain('import { Meta } from "@storybook/addon-docs/blocks"');
+      expect(partialSource).toContain(
+        'import { Meta } from "@storybook/addon-docs/blocks"',
+      );
       expect(templateMarkerIndex).toBeGreaterThan(-1);
-      expect(partialSource.slice(templateMarkerIndex)).not.toContain("\nimport ");
+      expect(partialSource.slice(templateMarkerIndex)).not.toContain(
+        "\nimport ",
+      );
     }
   });
 
@@ -124,7 +128,9 @@ describe("Checkbox docs Storybook config", () => {
     );
 
     expect(docsSource).toContain("## Examples");
-    expect(docsSource).not.toContain('import ReactMarkdown from "react-markdown"');
+    expect(docsSource).not.toContain(
+      'import ReactMarkdown from "react-markdown"',
+    );
     expect(docsSource).not.toContain("?raw");
 
     for (const {

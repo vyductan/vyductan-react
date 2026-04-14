@@ -2,7 +2,7 @@
 
 import type { XOR } from "ts-xor";
 
-import type { CheckboxProps } from "./checkbox";
+import type { CheckboxProps as CheckboxProperties } from "./checkbox";
 import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 import { Checkbox as InternalCheckbox } from "./checkbox";
 import { CheckboxGroup } from "./checkbox-group";
@@ -10,21 +10,21 @@ import { CheckboxGroup } from "./checkbox-group";
 export * from "./checkbox";
 export * from "./checkbox-group";
 
-type ShadcnCheckboxProps = Omit<
+type ShadcnCheckboxProperties = Omit<
   React.ComponentProps<typeof ShadcnCheckbox>,
   "onChange"
 >;
 
-type XORCheckboxProps = XOR<CheckboxProps, ShadcnCheckboxProps>;
+type XORCheckboxProperties = XOR<CheckboxProperties, ShadcnCheckboxProperties>;
 
-const ConditionCheckbox = (props: XORCheckboxProps) => {
-  const isShadcnCheckbox = props.onCheckedChange !== undefined;
+const ConditionCheckbox = (properties: XORCheckboxProperties) => {
+  const isShadcnCheckbox = properties.onCheckedChange !== undefined;
 
   if (isShadcnCheckbox) {
-    return <ShadcnCheckbox {...props} />;
+    return <ShadcnCheckbox {...properties} />;
   }
 
-  return <InternalCheckbox {...(props as CheckboxProps)} />;
+  return <InternalCheckbox {...(properties as CheckboxProperties)} />;
 };
 
 type InternalCheckboxType = typeof ConditionCheckbox;

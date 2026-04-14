@@ -15,10 +15,10 @@ afterEach(() => {
 });
 
 function renderCheckbox(
-  props: React.ComponentProps<typeof Checkbox> = {},
+  properties: React.ComponentProps<typeof Checkbox> = {},
   children?: React.ReactNode,
 ): ReturnType<typeof render> {
-  return render(React.createElement(Checkbox, props, children));
+  return render(React.createElement(Checkbox, properties, children));
 }
 
 describe("Checkbox", () => {

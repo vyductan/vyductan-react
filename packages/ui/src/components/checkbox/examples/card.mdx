@@ -1,13 +1,15 @@
 import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@acme/ui/components/tabs";
-import { ComponentSource } from "@acme/ui/components/mdx";
-import CardComposableExample from "./card-composable";
+
 import CardExample from "./card";
+import CardComposableExample from "./card-composable";
 
 <Meta isTemplate />
 
@@ -32,6 +34,9 @@ Use the card variant to compare the standard and composable APIs for richer labe
     forceMount
     className="data-[state=inactive]:hidden"
   >
-    <ComponentSource src="checkbox/examples/card-composable.tsx" __comp__={CardComposableExample} />
+    <ComponentSource
+      src="checkbox/examples/card-composable.tsx"
+      __comp__={CardComposableExample}
+    />
   </TabsContent>
 </Tabs>

@@ -1,51 +1,17 @@
-import type * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import type { JSX } from "react";
+import type * as React from "react";
 
-import type { CheckboxOptionType } from "./checkbox-group";
 import { Label } from "../label";
 import { ComponentSource } from "../mdx/component-source";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import BasicExample from "./examples/basic";
-import CardComposableExample from "./examples/card-composable";
 import CardExample from "./examples/card";
+import CardComposableExample from "./examples/card-composable";
+import GroupExample from "./examples/group";
 import { Checkbox } from "./index";
 
 const externalLabelClassName =
   "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70";
-
-function createAudienceLabel(title: string, description: string): JSX.Element {
-  return (
-    <div className="grid gap-1">
-      <span className="font-medium">{title}</span>
-      <span className="text-muted-foreground text-sm">{description}</span>
-    </div>
-  );
-}
-
-const audienceOptions: CheckboxOptionType[] = [
-  {
-    label: createAudienceLabel(
-      "Product managers",
-      "Roadmaps, priorities, and launch plans.",
-    ),
-    value: "product-managers",
-  },
-  {
-    label: createAudienceLabel(
-      "Engineers",
-      "APIs, implementation details, and technical updates.",
-    ),
-    value: "engineers",
-  },
-  {
-    label: createAudienceLabel(
-      "Designers",
-      "UX reviews, components, and design system changes.",
-    ),
-    value: "designers",
-  },
-];
 
 const meta = {
   title: "Components/Checkbox",
@@ -162,60 +128,13 @@ export const WithLabel: Story = {
   ),
 };
 
-type CheckboxGroupStory = StoryObj<typeof Checkbox.Group>;
-
-export const CheckboxGroup: CheckboxGroupStory = {
-  render: (args) => (
-    <div className="grid gap-3">
-      <div className="grid gap-1">
-        <h3 className="text-sm font-medium">Choose your audience</h3>
-        <p className="text-muted-foreground text-sm">
-          Select the teams that should receive this update.
-        </p>
-      </div>
-      <Checkbox.Group
-        {...args}
-        className="grid w-full max-w-3xl gap-3 md:grid-cols-3"
-      />
-    </div>
+export const CheckboxGroup: Story = {
+  render: () => (
+    <ComponentSource
+      src="checkbox/examples/group.tsx"
+      __comp__={GroupExample}
+    />
   ),
-  args: {
-    options: audienceOptions,
-    defaultValue: ["engineers"],
-    value: undefined,
-    disabled: false,
-    optionVariant: "default",
-  },
-  argTypes: {
-    checked: {
-      table: { disable: true },
-    },
-    variant: {
-      table: { disable: true },
-    },
-    options: {
-      control: false,
-      description: "Checkbox options",
-    },
-    defaultValue: {
-      control: "object",
-      description: "Default selected values (uncontrolled)",
-    },
-    value: {
-      control: "object",
-      description: "Selected values (controlled)",
-    },
-    disabled: {
-      control: "boolean",
-      description: "Disable all checkboxes in the group",
-    },
-    optionVariant: {
-      control: "radio",
-      options: ["default", "card"],
-      description: "Variant of the checkbox options",
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any,
 };
 
 export const WithDescription: Story = {

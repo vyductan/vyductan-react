@@ -14,7 +14,7 @@ afterEach(() => {
   cleanup();
 });
 
-type CheckboxGroupStringProps = React.ComponentProps<
+type CheckboxGroupStringProperties = React.ComponentProps<
   typeof CheckboxGroup<string>
 >;
 
@@ -39,16 +39,60 @@ const structuredOptions = [
   },
 ] as const;
 
-const renderCheckboxGroup = (props: CheckboxGroupStringProps = {}) =>
-  render(React.createElement(CheckboxGroup<string>, props));
+const renderCheckboxGroup = (properties: CheckboxGroupStringProperties = {}) =>
+  render(React.createElement(CheckboxGroup<string>, properties));
 
 describe("CheckboxGroup", () => {
+  test("forwards the group style prop to the checkbox-group root", () => {
+    const { container } = renderCheckboxGroup({
+      style: { justifyContent: "center" },
+    });
+
+    expect(container.querySelector('[data-slot="checkbox-group"]')).toHaveStyle({
+      justifyContent: "center",
+    });
+  });
+
+  test("forwards option-level props to each rendered checkbox and composes option onChange", async () => {
+    const user = userEvent.setup();
+    const optionOnChange = vi.fn();
+    const groupOnChange = vi.fn();
+
+    renderCheckboxGroup({
+      options: [
+        {
+          label: "Engineers",
+          value: "engineers",
+          id: "engineers-option",
+          title: "Engineers option",
+          required: true,
+          style: { justifyContent: "center" },
+          onChange: optionOnChange,
+        },
+      ],
+      onChange: groupOnChange,
+    });
+
+    const checkbox = screen.getByRole("checkbox", { name: "Engineers" });
+    const wrapper = checkbox.closest("label");
+
+    expect(checkbox).toHaveAttribute("id", "engineers-option");
+    expect(checkbox).toHaveAttribute("title", "Engineers option");
+    expect(checkbox).toBeRequired();
+    expect(wrapper).toHaveStyle({ justifyContent: "center" });
+
+    await user.click(checkbox);
+
+    expect(optionOnChange).toHaveBeenCalledTimes(1);
+    expect(groupOnChange).toHaveBeenCalledWith(["engineers"]);
+  });
+
   test('passing the documented optionVariant="card" input exposes structured option labels through block label slots', () => {
     const { container } = renderCheckboxGroup({
       options:
-        structuredOptions as unknown as CheckboxGroupStringProps["options"],
+        structuredOptions as unknown as CheckboxGroupStringProperties["options"],
       optionVariant: "card",
-    } as CheckboxGroupStringProps);
+    } as CheckboxGroupStringProperties);
 
     expect(
       screen.getByRole("checkbox", {
@@ -77,10 +121,10 @@ describe("CheckboxGroup", () => {
 
     renderCheckboxGroup({
       options:
-        structuredOptions as unknown as CheckboxGroupStringProps["options"],
+        structuredOptions as unknown as CheckboxGroupStringProperties["options"],
       onChange,
       optionVariant: "card",
-    } as CheckboxGroupStringProps);
+    } as CheckboxGroupStringProperties);
 
     await user.click(screen.getByText("Engineers"));
     expect(onChange).toHaveBeenNthCalledWith(1, ["engineers"]);

@@ -11,11 +11,12 @@ export interface CheckboxGroupContext<
   toggleOption?: (option: CheckboxOptionType<TValue>) => void;
   value?: TValue[];
   disabled?: boolean;
-  registerValue: (val: TValue) => void;
-  cancelValue: (val: TValue) => void;
+  registerValue: (value: TValue) => void;
+  cancelValue: (value: TValue) => void;
 }
 
-const GroupContext =
-  React.createContext<CheckboxGroupContext<CheckboxValueType> | null>(null);
+const GroupContext = React.createContext<
+  CheckboxGroupContext<CheckboxValueType> | undefined
+>(undefined);
 
 export default GroupContext;
