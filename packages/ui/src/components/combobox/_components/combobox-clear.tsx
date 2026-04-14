@@ -5,7 +5,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { RenderNode } from "../../select/types";
 import { Icon } from "../../../icons";
 
-type ComboboxClearProps = React.ComponentProps<"button"> & {
+type ComboboxClearProperties = React.ComponentProps<"button"> & {
   allowClear?: boolean | { clearIcon?: RenderNode };
   showClearIcon?: boolean;
   onClear?: () => void;
@@ -17,8 +17,8 @@ const ComboboxClear = ({
   className,
   onPointerDown,
   onClear,
-  ...restProps
-}: ComboboxClearProps) => {
+  ...restProperties
+}: ComboboxClearProperties) => {
   const mergedClearIcon = useMemo(() => {
     if (typeof allowClear === "object") {
       return allowClear.clearIcon;
@@ -60,7 +60,7 @@ const ComboboxClear = ({
         e.stopPropagation();
         onClear?.();
       }}
-      {...restProps}
+      {...restProperties}
     >
       {icon === undefined ? (
         <Icon
@@ -74,5 +74,5 @@ const ComboboxClear = ({
   );
 };
 
-export type { ComboboxClearProps };
+export type { ComboboxClearProperties as ComboboxClearProps };
 export { ComboboxClear };

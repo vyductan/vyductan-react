@@ -1,12 +1,15 @@
-import {
-  Combobox as ShadcnCombobox,
-} from "@acme/ui/shadcn/combobox";
+import { Combobox as ShadcnCombobox } from "@acme/ui/shadcn/combobox";
 
-function ComboboxPrimitive<Value, Multiple extends boolean | undefined = false>({
+function ComboboxPrimitive<
+  Value,
+  Multiple extends boolean | undefined = false,
+>({
   autoHighlight = true,
-  ...props
-}: React.ComponentProps<typeof ShadcnCombobox<Value, Multiple>>): React.JSX.Element {
-  return <ShadcnCombobox autoHighlight={autoHighlight} {...props} />;
+  ...properties
+}: React.ComponentProps<
+  typeof ShadcnCombobox<Value, Multiple>
+>): React.JSX.Element {
+  return <ShadcnCombobox autoHighlight={autoHighlight} {...properties} />;
 }
 
 export { ComboboxPrimitive };

@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Combobox } from "@acme/ui/components/combobox";
 import type { OptionType } from "@acme/ui/components/select/types";
+import { Combobox } from "@acme/ui/components/combobox";
 import { Icon } from "@acme/ui/icons";
 
 const priorityOptions: OptionType<string>[] = [

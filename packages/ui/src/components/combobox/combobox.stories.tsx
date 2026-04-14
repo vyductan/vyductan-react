@@ -1,16 +1,17 @@
-import type * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type * as React from "react";
 
 import { ComponentSource } from "../mdx/component-source";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
+import { Combobox } from "./combobox";
+import AllowClearExample from "./examples/allow-clear";
 import BasicExample from "./examples/basic";
 import BasicShadcnLikeExample from "./examples/basic-shadcn-like";
+import CustomClearIconExample from "./examples/custom-clear-icon";
 import MultipleExample from "./examples/multiple";
 import MultipleShadcnLikeExample from "./examples/multiple-shadcn-like";
+import NumericExample from "./examples/numeric";
 import TagsExample from "./examples/tags";
-import AllowClearExample from "./examples/allow-clear";
-import CustomClearIconExample from "./examples/custom-clear-icon";
-import { Combobox } from "./combobox";
 
 const meta = {
   title: "Components/Combobox",
@@ -88,6 +89,15 @@ export const Multiple: ExampleStory = {
       antLikeComp={MultipleExample}
       shadcnLikeSrc="combobox/examples/multiple-shadcn-like.tsx"
       shadcnLikeComp={MultipleShadcnLikeExample}
+    />
+  ),
+};
+
+export const Numeric: ExampleStory = {
+  render: () => (
+    <ComponentSource
+      src="combobox/examples/numeric.tsx"
+      __comp__={NumericExample}
     />
   ),
 };

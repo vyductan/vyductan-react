@@ -1,9 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
-import { Basic } from "./combobox.stories";
+import { Basic, Numeric } from "./combobox.stories";
 
 vi.mock("../mdx/component-source", () => ({
   ComponentSource: ({ src }: { src: string }) => (
@@ -18,7 +18,9 @@ describe("Combobox stories", () => {
 
     const { container } = render(rendered);
 
-    expect(container.querySelectorAll('[data-slot="code-box-demo"]')).toHaveLength(2);
+    expect(
+      container.querySelectorAll('[data-slot="code-box-demo"]'),
+    ).toHaveLength(2);
   });
 
   test("adds the inactive-state hiding class to force-mounted compare panels", () => {
@@ -26,7 +28,9 @@ describe("Combobox stories", () => {
     expect(rendered).toBeTruthy();
 
     const { container } = render(rendered);
-    const panels = container.querySelectorAll<HTMLElement>('[data-slot="tabs-content"]');
+    const panels = container.querySelectorAll<HTMLElement>(
+      '[data-slot="tabs-content"]',
+    );
 
     expect(panels).toHaveLength(2);
     expect(panels[0]).toHaveClass("data-[state=inactive]:hidden");
@@ -56,5 +60,16 @@ describe("Combobox stories", () => {
       container.querySelector('[role="tab"][data-state="active"]')?.textContent,
     ).toContain("Standard API");
     expect(container.textContent).toContain("Composable API");
+  });
+
+  test("renders the numeric story through ComponentSource with the expected example path", () => {
+    const rendered = Numeric.render?.({} as never, {} as never);
+    expect(rendered).toBeTruthy();
+
+    const { container } = render(rendered);
+
+    expect(
+      container.querySelector('[data-slot="code-box-demo"]'),
+    ).toHaveTextContent("combobox/examples/numeric.tsx");
   });
 });

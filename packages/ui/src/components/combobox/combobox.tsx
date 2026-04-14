@@ -18,8 +18,6 @@ import {
   useComboboxAnchor,
 } from "@acme/ui/shadcn/combobox";
 
-import { ComboboxPrimitive } from "./primitive-combobox";
-
 import type { AnyObject } from "../_util/type";
 import type {
   OptionType,
@@ -28,8 +26,9 @@ import type {
   SelectValueType,
 } from "../select/types";
 import { ComboboxClear } from "./_components/combobox-clear";
+import { ComboboxPrimitive } from "./primitive-combobox";
 
-type ComboboxDefaultProps<
+type ComboboxDefaultProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = {
@@ -39,7 +38,7 @@ type ComboboxDefaultProps<
   onChange?: ComboboxOnChangeSingle<TValue, TRecord>;
 };
 
-type ComboboxMultipleOrTagsProps<
+type ComboboxMultipleOrTagsProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = {
@@ -49,12 +48,12 @@ type ComboboxMultipleOrTagsProps<
   onChange?: ComboboxOnChangeMultiple<TValue, TRecord>;
 };
 
-type ComboboxProps<
+type ComboboxProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = (
-  | ComboboxDefaultProps<TValue, TRecord>
-  | ComboboxMultipleOrTagsProps<TValue, TRecord>
+  | ComboboxDefaultProperties<TValue, TRecord>
+  | ComboboxMultipleOrTagsProperties<TValue, TRecord>
 ) & {
   options: SelectOption<TValue, TRecord>[];
   placeholder?: string;
@@ -79,12 +78,18 @@ type ComboboxValue<TValue extends SelectValueType = SelectValueType> =
 type ComboboxGroupOption<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
-> = Extract<SelectOption<TValue, TRecord>, { options: OptionType<TValue, TRecord>[] }>;
+> = Extract<
+  SelectOption<TValue, TRecord>,
+  { options: OptionType<TValue, TRecord>[] }
+>;
 
-type ComboboxCollectionGroup = {
+type ComboboxCollectionGroup<
+  TValue extends SelectValueType = SelectValueType,
+  TRecord extends AnyObject = AnyObject,
+> = {
   key: string;
   label?: React.ReactNode;
-  items: string[];
+  items: OptionType<TValue, TRecord>[];
 };
 
 const isGroupOption = <
@@ -132,14 +137,24 @@ const findCanonicalOption = <
   });
 };
 
-const getOptionByStringValue = <
+const optionMatchesQuery = <
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 >(
-  options: OptionType<TValue, TRecord>[],
-  value: string,
+  option: OptionType<TValue, TRecord>,
+  query: string,
 ) => {
-  return options.find((option) => String(option.value) === value);
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) {
+    return true;
+  }
+
+  return [String(getOptionLabel(option)), String(option.value)].some(
+    (candidate) => {
+      return candidate.toLowerCase().includes(normalizedQuery);
+    },
+  );
 };
 
 function Combobox<
@@ -153,14 +168,13 @@ function Combobox<
   placeholder,
   allowClear,
   onChange,
-}: ComboboxProps<TValue, TRecord>): React.JSX.Element {
+}: ComboboxProperties<TValue, TRecord>): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState("");
-  const [internalValue, setInternalValue] = useControlledState<ComboboxValue<TValue>>(
-    defaultValue as ComboboxValue<TValue>,
-    value as ComboboxValue<TValue>,
-  );
-  const chipsAnchorRef = useComboboxAnchor();
+  const [internalValue, setInternalValue] = useControlledState<
+    ComboboxValue<TValue>
+  >(defaultValue as ComboboxValue<TValue>, value as ComboboxValue<TValue>);
+  const chipsAnchorReference = useComboboxAnchor();
   const isMultiple = mode === "multiple" || mode === "tags";
 
   const flatOptions = React.useMemo(() => {
@@ -169,10 +183,10 @@ function Combobox<
     );
   }, [options]);
   const groupedOptions = React.useMemo(() => {
-    const nextGroups: ComboboxCollectionGroup[] = [];
-    let ungroupedOptions: string[] = [];
+    const nextGroups: ComboboxCollectionGroup<TValue, TRecord>[] = [];
+    let ungroupedOptions: OptionType<TValue, TRecord>[] = [];
 
-    options.forEach((option, index) => {
+    for (const [index, option] of options.entries()) {
       if (isGroupOption(option)) {
         if (ungroupedOptions.length > 0) {
           nextGroups.push({
@@ -185,13 +199,13 @@ function Combobox<
         nextGroups.push({
           key: `group-${index}`,
           label: option.label,
-          items: option.options.map((item) => String(item.value)),
+          items: option.options,
         });
-        return;
+        continue;
       }
 
-      ungroupedOptions.push(String(option.value));
-    });
+      ungroupedOptions.push(option);
+    }
 
     if (ungroupedOptions.length > 0) {
       nextGroups.push({
@@ -202,6 +216,32 @@ function Combobox<
 
     return nextGroups;
   }, [options]);
+  const filteredItems = React.useMemo(() => {
+    const normalizedQuery = inputValue.trim();
+
+    if (!normalizedQuery) {
+      return groupedOptions;
+    }
+
+    const nextGroups = groupedOptions.flatMap((group) => {
+      const matchedItems = group.items.filter((option) => {
+        return optionMatchesQuery(option, normalizedQuery);
+      });
+
+      if (matchedItems.length === 0) {
+        return [] as ComboboxCollectionGroup<TValue, TRecord>[];
+      }
+
+      return [
+        {
+          ...group,
+          items: matchedItems,
+        },
+      ];
+    });
+
+    return nextGroups;
+  }, [groupedOptions, inputValue]);
   const mergedAllowClear = !!allowClear;
   const isTags = mode === "tags";
   const selectedValues = React.useMemo(() => {
@@ -223,8 +263,12 @@ function Combobox<
     });
   }, [flatOptions, selectedValues]);
   const selectedSingleOption = React.useMemo(() => {
-    if (isMultiple || internalValue === undefined || Array.isArray(internalValue)) {
-      return undefined;
+    if (
+      isMultiple ||
+      internalValue === undefined ||
+      Array.isArray(internalValue)
+    ) {
+      return;
     }
 
     return flatOptions.find((item) => item.value === internalValue);
@@ -262,12 +306,15 @@ function Combobox<
       return;
     }
 
+    const clearedValue = undefined as TValue | undefined;
+    const clearedOption = undefined as OptionType<TValue, TRecord> | undefined;
+
     setInternalValue(undefined);
     (
       onChange as
         | ((value?: TValue, option?: OptionType<TValue, TRecord>) => void)
         | undefined
-    )?.(undefined, undefined);
+    )?.(clearedValue, clearedOption);
     setOpen(false);
   }, [isMultiple, onChange, setInternalValue]);
 
@@ -282,9 +329,9 @@ function Combobox<
       const nextOption = findCanonicalOption(flatOptions, normalizedValue);
       const resolvedOption =
         nextOption ?? createOption<TValue, TRecord>(normalizedValue as TValue);
-      const nextValues = Array.from(
-        new Set([...selectedValues, resolvedOption.value as TValue]),
-      );
+      const nextValues = [
+        ...new Set([...selectedValues, resolvedOption.value as TValue]),
+      ];
       const nextOptions = nextValues.map((selectedValue) => {
         return (
           flatOptions.find((option) => option.value === selectedValue) ??
@@ -332,41 +379,33 @@ function Combobox<
   );
 
   const handleValueChange = React.useCallback(
-    (nextValue: string[] | string | null) => {
+    (
+      nextValue:
+        | OptionType<TValue, TRecord>[]
+        | OptionType<TValue, TRecord>
+        | null,
+    ) => {
       if (nextValue === null) {
         return;
       }
 
       if (isMultiple) {
-        const normalizedValues = Array.isArray(nextValue) ? nextValue : [nextValue];
-        const nextOptions = normalizedValues.flatMap<OptionType<TValue, TRecord>>((item) => {
-          const option = getOptionByStringValue(flatOptions, item);
-
-          if (option) {
-            return [option];
-          }
-
-          if (!isTags) {
-            return [];
-          }
-
-          return [createOption<TValue, TRecord>(item as TValue)];
-        });
+        const nextOptions = Array.isArray(nextValue) ? nextValue : [nextValue];
         const nextValues = nextOptions.map((option) => option.value as TValue);
 
         setInternalValue(nextValues as ComboboxValue<TValue>);
         (
           onChange as
-            | ((value?: TValue[], option?: OptionType<TValue, TRecord>[]) => void)
+            | ((
+                value?: TValue[],
+                option?: OptionType<TValue, TRecord>[],
+              ) => void)
             | undefined
         )?.(nextValues, nextOptions);
         return;
       }
 
-      const nextOption = getOptionByStringValue(
-        flatOptions,
-        Array.isArray(nextValue) ? nextValue[0] ?? "" : nextValue,
-      );
+      const nextOption = Array.isArray(nextValue) ? nextValue[0] : nextValue;
 
       if (!nextOption) {
         return;
@@ -380,31 +419,25 @@ function Combobox<
       )?.(nextOption.value as TValue, nextOption);
       setOpen(false);
     },
-    [flatOptions, isMultiple, isTags, onChange, setInternalValue],
+    [isMultiple, onChange, setInternalValue],
   );
 
   const comboboxItems = (
     <>
       <ComboboxEmpty>No options found.</ComboboxEmpty>
       <ComboboxList>
-        {(group: ComboboxCollectionGroup) => {
+        {(group: ComboboxCollectionGroup<TValue, TRecord>) => {
           return (
             <ComboboxGroup key={group.key} items={group.items}>
-              {group.label !== undefined && <ComboboxLabel>{group.label}</ComboboxLabel>}
+              {group.label !== undefined && (
+                <ComboboxLabel>{group.label}</ComboboxLabel>
+              )}
               <ComboboxCollection>
-                {(itemValue: string) => {
-                  const option = flatOptions.find(
-                    (candidate) => String(candidate.value) === itemValue,
-                  );
-
-                  if (!option) {
-                    return null;
-                  }
-
+                {(option: OptionType<TValue, TRecord>) => {
                   return (
                     <ComboboxItem
                       key={String(option.value)}
-                      value={String(option.value)}
+                      value={option}
                       onClick={() => {
                         option.onSelect?.();
                       }}
@@ -430,10 +463,16 @@ function Combobox<
         onOpenChange={setOpen}
         inputValue={inputValue}
         onInputValueChange={handleInputValueChange}
-        value={selectedValues.map((selectedValue) => String(selectedValue))}
+        value={selectedOptions}
         onValueChange={handleValueChange}
+        filteredItems={filteredItems}
+        itemToStringLabel={(option) => String(getOptionLabel(option))}
+        itemToStringValue={(option) => String(option.value)}
       >
-        <div ref={chipsAnchorRef} className="group/input-group relative w-auto">
+        <div
+          ref={chipsAnchorReference}
+          className="group/input-group relative w-auto"
+        >
           <div data-slot="input-group">
             <ComboboxChips>
               {selectedOptions.map((option) => (
@@ -468,7 +507,9 @@ function Combobox<
             />
           )}
         </div>
-        <ComboboxContent anchor={chipsAnchorRef}>{comboboxItems}</ComboboxContent>
+        <ComboboxContent anchor={chipsAnchorReference}>
+          {comboboxItems}
+        </ComboboxContent>
       </ComboboxPrimitive>
     );
   }
@@ -480,8 +521,11 @@ function Combobox<
       onOpenChange={setOpen}
       inputValue={inputValue}
       onInputValueChange={handleInputValueChange}
-      value={internalValue === undefined ? undefined : String(internalValue)}
+      value={selectedSingleOption}
       onValueChange={handleValueChange}
+      filteredItems={filteredItems}
+      itemToStringLabel={(option) => String(getOptionLabel(option))}
+      itemToStringValue={(option) => String(option.value)}
     >
       <div className="group/input-group relative w-auto">
         <ComboboxInput placeholder={placeholder} showTrigger />
@@ -503,5 +547,5 @@ function Combobox<
   );
 }
 
-export type { ComboboxProps };
+export type { ComboboxProperties as ComboboxProps };
 export { Combobox };

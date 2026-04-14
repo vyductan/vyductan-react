@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Combobox } from "@acme/ui/components/combobox";
 import type { OptionType } from "@acme/ui/components/select/types";
+import { Combobox } from "@acme/ui/components/combobox";
 
 const fruitOptions: OptionType<string>[] = [
   { label: "Apple", value: "apple" },

@@ -1,42 +1,42 @@
-import * as React from "react";
+import type * as React from "react";
 
 import type { AnyObject } from "../_util/type";
 import type { SelectValueType } from "../select/types";
+import type { ComboboxProps as PublicComboboxProperties } from "./combobox";
 import { Combobox as PublicCombobox } from "./combobox";
-import type { ComboboxProps as PublicComboboxProps } from "./combobox";
 import { ComboboxPrimitive } from "./primitive-combobox";
 
-type PrimitiveComboboxProps<
+type PrimitiveComboboxProperties<
   Value = string,
   Multiple extends boolean | undefined = false,
 > = React.ComponentProps<typeof ComboboxPrimitive<Value, Multiple>>;
 
-type ExportedComboboxProps<
+type ExportedComboboxProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
   Value = string,
   Multiple extends boolean | undefined = false,
 > =
-  | PublicComboboxProps<TValue, TRecord>
-  | PrimitiveComboboxProps<Value, Multiple>;
+  | PublicComboboxProperties<TValue, TRecord>
+  | PrimitiveComboboxProperties<Value, Multiple>;
 
-const isPublicComboboxProps = <
+const isPublicComboboxProperties = <
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
   Value = string,
   Multiple extends boolean | undefined = false,
 >(
-  props: ExportedComboboxProps<TValue, TRecord, Value, Multiple>,
-): props is PublicComboboxProps<TValue, TRecord> => {
-  return "options" in props;
+  properties: ExportedComboboxProperties<TValue, TRecord, Value, Multiple>,
+): properties is PublicComboboxProperties<TValue, TRecord> => {
+  return "options" in properties;
 };
 
 function Combobox<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
->(props: PublicComboboxProps<TValue, TRecord>): React.JSX.Element;
+>(properties: PublicComboboxProperties<TValue, TRecord>): React.JSX.Element;
 function Combobox<Value, Multiple extends boolean | undefined = false>(
-  props: PrimitiveComboboxProps<Value, Multiple>,
+  properties: PrimitiveComboboxProperties<Value, Multiple>,
 ): React.JSX.Element;
 function Combobox<
   TValue extends SelectValueType = SelectValueType,
@@ -44,13 +44,13 @@ function Combobox<
   Value = string,
   Multiple extends boolean | undefined = false,
 >(
-  props: ExportedComboboxProps<TValue, TRecord, Value, Multiple>,
+  properties: ExportedComboboxProperties<TValue, TRecord, Value, Multiple>,
 ): React.JSX.Element {
-  if (isPublicComboboxProps(props)) {
-    return <PublicCombobox {...props} />;
+  if (isPublicComboboxProperties(properties)) {
+    return <PublicCombobox {...properties} />;
   }
 
-  return <ComboboxPrimitive {...props} />;
+  return <ComboboxPrimitive {...properties} />;
 }
 
 export { Combobox };

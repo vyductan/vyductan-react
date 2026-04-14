@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 
 import * as React from "react";
-
 import {
   cleanup,
   fireEvent,
@@ -13,6 +12,7 @@ import {
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { Input } from "../input";
 import {
   Combobox,
   ComboboxContent,
@@ -35,8 +35,9 @@ globalThis.ResizeObserver ??= class ResizeObserver {
     return;
   }
 };
-
-Element.prototype.scrollIntoView ??= () => undefined;
+Element.prototype.scrollIntoView ??= () => {
+  return;
+};
 
 afterEach(() => {
   cleanup();
@@ -47,7 +48,7 @@ const getComboboxContainer = (placeholder: string) => {
     .getByPlaceholderText(placeholder)
     .closest('[data-slot="input-group"]');
 
-  return inputGroup?.parentElement ?? null;
+  return inputGroup?.parentElement ?? undefined;
 };
 
 describe("Combobox", () => {
@@ -71,9 +72,12 @@ describe("Combobox", () => {
     expect(group).not.toBeNull();
     fireEvent.pointerEnter(group as HTMLElement);
 
-    const clearButton = await within(group as HTMLElement).findByRole("button", {
-      name: /remove/i,
-    });
+    const clearButton = await within(group as HTMLElement).findByRole(
+      "button",
+      {
+        name: /remove/i,
+      },
+    );
     fireEvent.pointerDown(clearButton);
 
     await waitFor(() => {
@@ -101,9 +105,12 @@ describe("Combobox", () => {
     expect(group).not.toBeNull();
     fireEvent.pointerEnter(group as HTMLElement);
 
-    const clearButton = await within(group as HTMLElement).findByRole("button", {
-      name: /remove/i,
-    });
+    const clearButton = await within(group as HTMLElement).findByRole(
+      "button",
+      {
+        name: /remove/i,
+      },
+    );
     clearButton.focus();
     fireEvent.keyDown(clearButton, { key: "Enter" });
 
@@ -133,9 +140,12 @@ describe("Combobox", () => {
     expect(group).not.toBeNull();
     fireEvent.pointerEnter(group as HTMLElement);
 
-    const clearButton = await within(group as HTMLElement).findByRole("button", {
-      name: /remove/i,
-    });
+    const clearButton = await within(group as HTMLElement).findByRole(
+      "button",
+      {
+        name: /remove/i,
+      },
+    );
     fireEvent.pointerDown(clearButton);
 
     await waitFor(() => {
@@ -147,7 +157,9 @@ describe("Combobox", () => {
     render(
       <Combobox
         value="apple"
-        allowClear={{ clearIcon: <span data-testid="custom-clear-icon">clear</span> }}
+        allowClear={{
+          clearIcon: <span data-testid="custom-clear-icon">clear</span>,
+        }}
         placeholder="Pick a fruit"
         options={[
           { label: "Apple", value: "apple" },
@@ -160,7 +172,9 @@ describe("Combobox", () => {
     expect(group).not.toBeNull();
     fireEvent.pointerEnter(group as HTMLElement);
 
-    await within(group as HTMLElement).findByRole("button", { name: /remove/i });
+    await within(group as HTMLElement).findByRole("button", {
+      name: /remove/i,
+    });
     expect(screen.getByTestId("custom-clear-icon")).toBeInTheDocument();
   });
 
@@ -185,9 +199,12 @@ describe("Combobox", () => {
     expect(group).not.toBeNull();
     fireEvent.pointerEnter(group as HTMLElement);
 
-    const clearButton = await within(group as HTMLElement).findByRole("button", {
-      name: /remove/i,
-    });
+    const clearButton = await within(group as HTMLElement).findByRole(
+      "button",
+      {
+        name: /remove/i,
+      },
+    );
     fireEvent.pointerDown(clearButton);
 
     await waitFor(() => {
@@ -239,6 +256,39 @@ describe("Combobox", () => {
       expect(handleChange).toHaveBeenCalledWith(
         "next",
         expect.objectContaining({ label: "Next.js", value: "next" }),
+      );
+    });
+  });
+
+  test("selects a numeric option when searching by its label", async () => {
+    const handleChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <Combobox
+        placeholder="Pick a role"
+        options={[
+          { label: "Administrator", value: 1 },
+          { label: "Editor", value: 2 },
+          { label: "Viewer", value: 3 },
+        ]}
+        onChange={handleChange}
+      />,
+    );
+
+    const input = screen.getByRole("combobox");
+    await user.click(input);
+    await user.keyboard("[ArrowDown]");
+    await user.type(input, "Adm");
+    expect(
+      await screen.findByRole("option", { name: "Administrator" }),
+    ).toBeInTheDocument();
+    await user.keyboard("[Enter]");
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ label: "Administrator", value: 1 }),
       );
     });
   });
@@ -377,5 +427,29 @@ describe("Combobox", () => {
     await new Promise((resolve) => setTimeout(resolve, 600));
 
     expect(input).toHaveValue("Apple");
+  });
+
+  test("matches the standard input height contract in single mode", () => {
+    render(
+      <>
+        <Input placeholder="Standard input" />
+        <Combobox
+          placeholder="Pick a fruit"
+          options={[
+            { label: "Apple", value: "apple" },
+            { label: "Banana", value: "banana" },
+          ]}
+        />
+      </>,
+    );
+
+    const comboboxInput = screen.getByPlaceholderText("Pick a fruit");
+    const comboboxInputGroup = comboboxInput.closest(
+      '[data-slot="input-group"]',
+    );
+
+    expect(screen.getByPlaceholderText("Standard input")).toHaveClass("h-8");
+    expect(comboboxInput).toHaveClass("h-8");
+    expect(comboboxInputGroup).toHaveClass("h-8");
   });
 });
