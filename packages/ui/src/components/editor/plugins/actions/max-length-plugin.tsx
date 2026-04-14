@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -23,12 +24,12 @@ export function MaxLengthPlugin({ maxLength }: { maxLength: number }): null {
       if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
         return;
       }
-      const prevEditorState = editor.getEditorState();
-      const prevTextContentSize = prevEditorState.read(() =>
+      const previousEditorState = editor.getEditorState();
+      const previousTextContentSize = previousEditorState.read(() =>
         rootNode.getTextContentSize(),
       );
       const textContentSize = rootNode.getTextContentSize();
-      if (prevTextContentSize !== textContentSize) {
+      if (previousTextContentSize !== textContentSize) {
         const delCount = textContentSize - maxLength;
         const anchor = selection.anchor;
 
@@ -36,11 +37,11 @@ export function MaxLengthPlugin({ maxLength }: { maxLength: number }): null {
           // Restore the old editor state instead if the last
           // text content was already at the limit.
           if (
-            prevTextContentSize === maxLength &&
-            lastRestoredEditorState !== prevEditorState
+            previousTextContentSize === maxLength &&
+            lastRestoredEditorState !== previousEditorState
           ) {
-            lastRestoredEditorState = prevEditorState;
-            $restoreEditorState(editor, prevEditorState);
+            lastRestoredEditorState = previousEditorState;
+            $restoreEditorState(editor, previousEditorState);
           } else {
             $trimTextContentFromAnchor(editor, anchor, delCount);
           }

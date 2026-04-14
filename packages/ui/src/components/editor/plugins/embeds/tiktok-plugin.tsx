@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * TikTok Plugin
  *

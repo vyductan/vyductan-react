@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -58,9 +59,9 @@ function PageBreakComponent({ nodeKey }: { nodeKey: NodeKey }) {
       editor.registerCommand(
         CLICK_COMMAND,
         (event: MouseEvent) => {
-          const pbElem = editor.getElementByKey(nodeKey);
+          const pbElement = editor.getElementByKey(nodeKey);
 
-          if (event.target === pbElem) {
+          if (event.target === pbElement) {
             if (!event.shiftKey) {
               clearSelection();
             }
@@ -86,16 +87,16 @@ function PageBreakComponent({ nodeKey }: { nodeKey: NodeKey }) {
   }, [clearSelection, editor, isSelected, nodeKey, $onDelete, setSelected]);
 
   useEffect(() => {
-    const pbElem = editor.getElementByKey(nodeKey);
-    if (pbElem !== null) {
+    const pbElement = editor.getElementByKey(nodeKey);
+    if (pbElement !== null) {
       if (isSelected) {
-        pbElem.classList.add(
+        pbElement.classList.add(
           "!border-[var(--editor-color-primary,#4766cb)]",
           "!after:text-[var(--editor-color-primary,#4766cb)]",
           "!before:opacity-100",
         );
       } else {
-        pbElem.classList.remove(
+        pbElement.classList.remove(
           "!border-[var(--editor-color-primary,#4766cb)]",
           "!after:text-[var(--editor-color-primary,#4766cb)]",
           "!before:opacity-100",
@@ -144,10 +145,10 @@ export class PageBreakNode extends DecoratorNode<React.JSX.Element> {
   }
 
   createDOM(): HTMLElement {
-    const el = document.createElement("figure");
-    el.setAttribute("type", this.getType());
-    el.style.pageBreakAfter = "always";
-    el.className = `
+    const element = document.createElement("figure");
+    element.setAttribute("type", this.getType());
+    element.style.pageBreakAfter = "always";
+    element.className = `
       relative block w-[calc(100%+56px)] overflow-visible 
       -ml-[28px] mt-7 mb-7
       border-0 border-t border-b border-dashed border-[var(--editor-color-secondary,#eee)]
@@ -163,7 +164,7 @@ export class PageBreakNode extends DecoratorNode<React.JSX.Element> {
       after:border after:border-solid after:border-[#ccc]
       after:bg-white after:text-xs after:text-black after:font-semibold
     `;
-    return el;
+    return element;
   }
 
   getTextContent(): string {

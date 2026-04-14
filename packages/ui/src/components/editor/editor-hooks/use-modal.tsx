@@ -16,22 +16,25 @@ import {
 } from "../../modal";
 
 export function useEditorModal(): [
-  JSX.Element | null,
+  JSX.Element | undefined,
   (title: string, showModal: (onClose: () => void) => JSX.Element) => void,
 ] {
-  const [modalContent, setModalContent] = useState<null | {
-    closeOnClickOutside: boolean;
-    content: JSX.Element;
-    title: string;
-  }>(null);
+  const [modalContent, setModalContent] = useState<
+    | {
+        closeOnClickOutside: boolean;
+        content: JSX.Element;
+        title: string;
+      }
+    | undefined
+  >();
 
   const onClose = useCallback(() => {
-    setModalContent(null);
+    setModalContent(undefined);
   }, []);
 
   const modal = useMemo(() => {
-    if (modalContent === null) {
-      return null;
+    if (modalContent === undefined) {
+      return;
     }
     const { title, content } = modalContent;
     return (

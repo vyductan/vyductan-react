@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import { useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
@@ -26,6 +27,7 @@ import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
 import { CodeHighlightPlugin } from "../plugins/code-highlight-plugin";
 import { CollapsiblePlugin } from "../plugins/collapsible-plugin";
 import { ComponentPickerMenuPlugin } from "../plugins/component-picker-plugin";
+import { ContextMenuPlugin } from "../plugins/context-menu-plugin";
 import { DragDropPastePlugin } from "../plugins/drag-drop-paste-plugin";
 import { DraggableBlockPlugin } from "../plugins/draggable-block-plugin";
 import { AutoEmbedPlugin } from "../plugins/embeds/auto-embed-plugin";
@@ -54,7 +56,7 @@ import { PageBreakPlugin } from "../plugins/page-break-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
-import { TableActionsPlugin } from "../plugins/table-actions-plugin";
+import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
 import { TableHoverActionsPlugin } from "../plugins/table-hover-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
 import { VideoPlugin } from "../plugins/video-plugin";
@@ -93,21 +95,21 @@ export function Plugins({
     editor.setEditable(editable);
   }, [editor, editable]);
 
-  const [floatingAnchorElem, setFloatingAnchorElem] =
+  const [floatingAnchorElement, setFloatingAnchorElement] =
     useState<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerReference = useRef<HTMLDivElement | null>(null);
 
   const isSimple = variant === "simple" || variant === "minimal";
 
-  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
-    if (_floatingAnchorElem !== null) {
-      setFloatingAnchorElem(_floatingAnchorElem);
+  const onReference = (_floatingAnchorElement: HTMLDivElement) => {
+    if (_floatingAnchorElement !== null) {
+      setFloatingAnchorElement(_floatingAnchorElement);
     }
   };
 
   return (
     <div
-      ref={containerRef}
+      ref={containerReference}
       className={cn(
         "editor-scroll-container relative transition-colors",
         editable
@@ -152,13 +154,13 @@ export function Plugins({
         }}
       />
       {variant === "simple" && (
-        <FixedToolbarPlugin containerRef={containerRef} />
+        <FixedToolbarPlugin containerRef={containerReference} />
       )}
 
       {autoFocus && editable && <AutoFocusPlugin />}
       <RichTextPlugin
         contentEditable={
-          <div className="group relative" ref={onRef}>
+          <div className="group relative" ref={onReference}>
             <ContentEditable
               className={cn(
                 contentClassName,
@@ -180,8 +182,11 @@ export function Plugins({
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
-      {editable && <TableActionsPlugin anchorElem={floatingAnchorElem} />}
-      {editable && <TableHoverActionsPlugin anchorElem={floatingAnchorElem} />}
+      {editable && <ContextMenuPlugin />}
+      {editable && (
+        <TableCellActionMenuPlugin anchorElem={floatingAnchorElement} />
+      )}
+      {editable && <TableHoverActionsPlugin anchorElem={floatingAnchorElement} />}
       <TOCPlugin />
       <ListPlugin />
       <TabIndentationPlugin />
@@ -192,7 +197,7 @@ export function Plugins({
       <MentionsPlugin mentionsData={mentionsData} />
       {!isSimple && <PageBreakPlugin />}
       {!isSimple && editable && (
-        <DraggableBlockPlugin anchorElem={floatingAnchorElem} size={size} />
+        <DraggableBlockPlugin anchorElem={floatingAnchorElement} size={size} />
       )}
       {!isSimple && <KeywordsPlugin />}
       <EmojisPlugin />
@@ -214,7 +219,7 @@ export function Plugins({
 
       <CodeHighlightPlugin />
       {!isSimple && editable && (
-        <CodeActionMenuPlugin anchorElem={floatingAnchorElem} />
+        <CodeActionMenuPlugin anchorElem={floatingAnchorElement} />
       )}
 
       {/* MarkdownShortcutPlugin enabled for checklist support (- [ ]) */}
@@ -227,21 +232,20 @@ export function Plugins({
 
       {/* ComponentPickerMenuPlugin - Slash commands like Not ion */}
       {!isSimple && editable && <ComponentPickerMenuPlugin />}
-      {/* <ContextMenuPlugin /> */}
       {!isSimple && editable && (
         <DragDropPastePlugin
           onImageUpload={onImageUpload}
-          anchorElem={floatingAnchorElem ?? undefined}
+          anchorElem={floatingAnchorElement ?? undefined}
         />
       )}
       {editable && <MarkdownPastePlugin />}
       {editable && <PlainTextLinebreakPastePlugin />}
       {editable && <EmojiPickerPlugin />}
 
-      {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElem} />}
+      {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />}
       {editable && variant !== "simple" && (
         <FloatingTextFormatToolbarPlugin
-          anchorElem={floatingAnchorElem}
+          anchorElem={floatingAnchorElement}
           variant={isSimple ? "simple" : "default"}
         />
       )}

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { TextNode } from "lexical";
 import { useCallback, useMemo, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -62,7 +63,7 @@ export function EmojiPickerPlugin() {
   const options: Array<EmojiOption> = useMemo(() => {
     return emojiOptions
       .filter((option: EmojiOption) => {
-        if (queryString == null) {
+        if (queryString == undefined) {
           return true;
         }
 
@@ -108,10 +109,10 @@ export function EmojiPickerPlugin() {
       triggerFn={checkForTriggerMatch}
       options={options}
       menuRenderFn={(
-        anchorElementRef,
+        anchorElementReference,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
       ) => {
-        return anchorElementRef.current && options.length > 0
+        return anchorElementReference.current && options.length > 0
           ? createPortal(
               <div className="fixed w-[200px] rounded-md shadow-md">
                 <CommandRoot
@@ -156,7 +157,7 @@ export function EmojiPickerPlugin() {
                   </CommandList>
                 </CommandRoot>
               </div>,
-              anchorElementRef.current,
+              anchorElementReference.current,
             )
           : null;
       }}

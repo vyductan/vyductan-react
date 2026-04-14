@@ -33,7 +33,7 @@ import { Button } from "@acme/ui/components/button";
 
 import { $isFileAttachmentNode } from "../nodes/file-attachment-node";
 
-interface FileAttachmentComponentProps {
+interface FileAttachmentComponentProperties {
   fileName: string;
   fileUrl: string;
   fileSize?: number;
@@ -98,7 +98,7 @@ export default function FileAttachmentComponent({
   mimeType,
   description,
   nodeKey,
-}: FileAttachmentComponentProps) {
+}: FileAttachmentComponentProperties) {
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);

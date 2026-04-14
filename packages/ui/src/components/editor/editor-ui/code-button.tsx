@@ -16,12 +16,12 @@ import {
 } from "lexical";
 import { CircleCheckIcon, CopyIcon } from "lucide-react";
 
-interface Props {
+interface Properties {
   editor: LexicalEditor;
   getCodeDOMNode: () => HTMLElement | null;
 }
 
-export function CopyButton({ editor, getCodeDOMNode }: Props) {
+export function CopyButton({ editor, getCodeDOMNode }: Properties) {
   const [isCopyCompleted, setCopyCompleted] = useState<boolean>(false);
 
   const removeSuccessIcon = useDebounce(

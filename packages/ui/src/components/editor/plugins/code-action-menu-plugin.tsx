@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -58,23 +59,23 @@ function CodeActionMenuContainer({
     right: "0",
     top: "0",
   });
-  const codeSetRef = useRef<Set<string>>(new Set());
-  const codeDOMNodeRef = useRef<HTMLElement | null>(null);
+  const codeSetReference = useRef<Set<string>>(new Set());
+  const codeDOMNodeReference = useRef<HTMLElement | null>(null);
 
   const [isSelectOpen, setIsSelectOpen] = useState(false);
-  const isSelectOpenRef = useRef(isSelectOpen);
+  const isSelectOpenReference = useRef(isSelectOpen);
   useEffect(() => {
-    isSelectOpenRef.current = isSelectOpen;
+    isSelectOpenReference.current = isSelectOpen;
   }, [isSelectOpen]);
 
   function getCodeDOMNode(): HTMLElement | null {
-    return codeDOMNodeRef.current;
+    return codeDOMNodeReference.current;
   }
 
   const { run: debouncedOnMouseMove } = useDebounceFn(
     (event: MouseEvent | undefined) => {
       const { codeDOMNode, isOutside } = getMouseInfo(event);
-      if (isOutside && !isSelectOpenRef.current) {
+      if (isOutside && !isSelectOpenReference.current) {
         setShown(false);
         return;
       }
@@ -83,7 +84,7 @@ function CodeActionMenuContainer({
         return;
       }
 
-      codeDOMNodeRef.current = codeDOMNode;
+      codeDOMNodeReference.current = codeDOMNode;
 
       let codeNode: CodeNode | null = null;
       let _lang = "";
@@ -97,14 +98,14 @@ function CodeActionMenuContainer({
         }
       });
 
-      const { y: editorElemY, right: editorElemRight } =
+      const { y: editorElementY, right: editorElementRight } =
         anchorElem.getBoundingClientRect();
       const { y, right } = codeDOMNode.getBoundingClientRect();
       setLang(_lang);
       setShown(true);
       setPosition({
-        right: `${editorElemRight - right + CODE_PADDING}px`,
-        top: `${y - editorElemY}px`,
+        right: `${editorElementRight - right + CODE_PADDING}px`,
+        top: `${y - editorElementY}px`,
       });
     },
     {
@@ -139,12 +140,12 @@ function CodeActionMenuContainer({
           for (const [key, type] of mutations) {
             switch (type) {
               case "created": {
-                codeSetRef.current.add(key);
+                codeSetReference.current.add(key);
                 break;
               }
 
               case "destroyed": {
-                codeSetRef.current.delete(key);
+                codeSetReference.current.delete(key);
                 break;
               }
 
@@ -154,7 +155,7 @@ function CodeActionMenuContainer({
             }
           }
         });
-        setShouldListenMouseMove(codeSetRef.current.size > 0);
+        setShouldListenMouseMove(codeSetReference.current.size > 0);
       },
       { skipInitialization: false },
     );

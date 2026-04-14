@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -39,7 +40,7 @@ export function TypingPerfPlugin(): JSX.Element | null {
     let invalidatingEvent = false;
 
     const measureEventEnd = function logKeyPress() {
-      if (keyPressTimerId != null) {
+      if (keyPressTimerId != undefined) {
         if (invalidatingEvent) {
           invalidatingEvent = false;
         } else {
@@ -52,7 +53,7 @@ export function TypingPerfPlugin(): JSX.Element | null {
     };
 
     const measureEventStart = function measureEvent() {
-      if (timerId != null) {
+      if (timerId != undefined) {
         clearTimeout(timerId);
         timerId = null;
       }

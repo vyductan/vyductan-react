@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Video Node
  *
@@ -146,7 +147,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(
-    src: string,
+    source: string,
     altText: string,
     width?: "inherit" | number,
     height?: "inherit" | number,
@@ -157,7 +158,7 @@ export class VideoNode extends DecoratorNode<JSX.Element> {
     key?: NodeKey,
   ) {
     super(key);
-    this.__src = src;
+    this.__src = source;
     this.__altText = altText;
     this.__width = width ?? "inherit";
     this.__height = height ?? "inherit";

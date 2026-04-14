@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -25,7 +26,7 @@ function readTouch(e: TouchEvent): [number, number] | null {
   return [touch.clientX, touch.clientY];
 }
 
-function addListener(element: HTMLElement, cb: Listener): () => void {
+function addListener(element: HTMLElement, callback: Listener): () => void {
   let elementValues = elements.get(element);
   if (elementValues === undefined) {
     const listeners = new Set<Listener>();
@@ -60,17 +61,17 @@ function addListener(element: HTMLElement, cb: Listener): () => void {
     };
     elements.set(element, elementValues);
   }
-  elementValues.listeners.add(cb);
-  return () => deleteListener(element, cb);
+  elementValues.listeners.add(callback);
+  return () => deleteListener(element, callback);
 }
 
-function deleteListener(element: HTMLElement, cb: Listener): void {
+function deleteListener(element: HTMLElement, callback: Listener): void {
   const elementValues = elements.get(element);
   if (elementValues === undefined) {
     return;
   }
   const listeners = elementValues.listeners;
-  listeners.delete(cb);
+  listeners.delete(callback);
   if (listeners.size === 0) {
     elements.delete(element);
     element.removeEventListener("touchstart", elementValues.handleTouchstart);
@@ -80,48 +81,48 @@ function deleteListener(element: HTMLElement, cb: Listener): void {
 
 export function addSwipeLeftListener(
   element: HTMLElement,
-  cb: (_force: number, e: TouchEvent) => void,
+  callback: (_force: number, e: TouchEvent) => void,
 ) {
   return addListener(element, (force, e) => {
     const [x, y] = force;
     if (x < 0 && -x > Math.abs(y)) {
-      cb(x, e);
+      callback(x, e);
     }
   });
 }
 
 export function addSwipeRightListener(
   element: HTMLElement,
-  cb: (_force: number, e: TouchEvent) => void,
+  callback: (_force: number, e: TouchEvent) => void,
 ) {
   return addListener(element, (force, e) => {
     const [x, y] = force;
     if (x > 0 && x > Math.abs(y)) {
-      cb(x, e);
+      callback(x, e);
     }
   });
 }
 
 export function addSwipeUpListener(
   element: HTMLElement,
-  cb: (_force: number, e: TouchEvent) => void,
+  callback: (_force: number, e: TouchEvent) => void,
 ) {
   return addListener(element, (force, e) => {
     const [x, y] = force;
     if (y < 0 && -y > Math.abs(x)) {
-      cb(x, e);
+      callback(x, e);
     }
   });
 }
 
 export function addSwipeDownListener(
   element: HTMLElement,
-  cb: (_force: number, e: TouchEvent) => void,
+  callback: (_force: number, e: TouchEvent) => void,
 ) {
   return addListener(element, (force, e) => {
     const [x, y] = force;
     if (y > 0 && y > Math.abs(x)) {
-      cb(x, e);
+      callback(x, e);
     }
   });
 }

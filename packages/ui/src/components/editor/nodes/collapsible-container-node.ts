@@ -78,11 +78,11 @@ export class CollapsibleContainerNode extends ElementNode {
   }
 
   updateDOM(
-    prevNode: CollapsibleContainerNode,
+    previousNode: CollapsibleContainerNode,
     dom: HTMLDetailsElement,
   ): boolean {
     const currentOpen = this.__open;
-    if (prevNode.__open !== currentOpen) {
+    if (previousNode.__open !== currentOpen) {
       // details is not well supported in Chrome #5582
       if (IS_CHROME) {
         const contentDom = dom.children[1];

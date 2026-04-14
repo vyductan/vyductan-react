@@ -1,1 +1,4 @@
-export { LexicalContextMenuPlugin } from "@lexical/react/LexicalContextMenuPlugin";
+export {
+  NodeContextMenuOption,
+  NodeContextMenuPlugin,
+} from "@lexical/react/LexicalNodeContextMenuPlugin";

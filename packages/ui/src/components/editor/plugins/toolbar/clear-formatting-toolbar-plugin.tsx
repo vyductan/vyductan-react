@@ -32,16 +32,16 @@ export function ClearFormattingToolbarPlugin() {
         }
 
         // eslint-disable-next-line prefer-const
-        for (let [idx, node] of nodes.entries()) {
+        for (let [index, node] of nodes.entries()) {
           // We split the first and last node by the selection
           // So that we don't format unselected text inside those nodes
           if ($isTextNode(node)) {
             // Use a separate variable to ensure TS does not lose the refinement
             let textNode = node;
-            if (idx === 0 && anchor.offset !== 0) {
+            if (index === 0 && anchor.offset !== 0) {
               textNode = textNode.splitText(anchor.offset)[1] ?? textNode;
             }
-            if (idx === nodes.length - 1) {
+            if (index === nodes.length - 1) {
               textNode = textNode.splitText(focus.offset)[0] ?? textNode;
             }
             /**

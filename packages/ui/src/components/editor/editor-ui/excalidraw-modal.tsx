@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable react-hooks/static-components */
 "use client";
 
@@ -30,7 +31,7 @@ import { Excalidraw } from "./excalidraw";
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState["elements"];
 
-type Props = {
+type Properties = {
   closeOnClickOutside?: boolean;
   /**
    * The initial set of elements to draw into the scene
@@ -67,13 +68,13 @@ type Props = {
 };
 
 export const useCallbackRefState = () => {
-  const [refValue, setRefValue] =
+  const [referenceValue, setReferenceValue] =
     React.useState<ExcalidrawImperativeAPI | null>(null);
-  const refCallback = React.useCallback(
-    (value: ExcalidrawImperativeAPI | null) => setRefValue(value),
+  const referenceCallback = React.useCallback(
+    (value: ExcalidrawImperativeAPI | null) => setReferenceValue(value),
     [],
   );
-  return [refValue, refCallback] as const;
+  return [referenceValue, referenceCallback] as const;
 };
 
 /**
@@ -90,17 +91,17 @@ export function ExcalidrawModal({
   isShown = false,
   onDelete,
   onClose,
-}: Props): ReactElement | null {
-  const excaliDrawModelRef = useRef<HTMLDivElement | null>(null);
-  const [excalidrawAPI, excalidrawAPIRefCallback] = useCallbackRefState();
+}: Properties): ReactElement | null {
+  const excaliDrawModelReference = useRef<HTMLDivElement | null>(null);
+  const [excalidrawAPI, excalidrawAPIReferenceCallback] = useCallbackRefState();
   const [discardModalOpen, setDiscardModalOpen] = useState(false);
   const [elements, setElements] =
     useState<ExcalidrawInitialElements>(initialElements);
   const [files, setFiles] = useState<BinaryFiles>(initialFiles);
 
   useEffect(() => {
-    if (excaliDrawModelRef.current !== null) {
-      excaliDrawModelRef.current.focus();
+    if (excaliDrawModelReference.current !== null) {
+      excaliDrawModelReference.current.focus();
     }
   }, []);
 
@@ -110,16 +111,16 @@ export function ExcalidrawModal({
     const clickOutsideHandler = (event: MouseEvent) => {
       const target = event.target;
       if (
-        excaliDrawModelRef.current !== null &&
-        !excaliDrawModelRef.current.contains(target as Node) &&
+        excaliDrawModelReference.current !== null &&
+        !excaliDrawModelReference.current.contains(target as Node) &&
         closeOnClickOutside
       ) {
         onDelete();
       }
     };
 
-    if (excaliDrawModelRef.current !== null) {
-      modalOverlayElement = excaliDrawModelRef.current.parentElement;
+    if (excaliDrawModelReference.current !== null) {
+      modalOverlayElement = excaliDrawModelReference.current.parentElement;
       if (modalOverlayElement !== null) {
         modalOverlayElement.addEventListener("click", clickOutsideHandler);
       }
@@ -133,7 +134,7 @@ export function ExcalidrawModal({
   }, [closeOnClickOutside, onDelete]);
 
   useLayoutEffect(() => {
-    const currentModalRef = excaliDrawModelRef.current;
+    const currentModalReference = excaliDrawModelReference.current;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -141,19 +142,19 @@ export function ExcalidrawModal({
       }
     };
 
-    if (currentModalRef !== null) {
-      currentModalRef.addEventListener("keydown", onKeyDown);
+    if (currentModalReference !== null) {
+      currentModalReference.addEventListener("keydown", onKeyDown);
     }
 
     return () => {
-      if (currentModalRef !== null) {
-        currentModalRef.removeEventListener("keydown", onKeyDown);
+      if (currentModalReference !== null) {
+        currentModalReference.removeEventListener("keydown", onKeyDown);
       }
     };
   }, [elements, files, onDelete]);
 
   const save = () => {
-    if (elements?.some((el) => !el.isDeleted)) {
+    if (elements?.some((element) => !element.isDeleted)) {
       const appState = excalidrawAPI?.getAppState();
       // We only need a subset of the state
       const partialState: Partial<AppState> = {
@@ -221,12 +222,12 @@ export function ExcalidrawModal({
       <DialogTrigger />
       <DialogContent className="h-4/6 max-w-4xl overflow-hidden p-0">
         <div className="relative" role="dialog">
-          <div className="h-full w-full" ref={excaliDrawModelRef} tabIndex={-1}>
+          <div className="h-full w-full" ref={excaliDrawModelReference} tabIndex={-1}>
             <div className="h-full w-full">
               {discardModalOpen && <ShowDiscardDialog />}
               <Excalidraw
                 onChange={onChange}
-                excalidrawAPI={excalidrawAPIRefCallback}
+                excalidrawAPI={excalidrawAPIReferenceCallback}
                 initialData={{
                   appState: initialAppState || { isLoading: false },
                   elements: initialElements,

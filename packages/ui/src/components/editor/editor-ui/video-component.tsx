@@ -21,7 +21,7 @@ import {
 
 import { $isVideoNode } from "../nodes/video-node";
 
-interface VideoComponentProps {
+interface VideoComponentProperties {
   src: string;
   altText: string;
   width: "inherit" | number;
@@ -43,11 +43,11 @@ export default function VideoComponent({
   loop,
   muted,
   nodeKey,
-}: VideoComponentProps) {
+}: VideoComponentProperties) {
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoReference = useRef<HTMLVideoElement | null>(null);
 
   const onDelete = useCallback(
     (event: KeyboardEvent) => {
@@ -69,7 +69,7 @@ export default function VideoComponent({
       editor.registerCommand(
         CLICK_COMMAND,
         (event: MouseEvent) => {
-          const videoElement = videoRef.current;
+          const videoElement = videoReference.current;
           if (event.target === videoElement) {
             if (event.shiftKey) {
               setSelected(!isSelected);
@@ -110,7 +110,7 @@ export default function VideoComponent({
       className={`relative inline-block ${isSelected ? "ring-2 ring-blue-500" : ""}`}
     >
       <video
-        ref={videoRef}
+        ref={videoReference}
         src={src}
         controls={controls}
         autoPlay={autoplay}

@@ -9,24 +9,24 @@ import type { ReactNode } from "react";
 import * as React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-type Suggestion = null | string;
-type CallbackFn = (newSuggestion: Suggestion) => void;
-type SubscribeFn = (callbackFn: CallbackFn) => () => void;
-type PublishFn = (newSuggestion: Suggestion) => void;
-type ContextShape = [SubscribeFn, PublishFn];
-type HookShape = [suggestion: Suggestion, setSuggestion: PublishFn];
+type Suggestion = string | undefined;
+type CallbackFunction = (newSuggestion: Suggestion) => void;
+type SubscribeFunction = (callbackFunction: CallbackFunction) => () => void;
+type PublishFunction = (newSuggestion: Suggestion) => void;
+type ContextShape = [SubscribeFunction, PublishFunction];
+type HookShape = [suggestion: Suggestion, setSuggestion: PublishFunction];
 
 const noopUnsubscribe = () => {
   return;
 };
 
-const noopSubscribe: SubscribeFn = () => noopUnsubscribe;
+const noopSubscribe: SubscribeFunction = () => noopUnsubscribe;
 
-const noopPublish: PublishFn = () => {
+const noopPublish: PublishFunction = () => {
   return;
 };
 
-const Context: React.Context<ContextShape> = createContext([
+const Context: React.Context<ContextShape> = createContext<ContextShape>([
   noopSubscribe,
   noopPublish,
 ]);
@@ -35,31 +35,31 @@ export function SharedAutocompleteContext({
 }: {
   children: ReactNode;
 }) {
-  const suggestionRef = React.useRef<Suggestion>(null);
+  const suggestionReference = React.useRef<Suggestion>(undefined);
   const context: ContextShape = useMemo(() => {
-    const listeners = new Set<CallbackFn>();
+    const listeners = new Set<CallbackFunction>();
     return [
-      (cb: (newSuggestion: Suggestion) => void) => {
-        cb(suggestionRef.current);
-        listeners.add(cb);
+      (callback: (newSuggestion: Suggestion) => void) => {
+        callback(suggestionReference.current);
+        listeners.add(callback);
         return () => {
-          listeners.delete(cb);
+          listeners.delete(callback);
         };
       },
       (newSuggestion: Suggestion) => {
-        suggestionRef.current = newSuggestion;
+        suggestionReference.current = newSuggestion;
         for (const listener of listeners) {
           listener(newSuggestion);
         }
       },
     ];
-  }, [suggestionRef]);
+  }, [suggestionReference]);
   return <Context.Provider value={context}>{children}</Context.Provider>;
 }
 
 export const useSharedAutocompleteContext = (): HookShape => {
   const [subscribe, publish]: ContextShape = useContext(Context);
-  const [suggestion, setSuggestion] = useState<Suggestion>(null);
+  const [suggestion, setSuggestion] = useState<Suggestion>();
   useEffect(() => {
     return subscribe((newSuggestion: Suggestion) => {
       setSuggestion(newSuggestion);

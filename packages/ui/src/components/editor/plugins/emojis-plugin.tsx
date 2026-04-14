@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -24,17 +25,17 @@ const emojis = new Map<string, [string, string]>([
 function $findAndTransformEmoji(node: TextNode): null | TextNode {
   const text = node.getTextContent();
 
-  for (let i = 0; i < text.length; i++) {
-    const emojiData = emojis.get(text[i]!) ?? emojis.get(text.slice(i, i + 2));
+  for (let index = 0; index < text.length; index++) {
+    const emojiData = emojis.get(text[index]!) ?? emojis.get(text.slice(index, index + 2));
 
     if (emojiData !== undefined) {
       const [emojiStyle, emojiText] = emojiData;
       let targetNode;
 
-      if (i === 0) {
-        [targetNode] = node.splitText(i + 2);
+      if (index === 0) {
+        [targetNode] = node.splitText(index + 2);
       } else {
-        [, targetNode] = node.splitText(i, i + 2);
+        [, targetNode] = node.splitText(index, index + 2);
       }
 
       const emojiNode = $createEmojiNode(emojiStyle, emojiText);

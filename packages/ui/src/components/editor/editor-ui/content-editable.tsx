@@ -10,7 +10,7 @@ import { useBlockType } from "../editor-hooks/use-block-type";
 import { blockTypeToBlockName } from "../plugins/toolbar/block-format/block-format-data";
 import { editorTheme } from "../themes/editor-theme";
 
-type Props = {
+type Properties = {
   placeholder: string;
   className?: string;
   placeholderClassName?: string;
@@ -64,7 +64,7 @@ export function ContentEditable({
   placeholder = "Start typing...",
   className,
   placeholderClassName,
-}: Props): JSX.Element {
+}: Properties): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const blockType = useBlockType();
   const [isEmpty, setIsEmpty] = useState(true);
@@ -112,6 +112,7 @@ export function ContentEditable({
           className,
         )}
         aria-placeholder={dynamicPlaceholder}
+        // eslint-disable-next-line unicorn/no-null -- Lexical placeholder callback uses null to render no placeholder node.
         placeholder={() => null}
       />
     </div>

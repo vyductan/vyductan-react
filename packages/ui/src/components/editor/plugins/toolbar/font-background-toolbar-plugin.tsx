@@ -16,7 +16,7 @@ import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 
 export function FontBackgroundToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
-  const selectionRef = useRef<RangeSelection | null>(null);
+  const selectionReference = useRef<RangeSelection | null>(null);
 
   const [bgColor, setBgColor] = useState("#ffffff");
 
@@ -39,8 +39,8 @@ export function FontBackgroundToolbarPlugin() {
       activeEditor.update(
         () => {
           let selection = $getSelection();
-          if (!selection && selectionRef.current) {
-            $setSelection(selectionRef.current);
+          if (!selection && selectionReference.current) {
+            $setSelection(selectionReference.current);
             selection = $getSelection();
           }
           if ($isRangeSelection(selection)) {
@@ -83,7 +83,7 @@ export function FontBackgroundToolbarPlugin() {
         activeEditor.getEditorState().read(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            selectionRef.current = selection.clone();
+            selectionReference.current = selection.clone();
           }
         });
       }

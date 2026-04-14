@@ -28,12 +28,12 @@ const getElement = (): HTMLElement => {
   return element;
 };
 
-export function useReport(): (arg0: string) => ReturnType<typeof setTimeout> {
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+export function useReport(): (argument0: string) => ReturnType<typeof setTimeout> {
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const cleanup = useCallback(() => {
-    if (timer.current !== null) {
+    if (timer.current !== undefined) {
       clearTimeout(timer.current);
-      timer.current = null;
+      timer.current = undefined;
     }
 
     document.querySelector<HTMLElement>("#report-container")?.remove();
@@ -47,7 +47,7 @@ export function useReport(): (arg0: string) => ReturnType<typeof setTimeout> {
     (content) => {
       console.log(content);
       const element = getElement();
-      if (timer.current !== null) {
+      if (timer.current !== undefined) {
         clearTimeout(timer.current);
       }
       element.innerHTML = content;

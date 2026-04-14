@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * File Attachment Plugin
  *
@@ -118,7 +119,7 @@ export function InsertFileAttachmentUploadedDialogBody({
   const [mimeType, setMimeType] = useState<string | undefined>();
   const [description, setDescription] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputReference = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -170,7 +171,7 @@ export function InsertFileAttachmentUploadedDialogBody({
         <Input
           id="file-upload"
           type="file"
-          ref={fileInputRef}
+          ref={fileInputReference}
           onChange={handleFileUpload}
           disabled={isUploading}
           data-test-id="file-attachment-modal-upload-input"

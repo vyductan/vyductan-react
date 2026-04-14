@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-export type ImageResolverFn = (src: string) => Promise<string>;
+export type ImageResolverFn = (source: string) => Promise<string>;
 
 const ImageResolverContext = createContext<ImageResolverFn | undefined>(
   undefined,

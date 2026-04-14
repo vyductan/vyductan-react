@@ -25,7 +25,7 @@ import { ListIcon } from "lucide-react";
 
 import { $isTOCNode } from "../nodes/toc-node";
 
-interface TOCComponentProps {
+interface TOCComponentProperties {
   headings?: Array<{
     id: string;
     text: string;
@@ -132,7 +132,7 @@ export default function TOCComponent({
   headings: initialHeadings,
   nodeKey,
   editor: externalEditor,
-}: TOCComponentProps) {
+}: TOCComponentProperties) {
   const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -87,7 +88,7 @@ const SPEECH_RECOGNITION_CONSTRUCTOR = getSpeechRecognitionConstructor();
 const VOICE_COMMANDS: Readonly<
   Record<
     string,
-    (arg0: { editor: LexicalEditor; selection: RangeSelection }) => void
+    (argument0: { editor: LexicalEditor; selection: RangeSelection }) => void
   >
 > = {
   "\n": ({ selection }) => {

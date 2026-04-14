@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Video Plugin
  *
@@ -44,10 +45,10 @@ export function InsertVideoUriDialogBody({
 }: {
   onClick: (payload: InsertVideoPayload) => void;
 }) {
-  const [src, setSrc] = useState("");
+  const [source, setSource] = useState("");
   const [altText, setAltText] = useState("");
 
-  const isDisabled = src === "";
+  const isDisabled = source === "";
 
   return (
     <div className="grid gap-4 py-4">
@@ -56,8 +57,8 @@ export function InsertVideoUriDialogBody({
         <Input
           id="video-url"
           placeholder="i.e. https://example.com/video.mp4"
-          onChange={(e) => setSrc(e.target.value)}
-          value={src}
+          onChange={(e) => setSource(e.target.value)}
+          value={source}
           data-test-id="video-modal-url-input"
         />
       </div>
@@ -75,7 +76,7 @@ export function InsertVideoUriDialogBody({
         <Button
           type="submit"
           disabled={isDisabled}
-          onClick={() => onClick({ altText: altText || "Video", src })}
+          onClick={() => onClick({ altText: altText || "Video", src: source })}
           data-test-id="video-modal-confirm-btn"
         >
           Confirm
@@ -90,9 +91,9 @@ export function InsertVideoUploadedDialogBody({
 }: {
   onClick: (payload: InsertVideoPayload) => void;
 }) {
-  const [src, setSrc] = useState("");
+  const [source, setSource] = useState("");
   const [altText, setAltText] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputReference = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -121,13 +122,13 @@ export function InsertVideoUploadedDialogBody({
     const reader = new FileReader();
     reader.addEventListener("load", (event) => {
       const result = event.target?.result as string;
-      setSrc(result);
+      setSource(result);
       setAltText(file.name);
     });
     reader.readAsDataURL(file);
   };
 
-  const isDisabled = src === "";
+  const isDisabled = source === "";
 
   return (
     <div className="grid gap-4 py-4">
@@ -137,7 +138,7 @@ export function InsertVideoUploadedDialogBody({
           id="video-upload"
           type="file"
           accept="video/*"
-          ref={fileInputRef}
+          ref={fileInputReference}
           onChange={handleFileUpload}
           data-test-id="video-modal-upload-input"
         />
@@ -145,7 +146,7 @@ export function InsertVideoUploadedDialogBody({
           Supported formats: MP4, WebM, OGG (Max 100MB)
         </p>
       </div>
-      {src && (
+      {source && (
         <div className="grid gap-2">
           <Label htmlFor="alt-text-upload">Alt Text</Label>
           <Input
@@ -161,7 +162,7 @@ export function InsertVideoUploadedDialogBody({
         <Button
           type="submit"
           disabled={isDisabled}
-          onClick={() => onClick({ altText: altText || "Video", src })}
+          onClick={() => onClick({ altText: altText || "Video", src: source })}
           data-test-id="video-modal-confirm-upload-btn"
         >
           Confirm

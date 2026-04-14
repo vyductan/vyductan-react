@@ -1,6 +1,11 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import * as React from "react";
 
 import { Editor } from "../editor";
+import {
+  editorRenderFixtures,
+  editorRenderSourceFixtures,
+} from "../render/render-fixtures";
 
 type EditorFormat = "json" | "markdown" | "html";
 type EditorVariant = "default" | "simple" | "minimal";
@@ -25,40 +30,8 @@ const EMPTY_STATS: EditorStats = {
 const JSON_PRESETS: [Preset, ...Preset[]] = [
   {
     label: "Starter",
-    description: "A clean welcome state for experimenting with JSON output.",
-    value: JSON.stringify(
-      {
-        root: {
-          type: "root",
-          format: "",
-          indent: 0,
-          version: 1,
-          direction: "ltr",
-          children: [
-            {
-              type: "paragraph",
-              format: "",
-              indent: 0,
-              version: 1,
-              direction: "ltr",
-              children: [
-                {
-                  detail: 0,
-                  format: 0,
-                  mode: "normal",
-                  style: "",
-                  text: "Welcome to the editor playground.",
-                  type: "text",
-                  version: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      null,
-      2,
-    ),
+    description: "A semantic table example for experimenting with JSON output.",
+    value: JSON.stringify(editorRenderFixtures.table.content, null, 2),
   },
   {
     label: "Checklist",
@@ -157,8 +130,9 @@ const JSON_PRESETS: [Preset, ...Preset[]] = [
 const MARKDOWN_PRESETS: [Preset, ...Preset[]] = [
   {
     label: "Starter",
-    description: "Short markdown copy for quick editing.",
-    value: `# Notes\n\nStart with a short summary and a callout.`,
+    description:
+      "A semantic table example for experimenting with markdown output.",
+    value: editorRenderSourceFixtures.table.markdown,
   },
   {
     label: "Docs",
@@ -175,8 +149,8 @@ const MARKDOWN_PRESETS: [Preset, ...Preset[]] = [
 const HTML_PRESETS: [Preset, ...Preset[]] = [
   {
     label: "Starter",
-    description: "Simple semantic markup.",
-    value: `<h1>Welcome</h1><p>Use this preset to try the HTML mode quickly.</p>`,
+    description: "A semantic table example for experimenting with HTML output.",
+    value: editorRenderSourceFixtures.table.html,
   },
   {
     label: "Formatted",

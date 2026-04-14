@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/set-state-in-effect */
 
@@ -111,8 +112,8 @@ function useMentionLookupService(
   useEffect(() => {
     const cachedResults = mentionsCache.get(mentionString);
 
-    if (mentionString == null) {
-      setResults((prev) => (prev.length === 0 ? prev : []));
+    if (mentionString == undefined) {
+      setResults((previous) => (previous.length === 0 ? previous : []));
       return;
     }
 
@@ -251,10 +252,10 @@ export function MentionsPlugin({
       triggerFn={checkForMentionMatch}
       options={options}
       menuRenderFn={(
-        anchorElementRef,
+        anchorElementReference,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
       ) => {
-        return anchorElementRef.current && results.length > 0
+        return anchorElementReference.current && results.length > 0
           ? createPortal(
               <div className="fixed z-10 w-[200px] rounded-md shadow-md">
                 <Command
@@ -300,7 +301,7 @@ export function MentionsPlugin({
                   </CommandList>
                 </Command>
               </div>,
-              anchorElementRef.current,
+              anchorElementReference.current,
             )
           : null;
       }}

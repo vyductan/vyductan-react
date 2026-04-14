@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 "use client";
 
 /**
@@ -19,7 +20,7 @@ interface WordCountStats {
   readingTimeMinutes: number;
 }
 
-interface WordCountPluginProps {
+interface WordCountPluginProperties {
   onStatsChange?: (stats: WordCountStats) => void;
   wordsPerMinute?: number; // Default: 200
 }
@@ -27,7 +28,7 @@ interface WordCountPluginProps {
 export function WordCountPlugin({
   onStatsChange,
   wordsPerMinute = 200,
-}: WordCountPluginProps) {
+}: WordCountPluginProperties) {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

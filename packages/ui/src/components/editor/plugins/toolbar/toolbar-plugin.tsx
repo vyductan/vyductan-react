@@ -14,7 +14,7 @@ const $updateToolbar = () => {
 export function ToolbarPlugin({
   children,
 }: {
-  children: (props: { blockType: string }) => React.ReactNode;
+  children: (properties: { blockType: string }) => React.ReactNode;
 }) {
   const [editor] = useLexicalComposerContext();
 

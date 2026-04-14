@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Instagram Embed Node
  *
@@ -22,7 +23,7 @@ import { useEffect } from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-type InstagramComponentProps = Readonly<{
+type InstagramComponentProperties = Readonly<{
   className: Readonly<{
     base: string;
     focus: string;
@@ -37,7 +38,7 @@ function InstagramComponent({
   format,
   nodeKey,
   postId,
-}: InstagramComponentProps) {
+}: InstagramComponentProperties) {
   useEffect(() => {
     // Load Instagram embed script
     if (globalThis.instgrm) {

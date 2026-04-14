@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Twitter Embed Node
  *
@@ -22,7 +23,7 @@ import { useEffect } from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-type TwitterComponentProps = Readonly<{
+type TwitterComponentProperties = Readonly<{
   className: Readonly<{
     base: string;
     focus: string;
@@ -37,7 +38,7 @@ function TwitterComponent({
   format,
   nodeKey,
   tweetId,
-}: TwitterComponentProps) {
+}: TwitterComponentProperties) {
   useEffect(() => {
     // Load Twitter widget script
     if (globalThis.twttr) {

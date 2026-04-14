@@ -9,19 +9,19 @@ import type { ReactNode } from "react";
 import * as React from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-type CallbackFn = (isOpen: boolean) => void;
-type SubscribeFn = (callbackFn: CallbackFn) => () => void;
-type PublishFn = (isOpen: boolean) => void;
-type ContextShape = [SubscribeFn, PublishFn];
-type HookShape = [isOpen: boolean, setIsOpen: PublishFn];
+type CallbackFunction = (isOpen: boolean) => void;
+type SubscribeFunction = (callbackFunction: CallbackFunction) => () => void;
+type PublishFunction = (isOpen: boolean) => void;
+type ContextShape = [SubscribeFunction, PublishFunction];
+type HookShape = [isOpen: boolean, setIsOpen: PublishFunction];
 
 const noopUnsubscribe = () => {
   return;
 };
 
-const noopSubscribe: SubscribeFn = () => noopUnsubscribe;
+const noopSubscribe: SubscribeFunction = () => noopUnsubscribe;
 
-const noopPublish: PublishFn = () => {
+const noopPublish: PublishFunction = () => {
   return;
 };
 
@@ -31,25 +31,25 @@ const Context: React.Context<ContextShape> = createContext([
 ]);
 
 export function ComponentPickerContext({ children }: { children: ReactNode }) {
-  const isOpenRef = React.useRef<boolean>(false);
+  const isOpenReference = React.useRef<boolean>(false);
   const context: ContextShape = useMemo(() => {
-    const listeners = new Set<CallbackFn>();
+    const listeners = new Set<CallbackFunction>();
     return [
-      (cb: (isOpen: boolean) => void) => {
-        cb(isOpenRef.current);
-        listeners.add(cb);
+      (callback: (isOpen: boolean) => void) => {
+        callback(isOpenReference.current);
+        listeners.add(callback);
         return () => {
-          listeners.delete(cb);
+          listeners.delete(callback);
         };
       },
       (isOpen: boolean) => {
-        isOpenRef.current = isOpen;
+        isOpenReference.current = isOpen;
         for (const listener of listeners) {
           listener(isOpen);
         }
       },
     ];
-  }, [isOpenRef]);
+  }, [isOpenReference]);
   return <Context.Provider value={context}>{children}</Context.Provider>;
 }
 

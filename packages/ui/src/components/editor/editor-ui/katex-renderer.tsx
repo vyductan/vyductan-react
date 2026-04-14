@@ -18,10 +18,10 @@ export default function KatexRenderer({
   inline: boolean;
   onDoubleClick: () => void;
 }>): JSX.Element {
-  const katexElementRef = useRef<HTMLElement>(null);
+  const katexElementReference = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const katexElement = katexElementRef.current;
+    const katexElement = katexElementReference.current;
 
     if (katexElement !== null) {
       katex.render(equation, katexElement, {
@@ -47,7 +47,7 @@ export default function KatexRenderer({
         role="button"
         tabIndex={-1}
         onDoubleClick={onDoubleClick}
-        ref={katexElementRef}
+        ref={katexElementReference}
       />
       <picture>
         <img src="#" alt="" />

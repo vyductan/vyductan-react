@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 "use client";
 
 import type { EditorState } from "lexical";
@@ -14,10 +15,10 @@ import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 // Plugin to initialize editor with markdown content
 function InitialMarkdownPlugin({ markdown }: { markdown: string }) {
   const [editor] = useLexicalComposerContext();
-  const isInitializedRef = useRef(false);
+  const isInitializedReference = useRef(false);
 
   useEffect(() => {
-    if (isInitializedRef.current) return;
+    if (isInitializedReference.current) return;
 
     // Only initialize if markdown is provided and not empty
     if (markdown) {
@@ -26,13 +27,13 @@ function InitialMarkdownPlugin({ markdown }: { markdown: string }) {
       });
     }
 
-    isInitializedRef.current = true;
+    isInitializedReference.current = true;
   }, [editor, markdown]);
 
   return null;
 }
 
-interface MarkdownPluginsProps {
+interface MarkdownPluginsProperties {
   defaultValue?: string;
   value?: string;
   onChange?: (markdown: string, editorState: EditorState) => void;
@@ -42,7 +43,7 @@ export function MarkdownPlugins({
   defaultValue,
   value,
   onChange,
-}: MarkdownPluginsProps) {
+}: MarkdownPluginsProperties) {
   return (
     <>
       <InitialMarkdownPlugin markdown={defaultValue ?? value ?? ""} />

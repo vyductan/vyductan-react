@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -88,7 +89,7 @@ export const YoutubeEmbedConfig: PlaygroundEmbedConfig = {
 
     const id = match ? (match[2]?.length === 11 ? match[2] : null) : null;
 
-    if (id != null) {
+    if (id != undefined) {
       return {
         id,
         url,
@@ -121,7 +122,7 @@ export const FigmaEmbedConfig: PlaygroundEmbedConfig = {
         text,
       );
 
-    if (match != null) {
+    if (match != undefined) {
       return {
         id: match[3]!,
         url: match[0],
@@ -245,13 +246,13 @@ export function AutoEmbedDialog({
       debounce((inputText: string) => {
         const urlMatch = URL_MATCHER.exec(inputText);
 
-        if (embedConfig != null && inputText != null && urlMatch != null) {
+        if (embedConfig != undefined && inputText != undefined && urlMatch != undefined) {
           Promise.resolve(embedConfig.parseUrl(inputText)).then(
             (parseResult) => {
               setEmbedResult(parseResult);
             },
           );
-        } else if (embedResult != null) {
+        } else if (embedResult != undefined) {
           setEmbedResult(null);
         }
       }, 200),
@@ -259,7 +260,7 @@ export function AutoEmbedDialog({
   );
 
   const onClick = () => {
-    if (embedResult != null) {
+    if (embedResult != undefined) {
       embedConfig.insertNode(editor, embedResult);
       onClose();
     }
@@ -304,15 +305,15 @@ export function AutoEmbedPlugin(): JSX.Element {
 
   const getMenuOptions = (
     activeEmbedConfig: PlaygroundEmbedConfig,
-    embedFn: () => void,
-    dismissFn: () => void,
+    embedFunction: () => void,
+    dismissFunction: () => void,
   ) => {
     return [
       new AutoEmbedOption("Dismiss", {
-        onSelect: dismissFn,
+        onSelect: dismissFunction,
       }),
       new AutoEmbedOption(`Embed ${activeEmbedConfig.contentName}`, {
-        onSelect: embedFn,
+        onSelect: embedFunction,
       }),
     ];
   };
@@ -325,12 +326,12 @@ export function AutoEmbedPlugin(): JSX.Element {
         onOpenEmbedModalForConfig={openEmbedModal}
         getMenuOptions={getMenuOptions}
         menuRenderFn={(
-          anchorElementRef,
+          anchorElementReference,
           { options, selectOptionAndCleanUp },
         ) => {
-          return anchorElementRef.current ? (
+          return anchorElementReference.current ? (
             <Popover open={true}>
-              <PopoverPortal container={anchorElementRef.current}>
+              <PopoverPortal container={anchorElementReference.current}>
                 <div className="-translate-y-full transform">
                   <PopoverTrigger />
                   <PopoverContent

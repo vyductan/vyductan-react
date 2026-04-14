@@ -16,7 +16,7 @@ import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 
 export function FontColorToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
-  const selectionRef = useRef<RangeSelection | null>(null);
+  const selectionReference = useRef<RangeSelection | null>(null);
 
   const [fontColor, setFontColor] = useState("#000000");
 
@@ -35,8 +35,8 @@ export function FontColorToolbarPlugin() {
       activeEditor.update(
         () => {
           let selection = $getSelection();
-          if (!selection && selectionRef.current) {
-            $setSelection(selectionRef.current);
+          if (!selection && selectionReference.current) {
+            $setSelection(selectionReference.current);
             selection = $getSelection();
           }
           if ($isRangeSelection(selection)) {
@@ -79,7 +79,7 @@ export function FontColorToolbarPlugin() {
         activeEditor.getEditorState().read(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            selectionRef.current = selection.clone();
+            selectionReference.current = selection.clone();
           }
         });
       }

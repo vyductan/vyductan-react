@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -26,7 +27,7 @@ import EquationEditor from "../editor-ui/equation-editor";
 import KatexRenderer from "../editor-ui/katex-renderer";
 import { $isEquationNode } from "../nodes/equation-node";
 
-type EquationComponentProps = {
+type EquationComponentProperties = {
   equation: string;
   inline: boolean;
   nodeKey: NodeKey;
@@ -36,12 +37,12 @@ export default function EquationComponent({
   equation,
   inline,
   nodeKey,
-}: EquationComponentProps): JSX.Element {
+}: EquationComponentProperties): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const isEditable = useLexicalEditable();
   const [equationValue, setEquationValue] = useState(equation);
   const [showEquationEditor, setShowEquationEditor] = useState<boolean>(false);
-  const inputRef = useRef(null);
+  const inputReference = useRef(null);
 
   const onHide = useCallback(
     (restoreSelection?: boolean) => {
@@ -75,8 +76,8 @@ export default function EquationComponent({
             SELECTION_CHANGE_COMMAND,
             () => {
               const activeElement = document.activeElement;
-              const inputElem = inputRef.current;
-              if (inputElem !== activeElement) {
+              const inputElement = inputReference.current;
+              if (inputElement !== activeElement) {
                 onHide();
               }
               return false;
@@ -87,8 +88,8 @@ export default function EquationComponent({
             KEY_ESCAPE_COMMAND,
             () => {
               const activeElement = document.activeElement;
-              const inputElem = inputRef.current;
-              if (inputElem === activeElement) {
+              const inputElement = inputReference.current;
+              if (inputElement === activeElement) {
                 onHide(true);
                 return true;
               }
@@ -119,7 +120,7 @@ export default function EquationComponent({
           equation={equationValue}
           setEquation={setEquationValue}
           inline={inline}
-          ref={inputRef}
+          ref={inputReference}
         />
       ) : (
         <ErrorBoundary

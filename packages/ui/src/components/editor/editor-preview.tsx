@@ -1,7 +1,7 @@
 import type { SizeType } from "../config-provider/size-context";
 import { Editor } from "./editor";
 
-type EditorPreviewBaseProps = {
+type EditorPreviewBaseProperties = {
   value?: string;
   defaultValue?: string;
   placeholder?: string;
@@ -13,24 +13,24 @@ type EditorPreviewBaseProps = {
   size?: SizeType;
 };
 
-type EditorPreviewProps =
-  | (EditorPreviewBaseProps & { format?: "json" })
-  | (EditorPreviewBaseProps & { format: "markdown" })
-  | (EditorPreviewBaseProps & { format: "html" });
+type EditorPreviewProperties =
+  | (EditorPreviewBaseProperties & { format?: "json" })
+  | (EditorPreviewBaseProperties & { format: "markdown" })
+  | (EditorPreviewBaseProperties & { format: "html" });
 
 export function EditorPreview({
   format = "json",
-  ...props
-}: EditorPreviewProps) {
+  ...properties
+}: EditorPreviewProperties) {
   if (format === "markdown") {
-    return <Editor {...props} format="markdown" editable={false} />;
+    return <Editor {...properties} format="markdown" editable={false} />;
   }
 
   if (format === "html") {
-    return <Editor {...props} format="html" editable={false} />;
+    return <Editor {...properties} format="html" editable={false} />;
   }
 
-  return <Editor {...props} format="json" editable={false} />;
+  return <Editor {...properties} format="json" editable={false} />;
 }
 
-export type { EditorPreviewProps };
+export type { EditorPreviewProperties as EditorPreviewProps };

@@ -4,14 +4,14 @@ import React from "react";
 
 import { message } from "../../message";
 
-interface EditorErrorBoundaryProps {
+interface EditorErrorBoundaryProperties {
   children: React.ReactNode;
   fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
 }
 
 interface EditorErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  error?: Error;
 }
 
 /**
@@ -19,12 +19,12 @@ interface EditorErrorBoundaryState {
  * Provides user-friendly error messages and recovery options
  */
 export class EditorErrorBoundary extends React.Component<
-  EditorErrorBoundaryProps,
+  EditorErrorBoundaryProperties,
   EditorErrorBoundaryState
 > {
-  constructor(props: EditorErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
+  constructor(properties: EditorErrorBoundaryProperties) {
+    super(properties);
+    this.state = { hasError: false, error: undefined };
   }
 
   static getDerivedStateFromError(error: Error): EditorErrorBoundaryState {
@@ -42,7 +42,7 @@ export class EditorErrorBoundary extends React.Component<
   }
 
   resetError = () => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, error: undefined });
   };
 
   render() {

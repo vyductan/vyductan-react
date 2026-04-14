@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { LexicalNode, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -51,19 +52,19 @@ export function DraggableBlockPlugin({
   anchorElem: HTMLElement | null;
   size?: SizeType;
 }): JSX.Element | null {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const targetLineRef = useRef<HTMLDivElement>(null);
+  const menuReference = useRef<HTMLDivElement>(null);
+  const targetLineReference = useRef<HTMLDivElement>(null);
   const [editor] = useLexicalComposerContext();
   /* Use Ref for currentNodeKey to prevent re-renders when hovering different blocks */
-  const currentNodeKeyRef = useRef<NodeKey | null>(null);
+  const currentNodeKeyReference = useRef<NodeKey | null>(null);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTurnIntoOpen, setIsTurnIntoOpen] = useState(false);
   const [menuElement, setMenuElement] = useState<HTMLElement | null>(null);
-  const turnIntoAnchorRef = useRef<HTMLDivElement>(null);
+  const turnIntoAnchorReference = useRef<HTMLDivElement>(null);
 
-  const setMenuRef = useCallback((element: HTMLDivElement | null) => {
-    menuRef.current = element;
+  const setMenuReference = useCallback((element: HTMLDivElement | null) => {
+    menuReference.current = element;
     setMenuElement(element);
   }, []);
 
@@ -74,7 +75,7 @@ export function DraggableBlockPlugin({
 
       // 2. Fallback: Check if the trigger inside the menu indicates it's open
       if (
-        menuRef.current?.querySelector(
+        menuReference.current?.querySelector(
           '[data-slot="popover-trigger"][data-state="open"]',
         )
       ) {
@@ -128,7 +129,7 @@ export function DraggableBlockPlugin({
 
           // Only update if it's a valid block key to prevent flickering or losing state
           if (key) {
-            currentNodeKeyRef.current = key;
+            currentNodeKeyReference.current = key;
           }
         }
       });
@@ -142,7 +143,7 @@ export function DraggableBlockPlugin({
 
   // Insert a new paragraph below the current block and trigger component picker
   const handleAddBlockBelow = useCallback(() => {
-    const key = currentNodeKeyRef.current;
+    const key = currentNodeKeyReference.current;
     if (!key) return;
 
     editor.update(() => {
@@ -162,7 +163,7 @@ export function DraggableBlockPlugin({
   }, [editor]);
 
   const handleDelete = useCallback(() => {
-    const key = currentNodeKeyRef.current;
+    const key = currentNodeKeyReference.current;
     if (!key) return;
 
     editor.update(() => {
@@ -180,7 +181,7 @@ export function DraggableBlockPlugin({
   }, [editor]);
 
   const handleDuplicate = useCallback(() => {
-    const key = currentNodeKeyRef.current;
+    const key = currentNodeKeyReference.current;
     if (!key) return;
 
     editor.update(() => {
@@ -213,7 +214,7 @@ export function DraggableBlockPlugin({
   }, [editor]);
 
   const handleCopy = useCallback(() => {
-    const key = currentNodeKeyRef.current;
+    const key = currentNodeKeyReference.current;
     if (!key) return;
 
     editor.update(() => {
@@ -234,7 +235,7 @@ export function DraggableBlockPlugin({
   const handleTurnInto = useCallback(
     (type: string) => {
       console.log("handleTurnInto called with type:", type);
-      const key = currentNodeKeyRef.current;
+      const key = currentNodeKeyReference.current;
       console.log("Current node key:", key);
 
       if (!key) {
@@ -317,7 +318,7 @@ export function DraggableBlockPlugin({
 
     return (
       <div
-        ref={setMenuRef}
+        ref={setMenuReference}
         data-slot="draggable-block-menu"
         className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute top-0 left-0 -ml-1 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
       >
@@ -362,7 +363,7 @@ export function DraggableBlockPlugin({
                   >
                     <PopoverTrigger asChild>
                       <CommandItem
-                        ref={turnIntoAnchorRef}
+                        ref={turnIntoAnchorReference}
                         onMouseEnter={() => {
                           setIsTurnIntoOpen(true);
                         }}
@@ -444,7 +445,7 @@ export function DraggableBlockPlugin({
     handleDuplicate,
     handleTurnInto,
     handleAddBlockBelow,
-    setMenuRef,
+    setMenuReference,
     menuElement,
     isMenuOpen,
     isTurnIntoOpen,
@@ -465,8 +466,8 @@ export function DraggableBlockPlugin({
       }
 
       // We've left the editor, hide the target line
-      if (targetLineRef.current) {
-        targetLineRef.current.style.opacity = "0";
+      if (targetLineReference.current) {
+        targetLineReference.current.style.opacity = "0";
       }
     };
     const handleDragOver = (event: DragEvent) => {
@@ -491,12 +492,12 @@ export function DraggableBlockPlugin({
   return (
     <DraggableBlockPlugin_EXPERIMENTAL
       anchorElem={anchorElem}
-      menuRef={menuRef}
-      targetLineRef={targetLineRef}
+      menuRef={menuReference}
+      targetLineRef={targetLineReference}
       menuComponent={menuComponent}
       targetLineComponent={
         <div
-          ref={targetLineRef}
+          ref={targetLineReference}
           data-slot="draggable-block-target-line"
           className="bg-primary/50 pointer-events-none absolute top-0 left-0 h-1 w-full transition-opacity duration-200"
         />

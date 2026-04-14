@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -86,12 +87,12 @@ function LazyImage({
   onContextMenu: (e: React.MouseEvent) => void;
   onDoubleClick: (e: React.MouseEvent) => void;
 }): JSX.Element {
-  const resolvedSrc = useSuspenseImage(src);
+  const resolvedSource = useSuspenseImage(src);
   return (
     <picture>
       <img
         className={className ?? undefined}
-        src={resolvedSrc}
+        src={resolvedSource}
         alt={altText}
         ref={imageRef}
         style={{
@@ -193,14 +194,14 @@ export default function ImageComponent({
   captionsEnabled: boolean;
   loading?: boolean;
 }): JSX.Element {
-  const imageRef = useRef<null | HTMLImageElement>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const imageReference = useRef<null | HTMLImageElement>(null);
+  const buttonReference = useRef<HTMLButtonElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [editor] = useLexicalComposerContext();
   const [selection, setSelection] = useState<BaseSelection | null>(null);
-  const activeEditorRef = useRef<LexicalEditor | null>(null);
+  const activeEditorReference = useRef<LexicalEditor | null>(null);
   const [isLoadError, setIsLoadError] = useState<boolean>(false);
   const [retryCount, setRetryCount] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -233,7 +234,7 @@ export default function ImageComponent({
   const $onEnter = useCallback(
     (event: KeyboardEvent) => {
       const latestSelection = $getSelection();
-      const buttonElem = buttonRef.current;
+      const buttonElement = buttonReference.current;
       if (
         isSelected &&
         $isNodeSelection(latestSelection) &&
@@ -246,11 +247,11 @@ export default function ImageComponent({
           caption.focus();
           return true;
         } else if (
-          buttonElem !== null &&
-          buttonElem !== document.activeElement
+          buttonElement !== null &&
+          buttonElement !== document.activeElement
         ) {
           event.preventDefault();
-          buttonElem.focus();
+          buttonElement.focus();
           return true;
         }
       }
@@ -262,8 +263,8 @@ export default function ImageComponent({
   const $onEscape = useCallback(
     (event: KeyboardEvent) => {
       if (
-        activeEditorRef.current === caption ||
-        buttonRef.current === event.target
+        activeEditorReference.current === caption ||
+        buttonReference.current === event.target
       ) {
         $setSelection(null);
         editor.update(() => {
@@ -287,7 +288,7 @@ export default function ImageComponent({
       if (isResizing) {
         return true;
       }
-      if (event.target === imageRef.current) {
+      if (event.target === imageReference.current) {
         if (event.shiftKey) {
           setSelected(!isSelected);
         } else {
@@ -329,7 +330,7 @@ export default function ImageComponent({
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_, activeEditor) => {
-          activeEditorRef.current = activeEditor;
+          activeEditorReference.current = activeEditor;
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -347,7 +348,7 @@ export default function ImageComponent({
       editor.registerCommand(
         DRAGSTART_COMMAND,
         (event) => {
-          if (event.target === imageRef.current) {
+          if (event.target === imageReference.current) {
             // TODO This is just a temporary workaround for FF to behave like other browsers.
             // Ideally, this handles drag & drop too (and all browsers).
             event.preventDefault();
@@ -436,11 +437,11 @@ export default function ImageComponent({
         // For now, just create a local URL
         const reader = new FileReader();
         reader.addEventListener("load", (event) => {
-          const newSrc = event.target?.result as string;
+          const newSource = event.target?.result as string;
           editor.update(() => {
             const node = $getNodeByKey(nodeKey);
             if ($isImageNode(node)) {
-              node.setSrc(newSrc);
+              node.setSrc(newSource);
             }
           });
         });
@@ -486,7 +487,7 @@ export default function ImageComponent({
     if (retryCount < 1) {
       clearImageCache(src);
 
-      setRetryCount((prev) => prev + 1);
+      setRetryCount((previous) => previous + 1);
     } else {
       setIsLoadError(true);
     }
@@ -564,7 +565,7 @@ export default function ImageComponent({
                     }`}
                     src={src}
                     altText={altText}
-                    imageRef={imageRef}
+                    imageRef={imageReference}
                     width={width}
                     height={height}
                     maxWidth={maxWidth}
@@ -605,8 +606,8 @@ export default function ImageComponent({
               showCaption={showCaption}
               setShowCaption={setShowCaption}
               editor={editor}
-              buttonRef={buttonRef}
-              imageRef={imageRef}
+              buttonRef={buttonReference}
+              imageRef={imageReference}
               maxWidth={maxWidth}
               onResizeStart={onResizeStart}
               onResizeEnd={onResizeEnd}

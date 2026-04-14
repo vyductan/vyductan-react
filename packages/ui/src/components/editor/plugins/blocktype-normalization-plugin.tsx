@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -19,7 +20,7 @@ import {
  */
 export function BlockTypeNormalizationPlugin(): null {
   const [editor] = useLexicalComposerContext();
-  const transformTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const transformTimeoutReference = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     return editor.registerNodeTransform(TextNode, (node) => {
@@ -32,11 +33,11 @@ export function BlockTypeNormalizationPlugin(): null {
       }
 
       // Debounce transform to avoid excessive updates during rapid typing
-      if (transformTimeoutRef.current) {
-        clearTimeout(transformTimeoutRef.current);
+      if (transformTimeoutReference.current) {
+        clearTimeout(transformTimeoutReference.current);
       }
 
-      transformTimeoutRef.current = setTimeout(() => {
+      transformTimeoutReference.current = setTimeout(() => {
         editor.update(() => {
           const normalized = normalizeBlockTypeLikeString(textContent);
           if (textContent !== normalized) {
@@ -50,8 +51,8 @@ export function BlockTypeNormalizationPlugin(): null {
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (transformTimeoutRef.current) {
-        clearTimeout(transformTimeoutRef.current);
+      if (transformTimeoutReference.current) {
+        clearTimeout(transformTimeoutReference.current);
       }
     };
   }, []);

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * TableHoverActionsPlugin
  *
@@ -45,7 +46,7 @@ function TableHoverActionsInner({
   const [buttonState, setButtonState] = useState<ButtonState>(null);
   // Track the table element that is currently "active" so we can keep the
   // button visible while the user moves the mouse along the stripe.
-  const activeTableRef = useRef<HTMLTableElement | null>(null);
+  const activeTableReference = useRef<HTMLTableElement | null>(null);
 
   useEffect(() => {
     const editorRoot = editor.getRootElement();
@@ -58,7 +59,7 @@ function TableHoverActionsInner({
       const target = e.target as HTMLElement | null;
       if (!target) {
         setButtonState(null);
-        activeTableRef.current = null;
+        activeTableReference.current = null;
         return;
       }
 
@@ -73,9 +74,9 @@ function TableHoverActionsInner({
 
       if (!table || !editorRoot.contains(table)) {
         // Check if mouse is close enough to the previously active table
-        const prevTable = activeTableRef.current;
-        if (prevTable) {
-          const rect = prevTable.getBoundingClientRect();
+        const previousTable = activeTableReference.current;
+        if (previousTable) {
+          const rect = previousTable.getBoundingClientRect();
           const nearRight =
             clientX >= rect.right - 4 &&
             clientX <= rect.right + HOVER_MARGIN_PX &&
@@ -92,26 +93,26 @@ function TableHoverActionsInner({
           }
         }
         setButtonState(null);
-        activeTableRef.current = null;
+        activeTableReference.current = null;
         return;
       }
 
-      activeTableRef.current = table;
+      activeTableReference.current = table;
       const tableRect = table.getBoundingClientRect();
 
       // Determine if we're in the "right stripe" or the "bottom stripe"
-      const distToRight = tableRect.right - clientX;
-      const distToBottom = tableRect.bottom - clientY;
+      const distributionToRight = tableRect.right - clientX;
+      const distributionToBottom = tableRect.bottom - clientY;
 
       const inRightStripe =
-        distToRight >= 0 &&
-        distToRight <= HOVER_MARGIN_PX &&
+        distributionToRight >= 0 &&
+        distributionToRight <= HOVER_MARGIN_PX &&
         clientY >= tableRect.top &&
         clientY <= tableRect.bottom;
 
       const inBottomStripe =
-        distToBottom >= 0 &&
-        distToBottom <= HOVER_MARGIN_PX &&
+        distributionToBottom >= 0 &&
+        distributionToBottom <= HOVER_MARGIN_PX &&
         clientX >= tableRect.left &&
         clientX <= tableRect.right;
 
@@ -163,7 +164,7 @@ function TableHoverActionsInner({
           document.querySelector("[data-table-hover-btn]:hover") !== null;
         if (!isOnButton) {
           setButtonState(null);
-          activeTableRef.current = null;
+          activeTableReference.current = null;
         }
       }, 50);
     };
@@ -177,88 +178,85 @@ function TableHoverActionsInner({
     };
   }, [editor]);
 
-  if (!buttonState) return null;
-
-  const handleAddColumn = () => {
-    const cell = buttonState?.anchorCell;
+  const handleAddColumn = (cell: HTMLTableCellElement | null) => {
     if (!cell) return;
     editor.update(() => {
       const cellNode = $getNearestNodeFromDOMNode(cell);
       if ($isTableCellNode(cellNode)) {
         cellNode.selectEnd();
-        $insertTableColumnAtSelection(false);
+        $insertTableColumnAtSelection(true);
       }
     });
     setButtonState(null);
   };
 
-  const handleAddRow = () => {
-    const cell = buttonState?.anchorCell;
+  const handleAddRow = (cell: HTMLTableCellElement | null) => {
     if (!cell) return;
     editor.update(() => {
       const cellNode = $getNearestNodeFromDOMNode(cell);
       if ($isTableCellNode(cellNode)) {
         cellNode.selectEnd();
-        $insertTableRowAtSelection(false);
+        $insertTableRowAtSelection(true);
       }
     });
     setButtonState(null);
   };
 
-  const isColumn = buttonState.kind === "column";
+  const isHoverMode = buttonState !== null;
+  const isColumn = buttonState?.kind === "column";
 
-  return createPortal(
+  if (!isHoverMode) {
+    return null;
+  }
+
+  const portalContent = (
     <div
       data-table-hover-btn
       style={{
         position: "fixed",
         pointerEvents: "none",
         zIndex: 50,
-        // Position the stripe
         ...(isColumn
           ? {
               top: buttonState.y - buttonState.stripeHeight / 2,
               left: buttonState.x,
-              width: 28,
+              width: 24,
               height: buttonState.stripeHeight,
             }
           : {
               top: buttonState.y,
               left: buttonState.x - buttonState.stripeWidth / 2,
               width: buttonState.stripeWidth,
-              height: 28,
+              height: 24,
             }),
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
       }}
     >
-      {/* Background stripe */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: "hsl(var(--muted))",
-          borderRadius: isColumn ? "0 4px 4px 0" : "0 0 4px 4px",
-          opacity: 0.8,
-        }}
-      />
-
-      {/* "+" button */}
       <button
         type="button"
-        onClick={isColumn ? handleAddColumn : handleAddRow}
+        onClick={() =>
+          isColumn
+            ? handleAddColumn(buttonState.anchorCell)
+            : handleAddRow(buttonState.anchorCell)
+        }
         title={
           isColumn ? "Click to add a new column" : "Click to add a new row"
         }
         style={{ pointerEvents: "all" }}
-        className="border-border bg-background text-muted-foreground hover:border-primary hover:text-primary relative z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm border shadow-sm transition-all hover:shadow-md"
+        className={
+          isColumn
+            ? "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 relative z-10 flex h-[calc(100%-8px)] w-4 cursor-pointer items-center justify-center overflow-hidden rounded-r border shadow-sm transition-all hover:shadow-md"
+            : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 relative z-10 flex h-4 w-[calc(100%-8px)] cursor-pointer items-center justify-center overflow-hidden rounded-b border shadow-sm transition-all hover:shadow-md"
+        }
       >
-        <PlusIcon className="size-3.5" />
+        <PlusIcon className="size-3 shrink-0" />
       </button>
-    </div>,
-    anchorElem,
+    </div>
   );
+
+  return createPortal(portalContent, anchorElem);
 }
 
 export function TableHoverActionsPlugin({

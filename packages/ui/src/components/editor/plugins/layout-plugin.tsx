@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -190,7 +191,7 @@ export function LayoutPlugin(): null {
             const container = $createLayoutContainerNode(template);
             const itemsCount = getItemsCountFromTemplate(template);
 
-            for (let i = 0; i < itemsCount; i++) {
+            for (let index = 0; index < itemsCount; index++) {
               container.append(
                 $createLayoutItemNode().append($createParagraphNode()),
               );
@@ -215,20 +216,20 @@ export function LayoutPlugin(): null {
             }
 
             const itemsCount = getItemsCountFromTemplate(template);
-            const prevItemsCount = getItemsCountFromTemplate(
+            const previousItemsCount = getItemsCountFromTemplate(
               container.getTemplateColumns(),
             );
 
             // Add or remove extra columns if new template does not match existing one
-            if (itemsCount > prevItemsCount) {
-              for (let i = prevItemsCount; i < itemsCount; i++) {
+            if (itemsCount > previousItemsCount) {
+              for (let index = previousItemsCount; index < itemsCount; index++) {
                 container.append(
                   $createLayoutItemNode().append($createParagraphNode()),
                 );
               }
-            } else if (itemsCount < prevItemsCount) {
-              for (let i = prevItemsCount - 1; i >= itemsCount; i--) {
-                const layoutItem = container.getChildAtIndex<LexicalNode>(i);
+            } else if (itemsCount < previousItemsCount) {
+              for (let index = previousItemsCount - 1; index >= itemsCount; index--) {
+                const layoutItem = container.getChildAtIndex<LexicalNode>(index);
 
                 if ($isLayoutItemNode(layoutItem)) {
                   layoutItem.remove();

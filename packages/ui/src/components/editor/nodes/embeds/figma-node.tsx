@@ -18,7 +18,7 @@ import type * as React from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-type FigmaComponentProps = Readonly<{
+type FigmaComponentProperties = Readonly<{
   className: Readonly<{
     base: string;
     focus: string;
@@ -33,7 +33,7 @@ function FigmaComponent({
   format,
   nodeKey,
   documentID,
-}: FigmaComponentProps) {
+}: FigmaComponentProperties) {
   return (
     <BlockWithAlignableContents
       className={className}

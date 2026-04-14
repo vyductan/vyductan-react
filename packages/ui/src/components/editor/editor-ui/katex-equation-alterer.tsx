@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -18,7 +19,7 @@ import { Textarea } from "@acme/ui/components/textarea";
 
 import KatexRenderer from "../editor-ui/katex-renderer";
 
-type Props = {
+type Properties = {
   initialEquation?: string;
   onConfirm: (equation: string, inline: boolean) => void;
 };
@@ -26,7 +27,7 @@ type Props = {
 export default function KatexEquationAlterer({
   onConfirm,
   initialEquation = "",
-}: Props): JSX.Element {
+}: Properties): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [equation, setEquation] = useState<string>(initialEquation);
   const [inline, setInline] = useState<boolean>(true);

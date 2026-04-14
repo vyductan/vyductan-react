@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -47,9 +48,9 @@ export default function ExcalidrawComponent({
   const [isModalOpen, setModalOpen] = useState<boolean>(
     data === "[]" && editor.isEditable(),
   );
-  const imageContainerRef = useRef<HTMLDivElement | null>(null);
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-  const captionButtonRef = useRef<HTMLButtonElement | null>(null);
+  const imageContainerReference = useRef<HTMLDivElement | null>(null);
+  const buttonReference = useRef<HTMLButtonElement | null>(null);
+  const captionButtonReference = useRef<HTMLButtonElement | null>(null);
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
   const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -81,14 +82,14 @@ export default function ExcalidrawComponent({
       editor.registerCommand(
         CLICK_COMMAND,
         (event: MouseEvent) => {
-          const buttonElem = buttonRef.current;
+          const buttonElement = buttonReference.current;
           const eventTarget = event.target;
 
           if (isResizing) {
             return true;
           }
 
-          if (buttonElem?.contains(eventTarget as Node)) {
+          if (buttonElement?.contains(eventTarget as Node)) {
             if (!event.shiftKey) {
               clearSelection();
             }
@@ -225,11 +226,11 @@ export default function ExcalidrawComponent({
       )}
       {elements.length > 0 && (
         <button
-          ref={buttonRef}
+          ref={buttonReference}
           className={`m-0 border-0 bg-transparent p-0 ${isSelected ? "user-select-none ring-primary ring-2 ring-offset-2" : ""}`}
         >
           <ExcalidrawImage
-            ref={imageContainerRef}
+            ref={imageContainerReference}
             className="image"
             elements={elements}
             files={files}
@@ -248,10 +249,10 @@ export default function ExcalidrawComponent({
           )}
           {(isSelected || isResizing) && isEditable && (
             <ImageResizer
-              buttonRef={captionButtonRef}
+              buttonRef={captionButtonReference}
               showCaption={true}
               setShowCaption={() => null}
-              imageRef={imageContainerRef}
+              imageRef={imageContainerReference}
               editor={editor}
               onResizeStart={onResizeStart}
               onResizeEnd={onResizeEnd}

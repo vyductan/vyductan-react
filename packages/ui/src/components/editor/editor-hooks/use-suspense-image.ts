@@ -8,19 +8,19 @@ const failedImageCache = new Map<string, Error>();
 const resolvedUrlCache = new Map<string, string>();
 const pendingResolutionCache = new Map<string, Promise<string>>();
 
-function loadImage(src: string): Promise<void> {
-  const effectiveSrc = resolvedUrlCache.get(src) ?? src;
+function loadImage(source: string): Promise<void> {
+  const effectiveSource = resolvedUrlCache.get(source) ?? source;
 
-  if (loadedImageCache.has(effectiveSrc)) {
+  if (loadedImageCache.has(effectiveSource)) {
     return Promise.resolve();
   }
 
-  const failed = failedImageCache.get(effectiveSrc);
+  const failed = failedImageCache.get(effectiveSource);
   if (failed) {
     return Promise.reject(failed);
   }
 
-  let pending = pendingImageCache.get(effectiveSrc);
+  let pending = pendingImageCache.get(effectiveSource);
   if (pending) {
     return pending;
   }
@@ -35,106 +35,106 @@ function loadImage(src: string): Promise<void> {
 
     const onLoad = () => {
       cleanup();
-      pendingImageCache.delete(effectiveSrc);
-      failedImageCache.delete(effectiveSrc);
-      loadedImageCache.add(effectiveSrc);
+      pendingImageCache.delete(effectiveSource);
+      failedImageCache.delete(effectiveSource);
+      loadedImageCache.add(effectiveSource);
       resolve();
     };
 
     const onError = () => {
       cleanup();
-      pendingImageCache.delete(effectiveSrc);
-      const error = new Error(`Image failed to load: ${effectiveSrc}`);
-      failedImageCache.set(effectiveSrc, error);
+      pendingImageCache.delete(effectiveSource);
+      const error = new Error(`Image failed to load: ${effectiveSource}`);
+      failedImageCache.set(effectiveSource, error);
       reject(error);
     };
 
     img.addEventListener("load", onLoad);
     img.addEventListener("error", onError);
-    img.src = effectiveSrc;
+    img.src = effectiveSource;
   });
 
-  pendingImageCache.set(effectiveSrc, pending);
+  pendingImageCache.set(effectiveSource, pending);
   return pending;
 }
 
-export function useSuspenseImage(src: string) {
+export function useSuspenseImage(source: string) {
   const resolveImage = useImageResolver();
 
   // If no resolver, we just use the src as is (default behavior)
-  const effectiveSrc = resolveImage ? (resolvedUrlCache.get(src) ?? src) : src;
+  const effectiveSource = resolveImage ? (resolvedUrlCache.get(source) ?? source) : source;
 
   // If we have a resolver and haven't resolved yet
-  if (resolveImage && !resolvedUrlCache.has(src)) {
+  if (resolveImage && !resolvedUrlCache.has(source)) {
     // Check if resolution is pending
-    const pendingResolution = pendingResolutionCache.get(src);
+    const pendingResolution = pendingResolutionCache.get(source);
     if (pendingResolution) {
       use(pendingResolution);
     }
 
     // Start resolving
-    const promise = resolveImage(src).then((resolvedUrl) => {
-      resolvedUrlCache.set(src, resolvedUrl);
-      pendingResolutionCache.delete(src);
+    const promise = resolveImage(source).then((resolvedUrl) => {
+      resolvedUrlCache.set(source, resolvedUrl);
+      pendingResolutionCache.delete(source);
       return resolvedUrl;
     });
 
-    pendingResolutionCache.set(src, promise);
+    pendingResolutionCache.set(source, promise);
 
     use(promise);
   }
 
   // Now effectiveSrc is the resolved URL (or original if no resolver)
-  const promise = loadImage(effectiveSrc);
+  const promise = loadImage(effectiveSource);
   if (
-    !loadedImageCache.has(effectiveSrc) &&
-    !failedImageCache.has(effectiveSrc)
+    !loadedImageCache.has(effectiveSource) &&
+    !failedImageCache.has(effectiveSource)
   ) {
     throw promise;
-  } else if (failedImageCache.has(effectiveSrc)) {
+  } else if (failedImageCache.has(effectiveSource)) {
     throw (
-      failedImageCache.get(effectiveSrc) ??
-      new Error(`Image failed to load: ${effectiveSrc}`)
+      failedImageCache.get(effectiveSource) ??
+      new Error(`Image failed to load: ${effectiveSource}`)
     );
   }
 
   // Return effectiveSrc to ensure we return string even if use returns void (fulfilled)
-  return effectiveSrc;
+  return effectiveSource;
 }
 
-export function clearImageCache(src: string) {
-  const effectiveSrc = resolvedUrlCache.get(src) ?? src;
+export function clearImageCache(source: string) {
+  const effectiveSource = resolvedUrlCache.get(source) ?? source;
 
   // Clear the mapping from src to signed URL
-  resolvedUrlCache.delete(src);
-  pendingResolutionCache.delete(src);
+  resolvedUrlCache.delete(source);
+  pendingResolutionCache.delete(source);
 
   // Clear the loading/failure state for the signed URL
-  failedImageCache.delete(effectiveSrc);
-  pendingImageCache.delete(effectiveSrc);
-  loadedImageCache.delete(effectiveSrc);
+  failedImageCache.delete(effectiveSource);
+  pendingImageCache.delete(effectiveSource);
+  loadedImageCache.delete(effectiveSource);
 }
 
 export async function preloadImage(
-  src: string,
-  resolver?: (src: string) => Promise<string>,
+  source: string,
+  resolver?: (source_: string) => Promise<string>,
 ): Promise<void> {
   // 1. Resolve URL if resolver provided and not already resolved
-  if (resolver && !resolvedUrlCache.has(src)) {
+  if (resolver && !resolvedUrlCache.has(source)) {
     // Check pending resolution
-    let resolutionPromise = pendingResolutionCache.get(src);
+    let resolutionPromise = pendingResolutionCache.get(source);
     if (!resolutionPromise) {
-      resolutionPromise = resolver(src).then((resolvedUrl) => {
-        resolvedUrlCache.set(src, resolvedUrl);
-        pendingResolutionCache.delete(src);
+      resolutionPromise = resolver(source).then((resolvedUrl) => {
+        resolvedUrlCache.set(source, resolvedUrl);
+        pendingResolutionCache.delete(source);
         return resolvedUrl;
       });
-      pendingResolutionCache.set(src, resolutionPromise);
+      pendingResolutionCache.set(source, resolutionPromise);
     }
     await resolutionPromise;
   }
 
   // 2. Load the image (using resolved URL from cache if available)
-  const effectiveSrc = resolvedUrlCache.get(src) ?? src;
-  return loadImage(effectiveSrc);
+  const effectiveSource = resolvedUrlCache.get(source) ?? source;
+  return loadImage(effectiveSource);
 }

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { BaseSelection } from "lexical";
 import { useCallback, useEffect, useState } from "react";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";

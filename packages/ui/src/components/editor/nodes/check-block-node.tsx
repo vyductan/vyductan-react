@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -60,7 +61,7 @@ export class CheckBlockNode extends ElementNode {
   }
 
   updateDOM(
-    prevNode: CheckBlockNode,
+    previousNode: CheckBlockNode,
     dom: HTMLElement,
     config: EditorConfig,
   ): boolean {
@@ -68,7 +69,7 @@ export class CheckBlockNode extends ElementNode {
     const checkedClass = theme.checkBlockChecked as string | undefined;
     const icon = dom.querySelector<HTMLElement>("[data-check-icon]");
 
-    if (prevNode.__checked !== this.__checked && checkedClass) {
+    if (previousNode.__checked !== this.__checked && checkedClass) {
       if (this.__checked) {
         dom.classList.add(...checkedClass.split(" "));
         dom.dataset.checked = "true";

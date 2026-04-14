@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
@@ -11,7 +12,7 @@ import {
   useSuspenseImage,
 } from "../editor-hooks/use-suspense-image";
 
-interface ImagePreviewProps {
+interface ImagePreviewProperties {
   src: string;
   altText?: string;
   isOpen: boolean;
@@ -23,7 +24,7 @@ export function ImagePreview({
   altText,
   isOpen,
   onClose,
-}: ImagePreviewProps) {
+}: ImagePreviewProperties) {
   // Only call hook if isOpen is true to avoid suspending when closed?
   // But hooks must be called unconditionally.
   // We can pass null/undefined to hook if we want to skip?
@@ -38,12 +39,12 @@ export function ImagePreview({
   // So calling it here hits the cache.
   // So it's cheap.
 
-  const resolvedSrc = useSuspenseImage(src);
+  const resolvedSource = useSuspenseImage(src);
 
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const dragStartReference = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export function ImagePreview({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    dragStartRef.current = {
+    dragStartReference.current = {
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     };
@@ -82,8 +83,8 @@ export function ImagePreview({
     if (!isDragging) return;
     e.preventDefault();
     setPosition({
-      x: e.clientX - dragStartRef.current.x,
-      y: e.clientY - dragStartRef.current.y,
+      x: e.clientX - dragStartReference.current.x,
+      y: e.clientY - dragStartReference.current.y,
     });
   };
 
@@ -168,7 +169,7 @@ export function ImagePreview({
       >
         <picture>
           <img
-            src={resolvedSrc}
+            src={resolvedSource}
             alt={altText}
             className={cn(
               "max-h-[90vh] max-w-[90vw] object-contain transition-transform duration-75",
@@ -183,7 +184,7 @@ export function ImagePreview({
             onError={() => {
               if (retryCount < 1) {
                 clearImageCache(src);
-                setRetryCount((prev) => prev + 1);
+                setRetryCount((previous) => previous + 1);
               }
             }}
           />

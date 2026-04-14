@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 /**
@@ -122,7 +123,7 @@ class ComponentPickerOption extends MenuOption {
 function getDynamicOptions(editor: LexicalEditor, queryString: string) {
   const options: Array<ComponentPickerOption> = [];
 
-  if (queryString == null) {
+  if (queryString == undefined) {
     return options;
   }
 
@@ -494,8 +495,8 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Refs to access latest state in Lexical update listener (registered once)
-  const isMenuOpenRef = useRef(isMenuOpen);
-  const queryStringRef = useRef(queryString);
+  const isMenuOpenReference = useRef(isMenuOpen);
+  const queryStringReference = useRef(queryString);
 
   // Track when menu opens/closes
   const handleQueryChange = useCallback(
@@ -505,8 +506,8 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
       setIsMenuOpen(isOpen);
 
       // Keep refs in sync immediately so Lexical listeners don't lag behind React.
-      queryStringRef.current = query;
-      isMenuOpenRef.current = isOpen;
+      queryStringReference.current = query;
+      isMenuOpenReference.current = isOpen;
 
       // Publish menu state to context
       setIsComponentPickerOpen(isOpen);
@@ -514,9 +515,9 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
     [setIsComponentPickerOpen],
   );
 
-  const styledElementRef = useRef<HTMLElement | null>(null);
-  const styledKeyRef = useRef<string | null>(null);
-  const rafIdRef = useRef<number | null>(null);
+  const styledElementReference = useRef<HTMLElement | null>(null);
+  const styledKeyReference = useRef<string | null>(null);
+  const rafIdReference = useRef<number | null>(null);
 
   const CLASS_NAME = "lexical-slash-trigger";
   const VAR_CONTENT = "--pseudoAfter--content";
@@ -524,57 +525,57 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   const FILTER_COLOR = "rgb(156, 163, 175)";
 
   const clearStyled = useCallback(() => {
-    if (rafIdRef.current != null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
+    if (rafIdReference.current != undefined) {
+      cancelAnimationFrame(rafIdReference.current);
+      rafIdReference.current = null;
     }
 
-    const el = styledElementRef.current;
-    if (el) {
-      el.classList.remove(CLASS_NAME);
-      el.style.removeProperty(VAR_CONTENT);
-      el.style.removeProperty(VAR_COLOR);
+    const element = styledElementReference.current;
+    if (element) {
+      element.classList.remove(CLASS_NAME);
+      element.style.removeProperty(VAR_CONTENT);
+      element.style.removeProperty(VAR_COLOR);
     }
-    styledElementRef.current = null;
-    styledKeyRef.current = null;
+    styledElementReference.current = null;
+    styledKeyReference.current = null;
   }, []);
 
   const scheduleApplyStyled = useCallback(
     (nextKey: string, shouldShowFilter: boolean) => {
       // Style after Lexical commits the DOM for the current update.
-      if (rafIdRef.current != null) {
-        cancelAnimationFrame(rafIdRef.current);
+      if (rafIdReference.current != undefined) {
+        cancelAnimationFrame(rafIdReference.current);
       }
 
-      rafIdRef.current = requestAnimationFrame(() => {
-        rafIdRef.current = null;
+      rafIdReference.current = requestAnimationFrame(() => {
+        rafIdReference.current = null;
 
-        if (!isMenuOpenRef.current) {
+        if (!isMenuOpenReference.current) {
           clearStyled();
           return;
         }
 
-        const nextEl = editor.getElementByKey(nextKey);
-        if (!nextEl) {
+        const nextElement = editor.getElementByKey(nextKey);
+        if (!nextElement) {
           // DOM might not be ready yet for this key; next update / state change will retry.
           return;
         }
 
-        if (styledKeyRef.current !== nextKey) {
+        if (styledKeyReference.current !== nextKey) {
           clearStyled();
         }
 
-        nextEl.classList.add(CLASS_NAME);
+        nextElement.classList.add(CLASS_NAME);
         if (shouldShowFilter) {
-          nextEl.style.setProperty(VAR_CONTENT, '"Filter..."');
-          nextEl.style.setProperty(VAR_COLOR, FILTER_COLOR);
+          nextElement.style.setProperty(VAR_CONTENT, '"Filter..."');
+          nextElement.style.setProperty(VAR_COLOR, FILTER_COLOR);
         } else {
-          nextEl.style.removeProperty(VAR_CONTENT);
-          nextEl.style.removeProperty(VAR_COLOR);
+          nextElement.style.removeProperty(VAR_CONTENT);
+          nextElement.style.removeProperty(VAR_COLOR);
         }
 
-        styledElementRef.current = nextEl;
-        styledKeyRef.current = nextKey;
+        styledElementReference.current = nextElement;
+        styledKeyReference.current = nextKey;
       });
     },
     [clearStyled, editor],
@@ -582,14 +583,14 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
   const refreshSlashStyling = useCallback(
     (editorState: EditorState) => {
-      if (!isMenuOpenRef.current) {
+      if (!isMenuOpenReference.current) {
         clearStyled();
         return;
       }
 
-      const currentQuery = queryStringRef.current;
+      const currentQuery = queryStringReference.current;
       const shouldShowFilter =
-        currentQuery == null || currentQuery === "" || currentQuery === "/";
+        currentQuery == undefined || currentQuery === "" || currentQuery === "/";
 
       let nextKey: string | null = null;
 
@@ -615,18 +616,18 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
           // If caret is at the beginning of this text node, the "/" might be in a previous text sibling.
           if (anchorOffset === 0 && query.length === 0) {
-            const prev = anchorNode.getPreviousSibling();
-            if (prev != null && $isTextNode(prev)) {
-              const prevText = prev.getTextContent();
-              if (prevText.endsWith("/")) {
-                nextKey = prev.getKey();
+            const previous = anchorNode.getPreviousSibling();
+            if (previous != undefined && $isTextNode(previous)) {
+              const previousText = previous.getTextContent();
+              if (previousText.endsWith("/")) {
+                nextKey = previous.getKey();
               }
             }
           }
         }
       });
 
-      if (nextKey == null) {
+      if (nextKey == undefined) {
         clearStyled();
         return;
       }
@@ -651,8 +652,8 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   // so also re-evaluate when menu/query changes.
   useEffect(() => {
     // Update refs inline before using them in the callback
-    queryStringRef.current = queryString;
-    isMenuOpenRef.current = isMenuOpen;
+    queryStringReference.current = queryString;
+    isMenuOpenReference.current = isMenuOpen;
     refreshSlashStyling(editor.getEditorState());
   }, [editor, isMenuOpen, queryString, refreshSlashStyling]);
 
@@ -683,10 +684,10 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
         triggerFn={checkForTriggerMatch}
         options={flatOptions}
         menuRenderFn={(
-          anchorElementRef,
+          anchorElementReference,
           { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) => {
-          return anchorElementRef.current && flatOptions.length > 0
+          return anchorElementReference.current && flatOptions.length > 0
             ? createPortal(
                 <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
                   {/* Menu */}
@@ -814,7 +815,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                     </CommandRoot>
                   </div>
                 </div>,
-                anchorElementRef.current,
+                anchorElementReference.current,
               )
             : null;
         }}

@@ -31,7 +31,7 @@ import {
 import { Input } from "@acme/ui/components/input";
 import { Label } from "@acme/ui/components/label";
 
-interface FindReplacePluginProps {
+interface FindReplacePluginProperties {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -39,7 +39,7 @@ interface FindReplacePluginProps {
 export function FindReplacePlugin({
   isOpen: controlledIsOpen,
   onOpenChange: controlledOnOpenChange,
-}: FindReplacePluginProps = {}) {
+}: FindReplacePluginProperties = {}) {
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -152,7 +152,7 @@ export function FindReplacePlugin({
       }
 
       // Remove replaced match and update indices
-      const newMatches = matches.filter((_, i) => i !== currentMatchIndex);
+      const newMatches = matches.filter((_, index) => index !== currentMatchIndex);
       setMatches(newMatches);
       setMatchCount(newMatches.length);
       if (currentMatchIndex >= newMatches.length) {

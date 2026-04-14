@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -50,7 +51,7 @@ export interface ImagePayload {
   loading?: boolean;
 }
 
-function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
+function isGoogleDocumentCheckboxImg(img: HTMLImageElement): boolean {
   return (
     img.parentElement?.tagName === "LI" &&
     img.previousSibling === null &&
@@ -60,7 +61,7 @@ function isGoogleDocCheckboxImg(img: HTMLImageElement): boolean {
 
 function $convertImageElement(domNode: Node): null | DOMConversionOutput {
   const img = domNode as HTMLImageElement;
-  if (img.src.startsWith("file:///") || isGoogleDocCheckboxImg(img)) {
+  if (img.src.startsWith("file:///") || isGoogleDocumentCheckboxImg(img)) {
     return null;
   }
   const { alt: altText, src, width, height } = img;
@@ -162,7 +163,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(
-    src: string,
+    source: string,
     altText: string,
     maxWidth: number,
     width?: "inherit" | number,
@@ -174,7 +175,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     loading?: boolean,
   ) {
     super(key);
-    this.__src = src;
+    this.__src = source;
     this.__altText = altText;
     this.__maxWidth = maxWidth;
     this.__width = width ?? "inherit";
@@ -227,9 +228,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     writable.__showCaption = showCaption;
   }
 
-  setSrc(src: string): void {
+  setSrc(source: string): void {
     const writable = this.getWritable();
-    writable.__src = src;
+    writable.__src = source;
   }
 
   setLoading(loading: boolean): void {

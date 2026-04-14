@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -46,12 +47,12 @@ function PollOptionComponent({
   options: Options;
   totalVotes: number;
   withPollNode: (
-    cb: (pollNode: PollNode) => void,
+    callback: (pollNode: PollNode) => void,
     onSelect?: () => void,
   ) => void;
 }): JSX.Element {
   const { name: username } = useCollaborationContext();
-  const checkboxRef = useRef(null);
+  const checkboxReference = useRef(null);
   const votesArray = option.votes;
   const checkedIndex = votesArray.indexOf(username);
   const checked = checkedIndex !== -1;
@@ -68,7 +69,7 @@ function PollOptionComponent({
         }`}
       >
         <input
-          ref={checkboxRef}
+          ref={checkboxReference}
           className="absolute block h-full w-full cursor-pointer border-0 opacity-0"
           type="checkbox"
           onChange={() => {
@@ -136,7 +137,7 @@ export default function PollComponent({
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey);
   const [selection, setSelection] = useState<BaseSelection | null>(null);
-  const ref = useRef(null);
+  const reference = useRef(null);
 
   const $onDelete = useCallback(
     (payload: KeyboardEvent) => {
@@ -167,7 +168,7 @@ export default function PollComponent({
         (payload) => {
           const event = payload;
 
-          if (event.target === ref.current) {
+          if (event.target === reference.current) {
             if (!event.shiftKey) {
               clearSelection();
             }
@@ -193,14 +194,14 @@ export default function PollComponent({
   }, [clearSelection, editor, isSelected, nodeKey, $onDelete, setSelected]);
 
   const withPollNode = (
-    cb: (node: PollNode) => void,
+    callback: (node: PollNode) => void,
     onUpdate?: () => void,
   ): void => {
     editor.update(
       () => {
         const node = $getNodeByKey(nodeKey);
         if ($isPollNode(node)) {
-          cb(node);
+          callback(node);
         }
       },
       { onUpdate },
@@ -220,7 +221,7 @@ export default function PollComponent({
       className={`bg-background max-w-[600px] min-w-[400px] cursor-pointer rounded-lg border border-gray-200 select-none ${
         isFocused ? "outline-primary outline" : ""
       }`}
-      ref={ref}
+      ref={reference}
     >
       <div className="m-4 cursor-default">
         <h2 className="m-0 mb-4 text-center text-lg text-gray-600">

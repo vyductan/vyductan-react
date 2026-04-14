@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -52,9 +53,9 @@ function $search(selection: null | BaseSelection): [boolean, string] {
   }
   const word = [];
   const text = node.getTextContent();
-  let i = node.getTextContentSize();
+  let index = node.getTextContentSize();
   let c;
-  while (i-- && i >= 0 && (c = text[i]) !== " ") {
+  while (index-- && index >= 0 && (c = text[index]) !== " ") {
     word.push(c);
   }
   if (word.length === 0) {
@@ -105,13 +106,13 @@ export function AutocompletePlugin(): JSX.Element | null {
       lastFullSuggestion = null;
       lastMatchNodeKey = null;
       lastMatchOffset = null;
-      setSuggestion(null);
+      setSuggestion(undefined);
     }
     function updateAsyncSuggestion(
-      refSearchPromise: SearchPromise,
+      referenceSearchPromise: SearchPromise,
       newSuggestion: null | string,
     ) {
-      if (searchPromise !== refSearchPromise || newSuggestion === null) {
+      if (searchPromise !== referenceSearchPromise || newSuggestion === null) {
         // Outdated or no suggestion
         return;
       }
@@ -278,7 +279,7 @@ export function AutocompletePlugin(): JSX.Element | null {
       });
     }
 
-    const rootElem = editor.getRootElement();
+    const rootElement = editor.getRootElement();
 
     return mergeRegister(
       editor.registerNodeTransform(
@@ -296,9 +297,9 @@ export function AutocompletePlugin(): JSX.Element | null {
         $handleKeypressCommand,
         COMMAND_PRIORITY_LOW,
       ),
-      ...(rootElem === null
+      ...(rootElement === null
         ? []
-        : [addSwipeRightListener(rootElem, handleSwipeRight)]),
+        : [addSwipeRightListener(rootElement, handleSwipeRight)]),
       unmountSuggestion,
     );
   }, [editor, query, setSuggestion]);

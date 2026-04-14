@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Fullscreen Plugin
  *
@@ -49,16 +50,16 @@ export function FullscreenPlugin({
 } = {}) {
   const [editor] = useLexicalComposerContext();
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const originalStylesRef = useRef<Record<string, string> | null>(null);
+  const originalStylesReference = useRef<Record<string, string> | null>(null);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const doc = document as DocumentWithFullscreen;
+      const document_ = document as DocumentWithFullscreen;
       const isNowFullscreen = !!(
-        doc.fullscreenElement ??
-        doc.webkitFullscreenElement ??
-        doc.mozFullScreenElement ??
-        doc.msFullscreenElement
+        document_.fullscreenElement ??
+        document_.webkitFullscreenElement ??
+        document_.mozFullScreenElement ??
+        document_.msFullscreenElement
       );
       setIsFullscreen(isNowFullscreen);
 
@@ -75,9 +76,9 @@ export function FullscreenPlugin({
             rootElement.closest<HTMLElement>(".relative") ??
             rootElement.parentElement;
 
-          if (container && originalStylesRef.current) {
-            Object.assign(container.style, originalStylesRef.current);
-            originalStylesRef.current = null;
+          if (container && originalStylesReference.current) {
+            Object.assign(container.style, originalStylesReference.current);
+            originalStylesReference.current = null;
 
             // Restore editor scroll container background
             const editorScrollContainer = container.querySelector(
@@ -145,30 +146,30 @@ export function FullscreenPlugin({
       return;
     }
 
-    const doc = document as DocumentWithFullscreen;
-    const fullscreenEl =
-      doc.fullscreenElement ??
-      doc.webkitFullscreenElement ??
-      doc.mozFullScreenElement ??
-      doc.msFullscreenElement;
+    const document_ = document as DocumentWithFullscreen;
+    const fullscreenElement =
+      document_.fullscreenElement ??
+      document_.webkitFullscreenElement ??
+      document_.mozFullScreenElement ??
+      document_.msFullscreenElement;
 
     try {
-      if (fullscreenEl) {
+      if (fullscreenElement) {
         // Exit fullscreen
-        if (doc.exitFullscreen) {
-          await doc.exitFullscreen();
-        } else if (doc.webkitExitFullscreen) {
-          await doc.webkitExitFullscreen();
-        } else if (doc.mozCancelFullScreen) {
-          await doc.mozCancelFullScreen();
-        } else if (doc.msExitFullscreen) {
-          await doc.msExitFullscreen();
+        if (document_.exitFullscreen) {
+          await document_.exitFullscreen();
+        } else if (document_.webkitExitFullscreen) {
+          await document_.webkitExitFullscreen();
+        } else if (document_.mozCancelFullScreen) {
+          await document_.mozCancelFullScreen();
+        } else if (document_.msExitFullscreen) {
+          await document_.msExitFullscreen();
         }
 
         // Restore original styles after exiting fullscreen
-        if (originalStylesRef.current) {
-          Object.assign(container.style, originalStylesRef.current);
-          originalStylesRef.current = null;
+        if (originalStylesReference.current) {
+          Object.assign(container.style, originalStylesReference.current);
+          originalStylesReference.current = null;
         }
         // State will be updated by fullscreenchange event listener
       } else {
@@ -180,7 +181,7 @@ export function FullscreenPlugin({
           margin: container.style.margin,
           borderRadius: container.style.borderRadius,
         };
-        originalStylesRef.current = originalStyles;
+        originalStylesReference.current = originalStyles;
 
         // Add fullscreen styling before entering fullscreen
         Object.assign(container.style, {
@@ -204,25 +205,25 @@ export function FullscreenPlugin({
         }
 
         // Enter fullscreen
-        const el = container as HTMLElementWithFullscreen;
-        if (el.requestFullscreen) {
-          await el.requestFullscreen();
-        } else if (el.webkitRequestFullscreen) {
+        const element = container as HTMLElementWithFullscreen;
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) {
           // Safari
-          await el.webkitRequestFullscreen();
-        } else if (el.mozRequestFullScreen) {
+          await element.webkitRequestFullscreen();
+        } else if (element.mozRequestFullScreen) {
           // Firefox
-          await el.mozRequestFullScreen();
-        } else if (el.msRequestFullscreen) {
+          await element.mozRequestFullScreen();
+        } else if (element.msRequestFullscreen) {
           // IE/Edge
-          await el.msRequestFullscreen();
+          await element.msRequestFullscreen();
         } else {
           console.warn(
             "FullscreenPlugin: Fullscreen API not supported in this browser",
           );
           // Restore styles if fullscreen failed
-          Object.assign(container.style, originalStylesRef.current);
-          originalStylesRef.current = null;
+          Object.assign(container.style, originalStylesReference.current);
+          originalStylesReference.current = null;
           return;
         }
         // State will be updated by fullscreenchange event listener

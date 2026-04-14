@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -41,16 +42,16 @@ function $convertExcalidrawElement(
 ): DOMConversionOutput | null {
   const excalidrawData = domNode.dataset.lexicalExcalidrawJson;
   const styleAttributes = globalThis.getComputedStyle(domNode);
-  const heightStr = styleAttributes.getPropertyValue("height");
-  const widthStr = styleAttributes.getPropertyValue("width");
+  const heightString = styleAttributes.getPropertyValue("height");
+  const widthString = styleAttributes.getPropertyValue("width");
   const height =
-    !heightStr || heightStr === "inherit"
+    !heightString || heightString === "inherit"
       ? "inherit"
-      : Number.parseInt(heightStr, 10);
+      : Number.parseInt(heightString, 10);
   const width =
-    !widthStr || widthStr === "inherit"
+    !widthString || widthString === "inherit"
       ? "inherit"
-      : Number.parseInt(widthStr, 10);
+      : Number.parseInt(widthString, 10);
 
   if (excalidrawData) {
     const node = $createExcalidrawNode(excalidrawData, width, height);

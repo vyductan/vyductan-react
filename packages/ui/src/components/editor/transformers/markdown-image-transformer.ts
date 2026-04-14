@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type {
   ElementTransformer,
   TextMatchTransformer,
@@ -12,23 +13,23 @@ export const IMAGE: TextMatchTransformer = {
       return null;
     }
 
-    const src = node.getSrc();
+    const source = node.getSrc();
 
     // Skip blob URLs (temporary preview URLs that won't be valid after page reload)
-    if (src.startsWith("blob:") || src.startsWith("data:")) {
+    if (source.startsWith("blob:") || source.startsWith("data:")) {
       return null;
     }
 
-    return `![${node.getAltText()}](${src})`;
+    return `![${node.getAltText()}](${source})`;
   },
   importRegExp: /!(?:\[([^[]*)\])(?:\(([^(]+)\))/,
   regExp: /!(?:\[([^[]*)\])(?:\(([^(]+)\))$/,
   replace: (textNode, match) => {
-    const [, altText, src] = match;
+    const [, altText, source] = match;
     const imageNode = $createImageNode({
       altText: altText ?? "",
       maxWidth: 800,
-      src: src ?? "",
+      src: source ?? "",
     });
     textNode.replace(imageNode);
   },
@@ -43,12 +44,12 @@ export const IMAGE_ELEMENT: ElementTransformer = {
       return null;
     }
 
-    const src = node.getSrc();
-    if (src.startsWith("blob:") || src.startsWith("data:")) {
+    const source = node.getSrc();
+    if (source.startsWith("blob:") || source.startsWith("data:")) {
       return null;
     }
 
-    return `![${node.getAltText()}](${src})`;
+    return `![${node.getAltText()}](${source})`;
   },
   // We only use this for export, as import is handled by the text-match transformer
   regExp: /x^/,

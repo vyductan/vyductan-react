@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -56,10 +57,10 @@ export function InsertImageUriDialogBody({
 }: {
   onClick: (payload: InsertImagePayload) => void;
 }) {
-  const [src, setSrc] = useState("");
+  const [source, setSource] = useState("");
   const [altText, setAltText] = useState("");
 
-  const isDisabled = src === "";
+  const isDisabled = source === "";
 
   return (
     <div className="grid gap-4 py-4">
@@ -68,8 +69,8 @@ export function InsertImageUriDialogBody({
         <Input
           id="image-url"
           placeholder="i.e. https://source.unsplash.com/random"
-          onChange={(e) => setSrc(e.target.value)}
-          value={src}
+          onChange={(e) => setSource(e.target.value)}
+          value={source}
           data-test-id="image-modal-url-input"
         />
       </div>
@@ -87,7 +88,7 @@ export function InsertImageUriDialogBody({
         <Button
           type="submit"
           disabled={isDisabled}
-          onClick={() => onClick({ altText, src })}
+          onClick={() => onClick({ altText, src: source })}
           data-test-id="image-modal-confirm-btn"
         >
           Confirm
@@ -102,11 +103,11 @@ export function InsertImageUploadedDialogBody({
 }: {
   onClick: (payload: InsertImagePayload) => void;
 }) {
-  const [src, setSrc] = useState("");
+  const [source, setSource] = useState("");
   const [altText, setAltText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const isDisabled = src === "" || isLoading;
+  const isDisabled = source === "" || isLoading;
 
   const loadImage = (files: FileList | null) => {
     const reader = new FileReader();
@@ -114,7 +115,7 @@ export function InsertImageUploadedDialogBody({
 
     reader.addEventListener("load", function () {
       if (typeof reader.result === "string") {
-        setSrc(reader.result);
+        setSource(reader.result);
       }
       setIsLoading(false);
       return "";
@@ -152,11 +153,11 @@ export function InsertImageUploadedDialogBody({
           </p>
         </div>
       </div>
-      {src && (
+      {source && (
         <div className="relative rounded-lg border border-gray-200 p-2">
           <picture>
             <img
-              src={src}
+              src={source}
               alt="Preview"
               className={`max-h-48 w-full rounded object-contain ${isLoading ? "opacity-50 blur-sm" : ""}`}
             />
@@ -187,7 +188,7 @@ export function InsertImageUploadedDialogBody({
       <Button
         type="submit"
         disabled={isDisabled}
-        onClick={() => onClick({ altText, src })}
+        onClick={() => onClick({ altText, src: source })}
         data-test-id="image-modal-file-upload-btn"
         className="w-full"
       >
@@ -403,11 +404,11 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
   let range;
   const target = event.target as null | Element | Document;
   const targetWindow =
-    target == null
+    target == undefined
       ? null
-      : target.nodeType === 9
+      : (target.nodeType === 9
         ? (target as Document).defaultView
-        : (target as Element).ownerDocument.defaultView;
+        : (target as Element).ownerDocument.defaultView);
   const domSelection = getDOMSelection(targetWindow);
 
   if (document.caretRangeFromPoint) {

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -21,7 +22,7 @@ type ImageType = "svg" | "canvas";
 
 type Dimension = "inherit" | number;
 
-type Props = {
+type Properties = {
   /**
    * Configures the export setting for SVG/Canvas
    */
@@ -87,7 +88,7 @@ const ExcalidrawImage = ({
   width = "inherit",
   height = "inherit",
   ref,
-}: Props & { ref?: React.Ref<HTMLDivElement> }): JSX.Element => {
+}: Properties & { ref?: React.Ref<HTMLDivElement> }): JSX.Element => {
   const [Svg, setSvg] = useState<SVGElement | null>(null);
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -421,8 +422,8 @@ export function BlockCopyPastePlugin(): null {
           targetBlock ??= anchor.getNode().getTopLevelElementOrThrow();
 
           const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-          const nodes = $generateNodesFromDOM(editor, doc);
+          const document = parser.parseFromString(html, "text/html");
+          const nodes = $generateNodesFromDOM(editor, document);
 
           // Insert after current block
           let lastNode: LexicalNode = targetBlock;

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
 import {
@@ -16,7 +17,7 @@ export const HR: ElementTransformer = {
     const line = $createHorizontalRuleNode();
 
     // TODO: Get rid of isImport flag
-    if (isImport || parentNode.getNextSibling() != null) {
+    if (isImport || parentNode.getNextSibling() != undefined) {
       parentNode.replace(line);
     } else {
       parentNode.insertBefore(line);

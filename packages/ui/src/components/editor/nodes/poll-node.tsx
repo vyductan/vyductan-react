@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -68,7 +69,7 @@ function $convertPollElement(domNode: HTMLElement): DOMConversionOutput | null {
   const question = domNode.dataset.lexicalPollQuestion;
   const serializedOptions = domNode.dataset.lexicalPollOptions;
 
-  if (question == null || serializedOptions == null) {
+  if (question == undefined || serializedOptions == undefined) {
     return null;
   }
 
@@ -183,9 +184,9 @@ export class PollNode extends DecoratorNode<JSX.Element> {
   }
 
   createDOM(): HTMLElement {
-    const elem = document.createElement("span");
-    elem.style.display = "inline-block";
-    return elem;
+    const element = document.createElement("span");
+    element.style.display = "inline-block";
+    return element;
   }
 
   updateDOM(): false {

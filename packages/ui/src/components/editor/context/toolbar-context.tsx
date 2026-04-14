@@ -45,7 +45,7 @@ export function ToolbarContext({
   ) => void;
   children: React.ReactNode;
 }) {
-  const formatHandledRef = useRef(false);
+  const formatHandledReference = useRef(false);
 
   return (
     <Context.Provider
@@ -55,7 +55,7 @@ export function ToolbarContext({
         blockType,
         setBlockType,
         showModal,
-        formatHandledRef,
+        formatHandledRef: formatHandledReference,
       }}
     >
       {children}

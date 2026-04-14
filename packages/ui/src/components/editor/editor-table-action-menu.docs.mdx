@@ -1,0 +1,73 @@
+---
+title: Editor/Table Action Menu
+description: Row and column action handles for table editing in the rich text editor.
+component: true
+---
+
+# Table Action Menu
+
+The table action menu adds row and column handles to the editor when a table cell is focused. It gives the editor a spreadsheet-like control surface for common table edits without requiring toolbar navigation.
+
+## Features
+
+- **Focused cell handles** — shows row and column action buttons for the active table cell
+- **Contextual row actions** — insert above/below, duplicate, clear contents, delete, toggle the first row as a header row, and apply preset background colors
+- **Contextual column actions** — insert left/right, duplicate, clear contents, delete, toggle the active column as a header column, and apply preset background colors
+- **Drag to reorder** — drag the row or column handles to move table structure in place
+- **Simple editor support** — available in the `simple` editor variant used by Storybook interaction coverage
+
+## When it appears
+
+The feature is enabled through the editor plugin stack in [plugins.tsx](./plugins/plugins.tsx), where `TableCellActionMenuPlugin` is mounted alongside `TablePlugin` and `TableHoverActionsPlugin`. The handles render only when:
+
+1. the editor is editable
+2. a table cell is the current focused selection
+3. the editor has a floating anchor element available for portal-based UI
+
+Implementation lives in [table-cell-action-menu-plugin.tsx](./plugins/table-cell-action-menu-plugin.tsx).
+
+## Supported actions
+
+### Row actions
+
+- Header row — shown only when the focused cell is in the first row, with a switch-style state indicator on the right
+- Color — preset submenu with `Default`, gray, red, orange, yellow, green, and blue
+- Insert above
+- Insert below
+- Duplicate
+- Clear contents
+- Delete
+
+### Column actions
+
+- Header column — includes a switch-style state indicator on the right
+- Color — preset submenu with `Default`, gray, red, orange, yellow, green, and blue
+- Insert left
+- Insert right
+- Duplicate
+- Clear contents
+- Delete
+
+## Interaction notes
+
+- The left handle controls the active row.
+- The top handle controls the active column.
+- Opening a menu uses the shared dropdown component, so menu content is rendered in a portal.
+- Menu actions use icon treatment aligned with the editor context menu for visual consistency.
+- Color uses a lightweight preset submenu for quick row/column background updates instead of a freeform picker.
+- Drag-and-drop reordering uses table geometry from the current DOM layout to calculate drop indicators and destination indexes.
+
+## Validation
+
+This feature is covered in two places:
+
+- browser interaction coverage in [editor-table-action-menu.stories.tsx](./editor-table-action-menu.stories.tsx)
+- plugin-level regression coverage in [table-cell-action-menu-plugin.test.tsx](./plugins/table-cell-action-menu-plugin.test.tsx)
+
+## Example story
+
+Use the Storybook story at **Components/Editor/Table Action Menu** to verify:
+
+- handles appear after focusing a cell
+- the row actions menu opens from the handle
+- handles remain available after moving focus to another table cell

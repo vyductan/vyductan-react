@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -37,7 +38,7 @@ import { Input } from "@acme/ui/components/input";
 
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { getSelectedNode } from "../utils/get-selected-node";
-import { setFloatingElemPositionForLinkEditor } from "../utils/set-floating-elem-position-for-link-editor";
+import { setFloatingElemPositionForLinkEditor as setFloatingElementPositionForLinkEditor } from "../utils/set-floating-elem-position-for-link-editor";
 import { sanitizeUrl } from "../utils/url";
 
 function FloatingLinkEditor({
@@ -55,15 +56,15 @@ function FloatingLinkEditor({
   isLinkEditMode: boolean;
   setIsLinkEditMode: Dispatch<boolean>;
 }): JSX.Element {
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const editorReference = useRef<HTMLDivElement | null>(null);
+  const inputReference = useRef<HTMLInputElement>(null);
   const [linkUrl, setLinkUrl] = useState("");
   const [editedLinkUrl, setEditedLinkUrl] = useState("https://");
   const [lastSelection, setLastSelection] = useState<BaseSelection | null>(
     null,
   );
-  const showTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const showTimeoutReference = useRef<NodeJS.Timeout | null>(null);
+  const hideTimeoutReference = useRef<NodeJS.Timeout | null>(null);
   const [shouldShow, setShouldShow] = useState(false);
 
   const $updateLinkEditor = useCallback(() => {
@@ -88,10 +89,10 @@ function FloatingLinkEditor({
         setLinkUrl("");
       }
     }
-    const editorElem = editorRef.current;
+    const editorElement = editorReference.current;
     const nativeSelection = globalThis.getSelection();
 
-    if (editorElem === null) {
+    if (editorElement === null) {
       return;
     }
 
@@ -133,7 +134,7 @@ function FloatingLinkEditor({
       }
 
       if (domRect && rootElement) {
-        setFloatingElemPositionForLinkEditor(domRect, editorElem, anchorElem);
+        setFloatingElementPositionForLinkEditor(domRect, editorElement, anchorElem);
       }
 
       if ($isRangeSelection(selection)) {
@@ -153,47 +154,47 @@ function FloatingLinkEditor({
 
     if (hasLinkSelection) {
       // Show with a small delay to avoid flickering
-      if (showTimeoutRef.current) {
-        clearTimeout(showTimeoutRef.current);
+      if (showTimeoutReference.current) {
+        clearTimeout(showTimeoutReference.current);
       }
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-        hideTimeoutRef.current = null;
+      if (hideTimeoutReference.current) {
+        clearTimeout(hideTimeoutReference.current);
+        hideTimeoutReference.current = null;
       }
 
-      showTimeoutRef.current = setTimeout(() => {
+      showTimeoutReference.current = setTimeout(() => {
         const domRect: DOMRect | undefined =
           nativeSelection.focusNode?.parentElement?.getBoundingClientRect();
         if (domRect) {
           domRect.y += 40;
-          setFloatingElemPositionForLinkEditor(domRect, editorElem, anchorElem);
+          setFloatingElementPositionForLinkEditor(domRect, editorElement, anchorElem);
           setShouldShow(true);
         }
         setLastSelection(selection);
       }, 150); // Small delay to avoid showing on quick selections
     } else {
       // Hide editor when not in edit mode and no link selected
-      if (showTimeoutRef.current) {
-        clearTimeout(showTimeoutRef.current);
-        showTimeoutRef.current = null;
+      if (showTimeoutReference.current) {
+        clearTimeout(showTimeoutReference.current);
+        showTimeoutReference.current = null;
       }
 
       // Hide with a small delay to allow moving mouse to editor
-      if (!hideTimeoutRef.current && shouldShow) {
-        hideTimeoutRef.current = setTimeout(() => {
+      if (!hideTimeoutReference.current && shouldShow) {
+        hideTimeoutReference.current = setTimeout(() => {
           if (rootElement) {
-            setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
+            setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
           }
           setShouldShow(false);
           setLastSelection(null);
           setIsLinkEditMode(false);
           setLinkUrl("");
-          hideTimeoutRef.current = null;
+          hideTimeoutReference.current = null;
         }, 200); // Delay to allow mouse movement to editor
       } else if (!shouldShow) {
         // Immediately hide if already hidden
         if (rootElement) {
-          setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
+          setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
         }
         setLastSelection(null);
         setIsLinkEditMode(false);
@@ -213,7 +214,7 @@ function FloatingLinkEditor({
   ]);
 
   useEffect(() => {
-    const scrollerElem = anchorElem.parentElement;
+    const scrollerElement = anchorElem.parentElement;
 
     const update = () => {
       editor.getEditorState().read(() => {
@@ -223,22 +224,22 @@ function FloatingLinkEditor({
 
     window.addEventListener("resize", update);
 
-    if (scrollerElem) {
-      scrollerElem.addEventListener("scroll", update);
+    if (scrollerElement) {
+      scrollerElement.addEventListener("scroll", update);
     }
 
     return () => {
       window.removeEventListener("resize", update);
 
-      if (scrollerElem) {
-        scrollerElem.removeEventListener("scroll", update);
+      if (scrollerElement) {
+        scrollerElement.removeEventListener("scroll", update);
       }
       // Cleanup timeouts
-      if (showTimeoutRef.current) {
-        clearTimeout(showTimeoutRef.current);
+      if (showTimeoutReference.current) {
+        clearTimeout(showTimeoutReference.current);
       }
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
+      if (hideTimeoutReference.current) {
+        clearTimeout(hideTimeoutReference.current);
       }
     };
   }, [anchorElem.parentElement, editor, $updateLinkEditor]);
@@ -280,11 +281,11 @@ function FloatingLinkEditor({
   }, [editor, $updateLinkEditor]);
 
   useEffect(() => {
-    if (isLinkEditMode && inputRef.current) {
+    if (isLinkEditMode && inputReference.current) {
       // Small delay to ensure the element is visible before focusing
       setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
+        inputReference.current?.focus();
+        inputReference.current?.select();
       }, 100);
     }
   }, [isLinkEditMode, editedLinkUrl]);
@@ -302,7 +303,7 @@ function FloatingLinkEditor({
   };
 
   const handleLinkSubmission = () => {
-    const editorElem = editorRef.current;
+    const editorElement = editorReference.current;
     const rootElement = editor.getRootElement();
 
     if (editedLinkUrl === "" || editedLinkUrl === "https://") {
@@ -310,8 +311,8 @@ function FloatingLinkEditor({
       setIsLinkEditMode(false);
       setEditedLinkUrl("https://");
       // Force hide the editor
-      if (editorElem && rootElement) {
-        setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
+      if (editorElement && rootElement) {
+        setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
       }
       return;
     }
@@ -321,8 +322,8 @@ function FloatingLinkEditor({
       setIsLinkEditMode(false);
       setEditedLinkUrl("https://");
       // Force hide the editor
-      if (editorElem && rootElement) {
-        setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
+      if (editorElement && rootElement) {
+        setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
       }
       return;
     }
@@ -363,23 +364,23 @@ function FloatingLinkEditor({
     setShouldShow(false);
 
     // Cleanup timeouts
-    if (showTimeoutRef.current) {
-      clearTimeout(showTimeoutRef.current);
-      showTimeoutRef.current = null;
+    if (showTimeoutReference.current) {
+      clearTimeout(showTimeoutReference.current);
+      showTimeoutReference.current = null;
     }
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-      hideTimeoutRef.current = null;
+    if (hideTimeoutReference.current) {
+      clearTimeout(hideTimeoutReference.current);
+      hideTimeoutReference.current = null;
     }
 
     // Force hide the editor after submission
     setTimeout(() => {
-      const currentEditorElem = editorRef.current;
+      const currentEditorElement = editorReference.current;
       const currentRootElement = editor.getRootElement();
-      if (currentEditorElem && currentRootElement) {
-        setFloatingElemPositionForLinkEditor(
+      if (currentEditorElement && currentRootElement) {
+        setFloatingElementPositionForLinkEditor(
           null,
-          currentEditorElem,
+          currentEditorElement,
           anchorElem,
         );
       }
@@ -389,12 +390,12 @@ function FloatingLinkEditor({
   const isVisible = isLinkEditMode || (isLink && shouldShow);
 
   if (!isLinkEditMode && !isLink) {
-    return <div ref={editorRef} className="hidden" />;
+    return <div ref={editorReference} className="hidden" />;
   }
 
   return (
     <div
-      ref={editorRef}
+      ref={editorReference}
       className="absolute top-0 left-0 z-50 w-full max-w-sm rounded-md border border-gray-200 bg-white shadow-lg transition-opacity duration-200"
       style={{
         opacity: isVisible ? 1 : 0,
@@ -402,28 +403,28 @@ function FloatingLinkEditor({
       }}
       onMouseEnter={() => {
         // Keep editor visible when hovering over it
-        if (hideTimeoutRef.current) {
-          clearTimeout(hideTimeoutRef.current);
-          hideTimeoutRef.current = null;
+        if (hideTimeoutReference.current) {
+          clearTimeout(hideTimeoutReference.current);
+          hideTimeoutReference.current = null;
         }
       }}
       onMouseLeave={() => {
         // Hide when mouse leaves editor (if not in edit mode)
         if (!isLinkEditMode && shouldShow) {
-          hideTimeoutRef.current = setTimeout(() => {
-            const editorElem = editorRef.current;
+          hideTimeoutReference.current = setTimeout(() => {
+            const editorElement = editorReference.current;
             const rootElement = editor.getRootElement();
-            if (rootElement && editorElem) {
-              setFloatingElemPositionForLinkEditor(
+            if (rootElement && editorElement) {
+              setFloatingElementPositionForLinkEditor(
                 null,
-                editorElem,
+                editorElement,
                 anchorElem,
               );
             }
             setShouldShow(false);
             setIsLink(false);
             setLinkUrl("");
-            hideTimeoutRef.current = null;
+            hideTimeoutReference.current = null;
           }, 200);
         }
       }}
@@ -432,7 +433,7 @@ function FloatingLinkEditor({
         // Show input field when in edit mode (creating or editing link)
         <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-sm">
           <Input
-            ref={inputRef}
+            ref={inputReference}
             value={editedLinkUrl}
             onChange={(event) => setEditedLinkUrl(event.target.value)}
             onKeyDown={monitorInputInteraction}
@@ -451,21 +452,21 @@ function FloatingLinkEditor({
               setLastSelection(null);
               setShouldShow(false);
               // Cleanup timeouts
-              if (showTimeoutRef.current) {
-                clearTimeout(showTimeoutRef.current);
-                showTimeoutRef.current = null;
+              if (showTimeoutReference.current) {
+                clearTimeout(showTimeoutReference.current);
+                showTimeoutReference.current = null;
               }
-              if (hideTimeoutRef.current) {
-                clearTimeout(hideTimeoutRef.current);
-                hideTimeoutRef.current = null;
+              if (hideTimeoutReference.current) {
+                clearTimeout(hideTimeoutReference.current);
+                hideTimeoutReference.current = null;
               }
               // Force hide the editor
-              const editorElem = editorRef.current;
+              const editorElement = editorReference.current;
               const rootElement = editor.getRootElement();
-              if (editorElem && rootElement) {
-                setFloatingElemPositionForLinkEditor(
+              if (editorElement && rootElement) {
+                setFloatingElementPositionForLinkEditor(
                   null,
-                  editorElem,
+                  editorElement,
                   anchorElem,
                 );
               }
@@ -483,7 +484,7 @@ function FloatingLinkEditor({
             <Check className="h-4 w-4" />
           </Button>
         </div>
-      ) : isLink ? (
+      ) : (isLink ? (
         // Show link URL with edit/delete buttons when link is selected
         <div className="flex items-center justify-between gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-sm">
           <a
@@ -543,14 +544,14 @@ function FloatingLinkEditor({
             </Button>
           </div>
         </div>
-      ) : null}
+      ) : null)}
     </div>
   );
 }
 
 function useFloatingLinkEditorToolbar(
   editor: LexicalEditor,
-  anchorElem: HTMLDivElement | null,
+  anchorElement: HTMLDivElement | null,
   isLinkEditMode: boolean,
   setIsLinkEditMode: Dispatch<boolean>,
 ): JSX.Element | null {
@@ -567,7 +568,7 @@ function useFloatingLinkEditorToolbar(
           focusNode,
           $isAutoLinkNode,
         );
-        if ((focusLinkNode ?? focusAutoLinkNode) == null) {
+        if ((focusLinkNode ?? focusAutoLinkNode) == undefined) {
           setIsLink(false);
           return;
         }
@@ -628,7 +629,7 @@ function useFloatingLinkEditorToolbar(
     );
   }, [editor]);
 
-  if (!anchorElem) {
+  if (!anchorElement) {
     return null;
   }
 
@@ -636,12 +637,12 @@ function useFloatingLinkEditorToolbar(
     <FloatingLinkEditor
       editor={activeEditor}
       isLink={isLink}
-      anchorElem={anchorElem}
+      anchorElem={anchorElement}
       setIsLink={setIsLink}
       isLinkEditMode={isLinkEditMode}
       setIsLinkEditMode={setIsLinkEditMode}
     />,
-    anchorElem,
+    anchorElement,
   );
 }
 

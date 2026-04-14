@@ -16,15 +16,15 @@ import {
   TooltipTrigger,
 } from "@acme/ui/components/tooltip";
 
-import { docFromHash, docToHash } from "../../utils/doc-serialization";
+import { docFromHash as documentFromHash, docToHash as documentToHash } from "../../utils/doc-serialization";
 
-async function shareDoc(doc: SerializedDocument): Promise<void> {
+async function shareDocument(document: SerializedDocument): Promise<void> {
   if (globalThis.window === undefined) {
     throw new TypeError("shareDoc can only be called on the client side");
   }
 
   const url = new URL(globalThis.location.toString());
-  url.hash = await docToHash(doc);
+  url.hash = await documentToHash(document);
   const newUrl = url.toString();
   globalThis.history.replaceState({}, "", newUrl);
   await globalThis.navigator.clipboard.writeText(newUrl);
@@ -37,10 +37,10 @@ export function ShareContentPlugin() {
   useEffect(() => {
     if (!isClient) return;
 
-    void docFromHash(globalThis.location.hash)
-      .then((doc) => {
-        if (doc?.source === "editor") {
-          editor.setEditorState(editorStateFromSerializedDocument(editor, doc));
+    void documentFromHash(globalThis.location.hash)
+      .then((document) => {
+        if (document?.source === "editor") {
+          editor.setEditorState(editorStateFromSerializedDocument(editor, document));
           editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
         }
       })
@@ -57,7 +57,7 @@ export function ShareContentPlugin() {
           onClick={() => {
             if (!isClient) return;
 
-            void shareDoc(
+            void shareDocument(
               serializedDocumentFromEditorState(editor.getEditorState(), {
                 source: "editor",
               }),

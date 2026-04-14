@@ -44,14 +44,14 @@ export const WithPlaceholder: Story = {
 
 // Interactive editor with state management
 export const Interactive: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [editorContent, setEditorContent] = useState<string>("");
 
     return (
       <div className="space-y-4">
         <div className="rounded-lg border border-gray-200">
           <Editor
-            {...args}
+            {...arguments_}
             onChange={(jsonString) => {
               setEditorContent(jsonString);
             }}
@@ -73,7 +73,7 @@ export const Interactive: Story = {
 
 // Editor with styled container
 export const StyledContainer: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     return (
       <div className="mx-auto max-w-4xl">
         <div className="rounded-xl border-2 border-gray-200 bg-white shadow-lg">
@@ -86,7 +86,7 @@ export const StyledContainer: Story = {
             </p>
           </div>
           <div className="p-6">
-            <Editor {...args} />
+            <Editor {...arguments_} />
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ export const MarkdownDefault: MarkdownStory = {
     onChange: fn(),
     format: "markdown",
   },
-  render: (args) => <Editor {...args} format="markdown" />,
+  render: (arguments_) => <Editor {...arguments_} format="markdown" />,
 };
 
 // Markdown editor with initial content
@@ -160,7 +160,7 @@ Try editing this content!`,
     onChange: fn(),
     format: "markdown",
   },
-  render: (args) => <Editor {...args} format="markdown" />,
+  render: (arguments_) => <Editor {...arguments_} format="markdown" />,
 };
 
 // Interactive markdown editor with state
@@ -210,7 +210,7 @@ Edit this content and see the markdown output below.
 
 // Markdown editor with sync demonstration
 export const MarkdownSync: MarkdownStory = {
-  render: (args) => {
+  render: (arguments_) => {
     const [markdown, setMarkdown] = useState(
       String.raw`# Hello World\n\nThis is a test.`,
     );
@@ -231,7 +231,7 @@ export const MarkdownSync: MarkdownStory = {
           <div className="text-sm font-semibold">Preview:</div>
           <div className="rounded border border-gray-200">
             <Editor
-              {...args}
+              {...arguments_}
               format="markdown"
               value={markdown}
               onChange={(markdown) => setMarkdown(markdown)}
@@ -251,7 +251,7 @@ export const MarkdownSync: MarkdownStory = {
 
 // Markdown editor with full features
 export const MarkdownFullFeatures: MarkdownStory = {
-  render: (args) => {
+  render: (arguments_) => {
     const [markdown, setMarkdown] = useState(
       `# Full Featured Editor
 
@@ -295,7 +295,7 @@ Try editing to see all features in action!`,
           </div>
           <div className="p-6">
             <Editor
-              {...args}
+              {...arguments_}
               format="markdown"
               value={markdown}
               onChange={(markdown) => setMarkdown(markdown)}
@@ -344,7 +344,7 @@ export const HtmlDefault: HtmlStory = {
     onChange: fn(),
     format: "html",
   },
-  render: (args) => <Editor {...args} format="html" />,
+  render: (arguments_) => <Editor {...arguments_} format="html" />,
 };
 
 export const HtmlWithContent: HtmlStory = {
@@ -354,7 +354,7 @@ export const HtmlWithContent: HtmlStory = {
     onChange: fn(),
     format: "html",
   },
-  render: (args) => <Editor {...args} format="html" />,
+  render: (arguments_) => <Editor {...arguments_} format="html" />,
 };
 
 export const HtmlInteractive: HtmlStory = {

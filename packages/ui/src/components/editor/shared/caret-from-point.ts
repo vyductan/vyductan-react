@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -23,10 +24,10 @@ export function caretFromPoint(
   offset: number;
   node: Node;
 } {
-  const doc = document as DocumentWithCaretApi;
+  const document_ = document as DocumentWithCaretApi;
 
-  if (typeof doc.caretRangeFromPoint === "function") {
-    const range = doc.caretRangeFromPoint(x, y);
+  if (typeof document_.caretRangeFromPoint === "function") {
+    const range = document_.caretRangeFromPoint(x, y);
     if (!range) {
       return null;
     }
@@ -36,8 +37,8 @@ export function caretFromPoint(
     };
   }
 
-  if (typeof doc.caretPositionFromPoint === "function") {
-    const caret = doc.caretPositionFromPoint(x, y);
+  if (typeof document_.caretPositionFromPoint === "function") {
+    const caret = document_.caretPositionFromPoint(x, y);
     if (!caret) {
       return null;
     }

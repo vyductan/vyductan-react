@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -31,14 +32,14 @@ export function KeywordsPlugin(): JSX.Element | null {
   }, []);
 
   const getKeywordMatch = useCallback((text: string) => {
-    const matchArr = KEYWORDS_REGEX.exec(text);
+    const matchArray = KEYWORDS_REGEX.exec(text);
 
-    if (matchArr === null) {
+    if (matchArray === null) {
       return null;
     }
 
-    const hashtagLength = matchArr[2]!.length;
-    const startOffset = matchArr.index + matchArr[1]!.length;
+    const hashtagLength = matchArray[2]!.length;
+    const startOffset = matchArray.index + matchArray[1]!.length;
     const endOffset = startOffset + hashtagLength;
     return {
       end: endOffset,

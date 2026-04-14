@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * TikTok Embed Node
  *
@@ -22,7 +23,7 @@ import { useEffect } from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-type TikTokComponentProps = Readonly<{
+type TikTokComponentProperties = Readonly<{
   className: Readonly<{
     base: string;
     focus: string;
@@ -39,7 +40,7 @@ function TikTokComponent({
   nodeKey,
   videoId,
   username,
-}: TikTokComponentProps) {
+}: TikTokComponentProperties) {
   useEffect(() => {
     // Load TikTok embed script
     if (!globalThis.tiktokEmbed) {

@@ -46,12 +46,12 @@ export function ImageResizer({
   showCaption: boolean;
   captionsEnabled: boolean;
 }): JSX.Element {
-  const controlWrapperRef = useRef<HTMLDivElement>(null);
+  const controlWrapperReference = useRef<HTMLDivElement>(null);
   const userSelect = useRef({
     priority: "",
     value: "default",
   });
-  const positioningRef = useRef<{
+  const positioningReference = useRef<{
     currentHeight: "inherit" | number;
     currentWidth: "inherit" | number;
     direction: number;
@@ -94,7 +94,14 @@ export function ImageResizer({
       (direction & Direction.north && direction & Direction.west) ||
       (direction & Direction.south && direction & Direction.east);
 
-    const cursorDir = ew ? "ew" : ns ? "ns" : nwse ? "nwse" : "nesw";
+    let cursorDir = "nesw";
+    if (ew) {
+      cursorDir = "ew";
+    } else if (ns) {
+      cursorDir = "ns";
+    } else if (nwse) {
+      cursorDir = "nwse";
+    }
 
     if (editorRootElement !== null) {
       editorRootElement.style.setProperty(
@@ -148,13 +155,13 @@ export function ImageResizer({
     }
 
     const image = imageRef.current;
-    const controlWrapper = controlWrapperRef.current;
+    const controlWrapper = controlWrapperReference.current;
 
     if (image !== null && controlWrapper !== null) {
       event.preventDefault();
       const { width, height } = image.getBoundingClientRect();
       const zoom = calculateZoomLevel(image);
-      const positioning = positioningRef.current;
+      const positioning = positioningReference.current;
       positioning.startWidth = width;
       positioning.startHeight = height;
       positioning.ratio = width / height;
@@ -178,7 +185,7 @@ export function ImageResizer({
   };
   const handlePointerMove = (event: PointerEvent) => {
     const image = imageRef.current;
-    const positioning = positioningRef.current;
+    const positioning = positioningReference.current;
 
     const isHorizontal =
       positioning.direction & (Direction.east | Direction.west);
@@ -237,8 +244,8 @@ export function ImageResizer({
   };
   const handlePointerUp = () => {
     const image = imageRef.current;
-    const positioning = positioningRef.current;
-    const controlWrapper = controlWrapperRef.current;
+    const positioning = positioningReference.current;
+    const controlWrapper = controlWrapperReference.current;
     if (image !== null && controlWrapper !== null && positioning.isResizing) {
       const width = positioning.currentWidth;
       const height = positioning.currentHeight;
@@ -261,7 +268,7 @@ export function ImageResizer({
     }
   };
   return (
-    <div ref={controlWrapperRef}>
+    <div ref={controlWrapperReference}>
       {!showCaption && captionsEnabled && (
         <button
           className="image-caption-button"

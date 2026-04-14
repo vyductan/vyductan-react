@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -71,8 +72,8 @@ export class LayoutContainerNode extends ElementNode {
     return { element };
   }
 
-  updateDOM(prevNode: LayoutContainerNode, dom: HTMLElement): boolean {
-    if (prevNode.__templateColumns !== this.__templateColumns) {
+  updateDOM(previousNode: LayoutContainerNode, dom: HTMLElement): boolean {
+    if (previousNode.__templateColumns !== this.__templateColumns) {
       dom.style.gridTemplateColumns = this.__templateColumns;
     }
     return false;

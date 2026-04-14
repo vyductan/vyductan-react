@@ -81,6 +81,30 @@
   background-color: rgba(55, 53, 47, 0.03);
 }
 
+.EditorTheme__tableCellActionMenuHandle {
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.EditorTheme__tableCellActionMenuHandle:hover,
+.EditorTheme__tableCellActionMenuHandle[data-state="open"] {
+  transform: scale(1.05);
+}
+
+.EditorTheme__tableCellActionMenuHighlight {
+  transition: opacity 120ms ease;
+}
+
+.EditorTheme__tableCellActionMenuDropIndicator {
+  position: fixed;
+  z-index: 45;
+  background-color: rgb(59 130 246);
+  box-shadow: 0 0 0 1px rgb(59 130 246 / 0.15);
+}
+
 @media (max-width: 640px) {
   .RichTextSemanticContract__code {
     font-size: 13px;

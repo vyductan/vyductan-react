@@ -2,22 +2,22 @@
 
 import type { ReactNode } from "react";
 
-import type { ImageResolverFn } from "./context/image-resolver-context";
+import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
 import { TooltipProvider } from "../tooltip";
 import { ComponentPickerContext } from "./context/component-picker-context";
 import { FloatingLinkContext } from "./context/floating-link-context";
 import { ImageResolverProvider } from "./context/image-resolver-context";
 import { SharedAutocompleteContext } from "./context/shared-autocomplete-context";
 
-interface EditorProvidersProps {
+interface EditorProvidersProperties {
   children: ReactNode;
-  resolveImage?: ImageResolverFn;
+  resolveImage?: ImageResolverFunction;
 }
 
 export function EditorProviders({
   children,
   resolveImage,
-}: EditorProvidersProps) {
+}: EditorProvidersProperties) {
   return (
     <ImageResolverProvider value={resolveImage}>
       <TooltipProvider>

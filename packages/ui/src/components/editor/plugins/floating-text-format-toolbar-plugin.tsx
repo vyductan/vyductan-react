@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -77,7 +78,7 @@ import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
-import { setFloatingElemPosition } from "../utils/set-floating-elem-position";
+import { setFloatingElemPosition as setFloatingElementPosition } from "../utils/set-floating-elem-position";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
 import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
 
@@ -116,7 +117,7 @@ function TextFormatFloatingToolbar({
   onMath: () => void;
   variant: "default" | "simple";
 }): JSX.Element {
-  const popupCharStylesEditorRef = useRef<HTMLDivElement | null>(null);
+  const popupCharStylesEditorReference = useRef<HTMLDivElement | null>(null);
 
   const insertLink = useCallback(() => {
     if (isLink) {
@@ -130,31 +131,31 @@ function TextFormatFloatingToolbar({
 
   function mouseMoveListener(e: MouseEvent) {
     if (
-      popupCharStylesEditorRef.current &&
+      popupCharStylesEditorReference.current &&
       (e.buttons === 1 || e.buttons === 3) &&
-      popupCharStylesEditorRef.current.style.pointerEvents !== "none"
+      popupCharStylesEditorReference.current.style.pointerEvents !== "none"
     ) {
       const x = e.clientX;
       const y = e.clientY;
       const elementUnderMouse = document.elementFromPoint(x, y);
 
-      if (!popupCharStylesEditorRef.current.contains(elementUnderMouse)) {
+      if (!popupCharStylesEditorReference.current.contains(elementUnderMouse)) {
         // Mouse is not over the target element => not a normal click, but probably a drag
-        popupCharStylesEditorRef.current.style.pointerEvents = "none";
+        popupCharStylesEditorReference.current.style.pointerEvents = "none";
       }
     }
   }
   function mouseUpListener() {
     if (
-      popupCharStylesEditorRef.current &&
-      popupCharStylesEditorRef.current.style.pointerEvents !== "auto"
+      popupCharStylesEditorReference.current &&
+      popupCharStylesEditorReference.current.style.pointerEvents !== "auto"
     ) {
-      popupCharStylesEditorRef.current.style.pointerEvents = "auto";
+      popupCharStylesEditorReference.current.style.pointerEvents = "auto";
     }
   }
 
   useEffect(() => {
-    if (popupCharStylesEditorRef.current) {
+    if (popupCharStylesEditorReference.current) {
       document.addEventListener("mousemove", mouseMoveListener);
       document.addEventListener("mouseup", mouseUpListener);
 
@@ -163,15 +164,15 @@ function TextFormatFloatingToolbar({
         document.removeEventListener("mouseup", mouseUpListener);
       };
     }
-  }, [popupCharStylesEditorRef]);
+  }, [popupCharStylesEditorReference]);
 
   const $updateTextFormatFloatingToolbar = useCallback(() => {
     const selection = $getSelection();
 
-    const popupCharStylesEditorElem = popupCharStylesEditorRef.current;
+    const popupCharStylesEditorElement = popupCharStylesEditorReference.current;
     const nativeSelection = globalThis.getSelection();
 
-    if (popupCharStylesEditorElem === null) {
+    if (popupCharStylesEditorElement === null) {
       return;
     }
 
@@ -184,22 +185,22 @@ function TextFormatFloatingToolbar({
     ) {
       const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
 
-      setFloatingElemPosition(
+      setFloatingElementPosition(
         rangeRect,
-        popupCharStylesEditorElem,
+        popupCharStylesEditorElement,
         anchorElem,
         isLink,
       );
     } else {
       // Hide toolbar when no selection
-      popupCharStylesEditorElem.style.opacity = "0";
-      popupCharStylesEditorElem.style.transform =
+      popupCharStylesEditorElement.style.opacity = "0";
+      popupCharStylesEditorElement.style.transform =
         "translate(-10000px, -10000px)";
     }
   }, [editor, anchorElem, isLink]);
 
   useEffect(() => {
-    const scrollerElem = anchorElem.parentElement;
+    const scrollerElement = anchorElem.parentElement;
 
     const update = () => {
       editor.getEditorState().read(() => {
@@ -208,14 +209,14 @@ function TextFormatFloatingToolbar({
     };
 
     window.addEventListener("resize", update);
-    if (scrollerElem) {
-      scrollerElem.addEventListener("scroll", update);
+    if (scrollerElement) {
+      scrollerElement.addEventListener("scroll", update);
     }
 
     return () => {
       window.removeEventListener("resize", update);
-      if (scrollerElem) {
-        scrollerElem.removeEventListener("scroll", update);
+      if (scrollerElement) {
+        scrollerElement.removeEventListener("scroll", update);
       }
     };
   }, [editor, $updateTextFormatFloatingToolbar, anchorElem]);
@@ -769,7 +770,7 @@ function TextFormatFloatingToolbar({
 
   return (
     <div
-      ref={popupCharStylesEditorRef}
+      ref={popupCharStylesEditorReference}
       className="absolute top-0 left-0 z-50 flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-0.5 rounded-lg border border-gray-200 bg-white/95 px-1 py-1.5 shadow-lg backdrop-blur-sm transition-opacity duration-200 will-change-transform sm:max-w-none sm:gap-0.5 sm:bg-white/95 sm:px-1 sm:py-1.5"
       style={{
         opacity: 0,
@@ -1008,7 +1009,7 @@ function TextFormatFloatingToolbar({
 
 function useFloatingTextFormatToolbar(
   editor: LexicalEditor,
-  anchorElem: HTMLDivElement | null,
+  anchorElement: HTMLDivElement | null,
   setIsLinkEditMode: Dispatch<boolean>,
   variant: "default" | "simple" = "default",
 ): JSX.Element | null {
@@ -1183,14 +1184,14 @@ function useFloatingTextFormatToolbar(
     );
   }, [editor, updatePopup]);
 
-  if (!isText || !anchorElem) {
+  if (!isText || !anchorElement) {
     return null;
   }
 
   return createPortal(
     <TextFormatFloatingToolbar
       editor={editor}
-      anchorElem={anchorElem}
+      anchorElem={anchorElement}
       isLink={isLink}
       isBold={isBold}
       isItalic={isItalic}
@@ -1206,7 +1207,7 @@ function useFloatingTextFormatToolbar(
       onMath={handleMath}
       variant={variant}
     />,
-    anchorElem,
+    anchorElement,
   );
 }
 

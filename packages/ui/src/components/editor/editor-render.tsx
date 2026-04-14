@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import { Suspense, use } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -11,18 +12,18 @@ import {
   resolveServerHtmlEditorRenderContent,
 } from "./render/resolve-editor-render-content";
 
-type EditorRenderProps = {
+type EditorRenderProperties = {
   className?: string;
   format?: EditorRenderInputFormat;
   value: string | LexicalEditorContent;
 };
 
-type EditorRenderResolvedProps = {
+type EditorRenderResolvedProperties = {
   className?: string;
   value: LexicalEditorContent | string | null;
 };
 
-function EditorRenderResolved({ className, value }: EditorRenderResolvedProps) {
+function EditorRenderResolved({ className, value }: EditorRenderResolvedProperties) {
   const content = value ? normalizeEditorContent(value) : null;
 
   if (!content) {
@@ -36,7 +37,7 @@ function EditorRenderResolved({ className, value }: EditorRenderResolvedProps) {
   );
 }
 
-type EditorRenderServerHtmlProps = {
+type EditorRenderServerHtmlProperties = {
   className?: string;
   value: string;
 };
@@ -44,7 +45,7 @@ type EditorRenderServerHtmlProps = {
 function EditorRenderServerHtml({
   className,
   value,
-}: EditorRenderServerHtmlProps) {
+}: EditorRenderServerHtmlProperties) {
   const content = use(resolveServerHtmlEditorRenderContent(value));
 
   return <EditorRenderResolved className={className} value={content} />;
@@ -54,14 +55,14 @@ export function EditorRender({
   className,
   format = "json",
   value,
-}: EditorRenderProps) {
+}: EditorRenderProperties) {
   if (
     format === "html" &&
     typeof value === "string" &&
     typeof DOMParser !== "function"
   ) {
     return (
-      <Suspense fallback={null}>
+      <Suspense>
         <EditorRenderServerHtml className={className} value={value} />
       </Suspense>
     );
@@ -75,4 +76,4 @@ export function EditorRender({
   );
 }
 
-export type { EditorRenderProps };
+export type { EditorRenderProperties as EditorRenderProps };

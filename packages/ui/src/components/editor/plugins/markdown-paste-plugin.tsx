@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 "use client";
 
 import type { ListNode } from "@lexical/list";
@@ -152,19 +153,19 @@ export function MarkdownPastePlugin(): null {
             currentSelection.removeText();
           }
 
-          const tempParagraph = $createParagraphNode();
+          const temporaryParagraph = $createParagraphNode();
           const root = $getRoot();
 
-          root.append(tempParagraph);
+          root.append(temporaryParagraph);
 
           $convertFromMarkdownString(
             normalizedText,
             MARKDOWN_TRANSFORMERS,
-            tempParagraph,
+            temporaryParagraph,
           );
 
-          const children = tempParagraph.getChildren();
-          tempParagraph.remove();
+          const children = temporaryParagraph.getChildren();
+          temporaryParagraph.remove();
 
           collapseMarkdownListWrappers(children);
 

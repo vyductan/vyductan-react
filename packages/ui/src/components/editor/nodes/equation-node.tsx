@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -131,9 +132,9 @@ export class EquationNode extends DecoratorNode<JSX.Element> {
     };
   }
 
-  updateDOM(prevNode: EquationNode): boolean {
+  updateDOM(previousNode: EquationNode): boolean {
     // If the inline property changes, replace the element
-    return this.__inline !== prevNode.__inline;
+    return this.__inline !== previousNode.__inline;
   }
 
   getTextContent(): string {

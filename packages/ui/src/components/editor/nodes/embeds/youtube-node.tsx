@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -21,7 +22,7 @@ import type { JSX } from "react";
 import { BlockWithAlignableContents } from "@lexical/react/LexicalBlockWithAlignableContents";
 import { DecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";
 
-type YouTubeComponentProps = Readonly<{
+type YouTubeComponentProperties = Readonly<{
   className: Readonly<{
     base: string;
     focus: string;
@@ -36,7 +37,7 @@ function YouTubeComponent({
   format,
   nodeKey,
   videoID,
-}: YouTubeComponentProps) {
+}: YouTubeComponentProperties) {
   return (
     <BlockWithAlignableContents
       className={className}

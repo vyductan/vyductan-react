@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import "@testing-library/jest-dom/vitest";
 
 import { createElement } from "react";
@@ -10,6 +11,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { editorRenderSourceFixtures } from "../render/render-fixtures";
 import PlaygroundDemo from "./playground";
 
 vi.mock("../editor", async () => {
@@ -90,7 +92,7 @@ afterEach(() => {
 });
 
 describe("PlaygroundDemo", () => {
-  test("switches formats and remounts the editor when a preset is applied", async () => {
+  test("uses table content as the default preset for json, markdown, and html", async () => {
     render(createElement(PlaygroundDemo));
 
     expect(screen.getByRole("button", { name: "JSON" })).toHaveAttribute(
@@ -102,9 +104,32 @@ describe("PlaygroundDemo", () => {
     ).toBeInTheDocument();
 
     const jsonEditor = screen.getByRole("textbox", { name: /json editor/i });
-    expect((jsonEditor as HTMLTextAreaElement).value).toMatch(
-      /welcome to the editor playground/i,
-    );
+    expect((jsonEditor as HTMLTextAreaElement).value).toContain("table");
+    expect((jsonEditor as HTMLTextAreaElement).value).toContain("Header A");
+
+    fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
+
+    expect(
+      screen.getByRole("heading", { name: /markdown output/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /markdown editor/i }),
+    ).toHaveValue(editorRenderSourceFixtures.table.markdown);
+
+    fireEvent.click(screen.getByRole("button", { name: "HTML" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("textbox", { name: /html editor/i })).toHaveValue(
+        editorRenderSourceFixtures.table.html,
+      );
+      expect(screen.getByLabelText(/serialized output/i)).toHaveTextContent(
+        "<table>",
+      );
+    });
+  });
+
+  test("switches formats and remounts the editor when a preset is applied", async () => {
+    render(createElement(PlaygroundDemo));
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -126,17 +151,6 @@ describe("PlaygroundDemo", () => {
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Markdown" }));
-
-    expect(
-      screen.getByRole("heading", { name: /markdown output/i }),
-    ).toBeInTheDocument();
-    expect(
-      (
-        screen.getByRole("textbox", {
-          name: /markdown editor/i,
-        }) as HTMLTextAreaElement
-      ).value,
-    ).toMatch(/# notes/i);
 
     fireEvent.click(
       screen.getByRole("button", {
@@ -161,7 +175,7 @@ describe("PlaygroundDemo", () => {
   test("keeps the same editor instance while typing and remounts only for preset changes", async () => {
     render(createElement(PlaygroundDemo));
 
-    const initialEditorProps = JSON.parse(
+    const initialEditorProperties = JSON.parse(
       screen.getByTestId("editor-props").textContent ?? "{}",
     ) as { instanceId: number };
 
@@ -208,7 +222,7 @@ describe("PlaygroundDemo", () => {
         /drafting without remounting the editor/i,
       );
       expect(screen.getByTestId("editor-props")).toHaveTextContent(
-        `"instanceId":${initialEditorProps.instanceId}`,
+        `"instanceId":${initialEditorProperties.instanceId}`,
       );
     });
 
@@ -223,7 +237,7 @@ describe("PlaygroundDemo", () => {
         /release checklist/i,
       );
       expect(screen.getByTestId("editor-props")).not.toHaveTextContent(
-        `"instanceId":${initialEditorProps.instanceId}`,
+        `"instanceId":${initialEditorProperties.instanceId}`,
       );
     });
   });

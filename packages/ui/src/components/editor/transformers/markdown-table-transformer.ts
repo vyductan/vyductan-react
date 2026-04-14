@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
@@ -97,7 +98,7 @@ export const TABLE: ElementTransformer = {
 
     const matchCells = mapToTableCells(match[0]!);
 
-    if (matchCells == null) {
+    if (matchCells == undefined) {
       return;
     }
 
@@ -122,7 +123,7 @@ export const TABLE: ElementTransformer = {
 
       const cells = mapToTableCells(firstChild.getTextContent());
 
-      if (cells == null) {
+      if (cells == undefined) {
         break;
       }
 
@@ -139,8 +140,8 @@ export const TABLE: ElementTransformer = {
       const tableRow = $createTableRowNode();
       table.append(tableRow);
 
-      for (let i = 0; i < maxCells; i++) {
-        tableRow.append(i < cells.length ? cells[i]! : $createTableCell(""));
+      for (let index = 0; index < maxCells; index++) {
+        tableRow.append(index < cells.length ? cells[index]! : $createTableCell(""));
       }
     }
 

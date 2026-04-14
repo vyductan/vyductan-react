@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -36,21 +37,21 @@ const ACCEPTABLE_IMAGE_TYPES = [
   "image/webp",
 ];
 
-interface DragDropPastePluginProps {
+interface DragDropPastePluginProperties {
   onImageUpload?: (file: File) => Promise<string>;
 }
 
 export function DragDropPastePlugin({
   onImageUpload,
   anchorElem,
-}: DragDropPastePluginProps & {
+}: DragDropPastePluginProperties & {
   anchorElem?: HTMLElement;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const resolveImage = useImageResolver();
-  const targetLineRef = useRef<HTMLDivElement>(null);
-  const targetBlockRef = useRef<HTMLDivElement>(null);
-  const targetNodeKeyRef = useRef<string | null>(null);
+  const targetLineReference = useRef<HTMLDivElement>(null);
+  const targetBlockReference = useRef<HTMLDivElement>(null);
+  const targetNodeKeyReference = useRef<string | null>(null);
 
   useEffect(() => {
     const handleFiles = async (files: File[]) => {
@@ -62,26 +63,26 @@ export function DragDropPastePlugin({
             const reader = new FileReader();
             reader.addEventListener("load", () => {
               if (typeof reader.result === "string") {
-                const src = reader.result;
+                const source = reader.result;
 
                 // 2. Insert image with loading state
-                const nodeRef: { current: null | string } = { current: null };
+                const nodeReference: { current: null | string } = { current: null };
                 editor.update(() => {
                   // Get the target node from the ref
-                  const targetKey = targetNodeKeyRef.current;
+                  const targetKey = targetNodeKeyReference.current;
                   if (targetKey) {
                     const targetNode = $getNodeByKey(targetKey);
                     if (targetNode) {
                       // Create image node directly without inserting it
                       const imageNode = $createImageNode({
                         altText: file.name,
-                        src,
+                        src: source,
                         loading: true,
                       });
 
                       // Insert after the target node
                       targetNode.insertAfter(imageNode);
-                      nodeRef.current = imageNode.getKey();
+                      nodeReference.current = imageNode.getKey();
                       return;
                     }
                   }
@@ -89,18 +90,18 @@ export function DragDropPastePlugin({
                   // Fallback to default insertion
                   const node = $insertImageNode({
                     altText: file.name,
-                    src,
+                    src: source,
                     loading: true,
                   });
                   if (node) {
-                    nodeRef.current = node.getKey();
+                    nodeReference.current = node.getKey();
                   }
                 });
 
                 // Clear the target ref after insertion
-                targetNodeKeyRef.current = null;
+                targetNodeKeyReference.current = null;
 
-                const imageKey = nodeRef.current;
+                const imageKey = nodeReference.current;
                 if (imageKey) {
                   const key = imageKey;
                   void (async () => {
@@ -233,7 +234,7 @@ export function DragDropPastePlugin({
       const target = event.target as Node | null;
       if (!target) return;
 
-      const targetLine = targetLineRef.current;
+      const targetLine = targetLineReference.current;
       if (targetLine) {
         editor.read(() => {
           // Find the nearest block from the event target
@@ -246,7 +247,7 @@ export function DragDropPastePlugin({
               const anchorRect = anchorElem.getBoundingClientRect();
 
               // Store the target node key for insertion
-              targetNodeKeyRef.current = node.getKey();
+              targetNodeKeyReference.current = node.getKey();
 
               // Position the line relative to the anchor element (container)
               targetLine.style.top = `${rect.bottom - anchorRect.top}px`;
@@ -266,16 +267,16 @@ export function DragDropPastePlugin({
         return;
       }
 
-      if (targetLineRef.current) {
-        targetLineRef.current.style.opacity = "0";
+      if (targetLineReference.current) {
+        targetLineReference.current.style.opacity = "0";
       }
-      targetNodeKeyRef.current = null;
+      targetNodeKeyReference.current = null;
     };
 
     const handleDrop = (event: DragEvent) => {
       event.preventDefault();
-      if (targetLineRef.current) {
-        targetLineRef.current.style.opacity = "0";
+      if (targetLineReference.current) {
+        targetLineReference.current.style.opacity = "0";
       }
       // Note: targetNodeKeyRef is cleared in handleFiles after insertion
       // Actual file handling is done by DRAG_DROP_PASTE command triggered by Lexical
@@ -295,12 +296,12 @@ export function DragDropPastePlugin({
   return (
     <>
       <div
-        ref={targetBlockRef}
+        ref={targetBlockReference}
         className="bg-primary/10 pointer-events-none absolute top-0 left-0 rounded transition-opacity duration-200"
         style={{ opacity: 0, zIndex: 90 }}
       />
       <div
-        ref={targetLineRef}
+        ref={targetLineReference}
         className="bg-primary pointer-events-none absolute top-0 left-0 h-1 rounded transition-opacity duration-200"
         style={{ opacity: 0, zIndex: 100 }}
       />

@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 "use client";
 
 import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
@@ -6,7 +7,7 @@ import { useEffect, useState } from "react";
 
 // Client-only wrapper for Excalidraw to prevent SSR issues
 function ClientOnlyExcalidraw(
-  props: ExcalidrawProps & { fallback?: React.ReactNode },
+  properties: ExcalidrawProps & { fallback?: React.ReactNode },
 ) {
   const [ExcalidrawComponent, setExcalidrawComponent] =
     useState<ComponentType<ExcalidrawProps> | null>(null);
@@ -16,8 +17,8 @@ function ClientOnlyExcalidraw(
     setIsMounted(true);
     // Only import Excalidraw on the client side (useEffect only runs on client)
     import("@excalidraw/excalidraw")
-      .then((mod) => {
-        setExcalidrawComponent(() => mod.Excalidraw);
+      .then((module_) => {
+        setExcalidrawComponent(() => module_.Excalidraw);
       })
       .catch((error) => {
         console.error("Failed to load Excalidraw:", error);
@@ -25,14 +26,14 @@ function ClientOnlyExcalidraw(
   }, []);
 
   if (!isMounted || !ExcalidrawComponent) {
-    return (props.fallback ?? (
+    return (properties.fallback ?? (
       <div className="flex h-full w-full items-center justify-center">
         Loading...
       </div>
     )) as React.ReactElement;
   }
 
-  return <ExcalidrawComponent {...props} />;
+  return <ExcalidrawComponent {...properties} />;
 }
 
 export { ClientOnlyExcalidraw as Excalidraw };

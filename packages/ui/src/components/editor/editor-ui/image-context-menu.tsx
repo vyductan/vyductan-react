@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 
@@ -30,14 +31,14 @@ export function ImageContextMenu({
   onDelete,
   onClose,
 }: ImageContextMenuProps): JSX.Element | null {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuReference = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
   useEffect(() => {
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      if (menuReference.current && !menuReference.current.contains(event.target as Node)) {
         onClose();
       }
     };
@@ -107,7 +108,7 @@ export function ImageContextMenu({
 
   return (
     <div
-      ref={menuRef}
+      ref={menuReference}
       className="fixed z-50 min-w-[220px] rounded-lg border border-gray-200 bg-white shadow-lg"
       style={{
         top: `${position.y}px`,
