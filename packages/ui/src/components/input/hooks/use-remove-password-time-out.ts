@@ -3,21 +3,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 
-import type { InputRef } from "../types";
+import type { InputRef as InputReference } from "../types";
 
 export default function useRemovePasswordTimeout(
-  inputRef: React.RefObject<InputRef | null>,
+  inputReference: React.RefObject<InputReference | null>,
   triggerOnMount?: boolean,
 ) {
-  const removePasswordTimeoutRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const removePasswordTimeoutReference = useRef<
+    ReturnType<typeof setTimeout>[]
+  >([]);
   const removePasswordTimeout = () => {
-    removePasswordTimeoutRef.current.push(
+    removePasswordTimeoutReference.current.push(
       setTimeout(() => {
         if (
-          inputRef.current?.input?.getAttribute("type") === "password" &&
-          inputRef.current.input.hasAttribute("value")
+          inputReference.current?.input?.getAttribute("type") === "password" &&
+          inputReference.current.input.hasAttribute("value")
         ) {
-          inputRef.current.input.removeAttribute("value");
+          inputReference.current.input.removeAttribute("value");
         }
       }),
     );
@@ -29,7 +31,7 @@ export default function useRemovePasswordTimeout(
     }
 
     return () =>
-      removePasswordTimeoutRef.current.forEach((timer) => {
+      removePasswordTimeoutReference.current.forEach((timer) => {
         if (timer) {
           clearTimeout(timer);
         }

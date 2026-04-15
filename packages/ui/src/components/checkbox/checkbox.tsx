@@ -236,7 +236,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           ) : (
             <span
               data-slot="checkbox-label"
-              className={cn("px-2 leading-none", classNames?.label)}
+              className={cn("mt-px px-2 leading-none", classNames?.label)}
             >
               {children}
             </span>

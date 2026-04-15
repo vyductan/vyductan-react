@@ -2,16 +2,16 @@
 
 import React from "react";
 
-import type { InputProps } from ".";
-import type { InputRef } from "./types";
+import type { InputProps as InputProperties } from ".";
+import type { InputRef as InputReference } from "./types";
 import { Icon } from "../../icons";
 import { Input } from "./input";
 
-export type InputPasswordProps = Omit<InputProps, "type">;
+export type InputPasswordProps = Omit<InputProperties, "type">;
 export const InputPassword = ({
   ref,
-  ...props
-}: InputPasswordProps & { ref?: React.Ref<InputRef> }) => {
+  ...properties
+}: InputPasswordProps & { ref?: React.Ref<InputReference> }) => {
   const [type, setType] = React.useState("password");
   const toggle = () => setType(type === "password" ? "text" : "password");
 
@@ -31,7 +31,7 @@ export const InputPassword = ({
           )}
         </span>
       }
-      {...props}
+      {...properties}
     />
   );
 };

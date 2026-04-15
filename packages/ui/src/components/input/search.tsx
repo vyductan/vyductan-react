@@ -2,12 +2,12 @@
 
 import type React from "react";
 
-import type { InputProps } from ".";
-import type { InputRef } from "./types";
+import type { InputProps as InputProperties } from ".";
+import type { InputRef as InputReference } from "./types";
 import { Icon } from "../../icons";
 import { Input } from "./input";
 
-export type InputSearchProps = Omit<InputProps, "type"> & {
+export type InputSearchProps = Omit<InputProperties, "type"> & {
   onSearch?: (value: string) => void;
   enterButton?: boolean;
 };
@@ -16,11 +16,11 @@ export const InputSearch = ({
   onSearch,
   onPressEnter,
   ref,
-  ...props
-}: InputSearchProps & { ref?: React.Ref<InputRef> }) => {
+  ...properties
+}: InputSearchProps & { ref?: React.Ref<InputReference> }) => {
   const handleSearch = (currentValue?: string) => {
     if (!onSearch) return;
-    const value = (props.value ?? props.defaultValue ?? "") as string;
+    const value = (properties.value ?? properties.defaultValue ?? "") as string;
     onSearch(currentValue ?? value);
   };
 
@@ -37,7 +37,7 @@ export const InputSearch = ({
           <Icon icon="icon-[ant-design--search-outlined]" />
         </span>
       }
-      {...props}
+      {...properties}
     />
   );
 };

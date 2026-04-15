@@ -44,40 +44,40 @@ export const Default: Story = {
 };
 
 export const Variants: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
-      <Input {...args} variant="outlined" placeholder="Outlined" />
-      <Input {...args} variant="filled" placeholder="Filled" />
-      <Input {...args} variant="borderless" placeholder="Borderless" />
+      <Input {...arguments_} variant="outlined" placeholder="Outlined" />
+      <Input {...arguments_} variant="filled" placeholder="Filled" />
+      <Input {...arguments_} variant="borderless" placeholder="Borderless" />
     </div>
   ),
 };
 
 export const Sizes: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
-      <Input {...args} size="small" placeholder="Small Input" />
-      <Input {...args} size="middle" placeholder="Middle Input" />
-      <Input {...args} size="large" placeholder="Large Input" />
+      <Input {...arguments_} size="small" placeholder="Small Input" />
+      <Input {...arguments_} size="middle" placeholder="Middle Input" />
+      <Input {...arguments_} size="large" placeholder="Large Input" />
     </div>
   ),
 };
 
 export const WithIcons: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
       <Input
-        {...args}
+        {...arguments_}
         prefix={<User className="size-4" />}
         placeholder="Username"
       />
       <Input
-        {...args}
+        {...arguments_}
         suffix={<Search className="size-4" />}
         placeholder="Search..."
       />
       <Input
-        {...args}
+        {...arguments_}
         prefix={<Mail className="size-4" />}
         suffix={<Lock className="size-4" />}
         placeholder="Email"
@@ -87,26 +87,26 @@ export const WithIcons: Story = {
 };
 
 export const Status: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
-      <Input {...args} status="error" placeholder="Error Status" />
-      <Input {...args} status="warning" placeholder="Warning Status" />
+      <Input {...arguments_} status="error" placeholder="Error Status" />
+      <Input {...arguments_} status="warning" placeholder="Warning Status" />
     </div>
   ),
 };
 
 export const WithError: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
-      <Input {...args} aria-invalid placeholder="Outlined Error" />
+      <Input {...arguments_} aria-invalid placeholder="Outlined Error" />
       <Input
-        {...args}
+        {...arguments_}
         aria-invalid
         variant="filled"
         placeholder="Filled Error"
       />
       <Input
-        {...args}
+        {...arguments_}
         aria-invalid
         variant="borderless"
         placeholder="Borderless Error"
@@ -116,10 +116,20 @@ export const WithError: Story = {
 };
 
 export const WithCount: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
-      <Input {...args} showCount maxLength={20} placeholder="With Count" />
-      <Input {...args} showCount maxLength={100} placeholder="Max Length 100" />
+      <Input
+        {...arguments_}
+        showCount
+        maxLength={20}
+        placeholder="With Count"
+      />
+      <Input
+        {...arguments_}
+        showCount
+        maxLength={100}
+        placeholder="Max Length 100"
+      />
     </div>
   ),
 };

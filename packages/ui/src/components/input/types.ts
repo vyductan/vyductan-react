@@ -82,7 +82,7 @@ export type BaseInputProps = CommonInputProps & {
   children: ReactElement;
 };
 
-export type ShowCountFormatter = (args: {
+export type ShowCountFormatter = (arguments_: {
   value: string;
   count: number;
   maxLength?: number;
@@ -114,7 +114,7 @@ export interface InputRef {
   nativeElement: HTMLElement | null;
 
   // extends react-hook-form
-  setCustomValidity: (msg: string) => void;
+  setCustomValidity: (message: string) => void;
   reportValidity: () => boolean | undefined;
 }
 

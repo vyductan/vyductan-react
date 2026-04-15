@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { test } from "vitest";
 
-import type { InputProps } from ".";
+import type { InputProps as InputProperties } from ".";
 import { Input } from ".";
 
 test("Input type number keeps DOM input onChange contract", () => {
@@ -29,10 +29,10 @@ test("Input does not accept type time", () => {
 });
 
 test("Input props type does not allow type time", () => {
-  const props: InputProps = {
+  const properties: InputProperties = {
     // @ts-expect-error public InputProps should reject type=time
     type: "time",
   };
 
-  void props;
+  void properties;
 });

@@ -33,14 +33,14 @@ export default function StepHandler({
   onStep,
 }: StepHandlerProps) {
   // ======================== Step ========================
-  const stepTimeoutRef = React.useRef<any>(null);
+  const stepTimeoutReference = React.useRef<any>(null);
   const frameIds = React.useRef<number[]>([]);
 
-  const onStepRef = React.useRef<StepHandlerProps["onStep"]>(null);
-  onStepRef.current = onStep;
+  const onStepReference = React.useRef<StepHandlerProps["onStep"]>(null);
+  onStepReference.current = onStep;
 
   const onStopStep = () => {
-    clearTimeout(stepTimeoutRef.current);
+    clearTimeout(stepTimeoutReference.current);
   };
 
   // We will interval update step when hold mouse down
@@ -48,17 +48,17 @@ export default function StepHandler({
     e.preventDefault();
     onStopStep();
 
-    onStepRef.current?.(up, "handler");
+    onStepReference.current?.(up, "handler");
 
     // Loop step for interval
     function loopStep() {
-      onStepRef.current?.(up, "handler");
+      onStepReference.current?.(up, "handler");
 
-      stepTimeoutRef.current = setTimeout(loopStep, STEP_INTERVAL);
+      stepTimeoutReference.current = setTimeout(loopStep, STEP_INTERVAL);
     }
 
     // First time press will wait some time to trigger loop step update
-    stepTimeoutRef.current = setTimeout(loopStep, STEP_DELAY);
+    stepTimeoutReference.current = setTimeout(loopStep, STEP_DELAY);
   };
 
   React.useEffect(
@@ -72,7 +72,7 @@ export default function StepHandler({
   // ======================= Render =======================
   const isMobile = useMobile();
   if (isMobile) {
-    return null;
+    return;
   }
 
   // fix: https://github.com/ant-design/ant-design/issues/43088
@@ -82,7 +82,7 @@ export default function StepHandler({
   // So, we need to use requestAnimationFrame to ensure that the onmouseup event is executed after the onmousedown event.
   const safeOnStopStep = () => frameIds.current.push(raf(onStopStep));
 
-  const sharedHandlerProps = {
+  const sharedHandlerProperties = {
     unselectable: "on" as const,
     role: "button",
     onMouseUp: safeOnStopStep,
@@ -97,7 +97,7 @@ export default function StepHandler({
       )}
     >
       <span
-        {...sharedHandlerProps}
+        {...sharedHandlerProperties}
         onMouseDown={(e) => {
           onStepMouseDown(e, true);
         }}
@@ -113,7 +113,7 @@ export default function StepHandler({
         )}
       </span>
       <span
-        {...sharedHandlerProps}
+        {...sharedHandlerProperties}
         onMouseDown={(e) => {
           onStepMouseDown(e, false);
         }}

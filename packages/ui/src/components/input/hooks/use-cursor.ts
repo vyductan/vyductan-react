@@ -10,7 +10,7 @@ export default function useCursor(
   input: HTMLInputElement | null,
   focused: boolean,
 ): [() => void, () => void] {
-  const selectionRef = useRef<{
+  const selectionReference = useRef<{
     start: number | null;
     end: number | null;
     value?: string;
@@ -23,10 +23,10 @@ export default function useCursor(
     try {
       if (input) {
         const { selectionStart: start, selectionEnd: end, value } = input;
-        const beforeTxt = value.substring(0, start!);
-        const afterTxt = value.substring(end!);
+        const beforeTxt = value.slice(0, Math.max(0, start!));
+        const afterTxt = value.slice(Math.max(0, end!));
 
-        selectionRef.current = {
+        selectionReference.current = {
           start,
           end,
           value,
@@ -47,17 +47,17 @@ export default function useCursor(
    *  2. start string same
    */
   function restoreCursor() {
-    if (input && selectionRef.current && focused) {
+    if (input && selectionReference.current && focused) {
       try {
         const { value } = input;
-        const { beforeTxt, afterTxt, start } = selectionRef.current;
+        const { beforeTxt, afterTxt, start } = selectionReference.current;
 
         let startPos = value.length;
 
         if (value.startsWith(beforeTxt!)) {
           startPos = beforeTxt!.length;
         } else if (value.endsWith(afterTxt!)) {
-          startPos = value.length - selectionRef.current.afterTxt!.length;
+          startPos = value.length - selectionReference.current.afterTxt!.length;
         } else if (beforeTxt && start) {
           const beforeLastChar = beforeTxt[start - 1];
           const newIndex = value.indexOf(beforeLastChar!, start - 1);

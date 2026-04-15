@@ -6,6 +6,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import { Checkbox } from "./checkbox";
+import { Checkbox as PublicCheckbox } from "./index";
 import CardComposableExample from "./examples/card-composable";
 
 globalThis.React = React;
@@ -84,7 +85,7 @@ describe("Checkbox", () => {
     ).toBeInTheDocument();
   });
 
-  test("card variant applies the same checked visual defaults as the composable example", () => {
+  test("card variant applies the current checked visual defaults", () => {
     renderCheckbox(
       {
         variant: "card",
@@ -107,28 +108,48 @@ describe("Checkbox", () => {
     expect(wrapper).toHaveClass(
       "items-start",
       "gap-2",
-      "rounded-lg",
+      "rounded-md",
       "border",
-      "p-3",
       "hover:bg-accent/50",
-      "has-[[aria-checked=true]]:border-blue-600",
-      "has-[[aria-checked=true]]:bg-blue-50",
-      "dark:has-[[aria-checked=true]]:border-blue-900",
-      "dark:has-[[aria-checked=true]]:bg-blue-950",
+      "h-auto",
+      "min-h-8",
+      "px-3",
+      "py-2",
+      "has-aria-checked:border-primary-600",
+      "has-aria-checked:bg-primary-50",
+      "dark:has-aria-checked:border-primary-900",
+      "dark:has-aria-checked:bg-primary-950",
     );
     expect(checkbox).toHaveClass(
-      "data-[state=checked]:border-blue-600",
-      "data-[state=checked]:bg-blue-600",
+      "data-[state=checked]:border-primary-600",
+      "data-[state=checked]:bg-primary-600",
       "data-[state=checked]:text-white",
-      "dark:data-[state=checked]:border-blue-700",
-      "dark:data-[state=checked]:bg-blue-700",
+      "dark:data-[state=checked]:border-primary-700",
+      "dark:data-[state=checked]:bg-primary-700",
+      "self-start",
     );
-    expect(checkbox).not.toHaveClass("self-center");
+    expect(labelContent).toHaveClass("mt-px", "w-full");
     expect(labelContent).not.toHaveClass("px-2");
   });
 
-  test("composable card example exposes accessible names for both checkbox rows", () => {
-    render(<CardComposableExample />);
+  test("public Checkbox without children does not wrap an extra label", () => {
+    const { container } = render(
+      <label>
+        <PublicCheckbox defaultChecked />
+        <span>Auto Start</span>
+      </label>,
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: /Auto Start/i,
+      }),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll("label label")).toHaveLength(0);
+  });
+
+  test("composable card example avoids nested label wrappers while preserving accessible names", () => {
+    const { container } = render(<CardComposableExample />);
 
     expect(
       screen.getByRole("checkbox", {
@@ -140,5 +161,6 @@ describe("Checkbox", () => {
         name: /Auto update Download and install new version/i,
       }),
     ).toBeInTheDocument();
+    expect(container.querySelectorAll("label label")).toHaveLength(0);
   });
 });

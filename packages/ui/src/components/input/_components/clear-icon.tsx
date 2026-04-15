@@ -4,7 +4,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import { Icon } from "../../../icons";
 
-interface ClearIconProps {
+interface ClearIconProperties {
   visible?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
@@ -15,8 +15,8 @@ export const ClearIcon = ({
   onClick,
   className,
   ref,
-}: ClearIconProps & { ref?: React.Ref<HTMLButtonElement> }) => {
-  if (!visible) return null;
+}: ClearIconProperties & { ref?: React.Ref<HTMLButtonElement> }) => {
+  if (!visible) return;
 
   return (
     <button

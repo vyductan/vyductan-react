@@ -9,18 +9,18 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";
-import type { HolderRef } from "./_components/base-input";
+import type { HolderRef as HolderReference } from "./_components/base-input";
 import type {
   ChangeEventInfo,
-  CommonInputProps,
+  CommonInputProps as CommonInputProperties,
   CountConfig,
-  InputRef,
+  InputRef as InputReference,
   InputValueType,
   ShowCountFormatter,
 } from "./types";
 import type { InputFocusOptions } from "./utils/common-utils";
 import type { InputStatus } from "./variants";
-import { devUseWarning } from "../_util/warning";
+import { devUseWarning as developmentUseWarning } from "../_util/warning";
 import { useComponentConfig } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
 import useSize from "../config-provider/hooks/use-size";
@@ -33,12 +33,12 @@ import { inputSizeVariants, inputVariants } from "./variants";
 
 type SemanticName = "prefix" | "suffix" | "input" | "count";
 
-type InputProps = Omit<
+type InputProperties = Omit<
   React.ComponentProps<"input">,
   "ref" | "size" | "prefix" | "value"
 > &
-  CommonInputProps & {
-    ref?: React.Ref<InputRef | HTMLInputElement | null>;
+  CommonInputProperties & {
+    ref?: React.Ref<InputReference | HTMLInputElement | null>;
 
     onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
     classNames?: Partial<Record<SemanticName, string>>;
@@ -65,7 +65,7 @@ type InputProps = Omit<
     onClear?: () => void;
   };
 
-const Input = (props: InputProps) => {
+const Input = (properties: InputProperties) => {
   const {
     ref,
 
@@ -95,11 +95,11 @@ const Input = (props: InputProps) => {
     onCompositionStart,
     onCompositionEnd,
     ...rest
-  } = props;
+  } = properties;
 
   if (process.env.NODE_ENV !== "production") {
-    const { deprecated } = devUseWarning("Input");
-    deprecated(!("bordered" in props), "bordered", "variant");
+    const { deprecated } = developmentUseWarning("Input");
+    deprecated(!("bordered" in properties), "bordered", "variant");
   }
 
   const {
@@ -118,21 +118,21 @@ const Input = (props: InputProps) => {
   /// RC
 
   const [focused, setFocused] = useState<boolean>(false);
-  const compositionRef = useRef(false);
-  const keyLockRef = useRef(false);
+  const compositionReference = useRef(false);
+  const keyLockReference = useRef(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const holderRef = useRef<HolderRef>(null);
+  const inputReference = useRef<HTMLInputElement>(null);
+  const holderReference = useRef<HolderReference>(null);
 
   const focus = (option?: InputFocusOptions) => {
-    if (inputRef.current) {
-      triggerFocus(inputRef.current, option);
+    if (inputReference.current) {
+      triggerFocus(inputReference.current, option);
     }
   };
 
   // ====================== Value =======================
-  const [value, setValue] = useMergedState(props.defaultValue, {
-    value: props.value,
+  const [value, setValue] = useMergedState(properties.defaultValue, {
+    value: properties.value,
   });
   const formatValue =
     value === undefined || value === null ? "" : String(value);
@@ -141,7 +141,7 @@ const Input = (props: InputProps) => {
   const { compactSize } = useCompactItemContext(direction);
 
   // ===================== Size =====================
-  const mergedSize = useSize((ctx) => customSize ?? compactSize ?? ctx);
+  const mergedSize = useSize((context) => customSize ?? compactSize ?? context);
 
   // ===================== Disabled =====================
   const disabledFromContext = React.useContext(DisabledContext);
@@ -150,7 +150,7 @@ const Input = (props: InputProps) => {
   // =================== Select Range ===================
   const [selection, setSelection] = useState<
     [start: number, end: number] | null
-  >(null);
+  >();
 
   // ====================== Count =======================
   const countConfig = useCount(count, showCount);
@@ -161,33 +161,35 @@ const Input = (props: InputProps) => {
 
   // ======================= Ref ========================
   useImperativeHandle<
-    InputRef | HTMLInputElement | null,
-    InputRef | HTMLInputElement | null
+    InputReference | HTMLInputElement | null,
+    InputReference | HTMLInputElement | null
   >(ref, () =>
-    inputRef.current
+    inputReference.current
       ? {
-          ...inputRef.current,
+          ...inputReference.current,
           focus,
           blur: () => {
-            inputRef.current?.blur();
+            inputReference.current?.blur();
           },
           setSelectionRange: (
             start: number,
             end: number,
             direction?: "forward" | "backward" | "none",
           ) => {
-            inputRef.current?.setSelectionRange(start, end, direction);
+            inputReference.current?.setSelectionRange(start, end, direction);
           },
           select: () => {
-            inputRef.current?.select();
+            inputReference.current?.select();
           },
-          setCustomValidity: (msg) =>
-            inputRef.current?.setCustomValidity?.(msg),
-          reportValidity: () => inputRef.current?.reportValidity?.(),
-          input: inputRef.current,
-          nativeElement: holderRef.current?.nativeElement ?? inputRef.current,
+          setCustomValidity: (message) =>
+            inputReference.current?.setCustomValidity?.(message),
+          reportValidity: () => inputReference.current?.reportValidity?.(),
+          input: inputReference.current,
+          nativeElement:
+            holderReference.current?.nativeElement ?? inputReference.current,
         }
-      : null,
+      :  
+        null,
   );
   // useImperativeHandle(ref, () =>
   //   typeof ref === "object" && ref?.current && "current" in ref.current
@@ -216,11 +218,11 @@ const Input = (props: InputProps) => {
   // );
 
   useEffect(() => {
-    if (keyLockRef.current) {
-      keyLockRef.current = false;
+    if (keyLockReference.current) {
+      keyLockReference.current = false;
     }
-    if (disabledFromContext && focused && inputRef.current) {
-      inputRef.current.blur();
+    if (disabledFromContext && focused && inputReference.current) {
+      inputReference.current.blur();
     }
   }, [disabledFromContext, focused]);
 
@@ -234,7 +236,7 @@ const Input = (props: InputProps) => {
     let cutValue = currentValue;
 
     if (
-      !compositionRef.current &&
+      !compositionReference.current &&
       countConfig.exceedFormatter &&
       countConfig.max &&
       countConfig.strategy(currentValue) > countConfig.max
@@ -245,8 +247,8 @@ const Input = (props: InputProps) => {
 
       if (currentValue !== cutValue) {
         setSelection([
-          inputRef.current?.selectionStart || 0,
-          inputRef.current?.selectionEnd || 0,
+          inputReference.current?.selectionStart || 0,
+          inputReference.current?.selectionEnd || 0,
         ]);
       }
     } else if (info.source === "compositionEnd") {
@@ -256,14 +258,14 @@ const Input = (props: InputProps) => {
     }
     setValue(cutValue);
 
-    if (inputRef.current) {
-      resolveOnChange(inputRef.current, e, onChange, cutValue);
+    if (inputReference.current) {
+      resolveOnChange(inputReference.current, e, onChange, cutValue);
     }
   };
 
   useEffect(() => {
     if (selection) {
-      inputRef.current?.setSelectionRange(...selection);
+      inputReference.current?.setSelectionRange(...selection);
     }
   }, [selection]);
 
@@ -276,7 +278,7 @@ const Input = (props: InputProps) => {
   const onInternalCompositionEnd = (
     e: React.CompositionEvent<HTMLInputElement>,
   ) => {
-    compositionRef.current = false;
+    compositionReference.current = false;
     triggerChange(e, e.currentTarget.value, {
       source: "compositionEnd",
     });
@@ -284,15 +286,15 @@ const Input = (props: InputProps) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (onPressEnter && e.key === "Enter" && !keyLockRef.current) {
-      keyLockRef.current = true;
+    if (onPressEnter && e.key === "Enter" && !keyLockReference.current) {
+      keyLockReference.current = true;
       onPressEnter(e);
     }
     onKeyDown?.(e);
   };
   const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      keyLockRef.current = false;
+      keyLockReference.current = false;
     }
     onKeyUp?.(e);
   };
@@ -303,8 +305,8 @@ const Input = (props: InputProps) => {
   };
 
   const handleBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
-    if (keyLockRef.current) {
-      keyLockRef.current = false;
+    if (keyLockReference.current) {
+      keyLockReference.current = false;
     }
     setFocused(false);
     onBlur?.(e);
@@ -313,8 +315,8 @@ const Input = (props: InputProps) => {
   const handleReset = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
     setValue("");
     focus();
-    if (inputRef.current) {
-      resolveOnChange(inputRef.current, e, onChange);
+    if (inputReference.current) {
+      resolveOnChange(inputReference.current, e, onChange);
     }
   };
 
@@ -323,8 +325,8 @@ const Input = (props: InputProps) => {
 
   const getInputElement = () => {
     // Fix https://fb.me/react-unknown-prop
-    const otherProps = omit(
-      props as Omit<InputProps, "value"> & {
+    const otherProperties = omit(
+      properties as Omit<InputProperties, "value"> & {
         value?: React.InputHTMLAttributes<HTMLInputElement>["value"];
       },
       [
@@ -350,8 +352,8 @@ const Input = (props: InputProps) => {
       <input
         data-slot="input"
         autoComplete={autoComplete}
-        aria-invalid={props["aria-invalid"] ?? status === "error"}
-        {...otherProps}
+        aria-invalid={properties["aria-invalid"] ?? status === "error"}
+        {...otherProperties}
         onChange={onInternalChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
@@ -360,20 +362,20 @@ const Input = (props: InputProps) => {
         className={cn(
           "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
           !hasAffix && inputSizeVariants({ size: mergedSize }),
-          otherProps.readOnly && "bg-muted cursor-default",
+          otherProperties.readOnly && "bg-muted cursor-default",
           classNames?.input,
         )}
         style={styles?.input}
-        ref={inputRef}
+        ref={inputReference}
         size={htmlSize}
         onCompositionStart={(e) => {
-          compositionRef.current = true;
+          compositionReference.current = true;
           onCompositionStart?.(e);
         }}
         onClick={(e) => {
           // fix click input in radix dialog not focus correct
-          inputRef.current?.focus();
-          otherProps.onClick?.(e);
+          inputReference.current?.focus();
+          otherProperties.onClick?.(e);
         }}
         onCompositionEnd={onInternalCompositionEnd}
       />
@@ -423,7 +425,7 @@ const Input = (props: InputProps) => {
         </>
       );
     }
-    return null;
+    return;
   };
 
   return (
@@ -437,7 +439,7 @@ const Input = (props: InputProps) => {
       suffix={getSuffix()}
       disabled={disabled}
       styles={styles}
-      ref={holderRef}
+      ref={holderReference}
       classNames={{
         variant: cn(
           inputVariants({ variant, status, disabled }),
@@ -457,4 +459,4 @@ const Input = (props: InputProps) => {
 };
 
 export { Input };
-export type { InputProps };
+export type { InputProperties as InputProps };

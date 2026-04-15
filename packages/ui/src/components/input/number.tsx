@@ -10,17 +10,17 @@ import { cn } from "@acme/ui/lib/utils";
 import type { SizeType } from "../config-provider/size-context";
 import type {
   ValueType as NumberValueType,
-  InputNumberProps as RcInputNumberProps,
+  InputNumberProps as RcInputNumberProperties,
 } from "./_components/rc-input-number";
 import type { InputStatus, InputVariant } from "./variants";
 import { Icon } from "../../icons";
 import RcInputNumber from "./_components/rc-input-number";
 import { inputSizeVariants, inputVariants } from "./variants";
 
-interface InputNumberProps<
+interface InputNumberProperties<
   TNumberValue extends NumberValueType = NumberValueType,
 > extends Omit<
-  RcInputNumberProps<TNumberValue>,
+  RcInputNumberProperties<TNumberValue>,
   "ref" | "prefix" | "size" | "controls"
 > {
   ref?: React.Ref<HTMLInputElement>;
@@ -43,11 +43,11 @@ interface InputNumberProps<
 
 const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
   ref,
-  ...props
-}: InputNumberProps<TNumberValue>) => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  ...properties
+}: InputNumberProperties<TNumberValue>) => {
+  const inputReference = React.useRef<HTMLInputElement>(null);
 
-  React.useImperativeHandle(ref, () => inputRef.current!);
+  React.useImperativeHandle(ref, () => inputReference.current!);
 
   const {
     className,
@@ -67,7 +67,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
     onChange,
 
     ...others
-  } = props;
+  } = properties;
 
   let upIcon = (
     <Icon
@@ -256,6 +256,6 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 };
 
 export { InputNumber };
-export type { InputNumberProps };
+export type { InputNumberProperties as InputNumberProps };
 
 export { type ValueType as NumberValueType } from "./_components/rc-input-number";

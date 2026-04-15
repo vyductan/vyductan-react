@@ -18,9 +18,9 @@ import { useHover } from "ahooks";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { NumberValueType } from "../number";
-import type { BaseInputProps } from "../types";
+import type { BaseInputProps as BaseInputProperties } from "../types";
 import type { InputFocusOptions } from "../utils/common-utils";
-import type { HolderRef } from "./base-input";
+import type { HolderRef as HolderReference } from "./base-input";
 import useCursor from "../hooks/use-cursor";
 import useFrame from "../hooks/use-frame";
 import { triggerFocus } from "../utils/common-utils";
@@ -56,7 +56,7 @@ const getDecimalValue = (stringMode: boolean, decimalValue: DecimalClass) => {
 
 const getDecimalIfValidate = (value: ValueType) => {
   const decimal = getMiniDecimal(value);
-  return decimal.isInvalidate() ? null : decimal;
+  return decimal.isInvalidate() ? undefined : decimal;
 };
 
 const parseAriaNumber = (value: ValueType | null | undefined) => {
@@ -77,71 +77,72 @@ const parseAriaNumber = (value: ValueType | null | undefined) => {
   return;
 };
 
-type InputNumberProps<TNumberValue extends NumberValueType = NumberValueType> =
-  Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
-  > & {
-    /** value will show as string */
-    stringMode?: boolean;
+type InputNumberProperties<
+  TNumberValue extends NumberValueType = NumberValueType,
+> = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "defaultValue" | "onInput" | "onChange" | "prefix" | "suffix"
+> & {
+  /** value will show as string */
+  stringMode?: boolean;
 
-    defaultValue?: TNumberValue;
-    value?: TNumberValue | null;
+  defaultValue?: TNumberValue;
+  value?: TNumberValue | null;
 
-    onInput?: (text: string) => void;
-    onChange?: (value: TNumberValue | null) => void;
-    onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
+  onInput?: (text: string) => void;
+  onChange?: (value: TNumberValue | null) => void;
+  onPressEnter?: React.KeyboardEventHandler<HTMLInputElement>;
 
-    /** Parse display value to validate number */
-    parser?: (displayValue: string | undefined) => TNumberValue;
-    /** Transform `value` to display value show in input */
-    formatter?: (
-      value: TNumberValue | undefined,
-      info: { userTyping: boolean; input: string },
-    ) => string;
-    /** Syntactic sugar of `formatter`. Config precision of display. */
-    precision?: number;
-    /** Syntactic sugar of `formatter`. Config decimal separator of display. */
-    decimalSeparator?: string;
+  /** Parse display value to validate number */
+  parser?: (displayValue: string | undefined) => TNumberValue;
+  /** Transform `value` to display value show in input */
+  formatter?: (
+    value: TNumberValue | undefined,
+    info: { userTyping: boolean; input: string },
+  ) => string;
+  /** Syntactic sugar of `formatter`. Config precision of display. */
+  precision?: number;
+  /** Syntactic sugar of `formatter`. Config decimal separator of display. */
+  decimalSeparator?: string;
 
-    min?: TNumberValue;
-    max?: TNumberValue;
-    step?: TNumberValue;
-    onStep?: (
-      value: TNumberValue,
-      info: {
-        offset: TNumberValue;
-        type: "up" | "down";
-        emitter: "handler" | "keyboard" | "wheel";
-      },
-    ) => void;
+  min?: TNumberValue;
+  max?: TNumberValue;
+  step?: TNumberValue;
+  onStep?: (
+    value: TNumberValue,
+    info: {
+      offset: TNumberValue;
+      type: "up" | "down";
+      emitter: "handler" | "keyboard" | "wheel";
+    },
+  ) => void;
 
-    /**
-     * Trigger change onBlur event.
-     * If disabled, user must press enter or click handler to confirm the value update
-     */
-    changeOnBlur?: boolean;
+  /**
+   * Trigger change onBlur event.
+   * If disabled, user must press enter or click handler to confirm the value update
+   */
+  changeOnBlur?: boolean;
 
-    // Customize handler node
-    upHandler?: React.ReactNode;
-    downHandler?: React.ReactNode;
-    keyboard?: boolean;
-    changeOnWheel?: boolean;
+  // Customize handler node
+  upHandler?: React.ReactNode;
+  downHandler?: React.ReactNode;
+  keyboard?: boolean;
+  changeOnWheel?: boolean;
 
-    classNames?: BaseInputProps["classNames"] & {
-      input?: string;
-    };
-    controls?: boolean;
-
-    prefix?: React.ReactNode;
-    suffix?: React.ReactNode;
-    addonBefore?: React.ReactNode;
-    addonAfter?: React.ReactNode;
-    allowClear?: boolean | { clearIcon?: React.ReactNode };
+  classNames?: BaseInputProperties["classNames"] & {
+    input?: string;
   };
+  controls?: boolean;
 
-type InternalInputNumberProps<T extends ValueType = ValueType> = Omit<
-  InputNumberProps<T>,
+  prefix?: React.ReactNode;
+  suffix?: React.ReactNode;
+  addonBefore?: React.ReactNode;
+  addonAfter?: React.ReactNode;
+  allowClear?: boolean | { clearIcon?: React.ReactNode };
+};
+
+type InternalInputNumberProperties<T extends ValueType = ValueType> = Omit<
+  InputNumberProperties<T>,
   "prefix" | "suffix" | "ref"
 > & {
   ref: React.Ref<HTMLInputElement>;
@@ -186,15 +187,15 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   onStepRef,
   onDisabledChange,
 
-  ...inputProps
-}: InternalInputNumberProps<T>) => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  ...inputProperties
+}: InternalInputNumberProperties<T>) => {
+  const inputReference = React.useRef<HTMLInputElement>(null);
 
   const [focus, setFocus] = React.useState(false);
 
-  const userTypingRef = React.useRef(false);
-  const compositionRef = React.useRef(false);
-  const shiftKeyRef = React.useRef(false);
+  const userTypingReference = React.useRef(false);
+  const compositionReference = React.useRef(false);
+  const shiftKeyReference = React.useRef(false);
 
   // ============================ Value =============================
   // Real value control
@@ -239,14 +240,14 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   );
   // >>> Parser
   const mergedParser = React.useCallback(
-    (num: string | number) => {
-      const numStr = String(num);
+    (number_: string | number) => {
+      const numberString = String(number_);
 
       if (parser) {
-        return parser(numStr);
+        return parser(numberString);
       }
 
-      let parsedString = numStr;
+      let parsedString = numberString;
       if (decimalSeparator) {
         parsedString = parsedString.replace(decimalSeparator, ".");
       }
@@ -257,31 +258,31 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     [parser, decimalSeparator],
   );
   // >>> Formatter
-  const inputValueRef = React.useRef<string | number>("");
+  const inputValueReference = React.useRef<string | number>("");
   const mergedFormatter = React.useCallback(
     (number: string, userTyping: boolean) => {
       if (formatter) {
         return formatter(number as unknown as T, {
           userTyping,
-          input: String(inputValueRef.current),
+          input: String(inputValueReference.current),
         });
       }
 
-      let str = typeof number === "number" ? num2str(number) : number;
+      let string_ = typeof number === "number" ? num2str(number) : number;
 
       // User typing will not auto format with precision directly
       if (!userTyping) {
-        const mergedPrecision = getPrecision(str, userTyping);
+        const mergedPrecision = getPrecision(string_, userTyping);
         const hasPrecision =
           mergedPrecision !== undefined && mergedPrecision >= 0;
 
-        if (validateNumber(str) && (decimalSeparator || hasPrecision)) {
+        if (validateNumber(string_) && (decimalSeparator || hasPrecision)) {
           const separatorString = decimalSeparator ?? ".";
-          str = toFixed(str, separatorString, mergedPrecision);
+          string_ = toFixed(string_, separatorString, mergedPrecision);
         }
       }
 
-      return str;
+      return string_;
     },
     [formatter, getPrecision, decimalSeparator],
   );
@@ -306,7 +307,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     }
     return mergedFormatter(decimalValue.toString(), false);
   });
-  inputValueRef.current = inputValue;
+  inputValueReference.current = inputValue;
 
   // Should always be string
   function setInputValue(newValue: DecimalClass, userTyping: boolean) {
@@ -357,7 +358,10 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   }, [upDisabled, downDisabled, onDisabledChange]);
 
   // Cursor controller
-  const [recordCursor, restoreCursor] = useCursor(inputRef.current, focus);
+  const [recordCursor, restoreCursor] = useCursor(
+    inputReference.current,
+    focus,
+  );
 
   // ============================= Data =============================
   /**
@@ -378,7 +382,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
       return minDecimal;
     }
 
-    return null;
+    return;
   };
 
   /**
@@ -408,16 +412,18 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     }
 
     if (!readOnly && !disabled && isRangeValidate) {
-      const numStr = updateValue.toString();
-      const mergedPrecision = getPrecision(numStr, userTyping);
+      const numberString = updateValue.toString();
+      const mergedPrecision = getPrecision(numberString, userTyping);
       if (mergedPrecision && mergedPrecision >= 0) {
-        updateValue = getMiniDecimal(toFixed(numStr, ".", mergedPrecision));
+        updateValue = getMiniDecimal(
+          toFixed(numberString, ".", mergedPrecision),
+        );
 
         // When to fixed. The value may out of min & max range.
         // 4 in [0, 3.8] => 3.8 => 4 (toFixed)
         if (!isInRange(updateValue)) {
           updateValue = getMiniDecimal(
-            toFixed(numStr, ".", mergedPrecision, true),
+            toFixed(numberString, ".", mergedPrecision, true),
           );
         }
       }
@@ -427,7 +433,8 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         setUncontrolledDecimalValue(updateValue);
         onChange?.(
           updateValue.isEmpty()
-            ? null
+            ?  
+              null
             : (getDecimalValue(stringMode, updateValue) as T),
         );
 
@@ -452,11 +459,11 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
     // Update inputValue in case input can not parse as number
     // Refresh ref value immediately since it may used by formatter
-    inputValueRef.current = inputString;
+    inputValueReference.current = inputString;
     setInternalInputValue(inputString);
 
     // Parse number
-    if (!compositionRef.current) {
+    if (!compositionReference.current) {
       const finalValue = mergedParser(inputString);
       const finalDecimal = getMiniDecimal(finalValue);
       if (!finalDecimal.isNaN()) {
@@ -483,13 +490,13 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
   // >>> Composition
   const onCompositionStart = () => {
-    compositionRef.current = true;
+    compositionReference.current = true;
   };
 
   const onCompositionEnd = () => {
-    compositionRef.current = false;
+    compositionReference.current = false;
 
-    const input = inputRef.current;
+    const input = inputReference.current;
     if (!input) {
       return;
     }
@@ -516,10 +523,10 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
     // Clear typing status since it may be caused by up & down key.
     // We should sync with input value.
-    userTypingRef.current = false;
+    userTypingReference.current = false;
 
     let stepDecimal = getMiniDecimal(
-      shiftKeyRef.current ? getDecupleSteps(step) : step,
+      shiftKeyReference.current ? getDecupleSteps(step) : step,
     );
     if (!up) {
       stepDecimal = stepDecimal.negate();
@@ -531,12 +538,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
     const updatedValue = triggerValueUpdate(target, false);
     onStep?.(getDecimalValue(stringMode, updatedValue) as T, {
-      offset: (shiftKeyRef.current ? getDecupleSteps(step) : step) as T,
+      offset: (shiftKeyReference.current ? getDecupleSteps(step) : step) as T,
       type: up ? "up" : "down",
       emitter,
     });
 
-    inputRef.current?.focus();
+    inputReference.current?.focus();
   };
 
   // ============================ Flush =============================
@@ -564,18 +571,18 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
   // Solve the issue of the event triggering sequence when entering numbers in chinese input (Safari)
   const onBeforeInput = () => {
-    userTypingRef.current = true;
+    userTypingReference.current = true;
   };
 
   const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     const { key, shiftKey } = event;
-    userTypingRef.current = true;
+    userTypingReference.current = true;
 
-    shiftKeyRef.current = shiftKey;
+    shiftKeyReference.current = shiftKey;
 
     if (key === "Enter") {
-      if (!compositionRef.current) {
-        userTypingRef.current = false;
+      if (!compositionReference.current) {
+        userTypingReference.current = false;
       }
       flushInputValue(false);
       onPressEnter?.(event);
@@ -587,7 +594,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
     // Do step
     if (
-      !compositionRef.current &&
+      !compositionReference.current &&
       ["Up", "ArrowUp", "Down", "ArrowDown"].includes(key)
     ) {
       onInternalStep(key === "Up" || key === "ArrowUp", "keyboard");
@@ -596,8 +603,8 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   };
 
   const onKeyUp = () => {
-    userTypingRef.current = false;
-    shiftKeyRef.current = false;
+    userTypingReference.current = false;
+    shiftKeyReference.current = false;
   };
 
   // Expose onStep function to parent via ref
@@ -614,7 +621,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         onInternalStep(event.deltaY < 0, "wheel");
         event.preventDefault();
       };
-      const input = inputRef.current;
+      const input = inputReference.current;
       if (input) {
         // React onWheel is passive and we can't preventDefault() in it.
         // That's why we should subscribe with DOM listener.
@@ -636,7 +643,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
     setFocus(false);
 
-    userTypingRef.current = false;
+    userTypingReference.current = false;
   };
 
   // ========================== Controlled ==========================
@@ -658,11 +665,11 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     // But let it go if user set `formatter`
     if (
       !newValue.equals(currentParsedValue) ||
-      !userTypingRef.current ||
+      !userTypingReference.current ||
       formatter
     ) {
       // Update value as effect
-      setInputValue(newValue, userTypingRef.current);
+      setInputValue(newValue, userTypingReference.current);
     }
   }, [value]);
 
@@ -706,8 +713,8 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         aria-valuemax={ariaValueMax}
         aria-valuenow={ariaValueNow}
         step={step}
-        {...inputProps}
-        ref={ref ? composeRef(ref, inputRef) : inputRef}
+        {...inputProperties}
+        ref={ref ? composeRef(ref, inputReference) : inputReference}
         value={inputValue}
         onChange={onInternalInput}
         disabled={disabled}
@@ -734,11 +741,11 @@ const InputNumber = <T extends ValueType = ValueType>({
   downHandler,
   ref,
   ...rest
-}: InputNumberProps<T> & { ref?: React.Ref<InputNumberRef> }) => {
-  const holderRef = React.useRef<HolderRef>(null);
-  const inputNumberDomRef = React.useRef<HTMLDivElement>(null);
-  const inputFocusRef = React.useRef<HTMLInputElement>(null);
-  const isHovering = useHover(inputNumberDomRef);
+}: InputNumberProperties<T> & { ref?: React.Ref<InputNumberRef> }) => {
+  const holderReference = React.useRef<HolderReference>(null);
+  const inputNumberDomReference = React.useRef<HTMLDivElement>(null);
+  const inputFocusReference = React.useRef<HTMLInputElement>(null);
+  const isHovering = useHover(inputNumberDomReference);
 
   // Track disabled states from InternalInputNumber
   const [upDisabled, setUpDisabled] = useState(false);
@@ -750,18 +757,19 @@ const InputNumber = <T extends ValueType = ValueType>({
   }, []);
 
   const focus = (option?: InputFocusOptions) => {
-    if (inputFocusRef.current) {
-      triggerFocus(inputFocusRef.current, option);
+    if (inputFocusReference.current) {
+      triggerFocus(inputFocusReference.current, option);
     }
   };
 
   const handleReset = () => {
+     
     rest.onChange?.(null);
     focus();
   };
 
   // Ref to hold onStep function from InternalInputNumber
-  const onStepRef = React.useRef<((up: boolean) => void) | null>(null);
+  const onStepReference = React.useRef<((up: boolean) => void) | null>(null);
 
   // Render clear icon for InputNumber (only show on hover)
   const clearIcon = !!allowClear && !!value && !!isHovering && (
@@ -781,7 +789,7 @@ const InputNumber = <T extends ValueType = ValueType>({
         upDisabled={disabled || upDisabled}
         downDisabled={disabled || downDisabled}
         onStep={(up) => {
-          onStepRef.current?.(up);
+          onStepReference.current?.(up);
           focus();
         }}
       />
@@ -798,7 +806,7 @@ const InputNumber = <T extends ValueType = ValueType>({
   );
 
   React.useImperativeHandle(ref, () => {
-    const target = inputFocusRef.current;
+    const target = inputFocusReference.current;
     if (!target) {
       return {} as InputNumberRef;
     }
@@ -807,7 +815,9 @@ const InputNumber = <T extends ValueType = ValueType>({
       focus,
       // blur: () => target.blur(),
       nativeElement:
-        holderRef.current?.nativeElement || inputNumberDomRef.current || target,
+        holderReference.current?.nativeElement ||
+        inputNumberDomReference.current ||
+        target,
     });
   });
   // React.useImperativeHandle(ref, () =>
@@ -842,13 +852,13 @@ const InputNumber = <T extends ValueType = ValueType>({
         wrapper: "div",
         groupAddon: "div",
       }}
-      ref={holderRef}
+      ref={holderReference}
     >
       <InternalInputNumber
         disabled={disabled}
-        ref={inputFocusRef}
-        domRef={inputNumberDomRef}
-        onStepRef={onStepRef}
+        ref={inputFocusReference}
+        domRef={inputNumberDomReference}
+        onStepRef={onStepReference}
         onDisabledChange={handleDisabledChange}
         upHandler={upHandler}
         downHandler={downHandler}
@@ -863,6 +873,6 @@ const InputNumber = <T extends ValueType = ValueType>({
   );
 };
 export default InputNumber;
-export type { InputNumberProps };
+export type { InputNumberProperties as InputNumberProps };
 
 export { type ValueType } from "@rc-component/mini-decimal";

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import type { InputProps } from "..";
+import type { InputProps as InputProperties } from "..";
 import type { CountConfig, ShowCountFormatter } from "../types";
 
 type ForcedCountConfig = Omit<CountConfig, "show"> &
@@ -25,7 +25,7 @@ export function inCountRange(value: string, countConfig: ForcedCountConfig) {
 
 export default function useCount(
   count?: CountConfig,
-  showCount?: InputProps["showCount"],
+  showCount?: InputProperties["showCount"],
 ) {
   return React.useMemo<ForcedCountConfig>(() => {
     let mergedConfig: CountConfig = {};

@@ -1,4 +1,4 @@
-import type { InputProps as InternalInputProps } from "./input";
+import type { InputProps as InternalInputProperties } from "./input";
 import { Textarea } from "../textarea";
 import { Input as InternalInput } from "./input";
 import { InputNumber } from "./number";
@@ -35,11 +35,13 @@ type PublicInputType =
   | "url"
   | "week";
 
-type InputProps = Omit<InternalInputProps, "type"> & {
+type InputProperties = Omit<InternalInputProperties, "type"> & {
   type?: PublicInputType;
 };
 
-type CompoundedComponent = ((props: InputProps) => ReturnType<typeof InternalInput>) & {
+type CompoundedComponent = ((
+  properties: InputProperties,
+) => ReturnType<typeof InternalInput>) & {
   TextArea: typeof Textarea;
   Number: typeof InputNumber;
   Password: typeof InputPassword;
@@ -47,7 +49,7 @@ type CompoundedComponent = ((props: InputProps) => ReturnType<typeof InternalInp
 };
 
 const Input = Object.assign(
-  (props: InputProps) => <InternalInput {...props} />,
+  (properties: InputProperties) => <InternalInput {...properties} />,
   {
     TextArea: Textarea,
     Number: InputNumber,
@@ -57,4 +59,4 @@ const Input = Object.assign(
 ) as CompoundedComponent;
 
 export { Input };
-export type { InputProps };
+export type { InputProperties as InputProps };

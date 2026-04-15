@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-irregular-whitespace */
 
-import type { InputProps } from "../input";
-import type { BaseInputProps } from "../types";
+import type { InputProps as InputProperties } from "../input";
+import type { BaseInputProps as BaseInputProperties } from "../types";
 
-export function hasAddon(props: BaseInputProps | InputProps) {
-  return !!(props.addonBefore ?? props.addonAfter);
+export function hasAddon(properties: BaseInputProperties | InputProperties) {
+  return !!(properties.addonBefore ?? properties.addonAfter);
 }
 
-export function hasPrefixSuffix(props: BaseInputProps | InputProps) {
-  return !!(props.prefix ?? props.suffix ?? props.allowClear);
+export function hasPrefixSuffix(
+  properties: BaseInputProperties | InputProperties,
+) {
+  return !!(properties.prefix ?? properties.suffix ?? properties.allowClear);
 }
 
 // TODO: It's better to use `Proxy` replace the `element.value`. But we still need support IE11.
@@ -41,8 +43,8 @@ function cloneEvent<
     currentTarget.selectionEnd = target.selectionEnd;
   }
 
-  currentTarget.setSelectionRange = (...args) => {
-    target.setSelectionRange(...args);
+  currentTarget.setSelectionRange = (...arguments_) => {
+    target.setSelectionRange(...arguments_);
   };
 
   return newEvent;

@@ -7,7 +7,7 @@ import { useHover } from "ahooks";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { BaseInputProps } from "../types";
+import type { BaseInputProps as BaseInputProperties } from "../types";
 import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
 import { ClearIcon } from "./clear-icon";
@@ -18,7 +18,9 @@ export interface HolderRef {
 }
 
 /** To wrap input by div or not */
-const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
+const BaseInput = (
+  properties: BaseInputProperties & { ref: Ref<HolderRef> },
+) => {
   const {
     ref,
     children,
@@ -41,7 +43,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
     styles,
     components,
     onClear,
-  } = props;
+  } = properties;
 
   const inputElement = children;
 
@@ -50,16 +52,16 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   const WrapperComponent = components?.wrapper ?? "span";
   const GroupAddonComponent = components?.groupAddon ?? "span";
 
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerReference = useRef<HTMLDivElement>(null);
 
   const onInputClick: React.MouseEventHandler = (e) => {
-    if (containerRef.current?.contains(e.target as Element)) {
+    if (containerReference.current?.contains(e.target as Element)) {
       triggerFocus?.();
     }
   };
 
-  const hasAffix = hasPrefixSuffix(props);
-  const isAddon = hasAddon(props);
+  const hasAffix = hasPrefixSuffix(properties);
+  const isAddon = hasAddon(properties);
 
   let element: ReactElement = cloneElement(inputElement as ReactElement<any>, {
     value,
@@ -68,21 +70,21 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
         (inputElement as ReactElement<{ className?: string } | undefined>).props
           ?.className,
         !hasAffix && !isAddon && [className, classNames?.variant],
-      ) || null,
+      ) || undefined,
   });
 
   // ======================== Ref ======================== //
-  const groupRef = useRef<HTMLDivElement>(null);
+  const groupReference = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref, () => ({
-    nativeElement: groupRef.current ?? containerRef.current,
+    nativeElement: groupReference.current ?? containerReference.current,
   }));
 
   // ================== Prefix & Suffix ================== //
-  const isHovering = useHover(containerRef);
+  const isHovering = useHover(containerReference);
   if (hasAffix) {
     // ================== Clear Icon ================== //
-    let clearIcon: ReactNode = null;
+    let clearIcon: ReactNode;
     if (allowClear) {
       const needClear = !disabled && !readOnly && !!value;
 
@@ -130,7 +132,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
         style={styles?.affixWrapper}
         onClick={onInputClick}
         {...dataAttrs?.affixWrapper}
-        ref={containerRef}
+        ref={containerReference}
       >
         {prefix && (
           <span
@@ -147,7 +149,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
   }
 
   // ================== Addon ================== //
-  if (hasAddon(props)) {
+  if (hasAddon(properties)) {
     // const wrapperCls = `${prefixCls}-group`;
     const addonCls = cn(
       "flex items-center",
@@ -185,7 +187,7 @@ const BaseInput = (props: BaseInputProps & { ref: Ref<HolderRef> }) => {
       <GroupWrapperComponent
         data-slot="input-group-wrapper"
         className={classNames?.groupWrapper}
-        ref={groupRef}
+        ref={groupReference}
       >
         <WrapperComponent
           data-slot="input-wrapper"

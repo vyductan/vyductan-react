@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import type { XOR } from "ts-xor";
 
 import type { CheckboxProps as CheckboxProperties } from "./checkbox";
@@ -18,10 +19,20 @@ type ShadcnCheckboxProperties = Omit<
 type XORCheckboxProperties = XOR<CheckboxProperties, ShadcnCheckboxProperties>;
 
 const ConditionCheckbox = (properties: XORCheckboxProperties) => {
-  const isShadcnCheckbox = properties.onCheckedChange !== undefined;
+  const hasLabelContent = React.Children.toArray(properties.children).some(
+    (child) => {
+      if (typeof child === "boolean") {
+        return false;
+      }
+
+      return child !== "";
+    },
+  );
+  const isShadcnCheckbox =
+    properties.onCheckedChange !== undefined || !hasLabelContent;
 
   if (isShadcnCheckbox) {
-    return <ShadcnCheckbox {...properties} />;
+    return <ShadcnCheckbox {...(properties as ShadcnCheckboxProperties)} />;
   }
 
   return <InternalCheckbox {...(properties as CheckboxProperties)} />;

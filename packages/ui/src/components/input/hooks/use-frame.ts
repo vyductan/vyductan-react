@@ -5,10 +5,10 @@ import raf from "@rc-component/util/es/raf";
  * Always trigger latest once when call multiple time
  */
 const useFrame = () => {
-  const idRef = useRef(0);
+  const idReference = useRef(0);
 
   const cleanUp = () => {
-    raf.cancel(idRef.current);
+    raf.cancel(idReference.current);
   };
 
   useEffect(() => cleanUp, []);
@@ -16,7 +16,7 @@ const useFrame = () => {
   return (callback: () => void) => {
     cleanUp();
 
-    idRef.current = raf(() => {
+    idReference.current = raf(() => {
       callback();
     });
   };
