@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { cn } from "../../lib/utils";
 
-type BaseTypographyProps = React.HTMLAttributes<HTMLElement> & {
+type BaseTypographyProperties = React.HTMLAttributes<HTMLElement> & {
   className?: string;
   children?: React.ReactNode;
   /**
@@ -53,8 +53,8 @@ const Typography = ({
   italic = false,
   type,
   underline = false,
-  ...props
-}: BaseTypographyProps) => {
+  ...properties
+}: BaseTypographyProperties) => {
   const Comp = del ? "del" : "span";
 
   const getTypeClass = () => {
@@ -95,7 +95,7 @@ const Typography = ({
     >;
     return React.cloneElement(child, {
       className: cn(classes, child.props.className),
-      ...props,
+      ...properties,
     });
   }
 
@@ -104,18 +104,23 @@ const Typography = ({
       data-component="typography"
       className={classes}
       onClick={onClick}
-      {...props}
+      {...properties}
     >
       {children}
     </Comp>
   );
 };
 
-type TitleProps = BaseTypographyProps & {
+type TitleProperties = BaseTypographyProperties & {
   level?: 1 | 2 | 3 | 4 | 5;
 };
 
-const Title = ({ level = 1, className, children, ...props }: TitleProps) => {
+const Title = ({
+  level = 1,
+  className,
+  children,
+  ...properties
+}: TitleProperties) => {
   const Component = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5";
 
   const sizeClasses = {
@@ -130,14 +135,14 @@ const Title = ({ level = 1, className, children, ...props }: TitleProps) => {
     <Typography
       asChild
       className={cn(sizeClasses, "mt-0 mb-4", className)}
-      {...props}
+      {...properties}
     >
       <Component>{children}</Component>
     </Typography>
   );
 };
 
-type TextProps = BaseTypographyProps & {
+type TextProperties = BaseTypographyProperties & {
   keyboard?: boolean;
 };
 
@@ -146,8 +151,8 @@ const Text = ({
   keyboard = false,
   mark,
   children,
-  ...props
-}: TextProps) => {
+  ...properties
+}: TextProperties) => {
   return (
     <Typography
       className={cn(
@@ -155,7 +160,7 @@ const Text = ({
           "rounded border border-b-2 border-neutral-200 bg-neutral-100 px-1.5 py-0.5 font-mono text-xs dark:border-neutral-700 dark:bg-neutral-800",
         className,
       )}
-      {...props}
+      {...properties}
     >
       {mark ? (
         <mark className="bg-yellow-100 dark:bg-yellow-900/50">{children}</mark>
@@ -166,15 +171,15 @@ const Text = ({
   );
 };
 
-type ParagraphProps = BaseTypographyProps & {
+type ParagraphProperties = BaseTypographyProperties & {
   spacing?: "default" | "tight" | "loose";
 };
 
 const Paragraph = ({
   className,
   spacing = "default",
-  ...props
-}: ParagraphProps) => {
+  ...properties
+}: ParagraphProperties) => {
   const spacingClasses = {
     default: "mb-4",
     tight: "mb-2",
@@ -185,40 +190,37 @@ const Paragraph = ({
     <Typography
       asChild
       className={cn("not-first:mt-6", spacingClasses, className)}
-      {...props}
+      {...properties}
     >
       <p />
     </Typography>
   );
 };
 
-type LinkProps = BaseTypographyProps &
+type LinkProperties = BaseTypographyProperties &
   React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     href?: string;
     target?: string;
     rel?: string;
   };
 
-const Link = ({ className, ...props }: LinkProps) => {
+const Link = ({ className, children, ...properties }: LinkProperties) => {
   return (
     <Typography
       asChild
-      className={cn(
-        "text-primary font-medium underline-offset-4 hover:underline",
-        className,
-      )}
-      {...props}
+      className={cn("font-medium text-primary underline underline-offset-4", className)}
+      {...properties}
     >
-      <a />
+      <a>{children}</a>
     </Typography>
   );
 };
 
 export { Typography, Title, Text, Paragraph, Link };
 export type {
-  BaseTypographyProps,
-  TitleProps,
-  TextProps,
-  ParagraphProps,
-  LinkProps,
+  BaseTypographyProperties as BaseTypographyProps,
+  TitleProperties as TitleProps,
+  TextProperties as TextProps,
+  ParagraphProperties as ParagraphProps,
+  LinkProperties as LinkProps,
 };
