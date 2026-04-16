@@ -14,6 +14,22 @@ afterEach(() => {
 });
 
 describe("InputNumber spinner mode", () => {
+  test("renders spinner mode inside a group shell", () => {
+    render(
+      <InputNumber mode="spinner" aria-label="Quantity" defaultValue={2} />,
+    );
+
+    const group = screen.getByRole("group");
+    const input = screen.getByRole("spinbutton", { name: "Quantity" });
+    const decreaseButton = screen.getByRole("button", { name: "Decrease value" });
+    const increaseButton = screen.getByRole("button", { name: "Increase value" });
+
+    expect(group).toBeInTheDocument();
+    expect(group).toContainElement(decreaseButton);
+    expect(group).toContainElement(input);
+    expect(group).toContainElement(increaseButton);
+  });
+
   test("renders inline decrement and increment buttons and updates the value", async () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();

@@ -16,6 +16,7 @@ import { composeRef } from "@rc-component/util/es/ref";
 import { useHover } from "ahooks";
 import raf from "@rc-component/util/es/raf";
 
+import { ButtonGroup } from "@acme/ui/components/button-group";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { NumberValueType } from "../number";
@@ -908,13 +909,10 @@ const InputNumber = <T extends ValueType = ValueType>({
     ) : undefined;
 
     return (
-      <div
+      <ButtonGroup
         ref={inputNumberDomReference}
         data-slot="input-number-spinner"
-        className={cn(
-          "inline-flex w-[90px] items-stretch overflow-hidden",
-          className,
-        )}
+        className={cn("w-[90px] overflow-hidden", className)}
         style={style}
       >
         {controls ? (
@@ -1005,7 +1003,7 @@ const InputNumber = <T extends ValueType = ValueType>({
             {upHandler}
           </button>
         ) : null}
-      </div>
+      </ButtonGroup>
     );
   }
 
