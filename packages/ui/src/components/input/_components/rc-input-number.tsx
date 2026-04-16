@@ -3,7 +3,7 @@
 // https://github.com/react-component/input-number/commit/d9662d5831f6a9d5bda90e39742b75d5f7eb0c9c
 // Jan 28, 2025
 import type { DecimalClass, ValueType } from "@rc-component/mini-decimal";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import getMiniDecimal, {
   getNumberPrecision,
   num2str,
@@ -14,6 +14,7 @@ import { useLayoutUpdateEffect } from "@rc-component/util/es/hooks/useLayoutEffe
 import proxyObject from "@rc-component/util/es/proxyObject";
 import { composeRef } from "@rc-component/util/es/ref";
 import { useHover } from "ahooks";
+import raf from "@rc-component/util/es/raf";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -133,6 +134,7 @@ type InputNumberProperties<
     input?: string;
   };
   controls?: boolean;
+  mode?: "input" | "spinner";
 
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -140,6 +142,9 @@ type InputNumberProperties<
   addonAfter?: React.ReactNode;
   allowClear?: boolean | { clearIcon?: React.ReactNode };
 };
+
+const SPINNER_STEP_INTERVAL = 200;
+const SPINNER_STEP_DELAY = 600;
 
 type InternalInputNumberProperties<T extends ValueType = ValueType> = Omit<
   InputNumberProperties<T>,
@@ -737,6 +742,7 @@ const InputNumber = <T extends ValueType = ValueType>({
   classNames,
   allowClear,
   controls = true,
+  mode = "input",
   upHandler,
   downHandler,
   ref,
@@ -756,11 +762,11 @@ const InputNumber = <T extends ValueType = ValueType>({
     setDownDisabled(down);
   }, []);
 
-  const focus = (option?: InputFocusOptions) => {
+  const focus = useCallback((option?: InputFocusOptions) => {
     if (inputFocusReference.current) {
       triggerFocus(inputFocusReference.current, option);
     }
-  };
+  }, []);
 
   const handleReset = () => {
      
@@ -770,31 +776,93 @@ const InputNumber = <T extends ValueType = ValueType>({
 
   // Ref to hold onStep function from InternalInputNumber
   const onStepReference = React.useRef<((up: boolean) => void) | null>(null);
+  const spinnerStepTimeoutReference = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const spinnerFrameIdsReference = React.useRef<number[]>([]);
+  const suppressSpinnerClickReference = React.useRef(false);
+
+  const stopSpinnerStep = useCallback(() => {
+    if (spinnerStepTimeoutReference.current) {
+      clearTimeout(spinnerStepTimeoutReference.current);
+      spinnerStepTimeoutReference.current = null;
+    }
+  }, []);
+
+  const cancelSpinnerStep = useCallback(() => {
+    suppressSpinnerClickReference.current = false;
+    stopSpinnerStep();
+  }, [stopSpinnerStep]);
+
+  const handleSpinnerStep = useCallback(
+    (up: boolean) => {
+      onStepReference.current?.(up);
+      focus();
+    },
+    [focus],
+  );
+
+  const handleSpinnerStepMouseDown = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>, up: boolean) => {
+      event.preventDefault();
+      suppressSpinnerClickReference.current = true;
+      stopSpinnerStep();
+      handleSpinnerStep(up);
+
+      const loopStep = () => {
+        handleSpinnerStep(up);
+        spinnerStepTimeoutReference.current = setTimeout(
+          loopStep,
+          SPINNER_STEP_INTERVAL,
+        );
+      };
+
+      spinnerStepTimeoutReference.current = setTimeout(
+        loopStep,
+        SPINNER_STEP_DELAY,
+      );
+    },
+    [handleSpinnerStep, stopSpinnerStep],
+  );
+
+  const safeStopSpinnerStep = useCallback(() => {
+    spinnerFrameIdsReference.current.push(raf(stopSpinnerStep));
+  }, [stopSpinnerStep]);
+
+  useEffect(() => {
+    const frameIds = spinnerFrameIdsReference.current;
+
+    return () => {
+      stopSpinnerStep();
+      for (const id of frameIds) {
+        raf.cancel(id);
+      }
+    };
+  }, [stopSpinnerStep]);
 
   // Render clear icon for InputNumber (only show on hover)
-  const clearIcon = !!allowClear && !!value && !!isHovering && (
-    <ClearIcon
-      visible
-      onClick={() => handleReset()}
-      className="relative z-10 order-2 ml-1"
-    />
-  );
+  const clearIcon =
+    mode === "input" && !!allowClear && !!value && !!isHovering ? (
+      <ClearIcon
+        visible
+        onClick={() => handleReset()}
+        className="relative z-10 order-2 ml-1"
+      />
+    ) : null;
 
   // Render controls as suffix - override absolute positioning
-  const controlsNode = controls && (
-    <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
-      <StepHandler
-        upNode={upHandler}
-        downNode={downHandler}
-        upDisabled={disabled || upDisabled}
-        downDisabled={disabled || downDisabled}
-        onStep={(up) => {
-          onStepReference.current?.(up);
-          focus();
-        }}
-      />
-    </div>
-  );
+  const controlsNode =
+    mode === "input" && controls ? (
+      <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
+        <StepHandler
+          upNode={upHandler}
+          downNode={downHandler}
+          upDisabled={disabled || upDisabled}
+          downDisabled={disabled || downDisabled}
+          onStep={(up) => {
+            handleSpinnerStep(up);
+          }}
+        />
+      </div>
+    ) : null;
 
   // Combine clear icon and controls as suffix
   const combinedSuffix = (
@@ -833,6 +901,113 @@ const InputNumber = <T extends ValueType = ValueType>({
   //     //   holderRef.current?.nativeElement || inputNumberDomRef.current,
   //   }),
   // );
+
+  if (mode === "spinner") {
+    const middleSuffix = suffix ? (
+      <span className="mx-1 flex items-center">{suffix}</span>
+    ) : undefined;
+
+    return (
+      <div
+        ref={inputNumberDomReference}
+        data-slot="input-number-spinner"
+        className={cn(
+          "inline-flex w-[90px] items-stretch overflow-hidden",
+          className,
+        )}
+        style={style}
+      >
+        {controls ? (
+          <button
+            type="button"
+            aria-label="Decrease value"
+            className="flex shrink-0 items-center justify-center border-r px-3"
+            disabled={disabled || rest.readOnly || downDisabled}
+            onMouseDown={(event) => {
+              handleSpinnerStepMouseDown(event, false);
+            }}
+            onMouseUp={safeStopSpinnerStep}
+            onMouseLeave={cancelSpinnerStep}
+            onClick={(event) => {
+              if (suppressSpinnerClickReference.current) {
+                event.preventDefault();
+                event.stopPropagation();
+                suppressSpinnerClickReference.current = false;
+                return;
+              }
+              handleSpinnerStep(false);
+            }}
+          >
+            {downHandler}
+          </button>
+        ) : null}
+
+        <BaseInput
+          className="min-w-0 flex-1 border-none shadow-none"
+          triggerFocus={focus}
+          value={value}
+          disabled={disabled}
+          prefix={prefix}
+          suffix={middleSuffix}
+          classNames={{
+            ...classNames,
+            input: cn("text-center", classNames?.input),
+            affixWrapper: cn(
+              "min-w-0 border-none bg-transparent shadow-none",
+              classNames?.affixWrapper,
+            ),
+          }}
+          components={{
+            affixWrapper: "div",
+            groupWrapper: "div",
+            wrapper: "div",
+            groupAddon: "div",
+          }}
+          ref={holderReference}
+        >
+          <InternalInputNumber
+            disabled={disabled}
+            ref={inputFocusReference}
+            domRef={inputNumberDomReference}
+            onStepRef={onStepReference}
+            onDisabledChange={handleDisabledChange}
+            upHandler={upHandler}
+            downHandler={downHandler}
+            controls={false}
+            classNames={{
+              input: cn("text-center", classNames?.input),
+            }}
+            {...rest}
+          />
+        </BaseInput>
+
+        {controls ? (
+          <button
+            type="button"
+            aria-label="Increase value"
+            className="flex shrink-0 items-center justify-center border-l px-3"
+            disabled={disabled || rest.readOnly || upDisabled}
+            onMouseDown={(event) => {
+              handleSpinnerStepMouseDown(event, true);
+            }}
+            onMouseUp={safeStopSpinnerStep}
+            onMouseLeave={cancelSpinnerStep}
+            onClick={(event) => {
+              if (suppressSpinnerClickReference.current) {
+                event.preventDefault();
+                event.stopPropagation();
+                suppressSpinnerClickReference.current = false;
+                return;
+              }
+              handleSpinnerStep(true);
+            }}
+          >
+            {upHandler}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <BaseInput

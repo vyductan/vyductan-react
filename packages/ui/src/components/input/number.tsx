@@ -33,6 +33,7 @@ interface InputNumberProperties<
   disabled?: boolean;
   status?: InputStatus;
   controls?: boolean | { upIcon?: React.ReactNode; downIcon?: React.ReactNode };
+  mode?: "input" | "spinner";
   /**
    * @since 5.13.0
    * @default "outlined"
@@ -60,6 +61,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
     readOnly,
     status: customStatus,
     controls,
+    mode = "input",
     variant: customVariant,
     allowClear,
 
@@ -71,14 +73,22 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 
   let upIcon = (
     <Icon
-      icon="icon-[fluent-mdl2--caret-up-solid-8]"
-      className="h-2.5 w-4 opacity-70"
+      icon={
+        mode === "spinner"
+          ? "icon-[lucide--plus]"
+          : "icon-[fluent-mdl2--caret-up-solid-8]"
+      }
+      className={mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"}
     />
   );
   let downIcon = (
     <Icon
-      icon="icon-[teenyicons--down-solid]"
-      className="h-2.5 w-4 opacity-70"
+      icon={
+        mode === "spinner"
+          ? "icon-[lucide--minus]"
+          : "icon-[teenyicons--down-solid]"
+      }
+      className={mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"}
     />
   );
   const controlsTemporary =
@@ -109,15 +119,16 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 
   const mergedStatus = customStatus;
   const mergedSize = customizeSize;
+  const spinnerMode = mode === "spinner";
 
   // ===================== Disabled =====================
   const mergedDisabled = customDisabled;
 
   // Check if has addon to conditionally apply variant
-  const hasAddon = !!(addonBefore ?? addonAfter);
+  const hasAddon = !spinnerMode && !!(addonBefore ?? addonAfter);
 
   // Check if has affix (prefix/suffix/allowClear) - when true, affixWrapper is rendered
-  const hasAffix = !!(!!prefix || !!suffix || !!allowClear);
+  const hasAffix = !!(!!prefix || !!suffix || (!spinnerMode && !!allowClear));
 
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
@@ -131,7 +142,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       controls={controlsTemporary}
       prefix={prefix}
       suffix={suffix}
-      addonBefore={addonBefore}
+      addonBefore={spinnerMode ? undefined : addonBefore}
       // addonBefore={
       //   addonBefore && (
       //     <ContextIsolator form space>
@@ -139,7 +150,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       //     </ContextIsolator>
       //   )
       // }
-      addonAfter={addonAfter}
+      addonAfter={spinnerMode ? undefined : addonAfter}
       // addonAfter={
       //   addonAfter && (
       //     <ContextIsolator form space>
@@ -147,7 +158,8 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       //     </ContextIsolator>
       //   )
       // }
-      allowClear={allowClear}
+      allowClear={spinnerMode ? undefined : allowClear}
+      mode={mode}
       disabled={mergedDisabled}
       className={
         cn(
