@@ -11,10 +11,10 @@ import type { SizeType } from "../config-provider/size-context";
 import type {
   ValueType as NumberValueType,
   InputNumberProps as RcInputNumberProperties,
-} from "./_components/rc-input-number";
+} from "./components/rc-input-number";
 import type { InputStatus, InputVariant } from "./variants";
 import { Icon } from "../../icons";
-import RcInputNumber from "./_components/rc-input-number";
+import RcInputNumber from "./components/rc-input-number";
 import { inputSizeVariants, inputVariants } from "./variants";
 
 interface InputNumberProperties<
@@ -78,7 +78,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           ? "icon-[lucide--plus]"
           : "icon-[fluent-mdl2--caret-up-solid-8]"
       }
-      className={mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"}
+      className={
+        mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"
+      }
     />
   );
   let downIcon = (
@@ -88,7 +90,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           ? "icon-[lucide--minus]"
           : "icon-[teenyicons--down-solid]"
       }
-      className={mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"}
+      className={
+        mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"
+      }
     />
   );
   const controlsTemporary =
@@ -96,24 +100,12 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 
   if (typeof controls === "object") {
     upIcon =
-      controls.upIcon === undefined ? (
-        upIcon
-      ) : (
-        <span
-        // className={`${prefixCls}-handler-up-inner`}
-        >
-          {controls.upIcon}
-        </span>
-      );
+      controls.upIcon === undefined ? upIcon : <span>{controls.upIcon}</span>;
     downIcon =
       controls.downIcon === undefined ? (
         downIcon
       ) : (
-        <span
-        // className={`${prefixCls}-handler-down-inner`}
-        >
-          {controls.downIcon}
-        </span>
+        <span>{controls.downIcon}</span>
       );
   }
 
@@ -129,6 +121,14 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 
   // Check if has affix (prefix/suffix/allowClear) - when true, affixWrapper is rendered
   const hasAffix = !!(!!prefix || !!suffix || (!spinnerMode && !!allowClear));
+  const spinnerSizeClassNameBySize: Record<NonNullable<SizeType>, string> = {
+    small: "h-6",
+    middle: "h-8 text-sm",
+    large: "h-10 text-base",
+  };
+  const spinnerSizeClass = spinnerMode
+    ? spinnerSizeClassNameBySize[mergedSize ?? "middle"]
+    : undefined;
 
   //  const suffixNode = hasFeedback && <>{feedbackIcon}</>;
 
@@ -166,8 +166,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           // Only apply variant to outer element when no addon
           !hasAddon &&
             inputVariants({ status: mergedStatus, variant: customVariant }),
-          // Only apply size (padding) when no addon
-          !hasAddon && inputSizeVariants({ size: mergedSize }),
+          // Spinner mode owns its inner layout; do not add input shell padding to the group root
+          !hasAddon && !spinnerMode && inputSizeVariants({ size: mergedSize }),
+          spinnerSizeClass,
           className,
         )
         // cssVarCls, rootCls, className, rootClassName, compactItemClassnames
@@ -175,12 +176,13 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       classNames={{
         input: cn(
           "flex-1",
-          "text-left",
+          spinnerMode && "min-w-0 w-full",
+          !spinnerMode && "text-left",
           "bg-transparent",
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
           "border-none outline-hidden",
-          "w-px",
+          !spinnerMode && "w-px",
           // Add padding when has addon (match Input behavior)
           // hasAddon && addonBefore && "pl-[11px]",
           // hasAddon && addonAfter && "pr-[11px]",
@@ -270,4 +272,4 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 export { InputNumber };
 export type { InputNumberProperties as InputNumberProps };
 
-export { type ValueType as NumberValueType } from "./_components/rc-input-number";
+export { type ValueType as NumberValueType } from "./components/rc-input-number";

@@ -3,6 +3,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from ".";
 import { Button } from "../button/button";
+import { ButtonGroupInput as ButtonGroupInputExample } from "./examples/button-group-input";
 
 const meta = {
   title: "Components/ButtonGroup",
@@ -23,8 +24,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args) => (
-    <ButtonGroup {...args}>
+  render: (arguments_) => (
+    <ButtonGroup {...arguments_}>
       <Button>Button 1</Button>
       <Button>Button 2</Button>
       <Button>Button 3</Button>
@@ -36,8 +37,8 @@ export const Vertical: Story = {
   args: {
     orientation: "vertical",
   },
-  render: (args) => (
-    <ButtonGroup {...args}>
+  render: (arguments_) => (
+    <ButtonGroup {...arguments_}>
       <Button>Button 1</Button>
       <Button>Button 2</Button>
       <Button>Button 3</Button>
@@ -46,8 +47,8 @@ export const Vertical: Story = {
 };
 
 export const WithSeparator: Story = {
-  render: (args) => (
-    <ButtonGroup {...args}>
+  render: (arguments_) => (
+    <ButtonGroup {...arguments_}>
       <Button>Left</Button>
       <ButtonGroupSeparator />
       <Button>Right</Button>
@@ -56,8 +57,8 @@ export const WithSeparator: Story = {
 };
 
 export const WithText: Story = {
-  render: (args) => (
-    <ButtonGroup {...args}>
+  render: (arguments_) => (
+    <ButtonGroup {...arguments_}>
       <Button>Action</Button>
       <ButtonGroupText>Or</ButtonGroupText>
       <Button variant="outlined">Alternative</Button>
@@ -66,15 +67,15 @@ export const WithText: Story = {
 };
 
 export const Toolbar: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex flex-col gap-4">
-      <ButtonGroup {...args}>
+      <ButtonGroup {...arguments_}>
         <Button variant="outlined">Copy</Button>
         <Button variant="outlined">Paste</Button>
         <Button variant="outlined">Cut</Button>
       </ButtonGroup>
 
-      <ButtonGroup {...args}>
+      <ButtonGroup {...arguments_}>
         <Button variant="solid" color="primary">
           Save
         </Button>
@@ -89,13 +90,13 @@ export const Toolbar: Story = {
 
 // Interaction Testing - Test clicking buttons in a group
 export const InteractionTest: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const handleCopy = fn();
     const handlePaste = fn();
     const handleCut = fn();
 
     return (
-      <ButtonGroup {...args}>
+      <ButtonGroup {...arguments_}>
         <Button variant="outlined" onClick={handleCopy}>
           Copy
         </Button>
@@ -131,12 +132,12 @@ export const InteractionTest: Story = {
 
 // Interaction Testing - Test button group with separator
 export const InteractionWithSeparator: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const handleSave = fn();
     const handleDelete = fn();
 
     return (
-      <ButtonGroup {...args}>
+      <ButtonGroup {...arguments_}>
         <Button variant="solid" color="primary" onClick={handleSave}>
           Save
         </Button>
@@ -166,4 +167,8 @@ export const InteractionWithSeparator: Story = {
       await userEvent.click(canvas.getByRole("button", { name: /delete/i }));
     });
   },
+};
+
+export const WithInput: Story = {
+  render: () => <ButtonGroupInputExample />,
 };

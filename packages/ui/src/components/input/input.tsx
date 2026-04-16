@@ -9,7 +9,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { Variant } from "../config-provider";
 import type { SizeType } from "../config-provider/size-context";
-import type { HolderRef as HolderReference } from "./_components/base-input";
+import type { HolderRef as HolderReference } from "./components/base-input";
 import type {
   ChangeEventInfo,
   CommonInputProps as CommonInputProperties,
@@ -26,7 +26,7 @@ import DisabledContext from "../config-provider/disabled-context";
 import useSize from "../config-provider/hooks/use-size";
 import useVariant from "../form/hooks/use-variant";
 import { useCompactItemContext } from "../space/compact";
-import { BaseInput } from "./_components/base-input";
+import { BaseInput } from "./components/base-input";
 import useCount from "./hooks/use-count";
 import { resolveOnChange, triggerFocus } from "./utils/common-utils";
 import { inputSizeVariants, inputVariants } from "./variants";
@@ -188,8 +188,7 @@ const Input = (properties: InputProperties) => {
           nativeElement:
             holderReference.current?.nativeElement ?? inputReference.current,
         }
-      :  
-        null,
+      : null,
   );
   // useImperativeHandle(ref, () =>
   //   typeof ref === "object" && ref?.current && "current" in ref.current

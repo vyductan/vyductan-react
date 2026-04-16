@@ -12,10 +12,11 @@ import getMiniDecimal, {
 } from "@rc-component/mini-decimal";
 import { useLayoutUpdateEffect } from "@rc-component/util/es/hooks/useLayoutEffect";
 import proxyObject from "@rc-component/util/es/proxyObject";
+import raf from "@rc-component/util/es/raf";
 import { composeRef } from "@rc-component/util/es/ref";
 import { useHover } from "ahooks";
-import raf from "@rc-component/util/es/raf";
 
+import { Button } from "@acme/ui/components/button";
 import { ButtonGroup } from "@acme/ui/components/button-group";
 import { cn } from "@acme/ui/lib/utils";
 
@@ -439,8 +440,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         setUncontrolledDecimalValue(updateValue);
         onChange?.(
           updateValue.isEmpty()
-            ?  
-              null
+            ? null
             : (getDecimalValue(stringMode, updateValue) as T),
         );
 
@@ -770,14 +770,15 @@ const InputNumber = <T extends ValueType = ValueType>({
   }, []);
 
   const handleReset = () => {
-     
     rest.onChange?.(null);
     focus();
   };
 
   // Ref to hold onStep function from InternalInputNumber
   const onStepReference = React.useRef<((up: boolean) => void) | null>(null);
-  const spinnerStepTimeoutReference = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const spinnerStepTimeoutReference = React.useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const spinnerFrameIdsReference = React.useRef<number[]>([]);
   const suppressSpinnerClickReference = React.useRef(false);
 
@@ -912,14 +913,16 @@ const InputNumber = <T extends ValueType = ValueType>({
       <ButtonGroup
         ref={inputNumberDomReference}
         data-slot="input-number-spinner"
-        className={cn("w-[90px] overflow-hidden", className)}
+        className={cn("w-[120px] overflow-hidden", className)}
         style={style}
       >
         {controls ? (
-          <button
-            type="button"
+          <Button
+            htmlType="button"
+            variant="text"
+            shape="default"
             aria-label="Decrease value"
-            className="flex shrink-0 items-center justify-center border-r px-3"
+            className="h-auto rounded-none border-y-0 border-r border-l-0 px-3 shadow-none"
             disabled={disabled || rest.readOnly || downDisabled}
             onMouseDown={(event) => {
               handleSpinnerStepMouseDown(event, false);
@@ -937,7 +940,7 @@ const InputNumber = <T extends ValueType = ValueType>({
             }}
           >
             {downHandler}
-          </button>
+          </Button>
         ) : null}
 
         <BaseInput
@@ -980,10 +983,12 @@ const InputNumber = <T extends ValueType = ValueType>({
         </BaseInput>
 
         {controls ? (
-          <button
-            type="button"
+          <Button
+            htmlType="button"
+            variant="text"
+            shape="default"
             aria-label="Increase value"
-            className="flex shrink-0 items-center justify-center border-l px-3"
+            className="h-auto rounded-none border-y-0 border-r-0 border-l px-3 shadow-none"
             disabled={disabled || rest.readOnly || upDisabled}
             onMouseDown={(event) => {
               handleSpinnerStepMouseDown(event, true);
@@ -1001,7 +1006,7 @@ const InputNumber = <T extends ValueType = ValueType>({
             }}
           >
             {upHandler}
-          </button>
+          </Button>
         ) : null}
       </ButtonGroup>
     );
