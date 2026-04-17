@@ -1,3 +1,4 @@
+import type { CSSProperties, ReactNode } from "react";
 import type { VariantProps } from "class-variance-authority";
 import { tv } from "tailwind-variants";
 
@@ -8,8 +9,23 @@ import { Badge } from "@acme/ui/shadcn/badge";
 import type { BadgeProps } from "../badge";
 import { useComponentConfig } from "../config-provider";
 
-// Based on Vercel
-const color: Record<string, string> = {
+const familyColors = [
+  "red",
+  "orange",
+  "amber",
+  "lime",
+  "green",
+  "cyan",
+  "blue",
+  "indigo",
+  "purple",
+  "pink",
+  "rose",
+] as const;
+
+type FamilyColor = (typeof familyColors)[number];
+
+const legacyColorClasses: Record<string, string> = {
   default: "bg-gray-100 text-foreground border-gray-300",
   primary: "bg-primary-300 text-primary-700 border-primary-300",
   success: "bg-green-100 text-green-700 border-green-300",
@@ -20,6 +36,7 @@ const color: Record<string, string> = {
   gray: "bg-gray-100 text-gray-600 border-gray-300",
   yellow: "bg-yellow-100 text-yellow-800 border-yellow-300",
   amber: "bg-amber-100 text-amber-700 border-amber-300",
+  lime: "bg-lime-100 text-lime-700 border-lime-300",
   blue: "bg-blue-100 text-blue-700 border-blue-300",
   indigo: "bg-indigo-100 text-indigo-700 border-indigo-300",
   fuchsia: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-300",
@@ -34,35 +51,77 @@ const color: Record<string, string> = {
   "green-solid": "bg-green-600 text-white",
 };
 
-// Based on antd
-const colorBordered: Record<string, string> = {
-  default: "bg-gray-100 text-gray-700 border-gray-300",
-  primary: "bg-primary-200 text-primary-900 border-primary-600",
-  success: "bg-success-muted text-success border-green-600",
-  processing: "bg-blue-200 text-blue-900 border-blue-600",
-  error: "bg-red-200 text-red-900 border-red-600",
-  warning: "bg-amber-200 text-amber-900 border-amber-600",
-  gray: "bg-gray-200 text-gray-950 border-gray-600",
-  amber: "bg-amber-200 text-amber-900 border-amber-600",
-  blue: "bg-blue-200 text-blue-900 border-blue-600",
-  indigo: "bg-indigo-200 text-indigo-900 border-indigo-600",
-  orange: "bg-orange-200 text-orange-900 border-orange-600",
-  fuchsia: "bg-fuchsia-200 text-fuchsia-800 border-fuchsia-600",
-  green: "bg-green-200 text-green-900 border-green-600",
-  red: "bg-red-200 text-red-900 border-red-600",
-  rose: "bg-rose-100 text-rose-600 border-rose-400",
-  pink: "bg-pink-300 text-pink-900 border-pink-600",
-  purple: "bg-purple-200 text-purple-900 border-purple-600",
-  teal: "bg-teal-300 text-teal-900 border-teal-600",
+const familyColorClasses: Record<
+  FamilyColor,
+  {
+    filled: string;
+    solid: string;
+    outlined: string;
+  }
+> = {
+  red: {
+    filled: "bg-red-100 text-red-700 border-transparent",
+    solid: "bg-red-600 text-white border-red-600",
+    outlined: "bg-red-50 text-red-700 border-red-300",
+  },
+  orange: {
+    filled: "bg-orange-100 text-orange-700 border-transparent",
+    solid: "bg-orange-600 text-white border-orange-600",
+    outlined: "bg-orange-50 text-orange-700 border-orange-300",
+  },
+  amber: {
+    filled: "bg-amber-100 text-amber-700 border-transparent",
+    solid: "bg-amber-600 text-white border-amber-600",
+    outlined: "bg-amber-50 text-amber-700 border-amber-300",
+  },
+  lime: {
+    filled: "bg-lime-100 text-lime-700 border-transparent",
+    solid: "bg-lime-600 text-white border-lime-600",
+    outlined: "bg-lime-50 text-lime-700 border-lime-300",
+  },
+  green: {
+    filled: "bg-green-100 text-green-700 border-transparent",
+    solid: "bg-green-600 text-white border-green-600",
+    outlined: "bg-green-50 text-green-700 border-green-300",
+  },
+  cyan: {
+    filled: "bg-cyan-100 text-cyan-700 border-transparent",
+    solid: "bg-cyan-600 text-white border-cyan-600",
+    outlined: "bg-cyan-50 text-cyan-700 border-cyan-300",
+  },
+  blue: {
+    filled: "bg-blue-100 text-blue-700 border-transparent",
+    solid: "bg-blue-600 text-white border-blue-600",
+    outlined: "bg-blue-50 text-blue-700 border-blue-300",
+  },
+  indigo: {
+    filled: "bg-indigo-100 text-indigo-700 border-transparent",
+    solid: "bg-indigo-600 text-white border-indigo-600",
+    outlined: "bg-indigo-50 text-indigo-700 border-indigo-300",
+  },
+  purple: {
+    filled: "bg-purple-100 text-purple-700 border-transparent",
+    solid: "bg-purple-600 text-white border-purple-600",
+    outlined: "bg-purple-50 text-purple-700 border-purple-300",
+  },
+  pink: {
+    filled: "bg-pink-100 text-pink-700 border-transparent",
+    solid: "bg-pink-600 text-white border-pink-600",
+    outlined: "bg-pink-50 text-pink-700 border-pink-300",
+  },
+  rose: {
+    filled: "bg-rose-100 text-rose-700 border-transparent",
+    solid: "bg-rose-600 text-white border-rose-600",
+    outlined: "bg-rose-50 text-rose-700 border-rose-300",
+  },
 };
+
 const tagVariants = tv({
   base: [
     "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border font-medium whitespace-nowrap transition-[color,box-shadow]",
     "[&>svg]:pointer-events-none [&>svg]:size-3",
     "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
     "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-
-    // "px-2.5",
   ],
   variants: {
     variant: {
@@ -74,13 +133,33 @@ const tagVariants = tv({
         "bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 text-white",
       outline:
         "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-      // own
+      filled: "",
       solid: "text-white",
+      outlined: "",
     },
-    color,
-    bordered: {
-      true: "",
-      false: "border-transparent",
+    color: {
+      default: "",
+      primary: "",
+      success: "",
+      processing: "",
+      error: "",
+      warning: "",
+      orange: "",
+      gray: "",
+      yellow: "",
+      amber: "",
+      lime: "",
+      blue: "",
+      indigo: "",
+      fuchsia: "",
+      green: "",
+      cyan: "",
+      red: "",
+      rose: "",
+      pink: "",
+      purple: "",
+      teal: "",
+      "green-solid": "",
     },
     size: {
       default: "px-[7px] py-0.5 text-xs",
@@ -91,19 +170,16 @@ const tagVariants = tv({
   defaultVariants: {
     variant: "default",
     color: "default",
-    bordered: true,
     size: "default",
   },
   compoundVariants: [
     {
-      bordered: true,
       color: "default",
-      className: colorBordered.default,
+      className: legacyColorClasses.default,
     },
     {
-      bordered: true,
       color: "primary",
-      className: colorBordered.primary,
+      className: legacyColorClasses.primary,
     },
     {
       variant: "default",
@@ -118,33 +194,124 @@ const tagVariants = tv({
   ],
 });
 
+type TagColor = VariantProps<typeof tagVariants>["color"];
+
 type TagProps = BadgeProps &
-  VariantProps<typeof tagVariants> & {
-    icon?: React.ReactNode;
-    closeIcon?: React.ReactNode;
+  Omit<VariantProps<typeof tagVariants>, "color"> & {
+    color?: TagColor | `#${string}`;
+    icon?: ReactNode;
+    closeIcon?: ReactNode;
     onClose?: () => void;
   };
+
+function getNamedColorClassName(
+  variant: TagProps["variant"],
+  color: TagProps["color"],
+): string | undefined {
+  if (typeof color !== "string" || color.startsWith("#")) {
+    return undefined;
+  }
+
+  const finalVariant = variant === "outlined" ? "outlined" : variant;
+  let className: string | undefined;
+
+  if (familyColors.includes(color as FamilyColor)) {
+    const familyColor = color as FamilyColor;
+
+    switch (finalVariant) {
+      case "filled": {
+        className = familyColorClasses[familyColor].filled;
+        break;
+      }
+      case "solid": {
+        className = familyColorClasses[familyColor].solid;
+        break;
+      }
+      case "outlined": {
+        className = familyColorClasses[familyColor].outlined;
+        break;
+      }
+      default: {
+        className = legacyColorClasses[familyColor];
+        break;
+      }
+    }
+  } else if (
+    (finalVariant === "filled" ||
+      finalVariant === "solid" ||
+      finalVariant === "outlined") &&
+    color in legacyColorClasses
+  ) {
+    className = legacyColorClasses[color];
+  }
+
+  if (finalVariant === "filled" && className) {
+    return className.replaceAll(
+      /border-(?!transparent)\S+/g,
+      "border-transparent",
+    );
+  }
+
+  return className;
+}
+
+function getHexStyle(
+  variant: TagProps["variant"],
+  color: TagProps["color"],
+): CSSProperties | undefined {
+  if (typeof color !== "string" || !color.startsWith("#")) {
+    return undefined;
+  }
+
+  if (variant === "solid") {
+    return {
+      backgroundColor: color,
+      borderColor: color,
+      color: "#fff",
+    };
+  }
+
+  if (variant === "filled") {
+    return {
+      backgroundColor: `color-mix(in srgb, ${color} 10%, white)`,
+      color: `color-mix(in srgb, ${color} 80%, black)`,
+    };
+  }
+
+  if (variant === "outlined") {
+    return {
+      backgroundColor: `color-mix(in srgb, ${color} 4%, white)`,
+      borderColor: `color-mix(in srgb, ${color} 30%, white)`,
+      color: `color-mix(in srgb, ${color} 84%, black)`,
+    };
+  }
+
+  return undefined;
+}
 
 const Tag = ({
   className,
   variant,
   color,
-  bordered: borderedProp,
   icon,
   closeIcon,
   onClose,
+  style,
   ...props
 }: TagProps) => {
   const tagConfig = useComponentConfig("tag");
-  const bordered = borderedProp ?? tagConfig.bordered;
   const finalVariant = variant ?? tagConfig.variant;
   const finalColor = color ?? tagConfig.color;
-
   const finalSize = props.size ?? tagConfig.size;
-
-  // Check if color is a hex color (starts with #)
-  const isHexColor =
-    typeof finalColor === "string" && finalColor.startsWith("#");
+  const isHexColor = typeof finalColor === "string" && finalColor.startsWith("#");
+  const colorName = isHexColor ? undefined : (finalColor as TagColor);
+  const namedColorClassName = getNamedColorClassName(finalVariant, finalColor);
+  const hexStyle = getHexStyle(finalVariant, finalColor);
+  const mergedStyle = {
+    ...tagConfig.style,
+    ...hexStyle,
+    ...style,
+  };
 
   return (
     <Badge
@@ -152,23 +319,16 @@ const Tag = ({
       className={cn(
         tagVariants({
           variant: finalVariant,
-          color: isHexColor ? undefined : finalColor,
-          bordered,
+          color: colorName,
           size: finalSize,
         }),
+        namedColorClassName,
         closeIcon && "pr-1",
-        isHexColor && "text-white",
+        isHexColor && finalVariant !== "solid" && "text-white",
         tagConfig.className,
         className,
       )}
-      style={
-        isHexColor
-          ? {
-              backgroundColor: finalColor,
-              borderColor: finalColor,
-            }
-          : undefined
-      }
+      style={mergedStyle}
       {...props}
     >
       {icon}
@@ -179,15 +339,15 @@ const Tag = ({
           icon="icon-[lucide--x]"
           className="size-3 cursor-pointer opacity-50 transition-opacity hover:opacity-100"
           tabIndex={-1}
-          onPointerDown={(e) => {
-            e.stopPropagation();
+          onPointerDown={(event) => {
+            event.stopPropagation();
           }}
-          onPointerUp={(e) => {
-            e.stopPropagation();
+          onPointerUp={(event) => {
+            event.stopPropagation();
             onClose?.();
           }}
-          onClick={(e) => {
-            e.stopPropagation();
+          onClick={(event) => {
+            event.stopPropagation();
           }}
         />
       ) : (
@@ -197,5 +357,5 @@ const Tag = ({
   );
 };
 
-export { Tag, tagVariants, color as tagColors };
+export { Tag, tagVariants, legacyColorClasses as tagColors };
 export type { TagProps };
