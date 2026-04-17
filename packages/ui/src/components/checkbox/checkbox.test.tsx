@@ -2,12 +2,12 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { Checkbox } from "./checkbox";
-import { Checkbox as PublicCheckbox } from "./index";
 import CardComposableExample from "./examples/card-composable";
+import { Checkbox as PublicCheckbox } from "./index";
 
 globalThis.React = React;
 
@@ -132,10 +132,53 @@ describe("Checkbox", () => {
     expect(labelContent).not.toHaveClass("px-2");
   });
 
+  test("public Checkbox renders the minus icon when indeterminate", () => {
+    const { container } = render(<PublicCheckbox checked="indeterminate" />);
+
+    const checkbox = screen.getByRole("checkbox");
+    const indicator = container.querySelector('[data-slot="checkbox-indicator"]');
+    const minusIcon = indicator?.querySelector('svg path[d="M5 12h14"]');
+    const checkIcon = indicator?.querySelector(
+      'svg path[d="m9 12 2 2 4-4"]',
+    );
+
+    expect(checkbox).toHaveAttribute("data-state", "indeterminate");
+    expect(indicator).not.toBeNull();
+    expect(minusIcon).not.toBeNull();
+    expect(checkIcon).toBeNull();
+  });
+
   test("public Checkbox without children does not wrap an extra label", () => {
     const { container } = render(
       <label>
         <PublicCheckbox defaultChecked />
+        <span>Auto Start</span>
+      </label>,
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: /Auto Start/i,
+      }),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll("label label")).toHaveLength(0);
+  });
+
+  test("public Checkbox without children still emits onChange when clicked", () => {
+    const onChange = vi.fn();
+
+    render(<PublicCheckbox checked={false} onChange={onChange} />);
+
+    fireEvent.click(screen.getByRole("checkbox"));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange.mock.calls[0]?.[0]?.target?.checked).toBe(true);
+  });
+
+  test("public Checkbox without children and with onChange still avoids nested labels", () => {
+    const { container } = render(
+      <label>
+        <PublicCheckbox defaultChecked onChange={vi.fn()} />
         <span>Auto Start</span>
       </label>,
     );

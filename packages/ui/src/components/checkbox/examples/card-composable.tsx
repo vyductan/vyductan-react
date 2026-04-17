@@ -1,7 +1,8 @@
 import type React from "react";
 
-import { Checkbox } from "../index";
 import { Label } from "@acme/ui/components/label";
+
+import { Checkbox } from "../index";
 
 const App: React.FC = () => {
   return (

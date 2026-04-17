@@ -4,12 +4,12 @@ import type { CheckboxGroupContext, CheckboxValueType } from "./group-context";
 import { devUseWarning as developmentUseWarning } from "../_util/warning";
 import { cn } from "../../lib/utils";
 import Wave from "../../lib/wave";
-import { Checkbox as ShadcnCheckbox } from "../../shadcn/checkbox";
 import { LoadingIcon } from "../button/loading-icon";
 import { ConfigContext } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
 import { inputDisabledVariants, inputSizeVariants } from "../input/variants";
 import { Label } from "../label/label";
+import { CheckboxControl } from "./_components/checkbox-control";
 import GroupContext from "./group-context";
 import useBubbleLock from "./use-bubble-lock";
 
@@ -175,9 +175,8 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
         onMouseLeave={onMouseLeave}
         onClick={onLabelClick}
       >
-        <ShadcnCheckbox
+        <CheckboxControl
           className={cn(
-            "data-[state=indeterminate]:bg-muted",
             variant === "card" ? "self-start" : "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
             variant === "card" && [

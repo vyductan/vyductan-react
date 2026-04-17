@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import BasicExample from "./examples/basic";
 import CardExample from "./examples/card";
 import CardComposableExample from "./examples/card-composable";
+import CheckAllExample from "./examples/check-all";
 import GroupExample from "./examples/group";
 import { Checkbox } from "./index";
 
@@ -133,6 +134,15 @@ export const CheckboxGroup: Story = {
     <ComponentSource
       src="checkbox/examples/group.tsx"
       __comp__={GroupExample}
+    />
+  ),
+};
+
+export const CheckAll: Story = {
+  render: () => (
+    <ComponentSource
+      src="checkbox/examples/check-all.tsx"
+      __comp__={CheckAllExample}
     />
   ),
 };

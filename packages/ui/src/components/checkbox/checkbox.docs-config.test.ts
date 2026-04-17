@@ -26,6 +26,12 @@ const checkboxExampleInventory: ReadonlyArray<{
     partialImportPath: "./examples/card.mdx",
     partialComponentName: "CardExample",
   },
+  {
+    heading: "Check All",
+    sourcePath: "checkbox/examples/check-all.tsx",
+    partialImportPath: "./examples/check-all.mdx",
+    partialComponentName: "CheckAllExample",
+  },
 ] as const;
 
 const checkboxCardTabInventory: ReadonlyArray<{
