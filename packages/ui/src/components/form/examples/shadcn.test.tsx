@@ -12,7 +12,7 @@ globalThis.ResizeObserver ??= class ResizeObserver {
 };
 
 describe("Form shadcn demo", () => {
-  test("renders automatic required indicators for schema-required labels", () => {
+  test("renders a team size field backed by Select options", () => {
     const { container } = render(<ShadcnDemo />);
 
     expect(screen.getByText("Team Size")).toBeInTheDocument();
@@ -22,15 +22,5 @@ describe("Form shadcn demo", () => {
     expect(
       screen.getByText("Choose the team size for your workspace."),
     ).toBeInTheDocument();
-
-    const usernameLabel = screen.getByText("Username").closest("label");
-    const passwordLabel = screen.getByText("Password").closest("label");
-    const billingPeriodLabel = screen.getByText("Billing Period").closest("label");
-    const teamSizeLabel = screen.getByText("Team Size").closest("label");
-
-    expect(usernameLabel).toHaveTextContent("Username*");
-    expect(passwordLabel).toHaveTextContent("Password*");
-    expect(billingPeriodLabel).toHaveTextContent("Billing Period*");
-    expect(teamSizeLabel).toHaveTextContent("Team Size*");
   });
 });

@@ -5,10 +5,10 @@ import { Select } from "@acme/ui/components/select";
 
 const options: SelectProps["options"] = [];
 
-for (let i = 10; i < 36; i++) {
+for (let index = 10; index < 36; index++) {
   options.push({
-    value: i.toString(36) + i,
-    label: i.toString(36) + i,
+    value: index.toString(36) + index,
+    label: index.toString(36) + index,
   });
 }
 

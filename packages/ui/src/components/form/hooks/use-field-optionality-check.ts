@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import _ from "lodash";
-import { ZodOptional } from "zod";
+import { ZodNullable, ZodOptional } from "zod";
 
 import { useFormContext } from "../context";
 
@@ -47,6 +47,8 @@ export const useRequiredFieldCheck = (
 
     const zodField = _.get(shape, zodFieldPath);
     if (!zodField) handleNotFoundField(fieldName);
-    return !(zodField instanceof ZodOptional);
+    return !(
+      zodField instanceof ZodOptional || zodField instanceof ZodNullable
+    );
   }, [fieldName, schema, defaultRequired]);
 };
