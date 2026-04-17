@@ -1,5 +1,5 @@
-import type * as React from "react";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type * as React from "react";
 
 import { ComponentSource } from "../mdx/component-source";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";

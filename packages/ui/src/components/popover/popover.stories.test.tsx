@@ -18,9 +18,13 @@ describe("Popover stories", () => {
 
     const { container } = render(rendered);
 
-    expect(container.querySelectorAll('[data-slot="code-box-demo"]')).toHaveLength(1);
     expect(
-      container.querySelector('[data-slot="tabs-content"][data-state="inactive"]')?.children,
+      container.querySelectorAll('[data-slot="code-box-demo"]'),
+    ).toHaveLength(1);
+    expect(
+      container.querySelector(
+        '[data-slot="tabs-content"][data-state="inactive"]',
+      )?.children,
     ).toHaveLength(0);
   });
 

@@ -64,21 +64,23 @@ export const Popover = (props: PopoverProps) => {
     ...restProps
   } = props;
 
-  const side = placement?.includes("top")
-    ? "top"
-    : placement?.includes("right")
-      ? "right"
-      : !placement || placement.includes("bottom")
-        ? "bottom"
-        : "left";
-  const align = placement?.includes("Top")
-    ? "start"
-    : !placement ||
-        (!placement.includes("Left") && !placement.includes("Right"))
-      ? "center"
-      : placement.includes("Left")
-        ? "start"
-        : "end";
+  let side: "top" | "right" | "bottom" | "left" = "bottom";
+  if (placement?.includes("top")) {
+    side = "top";
+  } else if (placement?.includes("right")) {
+    side = "right";
+  } else if (placement?.includes("left")) {
+    side = "left";
+  }
+
+  let align: "start" | "center" | "end" = "center";
+  if (placement?.includes("Top")) {
+    align = "start";
+  } else if (placement?.includes("Left")) {
+    align = "start";
+  } else if (placement?.includes("Right")) {
+    align = "end";
+  }
 
   const alignOffset = domAlign?.offset?.[0];
   const sideOffset = domAlign?.offset?.[1];
