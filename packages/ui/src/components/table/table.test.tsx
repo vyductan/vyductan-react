@@ -33,6 +33,16 @@ type SelectionHarnessRecord = {
   name: string;
 };
 
+type NumericSelectionHarnessRecord = {
+  id: number;
+  name: string;
+};
+
+type ControlledStringSelectionHarnessRecord = {
+  key: string;
+  name: string;
+};
+
 const columns: ColumnsType<SelectionHarnessRecord> = [
   {
     key: "name",
@@ -48,8 +58,88 @@ const data: SelectionHarnessRecord[] = [
   },
 ];
 
+const numericData: NumericSelectionHarnessRecord[] = [
+  {
+    id: 1,
+    name: "John Brown",
+  },
+];
+
+const controlledStringData: ControlledStringSelectionHarnessRecord[] = [
+  {
+    key: "1",
+    name: "John Brown",
+  },
+];
+
 const tableExamplesDir = path.resolve(import.meta.dirname, "./examples");
+
+function ControlledStringSelectionHarness({
+  initialSelectedRowKeys = ["1"],
+  onChange,
+}: {
+  initialSelectedRowKeys?: React.Key[];
+  onChange?: (nextSelectedRowKeys: React.Key[]) => void;
+}) {
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
+    initialSelectedRowKeys,
+  );
+
+  return (
+    <Table<ControlledStringSelectionHarnessRecord>
+      columns={[
+        {
+          key: "name",
+          dataIndex: "name",
+          title: "Name",
+        },
+      ]}
+      dataSource={controlledStringData}
+      rowSelection={{
+        selectedRowKeys,
+        onChange: (nextSelectedRowKeys) => {
+          setSelectedRowKeys(nextSelectedRowKeys);
+          onChange?.(nextSelectedRowKeys);
+        },
+      }}
+    />
+  );
+}
 const tableDocsPath = path.resolve(import.meta.dirname, "./table.mdx");
+const tableSourcePath = path.resolve(import.meta.dirname, "./table.tsx");
+
+function ControlledNumericSelectionHarness({
+  initialSelectedRowKeys = [1],
+  onChange,
+}: {
+  initialSelectedRowKeys?: React.Key[];
+  onChange?: (nextSelectedRowKeys: React.Key[]) => void;
+}) {
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
+    initialSelectedRowKeys,
+  );
+
+  return (
+    <Table<NumericSelectionHarnessRecord>
+      rowKey="id"
+      columns={[
+        {
+          key: "name",
+          dataIndex: "name",
+          title: "Name",
+        },
+      ]}
+      dataSource={numericData}
+      rowSelection={{
+        selectedRowKeys,
+        onChange: (nextSelectedRowKeys) => {
+          setSelectedRowKeys(nextSelectedRowKeys);
+          onChange?.(nextSelectedRowKeys);
+        },
+      }}
+    />
+  );
+}
 
 function SelectionDropdownHarness({
   getPopupContainer,
@@ -121,12 +211,8 @@ describe("Table", () => {
       "utf8",
     );
 
-    expect(dragSortingFullRow).toContain(
-      'from "@acme/ui/components/table"',
-    );
-    expect(dragSortingWithHandle).toContain(
-      'from "@acme/ui/components/table"',
-    );
+    expect(dragSortingFullRow).toContain('from "@acme/ui/components/table"');
+    expect(dragSortingWithHandle).toContain('from "@acme/ui/components/table"');
     expect(dragSortingFullRow).not.toContain(
       'from "../_components/table-sortable-row"',
     );
@@ -149,8 +235,42 @@ describe("Table", () => {
     expect(localeModule).toHaveProperty("useLocale");
   });
 
+  test("table source uses the public skeleton component import", () => {
+    const tableSource = readFileSync(tableSourcePath, "utf8");
+
+    expect(tableSource).toContain('from "../skeleton"');
+    expect(tableSource).not.toContain('from "../../shadcn/skeleton"');
+  });
+
+  test("table source uses the public Checkbox component for row selection", () => {
+    const tableSource = readFileSync(tableSourcePath, "utf8");
+
+    expect(tableSource).toContain('from "../checkbox"');
+    expect(tableSource).toContain("<Checkbox");
+  });
+
+  test("keeps the header selection checkbox inside a stable centering wrapper", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowSelection={{
+          onChange: vi.fn(),
+        }}
+      />,
+    );
+
+    const headerCheckbox = within(container).getByRole("checkbox", {
+      name: "Select all",
+    });
+    const wrapper = headerCheckbox.parentElement;
+
+    expect(wrapper).not.toBeNull();
+    expect(wrapper).toHaveClass("flex", "items-center", "justify-center");
+  });
+
   test("uses a single table scroll container for own table mode", () => {
-    render(
+    const { container } = render(
       <Table
         columns={[
           {
@@ -169,9 +289,9 @@ describe("Table", () => {
       />,
     );
 
-    expect(screen.getByText("John Brown")).not.toBeNull();
+    expect(within(container).getByText("John Brown")).not.toBeNull();
     expect(
-      document.querySelectorAll('[data-slot="table-container"]'),
+      container.querySelectorAll('[data-slot="table-scroll-container"]'),
     ).toHaveLength(1);
   });
 
@@ -210,6 +330,150 @@ describe("Table", () => {
 
     await waitFor(() => {
       expect(handleSelect).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test("renders a row selection checkbox without hanging", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowSelection={{
+          onChange: vi.fn(),
+        }}
+      />,
+    );
+
+    expect(
+      within(container).getByRole("checkbox", {
+        name: "Select row",
+      }),
+    ).not.toBeNull();
+  });
+
+  test("checks a row checkbox and reports the selected key", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowSelection={{
+          onChange: handleChange,
+        }}
+      />,
+    );
+
+    const rowCheckbox = within(container).getByRole("checkbox", {
+      name: "Select row",
+    });
+    const nativeClick = vi.fn();
+
+    rowCheckbox.addEventListener("click", nativeClick);
+
+    expect(rowCheckbox).not.toBeChecked();
+
+    await user.click(rowCheckbox);
+
+    await waitFor(() => {
+      expect(nativeClick).toHaveBeenCalledTimes(1);
+    });
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith(
+        ["1"],
+        [data[0]],
+        expect.objectContaining({ type: "all" }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(
+        within(container).getByRole("checkbox", {
+          name: "Select row",
+        }),
+      ).toBeChecked();
+    });
+  });
+
+  test("supports controlled rowSelection with string keys", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    const { container } = render(
+      <ControlledStringSelectionHarness onChange={handleChange} />,
+    );
+
+    const rowCheckbox = within(container).getByRole("checkbox", {
+      name: "Select row",
+    });
+
+    expect(rowCheckbox).toBeChecked();
+
+    await user.click(rowCheckbox);
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith([]);
+    });
+
+    await waitFor(() => {
+      expect(
+        within(container).getByRole("checkbox", {
+          name: "Select row",
+        }),
+      ).not.toBeChecked();
+    });
+  });
+
+  test("supports controlled rowSelection with numeric rowKey values", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    const { container } = render(
+      <ControlledNumericSelectionHarness onChange={handleChange} />,
+    );
+
+    const rowCheckbox = within(container).getByRole("checkbox", {
+      name: "Select row",
+    });
+
+    expect(rowCheckbox).toBeChecked();
+
+    await user.click(rowCheckbox);
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith([]);
+    });
+
+    await waitFor(() => {
+      expect(
+        within(container).getByRole("checkbox", {
+          name: "Select row",
+        }),
+      ).not.toBeChecked();
+    });
+  });
+
+  test("preserves numeric rowKey types in rowSelection onChange", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    const { container } = render(
+      <ControlledNumericSelectionHarness
+        initialSelectedRowKeys={[]}
+        onChange={handleChange}
+      />,
+    );
+
+    await user.click(
+      within(container).getByRole("checkbox", {
+        name: "Select row",
+      }),
+    );
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith([1]);
     });
   });
 });

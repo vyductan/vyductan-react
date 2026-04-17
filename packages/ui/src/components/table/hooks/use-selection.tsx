@@ -10,13 +10,17 @@
 /* eslint-disable unicorn/prefer-ternary */
 /* eslint-disable unicorn/no-array-for-each */
 
-import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
+import type {
+  OnChangeFn,
+  RowSelectionState,
+  Updater,
+} from "@tanstack/react-table";
 import React, { useCallback, useMemo } from "react";
 import { useMergedState } from "@rc-component/util";
 import { createPortal } from "react-dom";
 
 import type { AnyObject } from "../../_util/type";
-import type { CheckboxProps } from "../../checkbox";
+import type { CheckboxProps } from "../../checkbox/checkbox";
 import type { DataNode, GetCheckDisabled } from "../../tree/types";
 import type {
   ColumnsType,
@@ -36,7 +40,6 @@ import useMultipleSelect from "../../_util/hooks/use-multiple-select";
 import { devUseWarning } from "../../_util/warning";
 import { Icon } from "../../../icons";
 import { cn } from "../../../lib/utils";
-import { Checkbox } from "../../checkbox";
 import { arrAdd, arrDel } from "../../tree/util";
 import { conductCheck } from "../../tree/utils/conduct-util";
 import { convertDataToEntities } from "../../tree/utils/tree-util";
@@ -217,6 +220,66 @@ function SelectionActionsDropdown({
   );
 }
 
+function SelectionCheckbox({
+  checked,
+  indeterminate = false,
+  checkboxProps,
+  onChange,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  checkboxProps?: SelectionCheckboxProps;
+  onChange: (event: SelectionChangeEvent) => void;
+}): React.ReactNode {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      id={checkboxProps?.id}
+      name={checkboxProps?.name}
+      value={
+        checkboxProps?.value as string | number | readonly string[] | undefined
+      }
+      disabled={checkboxProps?.disabled}
+      aria-checked={indeterminate ? "mixed" : checked}
+      aria-label={checkboxProps?.["aria-label"]}
+      aria-labelledby={checkboxProps?.["aria-labelledby"]}
+      className={cn(
+        "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors outline-none",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
+        (checked || indeterminate) &&
+          "border-primary bg-primary text-primary-foreground",
+        checkboxProps?.className,
+      )}
+      style={checkboxProps?.style}
+      onMouseEnter={checkboxProps?.onMouseEnter}
+      onMouseLeave={checkboxProps?.onMouseLeave}
+      onClick={(event) => {
+        event.stopPropagation();
+        checkboxProps?.onClick?.(event);
+
+        if (checkboxProps?.disabled) {
+          return;
+        }
+
+        onChange(
+          createSelectionChangeEvent(
+            checkboxProps,
+            indeterminate ? true : !checked,
+            event.nativeEvent,
+          ),
+        );
+      }}
+    >
+      {indeterminate ? (
+        <span className="block h-0.5 w-2 rounded-full bg-current" />
+      ) : checked ? (
+        <Icon icon="icon-[lucide--check]" className="size-3" />
+      ) : null}
+    </button>
+  );
+}
+
 function SelectionRadio({
   checked,
   checkboxProps,
@@ -349,19 +412,6 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
   } = config;
 
   const warning = devUseWarning("Table");
-
-  // ========================= Tanstack Table State =========================
-  const [rowSelectionState, setRowSelectionState] =
-    useMergedState<RowSelectionState>(
-      toRowSelectionState(rowSelection?.defaultSelectedRowKeys),
-      {
-        value: toRowSelectionState(rowSelection?.selectedRowKeys),
-        // onChange: (value) => {
-        //   if (!onSelectionChange) return;
-        //   onSelectionChange(value);
-        // },
-      },
-    );
 
   // ========================= MultipleSelect =========================
   const [multipleSelect, updatePrevSelectedIndex] = useMultipleSelect<
@@ -658,6 +708,24 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
     setSelectedKeys,
   ]);
 
+  const rowSelectionState = useMemo<RowSelectionState>(
+    () => toRowSelectionState(mergedSelectedKeys),
+    [mergedSelectedKeys],
+  );
+
+  const onRowSelectionChange = useCallback<OnChangeFn<RowSelectionState>>(
+    (updaterOrValue: Updater<RowSelectionState>) => {
+      const nextState =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(rowSelectionState)
+          : updaterOrValue;
+      const nextKeys = Object.keys(nextState).filter((key) => nextState[key]);
+
+      setSelectedKeys(nextKeys, "all");
+    },
+    [rowSelectionState, setSelectedKeys],
+  );
+
   // ======================= Columns ========================
   const transformColumns = useCallback(
     (columns: ColumnsType<RecordType>): ColumnsType<RecordType> => {
@@ -756,7 +824,7 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
           allDisabled && allDisabledData.some(({ checked }) => checked);
 
         columnTitleCheckbox = (
-          <Checkbox
+          <SelectionCheckbox
             checked={
               allDisabled
                 ? allDisabledAndChecked
@@ -767,10 +835,15 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
                 ? !allDisabledAndChecked && allDisabledSomeChecked
                 : !checkedCurrentAll && checkedCurrentSome
             }
-            onChange={onSelectAllChange}
-            disabled={flattedData.length === 0 || allDisabled}
-            aria-label={customizeSelections ? "Custom selection" : "Select all"}
-            skipGroup
+            checkboxProps={{
+              disabled: flattedData.length === 0 || allDisabled,
+              "aria-label": customizeSelections
+                ? "Custom selection"
+                : "Select all",
+            }}
+            onChange={() => {
+              onSelectAllChange();
+            }}
           />
         );
 
@@ -829,15 +902,10 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
           // Record checked
           return {
             node: (
-              <Checkbox
-                // {...checkboxProps}
+              <SelectionCheckbox
                 indeterminate={mergedIndeterminate}
                 checked={checked}
-                skipGroup
-                onClick={(e) => {
-                  e.stopPropagation();
-                  checkboxProps?.onClick?.(e);
-                }}
+                checkboxProps={checkboxProps}
                 onChange={(event) => {
                   const { nativeEvent } = event;
                   const { shiftKey } = nativeEvent;
@@ -1042,7 +1110,7 @@ const useSelection = <RecordType extends AnyObject = AnyObject>(
 
   return [
     rowSelectionState,
-    setRowSelectionState,
+    onRowSelectionChange,
     transformColumns,
     derivedSelectedKeySet,
   ] as const;

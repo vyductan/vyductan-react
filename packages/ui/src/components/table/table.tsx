@@ -1,13 +1,12 @@
 "use client";
 
 import type {
-  ColumnDef,
   ExpandedState,
   OnChangeFn,
   Row,
   Table as TableDef,
 } from "@tanstack/react-table";
-import React, { Fragment, useEffect, useRef } from "react";
+import React, { Fragment, useRef } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -33,6 +32,7 @@ import type {
   Key,
   LegacyExpandableProps,
   RcTableProps,
+  RowSelectMethod,
   SorterResult,
   SorterTooltipProps,
   SortOrder,
@@ -46,11 +46,11 @@ import type {
 import scrollTo from "../_util/scroll-to";
 import { devUseWarning } from "../_util/warning";
 import { cn } from "../../lib/utils";
-import { Skeleton } from "../../shadcn/skeleton";
 import { Checkbox } from "../checkbox";
 import { ConfigContext, useComponentConfig } from "../config-provider/context";
 import defaultLocale from "../locale/en-us";
 import { Pagination } from "../pagination";
+import { Skeleton } from "../skeleton";
 import { Spin } from "../spin";
 import {
   TableBody,
@@ -74,6 +74,112 @@ import { TableStoreProvider } from "./hooks/use-table";
 import { getCommonPinningClassName, getCommonPinningStyles } from "./styles";
 
 const EMPTY_LIST: AnyObject[] = [];
+
+function normalizeSelectionKeys(keys?: readonly Key[]) {
+  return (keys ?? []).map(String);
+}
+
+function flattenSelectionData<RecordType extends AnyObject = AnyObject>(
+  data: readonly RecordType[],
+  childrenColumnName: string,
+): RecordType[] {
+  let list: RecordType[] = [];
+
+  for (const record of data) {
+    list.push(record);
+
+    if (
+      record &&
+      typeof record === "object" &&
+      childrenColumnName in record &&
+      Array.isArray(record[childrenColumnName])
+    ) {
+      list = [
+        ...list,
+        ...flattenSelectionData(
+          record[childrenColumnName] as readonly RecordType[],
+          childrenColumnName,
+        ),
+      ];
+    }
+  }
+
+  return list;
+}
+
+function SelectionControl({
+  type,
+  checked,
+  indeterminate = false,
+  disabled = false,
+  ariaLabel,
+  className,
+  onClick,
+  onToggle,
+}: {
+  type: "checkbox" | "radio";
+  checked: boolean;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  ariaLabel: string;
+  className?: string;
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+  onToggle: () => void;
+}) {
+  if (type === "radio") {
+    return (
+      <span className="flex w-full items-center justify-center leading-none">
+        <button
+          type="button"
+          role="radio"
+          aria-checked={checked}
+          aria-label={ariaLabel}
+          disabled={disabled}
+          className={cn(
+            "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-full border align-middle outline-none transition-colors",
+            "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
+            checked ? "border-primary bg-primary text-primary-foreground" : undefined,
+            className,
+          )}
+          onClick={(event) => {
+            event.stopPropagation();
+            onClick?.(event);
+            onToggle();
+          }}
+        >
+          <span
+            className={cn(
+              "size-2 rounded-full bg-transparent",
+              checked && "bg-current",
+            )}
+          />
+        </button>
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex w-full items-center justify-center leading-none">
+      <Checkbox
+        aria-label={ariaLabel}
+        checked={indeterminate ? "indeterminate" : checked}
+        disabled={disabled}
+        className={cn("align-middle", className)}
+        onClick={(event: React.MouseEvent<HTMLElement>) => {
+          event.stopPropagation();
+          onClick?.(event);
+        }}
+        onCheckedChange={() => {
+          if (disabled) {
+            return;
+          }
+
+          onToggle();
+        }}
+      />
+    </span>
+  );
+}
 
 interface ChangeEventInfo<RecordType = AnyObject> {
   pagination: {
@@ -433,38 +539,223 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
    * version.
    */
 
+  // ============================ Filter/Sort Data ============================
+  // const sortedData = React.useMemo(
+  //   () => getSortData(rawData, sortStates, childrenColumnName),
+  //   [rawData, sortStates],
+  // );
+  const sortedData = React.useMemo(() => [...rawData], [rawData]);
+
+  const mergedData = React.useMemo(
+    () =>
+      getFilterData(
+        sortedData,
+        [], // filterStates,
+        childrenColumnName,
+      ),
+    [sortedData, childrenColumnName],
+  );
+
   // ====================== Column ======================
-  // TODO: remove flattenColumns
+  const flattenedSelectionData = React.useMemo(
+    () => flattenSelectionData(mergedData, childrenColumnName),
+    [mergedData, childrenColumnName],
+  );
+
+  const [internalSelectedRowKeys, setInternalSelectedRowKeys] = React.useState<
+    string[]
+  >(() => normalizeSelectionKeys(rowSelection?.defaultSelectedRowKeys));
+
+  const controlledSelectedRowKeys = React.useMemo(
+    () => normalizeSelectionKeys(rowSelection?.selectedRowKeys),
+    [rowSelection?.selectedRowKeys],
+  );
+
+  const selectedRowKeys =
+    rowSelection?.selectedRowKeys === undefined
+      ? internalSelectedRowKeys
+      : controlledSelectedRowKeys;
+  const selectedKeySet = React.useMemo(
+    () => new Set(selectedRowKeys),
+    [selectedRowKeys],
+  );
+
+  const selectionType = rowSelection?.type ?? "checkbox";
+  const recordKeyBySelectionKey = React.useMemo(
+    () =>
+      new Map(
+        flattenedSelectionData.map((record, index) => {
+          const recordKey = getRowKey(record, index);
+          return [String(recordKey), recordKey] as const;
+        }),
+      ),
+    [flattenedSelectionData, getRowKey],
+  );
+  const selectedRows = React.useMemo(
+    () =>
+      selectedRowKeys
+        .map((key) => getRecordByKey(key))
+        .filter((record): record is TRecord => record !== undefined),
+    [getRecordByKey, selectedRowKeys],
+  );
+
+  const setSelectedRows = React.useCallback(
+    (nextKeys: string[], method: RowSelectMethod) => {
+      if (rowSelection?.selectedRowKeys === undefined) {
+        setInternalSelectedRowKeys(nextKeys);
+      }
+
+      const nextRows = nextKeys
+        .map((key) => getRecordByKey(key))
+        .filter((record): record is TRecord => record !== undefined);
+      const nextRecordKeys = nextKeys.map(
+        (key) => recordKeyBySelectionKey.get(key) ?? key,
+      );
+
+      rowSelection?.onChange?.(nextRecordKeys, nextRows, { type: method });
+    },
+    [getRecordByKey, recordKeyBySelectionKey, rowSelection],
+  );
+
+  const transformSelectionColumns = React.useCallback(
+    (columns: ColumnsType<TRecord>) => {
+      if (!rowSelection) {
+        return columns;
+      }
+
+      const selectionColumnWidth = rowSelection.columnWidth ?? 48;
+      const visibleSelectionKeys = flattenedSelectionData
+        .map((record, index) => ({
+          key: String(getRowKey(record, index)),
+          record,
+          disabled: rowSelection.getCheckboxProps?.(record)?.disabled ?? false,
+        }))
+        .filter((item) => !item.disabled);
+
+      const allChecked =
+        visibleSelectionKeys.length > 0 &&
+        visibleSelectionKeys.every((item) => selectedKeySet.has(item.key));
+      const someChecked = visibleSelectionKeys.some((item) =>
+        selectedKeySet.has(item.key),
+      );
+
+      const toggleAll = () => {
+        const nextKeys = allChecked
+          ? selectedRowKeys.filter(
+              (key) => !visibleSelectionKeys.some((item) => item.key === key),
+            )
+          : [
+              ...new Set([
+                ...selectedRowKeys,
+                ...visibleSelectionKeys.map((item) => item.key),
+              ]),
+            ];
+
+        setSelectedRows(nextKeys, "all");
+      };
+
+      const selectionColumn = {
+        key: "__select__",
+        width: selectionColumnWidth,
+        minWidth:
+          typeof selectionColumnWidth === "number" ? selectionColumnWidth : 48,
+        title:
+          selectionType === "radio"
+            ? null
+            : rowSelection.columnTitle
+              ? typeof rowSelection.columnTitle === "function"
+                ? rowSelection.columnTitle(
+                    <SelectionControl
+                      type="checkbox"
+                      ariaLabel="Select all"
+                      checked={allChecked}
+                      indeterminate={!allChecked && someChecked}
+                      disabled={visibleSelectionKeys.length === 0}
+                      onToggle={toggleAll}
+                    />,
+                  )
+                : rowSelection.columnTitle
+              : !rowSelection.hideSelectAll && (
+                  <SelectionControl
+                    type="checkbox"
+                    ariaLabel="Select all"
+                    checked={allChecked}
+                    indeterminate={!allChecked && someChecked}
+                    disabled={visibleSelectionKeys.length === 0}
+                    onToggle={toggleAll}
+                  />
+                ),
+        render: (_: unknown, record: TRecord, index: number) => {
+          const key = String(getRowKey(record, index));
+          const checkboxProps = rowSelection.getCheckboxProps?.(record);
+          const checked = selectedKeySet.has(key);
+          const originNode = (
+            <SelectionControl
+              type={selectionType}
+              ariaLabel="Select row"
+              checked={checked}
+              disabled={checkboxProps?.disabled ?? false}
+              className={checkboxProps?.className}
+              onClick={(event) => {
+                checkboxProps?.onClick?.(event);
+              }}
+              onToggle={() => {
+                if (checkboxProps?.disabled) {
+                  return;
+                }
+
+                const nextKeys =
+                  selectionType === "radio"
+                    ? [key]
+                    : checked
+                      ? selectedRowKeys.filter(
+                          (selectedKey) => selectedKey !== key,
+                        )
+                      : [...selectedRowKeys, key];
+
+                const method: RowSelectMethod =
+                  selectionType === "radio" ? "single" : "all";
+                setSelectedRows([...new Set(nextKeys)], method);
+              }}
+            />
+          );
+
+          return rowSelection.renderCell
+            ? rowSelection.renderCell(checked, record, index, originNode)
+            : originNode;
+        },
+        align: rowSelection.align ?? "center",
+        onCell: rowSelection.onCell,
+      } satisfies ColumnsType<TRecord>[0];
+
+      return [selectionColumn, ...columns];
+    },
+    [
+      flattenedSelectionData,
+      getRowKey,
+      rowSelection,
+      selectedKeySet,
+      selectedRowKeys,
+      selectionType,
+      setSelectedRows,
+    ],
+  );
+
   const [mergedColumns, columnsForTTTable, _flattenColumns] =
     useColumns<TRecord>(
       {
         ...props,
         ...expandableConfig,
-        // Only create expand column for custom expandedRowRender (row type)
-        // For tree data (nest type), expand icon renders inline in first data column
         expandable: !!expandableConfig.expandedRowRender,
         expandColumnTitle: expandableConfig.columnTitle,
         expandedKeys: mergedExpandedKeys,
         getRowKey,
-        // https://github.com/ant-design/ant-design/issues/23894
         onTriggerExpand,
         expandIcon: mergedExpandIcon,
         expandIconColumnIndex: expandableConfig.expandIconColumnIndex,
-        // direction,
-        // scrollWidth: useInternalHooks && tailor && typeof scrollX === 'number' ? scrollX : null,
-        // clientWidth: componentWidth,
-
-        //   expandable ??
-        //   (data.some((x) => childrenColumnName in x) ? {} : undefined),
-        // getRowKey,
-
-        // mergedChildrenColumnName,
-
-        // rowSelection: rowSelection,
         expandedRowRender: expandableConfig.expandedRowRender,
       },
-      // transformColumns,
-      null,
+      transformSelectionColumns,
     );
 
   // ============================ Sorter =============================
@@ -490,55 +781,15 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     _sorterTitleProps,
     getSorters,
   ] = useSorter<TRecord>({
-    mergedColumns: mergedColumns,
+    mergedColumns,
     onSorterChange,
     sortDirections: sortDirections ?? ["ascend", "descend"],
     tableLocale,
     showSorterTooltip,
   });
-  // const sortedData = React.useMemo(
-  //   () => getSortData(rawData, sortStates, childrenColumnName),
-  //   [rawData, sortStates],
-  // );
-  const sortedData = React.useMemo(() => [...rawData], [rawData]);
 
   changeEventInfo.sorter = getSorters();
   changeEventInfo.sorterStates = sortStates;
-
-  // ============================ Filter ============================
-  // const onFilterChange: FilterConfig<TRecord>["onFilterChange"] = (
-  //   filters,
-  //   filterStates,
-  // ) => {
-  //   triggerOnChange({ filters, filterStates }, "filter", true);
-  // };
-
-  // const [transformFilterColumns, _filterStates, filters] = useFilter<TRecord>({
-  //   locale: tableLocale,
-  //   mergedColumns: baseColumns,
-  //   onFilterChange,
-  //   getPopupContainer: getPopupContainer || getContextPopupContainer,
-  // });
-
-  const mergedData = getFilterData(
-    sortedData,
-    [], //filterStates,
-    childrenColumnName,
-  );
-
-  // const columnTitleProps = React.useMemo<ColumnTitleProps<TRecord>>(() => {
-  //   const mergedFilters: Record<string, FilterValue> = {};
-  //   for (const filterKey of Object.keys(filters)) {
-  //     if (filters[filterKey] !== null) {
-  //       mergedFilters[filterKey] = filters[filterKey]!;
-  //     }
-  //   }
-  //   return {
-  //     ...sorterTitleProps,
-  //     filters: mergedFilters,
-  //   };
-  // }, [sorterTitleProps, filters]);
-  // const [transformTitleColumns] = useTitleColumns(columnTitleProps);
 
   // ====================== Pinnings ======================
 
@@ -600,18 +851,6 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   mergedPagination?.total,
   // ]);
 
-  // ========================== Selections ==========================
-
-  const [selectedRowKeys, setSelectedRowKeys] = React.useState<React.Key[]>(
-    rowSelection?.selectedRowKeys || [],
-  );
-  useEffect(() => {
-    setSelectedRowKeys(rowSelection?.selectedRowKeys || []);
-  }, [rowSelection?.selectedRowKeys]);
-
-  // const selectedRowKeys = Object.keys(rowSelectionState);
-  const selectedRows = selectedRowKeys.map((key) => getRecordByKey(key));
-
   // ====================== Table Instance ======================
   // Memoize columns to prevent unnecessary re-renders
   // const memoizedColumns = React.useMemo(
@@ -649,69 +888,13 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
   //   [transformSorterColumns, transformFilterColumns, transformSelectionColumns],
   // );
 
-  // Filter selectedRowKeys to only include keys that exist in mergedData
-  // This prevents TanStack Table from trying to select non-existent rows (e.g., when data is filtered)
-  const availableRowKeys = React.useMemo(() => {
-    const keySet = new Set(
-      mergedData.map((item, index) => getRowKey(item, index).toString()),
-    );
-    return selectedRowKeys.filter((key) => keySet.has(key.toString()));
-  }, [mergedData, selectedRowKeys, getRowKey]);
-
   // Create table instance with memoized values and required properties
 
   const table = useReactTable({
     data: mergedData,
-    columns: [
-      ...(rowSelection
-        ? [
-            {
-              id: "__select__",
-              size:
-                typeof rowSelection.columnWidth === "number"
-                  ? rowSelection.columnWidth
-                  : 32,
-              minSize:
-                typeof rowSelection.columnWidth === "number"
-                  ? rowSelection.columnWidth
-                  : 32,
-              enableResizing: false,
-              meta: {
-                align: "center",
-              },
-              header: ({ table }) => (
-                <Checkbox
-                  checked={table.getIsAllPageRowsSelected()}
-                  indeterminate={table.getIsSomePageRowsSelected()}
-                  onChange={(e) =>
-                    table.toggleAllPageRowsSelected(!!e.target.checked)
-                  }
-                  aria-label="Select all"
-                  skipGroup
-                  className="mx-auto flex items-center justify-center"
-                />
-              ),
-              cell: ({ row }) => (
-                <Checkbox
-                  checked={row.getIsSelected()}
-                  indeterminate={row.getIsSomeSelected()}
-                  onChange={(e) => row.toggleSelected(!!e.target.checked)}
-                  aria-label="Select row"
-                  className="mx-auto flex items-center justify-center"
-                />
-              ),
-              enableSorting: false,
-              enableHiding: false,
-            } as ColumnDef<TRecord, unknown>,
-          ]
-        : []),
-      ...columnsForTTTable,
-    ],
+    columns: columnsForTTTable,
     state: {
       sorting: sortingState,
-      rowSelection: Object.fromEntries(
-        availableRowKeys.map((key) => [key.toString(), true]),
-      ),
       expanded: expandedState,
     },
     // Core functionality
@@ -732,51 +915,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
     },
     onExpandedChange: handleExpandedChange,
     // Row selection
-    enableRowSelection: true,
-    // Enable sub-row selection for tree data (parent/child linked selection)
-    // Unless checkStrictly is true (parent/child selection independent)
-    enableSubRowSelection: rowSelection?.checkStrictly === true ? false : true,
-    onRowSelectionChange: (updater) => {
-      const newRowSelection =
-        typeof updater === "function"
-          ? updater(table.getState().rowSelection)
-          : updater;
-
-      const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection).map(
-        (stringKey) => {
-          // console.log("aa", stringKey, mergedData);
-          return getRowKey(getRecordByKey(stringKey), 0);
-        },
-      );
-      // Convert string keys back to React.Key[] by finding the original keys
-      // const newSelectedRowKeys: React.Key[] = Object.keys(newRowSelection)
-      //   .map((stringKey) => {
-      //     // Find the original row that matches this string key
-      //     const rowIndex = mergedData.findIndex((item, index) =>
-      //       getRowKey(item, index).toString() === stringKey
-      //     );
-      //     if (rowIndex !== -1) {
-      //       return getRowKey(mergedData[rowIndex]!, rowIndex);
-      //     }
-      //     // Fallback: try to parse as number if possible, otherwise keep as string
-      //     const numKey = Number(stringKey);
-      //     return isNaN(numKey) ? stringKey : numKey;
-      //   })
-      //   .filter((key): key is React.Key => key !== undefined);
-
-      setSelectedRowKeys(newSelectedRowKeys);
-
-      const selectedRows = mergedData.filter((item, index) =>
-        newSelectedRowKeys.includes(getRowKey(item, index)),
-      );
-
-      const info = {
-        type: "all" as const,
-      };
-
-      rowSelection?.onChange?.(newSelectedRowKeys, selectedRows, info);
-    },
-    // onRowSelectionChange: setRowSelection,
+    enableRowSelection: false,
+    enableSubRowSelection: false,
     // Sorting
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSortingState,
@@ -1114,7 +1254,11 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                       ) : (
                         <Fragment key={row.id}>
                           <TableRowComp
-                            data-state={row.getIsSelected() && "selected"}
+                            data-state={
+                              selectedKeySet.has(
+                                String(getRowKey(row.original, rowIndex)),
+                              ) && "selected"
+                            }
                             data-row-key={getRowKey(row.original, rowIndex)}
                             className={cn(
                               // row.getIsExpanded() && "bg-gray-50",

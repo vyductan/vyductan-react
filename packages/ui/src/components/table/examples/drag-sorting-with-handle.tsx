@@ -18,12 +18,8 @@ import {
 } from "@dnd-kit/sortable";
 
 import type { TableProps } from "@acme/ui/components/table";
-import {
-  DragHandle,
-  Table,
-  TableRowSortable,
-} from "@acme/ui/components/table";
 import { Space } from "@acme/ui/components/space";
+import { DragHandle, Table, TableRowSortable } from "@acme/ui/components/table";
 import { Tag } from "@acme/ui/components/tag";
 
 interface DataType {

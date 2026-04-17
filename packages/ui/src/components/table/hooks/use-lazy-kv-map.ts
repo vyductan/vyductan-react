@@ -22,41 +22,44 @@ const useLazyKVMap = <RecordType extends AnyObject = AnyObject>(
 ) => {
   const mapCacheRef = React.useRef<MapCache<RecordType>>({});
 
-  function getRecordByKey(key: Key): RecordType {
-    if (
-      mapCacheRef.current?.data !== data ||
-      mapCacheRef.current.childrenColumnName !== childrenColumnName ||
-      mapCacheRef.current.getRowKey !== getRowKey
-    ) {
-      const kvMap = new Map<Key, RecordType>();
+  const getRecordByKey = React.useCallback(
+    (key: Key): RecordType => {
+      if (
+        mapCacheRef.current?.data !== data ||
+        mapCacheRef.current.childrenColumnName !== childrenColumnName ||
+        mapCacheRef.current.getRowKey !== getRowKey
+      ) {
+        const kvMap = new Map<Key, RecordType>();
 
-      function dig(records: readonly RecordType[]) {
-        records.forEach((record, index) => {
-          const rowKey = getRowKey(record, index);
-          kvMap.set(rowKey.toString(), record);
+        function dig(records: readonly RecordType[]) {
+          records.forEach((record, index) => {
+            const rowKey = getRowKey(record, index);
+            kvMap.set(rowKey.toString(), record);
 
-          if (
-            record &&
-            typeof record === "object" &&
-            childrenColumnName in record
-          ) {
-            dig(record[childrenColumnName] || []);
-          }
-        });
+            if (
+              record &&
+              typeof record === "object" &&
+              childrenColumnName in record
+            ) {
+              dig(record[childrenColumnName] || []);
+            }
+          });
+        }
+
+        dig(data);
+
+        mapCacheRef.current = {
+          data,
+          childrenColumnName,
+          kvMap,
+          getRowKey,
+        };
       }
 
-      dig(data);
-
-      mapCacheRef.current = {
-        data,
-        childrenColumnName,
-        kvMap,
-        getRowKey,
-      };
-    }
-
-    return mapCacheRef.current.kvMap?.get(key)!;
-  }
+      return mapCacheRef.current.kvMap?.get(key)!;
+    },
+    [data, childrenColumnName, getRowKey],
+  );
 
   return [getRecordByKey] as const;
 };
