@@ -1,13 +1,16 @@
 import { cn } from "@acme/ui/lib/utils";
 import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
+import { useContext } from "react";
 
 import type { FormLabelAlign } from "../form";
-import type { ColProps } from "../grid";
+import { FormFieldContext } from "../form/context";
+import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check";
+import type { ColProps as ColProperties } from "../grid";
 import { useFormContext } from "../form";
 import { Col } from "../grid";
 
-type FieldLabelProps = React.ComponentProps<typeof ShadFieldLabel> & {
-  labelCol?: ColProps;
+type FieldLabelProperties = React.ComponentProps<typeof ShadFieldLabel> & {
+  labelCol?: ColProperties;
   labelAlign?: FormLabelAlign;
   labelWrap?: boolean;
   colon?: boolean;
@@ -21,8 +24,8 @@ const FieldLabel = ({
   colon,
   required,
   children,
-  ...props
-}: FieldLabelProps) => {
+  ...properties
+}: FieldLabelProperties) => {
   const formContext = useFormContext();
   const layout = formContext?.layout;
 
@@ -30,6 +33,10 @@ const FieldLabel = ({
   const mergedLabelAlign = labelAlign ?? formContext?.labelAlign;
   const mergedLabelWrap = labelWrap ?? formContext?.labelWrap;
   const mergedColon = colon ?? formContext?.colon;
+
+  const formFieldContext = useContext(FormFieldContext);
+  const inferredRequired = useRequiredFieldCheck(formFieldContext?.name);
+  const mergedRequired = required ?? inferredRequired ?? false;
 
   const labelNode = (
     <ShadFieldLabel
@@ -45,11 +52,11 @@ const FieldLabel = ({
           "overflow-hidden text-ellipsis whitespace-nowrap",
         className,
       )}
-      {...props}
+      {...properties}
     >
       {children}
       {mergedColon && ":"}
-      {required && <span className="text-destructive ml-1">*</span>}
+      {mergedRequired && <span className="text-destructive ml-1">*</span>}
     </ShadFieldLabel>
   );
 
