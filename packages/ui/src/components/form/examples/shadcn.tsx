@@ -36,6 +36,10 @@ import {
   SelectValue,
 } from "@acme/ui/components/select";
 import { Switch } from "@acme/ui/components/switch";
+import {
+  FormFieldContext,
+  Provider as FormProvider,
+} from "@acme/ui/components/form";
 
 import { Input } from "../../input";
 
@@ -57,6 +61,13 @@ const addons = [
   },
 ] as const;
 
+const teamSizeOptions = [
+  { value: "solo", label: "Solo" },
+  { value: "small", label: "2-10 people" },
+  { value: "growth", label: "11-50 people" },
+  { value: "enterprise", label: "50+ people" },
+] as const;
+
 const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -73,6 +84,17 @@ const formSchema = z.object({
       error: "Please select a billing period",
     })
     .min(1, "Please select a billing period"),
+  teamSize: z
+    .string({
+      error: "Please select a team size",
+    })
+    .min(1, "Please select a team size")
+    .refine(
+      (value) => teamSizeOptions.some((option) => option.value === value),
+      {
+        message: "Invalid team size. Please choose an available option",
+      },
+    ),
   addons: z
     .array(z.string())
     .min(1, "Please select at least one add-on")
@@ -86,13 +108,13 @@ const formSchema = z.object({
   emailNotifications: z.boolean(),
 });
 
-type FormRhfComplexProps = {
+type FormRhfComplexProperties = {
   showPasswordError?: boolean;
 };
 
 export default function FormRhfComplex({
   showPasswordError = false,
-}: FormRhfComplexProps) {
+}: FormRhfComplexProperties) {
   const form = useForm({
     resolver: standardSchemaResolver(formSchema),
     defaultValues: {
@@ -100,6 +122,7 @@ export default function FormRhfComplex({
       password: showPasswordError ? "123" : "",
       plan: "basic",
       billingPeriod: "",
+      teamSize: undefined,
       addons: [],
       emailNotifications: false,
     },
@@ -115,7 +138,7 @@ export default function FormRhfComplex({
     toast("You submitted the following values:", {
       description: (
         <pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-          <code>{JSON.stringify(data, null, 2)}</code>
+          <code>{JSON.stringify(data, undefined, 2)}</code>
         </pre>
       ),
       position: "bottom-right",
@@ -129,247 +152,295 @@ export default function FormRhfComplex({
   }
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="border-b">
-        <CardTitle>You&apos;re almost there!</CardTitle>
-        <CardDescription>
-          Choose your subscription plan and billing period.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form id="form-rhf-complex" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              name="username"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-username">
-                    Username
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-input-username"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="shadcn"
-                    autoComplete="username"
-                  />
-                  <FieldDescription>
-                    This is your public display name. Must be between 3 and 10
-                    characters. Must only contain letters, numbers, and
-                    underscores.
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <Controller
-              name="password"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-password">
-                    Password
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-input-password"
-                    type="password"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Enter password"
-                    autoComplete="new-password"
-                  />
-                  <FieldDescription>
-                    Must be at least 8 characters.
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
+    <FormProvider
+      value={{
+        id: "form-rhf-complex",
+        form: { ...form, schema: formSchema } as never,
+        children: null,
+      }}
+    >
+      <Card className="w-full max-w-sm">
+        <CardHeader className="border-b">
+          <CardTitle>You&apos;re almost there!</CardTitle>
+          <CardDescription>
+            Choose your subscription plan and billing period.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form id="form-rhf-complex" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <Controller
+                name="username"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-input-username">
+                        Username
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="form-rhf-input-username"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="shadcn"
+                        autoComplete="username"
+                      />
+                      <FieldDescription>
+                        This is your public display name. Must be between 3 and 10
+                        characters. Must only contain letters, numbers, and
+                        underscores.
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </FormFieldContext.Provider>
+                )}
+              />
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-input-password">
+                        Password
+                      </FieldLabel>
+                      <Input
+                        {...field}
+                        id="form-rhf-input-password"
+                        type="password"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Enter password"
+                        autoComplete="new-password"
+                      />
+                      <FieldDescription>
+                        Must be at least 8 characters.
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </FormFieldContext.Provider>
+                )}
+              />
+            </FieldGroup>
 
-          <FieldGroup>
-            <Controller
-              name="plan"
-              control={form.control}
-              render={({ field, fieldState }) => {
-                const isInvalid = fieldState.invalid;
-                return (
-                  <FieldSet data-invalid={isInvalid}>
-                    <FieldLegend variant="label">Subscription Plan</FieldLegend>
-                    <FieldDescription>
-                      Choose your subscription plan.
-                    </FieldDescription>
-                    <RadioGroup
-                      name={field.name}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      aria-invalid={isInvalid}
-                    >
-                      <FieldLabel htmlFor="form-rhf-complex-basic">
-                        <Field orientation="horizontal">
-                          <FieldContent>
-                            <FieldTitle>Basic</FieldTitle>
-                            <FieldDescription>
-                              For individuals and small teams
-                            </FieldDescription>
-                          </FieldContent>
-                          <RadioGroupItem
-                            value="basic"
-                            id="form-rhf-complex-basic"
-                          />
-                        </Field>
-                      </FieldLabel>
-                      <FieldLabel htmlFor="form-rhf-complex-pro">
-                        <Field orientation="horizontal">
-                          <FieldContent>
-                            <FieldTitle>Pro</FieldTitle>
-                            <FieldDescription>
-                              For businesses with higher demands
-                            </FieldDescription>
-                          </FieldContent>
-                          <RadioGroupItem
-                            value="pro"
-                            id="form-rhf-complex-pro"
-                          />
-                        </Field>
-                      </FieldLabel>
-                    </RadioGroup>
-                    {isInvalid && <FieldError errors={[fieldState.error]} />}
-                  </FieldSet>
-                );
-              }}
-            />
-            <FieldSeparator />
-            <Controller
-              name="billingPeriod"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-complex-billingPeriod">
-                    Billing Period
-                  </FieldLabel>
-                  <Select
-                    name={field.name}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger
-                      id="form-rhf-complex-billingPeriod"
-                      aria-invalid={fieldState.invalid}
-                    >
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="yearly">Yearly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FieldDescription>
-                    Choose how often you want to be billed.
-                  </FieldDescription>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            <FieldSeparator />
-            <Controller
-              name="addons"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FieldSet>
-                  <FieldLegend>Add-ons</FieldLegend>
-                  <FieldDescription>
-                    Select additional features you&apos;d like to include.
-                  </FieldDescription>
-                  <FieldGroup data-slot="checkbox-group">
-                    {addons.map((addon) => (
-                      <Field
-                        key={addon.id}
-                        orientation="horizontal"
-                        data-invalid={fieldState.invalid}
-                      >
-                        <Checkbox
-                          id={`form-rhf-complex-${addon.id}`}
+            <FieldGroup>
+              <Controller
+                name="plan"
+                control={form.control}
+                render={({ field, fieldState }) => {
+                  const isInvalid = fieldState.invalid;
+                  return (
+                    <FormFieldContext.Provider value={{ name: field.name }}>
+                      <FieldSet data-invalid={isInvalid}>
+                        <FieldLegend variant="label">Subscription Plan</FieldLegend>
+                        <FieldDescription>
+                          Choose your subscription plan.
+                        </FieldDescription>
+                        <RadioGroup
                           name={field.name}
-                          aria-invalid={fieldState.invalid}
-                          checked={field.value.includes(addon.id)}
-                          onCheckedChange={(checked) => {
-                            const newValue = checked
-                              ? [...field.value, addon.id]
-                              : field.value.filter(
-                                  (value) => value !== addon.id,
-                                );
-                            field.onChange(newValue);
-                            field.onBlur();
-                          }}
-                        />
-                        <FieldContent>
-                          <FieldLabel htmlFor={`form-rhf-complex-${addon.id}`}>
-                            {addon.title}
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          aria-invalid={isInvalid}
+                        >
+                          <FieldLabel htmlFor="form-rhf-complex-basic">
+                            <Field orientation="horizontal">
+                              <FieldContent>
+                                <FieldTitle>Basic</FieldTitle>
+                                <FieldDescription>
+                                  For individuals and small teams
+                                </FieldDescription>
+                              </FieldContent>
+                              <RadioGroupItem
+                                value="basic"
+                                id="form-rhf-complex-basic"
+                              />
+                            </Field>
                           </FieldLabel>
-                          <FieldDescription>
-                            {addon.description}
-                          </FieldDescription>
-                        </FieldContent>
-                      </Field>
-                    ))}
-                  </FieldGroup>
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </FieldSet>
-              )}
-            />
-            <FieldSeparator />
-            <Controller
-              name="emailNotifications"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field
-                  orientation="horizontal"
-                  data-invalid={fieldState.invalid}
-                >
-                  <FieldContent>
-                    <FieldLabel htmlFor="form-rhf-complex-emailNotifications">
-                      Email Notifications
-                    </FieldLabel>
-                    <FieldDescription>
-                      Receive email updates about your subscription
-                    </FieldDescription>
-                  </FieldContent>
-                  <Switch
-                    id="form-rhf-complex-emailNotifications"
-                    name={field.name}
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter className="border-t">
-        <Field>
-          <Button type="submit" form="form-rhf-complex">
-            Save Preferences
-          </Button>
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
-            Reset
-          </Button>
-        </Field>
-      </CardFooter>
-    </Card>
+                          <FieldLabel htmlFor="form-rhf-complex-pro">
+                            <Field orientation="horizontal">
+                              <FieldContent>
+                                <FieldTitle>Pro</FieldTitle>
+                                <FieldDescription>
+                                  For businesses with higher demands
+                                </FieldDescription>
+                              </FieldContent>
+                              <RadioGroupItem
+                                value="pro"
+                                id="form-rhf-complex-pro"
+                              />
+                            </Field>
+                          </FieldLabel>
+                        </RadioGroup>
+                        {isInvalid && <FieldError errors={[fieldState.error]} />}
+                      </FieldSet>
+                    </FormFieldContext.Provider>
+                  );
+                }}
+              />
+              <FieldSeparator />
+              <Controller
+                name="billingPeriod"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-complex-billingPeriod">
+                        Billing Period
+                      </FieldLabel>
+                      <Select
+                        name={field.name}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger
+                          id="form-rhf-complex-billingPeriod"
+                          aria-invalid={fieldState.invalid}
+                        >
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="yearly">Yearly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FieldDescription>
+                        Choose how often you want to be billed.
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </FormFieldContext.Provider>
+                )}
+              />
+              <FieldSeparator />
+              <Controller
+                name="teamSize"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="form-rhf-complex-teamSize">
+                        Team Size
+                      </FieldLabel>
+                      <Select
+                        id="form-rhf-complex-teamSize"
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={teamSizeOptions.map((option) => ({ ...option }))}
+                        placeholder="Select a team size"
+                        aria-invalid={fieldState.invalid}
+                      />
+                      <FieldDescription>
+                        Choose the team size for your workspace.
+                      </FieldDescription>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </FormFieldContext.Provider>
+                )}
+              />
+              <FieldSeparator />
+              <Controller
+                name="addons"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <FieldSet>
+                      <FieldLegend>Add-ons</FieldLegend>
+                      <FieldDescription>
+                        Select additional features you&apos;d like to include.
+                      </FieldDescription>
+                      <FieldGroup data-slot="checkbox-group">
+                        {addons.map((addon) => (
+                          <Field
+                            key={addon.id}
+                            orientation="horizontal"
+                            data-invalid={fieldState.invalid}
+                          >
+                            <Checkbox
+                              id={`form-rhf-complex-${addon.id}`}
+                              name={field.name}
+                              aria-invalid={fieldState.invalid}
+                              checked={field.value.includes(addon.id)}
+                              onCheckedChange={(checked) => {
+                                const newValue = checked
+                                  ? [...field.value, addon.id]
+                                  : field.value.filter(
+                                      (value) => value !== addon.id,
+                                    );
+                                field.onChange(newValue);
+                                field.onBlur();
+                              }}
+                            />
+                            <FieldContent>
+                              <FieldLabel htmlFor={`form-rhf-complex-${addon.id}`}>
+                                {addon.title}
+                              </FieldLabel>
+                              <FieldDescription>
+                                {addon.description}
+                              </FieldDescription>
+                            </FieldContent>
+                          </Field>
+                        ))}
+                      </FieldGroup>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </FieldSet>
+                  </FormFieldContext.Provider>
+                )}
+              />
+              <FieldSeparator />
+              <Controller
+                name="emailNotifications"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormFieldContext.Provider value={{ name: field.name }}>
+                    <Field
+                      orientation="horizontal"
+                      data-invalid={fieldState.invalid}
+                    >
+                      <FieldContent>
+                        <FieldLabel htmlFor="form-rhf-complex-emailNotifications">
+                          Email Notifications
+                        </FieldLabel>
+                        <FieldDescription>
+                          Receive email updates about your subscription
+                        </FieldDescription>
+                      </FieldContent>
+                      <Switch
+                        id="form-rhf-complex-emailNotifications"
+                        name={field.name}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-invalid={fieldState.invalid}
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  </FormFieldContext.Provider>
+                )}
+              />
+            </FieldGroup>
+          </form>
+        </CardContent>
+        <CardFooter className="border-t">
+          <Field>
+            <Button type="submit" form="form-rhf-complex">
+              Save Preferences
+            </Button>
+            <Button type="button" variant="outline" onClick={() => form.reset()}>
+              Reset
+            </Button>
+          </Field>
+        </CardFooter>
+      </Card>
+    </FormProvider>
   );
 }
