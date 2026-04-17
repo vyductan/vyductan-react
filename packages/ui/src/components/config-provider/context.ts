@@ -121,8 +121,10 @@ type TagVariantConfig =
   | "secondary"
   | "destructive"
   | "outline"
-  | "solid";
-type TagColorConfig =
+  | "filled"
+  | "solid"
+  | "outlined";
+type TagNamedColorConfig =
   | "default"
   | "primary"
   | "success"
@@ -133,6 +135,7 @@ type TagColorConfig =
   | "gray"
   | "yellow"
   | "amber"
+  | "lime"
   | "blue"
   | "indigo"
   | "fuchsia"
@@ -144,6 +147,8 @@ type TagColorConfig =
   | "purple"
   | "teal"
   | "green-solid";
+
+type TagColorConfig = TagNamedColorConfig | `#${string}`;
 type TagSizeConfig = "small" | "default" | "large";
 
 export type ButtonConfig = ComponentStyleConfig & {
@@ -232,7 +237,6 @@ export interface TableConfig extends ComponentStyleConfig {
 }
 
 export type TagConfig = ComponentStyleConfig & {
-  bordered?: boolean;
   variant?: TagVariantConfig;
   color?: TagColorConfig;
   size?: TagSizeConfig;
