@@ -11,20 +11,20 @@ import type { TabsType } from "./types";
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from "./_components";
 
 type TabBarExtraMap = { left?: React.ReactNode; right?: React.ReactNode };
-type TabItemDef = {
-  key: string;
+type TabItemDef<TKey extends string = string> = {
+  key: TKey;
   label: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   triggerProps?: Omit<TabsTriggerProps, "value">;
 };
 
-type TabsProps = {
+type TabsProps<TKey extends string = string> = {
   defaultValue?: never;
   onValueChange?: never;
   children?: never;
 } & Omit<
-  TabsRootProps,
+  TabsRootProps<TKey>,
   "value" | "defaultValue" | "onValueChange" | "children" | "onChange"
 > & {
     type?: TabsType;
@@ -38,10 +38,10 @@ type TabsProps = {
     /**
      * Initial active TabPane's key, if activeKey is not set
      */
-    defaultActiveKey?: TabsRootProps["defaultValue"];
-    activeKey?: TabsRootProps["value"];
-    items: TabItemDef[];
-    onChange?: (activeKey: string) => void;
+    defaultActiveKey?: TabsRootProps<TKey>["defaultValue"];
+    activeKey?: TabsRootProps<TKey>["value"];
+    items: TabItemDef<TKey>[];
+    onChange?: (activeKey: TKey) => void;
 
     /**
      * Extras content (left|right)
@@ -54,7 +54,7 @@ type TabsProps = {
     listProps?: TabsListProps;
   };
 
-const Tabs = (props: TabsProps) => {
+const Tabs = <TKey extends string = string>(props: TabsProps<TKey>) => {
   const {
     type = "line",
     className,
@@ -118,7 +118,7 @@ const Tabs = (props: TabsProps) => {
         )}
 
         {items.map((x) =>
-          x.children === null ? null : (
+          x.children === null ? undefined : (
             <TabsContent key={x.key} value={x.key} className={x.className}>
               {x.children}
             </TabsContent>
@@ -130,4 +130,4 @@ const Tabs = (props: TabsProps) => {
 };
 
 export { Tabs };
-export type { TabsProps, TabItemDef };
+export type { TabsProps as TabsProps, TabItemDef };

@@ -13,28 +13,39 @@ import {
 import type { TabsType } from "./types";
 import { TabsProvider, useTabsContext } from "./context";
 
-type TabsRootProps = React.ComponentProps<typeof Tabs> & {
+type TabsRootProperties<TValue extends string = string> = Omit<
+  React.ComponentProps<typeof Tabs>,
+  "value" | "defaultValue" | "onValueChange"
+> & {
   type?: TabsType;
+  value?: TValue;
+  defaultValue?: TValue;
+  onValueChange?: (value: TValue) => void;
 };
-const TabsRoot = ({
+const TabsRoot = <TValue extends string = string>({
   className,
   type = "line",
   children,
-  ...props
-}: TabsRootProps) => {
+  onValueChange,
+  ...properties
+}: TabsRootProperties<TValue>) => {
   return (
     <TabsProvider type={type}>
-      <Tabs {...props} className={cn(type === "line" && "gap-4", className)}>
+      <Tabs
+        {...properties}
+        onValueChange={onValueChange as ((value: string) => void) | undefined}
+        className={cn(type === "line" && "gap-4", className)}
+      >
         {children}
       </Tabs>
     </TabsProvider>
   );
 };
 
-type TabsListProps = React.ComponentProps<typeof ShadcnTabsList> & {
+type TabsListProperties = React.ComponentProps<typeof ShadcnTabsList> & {
   type?: TabsType;
 };
-function TabsList({ className, type, ...props }: TabsListProps) {
+function TabsList({ className, type, ...properties }: TabsListProperties) {
   const context = useTabsContext();
   const tabsType = type ?? context.type;
 
@@ -51,15 +62,19 @@ function TabsList({ className, type, ...props }: TabsListProps) {
         className,
       )}
       variant={tabsType === "line" ? "line" : "default"}
-      {...props}
+      {...properties}
     />
   );
 }
 
-type TabsTriggerProps = React.ComponentProps<typeof ShadcnTabsTrigger> & {
+type TabsTriggerProperties = React.ComponentProps<typeof ShadcnTabsTrigger> & {
   tabsType?: TabsType;
 };
-function TabsTrigger({ className, tabsType, ...props }: TabsTriggerProps) {
+function TabsTrigger({
+  className,
+  tabsType,
+  ...properties
+}: TabsTriggerProperties) {
   const context = useTabsContext();
   const type = tabsType ?? context.type;
 
@@ -84,11 +99,15 @@ function TabsTrigger({ className, tabsType, ...props }: TabsTriggerProps) {
         ],
         className,
       )}
-      {...props}
+      {...properties}
     />
   );
 }
 
 export { TabsRoot, TabsList, TabsTrigger };
 export { TabsContent } from "@acme/ui/shadcn/tabs";
-export type { TabsRootProps, TabsListProps, TabsTriggerProps };
+export type {
+  TabsRootProperties as TabsRootProps,
+  TabsListProperties as TabsListProps,
+  TabsTriggerProperties as TabsTriggerProps,
+};

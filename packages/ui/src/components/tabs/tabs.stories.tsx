@@ -3,6 +3,7 @@ import * as React from "react";
 import { fn } from "storybook/test";
 
 import { Tabs } from "./index";
+import type { TabsProps } from "./tabs";
 
 const items = [
   { key: "1", label: "Tab 1", children: "Content of Tab 1" },
@@ -12,7 +13,7 @@ const items = [
 
 const meta = {
   title: "Components/Tabs",
-  component: Tabs,
+  component: Tabs as React.ComponentType<TabsProps>,
   parameters: {
     layout: "centered",
   },
@@ -45,7 +46,7 @@ const meta = {
       description: "Extra content in tab bar",
     },
   },
-} satisfies Meta<typeof Tabs>;
+} satisfies Meta<TabsProps>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -98,19 +99,13 @@ export const WithExtraContent: Story = {
 
 // With Controlled State
 export const Controlled: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [activeKey, setActiveKey] = React.useState("1");
-    const {
-      value: _value,
-      defaultValue: _defaultValue,
-      onValueChange: _onValueChange,
-      children: _children,
-      ...rest
-    } = args;
+    const { ...rest } = arguments_;
 
     const handleChange = (key: string) => {
       setActiveKey(key);
-      args.onChange?.(key);
+      arguments_.onChange?.(key);
     };
 
     return (
