@@ -39,6 +39,38 @@ describe("Checkbox", () => {
     expect(screen.queryByText("Label")).not.toBeInTheDocument();
   });
 
+  test("loading with description does not reference suppressed generated ids", () => {
+    const { container } = renderCheckbox(
+      {
+        loading: true,
+        description: "Customers can choose any time to start.",
+        "aria-labelledby": "external-label",
+        "aria-describedby": "external-description",
+      },
+      "Allow custom start time",
+    );
+
+    const checkbox = screen.getByRole("checkbox");
+
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+    expect(screen.queryByText("Allow custom start time")).not.toBeInTheDocument();
+    expect(screen.queryByText("Customers can choose any time to start.")).not.toBeInTheDocument();
+    expect(checkbox).toHaveAttribute("aria-labelledby", "external-label");
+    expect(checkbox).toHaveAttribute("aria-describedby", "external-description");
+
+    const generatedLabelId = checkbox
+      .getAttribute("aria-labelledby")
+      ?.split(" ")
+      .find((id) => id !== "external-label");
+    const generatedDescriptionId = checkbox
+      .getAttribute("aria-describedby")
+      ?.split(" ")
+      .find((id) => id !== "external-description");
+
+    expect(generatedLabelId).toBeUndefined();
+    expect(generatedDescriptionId).toBeUndefined();
+  });
+
   test("renders the label-content slot only when children exist", () => {
     const { container, rerender } = renderCheckbox({}, "Label");
 
@@ -61,6 +93,71 @@ describe("Checkbox", () => {
       "data-slot",
       "checkbox-label",
     );
+  });
+
+  test("renders stacked description content for the default variant", () => {
+    renderCheckbox(
+      {
+        description:
+          "Customers can choose any time to start instead of selecting from predefined slots.",
+      },
+      "Allow custom start time",
+    );
+
+    const checkbox = screen.getByRole("checkbox", {
+      name: "Allow custom start time",
+    });
+    const wrapper = checkbox.closest("label");
+    const labelContent = screen
+      .getByText("Allow custom start time")
+      .closest('[data-slot="checkbox-label"]');
+    const description = screen.getByText(
+      "Customers can choose any time to start instead of selecting from predefined slots.",
+    );
+
+    expect(wrapper).toHaveClass("items-start");
+    expect(labelContent?.tagName).toBe("DIV");
+    expect(labelContent).toHaveClass("mt-px", "flex", "flex-col", "gap-0.5");
+    expect(description.tagName).toBe("P");
+    expect(description).toHaveClass("text-muted-foreground", "text-xs");
+    expect(checkbox).toHaveClass("self-start");
+    expect(checkbox).toHaveAccessibleName("Allow custom start time");
+    expect(checkbox).toHaveAccessibleDescription(
+      "Customers can choose any time to start instead of selecting from predefined slots.",
+    );
+  });
+
+  test("renders stacked description content for the card variant", () => {
+    renderCheckbox(
+      {
+        variant: "card",
+        description: "Starting with your OS.",
+      },
+      "Auto Start",
+    );
+
+    const checkbox = screen.getByRole("checkbox", { name: /Auto Start/i });
+    const wrapper = checkbox.closest("label");
+    const labelContent = screen
+      .getByText("Auto Start")
+      .closest('[data-slot="checkbox-label"]');
+    const description = screen.getByText("Starting with your OS.");
+
+    expect(wrapper).toHaveClass("items-start");
+    expect(labelContent?.tagName).toBe("DIV");
+    expect(labelContent).toHaveClass("mt-px", "w-full", "flex", "flex-col");
+    expect(description.tagName).toBe("P");
+    expect(description).toHaveClass("text-muted-foreground", "text-xs");
+  });
+
+  test("renders description even when children are omitted", () => {
+    const { container } = renderCheckbox({ description: "Only description" });
+
+    const checkbox = screen.getByRole("checkbox");
+
+    expect(screen.getByText("Only description")).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
+    expect(checkbox).toHaveAccessibleDescription("Only description");
   });
 
   test("documented variant=card usage renders structured label content through a block label slot", () => {
@@ -148,7 +245,7 @@ describe("Checkbox", () => {
     expect(checkIcon).toBeNull();
   });
 
-  test("public Checkbox without children does not wrap an extra label", () => {
+  test("public Checkbox without children and without description does not wrap an extra label", () => {
     const { container } = render(
       <label>
         <PublicCheckbox defaultChecked />
@@ -162,6 +259,15 @@ describe("Checkbox", () => {
       }),
     ).toBeInTheDocument();
     expect(container.querySelectorAll("label label")).toHaveLength(0);
+  });
+
+  test("public Checkbox renders description-only content through the wrapped API", () => {
+    render(<PublicCheckbox description="Only description" />);
+
+    const checkbox = screen.getByRole("checkbox");
+
+    expect(screen.getByText("Only description")).toBeInTheDocument();
+    expect(checkbox).toHaveAccessibleDescription("Only description");
   });
 
   test("public Checkbox without children still emits onChange when clicked", () => {

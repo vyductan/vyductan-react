@@ -1,0 +1,16 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import FormItemDescriptionExample from "./form-item-description";
+
+<Meta isTemplate />
+
+### FormItem Description
+
+Use the `description` prop when the checkbox needs to stay as the field component inside `FormItem`. This keeps `valuePropName="checked"` bound to `Checkbox` while still rendering helper text.
+
+<ComponentSource
+  src="checkbox/examples/form-item-description.tsx"
+  __comp__={FormItemDescriptionExample}
+/>

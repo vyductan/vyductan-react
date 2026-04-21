@@ -8,6 +8,7 @@ import BasicExample from "./examples/basic";
 import CardExample from "./examples/card";
 import CardComposableExample from "./examples/card-composable";
 import CheckAllExample from "./examples/check-all";
+import FormItemDescriptionExample from "./examples/form-item-description";
 import GroupExample from "./examples/group";
 import { Checkbox } from "./index";
 
@@ -163,5 +164,14 @@ export const WithDescription: Story = {
         </p>
       </div>
     </div>
+  ),
+};
+
+export const FormItemDescription: Story = {
+  render: () => (
+    <ComponentSource
+      src="checkbox/examples/form-item-description.tsx"
+      __comp__={FormItemDescriptionExample}
+    />
   ),
 };

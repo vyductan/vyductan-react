@@ -43,6 +43,7 @@ type AbstractCheckboxProperties<
 
   // render
   children?: React.ReactNode;
+  description?: React.ReactNode;
 
   // config
   skipGroup?: boolean;
@@ -79,9 +80,9 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
   properties: CheckboxProperties<TValue>,
 ) {
   const {
-    // id,
-    // "aria-describedby": ariaDescribedBy,
-    // "aria-invalid": ariaInvalid,
+    "aria-describedby": ariaDescribedBy,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
 
     value,
 
@@ -100,6 +101,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     size = "middle",
     // render
     children,
+    description,
 
     skipGroup,
 
@@ -146,6 +148,33 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     return child !== "";
   });
 
+  const hasDescriptionContent = React.Children.toArray(description).some(
+    (child) => {
+      if (typeof child === "boolean") {
+        return false;
+      }
+
+      return child !== "";
+    },
+  );
+
+  const rendersLabelContent = hasLabelContent && !loading;
+  const rendersDescriptionContent = hasDescriptionContent && !loading;
+
+  const generatedLabelId = React.useId();
+  const generatedDescriptionId = React.useId();
+  const mergedAriaLabelledBy =
+    [ariaLabelledBy, rendersLabelContent ? generatedLabelId : undefined]
+      .filter(Boolean)
+      .join(" ") || undefined;
+  const mergedAriaDescribedBy =
+    [
+      ariaDescribedBy,
+      rendersDescriptionContent ? generatedDescriptionId : undefined,
+    ]
+      .filter(Boolean)
+      .join(" ") || undefined;
+
   // ============================ Event Lock ============================
   const [onLabelClick, onInputClick] = useBubbleLock(restProperties.onClick);
 
@@ -153,7 +182,8 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
     <Wave component="Checkbox" disabled={mergedDisabled}>
       <Label
         className={cn(
-          "inline-flex shrink-0 cursor-pointer items-center text-sm",
+          "inline-flex shrink-0 cursor-pointer text-sm",
+          hasDescriptionContent ? "items-start" : "items-center",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           variant === "card" && [
             "hover:bg-accent/50 items-start gap-2 rounded-md border",
@@ -177,7 +207,9 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
       >
         <CheckboxControl
           className={cn(
-            variant === "card" ? "self-start" : "self-center",
+            hasDescriptionContent || variant === "card"
+              ? "self-start"
+              : "self-center",
             "disabled:border-black/55 disabled:bg-black/15",
             variant === "card" && [
               "data-[state=checked]:border-primary-600 data-[state=checked]:bg-primary-600 data-[state=checked]:text-white",
@@ -189,6 +221,9 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           defaultChecked={defaultChecked}
           name={isGroup ? checkboxGroup.name : restProperties.name}
           disabled={mergedDisabled}
+          aria-label={ariaLabel}
+          aria-labelledby={mergedAriaLabelledBy}
+          aria-describedby={mergedAriaDescribedBy}
           onClick={onInputClick}
           onCheckedChange={(nextChecked) => {
             onChange?.({
@@ -220,26 +255,59 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
         />
         {loading ? <LoadingIcon /> : undefined}
         {!loading &&
-          hasLabelContent &&
-          (variant === "card" ? (
+          (hasDescriptionContent ? (
             <div
-              data-slot="checkbox-label"
+              data-slot={rendersLabelContent ? "checkbox-label" : undefined}
               className={cn(
-                "mt-px flex w-full flex-col gap-0.5",
-                "leading-none font-medium",
+                "flex flex-col gap-1",
+                variant === "card" ? "w-full leading-none font-medium" : "px-2",
                 classNames?.label,
               )}
             >
-              {children}
+              {rendersLabelContent ? (
+                <div
+                  id={generatedLabelId}
+                  className={cn(
+                    variant === "card"
+                      ? "w-full leading-none font-medium"
+                      : "leading-4",
+                  )}
+                >
+                  {children}
+                </div>
+              ) : null}
+              {rendersDescriptionContent ? (
+                <p
+                  id={generatedDescriptionId}
+                  className="text-muted-foreground text-xs font-normal"
+                >
+                  {description}
+                </p>
+              ) : null}
             </div>
-          ) : (
-            <span
-              data-slot="checkbox-label"
-              className={cn("mt-px px-2 leading-none", classNames?.label)}
-            >
-              {children}
-            </span>
-          ))}
+          ) : rendersLabelContent ? (
+            variant === "card" ? (
+              <div
+                id={generatedLabelId}
+                data-slot="checkbox-label"
+                className={cn(
+                  "mt-px flex w-full flex-col gap-0.5",
+                  "leading-none font-medium",
+                  classNames?.label,
+                )}
+              >
+                {children}
+              </div>
+            ) : (
+              <span
+                id={generatedLabelId}
+                data-slot="checkbox-label"
+                className={cn("mt-px px-2 leading-none", classNames?.label)}
+              >
+                {children}
+              </span>
+            )
+          ) : null)}
       </Label>
     </Wave>
   );

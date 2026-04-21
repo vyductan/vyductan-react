@@ -28,8 +28,20 @@ const ConditionCheckbox = (props: XORCheckboxProps) => {
       return child !== "";
     },
   );
+  const hasDescriptionContent = React.Children.toArray(
+    (props as CheckboxProps).description,
+  ).some((child) => {
+    if (typeof child === "boolean") {
+      return false;
+    }
+
+    return child !== "";
+  });
   const isShadcnCheckbox =
-    props.onCheckedChange !== undefined || !hasLabelContent;
+    (props.onCheckedChange !== undefined &&
+      !hasLabelContent &&
+      !hasDescriptionContent) ||
+    (!hasLabelContent && !hasDescriptionContent);
 
   // Keep the no-label path wrapper-free, but adapt onChange to preserve the public Checkbox API.
   if (isShadcnCheckbox) {
