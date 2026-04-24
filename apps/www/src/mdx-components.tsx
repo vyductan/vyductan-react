@@ -5,19 +5,19 @@ import { cn } from "@acme/ui/lib/utils";
 import { getIconForLanguageExtension } from "./components/icons";
 
 const components: MDXComponents = {
-  h1: ({ className, ...props }: React.ComponentProps<"h1">) => (
+  h1: ({ className, ...properties }: React.ComponentProps<"h1">) => (
     <h1
       className={cn(
         "font-heading mt-2 scroll-m-28 text-3xl font-bold tracking-tight",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  h2: ({ className, ...props }: React.ComponentProps<"h2">) => {
+  h2: ({ className, ...properties }: React.ComponentProps<"h2">) => {
     return (
       <h2
-        id={props.children
+        id={properties.children
           ?.toString()
           .replaceAll(" ", "-")
           .replaceAll("'", "")
@@ -27,137 +27,148 @@ const components: MDXComponents = {
           "font-heading [&+]*:[code]:text-xl mt-10 scroll-m-28 text-xl font-medium tracking-tight first:mt-0 lg:mt-16 [&+.steps]:mt-0! [&+.steps>h3]:mt-4! [&+h3]:mt-6! [&+p]:mt-4!",
           className,
         )}
-        {...props}
+        {...properties}
       />
     );
   },
-  h3: ({ className, ...props }: React.ComponentProps<"h3">) => (
+  h3: ({ className, ...properties }: React.ComponentProps<"h3">) => (
     <h3
       className={cn(
         "font-heading mt-12 scroll-m-28 text-lg font-medium tracking-tight [&+p]:mt-4! *:[code]:text-xl",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  h4: ({ className, ...props }: React.ComponentProps<"h4">) => (
+  h4: ({ className, ...properties }: React.ComponentProps<"h4">) => (
     <h4
       className={cn(
         "font-heading mt-8 scroll-m-28 text-base font-medium tracking-tight",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  h5: ({ className, ...props }: React.ComponentProps<"h5">) => (
+  h5: ({ className, ...properties }: React.ComponentProps<"h5">) => (
     <h5
       className={cn(
         "mt-8 scroll-m-28 text-base font-medium tracking-tight",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  h6: ({ className, ...props }: React.ComponentProps<"h6">) => (
+  h6: ({ className, ...properties }: React.ComponentProps<"h6">) => (
     <h6
       className={cn(
         "mt-8 scroll-m-28 text-base font-medium tracking-tight",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  a: ({ className, ...props }: React.ComponentProps<"a">) => (
+  a: ({ className, ...properties }: React.ComponentProps<"a">) => (
     <a
       className={cn("font-medium underline underline-offset-4", className)}
-      {...props}
+      {...properties}
     />
   ),
-  p: ({ className, ...props }: React.ComponentProps<"p">) => (
-    <p className={cn("leading-relaxed not-first:mt-6", className)} {...props} />
+  p: ({ className, ...properties }: React.ComponentProps<"p">) => (
+    <p
+      className={cn("leading-relaxed not-first:mt-6", className)}
+      {...properties}
+    />
   ),
-  strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <strong className={cn("font-medium", className)} {...props} />
+  strong: ({ className, ...properties }: React.HTMLAttributes<HTMLElement>) => (
+    <strong className={cn("font-medium", className)} {...properties} />
   ),
-  ul: ({ className, ...props }: React.ComponentProps<"ul">) => (
-    <ul className={cn("my-6 ml-6 list-disc", className)} {...props} />
+  ul: ({ className, ...properties }: React.ComponentProps<"ul">) => (
+    <ul className={cn("my-6 ml-6 list-disc", className)} {...properties} />
   ),
-  ol: ({ className, ...props }: React.ComponentProps<"ol">) => (
-    <ol className={cn("my-6 ml-6 list-decimal", className)} {...props} />
+  ol: ({ className, ...properties }: React.ComponentProps<"ol">) => (
+    <ol className={cn("my-6 ml-6 list-decimal", className)} {...properties} />
   ),
-  li: ({ className, ...props }: React.ComponentProps<"li">) => (
-    <li className={cn("mt-2", className)} {...props} />
+  li: ({ className, ...properties }: React.ComponentProps<"li">) => (
+    <li className={cn("mt-2", className)} {...properties} />
   ),
-  blockquote: ({ className, ...props }: React.ComponentProps<"blockquote">) => (
+  blockquote: ({
+    className,
+    ...properties
+  }: React.ComponentProps<"blockquote">) => (
     <blockquote
       className={cn("mt-6 border-l-2 pl-6 italic", className)}
-      {...props}
+      {...properties}
     />
   ),
-  img: ({ className, alt, ...props }: React.ComponentProps<"img">) => (
+  img: ({ className, alt, ...properties }: React.ComponentProps<"img">) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img className={cn("rounded-md", className)} alt={alt} {...props} />
+    <img className={cn("rounded-md", className)} alt={alt} {...properties} />
   ),
-  hr: ({ ...props }: React.ComponentProps<"hr">) => (
-    <hr className="my-4 md:my-8" {...props} />
+  hr: ({ ...properties }: React.ComponentProps<"hr">) => (
+    <hr className="my-4 md:my-8" {...properties} />
   ),
-  table: ({ className, ...props }: React.ComponentProps<"table">) => (
+  table: ({ className, ...properties }: React.ComponentProps<"table">) => (
     <div className="no-scrollbar my-6 w-full overflow-y-auto rounded-lg border">
       <table
         className={cn(
           "relative w-full overflow-hidden border-none text-sm [&_tbody_tr:last-child]:border-b-0",
           className,
         )}
-        {...props}
+        {...properties}
       />
     </div>
   ),
-  tr: ({ className, ...props }: React.ComponentProps<"tr">) => (
-    <tr className={cn("m-0 border-b", className)} {...props} />
+  tr: ({ className, ...properties }: React.ComponentProps<"tr">) => (
+    <tr className={cn("m-0 border-b", className)} {...properties} />
   ),
-  th: ({ className, ...props }: React.ComponentProps<"th">) => (
+  th: ({ className, ...properties }: React.ComponentProps<"th">) => (
     <th
       className={cn(
         "px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  td: ({ className, ...props }: React.ComponentProps<"td">) => (
+  td: ({ className, ...properties }: React.ComponentProps<"td">) => (
     <td
       className={cn(
         "px-4 py-2 text-left whitespace-nowrap [[align=center]]:text-center [[align=right]]:text-right",
         className,
       )}
-      {...props}
+      {...properties}
     />
   ),
-  pre: ({ className, children, ...props }: React.ComponentProps<"pre">) => {
+  pre: ({
+    className,
+    children,
+    ...properties
+  }: React.ComponentProps<"pre">) => {
     return (
       <pre
         className={cn(
           "no-scrollbar min-w-0 overflow-x-auto px-4 py-3.5 outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0",
           className,
         )}
-        {...props}
+        {...properties}
       >
         {children}
       </pre>
     );
   },
-  figure: ({ className, ...props }: React.ComponentProps<"figure">) => {
-    return <figure className={cn(className)} {...props} />;
+  figure: ({ className, ...properties }: React.ComponentProps<"figure">) => {
+    return <figure className={cn(className)} {...properties} />;
   },
   figcaption: ({
     className,
     children,
-    ...props
+    ...properties
   }: React.ComponentProps<"figcaption">) => {
     const iconExtension =
-      "data-language" in props && typeof props["data-language"] === "string"
-        ? getIconForLanguageExtension(props["data-language"])
-        : null;
+      "data-language" in properties &&
+      typeof properties["data-language"] === "string"
+        ? getIconForLanguageExtension(properties["data-language"])
+        : undefined;
 
     return (
       <figcaption
@@ -165,7 +176,7 @@ const components: MDXComponents = {
           "text-code-foreground [&_svg]:text-code-foreground flex items-center gap-2 [&_svg]:size-4 [&_svg]:opacity-70",
           className,
         )}
-        {...props}
+        {...properties}
       >
         {iconExtension}
         {children}
@@ -181,7 +192,7 @@ const components: MDXComponents = {
     // __yarn__,
     // __pnpm__,
     // __bun__,
-    ...props
+    ...properties
   }: React.ComponentProps<"code"> & {
     __comp__: React.FC;
     __src__?: string;
@@ -192,16 +203,16 @@ const components: MDXComponents = {
     // __bun__?: string
   }) => {
     // Inline Code.
-    if (typeof props.children === "string") {
+    if (typeof properties.children === "string") {
       return (
         <code
           className={cn(
             "bg-muted relative rounded-md px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
             className,
           )}
-          {...props}
+          {...properties}
         >
-          {props.children}
+          {properties.children}
         </code>
       );
     }
@@ -212,9 +223,9 @@ const components: MDXComponents = {
           "bg-muted relative rounded-md px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
           className,
         )}
-        {...props}
+        {...properties}
       >
-        {props.children}
+        {properties.children}
       </code>
     );
   },

@@ -5,28 +5,28 @@ import { fileURLToPath } from "node:url";
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const src = url.searchParams.get("src");
+    const source = url.searchParams.get("src");
     const from = url.searchParams.get("from");
 
-    if (!src) {
+    if (!source) {
       return new Response("Missing src", { status: 400 });
     }
 
     let absolutePath: string | undefined;
 
-    if (src.startsWith(".")) {
+    if (source.startsWith(".")) {
       if (typeof from === "string") {
         const base = new URL(from);
-        const resolved = new URL(src, base);
+        const resolved = new URL(source, base);
         absolutePath = fileURLToPath(resolved);
       } else {
-        absolutePath = path.resolve(process.cwd(), src);
+        absolutePath = path.resolve(process.cwd(), source);
       }
-    } else if (path.isAbsolute(src)) {
-      absolutePath = src;
+    } else if (path.isAbsolute(source)) {
+      absolutePath = source;
     } else {
       // treat as workspace-relative path
-      absolutePath = path.resolve(process.cwd(), src);
+      absolutePath = path.resolve(process.cwd(), source);
     }
 
     if (!absolutePath || !fs.existsSync(absolutePath)) {
