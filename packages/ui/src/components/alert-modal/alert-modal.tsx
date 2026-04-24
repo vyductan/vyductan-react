@@ -2,7 +2,7 @@ import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ModalProps } from "../modal";
+import type { ModalProps as ModalProperties } from "../modal";
 import { Icon } from "../../icons";
 import { buttonColorVariants, buttonVariants, LoadingIcon } from "../button";
 import { tagColors } from "../tag";
@@ -19,7 +19,7 @@ import {
   AlertDialogTrigger,
 } from "./_components";
 
-export type AlertModalProps = Omit<ModalProps, "onOk"> & {
+export type AlertModalProps = Omit<ModalProperties, "onOk"> & {
   onConfirm?: () => void;
   type?: "confirm" | "warning" | "info" | "success" | "error";
   media?: React.ReactNode;
@@ -96,7 +96,7 @@ export const AlertModal = ({
         };
       }
       default: {
-        return null;
+        return;
       }
     }
   };

@@ -55,11 +55,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Basic: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [open, setOpen] = useState(false);
     return (
       <Modal
-        {...args}
+        {...arguments_}
         open={open}
         onOpenChange={setOpen}
         trigger={<Button onClick={() => setOpen(true)}>Open Modal</Button>}
@@ -79,11 +79,11 @@ export const Basic: Story = {
 };
 
 export const CustomWidth: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [open, setOpen] = useState(false);
     return (
       <Modal
-        {...args}
+        {...arguments_}
         open={open}
         onOpenChange={setOpen}
         trigger={<Button onClick={() => setOpen(true)}>Open Wide Modal</Button>}
@@ -101,7 +101,7 @@ export const CustomWidth: Story = {
 };
 
 export const AsyncLogic: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -115,7 +115,7 @@ export const AsyncLogic: Story = {
 
     return (
       <Modal
-        {...args}
+        {...arguments_}
         open={open}
         onOpenChange={setOpen}
         trigger={
@@ -136,11 +136,11 @@ export const AsyncLogic: Story = {
 };
 
 export const CustomFooter: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [open, setOpen] = useState(false);
     return (
       <Modal
-        {...args}
+        {...arguments_}
         open={open}
         onOpenChange={setOpen}
         trigger={<Button onClick={() => setOpen(true)}>Custom Footer</Button>}

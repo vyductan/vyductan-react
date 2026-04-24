@@ -29,7 +29,7 @@ describe("Modal", () => {
       React.createElement(
         Modal,
         { open: true, width: 800, title: "Custom Width Modal" },
-        React.createElement("div", null, "Body"),
+        React.createElement("div", undefined, "Body"),
       ),
     );
 
@@ -38,5 +38,28 @@ describe("Modal", () => {
     expect(content).toHaveClass("w-(--modal-width)");
     expect(content).toHaveClass("sm:max-w-(--modal-width)");
     expect(content).not.toHaveClass("sm:max-w-auto");
+  });
+
+  test("wraps fragment descriptions with DialogDescription", () => {
+    render(
+      <Modal
+        open
+        title="Per-pax limits"
+        description={
+          <>
+            Configure per-pax limits for{" "}
+            <span className="font-medium text-foreground">Food</span>.
+          </>
+        }
+      >
+        Body
+      </Modal>,
+    );
+
+    const categoryName = screen.getByText("Food");
+    const description = categoryName.closest('[data-slot="dialog-description"]');
+
+    expect(description).toBeInTheDocument();
+    expect(description).toHaveTextContent("Configure per-pax limits for Food.");
   });
 });

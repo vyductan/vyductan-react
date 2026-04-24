@@ -1,8 +1,8 @@
 import type { XOR } from "ts-xor";
 import React from "react";
 
-import type { ButtonProps } from "../button";
-import type { ModalProps } from "./modal";
+import type { ButtonProps as ButtonProperties } from "../button";
+import type { ModalProps as ModalProperties } from "./modal";
 import { Dialog, DialogContent } from "./_components";
 import { Modal as InternalModal } from "./modal";
 
@@ -11,8 +11,8 @@ export * from "./modal";
 export * from "./_components";
 export * from "./use-modal";
 
-type ShadcnModalProps = React.ComponentProps<typeof Dialog>;
-type XORModalProps = XOR<ModalProps, ShadcnModalProps>;
+type ShadcnModalProperties = React.ComponentProps<typeof Dialog>;
+type XORModalProperties = XOR<ModalProperties, ShadcnModalProperties>;
 
 // Confirm modal configuration interface (for reference)
 export interface ConfirmConfig {
@@ -23,21 +23,23 @@ export interface ConfirmConfig {
   okText?: string;
   cancelText?: string;
   okType?: "default" | "primary" | "danger";
-  okButtonProps?: ButtonProps;
+  okButtonProps?: ButtonProperties;
   confirmLoading?: boolean;
   /** Internal: used to customize global modal footer, e.g. hide Cancel for warning */
   type?: "confirm" | "warning" | "info" | "success" | "error";
 }
 
-const Modal = (props: XORModalProps) => {
-  const isShadcnDialog = React.Children.toArray(props.children).some(
+const Modal = (properties: XORModalProperties) => {
+  const isShadcnDialog = React.Children.toArray(properties.children).some(
     (child) => React.isValidElement(child) && child.type === DialogContent,
   );
   if (isShadcnDialog) {
-    return <Dialog {...props}>{props.children}</Dialog>;
+    return <Dialog {...properties}>{properties.children}</Dialog>;
   }
   return (
-    <InternalModal {...(props as ModalProps)}>{props.children}</InternalModal>
+    <InternalModal {...(properties as ModalProperties)}>
+      {properties.children}
+    </InternalModal>
   );
 };
 

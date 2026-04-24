@@ -41,33 +41,37 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const AlertModalStory = (args: React.ComponentProps<typeof AlertModal>) => {
+const AlertModalStory = (
+  arguments_: React.ComponentProps<typeof AlertModal>,
+) => {
   const [open, setOpen] = React.useState(false);
 
   return (
     <AlertModal
-      {...args}
+      {...arguments_}
       open={open}
       onOpenChange={setOpen}
       onConfirm={fn()}
       onCancel={() => setOpen(false)}
       trigger={
-        <Button>{args.okText ? `Open ${args.okText} modal` : "Open modal"}</Button>
+        <Button>
+          {arguments_.okText ? `Open ${arguments_.okText} modal` : "Open modal"}
+        </Button>
       }
     />
   );
 };
 
 const OpenAlertModalStory = (
-  args: React.ComponentProps<typeof AlertModal>,
+  arguments_: React.ComponentProps<typeof AlertModal>,
 ) => (
   <div className="w-[420px]">
-    <AlertModal {...args} open onOpenChange={fn()} onConfirm={fn()} />
+    <AlertModal {...arguments_} open onOpenChange={fn()} onConfirm={fn()} />
   </div>
 );
 
 export const Default: Story = {
-  render: (args) => <AlertModalStory {...args} />,
+  render: (arguments_) => <AlertModalStory {...arguments_} />,
   args: {
     title: "Delete item",
     description: "This action cannot be undone.",
@@ -78,7 +82,7 @@ export const Default: Story = {
 };
 
 export const Confirm: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Confirm action",
     description: "Please review before continuing.",
@@ -89,7 +93,7 @@ export const Confirm: Story = {
 };
 
 export const Danger: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Delete item",
     description: "This action cannot be undone.",
@@ -101,7 +105,7 @@ export const Danger: Story = {
 };
 
 export const Warning: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Warning",
     description: "This action may have unintended consequences.",
@@ -111,7 +115,7 @@ export const Warning: Story = {
 };
 
 export const Info: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Information",
     description: "Here is some important information about this flow.",
@@ -121,7 +125,7 @@ export const Info: Story = {
 };
 
 export const Success: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Success",
     description: "Your action has been completed successfully.",
@@ -131,7 +135,7 @@ export const Success: Story = {
 };
 
 export const Error: Story = {
-  render: (args) => <OpenAlertModalStory {...args} />,
+  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
     title: "Error",
     description: "An error occurred while processing your request.",
@@ -141,12 +145,12 @@ export const Error: Story = {
 };
 
 export const InteractionConfirm: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const onConfirm = fn();
 
     return (
       <AlertModal
-        {...args}
+        {...arguments_}
         onConfirm={onConfirm}
         trigger={<Button>Open confirm modal</Button>}
       />

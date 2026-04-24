@@ -19,7 +19,7 @@ import {
   DialogTrigger,
 } from "./_components";
 
-type ModalProps = React.ComponentProps<typeof Dialog> & {
+type ModalProperties = React.ComponentProps<typeof Dialog> & {
   /** Width of the modal dialog */
   width?: string | number | Partial<Record<Breakpoint, string | number>>;
   className?: string;
@@ -32,7 +32,7 @@ type ModalProps = React.ComponentProps<typeof Dialog> & {
   children?: React.ReactNode;
   description?: React.ReactNode;
   footer?:
-    | ((params: {
+    | ((parameters: {
         originNode: React.ReactNode;
         extra: {
           OkBtn: React.ReactElement<ButtonProps>;
@@ -69,9 +69,9 @@ const Modal = ({
   // onOpenChange,
   //
   ...rest
-}: ModalProps) => {
+}: ModalProperties) => {
   // =========================== Width ============================
-  const [numWidth, responsiveWidth] = React.useMemo<
+  const [numberWidth, responsiveWidth] = React.useMemo<
     [
       string | number | undefined,
       Partial<Record<Breakpoint, string | number>> | undefined,
@@ -83,20 +83,20 @@ const Modal = ({
     return [width, undefined];
   }, [width]);
 
-  const responsiveWidthVars = React.useMemo(() => {
-    const vars: Record<string, string> = {};
+  const responsiveWidthVariables = React.useMemo(() => {
+    const variables: Record<string, string> = {};
     if (responsiveWidth) {
       for (const breakpoint of Object.keys(responsiveWidth)) {
         const breakpointWidth = responsiveWidth[breakpoint as Breakpoint];
         if (breakpointWidth !== undefined) {
-          vars[`--modal-${breakpoint}-width`] =
+          variables[`--modal-${breakpoint}-width`] =
             typeof breakpointWidth === "number"
               ? `${breakpointWidth}px`
               : breakpointWidth;
         }
       }
     }
-    return vars;
+    return variables;
   }, [responsiveWidth]);
 
   // const CancelBtn = () => (
@@ -172,23 +172,28 @@ const Modal = ({
       <DialogContent
         className={cn(
           "px-0 text-sm select-text",
-          numWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],
+          numberWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],
           className,
         )}
         style={{
-          ...(numWidth &&
+          ...(numberWidth &&
             ({
               "--modal-width":
-                typeof numWidth === "number" ? `${numWidth}px` : numWidth,
+                typeof numberWidth === "number"
+                  ? `${numberWidth}px`
+                  : numberWidth,
             } as React.CSSProperties)),
-          ...responsiveWidthVars,
+          ...responsiveWidthVariables,
         }}
       >
         <DialogHeader className={cn("px-6", classNames?.header)}>
           <DialogTitle className={classNames?.title}>{title}</DialogTitle>
           <DialogDescription
             className={cn(!description && "hidden", classNames?.description)}
-            asChild={typeof description === "object"}
+            asChild={
+              React.isValidElement(description) &&
+              description.type !== React.Fragment
+            }
           >
             {description}
           </DialogDescription>
@@ -207,4 +212,4 @@ const Modal = ({
 };
 export { Modal };
 
-export { type ModalProps };
+export { type ModalProperties as ModalProps };

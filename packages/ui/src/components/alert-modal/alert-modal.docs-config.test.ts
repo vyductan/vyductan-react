@@ -9,7 +9,9 @@ describe("AlertModal docs Storybook config", () => {
       "utf8",
     );
 
-    expect(docsSource).toContain('import * as AlertModalStories from "./alert-modal.stories"');
+    expect(docsSource).toContain(
+      'import * as AlertModalStories from "./alert-modal.stories"',
+    );
     expect(docsSource).toContain("<Meta of={AlertModalStories} />");
   });
 });

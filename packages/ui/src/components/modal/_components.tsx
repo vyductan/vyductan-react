@@ -29,7 +29,9 @@ function shouldStartSelectionDrag(target: Element) {
   }
 
   return Boolean(
-    target.closest("[data-slot='dialog-title'], [data-slot='dialog-description']"),
+    target.closest(
+      "[data-slot='dialog-title'], [data-slot='dialog-description']",
+    ),
   );
 }
 
@@ -37,7 +39,7 @@ function DialogContent({
   onInteractOutside,
   onPointerDownCapture,
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDialogContent>) {
   const [selectionDragActive, setSelectionDragActive] = React.useState(false);
 
@@ -118,50 +120,56 @@ function DialogContent({
         }
         onInteractOutside?.(e);
       }}
-      {...props}
+      {...properties}
     />
   );
 }
 
 function DialogHeader({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDialogHeader>) {
   return (
-    <ShadcnDialogHeader className={cn("select-none", className)} {...props} />
+    <ShadcnDialogHeader
+      className={cn("select-none", className)}
+      {...properties}
+    />
   );
 }
 
 function DialogTitle({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDialogTitle>) {
   return (
     <ShadcnDialogTitle
       className={cn("inline-block select-text", className)}
-      {...props}
+      {...properties}
     />
   );
 }
 
 function DialogDescription({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDialogDescription>) {
   return (
     <ShadcnDialogDescription
       className={cn("select-text", className)}
-      {...props}
+      {...properties}
     />
   );
 }
 
 function DialogOverlay({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDialogOverlay>) {
   return (
-    <ShadcnDialogOverlay className={cn("select-none", className)} {...props} />
+    <ShadcnDialogOverlay
+      className={cn("select-none", className)}
+      {...properties}
+    />
   );
 }
 

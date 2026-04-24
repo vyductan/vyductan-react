@@ -40,7 +40,7 @@ const App: React.FC = () => {
       <Modal
         title="Modal without Footer"
         trigger={<Button variant="outlined">No Footer</Button>}
-        footer={null}
+        footer={undefined}
       >
         <p>This modal has no footer at all.</p>
       </Modal>
