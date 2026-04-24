@@ -114,6 +114,66 @@ export const WithFooter: Story = {
   ),
 };
 
+export const BorderedSections: Story = {
+  render: () => (
+    <Card className="w-[350px]">
+      <CardHeader className="border-b">
+        <CardTitle>Account settings</CardTitle>
+        <CardDescription>Manage your profile, security, and preferences.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <p className="text-sm font-medium">Profile visibility</p>
+          <p className="text-muted-foreground text-sm">
+            Choose what other people can see on your public profile.
+          </p>
+        </div>
+      </CardContent>
+      <CardFooter className="border-t flex justify-between">
+        <Button variant="outlined">Cancel</Button>
+        <Button>Save changes</Button>
+      </CardFooter>
+    </Card>
+  ),
+};
+
+export const ComposedClassNames: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "This story demonstrates that `classNames.*` still applies to `CardHeader` and `CardContent` when the card is composed manually with child slots, not only when using the shorthand title/description API.",
+      },
+    },
+  },
+  args: {
+    classNames: {
+      header: "bg-muted/30 ring-border rounded-b-none ring-1 ring-inset",
+      content: "bg-primary/5 rounded-t-none",
+    },
+  },
+  argTypes: {
+    classNames: {
+      control: "object",
+    },
+  },
+  render: (args) => (
+    <Card className="w-[350px]" classNames={args.classNames}>
+      <CardHeader>
+        <CardTitle>Composed slot overrides</CardTitle>
+        <CardDescription>
+          classNames.header and classNames.content still apply when you compose the slots manually.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm">
+          This story makes the overrides obvious so the composed API behavior is visible in Storybook.
+        </p>
+      </CardContent>
+    </Card>
+  ),
+};
+
 export const WithImage: Story = {
   render: () => (
     <Card className="relative mx-auto w-full max-w-sm">

@@ -10,8 +10,8 @@ export interface CardMetaProps {
   description?: React.ReactNode;
 }
 
-const CardMeta: React.FC<CardMetaProps> = (props) => {
-  const { className, avatar, title, description, ...others } = props;
+const CardMeta: React.FC<CardMetaProps> = (properties) => {
+  const { className, avatar, title, description, ...others } = properties;
 
   const classString = cn("flex items-start p-4", className);
 
@@ -19,7 +19,7 @@ const CardMeta: React.FC<CardMetaProps> = (props) => {
     <div data-slot="card-meta-avatar" className="mr-4 shrink-0">
       {avatar}
     </div>
-  ) : null;
+  ) : undefined;
 
   const titleDom: React.ReactNode = title ? (
     <div
@@ -28,7 +28,7 @@ const CardMeta: React.FC<CardMetaProps> = (props) => {
     >
       {title}
     </div>
-  ) : null;
+  ) : undefined;
 
   const descriptionDom: React.ReactNode = description ? (
     <div
@@ -37,7 +37,7 @@ const CardMeta: React.FC<CardMetaProps> = (props) => {
     >
       {description}
     </div>
-  ) : null;
+  ) : undefined;
 
   const MetaDetail: React.ReactNode =
     titleDom || descriptionDom ? (
@@ -45,7 +45,7 @@ const CardMeta: React.FC<CardMetaProps> = (props) => {
         {titleDom}
         {descriptionDom}
       </div>
-    ) : null;
+    ) : undefined;
 
   return (
     <div data-slot="card-meta" {...others} className={classString}>

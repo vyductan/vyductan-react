@@ -1,8 +1,8 @@
----
-title: Card
-description: A flexible container for displaying content with optional header and footer.
-component: true
----
+import { Meta, Story } from "@storybook/addon-docs/blocks";
+
+import * as CardStories from "./card.stories";
+
+<Meta of={CardStories} />
 
 # Examples
 
@@ -10,16 +10,10 @@ component: true
 
 A basic card containing a title, content and an extra corner content. Supports two sizes: `default` and `small`.
 
-```tsx
-import { Card } from "@acme/ui/components/card";
+<Story of={CardStories.Default} />
 
-<Card
-  title="Default size card"
-  extra={<a href="#">More</a>}
-  style={{ width: 300 }}
->
-  <p>Card content</p>
-  <p>Card content</p>
-  <p>Card content</p>
-</Card>;
-```
+## Composed classNames hooks
+
+This story demonstrates that `classNames.*` still applies to `CardHeader` and `CardContent` when the card is composed manually with child slots, not only when using the shorthand title/description API.
+
+<Story of={CardStories.ComposedClassNames} />
