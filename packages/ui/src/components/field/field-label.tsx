@@ -1,12 +1,13 @@
-import { cn } from "@acme/ui/lib/utils";
-import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
 import { useContext } from "react";
 
+import { cn } from "@acme/ui/lib/utils";
+import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
+
 import type { FormLabelAlign } from "../form";
-import { FormFieldContext } from "../form/context";
-import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check";
 import type { ColProps as ColProperties } from "../grid";
 import { useFormContext } from "../form";
+import { FormFieldContext } from "../form/context";
+import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check";
 import { Col } from "../grid";
 
 type FieldLabelProperties = React.ComponentProps<typeof ShadFieldLabel> & {
@@ -41,7 +42,7 @@ const FieldLabel = ({
   const labelNode = (
     <ShadFieldLabel
       className={cn(
-        "inline-flex gap-0",
+        "inline-flex gap-0 select-text",
         // layout === "vertical" ? "pb-2" : "",
         layout === "horizontal" && !mergedLabelCol ? "h-control" : "",
         // Label alignment

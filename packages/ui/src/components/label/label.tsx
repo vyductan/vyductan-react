@@ -7,20 +7,20 @@ const Label = ({
   required,
   colon,
   asChild,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadLabel> & {
   required?: boolean;
   colon?: boolean;
 }) => {
   if (asChild) {
     return (
-      <ShadLabel asChild className={className} {...props}>
+      <ShadLabel asChild className={className} {...properties}>
         {children}
       </ShadLabel>
     );
   }
   return (
-    <ShadLabel className={cn("gap-0", className)} {...props}>
+    <ShadLabel className={cn("gap-0 select-text", className)} {...properties}>
       {children}
       {colon && ":"}
       {required && <span className="ml-1 text-red-600">*</span>}
