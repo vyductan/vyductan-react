@@ -5,15 +5,19 @@ import { cn } from "@acme/ui/lib/utils";
 import type { RenderNode } from "../types";
 import { Icon } from "../../../icons";
 
-type SelectClearProps = React.ComponentProps<"span"> & {
+type SelectClearProperties = React.ComponentProps<"span"> & {
   allowClear?: boolean | { clearIcon?: RenderNode };
   showClearIcon?: boolean;
+  onClear?: () => void;
 };
 const SelectClear = ({
   allowClear,
   showClearIcon,
+  className,
   onPointerDown,
-}: SelectClearProps) => {
+  onClear,
+  ...restProperties
+}: SelectClearProperties) => {
   const mergedClearIcon = useMemo(() => {
     if (typeof allowClear === "object") {
       return allowClear.clearIcon;
@@ -27,24 +31,35 @@ const SelectClear = ({
 
   return (
     <span
+      role="button"
       data-slot="select-clear"
+      aria-label="Remove"
+      tabIndex={showClearIcon ? 0 : -1}
       className={cn(
         "z-10",
         "absolute right-[11px]",
         "flex size-5 items-center justify-center transition-opacity",
         "opacity-0",
-        // When there is no value, make the clear icon non-interactive so it doesn't block the trigger/arrow
         !showClearIcon && "pointer-events-none",
         showClearIcon && "hover:opacity-50!",
         showClearIcon && "group-hover:opacity-30",
+        className,
       )}
       onPointerDown={(e) => {
-        // If there's no value, don't intercept the click
         if (!showClearIcon) return;
         e.preventDefault();
         e.stopPropagation();
         onPointerDown?.(e);
       }}
+      onKeyDown={(e) => {
+        if (!showClearIcon) return;
+        if (e.key !== "Enter" && e.key !== " ") return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        onClear?.();
+      }}
+      {...restProperties}
     >
       {icon === undefined ? (
         <Icon
@@ -58,5 +73,5 @@ const SelectClear = ({
   );
 };
 
-export type { SelectClearProps };
+export type { SelectClearProperties as SelectClearProps };
 export { SelectClear };

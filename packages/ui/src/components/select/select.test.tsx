@@ -3,9 +3,38 @@ import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
+import { Select as PublicSelect } from ".";
 import { Select } from "./select";
 
 describe("Select", () => {
+  test("accepts form field props with options", () => {
+    const field = {
+      name: "expiryMonth",
+      ref: vi.fn(),
+      value: "01",
+      disabled: false,
+      onBlur: vi.fn(),
+      onChange: vi.fn(),
+    };
+
+    render(
+      <PublicSelect
+        {...field}
+        placeholder="MM"
+        options={[{ label: "01", value: "01" }]}
+      />,
+    );
+
+    const trigger = screen.getByRole("combobox", { name: "MM" });
+
+    expect(trigger).toBeInTheDocument();
+    expect(field.ref).toHaveBeenCalledWith(trigger);
+
+    fireEvent.blur(trigger);
+
+    expect(field.onBlur).toHaveBeenCalledOnce();
+  });
+
   test("calls onChange when clearing a single select", async () => {
     const handleChange = vi.fn();
 
@@ -24,6 +53,32 @@ describe("Select", () => {
 
     await waitFor(() => {
       expect(handleChange).toHaveBeenCalledWith(undefined, undefined);
+    });
+  });
+
+  test("selects the active tags option with the keyboard", async () => {
+    const handleChange = vi.fn();
+
+    render(
+      <Select
+        mode="tags"
+        placeholder="Type to add tags"
+        options={[{ label: "Alpha", value: "alpha" }]}
+        onChange={handleChange}
+      />,
+    );
+
+    const input = screen.getByPlaceholderText("Type to add tags");
+
+    fireEvent.click(input);
+    fireEvent.keyDown(input, { key: "ArrowDown" });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(handleChange).toHaveBeenCalledWith(
+        ["alpha"],
+        [{ label: "Alpha", value: "alpha" }],
+      );
     });
   });
 

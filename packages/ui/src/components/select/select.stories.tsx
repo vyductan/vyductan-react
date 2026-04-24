@@ -9,7 +9,7 @@ import {
   within,
 } from "storybook/test";
 
-import type { SelectProps } from "./select";
+import type { SelectProps as SelectProperties } from "./select";
 import type { OptionType } from "./types";
 import { Select } from "./select";
 
@@ -47,23 +47,23 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type SingleSelectStoryArgs = Omit<
-  SelectProps<string>,
+type SingleSelectStoryArguments = Omit<
+  SelectProperties<string>,
   "mode" | "value" | "defaultValue" | "options"
 >;
 
-type SelectPreviewArgs = SingleSelectStoryArgs;
-type SingleSelectComponentProps = Extract<
-  SelectProps<string>,
+type SelectPreviewArguments = SingleSelectStoryArguments;
+type SingleSelectComponentProperties = Extract<
+  SelectProperties<string>,
   { mode?: never }
 >;
 
 const SingleSelectPreview = (
-  props: SingleSelectStoryArgs & {
+  properties: SingleSelectStoryArguments & {
     options: OptionType<string>[];
     value?: string;
   },
-) => <Select<string> {...(props as SingleSelectComponentProps)} />;
+) => <Select<string> {...(properties as SingleSelectComponentProperties)} />;
 
 const basicOptions: OptionType<string>[] = [
   { label: "Option 1", value: "1" },
@@ -99,23 +99,23 @@ export const Variants: Story = {
       },
     },
   },
-  render: (args: SelectPreviewArgs) => {
+  render: (arguments_: SelectPreviewArguments) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           variant="outlined"
           placeholder="Outlined"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           variant="filled"
           placeholder="Filled"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           variant="borderless"
           placeholder="Borderless"
           options={basicOptions}
@@ -126,23 +126,23 @@ export const Variants: Story = {
 };
 
 export const Sizes: Story = {
-  render: (args: SelectPreviewArgs) => {
+  render: (arguments_: SelectPreviewArguments) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           size="small"
           placeholder="Small"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           size="middle"
           placeholder="Middle"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           size="large"
           placeholder="Large"
           options={basicOptions}
@@ -180,17 +180,17 @@ export const Loading: Story = {
 };
 
 export const Disabled: Story = {
-  render: (args: SelectPreviewArgs) => {
+  render: (arguments_: SelectPreviewArguments) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           disabled
           placeholder="Disabled"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           disabled
           placeholder="Disabled with value"
           value="1"
@@ -202,17 +202,17 @@ export const Disabled: Story = {
 };
 
 export const Status: Story = {
-  render: (args: SelectPreviewArgs) => {
+  render: (arguments_: SelectPreviewArguments) => {
     return (
       <div className="flex w-[300px] flex-col gap-4">
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           status="error"
           placeholder="Error status"
           options={basicOptions}
         />
         <SingleSelectPreview
-          {...args}
+          {...arguments_}
           status="warning"
           placeholder="Warning status"
           options={basicOptions}

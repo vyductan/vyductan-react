@@ -7,7 +7,7 @@ import { cn } from "@acme/ui/lib/utils";
 import { SelectTrigger as ShacnSelectTrigger } from "@acme/ui/shadcn/select";
 
 import type { inputSizeVariants } from "../../input";
-import type { SelectClearProps } from "./select-clear";
+import type { SelectClearProps as SelectClearProperties } from "./select-clear";
 import { Icon } from "../../../icons";
 import { inputVariants } from "../../input";
 import { SelectClear } from "./select-clear";
@@ -26,11 +26,11 @@ const SelectTrigger = ({
   disabled,
   suffixIcon,
 
-  ...restProps
+  ...restProperties
 }: Omit<React.ComponentProps<typeof ShacnSelectTrigger>, "size"> &
   VariantProps<typeof inputVariants> &
   VariantProps<typeof inputSizeVariants> &
-  Pick<SelectClearProps, "allowClear" | "showClearIcon"> & {
+  Pick<SelectClearProperties, "allowClear" | "showClearIcon"> & {
     onClear?: () => void;
     loading?: boolean;
     /* For clear */
@@ -74,7 +74,7 @@ const SelectTrigger = ({
         //
         className,
       )}
-      {...restProps}
+      {...restProperties}
     >
       {children}
       {mergedAllowClear && (
@@ -103,9 +103,9 @@ const SelectTrigger = ({
   );
 };
 
-type SelectShadcnProps = React.ComponentProps<typeof ShadcnSelect>;
+type SelectShadcnProperties = React.ComponentProps<typeof ShadcnSelect>;
 
-export type { SelectShadcnProps };
+export type { SelectShadcnProperties as SelectShadcnProps };
 export { SelectTrigger };
 
 export {

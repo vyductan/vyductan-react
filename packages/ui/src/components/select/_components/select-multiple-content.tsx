@@ -6,7 +6,9 @@ import type { SelectValueType } from "../types";
 import { inputInlineInsetClassName } from "../../input";
 import { Tag } from "../../tag";
 
-type SelectMultipleProps<TValue extends SelectValueType = SelectValueType> = {
+type SelectMultipleProperties<
+  TValue extends SelectValueType = SelectValueType,
+> = {
   mode: "multiple" | "tags";
   open?: boolean;
   disabled?: boolean;
@@ -37,12 +39,12 @@ export const SelectMultipleContent = <
   onInputSubmit,
   onInputBlur,
   onInputKeyDown,
-}: SelectMultipleProps<TValue>) => {
+}: SelectMultipleProperties<TValue>) => {
   const isTags = mode === "tags";
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputReference = React.useRef<HTMLInputElement>(null);
   const focusInput = () => {
     globalThis.requestAnimationFrame(() => {
-      inputRef.current?.focus();
+      inputReference.current?.focus();
     });
   };
 
@@ -86,7 +88,7 @@ export const SelectMultipleContent = <
       ))}
       {isTags && (
         <input
-          ref={inputRef}
+          ref={inputReference}
           disabled={disabled}
           className={cn(
             "pointer-events-auto relative z-10 m-0 h-[22px] min-w-[40px] flex-1 border-none bg-transparent p-0 text-sm outline-none disabled:pointer-events-none",
@@ -105,7 +107,7 @@ export const SelectMultipleContent = <
           onMouseDown={(e) => {
             e.stopPropagation();
             if (disabled) return;
-            inputRef.current?.focus();
+            inputReference.current?.focus();
           }}
           onFocus={() => {
             if (disabled) return;
@@ -114,7 +116,7 @@ export const SelectMultipleContent = <
           onClick={(e) => {
             e.stopPropagation();
             if (disabled) return;
-            inputRef.current?.focus();
+            inputReference.current?.focus();
             onInputClick(e);
             focusInput();
           }}

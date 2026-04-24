@@ -37,5 +37,6 @@ export interface FlattenOptionData<TOption> {
   group?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RenderNode = React.ReactNode | ((props: any) => React.ReactNode);
+export type RenderNode =
+  | React.ReactNode
+  | ((properties: any) => React.ReactNode);

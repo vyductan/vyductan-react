@@ -9,7 +9,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
-import type { SelectShadcnProps } from "./_components";
+import type { SelectShadcnProps as SelectShadcnProperties } from "./_components";
 import type {
   FlattenOptionData,
   GroupOptionType,
@@ -41,7 +41,7 @@ type SelectOnChange<TValue, TOption> = {
   bivarianceHack(value: TValue, option?: TOption): void;
 }["bivarianceHack"];
 
-type SelectDefaultProps<
+type SelectDefaultProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = {
@@ -49,13 +49,10 @@ type SelectDefaultProps<
 
   defaultValue?: TValue;
   value?: TValue;
-  onChange?: SelectOnChange<
-    TValue | undefined,
-    OptionType<TValue, TRecord>
-  >;
+  onChange?: SelectOnChange<TValue | undefined, OptionType<TValue, TRecord>>;
 };
 
-type SelectMultipleOrTagsProps<
+type SelectMultipleOrTagsProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = {
@@ -66,14 +63,22 @@ type SelectMultipleOrTagsProps<
   onChange?: SelectOnChange<TValue[], OptionType<TValue, TRecord>[]>;
 };
 
-type SelectProps<
+type SelectFormControlProperties = {
+  form?: string;
+  name?: string;
+  onBlur?: React.FocusEventHandler<HTMLButtonElement>;
+  ref?: React.Ref<HTMLButtonElement>;
+};
+
+type SelectProperties<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 > = (
-  | SelectDefaultProps<TValue, OptionType<TValue, TRecord>>
-  | SelectMultipleOrTagsProps<TValue, OptionType<TValue, TRecord>>
+  | SelectDefaultProperties<TValue, OptionType<TValue, TRecord>>
+  | SelectMultipleOrTagsProperties<TValue, OptionType<TValue, TRecord>>
 ) &
-  Pick<SelectShadcnProps, "open" | "onOpenChange"> &
+  Pick<SelectShadcnProperties, "open" | "onOpenChange"> &
+  SelectFormControlProperties &
   InputVariants &
   VariantProps<typeof inputSizeVariants> & {
     id?: string;
@@ -112,9 +117,9 @@ const Select = <
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
 >(
-  props: SelectProps<TValue, TRecord>,
+  properties: SelectProperties<TValue, TRecord>,
 ) => {
-  const { open, onOpenChange } = props;
+  const { open, onOpenChange } = properties;
 
   // fix placeholder did not back when set value to undefined
   // https://github.com/radix-ui/primitives/issues/1569#issuecomment-1434801848
@@ -145,10 +150,14 @@ const Select = <
     value,
     onChange,
     children,
+    form,
+    name,
+    onBlur,
+    ref,
     showSearch, // Destructure to prevent it from being passed to DOM
     empty,
-    ...triggerProps
-  } = props;
+    ...triggerProperties
+  } = properties;
 
   void showSearch;
 
@@ -162,7 +171,7 @@ const Select = <
   const [activeTagOptionValue, setActiveTagOptionValue] = React.useState<
     TValue | undefined
   >();
-  const shouldCommitOnBlurRef = React.useRef(true);
+  const shouldCommitOnBlurReference = React.useRef(true);
   const handleOpenChange = (open: boolean) => {
     if (disabled && open) return;
     setInternalOpen(open);
@@ -174,14 +183,14 @@ const Select = <
     defaultValue,
     value,
   );
-  const selectedValues =
-    internalValue === undefined
-      ? []
-      : isMultiple && Array.isArray(internalValue)
-        ? internalValue
-        : isDefault && !Array.isArray(internalValue)
-          ? [internalValue]
-          : [];
+  let selectedValues: TValue[] = [];
+  if (internalValue !== undefined) {
+    if (isMultiple && Array.isArray(internalValue)) {
+      selectedValues = internalValue;
+    } else if (isDefault && !Array.isArray(internalValue)) {
+      selectedValues = [internalValue];
+    }
+  }
 
   const createOption = (value: TValue): OptionType<TValue, TRecord> =>
     ({
@@ -346,24 +355,11 @@ const Select = <
   const firstDisplayOption = flatDisplayOptions.at(0);
   const lastDisplayOption = flatDisplayOptions.at(-1);
   const firstSelectedValue = selectedValues.at(0);
-
-  React.useEffect(() => {
-    if (!isTags || !internalOpen) {
-      setActiveTagOptionValue(undefined);
-      return;
-    }
-
-    setActiveTagOptionValue((currentValue) => {
-      if (
-        currentValue !== undefined &&
-        flatDisplayOptions.some((option) => option.value === currentValue)
-      ) {
-        return currentValue;
-      }
-
-      return;
-    });
-  }, [flatDisplayOptions, internalOpen, isTags]);
+  const activeTagOption =
+    isTags && internalOpen
+      ? flatDisplayOptions.find((option) => option.value === activeTagOptionValue)
+      : undefined;
+  const activeTagOptionValueFromOptions = activeTagOption?.value;
 
   const submitTagValue = (rawValue: string) => {
     const nextValue = rawValue.trim();
@@ -382,15 +378,15 @@ const Select = <
   };
 
   const selectActiveTagOption = () => {
-    if (activeTagOptionValue === undefined) return;
-    triggerChange(activeTagOptionValue);
+    if (activeTagOptionValueFromOptions === undefined) return;
+    triggerChange(activeTagOptionValueFromOptions);
   };
 
   const moveActiveTagOption = (direction: 1 | -1) => {
     if (flatDisplayOptions.length === 0) return;
 
     const currentIndex = flatDisplayOptions.findIndex(
-      (option) => option.value === activeTagOptionValue,
+      (option) => option.value === activeTagOptionValueFromOptions,
     );
     const nextIndex =
       currentIndex === -1
@@ -433,7 +429,7 @@ const Select = <
     if (
       e.key === "Enter" &&
       internalOpen &&
-      activeTagOptionValue !== undefined
+      activeTagOptionValueFromOptions !== undefined
     ) {
       e.preventDefault();
       selectActiveTagOption();
@@ -447,11 +443,11 @@ const Select = <
   };
 
   const isActiveTagsOption = (optionValue: TValue) =>
-    optionValue === activeTagOptionValue ||
+    optionValue === activeTagOptionValueFromOptions ||
     selectedValues.includes(optionValue) ||
     (isTags &&
       trimmedSearchValue !== "" &&
-      !activeTagOptionValue &&
+      !activeTagOptionValueFromOptions &&
       optionValue === trimmedSearchValue);
 
   // Content for dropdown
@@ -596,10 +592,10 @@ const Select = <
                         )}
                         onMouseDown={(event) => {
                           event.preventDefault();
-                          shouldCommitOnBlurRef.current = false;
+                          shouldCommitOnBlurReference.current = false;
                         }}
                         onClick={() => {
-                          shouldCommitOnBlurRef.current = true;
+                          shouldCommitOnBlurReference.current = true;
                           if (disabled) return;
                           triggerChange(item.value);
                         }}
@@ -636,10 +632,10 @@ const Select = <
                 )}
                 onMouseDown={(event) => {
                   event.preventDefault();
-                  shouldCommitOnBlurRef.current = false;
+                  shouldCommitOnBlurReference.current = false;
                 }}
                 onClick={() => {
-                  shouldCommitOnBlurRef.current = true;
+                  shouldCommitOnBlurReference.current = true;
                   if (disabled) return;
                   triggerChange(option.value);
                 }}
@@ -690,10 +686,10 @@ const Select = <
                       )}
                       onMouseDown={(event) => {
                         event.preventDefault();
-                        shouldCommitOnBlurRef.current = false;
+                        shouldCommitOnBlurReference.current = false;
                       }}
                       onClick={() => {
-                        shouldCommitOnBlurRef.current = true;
+                        shouldCommitOnBlurReference.current = true;
                         if (disabled) return;
                         triggerChange(item.value);
                       }}
@@ -730,10 +726,10 @@ const Select = <
               )}
               onMouseDown={(event) => {
                 event.preventDefault();
-                shouldCommitOnBlurRef.current = false;
+                shouldCommitOnBlurReference.current = false;
               }}
               onClick={() => {
-                shouldCommitOnBlurRef.current = true;
+                shouldCommitOnBlurReference.current = true;
                 if (disabled) return;
                 triggerChange(option.value);
               }}
@@ -768,7 +764,7 @@ const Select = <
                   "h-auto py-1 pr-8 pl-[3px]",
                   className,
                 )}
-                {...triggerProps}
+                {...triggerProperties}
               >
                 <SelectMultipleContent
                   mode={mode}
@@ -791,8 +787,8 @@ const Select = <
                     submitTagValue(searchValue);
                   }}
                   onInputBlur={() => {
-                    if (!shouldCommitOnBlurRef.current) {
-                      shouldCommitOnBlurRef.current = true;
+                    if (!shouldCommitOnBlurReference.current) {
+                      shouldCommitOnBlurReference.current = true;
                       return;
                     }
 
@@ -858,6 +854,8 @@ const Select = <
         }
         open={internalOpen}
         onOpenChange={handleOpenChange}
+        form={form}
+        name={name}
       >
         <SelectTrigger
           id={id}
@@ -875,6 +873,8 @@ const Select = <
           status={status}
           allowClear={allowClear}
           showClearIcon={selectedValues.length > 0}
+          onBlur={onBlur}
+          ref={ref}
           onClear={() => {
             if (allowClear) {
               clearValue();
@@ -882,7 +882,7 @@ const Select = <
 
             setKey(+Date.now());
           }}
-          {...triggerProps} // for form-control
+          {...triggerProperties} // for form-control
         >
           {isMultiple ? (
             <>
@@ -926,5 +926,5 @@ const Select = <
   );
 };
 
-export type { SelectProps };
+export type { SelectProperties as SelectProps };
 export { Select };

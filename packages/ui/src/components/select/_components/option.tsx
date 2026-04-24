@@ -6,16 +6,16 @@ import { SelectItem } from "@acme/ui/shadcn/select";
 import type { SelectValueType } from "../types";
 import { SelectContext } from "../context";
 
-type OptionProps = {
+type OptionProperties = {
   value: SelectValueType;
   children?: React.ReactNode;
   className?: string;
 };
 
-const Option: React.FC<OptionProps> = ({ value, children, className }) => {
-  const ctx = React.useContext(SelectContext);
-  if (!ctx) return null;
-  const isActive = ctx.selectedValues.includes(value);
+const Option: React.FC<OptionProperties> = ({ value, children, className }) => {
+  const context = React.useContext(SelectContext);
+  if (!context) return;
+  const isActive = context.selectedValues.includes(value);
   return (
     <SelectItem
       value={value as string}
@@ -28,13 +28,13 @@ const Option: React.FC<OptionProps> = ({ value, children, className }) => {
       onMouseDown={(e) => {
         e.stopPropagation();
         e.preventDefault();
-        ctx.triggerChange(value);
+        context.triggerChange(value);
       }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           e.stopPropagation();
-          ctx.triggerChange(value);
+          context.triggerChange(value);
         }
       }}
     >
