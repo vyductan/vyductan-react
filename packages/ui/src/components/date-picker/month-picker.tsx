@@ -10,7 +10,7 @@ import { inputSizeVariants, inputVariants } from "../input";
 import { Popover } from "../popover";
 import { Panel } from "./_components/panel";
 
-type MonthPickerProps = {
+type MonthPickerProperties = {
   id?: string;
   open?: boolean;
 
@@ -19,14 +19,14 @@ type MonthPickerProps = {
 };
 const MonthPicker = ({
   id: inputId,
-  open: openProp,
+  open: openProperty,
 
   value,
   onChange,
   ref,
-}: MonthPickerProps & { ref?: Ref<HTMLDivElement> }) => {
+}: MonthPickerProperties & { ref?: Ref<HTMLDivElement> }) => {
   const [open, setOpen] = useMergedState(false, {
-    value: openProp,
+    value: openProperty,
   });
 
   const [currentYear, setCurrentYear] = React.useState(

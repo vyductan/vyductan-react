@@ -1,9 +1,6 @@
 import * as React from "react";
 
-import {
-  AutoComplete,
-  removeTones,
-} from "@acme/ui/components/auto-complete";
+import { AutoComplete, removeTones } from "@acme/ui/components/auto-complete";
 
 const searchOptions = [
   { label: "Cà phê sữa", value: "cafe-sua" },

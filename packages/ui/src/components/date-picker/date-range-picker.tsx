@@ -9,8 +9,8 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { InputRef } from "../input";
-import type { DatePickerBaseProps } from "./date-picker";
+import type { InputRef as InputReference } from "../input";
+import type { DatePickerBaseProps as DatePickerBaseProperties } from "./date-picker";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { RangeCalendar } from "../calendar/range-calendar";
@@ -22,8 +22,8 @@ import { parseInputDate } from "./parse-input-date";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
-type DateRangePickerProps = DatePickerBaseProps & {
-  ref?: React.Ref<InputRef>;
+type DateRangePickerProperties = DatePickerBaseProperties & {
+  ref?: React.Ref<InputReference>;
 
   value?: RangeValueType | null;
   defaultValue?: RangeValueType | null;
@@ -48,17 +48,17 @@ type DateRangePickerProps = DatePickerBaseProps & {
   };
 };
 
-const DateRangePicker = (props: DateRangePickerProps) => {
+const DateRangePicker = (properties: DateRangePickerProperties) => {
   const {
     ref,
     id,
 
-    value: valueProp,
+    value: valueProperty,
     defaultValue,
     onChange,
 
     placeholder,
-    format: formatProp,
+    format: formatProperty,
     showTime,
 
     style,
@@ -75,7 +75,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
 
     className,
     ...rest
-  } = props;
+  } = properties;
   const {
     format: formatConfig,
     captionLayout: captionLayoutConfig,
@@ -88,13 +88,13 @@ const DateRangePicker = (props: DateRangePickerProps) => {
 
   // ====================== Format Date =======================
   const format =
-    (formatProp ?? showTime)
+    (formatProperty ?? showTime)
       ? `${formatConfig} HH:mm`
       : (formatConfig ?? "YYYY-MM-DD");
 
   // ====================== Value =======================
   const [value, setValue] = useMergedState(defaultValue, {
-    value: valueProp,
+    value: valueProperty,
     onChange: (next) => {
       onChange?.(next ?? null);
     },
@@ -134,23 +134,24 @@ const DateRangePicker = (props: DateRangePickerProps) => {
     } else if (activeInput === "end" && value?.[1]) {
       // For end date, show the month in the second panel (month - 1)
       const endDate = value[1].toDate();
-      const prevMonth = new Date(
+      const previousMonth = new Date(
         endDate.getFullYear(),
         endDate.getMonth() - 1,
         1,
       );
-      setMonth(prevMonth);
+      setMonth(previousMonth);
     }
   }, [activeInput, value]);
 
   // =============== Hover Preview (AntD-like) ===============
   // hoverPreview is already declared above
 
-  const startInputRef = React.useRef<InputRef>(null);
-  const endInputRef = React.useRef<InputRef>(null);
+  const startInputReference = React.useRef<InputReference>(null);
+  const endInputReference = React.useRef<InputReference>(null);
 
-  // eslint-disable-next-line react-hooks/refs
-  const composedStartRef = ref ? composeRef(ref, startInputRef) : startInputRef;
+  const composedStartReference = ref
+    ? composeRef(ref, startInputReference)
+    : startInputReference;
 
   const handleStartInputChange = (inputValue: string) => {
     setStartInputValue(inputValue);
@@ -211,7 +212,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             // always switch to input 2 and keep panel open (even if both inputs have values)
             if (activeInput === "start") {
               setActiveInput("end");
-              setTimeout(() => endInputRef.current?.focus(), 0);
+              setTimeout(() => endInputReference.current?.focus(), 0);
             } else if (activeInput === "end" && dates?.[1]) {
               // Only close panel when selecting end date while focused on input 2
               setTimeout(() => {
@@ -222,7 +223,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
               // No active input - if start date selected, switch to input 2
               if (dates?.[0] && !dates[1]) {
                 setActiveInput("end");
-                setTimeout(() => endInputRef.current?.focus(), 0);
+                setTimeout(() => endInputReference.current?.focus(), 0);
               } else if (dates?.[1]) {
                 // Both dates selected without active input - close panel
                 setTimeout(() => {
@@ -294,15 +295,15 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             // Update month to show end date month in the second panel if it exists
             if (value?.[1]) {
               const endDate = value[1].toDate();
-              const prevMonth = new Date(
+              const previousMonth = new Date(
                 endDate.getFullYear(),
                 endDate.getMonth() - 1,
                 1,
               );
-              setMonth(prevMonth);
+              setMonth(previousMonth);
             }
             // Focus end input
-            setTimeout(() => endInputRef.current?.focus(), 0);
+            setTimeout(() => endInputReference.current?.focus(), 0);
           } else if (activeInput === "end") {
             // Selecting end date
             const startDate = value?.[0] ?? null;
@@ -323,7 +324,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
             setStartInputValue(selectedDate.format(format));
             setEndInputValue("");
             setActiveInput("end");
-            setTimeout(() => endInputRef.current?.focus(), 0);
+            setTimeout(() => endInputReference.current?.focus(), 0);
           }
         }}
       />
@@ -348,12 +349,12 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   // prevent click label to focus input (open popover)
   useEffect(() => {
     const labelElm = document.querySelector(`label[for="${id}"]`);
-    const eventFn = (event: Event) => {
+    const eventFunction = (event: Event) => {
       event.preventDefault();
     };
-    labelElm?.addEventListener("click", eventFn);
+    labelElm?.addEventListener("click", eventFunction);
     return () => {
-      labelElm?.removeEventListener("click", eventFn);
+      labelElm?.removeEventListener("click", eventFunction);
     };
   }, [id]);
 
@@ -394,7 +395,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
         >
           <div className="relative flex-1">
             <Input
-              ref={composedStartRef}
+              ref={composedStartReference}
               id={id}
               value={
                 open && hoverPreview && activeInput === "start"
@@ -446,14 +447,14 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                   if (value?.[1]) {
                     // For end date, show the month in the second panel (month - 1)
                     const endDate = value[1].toDate();
-                    const prevMonth = new Date(
+                    const previousMonth = new Date(
                       endDate.getFullYear(),
                       endDate.getMonth() - 1,
                       1,
                     );
-                    setMonth(prevMonth);
+                    setMonth(previousMonth);
                   }
-                  endInputRef.current?.focus();
+                  endInputReference.current?.focus();
                 } else if (event.key === "Escape") {
                   setOpen(false);
                 }
@@ -494,7 +495,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                     popoverContainer?.contains(relatedTarget) ||
                     relatedTarget.closest('[data-slot="calendar"]') ||
                     relatedTarget.closest('[data-slot="popover-content"]') ||
-                    relatedTarget === endInputRef.current?.input)
+                    relatedTarget === endInputReference.current?.input)
                 ) {
                   return;
                 }
@@ -532,7 +533,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
           />
           <div className="relative flex-1">
             <Input
-              ref={endInputRef}
+              ref={endInputReference}
               value={
                 open && hoverPreview && activeInput === "end"
                   ? hoverPreview.format(format)
@@ -561,12 +562,12 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                   if (value?.[1]) {
                     // For end date, show the month in the second panel (month - 1)
                     const endDate = value[1].toDate();
-                    const prevMonth = new Date(
+                    const previousMonth = new Date(
                       endDate.getFullYear(),
                       endDate.getMonth() - 1,
                       1,
                     );
-                    setMonth(prevMonth);
+                    setMonth(previousMonth);
                   }
                 } else {
                   setOpen(true);
@@ -574,12 +575,12 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                   if (value?.[1]) {
                     // For end date, show the month in the second panel (month - 1)
                     const endDate = value[1].toDate();
-                    const prevMonth = new Date(
+                    const previousMonth = new Date(
                       endDate.getFullYear(),
                       endDate.getMonth() - 1,
                       1,
                     );
-                    setMonth(prevMonth);
+                    setMonth(previousMonth);
                   }
                 }
               }}
@@ -588,12 +589,12 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                 if (value?.[1]) {
                   // For end date, show the month in the second panel (month - 1)
                   const endDate = value[1].toDate();
-                  const prevMonth = new Date(
+                  const previousMonth = new Date(
                     endDate.getFullYear(),
                     endDate.getMonth() - 1,
                     1,
                   );
-                  setMonth(prevMonth);
+                  setMonth(previousMonth);
                 }
               }}
               onKeyUp={(event) => {
@@ -641,7 +642,7 @@ const DateRangePicker = (props: DateRangePickerProps) => {
                     popoverContainer?.contains(relatedTarget) ||
                     relatedTarget.closest('[data-slot="calendar"]') ||
                     relatedTarget.closest('[data-slot="popover-content"]') ||
-                    relatedTarget === startInputRef.current?.input)
+                    relatedTarget === startInputReference.current?.input)
                 ) {
                   return;
                 }
@@ -701,5 +702,5 @@ const DateRangePicker = (props: DateRangePickerProps) => {
   );
 };
 
-export type { DateRangePickerProps };
+export type { DateRangePickerProperties as DateRangePickerProps };
 export { DateRangePicker };

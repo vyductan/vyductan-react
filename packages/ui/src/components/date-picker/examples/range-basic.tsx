@@ -5,7 +5,7 @@ import { useState } from "react";
 import { DateRangePicker } from "@acme/ui/components/date-picker";
 
 const App: React.FC = () => {
-  const [value, setValue] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [value, setValue] = useState<[Dayjs | null, Dayjs | null] | null>();
 
   return (
     <DateRangePicker

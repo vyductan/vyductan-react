@@ -70,16 +70,16 @@ const autoCompleteExampleInventory: ReadonlyArray<{
   },
 ] as const;
 
+function readUtf8(filePath: string): string {
+  return readFileSync(filePath, "utf8");
+}
+
 describe("AutoComplete docs Storybook config", () => {
   const storybookConfigFilePath = path.resolve(
     import.meta.dirname,
     "../../../.storybook/main.ts",
   );
   const docsFilePath = path.resolve(import.meta.dirname, "./auto-complete.mdx");
-
-  function readUtf8(filePath: string): string {
-    return readFileSync(filePath, "utf8");
-  }
 
   test("configures addon-docs with remark-gfm so markdown tables render as tables in MDX docs", () => {
     const configSource = readUtf8(storybookConfigFilePath);
@@ -89,6 +89,16 @@ describe("AutoComplete docs Storybook config", () => {
     expect(configSource).toContain("remarkPlugins: [remarkGfm]");
   });
 
+  test("configures Storybook sidebar sorting alphabetically at the project level", () => {
+    const previewSource = readUtf8(
+      path.resolve(import.meta.dirname, "../../../.storybook/preview.tsx"),
+    );
+
+    expect(previewSource).toContain("storySort");
+    expect(previewSource).toContain('method: "alphabetical"');
+    expect(previewSource).toContain("includeNames: true");
+  });
+
   test("marks examples MDX partials as templates so Storybook does not index them as standalone sidebar entries", () => {
     for (const { partialImportPath } of autoCompleteExampleInventory) {
       const partialSource = readUtf8(
@@ -96,9 +106,13 @@ describe("AutoComplete docs Storybook config", () => {
       );
       const templateMarkerIndex = partialSource.indexOf("<Meta isTemplate />");
 
-      expect(partialSource).toContain('import { Meta } from "@storybook/addon-docs/blocks"');
+      expect(partialSource).toContain(
+        'import { Meta } from "@storybook/addon-docs/blocks"',
+      );
       expect(templateMarkerIndex).toBeGreaterThan(-1);
-      expect(partialSource.slice(templateMarkerIndex)).not.toContain("\nimport ");
+      expect(partialSource.slice(templateMarkerIndex)).not.toContain(
+        "\nimport ",
+      );
     }
   });
 

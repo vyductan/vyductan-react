@@ -13,6 +13,20 @@ afterEach(() => {
   cleanup();
 });
 
+describe("InputNumber default mode", () => {
+  test("uses primary border for focused outlined state", () => {
+    render(<InputNumber aria-label="Quantity" defaultValue={2} />);
+
+    const input = screen.getByRole("spinbutton", { name: "Quantity" });
+    const affixWrapper = input.closest('[data-slot="affix-wrapper"]');
+
+    expect(affixWrapper).toHaveClass("focus-within:border-primary-500");
+    expect(affixWrapper).toHaveClass("focus-within:ring-primary-500/20");
+    expect(affixWrapper).not.toHaveClass("focus-within:border-ring");
+    expect(affixWrapper).not.toHaveClass("focus-within:ring-ring/50");
+  });
+});
+
 describe("InputNumber spinner mode", () => {
   test("renders spinner mode inside a group shell", () => {
     render(

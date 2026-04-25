@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-type MonthSelectProps<DateValueType extends Dayjs = Dayjs> = {
+type MonthSelectProperties<DateValueType extends Dayjs = Dayjs> = {
   value?: DateValueType | null;
   onChange?: (value?: DateValueType | null, monthString?: string) => void;
   onHoverChange?: (value?: DateValueType | null, monthString?: string) => void;
@@ -14,7 +14,7 @@ const MonthSelect = <DateValueType extends Dayjs = Dayjs>({
   value,
   onChange,
   onHoverChange,
-}: MonthSelectProps<DateValueType>) => {
+}: MonthSelectProperties<DateValueType>) => {
   const currentMonth = useMemo(() => value ?? dayjs(), [value]);
   const currentMonthValue = currentMonth.month();
   const currentYearValue = currentMonth.year();
@@ -32,10 +32,10 @@ const MonthSelect = <DateValueType extends Dayjs = Dayjs>({
   );
 
   const months = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => {
+    return Array.from({ length: 12 }, (_, index) => {
       // Use a fixed date to get month names to avoid issues with different day lengths
       // setting day to 1st to be safe
-      return dayjs().month(i).date(1);
+      return dayjs().month(index).date(1);
     });
   }, []);
 

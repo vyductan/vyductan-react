@@ -8,9 +8,9 @@ import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
-import type { CommandProps } from "../command";
+import type { CommandProps as CommandProperties } from "../command";
 import type { SizeType } from "../config-provider/size-context";
-import type { PopoverContentProps } from "../popover";
+import type { PopoverContentProps as PopoverContentProperties } from "../popover";
 import type { OptionType } from "../select/types";
 import { Button, LoadingIcon } from "../button";
 import { Command } from "../command";
@@ -22,9 +22,9 @@ type AutoCompleteValueType = string | number;
 export type AutoCompleteProps<
   TValue extends AutoCompleteValueType = string,
   TRecord extends AnyObject = AnyObject,
-> = Pick<PopoverContentProps, "onFocusOutside"> &
+> = Pick<PopoverContentProperties, "onFocusOutside"> &
   Pick<
-    CommandProps<TValue>,
+    CommandProperties<TValue>,
     | "filter"
     | "placeholder"
     | "empty"
@@ -62,8 +62,8 @@ const AutoComplete = <
   TRecord extends AnyObject = AnyObject,
 >({
   mode = "combobox",
-  defaultValue: defaultValueProp,
-  value: valueProp,
+  defaultValue: defaultValueProperty,
+  value: valueProperty,
   options,
   optionsToSearch,
   optionLabelProp,
@@ -73,10 +73,10 @@ const AutoComplete = <
   className,
   size,
   disabled,
-  open: openProp,
+  open: openProperty,
   onOpenChange,
 
-  filter: filterProp,
+  filter: filterProperty,
 
   placeholder,
 
@@ -90,11 +90,11 @@ const AutoComplete = <
 
   // Popover
   onFocusOutside,
-  ...props
+  ...properties
 }: AutoCompleteProps<TValue, TRecord>) => {
   /* Filter Detault*/
   const filter =
-    filterProp ??
+    filterProperty ??
     ((value, search, _) => {
       const label = (optionsToSearch ?? options)
         .find((item) => String(item.value) === String(value))
@@ -111,11 +111,11 @@ const AutoComplete = <
     });
 
   const [open, setOpen] = useMergedState(false, {
-    value: openProp,
+    value: openProperty,
     onChange: onOpenChange,
   });
-  const [value, setValue] = useMergedState(defaultValueProp, {
-    value: valueProp,
+  const [value, setValue] = useMergedState(defaultValueProperty, {
+    value: valueProperty,
     onChange: (value) => {
       onChange?.(
         value,
@@ -134,46 +134,42 @@ const AutoComplete = <
     },
   });
 
-  // ===================== Search (input mode) =====================
   const [search, setSearch] = React.useState<string>("");
+  const selectedOption = options.find((option) => option.value === value);
+  const selectedTagColor = tagColors[selectedOption?.color ?? ""];
+  const selectedHoverTagColor =
+    "hover:" + selectedTagColor?.slice(0, selectedTagColor?.indexOf(" "));
+
   const getOptionLabel = (option: OptionType<TValue, TRecord>) => {
     if (optionLabelProp && option[optionLabelProp as keyof typeof option]) {
       return option[optionLabelProp as keyof typeof option];
     }
     return option.label as string;
   };
-  // React.useEffect(() => {
-  //   if (mode !== "input") return;
-  //   // Initialize/sync input text from current value when it changes
-  //   const o = options.find((o) => o.value === value);
-  //   const next = o ? String(getOptionLabel(o)) : "";
-  //   if (search !== next) {
-  //     setSearch(next);
-  //   }
-  // }, [mode, value, getOptionLabel]);
 
   const buttonText = (() => {
     if (!value) {
       return placeholder ?? <span className="opacity-0"></span>;
     }
-    const o = options.find((o) => o.value === value);
-    if (o) {
-      const label = optionRender?.label
-        ? optionRender.label(o)
-        : getOptionLabel(o);
-      return (
-        <>
-          {optionRender?.icon ? (
-            <span className="mr-2">{optionRender.icon(o)}</span>
-          ) : (
-            o.icon && <Icon icon={o.icon} />
-          )}
-          {label}
-        </>
-      );
+
+    if (!selectedOption) {
+      return value;
     }
 
-    return value;
+    const label = optionRender?.label
+      ? optionRender.label(selectedOption)
+      : getOptionLabel(selectedOption);
+
+    return (
+      <>
+        {optionRender?.icon ? (
+          <span className="mr-2">{optionRender.icon(selectedOption)}</span>
+        ) : (
+          selectedOption.icon && <Icon icon={selectedOption.icon} />
+        )}
+        {label}
+      </>
+    );
   })();
 
   const gatedSetOpen = (next: boolean) => {
@@ -201,7 +197,7 @@ const AutoComplete = <
       filter={filter}
       onSearchChange={mode === "input" ? undefined : onSearchChange}
       optionRender={optionRender}
-      {...props}
+      {...properties}
       // Input mode: drive filtering by external input
       {...(mode === "input"
         ? { searchValue: search, hideSearchInput: true }
@@ -305,17 +301,11 @@ const AutoComplete = <
           "w-full justify-between font-normal",
           // own
           "hover:border-primary bg-transparent text-start text-sm whitespace-normal hover:bg-transparent",
+          "focus:border-primary-500 focus:ring-primary-500/20 focus-visible:border-primary-500 focus-visible:ring-primary-500/20",
+          open && "border-primary-500 ring-[3px] ring-primary-500/20",
           !value && "text-muted-foreground hover:text-muted-foreground",
-          tagColors[options.find((o) => o.value === value)?.color ?? ""],
-          "hover:" +
-            tagColors[
-              options.find((o) => o.value === value)?.color ?? ""
-            ]?.slice(
-              0,
-              tagColors[
-                options.find((o) => o.value === value)?.color ?? ""
-              ]?.indexOf(" "),
-            ),
+          selectedTagColor,
+          selectedHoverTagColor,
           inputSizeVariants({ size }),
           className,
         )}

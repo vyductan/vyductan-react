@@ -68,52 +68,56 @@ export const WithValue: Story = {
 };
 
 export const Variants: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[240px] flex-col gap-4">
-      <DatePicker {...args} variant="outlined" placeholder="Outlined" />
-      <DatePicker {...args} variant="filled" placeholder="Filled" />
-      <DatePicker {...args} variant="borderless" placeholder="Borderless" />
+      <DatePicker {...arguments_} variant="outlined" placeholder="Outlined" />
+      <DatePicker {...arguments_} variant="filled" placeholder="Filled" />
+      <DatePicker
+        {...arguments_}
+        variant="borderless"
+        placeholder="Borderless"
+      />
     </div>
   ),
 };
 
 export const Sizes: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[240px] flex-col gap-4">
-      <DatePicker {...args} size="small" placeholder="Small" />
-      <DatePicker {...args} size="middle" placeholder="Middle" />
-      <DatePicker {...args} size="large" placeholder="Large" />
+      <DatePicker {...arguments_} size="small" placeholder="Small" />
+      <DatePicker {...arguments_} size="middle" placeholder="Middle" />
+      <DatePicker {...arguments_} size="large" placeholder="Large" />
     </div>
   ),
 };
 
 export const Status: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[240px] flex-col gap-4">
-      <DatePicker {...args} status="error" placeholder="Error" />
-      <DatePicker {...args} status="warning" placeholder="Warning" />
+      <DatePicker {...arguments_} status="error" placeholder="Error" />
+      <DatePicker {...arguments_} status="warning" placeholder="Warning" />
     </div>
   ),
 };
 
 export const PickerModes: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex w-[240px] flex-col gap-4">
-      <DatePicker {...args} picker="date" placeholder="Date Picker" />
+      <DatePicker {...arguments_} picker="date" placeholder="Date Picker" />
       <DatePicker
-        {...args}
+        {...arguments_}
         picker="week"
         placeholder="Week Picker"
         defaultValue={dayjs("2024-05-15")}
       />
-      <DatePicker {...args} picker="month" placeholder="Month Picker" />
+      <DatePicker {...arguments_} picker="month" placeholder="Month Picker" />
       <DatePicker
-        {...args}
+        {...arguments_}
         picker="quarter"
         placeholder="Quarter Picker"
         defaultValue={dayjs("2024-08-15")}
       />
-      <DatePicker {...args} picker="year" placeholder="Year Picker" />
+      <DatePicker {...arguments_} picker="year" placeholder="Year Picker" />
     </div>
   ),
   play: async ({ canvasElement, step }) => {
@@ -228,10 +232,10 @@ export const InteractionMonthSelection: Story = {
     await step("Switch to month picker", async () => {
       // Find the month button (it displays 'May')
       // Since it's in a portal, we search in document body
-      const monthBtn = within(document.body).getByRole("button", {
+      const monthButton = within(document.body).getByRole("button", {
         name: "May",
       });
-      await userEvent.click(monthBtn);
+      await userEvent.click(monthButton);
 
       // Verify month grid is visible
       // We can look for 'Jan', 'Feb' etc.
@@ -240,14 +244,14 @@ export const InteractionMonthSelection: Story = {
     });
 
     await step("Select 'Sep'", async () => {
-      const sep = within(document.body).getByText("Sep");
-      await userEvent.click(sep);
+      const separator = within(document.body).getByText("Sep");
+      await userEvent.click(separator);
 
       // Verify we are back to date view and showing Sep
-      const monthBtn = within(document.body).getByRole("button", {
+      const monthButton = within(document.body).getByRole("button", {
         name: "Sep",
       });
-      await expect(monthBtn).toBeTruthy();
+      await expect(monthButton).toBeTruthy();
     });
   },
 };

@@ -53,23 +53,23 @@ AutoComplete helps users search or choose from a known set of options while keep
 
 ## API Reference
 
-| Property | Type | Default | Description |
-| --- | --- | --- | --- |
-| `mode` | `"combobox" \| "input"` | `"combobox"` | Chooses between button trigger mode and text input trigger mode. |
-| `value` | `string \| number` | - | Controlled selected option value. |
-| `defaultValue` | `string \| number` | - | Initial selected option value for uncontrolled usage. |
-| `options` | `OptionType[]` | - | Options available to render and select. |
-| `optionsToSearch` | `{ value: string; label: string }[]` | - | Alternative search dataset when display and search data differ. |
-| `optionLabelProp` | `string` | - | Field used as the label when syncing selected text. |
-| `allowClear` | `boolean` | `false` | Shows a clear affordance for removing the current value. |
-| `loading` | `boolean` | `false` | Shows a loading indicator in the trigger. |
-| `disabled` | `boolean` | `false` | Disables interaction. |
-| `placeholder` | `string` | - | Placeholder shown when no value is selected. |
-| `searchPlaceholder` | `string` | - | Placeholder used by the search field inside the dropdown. |
-| `filter` | `(value, search, option?) => number` | built-in accent-insensitive label matcher | Filters options during search. |
-| `optionRender` | `{ label?, icon? }` | - | Customizes how each selected option label or icon is rendered. |
-| `dropdownRender` | `(menu) => React.ReactNode` | - | Customizes the dropdown body around the menu. |
-| `dropdownFooter` | `React.ReactNode` | - | Appends footer content below the options list. |
-| `onChange` | `(value?, option?) => void` | - | Called when the selection changes. |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when the popover open state changes. |
-| `onSearchChange` | `(search: string) => void` | - | Called when the search text changes. |
+| Property            | Type                                 | Default                                   | Description                                                      |
+| ------------------- | ------------------------------------ | ----------------------------------------- | ---------------------------------------------------------------- |
+| `mode`              | `"combobox" \| "input"`              | `"combobox"`                              | Chooses between button trigger mode and text input trigger mode. |
+| `value`             | `string \| number`                   | -                                         | Controlled selected option value.                                |
+| `defaultValue`      | `string \| number`                   | -                                         | Initial selected option value for uncontrolled usage.            |
+| `options`           | `OptionType[]`                       | -                                         | Options available to render and select.                          |
+| `optionsToSearch`   | `{ value: string; label: string }[]` | -                                         | Alternative search dataset when display and search data differ.  |
+| `optionLabelProp`   | `string`                             | -                                         | Field used as the label when syncing selected text.              |
+| `allowClear`        | `boolean`                            | `false`                                   | Shows a clear affordance for removing the current value.         |
+| `loading`           | `boolean`                            | `false`                                   | Shows a loading indicator in the trigger.                        |
+| `disabled`          | `boolean`                            | `false`                                   | Disables interaction.                                            |
+| `placeholder`       | `string`                             | -                                         | Placeholder shown when no value is selected.                     |
+| `searchPlaceholder` | `string`                             | -                                         | Placeholder used by the search field inside the dropdown.        |
+| `filter`            | `(value, search, option?) => number` | built-in accent-insensitive label matcher | Filters options during search.                                   |
+| `optionRender`      | `{ label?, icon? }`                  | -                                         | Customizes how each selected option label or icon is rendered.   |
+| `dropdownRender`    | `(menu) => React.ReactNode`          | -                                         | Customizes the dropdown body around the menu.                    |
+| `dropdownFooter`    | `React.ReactNode`                    | -                                         | Appends footer content below the options list.                   |
+| `onChange`          | `(value?, option?) => void`          | -                                         | Called when the selection changes.                               |
+| `onOpenChange`      | `(open: boolean) => void`            | -                                         | Called when the popover open state changes.                      |
+| `onSearchChange`    | `(search: string) => void`           | -                                         | Called when the search text changes.                             |

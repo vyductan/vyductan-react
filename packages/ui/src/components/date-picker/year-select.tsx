@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-type YearSelectProps<DateValueType extends Dayjs = Dayjs> = {
+type YearSelectProperties<DateValueType extends Dayjs = Dayjs> = {
   value?: DateValueType | null;
   onChange?: (value?: DateValueType | null, yearString?: string) => void;
   onHoverChange?: (value?: DateValueType | null, yearString?: string) => void;
@@ -14,13 +14,13 @@ const YearSelect = <DateValueType extends Dayjs = Dayjs>({
   value,
   onChange,
   onHoverChange,
-}: YearSelectProps<DateValueType>) => {
+}: YearSelectProperties<DateValueType>) => {
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
   const [currentDecadeRange] = useState<Dayjs[]>(() =>
-    Array.from({ length: 10 }, (_, i) => {
+    Array.from({ length: 10 }, (_, index) => {
       const yearValue = currentYear.year();
       const startYear = Math.floor(yearValue / 10) * 10;
-      return dayjs((startYear + i).toString());
+      return dayjs((startYear + index).toString());
     }),
   );
 

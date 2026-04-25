@@ -9,25 +9,25 @@ import { Space } from "@acme/ui/components/space";
 const VariantsDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
   const [separateValue, setSeparateValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
   const [singleCalendarValue, setSingleCalendarValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
   const [withTimeValue, setWithTimeValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
   const [withMinMaxValue, setWithMinMaxValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
   const [disabledValue, setDisabledValue] = useState<
     [Dayjs | null, Dayjs | null] | null
   >([dayjs().subtract(7, "day"), dayjs()]);
   const [errorValue, setErrorValue] = useState<
     [Dayjs | null, Dayjs | null] | null
-  >(null);
+  >();
 
   return (
     <Space direction="vertical" size="large" style={{ width: "100%" }}>

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import type { RefObject } from "react";
 import { useRef } from "react";
 import warning from "@rc-component/util/es/warning";
 
@@ -7,7 +8,7 @@ import warning from "@rc-component/util/es/warning";
  * Is this necessary since we have `formatter` which may mass the content?
  */
 export default function useCursor(
-  input: HTMLInputElement | null,
+  inputReference: RefObject<HTMLInputElement | null>,
   focused: boolean,
 ): [() => void, () => void] {
   const selectionReference = useRef<{
@@ -21,6 +22,7 @@ export default function useCursor(
   function recordCursor() {
     // Record position
     try {
+      const input = inputReference.current;
       if (input) {
         const { selectionStart: start, selectionEnd: end, value } = input;
         const beforeTxt = value.slice(0, Math.max(0, start!));
@@ -47,6 +49,7 @@ export default function useCursor(
    *  2. start string same
    */
   function restoreCursor() {
+    const input = inputReference.current;
     if (input && selectionReference.current && focused) {
       try {
         const { value } = input;

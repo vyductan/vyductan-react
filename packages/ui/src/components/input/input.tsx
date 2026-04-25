@@ -25,11 +25,16 @@ import { useComponentConfig } from "../config-provider/context";
 import DisabledContext from "../config-provider/disabled-context";
 import useSize from "../config-provider/hooks/use-size";
 import useVariant from "../form/hooks/use-variant";
+import { InputGroupInput } from "../input-group";
 import { useCompactItemContext } from "../space/compact";
 import { BaseInput } from "./components/base-input";
 import useCount from "./hooks/use-count";
 import { resolveOnChange, triggerFocus } from "./utils/common-utils";
-import { inputSizeVariants, inputVariants } from "./variants";
+import {
+  inputAffixWrapperSizeVariants,
+  inputSizeVariants,
+  inputVariants,
+} from "./variants";
 
 type SemanticName = "prefix" | "suffix" | "input" | "count";
 
@@ -347,9 +352,12 @@ const Input = (properties: InputProperties) => {
         "status",
       ],
     );
+    const InputComponent = hasAffix ? InputGroupInput : "input";
+    const slotProperties = hasAffix ? undefined : { "data-slot": "input" };
+
     return (
-      <input
-        data-slot="input"
+      <InputComponent
+        {...slotProperties}
         autoComplete={autoComplete}
         aria-invalid={properties["aria-invalid"] ?? status === "error"}
         {...otherProperties}
@@ -446,7 +454,9 @@ const Input = (properties: InputProperties) => {
           classNames?.variant,
         ),
         affixWrapper: cn(
-          hasAffix && inputSizeVariants({ size: mergedSize }),
+          hasAffix && inputAffixWrapperSizeVariants({ size: mergedSize }),
+          hasAffix &&
+            "has-[[data-slot=input-group-control]:focus-visible]:border-primary-500 has-[[data-slot=input-group-control]:focus-visible]:ring-primary-500/20",
           rest.readOnly && "cursor-default bg-muted",
           classNames?.affixWrapper,
         ),

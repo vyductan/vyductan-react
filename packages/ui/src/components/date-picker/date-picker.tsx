@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { InputRef } from "../input";
+import type { InputRef as InputReference } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
@@ -48,7 +48,7 @@ export type PanelMode =
   | "decade";
 export type PickerMode = Exclude<PanelMode, "datetime" | "decade">;
 
-type DatePickerBaseProps = InputVariants &
+type DatePickerBaseProperties = InputVariants &
   InputSizeVariants & {
     id?: string;
     format?: string;
@@ -69,8 +69,8 @@ type DatePickerBaseProps = InputVariants &
     maxDate?: Dayjs;
   };
 
-type DatePickerProps = DatePickerBaseProps & {
-  ref?: React.Ref<InputRef>;
+type DatePickerProperties = DatePickerBaseProperties & {
+  ref?: React.Ref<InputReference>;
   defaultValue?: Dayjs | null;
   value?: Dayjs | null;
   onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
@@ -88,17 +88,17 @@ type DatePickerProps = DatePickerBaseProps & {
   };
 };
 
-const DatePicker = (props: DatePickerProps) => {
+const DatePicker = (properties: DatePickerProperties) => {
   const {
     ref,
     id,
 
-    value: valueProp,
+    value: valueProperty,
     defaultValue,
     onChange,
 
     placeholder,
-    format: formatProp,
+    format: formatProperty,
     showTime,
     picker,
     disabledDate,
@@ -115,9 +115,9 @@ const DatePicker = (props: DatePickerProps) => {
     status,
 
     className,
-    commitYearOnClose: commitYearOnCloseProp,
+    commitYearOnClose: commitYearOnCloseProperty,
     ...rest
-  } = props;
+  } = properties;
 
   const [pickerMode, setPickerMode] = useState(picker ?? "date");
 
@@ -180,19 +180,22 @@ const DatePicker = (props: DatePickerProps) => {
     commitYearOnClose: commitYearOnCloseConfig,
   } = useComponentConfig("datePicker");
 
-  const commitYearOnClose = commitYearOnCloseProp ?? commitYearOnCloseConfig;
+  const commitYearOnClose =
+    commitYearOnCloseProperty ?? commitYearOnCloseConfig;
 
   // ====================== Format Date =======================
   const { format: datePickerFormat } = useComponentConfig("datePicker");
-  const format =
-    formatProp ??
-    (picker === "year"
-      ? "YYYY"
-      : picker === "quarter"
-        ? "YYYY-[Q]Q"
-        : showTime
-          ? `${formatConfig ?? datePickerFormat} HH:mm`
-          : (formatConfig ?? datePickerFormat ?? "YYYY-MM-DD"));
+  let fallbackFormat = formatConfig ?? datePickerFormat ?? "YYYY-MM-DD";
+
+  if (picker === "year") {
+    fallbackFormat = "YYYY";
+  } else if (picker === "quarter") {
+    fallbackFormat = "YYYY-[Q]Q";
+  } else if (showTime) {
+    fallbackFormat = `${formatConfig ?? datePickerFormat} HH:mm`;
+  }
+
+  const format = formatProperty ?? fallbackFormat;
 
   const formatValue = React.useCallback(
     (date: Dayjs) => {
@@ -223,7 +226,7 @@ const DatePicker = (props: DatePickerProps) => {
 
   // ====================== Value =======================
   const [value, setValue] = useMergedState(defaultValue, {
-    value: valueProp,
+    value: valueProperty,
     onChange: (next) => {
       onChange?.(next, next ? formatValue(next) : "");
     },
@@ -242,12 +245,13 @@ const DatePicker = (props: DatePickerProps) => {
     return dayjs(date);
   };
 
-  const inputRef = React.useRef<InputRef>(null);
-  const skipBlurCommitRef = React.useRef(false);
-  const interactingInsidePanelRef = React.useRef(false);
+  const inputReference = React.useRef<InputReference>(null);
+  const skipBlurCommitReference = React.useRef(false);
+  const interactingInsidePanelReference = React.useRef(false);
 
-  // eslint-disable-next-line react-hooks/refs
-  const composedRef = ref ? composeRef(ref, inputRef) : inputRef;
+  const composedReference = ref
+    ? composeRef(ref, inputReference)
+    : inputReference;
   const handleChangeInput = (value: string) => {
     if (value.trim()) {
       const parsed = parseInputDate(value, format);
@@ -267,12 +271,12 @@ const DatePicker = (props: DatePickerProps) => {
   // prevent click label to focus input (open popover)
   useEffect(() => {
     const labelElm = document.querySelector(`label[for="${id}"]`);
-    const eventFn = (event: Event) => {
+    const eventFunction = (event: Event) => {
       event.preventDefault();
     };
-    labelElm?.addEventListener("click", eventFn);
+    labelElm?.addEventListener("click", eventFunction);
     return () => {
-      labelElm?.removeEventListener("click", eventFn);
+      labelElm?.removeEventListener("click", eventFunction);
     };
   }, [id]);
 
@@ -303,10 +307,10 @@ const DatePicker = (props: DatePickerProps) => {
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
 
   const [currentDecadeRange] = useState<Dayjs[]>(() =>
-    Array.from({ length: 10 }, (_, i) => {
+    Array.from({ length: 10 }, (_, index) => {
       const yearValue = currentYear.year();
       const startYear = Math.floor(yearValue / 10) * 10;
-      return dayjs((startYear + i).toString());
+      return dayjs((startYear + index).toString());
     }),
   );
 
@@ -329,7 +333,7 @@ const DatePicker = (props: DatePickerProps) => {
 
   // Memoized components to prevent remounts during hover (which broke clicks)
   const YearModeMonthGrid = React.useCallback(
-    (_props: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
+    (_properties: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
       return (
         <YearSelect
           value={value}
@@ -399,7 +403,7 @@ const DatePicker = (props: DatePickerProps) => {
   );
 
   const MonthModeMonthGrid = React.useCallback(
-    (_props: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
+    (_properties: React.HTMLAttributes<HTMLDivElement>): React.ReactElement => {
       return (
         <MonthSelect
           value={value}
@@ -499,7 +503,7 @@ const DatePicker = (props: DatePickerProps) => {
       setInputValue(formatValue(nextValue));
       setTypedDate(nextValue.toDate());
       setMonth(nextValue.toDate());
-      skipBlurCommitRef.current = true;
+      skipBlurCommitReference.current = true;
       setPendingYearCommit(false);
       setHoverPreview(undefined);
       setStickyPreview(undefined);
@@ -518,13 +522,13 @@ const DatePicker = (props: DatePickerProps) => {
   );
 
   const CalendarDayButton = React.useCallback(
-    (props: React.ComponentProps<typeof CustomCalendarDayButton>) => (
+    (properties: React.ComponentProps<typeof CustomCalendarDayButton>) => (
       <CustomCalendarDayButton
-        {...props}
+        {...properties}
         onMouseDown={(event) => {
-          interactingInsidePanelRef.current = true;
+          interactingInsidePanelReference.current = true;
           event.preventDefault();
-          props.onMouseDown?.(event);
+          properties.onMouseDown?.(event);
         }}
       />
     ),
@@ -534,14 +538,14 @@ const DatePicker = (props: DatePickerProps) => {
   const BaseCaptionLabel = React.useCallback(
     ({
       className,
-      ...props
+      ...properties
     }: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => {
       const d = month ?? new Date();
       const m = dayjs(d);
       const monthText = m.format("MMM");
       const yearText = m.format("YYYY");
       return (
-        <span className={cn("space-x-2", className)} {...props}>
+        <span className={cn("space-x-2", className)} {...properties}>
           <Button
             variant="outline"
             onClick={() => {
@@ -574,8 +578,8 @@ const DatePicker = (props: DatePickerProps) => {
   );
 
   const YearModeCaptionLabel = React.useCallback(
-    (props: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => (
-      <span {...props}>
+    (properties: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => (
+      <span {...properties}>
         {computedDecadeRange.start}-{computedDecadeRange.end}
       </span>
     ),
@@ -585,13 +589,13 @@ const DatePicker = (props: DatePickerProps) => {
   const MonthModeCaptionLabel = React.useCallback(
     ({
       className,
-      ...props
+      ...properties
     }: React.HTMLAttributes<HTMLSpanElement>): React.ReactElement => {
       const d = month ?? new Date();
       const m = dayjs(d);
       const yearText = m.format("YYYY");
       return (
-        <span className={cn("space-x-2", className)} {...props}>
+        <span className={cn("space-x-2", className)} {...properties}>
           <Button
             variant="outline"
             onClick={() => {
@@ -634,7 +638,7 @@ const DatePicker = (props: DatePickerProps) => {
               setTypedDate(commit.toDate());
               setMonth(commit.toDate());
             }
-            interactingInsidePanelRef.current = false;
+            interactingInsidePanelReference.current = false;
             setPendingYearCommit(false);
             setHoverPreview(undefined);
             setStickyPreview(undefined);
@@ -647,7 +651,7 @@ const DatePicker = (props: DatePickerProps) => {
           <div
             className="flex"
             onMouseDown={() => {
-              interactingInsidePanelRef.current = true;
+              interactingInsidePanelReference.current = true;
             }}
           >
             <Calendar
@@ -674,8 +678,8 @@ const DatePicker = (props: DatePickerProps) => {
                     picker === "week"
                       ? getPeriodStart(hoveredDate, "week")
                       : hoveredDate;
-                  setHoverPreview((prev) =>
-                    prev?.isSame(preview, "day") ? prev : preview,
+                  setHoverPreview((previous) =>
+                    previous?.isSame(preview, "day") ? previous : preview,
                   );
                 }
               }}
@@ -701,8 +705,8 @@ const DatePicker = (props: DatePickerProps) => {
               disabled={(date) => {
                 if (disabledDate) {
                   // Pass both the date and the required info object
-                  const currentArg = getDestinationValue(date);
-                  return disabledDate(currentArg, {
+                  const currentArgument = getDestinationValue(date);
+                  return disabledDate(currentArgument, {
                     type: "date",
                   });
                 }
@@ -735,7 +739,7 @@ const DatePicker = (props: DatePickerProps) => {
           style={style}
         >
           <Input
-            ref={composedRef}
+            ref={composedReference}
             id={id}
             value={
               open && hoverPreview ? formatValue(hoverPreview) : inputValue
@@ -806,13 +810,13 @@ const DatePicker = (props: DatePickerProps) => {
               }
             }}
             onBlur={(e) => {
-              if (skipBlurCommitRef.current) {
-                skipBlurCommitRef.current = false;
+              if (skipBlurCommitReference.current) {
+                skipBlurCommitReference.current = false;
                 return;
               }
 
-              if (interactingInsidePanelRef.current) {
-                interactingInsidePanelRef.current = false;
+              if (interactingInsidePanelReference.current) {
+                interactingInsidePanelReference.current = false;
                 return;
               }
 
@@ -864,5 +868,8 @@ const DatePicker = (props: DatePickerProps) => {
   );
 };
 
-export type { DatePickerProps, DatePickerBaseProps };
+export type {
+  DatePickerProperties as DatePickerProps,
+  DatePickerBaseProperties as DatePickerBaseProps,
+};
 export { DatePicker };

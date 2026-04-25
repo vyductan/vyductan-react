@@ -1,10 +1,10 @@
 "use client";
 
-import type { DatePickerProps } from "./date-picker";
+import type { DatePickerProps as DatePickerProperties } from "./date-picker";
 import { DatePicker } from "./date-picker";
 
 export type YearPickerProps = Omit<
-  DatePickerProps,
+  DatePickerProperties,
   "picker" | "disabledDate" | "showTime"
 > & {
   // valueType: "dayjs";

@@ -8,6 +8,7 @@ import { useHover } from "ahooks";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { BaseInputProps as BaseInputProperties } from "../types";
+import { InputGroup, InputGroupAddon } from "../../input-group";
 import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
 import { ClearIcon } from "./clear-icon";
@@ -47,7 +48,7 @@ const BaseInput = (
 
   const inputElement = children;
 
-  const AffixWrapperComponent = components?.affixWrapper ?? "span";
+  const AffixWrapperComponent = components?.affixWrapper;
   const GroupWrapperComponent = components?.groupWrapper ?? "span";
   const WrapperComponent = components?.wrapper ?? "span";
   const GroupAddonComponent = components?.groupAddon ?? "span";
@@ -99,34 +100,25 @@ const BaseInput = (
       );
     }
 
-    const suffixNode = (!!suffix || allowClear) && (
-      <span
-        className={cn("order-2 ml-1 flex items-center", classNames?.suffix)}
-        style={styles?.suffix}
-      >
-        {allowClear && value && (!suffix || (isHovering && suffix)) ? (
-          clearIcon
-        ) : typeof suffix === "string" ? (
-          <span>{suffix}</span>
-        ) : (
-          suffix
-        )}
-      </span>
-    );
+    const suffixNode =
+      allowClear && value && (!suffix || (isHovering && suffix)) ? (
+        clearIcon
+      ) : typeof suffix === "string" ? (
+        <span>{suffix}</span>
+      ) : (
+        suffix
+      );
 
-    element = (
+    element = AffixWrapperComponent ? (
       <AffixWrapperComponent
         data-slot="affix-wrapper"
         className={cn(
-          "text-sm",
-          "relative inline-flex w-full",
-          "[&_input]:h-auto [&_input]:border-none [&_input]:outline-none",
-          // When has addon, remove all visual styling and padding from affix wrapper
+          "relative inline-flex w-full text-sm [&_input]:h-auto [&_input]:border-none [&_input]:outline-none",
           isAddon
             ? "border-none bg-transparent p-0 shadow-none outline-none"
             : "transition-all",
-          cn(classNames?.affixWrapper, !isAddon && classNames?.variant),
-          // fix cannot merge className by GenericSlot
+          classNames?.affixWrapper,
+          !isAddon && classNames?.variant,
           !isAddon && className,
         )}
         style={styles?.affixWrapper}
@@ -143,8 +135,51 @@ const BaseInput = (
           </span>
         )}
         {element}
-        {suffixNode}
+        {(!!suffix || allowClear) && (
+          <span
+            className={cn("order-2 ml-1 flex items-center", classNames?.suffix)}
+            style={styles?.suffix}
+          >
+            {suffixNode}
+          </span>
+        )}
       </AffixWrapperComponent>
+    ) : (
+      <InputGroup
+        data-slot="input-group"
+        className={cn(
+          isAddon
+            ? "border-none bg-transparent p-0 shadow-none outline-none"
+            : "transition-all",
+          classNames?.affixWrapper,
+          !isAddon && classNames?.variant,
+          !isAddon && className,
+        )}
+        style={styles?.affixWrapper}
+        data-disabled={disabled ? "true" : undefined}
+        {...dataAttrs?.affixWrapper}
+        ref={containerReference}
+      >
+        {prefix && (
+          <InputGroupAddon
+            align="inline-start"
+            className={classNames?.prefix}
+            style={styles?.prefix}
+          >
+            {prefix}
+          </InputGroupAddon>
+        )}
+        {element}
+        {(!!suffix || allowClear) && (
+          <InputGroupAddon
+            align="inline-end"
+            className={classNames?.suffix}
+            style={styles?.suffix}
+          >
+            {suffixNode}
+          </InputGroupAddon>
+        )}
+      </InputGroup>
     );
   }
 

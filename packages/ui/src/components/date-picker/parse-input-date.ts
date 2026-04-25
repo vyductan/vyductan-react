@@ -28,7 +28,7 @@ const FALLBACK_DATE_FORMATS = [
 export const parseInputDate = (rawValue: string, preferredFormat: string) => {
   const value = rawValue.trim();
   if (value === "") {
-    return null;
+    return;
   }
 
   const uniqueFormats = [
@@ -46,5 +46,5 @@ export const parseInputDate = (rawValue: string, preferredFormat: string) => {
     return relaxedParsed;
   }
 
-  return null;
+  return;
 };

@@ -1,7 +1,7 @@
 import { NavigationLeft } from "./navigation-left";
 import { NavigationRight } from "./navigation-right";
 
-type PanelProps = {
+type PanelProperties = {
   title?: React.ReactNode;
   children?: React.ReactNode;
   topbar?: boolean;
@@ -19,7 +19,7 @@ export const Panel = ({
   classNames,
   onNavigationLeftClick,
   onNavigationRightClick,
-}: PanelProps) => {
+}: PanelProperties) => {
   return (
     <div>
       {topbar && (

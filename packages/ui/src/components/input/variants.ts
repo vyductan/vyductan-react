@@ -57,7 +57,7 @@ const inputVariants = tv({
         "border",
         "rounded-md",
         "transition-colors",
-        "focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
+        "focus-within:ring-[3px]",
       ],
       filled: [
         "bg-accent rounded-md border-none shadow-none",
@@ -79,6 +79,19 @@ const inputVariants = tv({
   },
 });
 const inputInlineInsetClassName = "pl-3";
+
+const inputAffixWrapperSizeVariants = tv({
+  variants: {
+    size: {
+      small: "h-6",
+      middle: "h-8",
+      large: "h-10",
+    },
+  },
+  defaultVariants: {
+    size: "middle",
+  },
+});
 
 const inputSizeVariants = tv({
   variants: {
@@ -107,5 +120,6 @@ export {
   inputVariants,
   inputDisabledVariants,
   inputInlineInsetClassName,
+  inputAffixWrapperSizeVariants,
   inputSizeVariants,
 };

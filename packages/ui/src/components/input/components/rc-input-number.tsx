@@ -13,7 +13,6 @@ import getMiniDecimal, {
 import { useLayoutUpdateEffect } from "@rc-component/util/es/hooks/useLayoutEffect";
 import proxyObject from "@rc-component/util/es/proxyObject";
 import raf from "@rc-component/util/es/raf";
-import { composeRef } from "@rc-component/util/es/ref";
 import { useHover } from "ahooks";
 
 import { Button } from "@acme/ui/components/button";
@@ -200,6 +199,18 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
 
   const [focus, setFocus] = React.useState(false);
 
+  const setInputReference = React.useCallback(
+    (element: HTMLInputElement | null) => {
+      inputReference.current = element;
+      if (typeof ref === "function") {
+        ref(element);
+      } else if (ref) {
+        ref.current = element;
+      }
+    },
+    [ref],
+  );
+
   const userTypingReference = React.useRef(false);
   const compositionReference = React.useRef(false);
   const shiftKeyReference = React.useRef(false);
@@ -266,12 +277,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   );
   // >>> Formatter
   const inputValueReference = React.useRef<string | number>("");
-  const mergedFormatter = React.useCallback(
-    (number: string, userTyping: boolean) => {
+  const formatNumber = React.useCallback(
+    (number: string, userTyping: boolean, input: string) => {
       if (formatter) {
         return formatter(number as unknown as T, {
           userTyping,
-          input: String(inputValueReference.current),
+          input,
         });
       }
 
@@ -294,6 +305,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     [formatter, getPrecision, decimalSeparator],
   );
 
+  const mergedFormatter = React.useCallback(
+    (number: string, userTyping: boolean) =>
+      formatNumber(number, userTyping, String(inputValueReference.current)),
+    [formatNumber],
+  );
+
   // ========================== InputValue ==========================
   /**
    * Input text value control
@@ -312,9 +329,12 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     ) {
       return Number.isNaN(initValue) ? "" : initValue;
     }
-    return mergedFormatter(decimalValue.toString(), false);
+    return formatNumber(decimalValue.toString(), false, "");
   });
-  inputValueReference.current = inputValue;
+
+  React.useEffect(() => {
+    inputValueReference.current = inputValue;
+  }, [inputValue]);
 
   // Should always be string
   function setInputValue(newValue: DecimalClass, userTyping: boolean) {
@@ -365,10 +385,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
   }, [upDisabled, downDisabled, onDisabledChange]);
 
   // Cursor controller
-  const [recordCursor, restoreCursor] = useCursor(
-    inputReference.current,
-    focus,
-  );
+  const [recordCursor, restoreCursor] = useCursor(inputReference, focus);
 
   // ============================= Data =============================
   /**
@@ -613,11 +630,14 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
     shiftKeyReference.current = false;
   };
 
-  // Expose onStep function to parent via ref
-  // Update on every render to avoid stale closure
-  if (onStepRef) {
-    onStepRef.current = (up: boolean) => onInternalStep(up, "handler");
-  }
+  React.useEffect(() => {
+    if (onStepRef) {
+      onStepRef.current = (up: boolean) => onInternalStep(up, "handler");
+      return () => {
+        onStepRef.current = null;
+      };
+    }
+  });
 
   React.useEffect(() => {
     if (changeOnWheel && focus) {
@@ -720,7 +740,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         aria-valuenow={ariaValueNow}
         step={step}
         {...inputProperties}
-        ref={ref ? composeRef(ref, inputReference) : inputReference}
+        ref={setInputReference}
         value={inputValue}
         onChange={onInternalInput}
         disabled={disabled}

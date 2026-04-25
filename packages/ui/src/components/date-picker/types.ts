@@ -1,6 +1,6 @@
 import type { Dayjs } from "dayjs";
 
-import type { InputRef } from "../input";
+import type { InputRef as InputReference } from "../input";
 
 export type PanelMode =
   | "time"
@@ -24,7 +24,7 @@ export type DisabledDate<DateType = Dayjs> = (
 ) => boolean;
 
 export type PickerRef = Pick<
-  InputRef,
+  InputReference,
   "select" | "setCustomValidity" | "reportValidity"
 > & {
   nativeElement: HTMLDivElement;
