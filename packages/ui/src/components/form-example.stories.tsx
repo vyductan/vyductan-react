@@ -17,11 +17,11 @@ import { Input } from "./input/input";
 // Example 1: Login Form with Validation
 // ============================================
 
-interface LoginFormProps {
+interface LoginFormProperties {
   onSubmit: (data: { email: string; password: string }) => void;
 }
 
-const LoginForm = ({ onSubmit }: LoginFormProps) => {
+const LoginForm = ({ onSubmit }: LoginFormProperties) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -278,12 +278,12 @@ export const LoginFormFlow: Story = {
 // Example 2: Search Form with Debounce
 // ============================================
 
-interface SearchFormProps {
+interface SearchFormProperties {
   onSearch: (query: string) => Promise<string[]>;
   onSelect: (item: string) => void;
 }
 
-const SearchForm = ({ onSearch, onSelect }: SearchFormProps) => {
+const SearchForm = ({ onSearch, onSelect }: SearchFormProperties) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -315,7 +315,7 @@ const SearchForm = ({ onSearch, onSelect }: SearchFormProps) => {
         placeholder="Search..."
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
-        suffix={loading ? <span>Loading...</span> : null}
+        suffix={loading ? <span>Loading...</span> : undefined}
       />
 
       {results.length > 0 && (
@@ -342,8 +342,8 @@ const SearchForm = ({ onSearch, onSelect }: SearchFormProps) => {
   );
 };
 
-export const SearchWithDebounce: StoryObj<SearchFormProps> = {
-  render: (args) => <SearchForm {...args} />,
+export const SearchWithDebounce: StoryObj<SearchFormProperties> = {
+  render: (arguments_) => <SearchForm {...arguments_} />,
   args: {
     onSearch: fn(async (query: string) => {
       // Mock search results
@@ -428,7 +428,7 @@ export const SearchWithDebounce: StoryObj<SearchFormProps> = {
 // Example 3: Multi-step Form
 // ============================================
 
-interface MultiStepFormProps {
+interface MultiStepFormProperties {
   onComplete: (data: {
     step1: { username: string };
     step2: { email: string };
@@ -436,7 +436,7 @@ interface MultiStepFormProps {
   }) => void;
 }
 
-const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
+const MultiStepForm = ({ onComplete }: MultiStepFormProperties) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState({
     step1: { username: "" },
@@ -445,9 +445,9 @@ const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
   });
 
   const handleNext = (stepData: Record<string, string>) => {
-    setData((prev) => {
+    setData((previous) => {
       const updated = {
-        ...prev,
+        ...previous,
         [`step${currentStep}`]: stepData,
       };
       if (currentStep === 3) {
@@ -559,8 +559,8 @@ const MultiStepForm = ({ onComplete }: MultiStepFormProps) => {
   );
 };
 
-export const MultiStepFormFlow: StoryObj<MultiStepFormProps> = {
-  render: (args) => <MultiStepForm {...args} />,
+export const MultiStepFormFlow: StoryObj<MultiStepFormProperties> = {
+  render: (arguments_) => <MultiStepForm {...arguments_} />,
   args: {
     onComplete: fn(),
   },

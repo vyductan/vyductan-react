@@ -1,13 +1,9 @@
 import { cn } from "@acme/ui/lib/utils";
-import {
-  FieldError,
-  Field as ShadcnField,
-  FieldDescription as ShadcnFieldDescription,
-} from "@acme/ui/shadcn/field";
+import { FieldError, Field as ShadcnField } from "@acme/ui/shadcn/field";
 
 import type { ColProps } from "../../grid";
 import type { FormLabelAlign, FormLayout } from "../types";
-import { FieldLabel } from "../../field";
+import { FieldDescription, FieldLabel } from "../../field";
 import { Col, Row } from "../../grid";
 
 const FormItemRow = ({
@@ -60,11 +56,6 @@ const FormItemRow = ({
         {label}
       </FieldLabel>
     ) : null,
-    description ? (
-      <ShadcnFieldDescription key="form-item-description">
-        {description}
-      </ShadcnFieldDescription>
-    ) : null,
   ];
 
   const formControlNodes = [
@@ -80,8 +71,17 @@ const FormItemRow = ({
         {children}
       </div>
     ) : null,
+    description ? (
+      <FieldDescription key="form-item-description">
+        {description}
+      </FieldDescription>
+    ) : null,
     invalid ? (
-      <div key="form-item-additional" data-slot="form-item-additional">
+      <div
+        key="form-item-additional"
+        data-slot="form-item-additional"
+        className="min-h-6 leading-[22px]"
+      >
         <FieldError errors={errors} />
       </div>
     ) : null,
@@ -92,7 +92,8 @@ const FormItemRow = ({
       data-slot="form-item"
       data-invalid={invalid}
       className={cn(
-        "mb-6 gap-x-3 gap-y-1",
+        invalid ? "mb-0" : "mb-6",
+        "gap-x-3 gap-y-1",
         layout === "vertical" ? "flex-col" : "flex-row",
         className,
       )}
@@ -134,11 +135,6 @@ const FormItemRow = ({
             {...wrapperCol}
           >
             {formControlNodes}
-            {invalid && (
-              <div data-slot="form-item-additional">
-                <FieldError errors={errors} />
-              </div>
-            )}
           </Col>
         </Row>
       ) : null}
@@ -148,7 +144,6 @@ const FormItemRow = ({
       {!labelCol && !labelAlign && !labelWrap && !wrapperCol
         ? formControlNodes
         : null}
-      {invalid && <div className="-mb-8" />}
     </ShadcnField>
   );
 };

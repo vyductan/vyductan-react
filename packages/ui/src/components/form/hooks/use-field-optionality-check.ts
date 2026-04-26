@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import _ from "lodash";
-import { ZodNullable, ZodOptional } from "zod";
+import { ZodArray } from "zod";
 
 import { useFormContext } from "../context";
 
@@ -25,6 +25,32 @@ const handleNotFoundField = (fieldName: string) => {
     `Field ${fieldName} not found in schema. Make sure the field exists in the schema or do not pass the schema inside the Form - in this case you could manually set the required property for FormLabel.`,
   );
 };
+
+const isRequiredField = (zodField: unknown) => {
+  if (
+    typeof zodField !== "object" ||
+    zodField === null ||
+    !("safeParse" in zodField) ||
+    typeof zodField.safeParse !== "function"
+  ) {
+    return true;
+  }
+
+  if (zodField.safeParse(void 0).success) {
+    return false;
+  }
+
+  if (zodField.safeParse(null).success) {
+    return false;
+  }
+
+  if (zodField instanceof ZodArray && zodField.safeParse([]).success) {
+    return false;
+  }
+
+  return true;
+};
+
 export const useRequiredFieldCheck = (
   fieldName: string | undefined,
   defaultRequired?: boolean,
@@ -47,8 +73,6 @@ export const useRequiredFieldCheck = (
 
     const zodField = _.get(shape, zodFieldPath);
     if (!zodField) handleNotFoundField(fieldName);
-    return !(
-      zodField instanceof ZodOptional || zodField instanceof ZodNullable
-    );
+    return isRequiredField(zodField);
   }, [fieldName, schema, defaultRequired]);
 };
