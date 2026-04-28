@@ -101,8 +101,8 @@ const CardContent = ({
   return (
     <ShadcnCardContent
       className={cn(
-        "p-4 pt-0 peer-[.border-b]/card-header:pt-4",
-        size === "small" && "p-3 pt-0 peer-[.border-b]/card-header:pt-3",
+        "p-4 pt-0 first:pt-4 peer-[.border-b]/card-header:pt-4",
+        size === "small" && "p-3 pt-0 first:pt-3 peer-[.border-b]/card-header:pt-3",
         className,
       )}
       {...properties}

@@ -111,6 +111,36 @@ describe("Card wrapper", () => {
     expect(footer.parentElement).toBe(root);
   });
 
+  test("keeps top padding when content is the first card section", () => {
+    cleanup();
+
+    render(
+      <Card>
+        <CardContent data-testid="card-content">Body</CardContent>
+      </Card>,
+    );
+
+    const content = screen.getByTestId("card-content");
+
+    expect(content).toHaveClass("p-4");
+    expect(content).toHaveClass("first:pt-4");
+  });
+
+  test("keeps compact top padding when small content is the first card section", () => {
+    cleanup();
+
+    render(
+      <Card size="small">
+        <CardContent data-testid="card-content">Body</CardContent>
+      </Card>,
+    );
+
+    const content = screen.getByTestId("card-content");
+
+    expect(content).toHaveClass("p-3");
+    expect(content).toHaveClass("first:pt-3");
+  });
+
   test("keeps slot padding stable when header and footer render their own borders", () => {
     cleanup();
 

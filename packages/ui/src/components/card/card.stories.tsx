@@ -323,7 +323,7 @@ export const GridLayout: Story = {
 export const MinimalContent: Story = {
   render: () => (
     <Card className="w-[350px]">
-      <CardContent className="pt-6">
+      <CardContent>
         <p className="text-muted-foreground text-sm">
           A simple card with just content, no header or footer.
         </p>
