@@ -367,7 +367,7 @@ const Input = (properties: InputProperties) => {
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         className={cn(
-          "relative inline-block w-full text-sm placeholder-shown:overflow-ellipsis",
+          "relative inline-block w-full text-sm text-foreground placeholder:text-placeholder placeholder-shown:overflow-ellipsis",
           !hasAffix && inputSizeVariants({ size: mergedSize }),
           otherProperties.readOnly && "bg-muted cursor-default",
           classNames?.input,

@@ -103,7 +103,7 @@ export default function StepHandler({
         }}
         aria-label="Increase Value"
         aria-disabled={upDisabled}
-        className={"bg-muted hover:bg-muted-foreground flex"}
+        className="flex bg-muted text-muted-foreground hover:bg-accent"
       >
         {upNode ?? (
           <span
@@ -119,7 +119,7 @@ export default function StepHandler({
         }}
         aria-label="Decrease Value"
         aria-disabled={downDisabled}
-        className={"bg-muted hover:bg-muted-foreground flex"}
+        className="flex bg-muted text-muted-foreground hover:bg-accent"
       >
         {downNode ?? (
           <span

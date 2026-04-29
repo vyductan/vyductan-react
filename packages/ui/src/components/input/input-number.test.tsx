@@ -25,6 +25,26 @@ describe("InputNumber default mode", () => {
     expect(affixWrapper).not.toHaveClass("focus-within:border-ring");
     expect(affixWrapper).not.toHaveClass("focus-within:ring-ring/50");
   });
+
+  test("keeps controls from inheriting error text color", () => {
+    render(
+      <InputNumber aria-label="Quantity" defaultValue={2} aria-invalid />,
+    );
+
+    const increaseButton = screen.getByRole("button", {
+      name: "Increase Value",
+    });
+    const decreaseButton = screen.getByRole("button", {
+      name: "Decrease Value",
+    });
+    const increaseIcon = increaseButton.querySelector('[role="img"]');
+    const decreaseIcon = decreaseButton.querySelector('[role="img"]');
+
+    expect(increaseButton).toHaveClass("text-muted-foreground");
+    expect(decreaseButton).toHaveClass("text-muted-foreground");
+    expect(increaseIcon).toHaveClass("text-muted-foreground");
+    expect(decreaseIcon).toHaveClass("text-muted-foreground");
+  });
 });
 
 describe("InputNumber spinner mode", () => {

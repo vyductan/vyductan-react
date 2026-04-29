@@ -79,7 +79,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           : "icon-[fluent-mdl2--caret-up-solid-8]"
       }
       className={
-        mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"
+        mode === "spinner"
+          ? "h-4 w-4 text-muted-foreground opacity-70"
+          : "h-2.5 w-4 text-muted-foreground opacity-70"
       }
     />
   );
@@ -91,7 +93,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           : "icon-[teenyicons--down-solid]"
       }
       className={
-        mode === "spinner" ? "h-4 w-4 opacity-70" : "h-2.5 w-4 opacity-70"
+        mode === "spinner"
+          ? "h-4 w-4 text-muted-foreground opacity-70"
+          : "h-2.5 w-4 text-muted-foreground opacity-70"
       }
     />
   );
@@ -109,7 +113,8 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       );
   }
 
-  const mergedStatus = customStatus;
+  const mergedStatus =
+    customStatus ?? (others["aria-invalid"] ? "error" : undefined);
   const mergedSize = customizeSize;
   const spinnerMode = mode === "spinner";
 
@@ -179,6 +184,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           spinnerMode && "min-w-0 w-full",
           !spinnerMode && "text-left",
           "bg-transparent",
+          "text-foreground",
           // "placeholder:text-muted-foreground",
           "placeholder:text-placeholder",
           "border-none outline-hidden",
