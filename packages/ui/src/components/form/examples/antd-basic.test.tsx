@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, test } from "vitest";
 
 import AntdBasicExample from "./antd-basic";
 
@@ -24,17 +24,40 @@ globalThis.matchMedia ??= (() => ({
   },
 })) as typeof globalThis.matchMedia;
 
+afterEach(cleanup);
+
 describe("Form AntD basic example", () => {
-  test("renders each validation error only once after submit", async () => {
+  test("renders payment fields and a card checkbox option", () => {
+    const { container } = render(<AntdBasicExample />);
+
+    expect(screen.getByRole("textbox", { name: /name on card/i })).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: /card number/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/soft limit \/ pax/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/hard limit \/ pax/i)).toBeInTheDocument();
+    expect(screen.getByText(/soft limit must be less than or equal to/i)).toBeInTheDocument();
+
+    const cardCheckboxLabel = screen.getByText("Save payment method").closest("label");
+
+    expect(cardCheckboxLabel).toHaveClass("rounded-md", "border");
+    expect(container.querySelector(".-mb-8")).toBeNull();
+  });
+
+  test("renders each payment validation error only once after submit", async () => {
     const { container } = render(<AntdBasicExample />);
 
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 
     expect(
-      await screen.findAllByText("Please input your username!"),
+      await screen.findAllByText("Please input your card name!"),
     ).toHaveLength(1);
     expect(
-      await screen.findAllByText("Please input your password!"),
+      await screen.findAllByText("Please input your card number!"),
+    ).toHaveLength(1);
+    expect(
+      await screen.findAllByText("Please input your soft limit!"),
+    ).toHaveLength(1);
+    expect(
+      await screen.findAllByText("Please input your hard limit!"),
     ).toHaveLength(1);
     expect(container.querySelector(".-mb-8")).toBeNull();
   });
@@ -47,25 +70,25 @@ describe("Form AntD basic example", () => {
     expect(form).toBeInstanceOf(HTMLElement);
 
     const formElement = form as HTMLElement;
-    const usernameInput = within(formElement).getByRole("textbox", {
-      name: /username/i,
+    const cardNameInput = within(formElement).getByRole("textbox", {
+      name: /name on card/i,
     });
-    const usernameRow = usernameInput.closest('[data-slot="form-item"]');
+    const cardNameRow = cardNameInput.closest('[data-slot="form-item"]');
 
-    expect(usernameRow).toHaveClass("mb-6");
+    expect(cardNameRow).toHaveClass("mb-6");
 
     fireEvent.click(
       within(formElement).getByRole("button", { name: /submit/i }),
     );
 
-    await within(formElement).findByText("Please input your username!");
+    await within(formElement).findByText("Please input your card name!");
 
-    const errorContainer = usernameRow?.querySelector(
+    const errorContainer = cardNameRow?.querySelector(
       '[data-slot="form-item-additional"]',
     );
 
-    expect(usernameRow).not.toHaveClass("mb-6");
-    expect(usernameRow).toHaveClass("mb-0");
+    expect(cardNameRow).not.toHaveClass("mb-6");
+    expect(cardNameRow).toHaveClass("mb-0");
     expect(errorContainer).toHaveClass("min-h-6");
     expect(container.querySelector(".-mb-8")).toBeNull();
   });

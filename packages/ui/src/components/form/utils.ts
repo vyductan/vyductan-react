@@ -11,6 +11,31 @@ export type Rule = {
   validator?: (value: any) => boolean | Promise<boolean>;
 };
 
+type RequiredNumberSchemaOptions = {
+  min?: number;
+  max?: number;
+};
+
+export function requiredNumberSchema(
+  message: string,
+  options: RequiredNumberSchemaOptions = {},
+) {
+  let schema = z.coerce.number({ error: message });
+
+  if (options.min !== undefined) {
+    schema = schema.min(options.min, { message });
+  }
+
+  if (options.max !== undefined) {
+    schema = schema.max(options.max, { message });
+  }
+
+  return z.preprocess(
+    (value) => (value === "" || value === null ? undefined : value),
+    schema,
+  );
+}
+
 export function rulesToZod(
   rules: Rule[],
   baseType: "string" | "number" | "boolean" = "string",

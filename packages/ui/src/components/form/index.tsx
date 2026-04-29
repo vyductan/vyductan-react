@@ -25,9 +25,11 @@ export * from "./_components/form-message";
 export * from "./_components/form-description";
 export * from "./_components/form-list";
 export * from "./_components/form-control";
+export * from "./_components/field-item";
 export * from "./_components/form-controller";
 export * from "./_components/form-item";
 export * from "./types";
+export { requiredNumberSchema } from "./utils";
 
 // Export Field components from shadcn
 // export * from "./_components";
@@ -77,4 +79,4 @@ Form.create = () => {
 
 export { Form };
 
-export { FormItem, FormItem as Field } from "./_components";
+export { Field, FormItem } from "./_components";

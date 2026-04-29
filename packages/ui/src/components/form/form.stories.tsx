@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
+import AntdBasicDemo from "./examples/antd-basic";
 import ShadcnDemo from "./examples/shadcn";
 
 const meta = {
@@ -13,6 +14,10 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+export const AntdBasic: Story = {
+  render: () => <AntdBasicDemo />,
+};
 
 export const Shadcn: Story = {};
 

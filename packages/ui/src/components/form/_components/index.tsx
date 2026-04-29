@@ -161,4 +161,5 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
   );
 };
 
+export { Field } from "./field-item";
 export { FormItem };
