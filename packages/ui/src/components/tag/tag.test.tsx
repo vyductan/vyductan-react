@@ -22,6 +22,17 @@ function renderTag(
 }
 
 describe("Tag", () => {
+  test("renders default tags as filled gray tags", () => {
+    renderTag();
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-gray-100",
+      "text-foreground",
+      "border-transparent",
+    );
+    expect(screen.getByText("Tag")).not.toHaveClass("bg-primary");
+  });
+
   test("renders filled blue with a transparent border", () => {
     renderTag({ variant: "filled", color: "blue" });
 
@@ -53,20 +64,39 @@ describe("Tag", () => {
     );
   });
 
-  test("renders default lime with the legacy named color classes", () => {
+  test("renders color-only lime tags as filled lime tags", () => {
     renderTag({ color: "lime" });
 
     expect(screen.getByText("Tag")).toHaveClass(
       "bg-lime-100",
       "text-lime-700",
-      "border-lime-300",
+      "border-transparent",
     );
   });
 
-  test("keeps legacy outline default text foreground styling", () => {
-    renderTag({ variant: "outline", color: "default" });
+  test("falls back to filled styling for unsupported legacy variant strings", () => {
+    renderTag({
+      variant: "default" as React.ComponentProps<typeof Tag>["variant"],
+      color: "default",
+    });
 
-    expect(screen.getByText("Tag")).toHaveClass("text-foreground");
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-gray-100",
+      "text-foreground",
+      "border-transparent",
+    );
+    expect(screen.getByText("Tag")).not.toHaveClass("bg-primary");
+  });
+
+  test("falls back to filled default styling for unsupported legacy color strings", () => {
+    renderTag({ color: "gray" as React.ComponentProps<typeof Tag>["color"] });
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-gray-100",
+      "text-foreground",
+      "border-transparent",
+    );
+    expect(screen.getByText("Tag")).not.toHaveClass("bg-primary");
   });
 
   test("uses color-mix styles for hex filled, outlined, and solid tags", () => {

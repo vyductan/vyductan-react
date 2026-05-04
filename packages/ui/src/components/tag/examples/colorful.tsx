@@ -66,7 +66,11 @@ const ColorfulExample: React.FC = () => (
         <Divider orientation="start">{group.title}</Divider>
         <Flex gap="small" wrap>
           {group.colors.map((color) => (
-            <Tag key={`${group.title}-${color}`} variant={group.variant} color={color}>
+            <Tag
+              key={`${group.title}-${color}`}
+              variant={group.variant}
+              color={color}
+            >
               {color}
             </Tag>
           ))}

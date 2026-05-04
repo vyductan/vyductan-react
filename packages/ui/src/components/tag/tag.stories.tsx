@@ -13,7 +13,7 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "filled", "solid", "outlined"],
+      options: ["filled", "solid", "outlined"],
     },
     color: {
       control: "select",
@@ -25,7 +25,6 @@ const meta = {
         "error",
         "warning",
         "orange",
-        "gray",
         "yellow",
         "amber",
         "lime",
@@ -61,7 +60,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     children: "Tag",
-    variant: "default",
+    variant: "filled",
     color: "default",
     size: "default",
   },

@@ -71,11 +71,7 @@ function ColoredExample() {
   const [checked, setChecked] = useState(false);
 
   return (
-    <CheckableTag
-      checked={checked}
-      onChange={setChecked}
-      color="success"
-    >
+    <CheckableTag checked={checked} onChange={setChecked} color="success">
       Success Tag
     </CheckableTag>
   );

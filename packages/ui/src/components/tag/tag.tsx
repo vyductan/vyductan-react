@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
 import type { VariantProps } from "class-variance-authority";
+import type { CSSProperties, ReactNode } from "react";
 import { tv } from "tailwind-variants";
 
 import { Icon } from "@acme/ui/icons";
@@ -33,7 +33,6 @@ const legacyColorClasses: Record<string, string> = {
   error: "bg-red-100 text-red-700 border-red-300",
   warning: "bg-amber-100 text-amber-700 border-amber-300",
   orange: "bg-orange-100 text-orange-700 border-orange-300",
-  gray: "bg-gray-100 text-gray-600 border-gray-300",
   yellow: "bg-yellow-100 text-yellow-800 border-yellow-300",
   amber: "bg-amber-100 text-amber-700 border-amber-300",
   lime: "bg-lime-100 text-lime-700 border-lime-300",
@@ -125,14 +124,6 @@ const tagVariants = tv({
   ],
   variants: {
     variant: {
-      default:
-        "bg-primary text-primary-foreground [a&]:hover:bg-primary/90 border-transparent",
-      secondary:
-        "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 border-transparent",
-      destructive:
-        "bg-destructive [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 text-white",
-      outline:
-        "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
       filled: "",
       solid: "text-white",
       outlined: "",
@@ -145,7 +136,6 @@ const tagVariants = tv({
       error: "",
       warning: "",
       orange: "",
-      gray: "",
       yellow: "",
       amber: "",
       lime: "",
@@ -168,30 +158,10 @@ const tagVariants = tv({
     },
   },
   defaultVariants: {
-    variant: "default",
+    variant: "filled",
     color: "default",
     size: "default",
   },
-  compoundVariants: [
-    {
-      color: "default",
-      className: legacyColorClasses.default,
-    },
-    {
-      color: "primary",
-      className: legacyColorClasses.primary,
-    },
-    {
-      variant: "default",
-      color: "green",
-      className: "text-green-700",
-    },
-    {
-      variant: "solid",
-      color: "green",
-      className: "bg-green-600",
-    },
-  ],
 });
 
 type TagColor = VariantProps<typeof tagVariants>["color"];
@@ -203,6 +173,27 @@ type TagProps = BadgeProps &
     closeIcon?: ReactNode;
     onClose?: () => void;
   };
+
+function normalizeVariant(variant: TagProps["variant"]): TagProps["variant"] {
+  return variant === "solid" || variant === "outlined" ? variant : "filled";
+}
+
+function normalizeColor(color: TagProps["color"]): TagProps["color"] {
+  if (color === undefined) {
+    return "default";
+  }
+
+  if (
+    typeof color !== "string" ||
+    color.startsWith("#") ||
+    color in legacyColorClasses ||
+    familyColors.includes(color as FamilyColor)
+  ) {
+    return color;
+  }
+
+  return "default";
+}
 
 function getNamedColorClassName(
   variant: TagProps["variant"],
@@ -300,10 +291,11 @@ const Tag = ({
   ...props
 }: TagProps) => {
   const tagConfig = useComponentConfig("tag");
-  const finalVariant = variant ?? tagConfig.variant;
-  const finalColor = color ?? tagConfig.color;
+  const finalVariant = normalizeVariant(variant ?? tagConfig.variant);
+  const finalColor = normalizeColor(color ?? tagConfig.color);
   const finalSize = props.size ?? tagConfig.size;
-  const isHexColor = typeof finalColor === "string" && finalColor.startsWith("#");
+  const isHexColor =
+    typeof finalColor === "string" && finalColor.startsWith("#");
   const colorName = isHexColor ? undefined : (finalColor as TagColor);
   const namedColorClassName = getNamedColorClassName(finalVariant, finalColor);
   const hexStyle = getHexStyle(finalVariant, finalColor);
@@ -316,6 +308,7 @@ const Tag = ({
   return (
     <Badge
       data-slot="tag"
+      variant="ghost"
       className={cn(
         tagVariants({
           variant: finalVariant,
