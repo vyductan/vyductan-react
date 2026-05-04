@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { ArrowUpRight, Download, Mail, Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
-import { Flex } from "../flex";
 import { Button } from "./button";
+import CopyButtonDemo from "./examples/copy-button";
+import DisabledDemo from "./examples/disabled";
+import IconDemo from "./examples/icon";
+import LoadingDemo from "./examples/loading";
+import SizesDemo from "./examples/sizes";
+import WithIconDemo from "./examples/with-icon";
 
 const meta = {
   title: "Components/Button",
@@ -70,24 +75,24 @@ export const Primary: Story = {
 };
 
 export const Variants: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex flex-wrap items-center gap-4">
-      <Button {...args} variant="solid">
+      <Button {...arguments_} variant="solid">
         Solid
       </Button>
-      <Button {...args} variant="outlined">
+      <Button {...arguments_} variant="outlined">
         Outlined
       </Button>
-      <Button {...args} variant="dashed">
+      <Button {...arguments_} variant="dashed">
         Dashed
       </Button>
-      <Button {...args} variant="filled">
+      <Button {...arguments_} variant="filled">
         Filled
       </Button>
-      <Button {...args} variant="text">
+      <Button {...arguments_} variant="text">
         Text
       </Button>
-      <Button {...args} variant="link">
+      <Button {...arguments_} variant="link">
         Link
       </Button>
     </div>
@@ -98,36 +103,36 @@ export const Variants: Story = {
 };
 
 export const Colors: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-4">
-        <Button {...args} color="default">
+        <Button {...arguments_} color="default">
           Default
         </Button>
-        <Button {...args} color="primary">
+        <Button {...arguments_} color="primary">
           Primary
         </Button>
-        <Button {...args} color="danger">
+        <Button {...arguments_} color="danger">
           Danger
         </Button>
-        <Button {...args} color="success">
+        <Button {...arguments_} color="success">
           Success
         </Button>
       </div>
       <div className="flex flex-wrap items-center gap-4">
-        <Button {...args} color="blue">
+        <Button {...arguments_} color="blue">
           Blue
         </Button>
-        <Button {...args} color="green">
+        <Button {...arguments_} color="green">
           Green
         </Button>
-        <Button {...args} color="orange">
+        <Button {...arguments_} color="orange">
           Orange
         </Button>
-        <Button {...args} color="red">
+        <Button {...arguments_} color="red">
           Red
         </Button>
-        <Button {...args} color="gray">
+        <Button {...arguments_} color="gray">
           Gray
         </Button>
       </div>
@@ -139,139 +144,39 @@ export const Colors: Story = {
 };
 
 export const Sizes: Story = {
-  render: () => (
-    <Flex gap="small" align="center" wrap>
-      <Button type="primary" size="small">
-        Small
-      </Button>
-      <Button type="primary" size="middle">
-        Default
-      </Button>
-      <Button type="primary" size="large">
-        Large
-      </Button>
-    </Flex>
-  ),
+  render: () => <SizesDemo />,
 };
 
 export const WithIcon: Story = {
-  render: () => (
-    <Flex gap="small" align="center" wrap>
-      <Button type="primary">
-        <Plus className="size-4" />
-        Add Item
-      </Button>
-      <Button>
-        <Download className="size-4" />
-        Download
-      </Button>
-      <Button type="link">
-        <Mail className="size-4" />
-        Send Email
-      </Button>
-    </Flex>
-  ),
+  render: () => <WithIconDemo />,
+};
+
+export const CopyButton: Story = {
+  render: () => <CopyButtonDemo />,
 };
 
 export const IconOnly: Story = {
-  render: () => (
-    <Flex gap="small" align="center" wrap>
-      <Button shape="icon" size="small" aria-label="Add item">
-        <Plus className="size-4" />
-      </Button>
-      <Button shape="icon" aria-label="Open link">
-        <ArrowUpRight className="size-4" />
-      </Button>
-      <Button type="primary" shape="icon" size="large" aria-label="Delete item">
-        <Trash2 className="size-4" />
-      </Button>
-    </Flex>
-  ),
+  render: () => <IconDemo />,
 };
 
 export const Loading: Story = {
-  render: () => (
-    <Flex gap="small" wrap>
-      <Button type="primary" loading>
-        Loading
-      </Button>
-      <Button loading>Loading default</Button>
-    </Flex>
-  ),
+  render: () => <LoadingDemo />,
 };
 
 export const Disabled: Story = {
-  render: () => (
-    <Flex gap="small" align="flex-start" vertical>
-      <Flex gap="small">
-        <Button type="primary">Primary</Button>
-        <Button type="primary" disabled>
-          Primary(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button>Default</Button>
-        <Button disabled>Default(disabled)</Button>
-      </Flex>
-      <Flex gap="small">
-        <Button type="dashed">Dashed</Button>
-        <Button type="dashed" disabled>
-          Dashed(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button type="text">Text</Button>
-        <Button type="text" disabled>
-          Text(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button type="link">Link</Button>
-        <Button type="link" disabled>
-          Link(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button type="primary" href="https://ant.design/index-cn">
-          Href Primary
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button danger>Danger Default</Button>
-        <Button danger disabled>
-          Danger Default(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button danger type="text">
-          Danger Text
-        </Button>
-        <Button danger type="text" disabled>
-          Danger Text(disabled)
-        </Button>
-      </Flex>
-      <Flex gap="small">
-        <Button type="link" danger>
-          Danger Link
-        </Button>
-        <Button type="link" danger disabled>
-          Danger Link(disabled)
-        </Button>
-      </Flex>
-    </Flex>
-  ),
+  render: () => <DisabledDemo />,
 };
 
 export const WithError: Story = {
-  render: (args) => (
+  render: (arguments_) => (
     <div className="flex items-center gap-4">
-      <Button {...args} aria-invalid variant="solid">
+      <Button {...arguments_} aria-invalid variant="solid">
         Solid
       </Button>
-      <Button {...args} aria-invalid variant="outlined">
+      <Button {...arguments_} aria-invalid variant="outlined">
         Outlined
       </Button>
-      <Button {...args} aria-invalid variant="text">
+      <Button {...arguments_} aria-invalid variant="text">
         Text
       </Button>
     </div>

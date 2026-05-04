@@ -2,7 +2,7 @@ import { cn } from "../../lib/utils";
 
 export const LoadingIcon = ({
   className,
-  ...props
+  ...properties
 }: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg
@@ -11,7 +11,7 @@ export const LoadingIcon = ({
       height="1em"
       viewBox="0 0 24 24"
       className={cn("animate-spin", className)}
-      {...props}
+      {...properties}
     >
       <defs>
         <linearGradient

@@ -2,26 +2,27 @@ import type { XOR } from "ts-xor";
 
 import type { Button as ShadcnButton } from "@acme/ui/shadcn/button";
 
-import type { ButtonProps } from "./button";
+import type { ButtonProps as ButtonProperties } from "./button";
 import { Button as InternalButton } from "./button";
 
 export { buttonVariants, buttonColorVariants } from "./button-variants";
 export { LoadingIcon } from "./loading-icon";
 
-type ShadcnButtonProps = React.ComponentProps<typeof ShadcnButton>;
-type ConditionButtonProps = XOR<ButtonProps, ShadcnButtonProps>;
+type ShadcnButtonProperties = React.ComponentProps<typeof ShadcnButton>;
+type ConditionButtonProperties = XOR<ButtonProperties, ShadcnButtonProperties>;
 
 const ConditionButton = ({
   size,
   variant,
   shape,
   color,
-  ...props
-}: ConditionButtonProps) => {
-  let mergedColor: ButtonProps["color"] = color as ButtonProps["color"];
-  let mergedSize: ButtonProps["size"];
-  let mergedVariant: ButtonProps["variant"];
-  let mergedShape: ButtonProps["shape"] = shape;
+  ...properties
+}: ConditionButtonProperties) => {
+  let mergedColor: ButtonProperties["color"] =
+    color as ButtonProperties["color"];
+  let mergedSize: ButtonProperties["size"];
+  let mergedVariant: ButtonProperties["variant"];
+  let mergedShape: ButtonProperties["shape"] = shape;
 
   switch (size) {
     case "xs": {
@@ -97,7 +98,7 @@ const ConditionButton = ({
 
       break;
     }
-    case null: {
+    case undefined: {
       mergedVariant = undefined;
       break;
     }
@@ -114,7 +115,7 @@ const ConditionButton = ({
       variant={mergedVariant}
       shape={mergedShape}
       color={mergedColor}
-      {...props}
+      {...properties}
     />
   );
 };

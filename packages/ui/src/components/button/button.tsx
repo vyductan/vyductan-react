@@ -67,10 +67,10 @@ const Button = ({
   children,
 
   className,
-  type: typeProp,
-  color: colorProp,
-  size: sizeProp,
-  variant: variantProp,
+  type: typeProperty,
+  color: colorProperty,
+  size: sizeProperty,
+  variant: variantProperty,
   shape,
   icon,
   disabled,
@@ -79,7 +79,7 @@ const Button = ({
   htmlType,
   htmlColor,
   srOnly,
-  ...props
+  ...properties
 }: ButtonProps) => {
   const {
     type: typeConfig,
@@ -90,7 +90,8 @@ const Button = ({
 
   // Validate accessibility for icon-only buttons
   const isIconOnly = (!!icon || loading) && !children && !srOnly;
-  const hasAccessibleName = !!props["aria-label"] || props["aria-labelledby"];
+  const hasAccessibleName =
+    !!properties["aria-label"] || properties["aria-labelledby"];
 
   if (
     process.env.NODE_ENV !== "production" &&
@@ -102,10 +103,10 @@ const Button = ({
     );
   }
 
-  const size = sizeProp ?? sizeConfig;
+  const size = sizeProperty ?? sizeConfig;
 
-  const defaultType = variantProp ? "default" : "primary";
-  const type = typeProp ?? typeConfig ?? defaultType;
+  const defaultType = variantProperty ? "default" : "primary";
+  const type = typeProperty ?? typeConfig ?? defaultType;
   const isHtmlType = type === "submit" || type === "reset" || type === "button";
   const htmlTypeToPass = isHtmlType ? type : (htmlType ?? "button");
 
@@ -113,8 +114,8 @@ const Button = ({
   // Default to "default" type if no button type is provided (Ant Design behavior)
   const buttonType: ButtonType = isHtmlType ? defaultType : type;
 
-  let color = colorProp ?? colorConfig;
-  let variant = variantProp ?? variantConfig;
+  let color = colorProperty ?? colorConfig;
+  let variant = variantProperty ?? variantConfig;
   const isDashed = variant === "dashed" || buttonType === "dashed";
 
   // Map type to color/variant using ButtonTypeMap
@@ -190,8 +191,8 @@ const Button = ({
         aria-disabled={loading ?? disabled}
         type={htmlTypeToPass}
         color={htmlColor}
-        {...props}
-        style={{ ...props.style }}
+        {...properties}
+        style={{ ...properties.style }}
       >
         {asChild ? (
           children

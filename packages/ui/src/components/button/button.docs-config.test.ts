@@ -74,6 +74,12 @@ const buttonExampleInventory: ReadonlyArray<{
     partialImportPath: "./examples/form-integration.mdx",
     partialComponentName: "FormIntegrationExample",
   },
+  {
+    heading: "Copy Button",
+    sourcePath: "button/examples/copy-button.tsx",
+    partialImportPath: "./examples/copy-button.mdx",
+    partialComponentName: "CopyButtonExample",
+  },
 ] as const;
 
 describe("Button docs Storybook config", () => {
@@ -96,9 +102,13 @@ describe("Button docs Storybook config", () => {
       );
       const templateMarkerIndex = partialSource.indexOf("<Meta isTemplate />");
 
-      expect(partialSource).toContain('import { Meta } from "@storybook/addon-docs/blocks"');
+      expect(partialSource).toContain(
+        'import { Meta } from "@storybook/addon-docs/blocks"',
+      );
       expect(templateMarkerIndex).toBeGreaterThan(-1);
-      expect(partialSource.slice(templateMarkerIndex)).not.toContain("\nimport ");
+      expect(partialSource.slice(templateMarkerIndex)).not.toContain(
+        "\nimport ",
+      );
     }
   });
 
@@ -117,7 +127,9 @@ describe("Button docs Storybook config", () => {
       "utf8",
     );
 
-    expect(docsSource).toContain('import * as ButtonStories from "./button.stories"');
+    expect(docsSource).toContain(
+      'import * as ButtonStories from "./button.stories"',
+    );
     expect(docsSource).toContain("<Meta of={ButtonStories} />");
   });
 
