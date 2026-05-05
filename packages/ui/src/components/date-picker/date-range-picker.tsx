@@ -1,16 +1,20 @@
+/* eslint-disable react-hooks/set-state-in-effect -- Range picker synchronizes calendar panel month from controlled range values. */
 "use client";
 
 import type { Dayjs } from "dayjs";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { useMergedState } from "@rc-component/util";
-import { composeRef } from "@rc-component/util/es/ref";
 import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import type { InputRef as InputReference } from "../input";
-import type { DatePickerBaseProps as DatePickerBaseProperties } from "./date-picker";
+import type {
+  DatePickerBaseProps as DatePickerBaseProperties,
+  DisabledTimeConfig,
+} from "./date-picker";
+import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
 import { Calendar } from "../calendar";
 import { RangeCalendar } from "../calendar/range-calendar";
@@ -21,6 +25,11 @@ import { Popover } from "../popover";
 import { parseInputDate } from "./parse-input-date";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
+type RangePickerType = "start" | "end";
+type DisabledRangeTime = (
+  date: Dayjs | null,
+  type: RangePickerType,
+) => DisabledTimeConfig;
 
 type DateRangePickerProperties = DatePickerBaseProperties & {
   ref?: React.Ref<InputReference>;
@@ -38,6 +47,8 @@ type DateRangePickerProperties = DatePickerBaseProperties & {
 
   /** Show separate calendars for start and end dates instead of single calendar with 2 panels */
   separateCalendars?: boolean;
+  disabledDate?: DisabledDate<Dayjs>;
+  disabledTime?: DisabledRangeTime;
 
   style?: React.CSSProperties;
   styles?: {
@@ -72,6 +83,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     separateCalendars = true,
     minDate,
     maxDate,
+    disabledDate,
+    disabledTime,
 
     className,
     ...rest
@@ -87,10 +100,52 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
   const [isHovering, setIsHovering] = useState(false);
 
   // ====================== Format Date =======================
-  const format =
-    (formatProperty ?? showTime)
-      ? `${formatConfig} HH:mm`
-      : (formatConfig ?? "YYYY-MM-DD");
+  const fallbackFormat = showTime
+    ? `${formatConfig ?? "YYYY-MM-DD"} HH:mm`
+    : (formatConfig ?? "YYYY-MM-DD");
+  const format = formatProperty ?? fallbackFormat;
+
+  const isDateAllowed = React.useCallback(
+    (date: Dayjs) => {
+      if (minDate && date.isBefore(minDate, "day")) return false;
+      if (maxDate && date.isAfter(maxDate, "day")) return false;
+      if (disabledDate?.(date, { type: "date" })) return false;
+      return true;
+    },
+    [disabledDate, maxDate, minDate],
+  );
+
+  const isTimeAllowed = React.useCallback(
+    (date: Dayjs, type: RangePickerType) => {
+      if (!showTime || !disabledTime) return true;
+
+      const config = disabledTime(date, type);
+      const hour = date.hour();
+      const minute = date.minute();
+      const second = date.second();
+      const millisecond = date.millisecond();
+
+      if (config.disabledHours?.().includes(hour)) return false;
+      if (config.disabledMinutes?.(hour).includes(minute)) return false;
+      if (config.disabledSeconds?.(hour, minute).includes(second)) return false;
+      if (
+        config
+          .disabledMilliseconds?.(hour, minute, second)
+          .includes(millisecond)
+      ) {
+        return false;
+      }
+
+      return true;
+    },
+    [disabledTime, showTime],
+  );
+
+  const isSelectableValue = React.useCallback(
+    (date: Dayjs, type: RangePickerType) =>
+      isDateAllowed(date) && isTimeAllowed(date, type),
+    [isDateAllowed, isTimeAllowed],
+  );
 
   // ====================== Value =======================
   const [value, setValue] = useMergedState(defaultValue, {
@@ -99,6 +154,16 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
       onChange?.(next ?? null);
     },
   });
+
+  const commitInputRange = React.useCallback(
+    (startDate: Dayjs | null, endDate: Dayjs | null) => {
+      if (startDate && !isSelectableValue(startDate, "start")) return false;
+      if (endDate && !isSelectableValue(endDate, "end")) return false;
+      setValue([startDate, endDate]);
+      return true;
+    },
+    [isSelectableValue, setValue],
+  );
 
   const [startInputValue, setStartInputValue] = useMergedState(
     value?.[0] ? value[0].format(format) : "",
@@ -149,23 +214,33 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
   const startInputReference = React.useRef<InputReference>(null);
   const endInputReference = React.useRef<InputReference>(null);
 
-  const composedStartReference = ref
-    ? composeRef(ref, startInputReference)
-    : startInputReference;
+  const composedStartReference = React.useCallback<
+    React.RefCallback<InputReference>
+  >(
+    (node) => {
+      startInputReference.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref],
+  );
 
   const handleStartInputChange = (inputValue: string) => {
     setStartInputValue(inputValue);
     if (inputValue.trim()) {
       const parsed = parseInputDate(inputValue, format);
-      if (parsed) {
+      if (parsed && isSelectableValue(parsed, "start")) {
         const endDate = value?.[1] ?? null;
-        // If end date exists and parsed start date is after end date, swap them
         if (endDate && parsed.isAfter(endDate)) {
-          setValue([endDate, parsed]);
-          setStartInputValue(endDate.format(format));
-          setEndInputValue(parsed.format(format));
-        } else {
-          setValue([parsed, endDate]);
+          if (commitInputRange(endDate, parsed)) {
+            setStartInputValue(endDate.format(format));
+            setEndInputValue(parsed.format(format));
+          }
+        } else if (commitInputRange(parsed, endDate)) {
+          setStartInputValue(parsed.format(format));
         }
         setMonth(parsed.toDate());
       }
@@ -178,15 +253,15 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     setEndInputValue(inputValue);
     if (inputValue.trim()) {
       const parsed = parseInputDate(inputValue, format);
-      if (parsed) {
+      if (parsed && isSelectableValue(parsed, "end")) {
         const startDate = value?.[0] ?? null;
-        // If start date exists and parsed end date is before start date, swap them
         if (startDate && parsed.isBefore(startDate)) {
-          setValue([parsed, startDate]);
-          setStartInputValue(parsed.format(format));
-          setEndInputValue(startDate.format(format));
-        } else {
-          setValue([startDate, parsed]);
+          if (commitInputRange(parsed, startDate)) {
+            setStartInputValue(parsed.format(format));
+            setEndInputValue(startDate.format(format));
+          }
+        } else if (commitInputRange(startDate, parsed)) {
+          setEndInputValue(parsed.format(format));
         }
       }
     } else {
@@ -237,7 +312,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
           captionLayout={captionLayoutConfig}
           minDate={minDate}
           maxDate={maxDate}
-          disabled={disabled}
+          disabled={(date: Date) => disabled || !isDateAllowed(dayjs(date))}
           activeInput={activeInput}
           hoverPreview={hoverPreview}
           onHoverPreviewChange={setHoverPreview}
@@ -275,8 +350,10 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               }
             : undefined
         }
+        disabled={(date: Date) => disabled || !isDateAllowed(dayjs(date))}
         onSelect={(_selected, triggerDate) => {
           const selectedDate = dayjs(triggerDate);
+          if (!isDateAllowed(selectedDate)) return;
 
           // Use activeInput to determine which date to set
           if (activeInput === "start") {
@@ -343,6 +420,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     maxDate,
     disabled,
     hoverPreview,
+    isDateAllowed,
     setHoverPreview,
   ]);
 
@@ -462,20 +540,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               onChange={(event) => {
                 const newValue = event.currentTarget.value;
                 setStartInputValue(newValue);
-                if (newValue.trim()) {
-                  const parsed = parseInputDate(newValue, format);
-                  if (parsed) {
-                    const endDate = value?.[1] ?? null;
-                    // If end date exists and parsed start date is after end date, swap them
-                    if (endDate && parsed.isAfter(endDate)) {
-                      setValue([endDate, parsed]);
-                      setStartInputValue(endDate.format(format));
-                      setEndInputValue(parsed.format(format));
-                    } else {
-                      setValue([parsed, endDate]);
-                    }
-                    setMonth(parsed.toDate());
-                  }
+                if (parseInputDate(newValue, format)) {
+                  handleStartInputChange(newValue);
                 }
               }}
               onBlur={(e) => {
@@ -502,16 +568,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
 
                 if (startInputValue.trim()) {
                   const parsed = parseInputDate(startInputValue, format);
-                  if (parsed) {
-                    const endDate = value?.[1] ?? null;
-                    // If end date exists and parsed start date is after end date, swap them
-                    if (endDate && parsed.isAfter(endDate)) {
-                      setValue([endDate, parsed]);
-                      setStartInputValue(endDate.format(format));
-                      setEndInputValue(parsed.format(format));
-                    } else {
-                      setValue([parsed, endDate]);
-                    }
+                  if (parsed && isSelectableValue(parsed, "start")) {
+                    handleStartInputChange(startInputValue);
                   } else {
                     setStartInputValue(
                       value?.[0] ? value[0].format(format) : "",
@@ -609,20 +667,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               onChange={(event) => {
                 const newValue = event.currentTarget.value;
                 setEndInputValue(newValue);
-                if (newValue.trim()) {
-                  const parsed = parseInputDate(newValue, format);
-                  if (parsed) {
-                    const startDate = value?.[0] ?? null;
-                    // If start date exists and parsed end date is before start date, swap them
-                    if (startDate && parsed.isBefore(startDate)) {
-                      setValue([parsed, startDate]);
-                      setStartInputValue(parsed.format(format));
-                      setEndInputValue(startDate.format(format));
-                    } else {
-                      setValue([startDate, parsed]);
-                    }
-                    setMonth(parsed.toDate());
-                  }
+                if (parseInputDate(newValue, format)) {
+                  handleEndInputChange(newValue);
                 }
               }}
               onBlur={(e) => {
@@ -649,16 +695,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
 
                 if (endInputValue.trim()) {
                   const parsed = parseInputDate(endInputValue, format);
-                  if (parsed) {
-                    const startDate = value?.[0] ?? null;
-                    // If start date exists and parsed end date is before start date, swap them
-                    if (startDate && parsed.isBefore(startDate)) {
-                      setValue([parsed, startDate]);
-                      setStartInputValue(parsed.format(format));
-                      setEndInputValue(startDate.format(format));
-                    } else {
-                      setValue([startDate, parsed]);
-                    }
+                  if (parsed && isSelectableValue(parsed, "end")) {
+                    handleEndInputChange(endInputValue);
                   } else {
                     setEndInputValue(value?.[1] ? value[1].format(format) : "");
                   }

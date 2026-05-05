@@ -13,11 +13,11 @@ export const CustomCalendarDayButton = ({
   //   day,
   modifiers,
   //   color,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof CalendarDayButton>) => {
-  const ref = React.useRef<HTMLButtonElement>(null);
+  const reference = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus();
+    if (modifiers.focused) reference.current?.focus();
   }, [modifiers.focused]);
 
   // Custom logic for Ant Design-like range highlighting
@@ -37,7 +37,7 @@ export const CustomCalendarDayButton = ({
       )}
       modifiers={modifiers}
       //   color={color as ButtonProps["color"]}
-      {...props}
+      {...properties}
     />
   );
 };
@@ -54,7 +54,7 @@ const CustomCalendar = ({
   formatters,
   locale,
   onWeeksMouseLeave,
-  ...props
+  ...properties
 }: ShadcnCalendarProps) => {
   const DayButtonComponent = components?.DayButton ?? CustomCalendarDayButton;
   const WeeksComponent = components?.Weeks;
@@ -76,13 +76,15 @@ const CustomCalendar = ({
       }}
       components={{
         ...components,
-        DayButton: (dayButtonProps) => (
+        DayButton: (dayButtonProperties) => (
           <DayButtonComponent
-            {...dayButtonProps}
-            data-day={dayButtonProps.day.date.toLocaleDateString(locale?.code)}
+            {...dayButtonProperties}
+            data-day={dayButtonProperties.day.date.toLocaleDateString(
+              locale?.code,
+            )}
           />
         ),
-        Weeks: ({ children, onMouseLeave, ...weekProps }) => {
+        Weeks: ({ children, onMouseLeave, ...weekProperties }) => {
           const handleMouseLeave = (
             e: React.MouseEvent<HTMLTableSectionElement>,
           ) => {
@@ -92,20 +94,23 @@ const CustomCalendar = ({
 
           if (WeeksComponent) {
             return (
-              <WeeksComponent {...weekProps} onMouseLeave={handleMouseLeave}>
+              <WeeksComponent
+                {...weekProperties}
+                onMouseLeave={handleMouseLeave}
+              >
                 {children}
               </WeeksComponent>
             );
           }
 
           return (
-            <tbody onMouseLeave={handleMouseLeave} {...weekProps}>
+            <tbody onMouseLeave={handleMouseLeave} {...weekProperties}>
               {children}
             </tbody>
           );
         },
       }}
-      {...props}
+      {...properties}
     />
   );
 };

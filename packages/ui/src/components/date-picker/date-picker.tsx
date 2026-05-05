@@ -9,7 +9,6 @@ import type { Dayjs } from "dayjs";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useMergedState } from "@rc-component/util";
-import { composeRef } from "@rc-component/util/es/ref";
 import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -48,12 +47,32 @@ export type PanelMode =
   | "decade";
 export type PickerMode = Exclude<PanelMode, "datetime" | "decade">;
 
+type DisabledTimeConfig = {
+  disabledHours?: () => number[];
+  disabledMinutes?: (selectedHour: number) => number[];
+  disabledSeconds?: (selectedHour: number, selectedMinute: number) => number[];
+  disabledMilliseconds?: (
+    selectedHour: number,
+    selectedMinute: number,
+    selectedSecond: number,
+  ) => number[];
+};
+
+type DisabledTime = (date: Dayjs) => DisabledTimeConfig;
+
+type ShowTimeConfig =
+  | boolean
+  | {
+      defaultOpenValue?: Dayjs | [Dayjs, Dayjs];
+      hideDisabledOptions?: boolean;
+    };
+
 type DatePickerBaseProperties = InputVariants &
   InputSizeVariants & {
     id?: string;
     format?: string;
     /** To provide an additional time selection **/
-    showTime?: boolean;
+    showTime?: ShowTimeConfig;
 
     allowClear?: boolean;
     className?: string;
@@ -75,6 +94,7 @@ type DatePickerProperties = DatePickerBaseProperties & {
   value?: Dayjs | null;
   onChange?: (date: Dayjs | null | undefined, dateString: string) => void;
   disabledDate?: DisabledDate<Dayjs>;
+  disabledTime?: DisabledTime;
   placeholder?: string;
 
   picker?: PickerMode;
@@ -102,6 +122,7 @@ const DatePicker = (properties: DatePickerProperties) => {
     showTime,
     picker,
     disabledDate,
+    disabledTime,
     minDate,
     maxDate,
 
@@ -162,6 +183,38 @@ const DatePicker = (properties: DatePickerProperties) => {
       return true;
     },
     [disabledDate, maxDate, minDate, picker],
+  );
+
+  const isTimeAllowed = React.useCallback(
+    (date: Dayjs) => {
+      if (!showTime || !disabledTime) return true;
+
+      const config = disabledTime(date);
+      const hour = date.hour();
+      const minute = date.minute();
+      const second = date.second();
+      const millisecond = date.millisecond();
+
+      if (config.disabledHours?.().includes(hour)) return false;
+      if (config.disabledMinutes?.(hour).includes(minute)) return false;
+      if (config.disabledSeconds?.(hour, minute).includes(second)) return false;
+      if (
+        config
+          .disabledMilliseconds?.(hour, minute, second)
+          .includes(millisecond)
+      ) {
+        return false;
+      }
+
+      return true;
+    },
+    [disabledTime, showTime],
+  );
+
+  const isSelectableValue = React.useCallback(
+    (date: Dayjs, mode: PanelMode = picker ?? "date") =>
+      isDateAllowed(date, mode) && (mode !== "date" || isTimeAllowed(date)),
+    [isDateAllowed, isTimeAllowed, picker],
   );
 
   const isWholePeriodAllowed = React.useCallback(
@@ -249,13 +302,23 @@ const DatePicker = (properties: DatePickerProperties) => {
   const skipBlurCommitReference = React.useRef(false);
   const interactingInsidePanelReference = React.useRef(false);
 
-  const composedReference = ref
-    ? composeRef(ref, inputReference)
-    : inputReference;
+  const composedReference = React.useCallback<
+    React.RefCallback<InputReference>
+  >(
+    (node) => {
+      inputReference.current = node;
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    },
+    [ref],
+  );
   const handleChangeInput = (value: string) => {
     if (value.trim()) {
       const parsed = parseInputDate(value, format);
-      if (parsed) {
+      if (parsed && isSelectableValue(parsed)) {
         setValue(parsed);
         setInputValue(formatValue(parsed));
         setMonth(parsed.toDate());
@@ -283,26 +346,16 @@ const DatePicker = (properties: DatePickerProperties) => {
   const [month, setMonth] = React.useState<Date | undefined>(
     value ? value.toDate() : undefined,
   );
-  const [typedDate, setTypedDate] = React.useState<Date | undefined>(
-    value ? value.toDate() : undefined,
-  );
-
-  // Sync calendar month and selected date when input value changes
-  React.useEffect(() => {
+  const selectedDate = useMemo(() => {
     if (inputValue.trim()) {
       const parsed = parseInputDate(inputValue, format);
-      if (parsed) {
-        setMonth(parsed.toDate());
-        setTypedDate(parsed.toDate());
+      if (parsed && isSelectableValue(parsed)) {
+        return parsed.toDate();
       }
-    } else if (value) {
-      // If there's a selected value, use it for month
-      setMonth(value.toDate());
-      setTypedDate(value.toDate());
-    } else {
-      setTypedDate(undefined);
     }
-  }, [inputValue, value, format]);
+
+    return value ? value.toDate() : undefined;
+  }, [format, inputValue, isSelectableValue, value]);
 
   const currentYear = useMemo(() => value ?? dayjs(), [value]);
 
@@ -494,14 +547,16 @@ const DatePicker = (properties: DatePickerProperties) => {
       const nextValue =
         picker === "week" ? getPeriodStart(dayjsDate, "week") : dayjsDate;
 
-      if (picker === "week" && !isWholePeriodAllowed(nextValue, "week")) {
+      if (
+        (picker === "week" && !isWholePeriodAllowed(nextValue, "week")) ||
+        !isDateAllowed(nextValue)
+      ) {
         setHoverPreview(undefined);
         return;
       }
 
       setValue(nextValue);
       setInputValue(formatValue(nextValue));
-      setTypedDate(nextValue.toDate());
       setMonth(nextValue.toDate());
       skipBlurCommitReference.current = true;
       setPendingYearCommit(false);
@@ -512,6 +567,7 @@ const DatePicker = (properties: DatePickerProperties) => {
     [
       formatValue,
       getPeriodStart,
+      isDateAllowed,
       isWholePeriodAllowed,
       picker,
       setInputValue,
@@ -633,9 +689,9 @@ const DatePicker = (properties: DatePickerProperties) => {
                 : dayjs(stickyPreview).isValid()
                   ? dayjs(stickyPreview)
                   : dayjs();
+              if (!isSelectableValue(commit)) return;
               setValue(commit);
               setInputValue(commit.format(format));
-              setTypedDate(commit.toDate());
               setMonth(commit.toDate());
             }
             interactingInsidePanelReference.current = false;
@@ -688,8 +744,7 @@ const DatePicker = (properties: DatePickerProperties) => {
                   setHoverPreview(stickyPreview ?? undefined);
                 }
               }}
-              // value={typedDate ? dayjs(typedDate) : (value ?? undefined)}
-              selected={typedDate ?? (value ? value.toDate() : undefined)}
+              selected={selectedDate}
               startMonth={
                 minDate?.toDate() ??
                 dayjs().subtract(50, "year").startOf("year").toDate()
@@ -702,16 +757,7 @@ const DatePicker = (properties: DatePickerProperties) => {
                 if (!date) return;
                 commitCalendarSelection(date);
               }}
-              disabled={(date) => {
-                if (disabledDate) {
-                  // Pass both the date and the required info object
-                  const currentArgument = getDestinationValue(date);
-                  return disabledDate(currentArgument, {
-                    type: "date",
-                  });
-                }
-                return false;
-              }}
+              disabled={(date) => !isDateAllowed(getDestinationValue(date))}
               components={{
                 CaptionLabel: BaseCaptionLabel,
                 DayButton: CalendarDayButton,
@@ -781,10 +827,9 @@ const DatePicker = (properties: DatePickerProperties) => {
                 // Only trigger onChange if input is valid, otherwise just close
                 if (inputValue.trim()) {
                   const parsed = parseInputDate(inputValue, format);
-                  if (parsed) {
+                  if (parsed && isSelectableValue(parsed)) {
                     setValue(parsed);
                     setInputValue(formatValue(parsed));
-                    setTypedDate(parsed.toDate());
                   }
                 }
                 setOpen(false);
@@ -797,16 +842,14 @@ const DatePicker = (properties: DatePickerProperties) => {
               // Update calendar month and selected date when typing
               if (newValue.trim()) {
                 const parsed = parseInputDate(newValue, format);
-                if (parsed) {
+                if (parsed && isSelectableValue(parsed)) {
                   // Commit immediately so form state is updated even before blur
                   setValue(parsed);
-                  setTypedDate(parsed.toDate());
                   setMonth(parsed.toDate());
                 }
               } else {
                 // Keep form state in sync when clearing input
                 setValue(undefined);
-                setTypedDate(undefined);
               }
             }}
             onBlur={(e) => {
@@ -843,20 +886,17 @@ const DatePicker = (properties: DatePickerProperties) => {
               // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
               if (inputValue.trim()) {
                 const parsed = parseInputDate(inputValue, format);
-                if (parsed) {
+                if (parsed && isSelectableValue(parsed)) {
                   setValue(parsed);
                   setInputValue(formatValue(parsed));
-                  setTypedDate(parsed.toDate());
                 } else {
                   // Invalid input - revert to previous value
                   setInputValue(value ? formatValue(value) : "");
-                  setTypedDate(value ? value.toDate() : undefined);
                 }
               } else {
                 // Empty input - trigger onChange with undefined
                 setValue(undefined);
                 setInputValue("");
-                setTypedDate(undefined);
               }
               setOpen(false);
             }}
@@ -871,5 +911,8 @@ const DatePicker = (properties: DatePickerProperties) => {
 export type {
   DatePickerProperties as DatePickerProps,
   DatePickerBaseProperties as DatePickerBaseProps,
+  DisabledTime,
+  DisabledTimeConfig,
+  ShowTimeConfig,
 };
 export { DatePicker };

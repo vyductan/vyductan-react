@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { expect, fireEvent, fn, userEvent, within } from "storybook/test";
 
 import { DatePicker } from "./date-picker";
+import DisabledDateTimeDemo from "./examples/disabled-date-time";
 
 const meta = {
   title: "Components/DatePicker",
@@ -189,6 +190,10 @@ export const WithTime: Story = {
     placeholder: "Select date & time",
     className: "w-[240px]",
   },
+};
+
+export const DisabledDateTime: Story = {
+  render: () => <DisabledDateTimeDemo />,
 };
 
 export const InteractionOpenCalendar: Story = {

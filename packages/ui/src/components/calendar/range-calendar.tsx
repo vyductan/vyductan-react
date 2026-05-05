@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/set-state-in-effect -- Range calendar public API uses explicit null boundaries. */
 "use client";
 
 import type { Dayjs } from "dayjs";
@@ -8,12 +8,15 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ShadcnCalendarProps } from "./_components";
+import type { ShadcnCalendarProps as ShadcnCalendarProperties } from "./_components";
 import { CustomCalendar } from "./_components";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
 
-type RangeCalendarProps = Pick<ShadcnCalendarProps, "captionLayout"> & {
+type RangeCalendarProperties = Pick<
+  ShadcnCalendarProperties,
+  "captionLayout"
+> & {
   value?: RangeValueType | null;
   onChange?: (dates: RangeValueType | null) => void;
   format?: string;
@@ -21,7 +24,7 @@ type RangeCalendarProps = Pick<ShadcnCalendarProps, "captionLayout"> & {
   endMonth?: Date;
   minDate?: Dayjs;
   maxDate?: Dayjs;
-  disabled?: boolean;
+  disabled?: ShadcnCalendarProperties["disabled"];
   className?: string;
   onStartMonthChange?: (month: Date) => void;
   onEndMonthChange?: (month: Date) => void;
@@ -31,13 +34,13 @@ type RangeCalendarProps = Pick<ShadcnCalendarProps, "captionLayout"> & {
   onHoverPreviewChange?: (preview: Dayjs | undefined) => void;
 };
 
-const RangeCalendar = (props: RangeCalendarProps) => {
+const RangeCalendar = (properties: RangeCalendarProperties) => {
   const {
     value,
     onChange,
     captionLayout,
-    startMonth: startMonthProp,
-    endMonth: endMonthProp,
+    startMonth: startMonthProperty,
+    endMonth: endMonthProperty,
     minDate,
     maxDate,
     disabled,
@@ -48,7 +51,7 @@ const RangeCalendar = (props: RangeCalendarProps) => {
     activeInput,
     hoverPreview: externalHoverPreview,
     onHoverPreviewChange,
-  } = props;
+  } = properties;
 
   // Use external hover preview if provided, otherwise use internal state
   const [internalHoverPreview, setInternalHoverPreview] = useState<
@@ -59,13 +62,13 @@ const RangeCalendar = (props: RangeCalendarProps) => {
 
   // State for managing months independently
   const [startMonth, setStartMonth] = useState<Date>(() => {
-    if (startMonthProp) return startMonthProp;
+    if (startMonthProperty) return startMonthProperty;
     if (value?.[0]) return value[0].toDate();
     // Default to next month if no value
     return dayjs().toDate();
   });
   const [endMonth, setEndMonth] = useState<Date>(() => {
-    if (endMonthProp) return endMonthProp;
+    if (endMonthProperty) return endMonthProperty;
     if (value?.[1]) {
       const endDate = value[1].toDate();
       const startDate = value[0]?.toDate();
@@ -112,16 +115,16 @@ const RangeCalendar = (props: RangeCalendarProps) => {
 
   // Update months when props change
   useEffect(() => {
-    if (startMonthProp) {
-      setStartMonth(startMonthProp);
+    if (startMonthProperty) {
+      setStartMonth(startMonthProperty);
     }
-  }, [startMonthProp]);
+  }, [startMonthProperty]);
 
   useEffect(() => {
-    if (endMonthProp) {
-      setEndMonth(endMonthProp);
+    if (endMonthProperty) {
+      setEndMonth(endMonthProperty);
     }
-  }, [endMonthProp]);
+  }, [endMonthProperty]);
 
   const handleStartMonthChange = React.useCallback(
     (month: Date) => {
@@ -281,7 +284,9 @@ const RangeCalendar = (props: RangeCalendarProps) => {
       if (isStartCalendar) {
         // Hovering on start calendar
         const actualEndDate =
-          startDate && endDate && startDate.isSame(endDate) ? null : endDate;
+          startDate && endDate && startDate.isSame(endDate)
+            ? undefined
+            : endDate;
 
         if (actualEndDate && hoverPreview.isAfter(actualEndDate)) {
           return { from: actualEndDate.toDate(), to: hoverPreview.toDate() };
@@ -305,7 +310,9 @@ const RangeCalendar = (props: RangeCalendarProps) => {
         }
 
         const actualStartDate =
-          startDate && endDate && startDate.isSame(endDate) ? null : startDate;
+          startDate && endDate && startDate.isSame(endDate)
+            ? undefined
+            : startDate;
 
         if (actualStartDate && hoverPreview.isBefore(actualStartDate)) {
           return { from: hoverPreview.toDate(), to: actualStartDate.toDate() };
@@ -400,5 +407,5 @@ const RangeCalendar = (props: RangeCalendarProps) => {
   );
 };
 
-export type { RangeCalendarProps };
+export type { RangeCalendarProperties as RangeCalendarProps };
 export { RangeCalendar };

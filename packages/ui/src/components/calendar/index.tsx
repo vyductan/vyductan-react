@@ -9,11 +9,11 @@ import type {
 } from "react-day-picker";
 import type { XOR } from "ts-xor";
 
-import type { CalendarProps as OwnCalendarProps } from "./calendar";
+import type { CalendarProps as OwnCalendarProperties } from "./calendar";
 import { CustomCalendar } from "./_components";
 import { Calendar as CalendarComponent } from "./calendar";
 
-type ShadcnCalendarProps = PropsBase &
+type ShadcnCalendarProperties = PropsBase &
   (
     | PropsSingle
     | PropsSingleRequired
@@ -26,14 +26,17 @@ type ShadcnCalendarProps = PropsBase &
     showEndDateMonth?: boolean;
   };
 
-type ConditionalProps = XOR<OwnCalendarProps, ShadcnCalendarProps>;
+type ConditionalProperties = XOR<
+  OwnCalendarProperties,
+  ShadcnCalendarProperties
+>;
 
-const Calendar = (props: ConditionalProps) => {
-  if ("selected" in props) {
-    return <CustomCalendar {...(props as ShadcnCalendarProps)} />;
+const Calendar = (properties: ConditionalProperties) => {
+  if ("selected" in properties) {
+    return <CustomCalendar {...(properties as ShadcnCalendarProperties)} />;
   }
 
-  return <CalendarComponent {...(props as OwnCalendarProps)} />;
+  return <CalendarComponent {...(properties as OwnCalendarProperties)} />;
 };
 
 export { Calendar };

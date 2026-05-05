@@ -2,11 +2,11 @@ import type { Dayjs } from "dayjs";
 import type { Modifiers } from "react-day-picker";
 import dayjs from "dayjs";
 
-import type { ShadcnCalendarProps } from "./_components";
+import type { ShadcnCalendarProps as ShadcnCalendarProperties } from "./_components";
 import { CustomCalendar, CustomCalendarDayButton } from "./_components";
 
-type CalendarSingleValueProps = Omit<
-  ShadcnCalendarProps,
+type CalendarSingleValueProperties = Omit<
+  ShadcnCalendarProperties,
   "mode" | "required" | "selected" | "onSelect"
 > & {
   mode: "single";
@@ -19,8 +19,8 @@ type CalendarSingleValueProps = Omit<
   fixedWeeks?: boolean;
 };
 
-type CalendarMultipleValueProps = Omit<
-  ShadcnCalendarProps,
+type CalendarMultipleValueProperties = Omit<
+  ShadcnCalendarProperties,
   "mode" | "required" | "selected" | "onSelect"
 > & {
   mode: "multiple";
@@ -33,8 +33,8 @@ type CalendarMultipleValueProps = Omit<
   fixedWeeks?: boolean;
 };
 
-type CalendarRangeValueProps = Omit<
-  ShadcnCalendarProps,
+type CalendarRangeValueProperties = Omit<
+  ShadcnCalendarProperties,
   "mode" | "required" | "selected" | "onSelect"
 > & {
   mode: "range";
@@ -51,23 +51,23 @@ type CalendarRangeValueProps = Omit<
   fixedWeeks?: boolean;
 };
 
-type CalendarProps =
-  | CalendarSingleValueProps
-  | CalendarMultipleValueProps
-  | CalendarRangeValueProps
+type CalendarProperties =
+  | CalendarSingleValueProperties
+  | CalendarMultipleValueProperties
+  | CalendarRangeValueProperties
   | {
       mode?: undefined;
       onSelect?: undefined;
       className?: string;
-      classNames?: ShadcnCalendarProps["classNames"];
+      classNames?: ShadcnCalendarProperties["classNames"];
       numberOfMonths?: number;
       fixedWeeks?: boolean;
     };
 
 function composeDisabled(
-  base: ShadcnCalendarProps["disabled"],
+  base: ShadcnCalendarProperties["disabled"],
   disabledDate?: (date: Dayjs) => boolean,
-): ShadcnCalendarProps["disabled"] {
+): ShadcnCalendarProperties["disabled"] {
   const disabledMatchers = [
     ...(base ? (Array.isArray(base) ? base : [base]) : []),
     ...(disabledDate ? [(d: Date) => disabledDate(dayjs(d))] : []),
@@ -77,35 +77,35 @@ function composeDisabled(
   return disabledMatchers;
 }
 
-const Calendar = (props: CalendarProps) => {
-  const { format = "YYYY-MM-DD" } = props as {
+const Calendar = (properties: CalendarProperties) => {
+  const { format = "YYYY-MM-DD" } = properties as {
     format?: string;
   };
 
-  if ("selected" in props) {
+  if ("selected" in properties) {
     return (
       <CustomCalendar
         components={{
           DayButton: CustomCalendarDayButton,
         }}
         fixedWeeks={true}
-        {...(props as ShadcnCalendarProps)}
+        {...(properties as ShadcnCalendarProperties)}
       />
     );
   }
 
   // Single (Dayjs convenience)
   if (
-    props.mode === "single" &&
-    "value" in props &&
-    props.value &&
-    !Array.isArray(props.value)
+    properties.mode === "single" &&
+    "value" in properties &&
+    properties.value &&
+    !Array.isArray(properties.value)
   ) {
-    const { value, onSelect, disabledDate, ...rest } = props;
+    const { value, onSelect, disabledDate, ...rest } = properties;
     const disabled = composeDisabled(rest.disabled, disabledDate);
     return (
       <CustomCalendar
-        {...(rest as Omit<ShadcnCalendarProps, "selected" | "onSelect">)}
+        {...(rest as Omit<ShadcnCalendarProperties, "selected" | "onSelect">)}
         mode="single"
         disabled={disabled}
         selected={value.toDate()}
@@ -121,8 +121,9 @@ const Calendar = (props: CalendarProps) => {
   }
 
   // Range mode
-  if (props.mode === "range") {
-    const { value, onSelect, disabledDate, onMonthChange, ...rest } = props;
+  if (properties.mode === "range") {
+    const { value, onSelect, disabledDate, onMonthChange, ...rest } =
+      properties;
     const disabled = composeDisabled(rest.disabled, disabledDate);
 
     // Extract props that shouldn't be passed to ShadcnCalendar
@@ -152,7 +153,7 @@ const Calendar = (props: CalendarProps) => {
   }
 
   const { value, onSelect, disabledDate, onMonthChange, ...rest } =
-    props as CalendarMultipleValueProps;
+    properties as CalendarMultipleValueProperties;
   const disabled = composeDisabled(rest.disabled, disabledDate);
 
   // Extract props that shouldn't be passed to ShadcnCalendar
@@ -177,5 +178,5 @@ const Calendar = (props: CalendarProps) => {
   );
 };
 
-export type { CalendarProps };
+export type { CalendarProperties as CalendarProps };
 export { Calendar };
