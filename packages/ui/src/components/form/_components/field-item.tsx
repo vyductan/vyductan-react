@@ -21,7 +21,7 @@ type FieldItemChildProps = {
 
 type FieldProps<TFieldValues extends FieldValues = FieldValues> = {
   control?: Control<TFieldValues>;
-  name: FieldPath<TFieldValues>;
+  name?: FieldPath<TFieldValues>;
   label?: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactElement<FieldItemChildProps>;
@@ -64,17 +64,18 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   getValueProps,
   normalize,
 }: FieldProps<TFieldValues>): React.JSX.Element {
+  const generatedId = React.useId();
   const formContext = useFormContext();
   const form = formContext?.form;
   const formId = formContext?.id;
   const required = useRequiredFieldCheck(name, defaultRequired);
-  const inputId = `${formId}-${name}`;
+  const inputId = name ? `${formId ?? generatedId}-${name}` : generatedId;
   const finalValuePropName = valuePropName ?? "value";
   const mergedControl = (control ?? form?.control) as
     | Control<TFieldValues>
     | undefined;
 
-  if (!mergedControl) {
+  if (!name || !mergedControl) {
     return (
       <ComposableField className={className} data-invalid={false}>
         {label && (
@@ -85,7 +86,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
         {children &&
           React.cloneElement(children, {
             id: inputId,
-            name,
+            ...(name ? { name } : {}),
             "aria-invalid": false,
           })}
         {description && <FieldDescription>{description}</FieldDescription>}

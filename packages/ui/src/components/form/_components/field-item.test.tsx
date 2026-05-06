@@ -119,9 +119,35 @@ function LegacyFormItemTestForm(): React.JSX.Element {
   );
 }
 
+function DisplayFieldForm(): React.JSX.Element {
+  return (
+    <Form name="display-field-demo">
+      <Field label="Reseller Group">
+        <Input readOnly value="Enterprise" />
+      </Field>
+    </Form>
+  );
+}
+
 afterEach(cleanup);
 
 describe("Field", () => {
+  test("renders a display field without a form name", () => {
+    render(<DisplayFieldForm />);
+
+    const input = screen.getByRole("textbox", { name: /reseller group/i });
+    const label = screen.getByText("Reseller Group").closest("label");
+    const field = input.closest('[data-slot="field"]');
+
+    expect(input).toHaveAttribute("readonly");
+    expect(input).toHaveValue("Enterprise");
+    expect(input).not.toHaveAttribute("name");
+    expect(input).toHaveAttribute("aria-invalid", "false");
+    expect(label).toHaveAttribute("for", input.getAttribute("id"));
+    expect(label).toHaveTextContent("Reseller Group");
+    expect(field).not.toHaveAttribute("data-invalid", "true");
+  });
+
   test("binds form state to a child while rendering the composable field layout", async () => {
     render(<TestForm />);
 
