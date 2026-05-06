@@ -10,11 +10,23 @@ const SNIPPET = "pnpm -F @acme/ui storybook";
 
 type CopyState = "idle" | "copied" | "error";
 
-type CopyButtonProps = {
+export type CopyButtonProps = {
   value: string;
+  ariaLabel?: string;
+  copiedLabel?: string;
+  resetDelay?: number;
+  onCopied?: () => void;
+  className?: string;
 };
 
-function CopyButton({ value }: CopyButtonProps): React.JSX.Element {
+export function CopyButton({
+  value,
+  ariaLabel = "Copy command",
+  copiedLabel = "Copied command",
+  resetDelay = 2000,
+  onCopied,
+  className,
+}: CopyButtonProps): React.JSX.Element {
   const [copyState, setCopyState] = useState<CopyState>("idle");
 
   useEffect(() => {
@@ -22,10 +34,10 @@ function CopyButton({ value }: CopyButtonProps): React.JSX.Element {
       return;
     }
 
-    const timeout = globalThis.setTimeout(() => setCopyState("idle"), 2000);
+    const timeout = globalThis.setTimeout(() => setCopyState("idle"), resetDelay);
 
     return () => globalThis.clearTimeout(timeout);
-  }, [copyState]);
+  }, [copyState, resetDelay]);
 
   async function copySnippet(): Promise<void> {
     if (!navigator.clipboard?.writeText) {
@@ -36,6 +48,7 @@ function CopyButton({ value }: CopyButtonProps): React.JSX.Element {
     try {
       await navigator.clipboard.writeText(value);
       setCopyState("copied");
+      onCopied?.();
     } catch {
       setCopyState("error");
     }
@@ -45,9 +58,10 @@ function CopyButton({ value }: CopyButtonProps): React.JSX.Element {
 
   return (
     <Button
-      aria-label={isCopied ? "Copied command" : "Copy command"}
-      type="default"
+      aria-label={isCopied ? copiedLabel : ariaLabel}
+      variant="text"
       shape="icon"
+      className={className}
       icon={isCopied ? <Check /> : <Copy />}
       onClick={copySnippet}
     />

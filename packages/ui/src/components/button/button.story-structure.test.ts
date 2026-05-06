@@ -58,8 +58,12 @@ test("copy button example keeps the copy control icon-only and visually stable",
     "utf8",
   );
 
-  expect(copyButtonSource).toContain('type="default"');
+  expect(copyButtonSource).toContain("export type CopyButtonProps =");
+  expect(copyButtonSource).toContain("export function CopyButton");
+  expect(copyButtonSource).toContain("className?: string");
+  expect(copyButtonSource).toContain('variant="text"');
   expect(copyButtonSource).toContain('shape="icon"');
+  expect(copyButtonSource).not.toContain('type="default"');
   expect(copyButtonSource).not.toContain('type={isCopied ? "primary" : "default"}');
   expect(copyButtonSource).not.toContain("{getCopyButtonLabel(copyState)}");
 });

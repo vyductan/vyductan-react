@@ -7,10 +7,14 @@ function TooltipContent({
   sideOffset = 4,
   children,
   classNames,
+  styles,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content> & {
   classNames?: {
     arrow?: string;
+  };
+  styles?: {
+    arrow?: React.CSSProperties;
   };
 }) {
   return (
@@ -29,10 +33,11 @@ function TooltipContent({
         <TooltipPrimitive.Arrow
           data-slot="tooltip-arrow"
           className={cn(
-            "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px]",
+            "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px]",
             "fill-foreground bg-foreground",
             classNames?.arrow,
           )}
+          style={styles?.arrow}
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
