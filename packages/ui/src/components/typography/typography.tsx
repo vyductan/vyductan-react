@@ -171,6 +171,20 @@ const Text = ({
   );
 };
 
+type CurrencyProperties = BaseTypographyProperties;
+
+const TypographyCurrency = ({
+  className,
+  ...properties
+}: CurrencyProperties) => {
+  return (
+    <Typography
+      className={cn("font-features-['tnum'] tabular-nums", className)}
+      {...properties}
+    />
+  );
+};
+
 type ParagraphProperties = BaseTypographyProperties & {
   spacing?: "default" | "tight" | "loose";
 };
@@ -208,7 +222,10 @@ const Link = ({ className, children, ...properties }: LinkProperties) => {
   return (
     <Typography
       asChild
-      className={cn("font-medium text-primary underline underline-offset-4", className)}
+      className={cn(
+        "text-primary font-medium underline underline-offset-4",
+        className,
+      )}
       {...properties}
     >
       <a>{children}</a>
@@ -216,11 +233,12 @@ const Link = ({ className, children, ...properties }: LinkProperties) => {
   );
 };
 
-export { Typography, Title, Text, Paragraph, Link };
+export { Typography, Title, Text, TypographyCurrency, Paragraph, Link };
 export type {
   BaseTypographyProperties as BaseTypographyProps,
   TitleProperties as TitleProps,
   TextProperties as TextProps,
+  CurrencyProperties as CurrencyProps,
   ParagraphProperties as ParagraphProps,
   LinkProperties as LinkProps,
 };

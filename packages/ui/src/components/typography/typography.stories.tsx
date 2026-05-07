@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { Typography } from ".";
+import { Typography, TypographyCurrency } from ".";
 import { Space } from "../space";
 
 const meta = {
@@ -38,6 +38,15 @@ export const TextAndLink: Story = {
       >
         Ant Design (Link)
       </Typography.Link>
+    </Space>
+  ),
+};
+
+export const Currency: Story = {
+  render: () => (
+    <Space direction="vertical">
+      <TypographyCurrency>1,234,567 ₫</TypographyCurrency>
+      <Typography.Currency>9,876,543 ₫</Typography.Currency>
     </Space>
   ),
 };
