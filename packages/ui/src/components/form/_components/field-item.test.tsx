@@ -5,9 +5,10 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, describe, expect, test } from "vitest";
 import { z } from "zod";
 
+import { Field } from "@acme/ui/components/field";
 import { Input, InputNumber } from "@acme/ui/components/input";
 
-import { Field, FormItem } from ".";
+import { FormItem } from ".";
 import { Form } from "../form";
 import { useForm } from "../hooks/use-form";
 

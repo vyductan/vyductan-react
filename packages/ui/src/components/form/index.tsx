@@ -25,7 +25,6 @@ export * from "./_components/form-message";
 export * from "./_components/form-description";
 export * from "./_components/form-list";
 export * from "./_components/form-control";
-export * from "./_components/field-item";
 export * from "./_components/form-controller";
 export * from "./_components/form-item";
 export * from "./types";
@@ -79,4 +78,4 @@ Form.create = () => {
 
 export { Form };
 
-export { Field, FormItem } from "./_components";
+export { FormItem } from "./_components";

@@ -5,19 +5,14 @@ import { z } from "zod";
 import { Button } from "@acme/ui/components/button";
 import { Checkbox } from "@acme/ui/components/checkbox";
 import {
-  Field as ComposableField,
+  Field,
   FieldGroup,
   FieldLegend,
   FieldLegendDescription,
   FieldSeparator,
   FieldSet,
 } from "@acme/ui/components/field";
-import {
-  Field,
-  Form,
-  requiredNumberSchema,
-  useForm,
-} from "@acme/ui/components/form";
+import { Form, requiredNumberSchema, useForm } from "@acme/ui/components/form";
 import { Input, InputNumber } from "@acme/ui/components/input";
 import { Select } from "@acme/ui/components/select";
 import { Textarea } from "@acme/ui/components/textarea";
@@ -189,12 +184,12 @@ function App(): React.JSX.Element {
               </Field>
             </FieldGroup>
           </FieldSet>
-          <ComposableField orientation="horizontal">
+          <Field orientation="horizontal">
             <Button type="submit">Submit</Button>
             <Button variant="outline" type="button">
               Cancel
             </Button>
-          </ComposableField>
+          </Field>
         </FieldGroup>
       </Form>
     </div>
