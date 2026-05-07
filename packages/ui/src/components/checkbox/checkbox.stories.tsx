@@ -10,6 +10,7 @@ import CardComposableExample from "./examples/card-composable";
 import CheckAllExample from "./examples/check-all";
 import FormItemDescriptionExample from "./examples/form-item-description";
 import GroupExample from "./examples/group";
+import ShadcnControlledExample from "./examples/shadcn-controlled";
 import { Checkbox } from "./index";
 
 const externalLabelClassName =
@@ -45,6 +46,15 @@ export const Default: Story = {
     <ComponentSource
       src="checkbox/examples/basic.tsx"
       __comp__={BasicExample}
+    />
+  ),
+};
+
+export const ShadcnControlled: Story = {
+  render: () => (
+    <ComponentSource
+      src="checkbox/examples/shadcn-controlled.tsx"
+      __comp__={ShadcnControlledExample}
     />
   ),
 };

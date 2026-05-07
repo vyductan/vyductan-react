@@ -66,7 +66,7 @@ describe("CheckboxGroup", () => {
           label: "Engineers",
           value: "engineers",
           id: "engineers-option",
-          title: "Engineers option",
+          description: "APIs, implementation details, and technical updates.",
           required: true,
           style: { justifyContent: "center" },
           onChange: optionOnChange,
@@ -79,7 +79,12 @@ describe("CheckboxGroup", () => {
     const wrapper = checkbox.closest("label");
 
     expect(checkbox).toHaveAttribute("id", "engineers-option");
-    expect(checkbox).toHaveAttribute("title", "Engineers option");
+    expect(
+      screen.getByText("APIs, implementation details, and technical updates."),
+    ).toBeInTheDocument();
+    expect(checkbox).toHaveAccessibleDescription(
+      "APIs, implementation details, and technical updates.",
+    );
     expect(checkbox).toBeRequired();
     expect(wrapper).toHaveStyle({ justifyContent: "center" });
 

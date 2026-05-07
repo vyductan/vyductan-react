@@ -15,6 +15,12 @@ const checkboxExampleInventory: ReadonlyArray<{
     partialComponentName: "BasicExample",
   },
   {
+    heading: "Shadcn Controlled",
+    sourcePath: "checkbox/examples/shadcn-controlled.tsx",
+    partialImportPath: "./examples/shadcn-controlled.mdx",
+    partialComponentName: "ShadcnControlledExample",
+  },
+  {
     heading: "Card Variant",
     sourcePath: "checkbox/examples/card.tsx",
     partialImportPath: "./examples/card.mdx",

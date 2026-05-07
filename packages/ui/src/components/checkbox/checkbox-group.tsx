@@ -110,15 +110,9 @@ const CheckboxGroup = <T extends CheckboxValueType = CheckboxValueType>({
             classNames={classNames}
             variant={optionVariant}
             size={size}
+            description={o.description}
           >
-            {o.description ? (
-              <div className="grid gap-1.5 font-normal">
-                <p className="text-sm leading-none font-medium">{o.label}</p>
-                <p className="text-muted-foreground text-sm">{o.description}</p>
-              </div>
-            ) : (
-              o.label
-            )}
+            {o.label}
           </Checkbox>
         );
       })}

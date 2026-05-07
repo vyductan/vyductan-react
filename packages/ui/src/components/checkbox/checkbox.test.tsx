@@ -53,10 +53,17 @@ describe("Checkbox", () => {
     const checkbox = screen.getByRole("checkbox");
 
     expect(container.querySelector('[data-slot="checkbox-label"]')).toBeNull();
-    expect(screen.queryByText("Allow custom start time")).not.toBeInTheDocument();
-    expect(screen.queryByText("Customers can choose any time to start.")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Allow custom start time"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Customers can choose any time to start."),
+    ).not.toBeInTheDocument();
     expect(checkbox).toHaveAttribute("aria-labelledby", "external-label");
-    expect(checkbox).toHaveAttribute("aria-describedby", "external-description");
+    expect(checkbox).toHaveAttribute(
+      "aria-describedby",
+      "external-description",
+    );
 
     const generatedLabelId = checkbox
       .getAttribute("aria-labelledby")
@@ -117,9 +124,13 @@ describe("Checkbox", () => {
 
     expect(wrapper).toHaveClass("items-start");
     expect(labelContent?.tagName).toBe("DIV");
-    expect(labelContent).toHaveClass("mt-px", "flex", "flex-col", "gap-0.5");
+    expect(labelContent).toHaveClass("flex", "flex-col", "gap-1", "px-2");
     expect(description.tagName).toBe("P");
-    expect(description).toHaveClass("text-muted-foreground", "text-xs");
+    expect(description).toHaveClass(
+      "text-muted-foreground",
+      "text-xs",
+      "font-normal",
+    );
     expect(checkbox).toHaveClass("self-start");
     expect(checkbox).toHaveAccessibleName("Allow custom start time");
     expect(checkbox).toHaveAccessibleDescription(
@@ -145,9 +156,20 @@ describe("Checkbox", () => {
 
     expect(wrapper).toHaveClass("items-start");
     expect(labelContent?.tagName).toBe("DIV");
-    expect(labelContent).toHaveClass("mt-px", "w-full", "flex", "flex-col");
+    expect(labelContent).toHaveClass(
+      "flex",
+      "flex-col",
+      "gap-1",
+      "w-full",
+      "leading-none",
+      "font-medium",
+    );
     expect(description.tagName).toBe("P");
-    expect(description).toHaveClass("text-muted-foreground", "text-xs");
+    expect(description).toHaveClass(
+      "text-muted-foreground",
+      "text-xs",
+      "font-normal",
+    );
   });
 
   test("renders description even when children are omitted", () => {
@@ -233,11 +255,11 @@ describe("Checkbox", () => {
     const { container } = render(<PublicCheckbox checked="indeterminate" />);
 
     const checkbox = screen.getByRole("checkbox");
-    const indicator = container.querySelector('[data-slot="checkbox-indicator"]');
-    const minusIcon = indicator?.querySelector('svg path[d="M5 12h14"]');
-    const checkIcon = indicator?.querySelector(
-      'svg path[d="m9 12 2 2 4-4"]',
+    const indicator = container.querySelector(
+      '[data-slot="checkbox-indicator"]',
     );
+    const minusIcon = indicator?.querySelector('svg path[d="M5 12h14"]');
+    const checkIcon = indicator?.querySelector('svg path[d="m9 12 2 2 4-4"]');
 
     expect(checkbox).toHaveAttribute("data-state", "indeterminate");
     expect(indicator).not.toBeNull();
