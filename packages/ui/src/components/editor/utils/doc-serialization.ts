@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -28,7 +27,9 @@ async function readBytestoString(
   const chunkSize = 0x80_00;
   for await (const value of generateReader(reader)) {
     for (let index = 0; index < value.length; index += chunkSize) {
-      output.push(String.fromCodePoint(...value.subarray(index, index + chunkSize)));
+      output.push(
+        String.fromCodePoint(...value.subarray(index, index + chunkSize)),
+      );
     }
   }
   return output.join("");

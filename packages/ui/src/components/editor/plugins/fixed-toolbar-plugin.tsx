@@ -30,7 +30,9 @@ interface FixedToolbarPluginProperties {
   containerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export function FixedToolbarPlugin({ containerRef }: FixedToolbarPluginProperties) {
+export function FixedToolbarPlugin({
+  containerRef,
+}: FixedToolbarPluginProperties) {
   return (
     <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 shadow-sm">
       <ToolbarPlugin>

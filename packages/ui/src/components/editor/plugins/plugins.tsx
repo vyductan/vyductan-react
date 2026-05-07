@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import { useEffect, useRef, useState } from "react";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
@@ -186,7 +185,9 @@ export function Plugins({
       {editable && (
         <TableCellActionMenuPlugin anchorElem={floatingAnchorElement} />
       )}
-      {editable && <TableHoverActionsPlugin anchorElem={floatingAnchorElement} />}
+      {editable && (
+        <TableHoverActionsPlugin anchorElem={floatingAnchorElement} />
+      )}
       <TOCPlugin />
       <ListPlugin />
       <TabIndentationPlugin />
@@ -242,7 +243,9 @@ export function Plugins({
       {editable && <PlainTextLinebreakPastePlugin />}
       {editable && <EmojiPickerPlugin />}
 
-      {editable && <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />}
+      {editable && (
+        <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />
+      )}
       {editable && variant !== "simple" && (
         <FloatingTextFormatToolbarPlugin
           anchorElem={floatingAnchorElement}

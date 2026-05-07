@@ -21,7 +21,6 @@ const meta = {
       description: "Initial editor state as JSON string",
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof Editor>;
 
 export default meta;
@@ -119,7 +118,6 @@ const markdownMeta = {
       description: "Markdown content",
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof Editor>;
 
 type MarkdownStory = StoryObj<typeof markdownMeta>;
@@ -332,7 +330,6 @@ const htmlMeta = {
       description: "HTML content",
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof Editor>;
 
 type HtmlStory = StoryObj<typeof htmlMeta>;

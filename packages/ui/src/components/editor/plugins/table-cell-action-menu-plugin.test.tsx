@@ -1,8 +1,6 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import "@testing-library/jest-dom/vitest";
 
 import type { LexicalEditor } from "lexical";
-import type { LexicalEditorContent } from "../types";
 import * as React from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -31,10 +29,11 @@ import {
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
+import type { LexicalEditorContent } from "../types";
 import { nodes } from "../nodes/nodes";
 import { editorRenderFixtures } from "../render/render-fixtures";
-import { TableCellActionMenuPlugin } from "./table-cell-action-menu-plugin";
 import { invariant } from "../shared/invariant";
+import { TableCellActionMenuPlugin } from "./table-cell-action-menu-plugin";
 
 Object.assign(globalThis, { React });
 
@@ -321,13 +320,22 @@ function getColoredCellOrThrow(
   rowIndex: number,
   cellIndex: number,
 ): BackgroundColorCell {
-  const tableNode = content.root.children[0] as FixtureNodeWithChildren | undefined;
-  invariant(tableNode !== undefined, "Expected fixture root to contain a table node");
+  const tableNode = content.root.children[0] as
+    | FixtureNodeWithChildren
+    | undefined;
+  invariant(
+    tableNode !== undefined,
+    "Expected fixture root to contain a table node",
+  );
 
-  const rowNode = tableNode.children[rowIndex] as FixtureNodeWithChildren | undefined;
+  const rowNode = tableNode.children[rowIndex] as
+    | FixtureNodeWithChildren
+    | undefined;
   invariant(rowNode !== undefined, "Expected fixture row node to exist");
 
-  const cellNode = rowNode.children[cellIndex] as BackgroundColorCell | undefined;
+  const cellNode = rowNode.children[cellIndex] as
+    | BackgroundColorCell
+    | undefined;
   invariant(
     cellNode !== undefined,
     "Expected fixture cell node to contain backgroundColor",
@@ -341,7 +349,10 @@ getColoredCellOrThrow(mixedColorTableContent, 0, 1).backgroundColor = "#fee2e2";
 getColoredCellOrThrow(mixedColorTableContent, 2, 0).backgroundColor = "#dcfce7";
 
 function getEditorOrThrow(editor: LexicalEditor | null): LexicalEditor {
-  invariant(editor !== null, "Expected test harness to provide a Lexical editor");
+  invariant(
+    editor !== null,
+    "Expected test harness to provide a Lexical editor",
+  );
   return editor;
 }
 

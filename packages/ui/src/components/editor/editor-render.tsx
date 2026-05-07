@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import { Suspense, use } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -23,7 +22,10 @@ type EditorRenderResolvedProperties = {
   value: LexicalEditorContent | string | null;
 };
 
-function EditorRenderResolved({ className, value }: EditorRenderResolvedProperties) {
+function EditorRenderResolved({
+  className,
+  value,
+}: EditorRenderResolvedProperties) {
   const content = value ? normalizeEditorContent(value) : null;
 
   if (!content) {

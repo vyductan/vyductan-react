@@ -152,7 +152,9 @@ export function FindReplacePlugin({
       }
 
       // Remove replaced match and update indices
-      const newMatches = matches.filter((_, index) => index !== currentMatchIndex);
+      const newMatches = matches.filter(
+        (_, index) => index !== currentMatchIndex,
+      );
       setMatches(newMatches);
       setMatchCount(newMatches.length);
       if (currentMatchIndex >= newMatches.length) {

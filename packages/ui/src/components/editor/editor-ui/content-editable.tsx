@@ -112,7 +112,6 @@ export function ContentEditable({
           className,
         )}
         aria-placeholder={dynamicPlaceholder}
-        // eslint-disable-next-line unicorn/no-null -- Lexical placeholder callback uses null to render no placeholder node.
         placeholder={() => null}
       />
     </div>

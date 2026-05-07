@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Shared utilities for converting between Lexical editor content and Markdown
  * Used across the application to avoid code duplication

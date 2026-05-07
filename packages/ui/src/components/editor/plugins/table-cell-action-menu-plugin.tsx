@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { TableCellNode } from "@lexical/table";
 import type { LexicalNode } from "lexical";
 import type { DragEventHandler, JSX } from "react";
@@ -733,7 +732,9 @@ function TableCellActionMenuInner({
       if (!editorRoot || !cell || !table || !editorRoot.contains(table)) {
         setFocusedCellState(null);
         setOpenMenu(null);
-        setActiveAxis((current) => (dragStateReference.current ? current : null));
+        setActiveAxis((current) =>
+          dragStateReference.current ? current : null,
+        );
         return;
       }
 
@@ -753,7 +754,9 @@ function TableCellActionMenuInner({
         if ($isTableSelection(selection)) {
           setFocusedCellState(null);
           setOpenMenu(null);
-          setActiveAxis((current) => (dragStateReference.current ? current : null));
+          setActiveAxis((current) =>
+            dragStateReference.current ? current : null,
+          );
           return;
         }
 
@@ -769,7 +772,9 @@ function TableCellActionMenuInner({
         if (!$isTableCellNode(tableCellNode)) {
           setFocusedCellState(null);
           setOpenMenu(null);
-          setActiveAxis((current) => (dragStateReference.current ? current : null));
+          setActiveAxis((current) =>
+            dragStateReference.current ? current : null,
+          );
           return;
         }
 

@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -66,7 +65,9 @@ export function DragDropPastePlugin({
                 const source = reader.result;
 
                 // 2. Insert image with loading state
-                const nodeReference: { current: null | string } = { current: null };
+                const nodeReference: { current: null | string } = {
+                  current: null,
+                };
                 editor.update(() => {
                   // Get the target node from the ref
                   const targetKey = targetNodeKeyReference.current;

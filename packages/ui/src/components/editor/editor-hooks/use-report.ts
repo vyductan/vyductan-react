@@ -28,7 +28,9 @@ const getElement = (): HTMLElement => {
   return element;
 };
 
-export function useReport(): (argument0: string) => ReturnType<typeof setTimeout> {
+export function useReport(): (
+  argument0: string,
+) => ReturnType<typeof setTimeout> {
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const cleanup = useCallback(() => {
     if (timer.current !== undefined) {

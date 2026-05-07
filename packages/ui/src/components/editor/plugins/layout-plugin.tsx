@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -222,14 +221,23 @@ export function LayoutPlugin(): null {
 
             // Add or remove extra columns if new template does not match existing one
             if (itemsCount > previousItemsCount) {
-              for (let index = previousItemsCount; index < itemsCount; index++) {
+              for (
+                let index = previousItemsCount;
+                index < itemsCount;
+                index++
+              ) {
                 container.append(
                   $createLayoutItemNode().append($createParagraphNode()),
                 );
               }
             } else if (itemsCount < previousItemsCount) {
-              for (let index = previousItemsCount - 1; index >= itemsCount; index--) {
-                const layoutItem = container.getChildAtIndex<LexicalNode>(index);
+              for (
+                let index = previousItemsCount - 1;
+                index >= itemsCount;
+                index--
+              ) {
+                const layoutItem =
+                  container.getChildAtIndex<LexicalNode>(index);
 
                 if ($isLayoutItemNode(layoutItem)) {
                   layoutItem.remove();

@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -134,7 +133,11 @@ function FloatingLinkEditor({
       }
 
       if (domRect && rootElement) {
-        setFloatingElementPositionForLinkEditor(domRect, editorElement, anchorElem);
+        setFloatingElementPositionForLinkEditor(
+          domRect,
+          editorElement,
+          anchorElem,
+        );
       }
 
       if ($isRangeSelection(selection)) {
@@ -167,7 +170,11 @@ function FloatingLinkEditor({
           nativeSelection.focusNode?.parentElement?.getBoundingClientRect();
         if (domRect) {
           domRect.y += 40;
-          setFloatingElementPositionForLinkEditor(domRect, editorElement, anchorElem);
+          setFloatingElementPositionForLinkEditor(
+            domRect,
+            editorElement,
+            anchorElem,
+          );
           setShouldShow(true);
         }
         setLastSelection(selection);
@@ -183,7 +190,11 @@ function FloatingLinkEditor({
       if (!hideTimeoutReference.current && shouldShow) {
         hideTimeoutReference.current = setTimeout(() => {
           if (rootElement) {
-            setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
+            setFloatingElementPositionForLinkEditor(
+              null,
+              editorElement,
+              anchorElem,
+            );
           }
           setShouldShow(false);
           setLastSelection(null);
@@ -194,7 +205,11 @@ function FloatingLinkEditor({
       } else if (!shouldShow) {
         // Immediately hide if already hidden
         if (rootElement) {
-          setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
+          setFloatingElementPositionForLinkEditor(
+            null,
+            editorElement,
+            anchorElem,
+          );
         }
         setLastSelection(null);
         setIsLinkEditMode(false);
@@ -312,7 +327,11 @@ function FloatingLinkEditor({
       setEditedLinkUrl("https://");
       // Force hide the editor
       if (editorElement && rootElement) {
-        setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
+        setFloatingElementPositionForLinkEditor(
+          null,
+          editorElement,
+          anchorElem,
+        );
       }
       return;
     }
@@ -323,7 +342,11 @@ function FloatingLinkEditor({
       setEditedLinkUrl("https://");
       // Force hide the editor
       if (editorElement && rootElement) {
-        setFloatingElementPositionForLinkEditor(null, editorElement, anchorElem);
+        setFloatingElementPositionForLinkEditor(
+          null,
+          editorElement,
+          anchorElem,
+        );
       }
       return;
     }
@@ -484,7 +507,7 @@ function FloatingLinkEditor({
             <Check className="h-4 w-4" />
           </Button>
         </div>
-      ) : (isLink ? (
+      ) : isLink ? (
         // Show link URL with edit/delete buttons when link is selected
         <div className="flex items-center justify-between gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-sm">
           <a
@@ -544,7 +567,7 @@ function FloatingLinkEditor({
             </Button>
           </div>
         </div>
-      ) : null)}
+      ) : null}
     </div>
   );
 }

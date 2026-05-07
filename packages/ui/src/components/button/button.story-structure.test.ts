@@ -64,6 +64,8 @@ test("copy button example keeps the copy control icon-only and visually stable",
   expect(copyButtonSource).toContain('variant="text"');
   expect(copyButtonSource).toContain('shape="icon"');
   expect(copyButtonSource).not.toContain('type="default"');
-  expect(copyButtonSource).not.toContain('type={isCopied ? "primary" : "default"}');
+  expect(copyButtonSource).not.toContain(
+    'type={isCopied ? "primary" : "default"}',
+  );
   expect(copyButtonSource).not.toContain("{getCopyButtonLabel(copyState)}");
 });

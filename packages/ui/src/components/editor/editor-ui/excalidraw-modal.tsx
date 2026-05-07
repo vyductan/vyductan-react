@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable react-hooks/static-components */
 "use client";
 
@@ -222,7 +221,11 @@ export function ExcalidrawModal({
       <DialogTrigger />
       <DialogContent className="h-4/6 max-w-4xl overflow-hidden p-0">
         <div className="relative" role="dialog">
-          <div className="h-full w-full" ref={excaliDrawModelReference} tabIndex={-1}>
+          <div
+            className="h-full w-full"
+            ref={excaliDrawModelReference}
+            tabIndex={-1}
+          >
             <div className="h-full w-full">
               {discardModalOpen && <ShowDiscardDialog />}
               <Excalidraw

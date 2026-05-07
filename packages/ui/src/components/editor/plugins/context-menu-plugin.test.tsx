@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import "@testing-library/jest-dom/vitest";
 
 import type { LexicalEditor } from "lexical";
@@ -27,8 +26,8 @@ import { afterEach, expect, test, vi } from "vitest";
 
 import { nodes } from "../nodes/nodes";
 import { editorRenderFixtures } from "../render/render-fixtures";
-import { ContextMenuPlugin } from "./context-menu-plugin";
 import { invariant } from "../shared/invariant";
+import { ContextMenuPlugin } from "./context-menu-plugin";
 
 Object.assign(globalThis, { React });
 
@@ -156,7 +155,10 @@ function EditorRefPlugin({
 }
 
 function getEditorOrThrow(editor: LexicalEditor | null): LexicalEditor {
-  invariant(editor !== null, "Expected test harness to provide a Lexical editor");
+  invariant(
+    editor !== null,
+    "Expected test harness to provide a Lexical editor",
+  );
   return editor;
 }
 

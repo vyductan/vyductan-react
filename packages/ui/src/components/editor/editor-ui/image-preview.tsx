@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";

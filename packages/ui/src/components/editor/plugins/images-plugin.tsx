@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -406,9 +405,9 @@ function getDragSelection(event: DragEvent): Range | null | undefined {
   const targetWindow =
     target == undefined
       ? null
-      : (target.nodeType === 9
+      : target.nodeType === 9
         ? (target as Document).defaultView
-        : (target as Element).ownerDocument.defaultView);
+        : (target as Element).ownerDocument.defaultView;
   const domSelection = getDOMSelection(targetWindow);
 
   if (document.caretRangeFromPoint) {

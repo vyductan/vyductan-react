@@ -16,7 +16,10 @@ import {
   TooltipTrigger,
 } from "@acme/ui/components/tooltip";
 
-import { docFromHash as documentFromHash, docToHash as documentToHash } from "../../utils/doc-serialization";
+import {
+  docFromHash as documentFromHash,
+  docToHash as documentToHash,
+} from "../../utils/doc-serialization";
 
 async function shareDocument(document: SerializedDocument): Promise<void> {
   if (globalThis.window === undefined) {
@@ -40,7 +43,9 @@ export function ShareContentPlugin() {
     void documentFromHash(globalThis.location.hash)
       .then((document) => {
         if (document?.source === "editor") {
-          editor.setEditorState(editorStateFromSerializedDocument(editor, document));
+          editor.setEditorState(
+            editorStateFromSerializedDocument(editor, document),
+          );
           editor.dispatchCommand(CLEAR_HISTORY_COMMAND, void 0);
         }
       })

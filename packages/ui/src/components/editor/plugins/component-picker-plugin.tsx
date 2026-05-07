@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 /**
@@ -590,7 +589,9 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
       const currentQuery = queryStringReference.current;
       const shouldShowFilter =
-        currentQuery == undefined || currentQuery === "" || currentQuery === "/";
+        currentQuery == undefined ||
+        currentQuery === "" ||
+        currentQuery === "/";
 
       let nextKey: string | null = null;
 

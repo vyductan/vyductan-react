@@ -12,7 +12,7 @@ import {
 } from "../collapsible";
 
 // Unified TreeTitle component for both leaf and parent nodes
-interface TreeTitleProps {
+interface TreeTitleProperties {
   title: React.ReactNode;
   icon?: React.ReactNode;
   isSelected?: boolean;
@@ -30,7 +30,7 @@ function TreeTitle({
   onClick,
   style,
   showIcon,
-}: TreeTitleProps) {
+}: TreeTitleProperties) {
   return (
     <div
       tabIndex={0}
@@ -105,7 +105,7 @@ export interface TreeNodeProps<TreeDataType extends BasicDataNode = DataNode> {
 }
 export type IconType =
   | React.ReactNode
-  | ((props: TreeNodeProps) => React.ReactNode);
+  | ((properties: TreeNodeProps) => React.ReactNode);
 
 /** For fieldNames, we provides a abstract interface */
 export interface BasicDataNode {
@@ -121,7 +121,7 @@ export interface BasicDataNode {
   style?: React.CSSProperties;
 }
 
-type TreeProps<TreeDataType extends BasicDataNode = DataNode> = {
+type TreeProperties<TreeDataType extends BasicDataNode = DataNode> = {
   /** The treeNodes data Array, if set it then you need not to construct children TreeNode. (key should be unique across the whole array) */
   treeData?: TreeDataType[];
   /** Tree node data */
@@ -163,7 +163,7 @@ type TreeNodeData = {
   disabled?: boolean;
 };
 
-type InternalTreeProps = TreeProps & {
+type InternalTreeProperties = TreeProperties & {
   /** Internal prop for recursive rendering */
   item?: TreeNodeData;
   /** Internal prop for tracking depth level */
@@ -178,7 +178,7 @@ type InternalTreeProps = TreeProps & {
   };
 };
 
-function Tree(props: InternalTreeProps) {
+function Tree(properties: InternalTreeProperties) {
   const {
     treeData,
     item,
@@ -189,8 +189,8 @@ function Tree(props: InternalTreeProps) {
     isLast = false,
     parentLines = [],
     className,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
 
   // If treeData is provided, render the tree structure
   if (treeData && treeData.length > 0) {
@@ -205,7 +205,7 @@ function Tree(props: InternalTreeProps) {
             depth={depth}
             isLast={index === treeData.length - 1}
             parentLines={parentLines}
-            {...restProps}
+            {...restProperties}
           />
         ))}
       </div>
@@ -222,7 +222,7 @@ function Tree(props: InternalTreeProps) {
         depth={depth}
         isLast={isLast}
         parentLines={parentLines}
-        {...restProps}
+        {...restProperties}
       />
     );
   }
@@ -241,11 +241,11 @@ function TreeNode({
   showIcon = false,
   showLine = false,
   _parent,
-  ...props
+  ...properties
 }: {
   item: TreeNodeData;
   selectedKeys?: Key[];
-  onSelect?: TreeProps["onSelect"];
+  onSelect?: TreeProperties["onSelect"];
   depth?: number;
   isLast?: boolean;
   parentLines?: boolean[];
@@ -254,7 +254,7 @@ function TreeNode({
     isLast: boolean;
   };
   showLine?: boolean;
-} & Omit<TreeProps, "selectedKeys" | "onSelect" | "showLine">) {
+} & Omit<TreeProperties, "selectedKeys" | "onSelect" | "showLine">) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const hasChildren = item.children && item.children.length > 0;
@@ -302,18 +302,18 @@ function TreeNode({
           aria-hidden="true"
           data-slot="tree-indent"
         >
-          {Array.from({ length: depth }).map((_, i) => (
+          {Array.from({ length: depth }).map((_, index) => (
             <span
-              key={i}
+              key={index}
               className="relative inline-block h-8 w-6"
               data-slot="tree-indent-unit"
-              data-indent-level={i}
+              data-indent-level={index}
             >
               {/* {_parent?.depth}.{i} */}
               <span
                 className={cn(
                   "absolute top-0 left-1/2 h-full w-px",
-                  _parent?.isLast && _parent.depth === i ? "hidden" : "",
+                  _parent?.isLast && _parent.depth === index ? "hidden" : "",
                 )}
                 style={{
                   background: "#d9d9d9",
@@ -399,12 +399,12 @@ function TreeNode({
             aria-hidden="true"
             data-slot="tree-indent"
           >
-            {Array.from({ length: depth }).map((_, i) => (
+            {Array.from({ length: depth }).map((_, index) => (
               <span
-                key={i}
+                key={index}
                 className="relative inline-block h-8 w-6"
                 data-slot="tree-indent-unit"
-                data-indent-level={i}
+                data-indent-level={index}
               >
                 <span
                   className="absolute top-0 left-1/2 h-full w-px"
@@ -482,7 +482,7 @@ function TreeNode({
                   }}
                   showLine={showLine}
                   showIcon={showIcon}
-                  {...props}
+                  {...properties}
                 />
               );
             })}
@@ -493,6 +493,6 @@ function TreeNode({
   );
 }
 
-export type { TreeProps };
+export type { TreeProperties as TreeProps };
 
 export { Tree };

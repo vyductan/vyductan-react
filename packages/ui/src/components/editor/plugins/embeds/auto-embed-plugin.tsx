@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -246,7 +245,11 @@ export function AutoEmbedDialog({
       debounce((inputText: string) => {
         const urlMatch = URL_MATCHER.exec(inputText);
 
-        if (embedConfig != undefined && inputText != undefined && urlMatch != undefined) {
+        if (
+          embedConfig != undefined &&
+          inputText != undefined &&
+          urlMatch != undefined
+        ) {
           Promise.resolve(embedConfig.parseUrl(inputText)).then(
             (parseResult) => {
               setEmbedResult(parseResult);

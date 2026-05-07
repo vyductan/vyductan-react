@@ -7,8 +7,8 @@ beforeEach(() => {
   Object.defineProperty(navigator, "clipboard", {
     configurable: true,
     value: {
-      writeText: vi.fn().mockResolvedValue(),
-    },
+      writeText: vi.fn().mockImplementation(() => Promise.resolve()),
+    }
   });
 });
 

@@ -102,7 +102,7 @@ export function convertTreeToData(rootNodes: React.ReactNode): DataNode[] {
             !treeNode,
             "Tree/TreeNode can only accept TreeNode as children.",
           );
-          return null;
+          return;
         }
 
         const { key } = treeNode;
@@ -159,8 +159,8 @@ export function flattenTreeData<TreeDataType extends BasicDataNode = DataNode>(
 
       // Pick matched title in field title list
       let mergedTitle: React.ReactNode;
-      for (let i = 0; i < fieldTitles.length; i += 1) {
-        const fieldTitle = fieldTitles[i];
+      for (let index_ = 0; index_ < fieldTitles.length; index_ += 1) {
+        const fieldTitle = fieldTitles[index_];
         if (treeNode[fieldTitle as keyof TreeDataType] !== undefined) {
           mergedTitle = treeNode[
             fieldTitle as keyof TreeDataType
@@ -178,7 +178,7 @@ export function flattenTreeData<TreeDataType extends BasicDataNode = DataNode>(
           key: mergedKey as Key,
           parent,
           pos,
-          children: null as unknown as FlattenNode<TreeDataType>[],
+          children: undefined as unknown as FlattenNode<TreeDataType>[],
           data: treeNode,
           isStart: [...(parent ? parent.isStart : []), index === 0],
           isEnd: [...(parent ? parent.isEnd : []), index === list.length - 1],
@@ -240,7 +240,7 @@ export function traverseDataNodes(
 
   const { key: fieldKey, children: fieldChildren } = fillFieldNames(fieldNames);
 
-  const mergeChildrenPropName = childrenPropName || fieldChildren;
+  const mergeChildrenPropertyName = childrenPropName || fieldChildren;
 
   // Get keys
   let syntheticGetKey: (node: DataNode, pos?: string) => Key;
@@ -263,7 +263,7 @@ export function traverseDataNodes(
     pathNodes?: DataNode[],
   ) {
     const children = node
-      ? (node[mergeChildrenPropName as keyof DataNode] as DataNode[])
+      ? (node[mergeChildrenPropertyName as keyof DataNode] as DataNode[])
       : dataNodes;
     const pos = node ? getPosition(parent!.pos, index!) : "0";
     const connectNodes = node ? [...pathNodes!, node] : [];
@@ -276,7 +276,7 @@ export function traverseDataNodes(
         index: index!,
         pos,
         key: key as Key,
-        parentPos: (parent!.node ? parent!.pos : null) as string | number,
+        parentPos: (parent!.node ? parent!.pos : undefined) as string | number,
         level: parent!.level + 1,
         nodes: connectNodes,
       };
@@ -301,7 +301,7 @@ export function traverseDataNodes(
     }
   }
 
-  processNode(null as unknown as DataNode);
+  processNode(undefined as unknown as DataNode);
 }
 
 interface Wrapper {
@@ -411,7 +411,7 @@ export function getTreeNodeProps<TreeDataType extends BasicDataNode = DataNode>(
 ) {
   const entity = getEntity(keyEntities, key);
 
-  const treeNodeProps = {
+  const treeNodeProperties = {
     eventKey: key,
     expanded: expandedKeys.includes(key),
     selected: selectedKeys.includes(key),
@@ -429,7 +429,7 @@ export function getTreeNodeProps<TreeDataType extends BasicDataNode = DataNode>(
     dragOverGapBottom: dragOverNodeKey === key && dropPosition === 1,
   };
 
-  return treeNodeProps;
+  return treeNodeProperties;
 }
 
 // export function convertNodePropsToEventData<

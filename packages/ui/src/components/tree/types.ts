@@ -34,7 +34,7 @@ export interface TreeNodeProps<TreeDataType extends BasicDataNode = DataNode> {
 }
 export type IconType =
   | React.ReactNode
-  | ((props: TreeNodeProps) => React.ReactNode);
+  | ((properties: TreeNodeProps) => React.ReactNode);
 /** For fieldNames, we provides a abstract interface */
 export interface BasicDataNode {
   checkable?: boolean;

@@ -62,7 +62,9 @@ export function useSuspenseImage(source: string) {
   const resolveImage = useImageResolver();
 
   // If no resolver, we just use the src as is (default behavior)
-  const effectiveSource = resolveImage ? (resolvedUrlCache.get(source) ?? source) : source;
+  const effectiveSource = resolveImage
+    ? (resolvedUrlCache.get(source) ?? source)
+    : source;
 
   // If we have a resolver and haven't resolved yet
   if (resolveImage && !resolvedUrlCache.has(source)) {

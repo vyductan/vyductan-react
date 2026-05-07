@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
 import {

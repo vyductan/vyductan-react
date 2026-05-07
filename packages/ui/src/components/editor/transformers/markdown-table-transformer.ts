@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-null -- Lexical APIs and serialized editor fixtures intentionally use null semantics. */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
@@ -141,7 +140,9 @@ export const TABLE: ElementTransformer = {
       table.append(tableRow);
 
       for (let index = 0; index < maxCells; index++) {
-        tableRow.append(index < cells.length ? cells[index]! : $createTableCell(""));
+        tableRow.append(
+          index < cells.length ? cells[index]! : $createTableCell(""),
+        );
       }
     }
 
