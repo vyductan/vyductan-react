@@ -20,7 +20,7 @@ const familyColors = [
 
 const hexColors = ["#f50", "#2db7f5", "#87d068", "#108ee9"] as const;
 
-const variants = ["filled", "solid", "outlined"] as const;
+type TagVariant = "filled" | "solid" | "outlined";
 
 const colorfulGroups = [
   {
@@ -55,7 +55,7 @@ const colorfulGroups = [
   },
 ] as const satisfies ReadonlyArray<{
   title: string;
-  variant: (typeof variants)[number];
+  variant: TagVariant;
   colors: readonly string[];
 }>;
 
