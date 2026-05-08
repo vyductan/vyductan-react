@@ -53,17 +53,17 @@ export class Color {
 
   constructor(color: ColorGenInput) {
     // Parse color input
-    let colorObj: PlainColorObject;
+    let colorObject: PlainColorObject;
 
     if (Array.isArray(color)) {
       // Handle array input - create a default black color
-      colorObj = {
+      colorObject = {
         space: "srgb",
         coords: [0, 0, 0],
         alpha: 1,
       } as unknown as PlainColorObject;
     } else if (typeof color === "number") {
-      colorObj = parse(color.toString()) as unknown as PlainColorObject;
+      colorObject = parse(color.toString()) as unknown as PlainColorObject;
     } else if (typeof color === "object") {
       // Handle RGB/RGBA objects
       if ("r" in color && "g" in color && "b" in color) {
@@ -79,7 +79,7 @@ export class Color {
               ? Number.parseFloat(color.a)
               : color.a
             : undefined;
-        colorObj = {
+        colorObject = {
           space: "srgb",
           coords: [r, g, b],
           alpha: a,
@@ -99,32 +99,32 @@ export class Color {
               ? Number.parseFloat(color.a)
               : color.a
             : undefined;
-        colorObj = {
+        colorObject = {
           space: "hsl",
           coords: [h, s, b],
           alpha: a,
         } as unknown as PlainColorObject;
       }
     } else {
-      colorObj = parse(color) as unknown as PlainColorObject;
+      colorObject = parse(color) as unknown as PlainColorObject;
     }
 
-    this.colorObject = colorObj;
+    this.colorObject = colorObject;
 
     // Convert to sRGB to get RGB values
-    const rgb = to(colorObj, "srgb");
+    const rgb = to(colorObject, "srgb");
     this.r = rgb.coords[0] ?? 0;
     this.g = rgb.coords[1] ?? 0;
     this.b = rgb.coords[2] ?? 0;
 
     // Convert to HSL to get HSL values
-    const hsl = to(colorObj, "hsl");
+    const hsl = to(colorObject, "hsl");
     this.h = hsl.coords[0] ?? 0;
     this.s = hsl.coords[1] ?? 0;
     this.l = hsl.coords[2] ?? 0;
 
-    this.a = colorObj.alpha ?? 1;
-    this.a = colorObj.alpha ?? 1;
+    this.a = colorObject.alpha ?? 1;
+    this.a = colorObject.alpha ?? 1;
   }
 
   clone(): Color {
@@ -198,12 +198,12 @@ export class Color {
   }
 
   static fromOKLCH(oklch: OKLCHColor): Color {
-    const colorObj: PlainColorObject = {
+    const colorObject: PlainColorObject = {
       space: "oklch",
       coords: [oklch.l, oklch.c, oklch.h],
       alpha: oklch.alpha,
     } as unknown as PlainColorObject;
-    return new Color(serialize(colorObj));
+    return new Color(serialize(colorObject));
   }
 }
 
@@ -297,10 +297,10 @@ export class AggregationColor {
 
     // CSS line-gradient
     if (colors) {
-      const colorsStr = colors
+      const colorsString = colors
         .map((c) => `${c.color.toRgbString()} ${c.percent}%`)
         .join(", ");
-      return `linear-gradient(90deg, ${colorsStr})`;
+      return `linear-gradient(90deg, ${colorsString})`;
     }
 
     return this.metaColor.toRgbString();
@@ -319,8 +319,8 @@ export class AggregationColor {
       !!this.colors &&
       !!color.colors &&
       this.colors.length === color.colors.length &&
-      this.colors.every((c, i) => {
-        const target = color.colors?.[i];
+      this.colors.every((c, index) => {
+        const target = color.colors?.[index];
         return c.percent === target?.percent && c.color.equals(target.color);
       })
     );

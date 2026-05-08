@@ -1,34 +1,36 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HexAlphaColorPicker } from "react-colorful";
 
-import type { ColorPickerPanelProps } from "./types";
+import type { ColorPickerPanelProps as ColorPickerPanelProperties } from "./types";
 import { cn } from "../../lib/utils";
 import { Button } from "../button";
 import { Input } from "../input";
 import { AggregationColor } from "./color";
 
-export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
+export const ColorPickerPanel: React.FC<ColorPickerPanelProperties> = ({
   hexValue,
   onChange,
   onClear,
   presets = [],
   className,
-  ...props
+  ...properties
 }) => {
-  const [inputValue, setInputValue] = useState(hexValue);
-  useEffect(() => {
-    setInputValue(hexValue);
-  }, [hexValue]);
+  const [inputState, setInputState] = useState({
+    sourceValue: hexValue,
+    value: hexValue ?? "",
+  });
+  const inputValue =
+    inputState.sourceValue === hexValue ? inputState.value : (hexValue ?? "");
 
   const handlePickerChange = (nextColor: string) => {
     onChange?.(nextColor);
   };
 
   const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
+    setInputState({ sourceValue: hexValue, value: newValue });
     try {
       new AggregationColor(newValue);
       onChange?.(newValue);
@@ -63,7 +65,7 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProps> = ({
   };
 
   return (
-    <div className={cn("space-y-4 p-4", className)} {...props}>
+    <div className={cn("space-y-4 p-4", className)} {...properties}>
       {/* Color Display */}
       <div className="flex items-center space-x-3">
         <div

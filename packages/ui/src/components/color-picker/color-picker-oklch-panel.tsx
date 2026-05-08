@@ -1,34 +1,35 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { OKLCHColor } from "./color";
-import type { ColorPickerOKLCHPanelProps } from "./types";
+import type { ColorPickerOKLCHPanelProps as ColorPickerOKLCHPanelProperties } from "./types";
 import { cn } from "../../lib/utils";
 import { Button } from "../button";
 import { Input } from "../input";
 import { AggregationColor } from "./color";
 import { OKLCHSlider } from "./oklch-slider";
 
-export const ColorPickerOKLCHPanel: React.FC<ColorPickerOKLCHPanelProps> = ({
+export const ColorPickerOKLCHPanel: React.FC<
+  ColorPickerOKLCHPanelProperties
+> = ({
   oklchValue = { l: 0.5, c: 0.1, h: 180, alpha: 1 },
   onChange,
   onClear,
   presets = [],
   showAlpha = false,
   className,
-  ...props
+  ...properties
 }) => {
-  const [inputValue, setInputValue] = useState("");
-
-  // Convert OKLCH to hex for display
   const currentColor = AggregationColor.fromOKLCH(oklchValue);
   const hexValue = currentColor.toHexString();
-
-  useEffect(() => {
-    setInputValue(hexValue);
-  }, [hexValue]);
+  const [inputState, setInputState] = useState({
+    sourceValue: hexValue,
+    value: hexValue,
+  });
+  const inputValue =
+    inputState.sourceValue === hexValue ? inputState.value : hexValue;
 
   const handleSliderChange = (channel: keyof OKLCHColor, value: number) => {
     const newOklch = { ...oklchValue, [channel]: value };
@@ -36,7 +37,7 @@ export const ColorPickerOKLCHPanel: React.FC<ColorPickerOKLCHPanelProps> = ({
   };
 
   const handleInputChange = (newValue: string) => {
-    setInputValue(newValue);
+    setInputState({ sourceValue: hexValue, value: newValue });
     try {
       const color = new AggregationColor(newValue);
       const oklch = color.toOKLCH();
@@ -52,8 +53,7 @@ export const ColorPickerOKLCHPanel: React.FC<ColorPickerOKLCHPanelProps> = ({
       const oklch = color.toOKLCH();
       onChange?.(oklch);
     } catch {
-      // Invalid color, revert to current hex value
-      setInputValue(hexValue);
+      setInputState({ sourceValue: hexValue, value: hexValue });
     }
   };
 
@@ -72,7 +72,7 @@ export const ColorPickerOKLCHPanel: React.FC<ColorPickerOKLCHPanelProps> = ({
   };
 
   return (
-    <div className={cn("space-y-4 p-4", className)} {...props}>
+    <div className={cn("space-y-4 p-4", className)} {...properties}>
       {/* Color Display */}
       <div className="flex items-center space-x-3">
         <div

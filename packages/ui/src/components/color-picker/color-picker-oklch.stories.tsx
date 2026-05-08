@@ -21,7 +21,6 @@ const meta = {
       description: "Preset colors",
     },
   },
-  tags: ["autodocs"],
 } satisfies Meta<typeof ColorPickerOKLCHPanel>;
 
 export default meta;
@@ -93,7 +92,7 @@ export const WithClear: Story = {
 
 // Interactive story demonstrating color updates
 export const Interactive: Story = {
-  render: (args) => {
+  render: (arguments_) => {
     const [color, setColor] = useState<OKLCHColor>({
       l: 0.6,
       c: 0.15,
@@ -114,14 +113,14 @@ export const Interactive: Story = {
           <div className="text-muted-foreground font-mono">
             H: {Math.round(color.h)}°
           </div>
-          {args.showAlpha && (
+          {arguments_.showAlpha && (
             <div className="text-muted-foreground font-mono">
               Alpha: {Math.round((color.alpha ?? 1) * 100)}%
             </div>
           )}
         </div>
         <ColorPickerOKLCHPanel
-          {...args}
+          {...arguments_}
           oklchValue={color}
           onChange={setColor}
         />

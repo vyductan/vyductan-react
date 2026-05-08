@@ -3,13 +3,13 @@
 import type * as React from "react";
 import { useControlledState } from "@rc-component/util";
 
-import type { ColorPickerProps } from "./types";
+import type { ColorPickerProps as ColorPickerProperties } from "./types";
 import { Button } from "../button";
 import { Popover } from "../popover";
 import { AggregationColor } from "./color";
 import { ColorPickerPanel } from "./color-picker-panel";
 
-export const ColorPicker: React.FC<ColorPickerProps> = ({
+export const ColorPicker: React.FC<ColorPickerProperties> = ({
   value,
   defaultValue,
   onChange,
@@ -24,7 +24,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   trigger = "click",
   placement = "bottomLeft",
   children,
-  ...props
+  ...properties
 }) => {
   const [internalValue, setInternalValue] = useControlledState(
     defaultValue,
@@ -63,7 +63,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
         disabled={disabled}
         data-slot="color-picker-trigger"
         shape="icon"
-        {...props}
+        {...properties}
       >
         <div
           data-slot="color-picker-color-block"

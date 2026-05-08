@@ -20,7 +20,7 @@ ColorSpace.register(sRGB_Linear);
 ColorSpace.register(sRGB);
 ColorSpace.register(OKLCH);
 
-interface OKLCHSliderProps {
+interface OKLCHSliderProperties {
   /**
    * Current OKLCH values
    */
@@ -45,7 +45,7 @@ interface OKLCHSliderProps {
   className?: string;
 }
 
-export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
+export const OKLCHSlider: React.FC<OKLCHSliderProperties> = ({
   l,
   c,
   h,
@@ -114,13 +114,13 @@ export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
     const steps = 10;
     const colors: string[] = [];
 
-    for (let i = 0; i <= steps; i++) {
+    for (let index = 0; index <= steps; index++) {
       let stepValue: number;
       let oklchColor: PlainColorObject;
 
       switch (channel) {
         case "l": {
-          stepValue = (i / steps) * config.max;
+          stepValue = (index / steps) * config.max;
           oklchColor = {
             space: "oklch",
             coords: [stepValue, c, h],
@@ -129,7 +129,7 @@ export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
           break;
         }
         case "c": {
-          stepValue = (i / steps) * config.max;
+          stepValue = (index / steps) * config.max;
           oklchColor = {
             space: "oklch",
             coords: [l, stepValue, h],
@@ -138,7 +138,7 @@ export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
           break;
         }
         case "h": {
-          stepValue = (i / steps) * config.max;
+          stepValue = (index / steps) * config.max;
           oklchColor = {
             space: "oklch",
             coords: [l, c, stepValue],
@@ -147,7 +147,7 @@ export const OKLCHSlider: React.FC<OKLCHSliderProps> = ({
           break;
         }
         case "alpha": {
-          stepValue = i / steps;
+          stepValue = index / steps;
           oklchColor = {
             space: "oklch",
             coords: [l, c, h],
