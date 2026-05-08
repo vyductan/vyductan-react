@@ -5,14 +5,14 @@ import { useState } from "react";
 import { TimePicker } from "../";
 
 const App: React.FC = () => {
-  const [value, setValue] = useState<Dayjs | null | undefined>(null);
+  const [value, setValue] = useState<Dayjs | null | undefined>();
 
   return (
     <TimePicker
       value={value}
-      onChange={(val) => {
-        console.log("onChange", val);
-        setValue(val);
+      onChange={(value_) => {
+        console.log("onChange", value_);
+        setValue(value_);
       }}
     />
   );

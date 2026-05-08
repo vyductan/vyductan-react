@@ -6,7 +6,7 @@ import { cn } from "@acme/ui/lib/utils";
 import type { DateType } from "../time-picker";
 import { Button } from "../../button";
 
-type TimeSelectProps = {
+type TimeSelectProperties = {
   value?: DateType;
   onChange?: (value: DateType) => void;
   onHoverChange?: (value?: DateType) => void;
@@ -22,7 +22,7 @@ export const TimeSelect = ({
   onHoverChange,
   onOk,
   onNow,
-}: TimeSelectProps) => {
+}: TimeSelectProperties) => {
   const hourType = format.split(":")[0];
   const baseHourOptions = Array.from(
     { length: hourType === "HH" ? 24 : 12 },
@@ -50,9 +50,9 @@ export const TimeSelect = ({
   ];
 
   // Refs for scrollable containers
-  const hourListRef = React.useRef<HTMLUListElement>(null);
-  const minuteListRef = React.useRef<HTMLUListElement>(null);
-  const secondListRef = React.useRef<HTMLUListElement>(null);
+  const hourListReference = React.useRef<HTMLUListElement>(null);
+  const minuteListReference = React.useRef<HTMLUListElement>(null);
+  const secondListReference = React.useRef<HTMLUListElement>(null);
 
   // Item height for scroll calculations (py-1 = 4px top + 4px bottom + ~20px text ≈ 28px)
   const ITEM_HEIGHT = 28;
@@ -87,11 +87,11 @@ export const TimeSelect = ({
 
       // If no value, scroll to start of middle set to show 00 at top
       if (!value) {
-        if (hourListRef.current) {
+        if (hourListReference.current) {
           const targetIndex = hourLength; // Start of middle set
-          const hourElement = hourListRef.current.children[targetIndex] as
-            | HTMLElement
-            | undefined;
+          const hourElement = hourListReference.current.children[
+            targetIndex
+          ] as HTMLElement | undefined;
           if (hourElement) {
             hourElement.scrollIntoView({
               behavior: "auto",
@@ -100,11 +100,11 @@ export const TimeSelect = ({
           }
         }
 
-        if (minuteListRef.current) {
+        if (minuteListReference.current) {
           const targetIndex = minuteLength;
-          const minuteElement = minuteListRef.current.children[targetIndex] as
-            | HTMLElement
-            | undefined;
+          const minuteElement = minuteListReference.current.children[
+            targetIndex
+          ] as HTMLElement | undefined;
           if (minuteElement) {
             minuteElement.scrollIntoView({
               behavior: "auto",
@@ -113,11 +113,11 @@ export const TimeSelect = ({
           }
         }
 
-        if (showSeconds && secondListRef.current) {
+        if (showSeconds && secondListReference.current) {
           const targetIndex = secondLength;
-          const secondElement = secondListRef.current.children[targetIndex] as
-            | HTMLElement
-            | undefined;
+          const secondElement = secondListReference.current.children[
+            targetIndex
+          ] as HTMLElement | undefined;
           if (secondElement) {
             secondElement.scrollIntoView({
               behavior: "auto",
@@ -133,9 +133,9 @@ export const TimeSelect = ({
       const selectedMinute = value.minute();
 
       // Scroll to middle set (offset by one full set) for infinite scroll effect
-      if (hourListRef.current) {
+      if (hourListReference.current) {
         const targetIndex = hourLength + selectedHour;
-        const hourElement = hourListRef.current.children[targetIndex] as
+        const hourElement = hourListReference.current.children[targetIndex] as
           | HTMLElement
           | undefined;
         if (hourElement) {
@@ -146,11 +146,11 @@ export const TimeSelect = ({
         }
       }
 
-      if (minuteListRef.current) {
+      if (minuteListReference.current) {
         const targetIndex = minuteLength + selectedMinute;
-        const minuteElement = minuteListRef.current.children[targetIndex] as
-          | HTMLElement
-          | undefined;
+        const minuteElement = minuteListReference.current.children[
+          targetIndex
+        ] as HTMLElement | undefined;
         if (minuteElement) {
           minuteElement.scrollIntoView({
             behavior: "auto", // instant scroll, no animation
@@ -160,12 +160,12 @@ export const TimeSelect = ({
       }
 
       // Scroll second list to selected second if seconds are shown
-      if (showSeconds && secondListRef.current) {
+      if (showSeconds && secondListReference.current) {
         const selectedSecond = value.second();
         const targetIndex = secondLength + selectedSecond;
-        const secondElement = secondListRef.current.children[targetIndex] as
-          | HTMLElement
-          | undefined;
+        const secondElement = secondListReference.current.children[
+          targetIndex
+        ] as HTMLElement | undefined;
         if (secondElement) {
           secondElement.scrollIntoView({
             behavior: "auto", // instant scroll, no animation
@@ -196,7 +196,7 @@ export const TimeSelect = ({
         onMouseLeave={() => onHoverChange?.()}
       >
         <ul
-          ref={hourListRef}
+          ref={hourListReference}
           className="flex w-14 flex-1 flex-col gap-0.5 overflow-y-auto py-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onScroll={(e) => handleInfiniteScroll(e, baseHourOptions.length)}
         >
@@ -252,7 +252,7 @@ export const TimeSelect = ({
           {/* </ScrollArea> */}
         </ul>
         <ul
-          ref={minuteListRef}
+          ref={minuteListReference}
           className="flex w-14 flex-col gap-0.5 overflow-y-auto border-l py-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onScroll={(e) => handleInfiniteScroll(e, baseMinuteOptions.length)}
         >
@@ -307,7 +307,7 @@ export const TimeSelect = ({
         </ul>
         {showSeconds && (
           <ul
-            ref={secondListRef}
+            ref={secondListReference}
             className="flex w-14 flex-col gap-0.5 overflow-y-auto border-l py-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             onScroll={(e) => handleInfiniteScroll(e, baseSecondOptions.length)}
           >
@@ -379,4 +379,4 @@ export const TimeSelect = ({
   );
 };
 
-export type { TimeSelectProps };
+export type { TimeSelectProperties as TimeSelectProps };

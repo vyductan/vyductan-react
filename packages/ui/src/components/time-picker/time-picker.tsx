@@ -1,12 +1,16 @@
 import type { Dayjs } from "dayjs";
 import React from "react";
+import { useMergedState } from "@rc-component/util";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { PickerRef } from "../date-picker/types";
-import type { InputProps, InputRef } from "../input";
+import type { PickerRef as PickerReference } from "../date-picker/types";
+import type {
+  InputProps as InputProperties,
+  InputRef as InputReference,
+} from "../input";
 import { Icon } from "../../icons";
 import { Input } from "../input";
 import { Popover } from "../popover";
@@ -16,28 +20,29 @@ dayjs.extend(customParseFormat);
 
 export type DateType = Dayjs | null | undefined;
 
-type TimePickerProps<TValue extends Dayjs | string | null | undefined = Dayjs> =
-  Omit<React.ComponentProps<"div">, "onBlur" | "onChange" | "defaultValue"> &
-    Pick<
-      InputProps,
-      "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
-    > & {
-      ref?: React.Ref<PickerRef>;
-      id?: string;
-      open?: boolean;
-      onOpenChange?: (open: boolean) => void;
-      format?: string;
-      showNow?: boolean;
-      defaultValue?: TValue;
-      value?: TValue;
-      onChange?: (time: TValue, timeString: string | undefined) => void;
-    };
+type TimePickerProperties<
+  TValue extends Dayjs | string | null | undefined = Dayjs,
+> = Omit<React.ComponentProps<"div">, "onBlur" | "onChange" | "defaultValue"> &
+  Pick<
+    InputProperties,
+    "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"
+  > & {
+    ref?: React.Ref<PickerReference>;
+    id?: string;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    format?: string;
+    showNow?: boolean;
+    defaultValue?: TValue;
+    value?: TValue;
+    onChange?: (time: TValue, timeString: string | undefined) => void;
+  };
 const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
-  props: TimePickerProps<TValue>,
+  properties: TimePickerProperties<TValue>,
 ) => {
   const {
     id: inputId,
-    open: openProp,
+    open: openProperty,
     onOpenChange,
     className,
 
@@ -59,81 +64,72 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     "aria-describedby": ariaDescribedBy,
 
     // trigger props
-    ...restProps
-  } = props;
-  const isControlled = Object.prototype.hasOwnProperty.call(props, "value");
+    ...restProperties
+  } = properties;
+  const [open, setOpen] = useMergedState(false, {
+    value: openProperty,
+    onChange: onOpenChange,
+  });
 
-  const [open, setOpen] = React.useState(openProp ?? false);
-
-  // Sync controlled open prop
-  React.useEffect(() => {
-    if (openProp !== undefined) {
-      setOpen(openProp);
-    }
-  }, [openProp]);
-
-  // Handle open change
   const handleOpenChange = React.useCallback(
     (newOpen: boolean) => {
       setOpen(newOpen);
-      onOpenChange?.(newOpen);
     },
-    [onOpenChange],
+    [setOpen],
   );
 
   // ====================== Value =======================
-  const [localValue, setLocalValue] = React.useState<TValue>(
-    (value ?? defaultValue) as TValue,
+  const [localValue, setLocalValue] = useMergedState<TValue>(
+    defaultValue as TValue,
+    {
+      value: value as TValue,
+      onChange: (newValue) => {
+        onChange?.(newValue, formatDateValue(newValue, format));
+      },
+    },
   );
 
-  // Sync controlled value prop
-  React.useEffect(() => {
-    if (isControlled) {
-      setLocalValue(value as TValue);
-    }
-  }, [isControlled, value]);
-
-  // Track input display value separately from parsed value
-  const [inputValue, setInputValue] = React.useState(() =>
-    formatDateValue(localValue, format),
-  );
+  const [inputDraft, setInputDraft] = React.useState<{
+    format: string;
+    text: string;
+    value: TValue;
+  }>();
   const [isInputFocused, setIsInputFocused] = React.useState(false);
-
-  // Hover preview state for showing preview in input
   const [hoverPreview, setHoverPreview] = React.useState<DateType>(null);
 
-  // Update input value when localValue changes externally
-  React.useEffect(() => {
-    if (typeof localValue === "string") {
-      setInputValue(localValue);
-    } else {
-      setInputValue(formatDateValue(localValue, format));
-    }
-  }, [localValue, format]);
+  const committedInputValue =
+    typeof localValue === "string"
+      ? localValue
+      : formatDateValue(localValue, format);
+  const inputValue =
+    inputDraft?.format === format && Object.is(inputDraft.value, localValue)
+      ? inputDraft.text
+      : committedInputValue;
 
   const handleChange = React.useCallback(
     (newValue: DateType) => {
+      setInputDraft(undefined);
       setLocalValue(newValue as TValue);
-      onChange?.(newValue as TValue, formatDateValue(newValue, format));
     },
-    [format, onChange],
+    [setLocalValue],
   );
 
   // ========================= Refs =========================
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const inputRef = React.useRef<InputRef>(null);
+  const rootReference = React.useRef<HTMLDivElement>(null);
+  const inputReference = React.useRef<InputReference>(null);
   React.useImperativeHandle(ref, () => ({
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    nativeElement: rootRef.current!,
+    nativeElement: rootReference.current!,
     focus: (options) => {
-      inputRef.current?.focus(options);
+      inputReference.current?.focus(options);
     },
     blur: () => {
-      inputRef.current?.blur();
+      inputReference.current?.blur();
     },
-    select: () => inputRef.current?.select(),
-    setCustomValidity: (msg) => inputRef.current?.setCustomValidity(msg),
-    reportValidity: () => inputRef.current?.reportValidity(),
+    select: () => inputReference.current?.select(),
+    setCustomValidity: (message) =>
+      inputReference.current?.setCustomValidity(message),
+    reportValidity: () => inputReference.current?.reportValidity(),
   }));
 
   // const inputRef = React.useRef<HTMLInputElement>(null);
@@ -143,7 +139,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 
     // Typing should override hover preview text.
     setHoverPreview(null);
-    setInputValue(rawValue);
+    setInputDraft({ format, text: rawValue, value: localValue });
 
     if (!rawValue) {
       handleChange(null);
@@ -223,17 +219,17 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
         content={timeSelectContent}
       >
         <div
-          ref={rootRef}
+          ref={rootReference}
           onClick={(e) => {
             e.stopPropagation();
             if (!open) handleOpenChange(true);
           }}
-          {...restProps}
+          {...restProperties}
           data-slot="time-picker"
           className={cn("inline-flex", "w-[120px]", className)}
         >
           <Input
-            ref={inputRef}
+            ref={inputReference}
             type="text"
             id={inputId}
             name={name}
@@ -298,7 +294,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
 };
 
 export { TimePicker };
-export type { TimePickerProps };
+export type { TimePickerProperties as TimePickerProps };
 
 const parseDateValue = (
   value: Dayjs | string | null | undefined,
