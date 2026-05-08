@@ -22,7 +22,7 @@ export const responsiveArray: Breakpoint[] = [
   "sm",
   "xs",
 ];
-type SubscribeFunc = (screens: ScreenMap) => void;
+type SubscribeFunction = (screens: ScreenMap) => void;
 
 const responsiveMap: BreakpointMap = {
   xs: "(max-width: 575px)",
@@ -50,7 +50,7 @@ export const matchScreen = (
 interface ResponsiveObserverType {
   responsiveMap: BreakpointMap;
   dispatch: (map: ScreenMap) => boolean;
-  subscribe: (func: SubscribeFunc) => number;
+  subscribe: (function_: SubscribeFunction) => number;
   unsubscribe: (token: number) => void;
   register: () => void;
   unregister: () => void;
@@ -58,36 +58,40 @@ interface ResponsiveObserverType {
     PropertyKey,
     {
       mql: MediaQueryList;
-      listener: (this: MediaQueryList, ev: MediaQueryListEvent) => void;
+      listener: (this: MediaQueryList, event: MediaQueryListEvent) => void;
     }
   >;
 }
 
 const useResponsiveObserver = () => {
+  const subscribersReference = React.useRef(
+    new Map<number, SubscribeFunction>(),
+  );
+  const subUidReference = React.useRef(-1);
+  const screensReference = React.useRef<ScreenMap>({});
+
   // To avoid repeat create instance, we add `useMemo` here.
   return React.useMemo<ResponsiveObserverType>(() => {
-    const subscribers = new Map<number, SubscribeFunc>();
-    let subUid = -1;
-    let screens: Partial<Record<Breakpoint, boolean>> = {};
+    const subscribers = subscribersReference.current;
     return {
       responsiveMap,
       matchHandlers: {},
       dispatch(pointMap: ScreenMap) {
-        screens = pointMap;
-        subscribers.forEach((func) => func(screens));
+        screensReference.current = pointMap;
+        subscribers.forEach((function_) => function_(screensReference.current));
         return subscribers.size > 0;
       },
-      subscribe(func: SubscribeFunc): number {
+      subscribe(function_: SubscribeFunction): number {
         if (subscribers.size === 0) {
           this.register();
         }
-        subUid += 1;
-        subscribers.set(subUid, func);
-        func(screens);
-        return subUid;
+        subUidReference.current += 1;
+        subscribers.set(subUidReference.current, function_);
+        function_(screensReference.current);
+        return subUidReference.current;
       },
-      unsubscribe(paramToken: number) {
-        subscribers.delete(paramToken);
+      unsubscribe(parameterToken: number) {
+        subscribers.delete(parameterToken);
         if (subscribers.size === 0) {
           this.unregister();
         }
@@ -95,7 +99,7 @@ const useResponsiveObserver = () => {
       register() {
         for (const [screen, mediaQuery] of Object.entries(responsiveMap)) {
           const listener = ({ matches }: { matches: boolean }) => {
-            this.dispatch({ ...screens, [screen]: matches });
+            this.dispatch({ ...screensReference.current, [screen]: matches });
           };
           const mql = globalThis.matchMedia(mediaQuery);
           addMediaQueryListener(mql, listener);

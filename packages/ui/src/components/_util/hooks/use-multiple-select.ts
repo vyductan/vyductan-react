@@ -2,27 +2,28 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { useCallback, useState } from "react";
 
-export type PrevSelectedIndex = null | number;
+export type PrevSelectedIndex = number | undefined;
 
 /**
  * @title multipleSelect hooks
  * @description multipleSelect by hold down shift key
  */
 export default function useMultipleSelect<T, K>(getKey: (item: T) => K) {
-  const [prevSelectedIndex, setPrevSelectedIndex] =
-    useState<PrevSelectedIndex>(null);
+  const [previousSelectedIndex, setPreviousSelectedIndex] =
+    useState<PrevSelectedIndex>();
 
   const multipleSelect = useCallback(
     (currentSelectedIndex: number, data: T[], selectedKeys: Set<K>) => {
-      const configPrevSelectedIndex = prevSelectedIndex ?? currentSelectedIndex;
+      const configPreviousSelectedIndex =
+        previousSelectedIndex ?? currentSelectedIndex;
 
       // add/delete the selected range
       const startIndex = Math.min(
-        configPrevSelectedIndex || 0,
+        configPreviousSelectedIndex || 0,
         currentSelectedIndex,
       );
       const endIndex = Math.max(
-        configPrevSelectedIndex || 0,
+        configPreviousSelectedIndex || 0,
         currentSelectedIndex,
       );
       const rangeKeys = data
@@ -45,16 +46,16 @@ export default function useMultipleSelect<T, K>(getKey: (item: T) => K) {
         }
       });
 
-      setPrevSelectedIndex(shouldSelected ? endIndex : null);
+      setPreviousSelectedIndex(shouldSelected ? endIndex : undefined);
 
       return changedKeys;
     },
-    [prevSelectedIndex],
+    [previousSelectedIndex],
   );
 
-  const updatePrevSelectedIndex = (val: PrevSelectedIndex) => {
-    setPrevSelectedIndex(val);
+  const updatePreviousSelectedIndex = (value: PrevSelectedIndex) => {
+    setPreviousSelectedIndex(value);
   };
 
-  return [multipleSelect, updatePrevSelectedIndex] as const;
+  return [multipleSelect, updatePreviousSelectedIndex] as const;
 }

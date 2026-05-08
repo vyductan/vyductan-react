@@ -7,10 +7,10 @@ import rcWarning, { resetWarned as rcResetWarned } from "rc-util/es/warning";
 
 export function noop() {}
 
-let deprecatedWarnList: Record<string, string[]> | null = null;
+let deprecatedWarnList: Record<string, string[]> | undefined;
 
 export function resetWarned() {
-  deprecatedWarnList = null;
+  deprecatedWarnList = undefined;
   rcResetWarned();
 }
 
@@ -43,8 +43,8 @@ type BaseTypeWarning = (
 type TypeWarning = BaseTypeWarning & {
   deprecated: (
     valid: boolean,
-    oldProp: string,
-    newProp: string,
+    oldProperty: string,
+    newProperty: string,
     message?: string,
   ) => void;
 };
@@ -97,11 +97,11 @@ export const devUseWarning: (component: string) => TypeWarning =
           }
         };
 
-        typeWarning.deprecated = (valid, oldProp, newProp, message) => {
+        typeWarning.deprecated = (valid, oldProperty, newProperty, message) => {
           typeWarning(
             valid,
             "deprecated",
-            `\`${oldProp}\` is deprecated. Please use \`${newProp}\` instead.${
+            `\`${oldProperty}\` is deprecated. Please use \`${newProperty}\` instead.${
               message ? ` ${message}` : ""
             }`,
           );

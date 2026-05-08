@@ -2,8 +2,8 @@
 
 /* eslint-disable unicorn/prefer-global-this */
 
-export function isWindow(obj: any): obj is Window {
-  return obj !== null && obj !== undefined && obj === obj.window;
+export function isWindow(object: any): object is Window {
+  return object !== null && object !== undefined && object === object.window;
 }
 
 const getScroll = (target: HTMLElement | Window | Document | null): number => {

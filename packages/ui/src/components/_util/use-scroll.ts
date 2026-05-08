@@ -20,7 +20,7 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
   const scrollTop = getScroll(container);
   const startTime = Date.now();
 
-  const frameFunc = () => {
+  const frameFunction = () => {
     const timestamp = Date.now();
     const time = timestamp - startTime;
     const nextScrollTop = easeInOutCubic(
@@ -40,10 +40,10 @@ export default function scrollTo(y: number, options: ScrollToOptions = {}) {
       (container as HTMLElement).scrollTop = nextScrollTop;
     }
     if (time < duration) {
-      raf(frameFunc);
+      raf(frameFunction);
     } else if (typeof callback === "function") {
       callback();
     }
   };
-  raf(frameFunc);
+  raf(frameFunction);
 }

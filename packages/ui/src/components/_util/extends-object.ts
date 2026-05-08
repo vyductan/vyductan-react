@@ -2,21 +2,21 @@
 
 /* eslint-disable unicorn/no-array-for-each */
 // copied https://github.com/ant-design/ant-design-mobile/blob/d3b3bae/src/utils/with-default-props.tsx
-function mergeProps<A, B>(a: A, b: B): B & A;
-function mergeProps<A, B, C>(a: A, b: B, c: C): C & B & A;
-function mergeProps<A, B, C, D>(a: A, b: B, c: C, d: D): D & C & B & A;
-function mergeProps(...items: any[]) {
-  const ret: any = {};
+function mergeProperties<A, B>(a: A, b: B): B & A;
+function mergeProperties<A, B, C>(a: A, b: B, c: C): C & B & A;
+function mergeProperties<A, B, C, D>(a: A, b: B, c: C, d: D): D & C & B & A;
+function mergeProperties(...items: any[]) {
+  const returnValue: any = {};
   items.forEach((item) => {
     if (item) {
       Object.keys(item).forEach((key) => {
         if (item[key] !== undefined) {
-          ret[key] = item[key];
+          returnValue[key] = item[key];
         }
       });
     }
   });
-  return ret;
+  return returnValue;
 }
 
-export default mergeProps;
+export default mergeProperties;
