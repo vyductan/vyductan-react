@@ -3,6 +3,8 @@
 import * as React from "react";
 import useControlledState from "@rc-component/util/es/hooks/useControlledState";
 
+import { Combobox as BaseCombobox } from "@base-ui/react";
+import { cn } from "@acme/ui/lib/utils";
 import {
   ComboboxChip,
   ComboboxChips,
@@ -11,12 +13,19 @@ import {
   ComboboxContent,
   ComboboxEmpty,
   ComboboxGroup,
-  ComboboxInput,
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxTrigger,
   useComboboxAnchor,
 } from "@acme/ui/shadcn/combobox";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@acme/ui/shadcn/input-group";
+
 
 import type { AnyObject } from "../_util/type";
 import type {
@@ -157,6 +166,41 @@ const optionMatchesQuery = <
   );
 };
 
+function ComboboxInput({
+  className,
+  children,
+  disabled = false,
+  showTrigger = true,
+  ...props
+}: React.ComponentProps<typeof BaseCombobox.Input> & {
+  showTrigger?: boolean;
+}) {
+  return (
+    <InputGroup className={cn("w-auto h-8", className)}>
+      <BaseCombobox.Input
+        render={<InputGroupInput className="h-8 text-sm" disabled={disabled} />}
+        {...props}
+      />
+      <InputGroupAddon align="inline-end">
+        {showTrigger && (
+          <InputGroupButton
+            size="icon-xs"
+            variant="ghost"
+            asChild
+            data-slot="input-group-button"
+            className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
+            disabled={disabled}
+          >
+            <ComboboxTrigger />
+          </InputGroupButton>
+        )}
+      </InputGroupAddon>
+      {children}
+    </InputGroup>
+  );
+}
+
+
 function Combobox<
   TValue extends SelectValueType = SelectValueType,
   TRecord extends AnyObject = AnyObject,
@@ -273,26 +317,18 @@ function Combobox<
 
     return flatOptions.find((item) => item.value === internalValue);
   }, [flatOptions, internalValue, isMultiple]);
+  const selectedSingleInputValue = React.useMemo(() => {
+    if (isMultiple || internalValue === undefined || Array.isArray(internalValue)) {
+      return "";
+    }
+
+    return selectedSingleOption
+      ? String(getOptionLabel(selectedSingleOption))
+      : String(internalValue);
+  }, [internalValue, isMultiple, selectedSingleOption]);
   const showClearIcon = isMultiple
     ? selectedValues.length > 0
     : internalValue !== undefined;
-
-  React.useEffect(() => {
-    if (isMultiple) {
-      return;
-    }
-
-    if (internalValue === undefined || Array.isArray(internalValue)) {
-      setInputValue("");
-      return;
-    }
-
-    setInputValue(
-      selectedSingleOption
-        ? String(getOptionLabel(selectedSingleOption))
-        : String(internalValue),
-    );
-  }, [internalValue, isMultiple, selectedSingleOption]);
 
   const clearValue = React.useCallback(() => {
     if (isMultiple) {
@@ -315,6 +351,7 @@ function Combobox<
         | ((value?: TValue, option?: OptionType<TValue, TRecord>) => void)
         | undefined
     )?.(clearedValue, clearedOption);
+    setInputValue("");
     setOpen(false);
   }, [isMultiple, onChange, setInternalValue]);
 
@@ -356,6 +393,18 @@ function Combobox<
   const items = React.useMemo(() => {
     return groupedOptions;
   }, [groupedOptions]);
+  const primitiveInputValue = !isMultiple && !open ? selectedSingleInputValue : inputValue;
+
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!isMultiple && nextOpen) {
+        setInputValue(selectedSingleInputValue);
+      }
+
+      setOpen(nextOpen);
+    },
+    [isMultiple, selectedSingleInputValue],
+  );
 
   const handleInputValueChange = React.useCallback(
     (nextInputValue: string, details?: { reason?: string }) => {
@@ -460,7 +509,7 @@ function Combobox<
         multiple
         items={items}
         open={open}
-        onOpenChange={setOpen}
+        onOpenChange={handleOpenChange}
         inputValue={inputValue}
         onInputValueChange={handleInputValueChange}
         value={selectedOptions}
@@ -518,8 +567,8 @@ function Combobox<
     <ComboboxPrimitive
       items={items}
       open={open}
-      onOpenChange={setOpen}
-      inputValue={inputValue}
+      onOpenChange={handleOpenChange}
+      inputValue={primitiveInputValue}
       onInputValueChange={handleInputValueChange}
       value={selectedSingleOption}
       onValueChange={handleValueChange}
