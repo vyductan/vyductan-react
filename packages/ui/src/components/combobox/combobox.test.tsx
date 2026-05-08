@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 
+import { readFileSync } from "node:fs";
 import * as React from "react";
 import {
   cleanup,
@@ -451,5 +452,16 @@ describe("Combobox", () => {
     expect(screen.getByPlaceholderText("Standard input")).toHaveClass("h-8");
     expect(comboboxInput).toHaveClass("h-8");
     expect(comboboxInputGroup).toHaveClass("h-8");
+  });
+
+  test("keeps standard input composition delegated to the shadcn combobox input", () => {
+    const source = readFileSync(
+      "src/components/combobox/combobox.tsx",
+      "utf8",
+    );
+
+    expect(source).not.toMatch(/function ComboboxInput\(/);
+    expect(source).toContain("ComboboxInput,");
+    expect(source).toContain('} from "@acme/ui/shadcn/combobox";');
   });
 });
