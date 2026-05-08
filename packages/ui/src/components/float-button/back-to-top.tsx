@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useSyncExternalStore } from "react";
 import { motion } from "motion/react";
 
 import type { FloatButtonProps } from "./float-button";
@@ -33,36 +32,48 @@ export const FloatButtonBackToTop = ({
   ref,
   ...restProps
 }: BackToTopProps & { ref?: React.Ref<FloatButtonRef> }) => {
-  const [visible, setVisible] = useState<boolean>(visibilityHeight === 0);
-
   const internalRef = React.useRef<FloatButtonRef["nativeElement"]>(null);
 
   React.useImperativeHandle(ref, () => ({
     nativeElement: internalRef.current,
   }));
 
-  const getDefaultTarget = (): HTMLElement | Document | Window =>
-    // eslint-disable-next-line unicorn/prefer-global-this
-    internalRef.current?.ownerDocument ?? window;
+  const getDefaultTarget = useCallback(
+    (): HTMLElement | Document | Window =>
+      // eslint-disable-next-line unicorn/prefer-global-this
+      internalRef.current?.ownerDocument ?? window,
+    [],
+  );
 
-  const handleScroll = useCallback(
-    (e: React.UIEvent<HTMLElement, UIEvent> | { target: any }) => {
-      const scrollTop = getScrollTarget(e.target, true);
-      setVisible(scrollTop >= visibilityHeight);
+  const getTarget = target ?? getDefaultTarget;
+
+  const subscribeToScroll = useCallback(
+    (onStoreChange: () => void) => {
+      const container = getTarget();
+      container.addEventListener("scroll", onStoreChange);
+
+      return () => {
+        container.removeEventListener("scroll", onStoreChange);
+      };
     },
+    [getTarget],
+  );
+
+  const getVisibleSnapshot = useCallback(() => {
+    const scrollTop = getScrollTarget(getTarget(), true);
+    return scrollTop >= visibilityHeight;
+  }, [getTarget, visibilityHeight]);
+
+  const getServerVisibleSnapshot = useCallback(
+    () => visibilityHeight === 0,
     [visibilityHeight],
   );
 
-  useEffect(() => {
-    const getTarget = target ?? getDefaultTarget;
-    const container = getTarget();
-    handleScroll({ target: container });
-    container.addEventListener("scroll", handleScroll);
-    return () => {
-      // handleScroll.cancel();
-      container.removeEventListener("scroll", handleScroll);
-    };
-  }, [target, handleScroll]);
+  const visible = useSyncExternalStore(
+    subscribeToScroll,
+    getVisibleSnapshot,
+    getServerVisibleSnapshot,
+  );
 
   const scrollToTop: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     // TODO: switch to use react-scroll
