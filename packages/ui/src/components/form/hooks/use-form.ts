@@ -228,7 +228,7 @@ const useForm = <
   useEffect(() => {
     if (!onValuesChange) return;
 
-    // Use watch to detect changes
+    // eslint-disable-next-line react-hooks/incompatible-library
     const subscription = methods.watch((value, info) => {
       if (info.type === "change") {
         onValuesChange(info.name ? value[info.name] : {}, value);

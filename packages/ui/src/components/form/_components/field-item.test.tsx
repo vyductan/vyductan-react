@@ -1,7 +1,13 @@
 import "@testing-library/jest-dom/vitest";
 
 import type React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 import { z } from "zod";
 
@@ -21,8 +27,12 @@ const paymentFormSchema = z.object({
 });
 
 const limitFormSchema = z.object({
-  softLimitPerPax: z.number().min(1, { message: "Please input your soft limit!" }),
-  hardLimitPerPax: z.number().min(1, { message: "Please input your hard limit!" }),
+  softLimitPerPax: z
+    .number()
+    .min(1, { message: "Please input your soft limit!" }),
+  hardLimitPerPax: z
+    .number()
+    .min(1, { message: "Please input your hard limit!" }),
 });
 
 function TestForm(): React.JSX.Element {
@@ -184,7 +194,9 @@ describe("Field", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 
-    expect(await screen.findByText("Please input your cvv!")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please input your cvv!"),
+    ).toBeInTheDocument();
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveClass("placeholder:text-placeholder");
     expect(input).toHaveClass("text-foreground");
@@ -200,7 +212,9 @@ describe("Field", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 
-    expect(await screen.findByText("Please input your cvv!")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please input your cvv!"),
+    ).toBeInTheDocument();
     expect(input).toHaveAttribute("aria-invalid", "true");
     expect(input).toHaveClass("placeholder:text-placeholder");
     expect(input).toHaveClass("text-foreground");
@@ -215,13 +229,17 @@ describe("Field", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 
-    expect(await screen.findByText("Please input your cvv!")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please input your cvv!"),
+    ).toBeInTheDocument();
     expect(input).toHaveAttribute("aria-invalid", "true");
 
     fireEvent.change(input, { target: { value: "123" } });
 
     await waitFor(() => {
-      expect(screen.queryByText("Please input your cvv!")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Please input your cvv!"),
+      ).not.toBeInTheDocument();
     });
     expect(input).toHaveAttribute("aria-invalid", "false");
     expect(field).not.toHaveAttribute("data-invalid", "true");

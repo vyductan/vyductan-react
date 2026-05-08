@@ -2,7 +2,13 @@ import "@testing-library/jest-dom/vitest";
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import BasicExample from "./basic";
@@ -30,7 +36,10 @@ afterEach(cleanup);
 
 describe("Form basic example", () => {
   test("documents Select with the options prop instead of composable children", () => {
-    const source = readFileSync(path.resolve(import.meta.dirname, "./basic.tsx"), "utf8");
+    const source = readFileSync(
+      path.resolve(import.meta.dirname, "./basic.tsx"),
+      "utf8",
+    );
 
     expect(source).toContain("options={[");
     expect(source).not.toContain("SelectContent");
@@ -57,8 +66,9 @@ describe("Form basic example", () => {
     expect(screen.getByLabelText(/soft limit \/ pax/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/hard limit \/ pax/i)).toBeInTheDocument();
 
-    const note = screen.getByText(/soft limit must be less than or equal to/i)
-      .parentElement;
+    const note = screen.getByText(
+      /soft limit must be less than or equal to/i,
+    ).parentElement;
 
     expect(note).toHaveClass("rounded-md", "border", "bg-blue-50");
     expect(note?.parentElement).toHaveClass("space-y-6");
@@ -100,7 +110,9 @@ describe("Form basic example", () => {
     const limitSection = limitNote.closest("div")?.parentElement;
 
     expect(
-      within(limitSection as HTMLElement).getAllByText(/please input your .* limit!/i),
+      within(limitSection as HTMLElement).getAllByText(
+        /please input your .* limit!/i,
+      ),
     ).toHaveLength(2);
   });
 });

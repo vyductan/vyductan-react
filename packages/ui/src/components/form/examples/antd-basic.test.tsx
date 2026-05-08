@@ -1,6 +1,12 @@
 import "@testing-library/jest-dom/vitest";
 
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import AntdBasicExample from "./antd-basic";
@@ -30,13 +36,21 @@ describe("Form AntD basic example", () => {
   test("renders payment fields and a card checkbox option", () => {
     const { container } = render(<AntdBasicExample />);
 
-    expect(screen.getByRole("textbox", { name: /name on card/i })).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: /card number/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /name on card/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /card number/i }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/soft limit \/ pax/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/hard limit \/ pax/i)).toBeInTheDocument();
-    expect(screen.getByText(/soft limit must be less than or equal to/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/soft limit must be less than or equal to/i),
+    ).toBeInTheDocument();
 
-    const cardCheckboxLabel = screen.getByText("Save payment method").closest("label");
+    const cardCheckboxLabel = screen
+      .getByText("Save payment method")
+      .closest("label");
 
     expect(cardCheckboxLabel).toHaveClass("rounded-md", "border");
     expect(container.querySelector(".-mb-8")).toBeNull();

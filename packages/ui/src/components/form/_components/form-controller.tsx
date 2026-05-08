@@ -16,7 +16,10 @@ type FormControllerProps<
 function FormController<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({ render, ...props }: FormControllerProps<TFieldValues, TName>): React.JSX.Element {
+>({
+  render,
+  ...props
+}: FormControllerProps<TFieldValues, TName>): React.JSX.Element {
   return (
     <Controller
       {...props}
