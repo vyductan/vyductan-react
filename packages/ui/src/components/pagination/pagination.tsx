@@ -108,12 +108,6 @@ export const Pagination = (props: PaginationProps) => {
       Math.max(1, Math.min(c, calculatePage(undefined, pageSize, total))),
   });
 
-  const [internalInputValue, setInternalInputValue] = React.useState(current);
-
-  React.useEffect(() => {
-    setInternalInputValue(current);
-  }, [current]);
-
   const jumpPrevPage = Math.max(1, current - (showLessItems ? 3 : 5));
   const jumpNextPage = Math.min(
     calculatePage(undefined, pageSize, total),
@@ -130,7 +124,6 @@ export const Pagination = (props: PaginationProps) => {
       current > newCurrent && newCurrent !== 0 ? newCurrent : current;
 
     setPageSize(size);
-    setInternalInputValue(nextCurrent);
     onShowSizeChange?.(current, size);
     setCurrent(nextCurrent);
     onChange?.(nextCurrent, size);
@@ -144,10 +137,6 @@ export const Pagination = (props: PaginationProps) => {
         newPage = currentPage;
       } else if (page < 1) {
         newPage = 1;
-      }
-
-      if (newPage !== internalInputValue) {
-        setInternalInputValue(newPage);
       }
 
       setCurrent(newPage);
