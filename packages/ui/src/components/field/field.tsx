@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
 import type { Control, FieldPath, FieldValues } from "react-hook-form";
+import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 import {
@@ -17,7 +18,9 @@ import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check
 import { FieldLabel } from "./field-label";
 
 type FieldProperties = React.ComponentProps<typeof ShadField>;
-type FieldDescriptionProperties = React.ComponentProps<typeof ShadFieldDescription>;
+type FieldDescriptionProperties = React.ComponentProps<
+  typeof ShadFieldDescription
+>;
 type FieldGroupProperties = React.ComponentProps<typeof ShadFieldGroup>;
 type FieldErrorProperties = React.ComponentProps<typeof ShadFieldError>;
 type FieldChildProps = {
@@ -37,8 +40,8 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   children?: React.ReactNode;
   required?: boolean;
   valuePropName?: string;
-  getValueProps?: (value: unknown) => Record<string, unknown>;
-  normalize?: (value: unknown, previousValue: unknown) => unknown;
+  getValueProps?: (value: any) => Record<string, unknown>;
+  normalize?: (value: any, previousValue: any) => unknown;
 };
 
 function getFormValue(
@@ -165,28 +168,44 @@ const FieldDescription = ({
   className,
   ...properties
 }: FieldDescriptionProperties) => {
-  return <ShadFieldDescription className={cn("text-xs", className)} {...properties} />;
+  return (
+    <ShadFieldDescription
+      className={cn("text-xs", className)}
+      {...properties}
+    />
+  );
 };
 
 const FieldLegendDescription = ({
   className,
   ...properties
 }: FieldDescriptionProperties) => {
-  return <FieldDescription className={cn("text-sm", className)} {...properties} />;
+  return (
+    <FieldDescription className={cn("text-sm", className)} {...properties} />
+  );
 };
 
 const FieldGroup = ({ className, ...properties }: FieldGroupProperties) => {
   return <ShadFieldGroup className={cn("gap-6", className)} {...properties} />;
 };
 
-const FieldError = ({ className, errors, children, ...properties }: FieldErrorProperties) => {
-  const hasContent = Boolean(children) || errors?.some((error) => error?.message);
+const FieldError = ({
+  className,
+  errors,
+  children,
+  ...properties
+}: FieldErrorProperties) => {
+  const hasContent =
+    Boolean(children) || errors?.some((error) => error?.message);
 
   if (!hasContent) {
     return (
       <div
         data-slot="field-error"
-        className={cn("min-h-6 text-sm font-normal text-destructive", className)}
+        className={cn(
+          "text-destructive min-h-6 text-sm font-normal",
+          className,
+        )}
         {...properties}
       />
     );
@@ -204,4 +223,10 @@ const FieldError = ({ className, errors, children, ...properties }: FieldErrorPr
 };
 
 export type { SmartFieldProps as FieldProps };
-export { Field, FieldDescription, FieldError, FieldGroup, FieldLegendDescription };
+export {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLegendDescription,
+};

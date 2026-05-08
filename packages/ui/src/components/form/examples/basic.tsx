@@ -1,4 +1,5 @@
 import type React from "react";
+import dayjs from "dayjs";
 import { Info } from "lucide-react";
 import { z } from "zod";
 
@@ -16,6 +17,7 @@ import { Form, requiredNumberSchema, useForm } from "@acme/ui/components/form";
 import { Input, InputNumber } from "@acme/ui/components/input";
 import { Select } from "@acme/ui/components/select";
 import { Textarea } from "@acme/ui/components/textarea";
+import { TimePicker } from "@acme/ui/components/time-picker";
 
 const formSchema = z.object({
   card_name: z.string().min(1, { message: "Please input your card name!" }),
@@ -25,6 +27,7 @@ const formSchema = z.object({
     .min(1, { message: "Please input your expiry month!" }),
   expiryYear: z.string().min(1, { message: "Please input your expiry year!" }),
   cvv: requiredNumberSchema("Please input your cvv!", { min: 1 }),
+  paymentTime: z.string().optional(),
   softLimitPerPax: requiredNumberSchema("Please input your soft limit!", {
     min: 1,
   }),
@@ -44,6 +47,7 @@ function App(): React.JSX.Element {
       expiryMonth: "",
       expiryYear: "",
       cvv: undefined,
+      paymentTime: "",
       softLimitPerPax: undefined,
       hardLimitPerPax: undefined,
       sameAsShipping: true,
@@ -121,6 +125,19 @@ function App(): React.JSX.Element {
                   />
                 </Field>
               </div>
+              <Field
+                name="paymentTime"
+                control={form.control}
+                label="Payment Time"
+                getValueProps={(value) => ({
+                  value: value && dayjs(value, "HH:mm"),
+                })}
+                normalize={(value) =>
+                  value && `${dayjs(value).format("HH:mm")}`
+                }
+              >
+                <TimePicker placeholder="Select payment time" format="HH:mm" />
+              </Field>
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-x-4">
                   <Field

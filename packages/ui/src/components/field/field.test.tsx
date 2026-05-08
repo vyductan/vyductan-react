@@ -52,7 +52,9 @@ describe("Field", () => {
   });
 
   test("uses text-sm for legend descriptions", () => {
-    render(<FieldLegendDescription>Section helper text</FieldLegendDescription>);
+    render(
+      <FieldLegendDescription>Section helper text</FieldLegendDescription>,
+    );
 
     expect(screen.getByText("Section helper text")).toHaveClass("text-sm");
   });
