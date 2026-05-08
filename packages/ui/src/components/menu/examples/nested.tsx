@@ -69,8 +69,8 @@ function App(): React.JSX.Element {
   return (
     <SidebarProvider>
       <Menu
-        onSelect={(args) => {
-          console.log("click", args);
+        onSelect={(arguments_) => {
+          console.log("click", arguments_);
         }}
         className="w-64"
         mode="vertical"

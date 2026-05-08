@@ -9,10 +9,10 @@ import { Icon } from "../../../icons";
 
 export * from "./submenu";
 
-type MenuItemProps = Omit<MenuItemType, "key"> & {
+type MenuItemProperties = Omit<MenuItemType, "key"> & {
   keyProp: React.Key;
   isActive?: boolean;
-  onSelect?: (args: {
+  onSelect?: (arguments_: {
     item: MenuItemType;
     key: React.Key;
     event: MouseEvent<HTMLLIElement> | KeyboardEvent<HTMLLIElement>;
@@ -24,7 +24,7 @@ export const MenuItem = ({
   icon,
   onSelect,
   isActive,
-}: MenuItemProps) => {
+}: MenuItemProperties) => {
   const labelToRender = (
     <div>
       {typeof icon === "string" ? <Icon icon={icon} /> : icon}

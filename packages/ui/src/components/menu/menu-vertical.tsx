@@ -21,7 +21,7 @@ import {
   SidebarMenuSubItem,
 } from "../sidebar/_component";
 
-type MenuVerticalProps = {
+type MenuVerticalProperties = {
   className?: string;
   classNames?: {
     item?: string;
@@ -41,7 +41,7 @@ type MenuVerticalProps = {
   multiple?: boolean;
 
   selectedKeys?: string[];
-  onSelect?: (args: {
+  onSelect?: (arguments_: {
     item: ItemType;
     key: React.Key;
     selectedKeys: string[];
@@ -61,7 +61,7 @@ const MenuVertical = ({
   selectedKeys,
   onSelect,
   onOpenChange,
-}: MenuVerticalProps) => {
+}: MenuVerticalProperties) => {
   const [mergedOpenKeys, setMergedOpenKeys] = useMergedState(
     defaultOpenKeys ?? [],
     {
@@ -89,7 +89,7 @@ const MenuVertical = ({
     isSubMenu = false,
   ): React.ReactNode[] => {
     return menu.map((item, index) => {
-      if (!item) return null;
+      if (!item) return;
 
       // Handle divider type
       if (item.type === "divider") {
@@ -124,46 +124,48 @@ const MenuVertical = ({
 
       // Handle submenu
       if (item.type === "submenu") {
-        const subMenuProps = item;
-        const isOpen = mergedOpenKeys.includes(subMenuProps.key.toString());
+        const subMenuProperties = item;
+        const isOpen = mergedOpenKeys.includes(
+          subMenuProperties.key.toString(),
+        );
         const hasActiveChild = mergedSelectKeys.some((k) =>
-          k.toString().startsWith(subMenuProps.key.toString()),
+          k.toString().startsWith(subMenuProperties.key.toString()),
         );
 
         return (
-          <SidebarMenuItem key={subMenuProps.key}>
+          <SidebarMenuItem key={subMenuProperties.key}>
             <Collapsible.Root
               open={isOpen}
               onOpenChange={(open) =>
-                handleOpenChange(subMenuProps.key.toString(), open)
+                handleOpenChange(subMenuProperties.key.toString(), open)
               }
             >
               <Collapsible.Trigger asChild>
                 <SidebarMenuButton
                   isActive={hasActiveChild}
                   tooltip={
-                    typeof subMenuProps.label === "string"
-                      ? subMenuProps.label
-                      : subMenuProps.key.toString()
+                    typeof subMenuProperties.label === "string"
+                      ? subMenuProperties.label
+                      : subMenuProperties.key.toString()
                   }
                 >
-                  {typeof subMenuProps.icon === "string" ? (
-                    <Icon icon={subMenuProps.icon} />
+                  {typeof subMenuProperties.icon === "string" ? (
+                    <Icon icon={subMenuProperties.icon} />
                   ) : (
-                    subMenuProps.icon
+                    subMenuProperties.icon
                   )}
                   <span>
-                    {typeof subMenuProps.label === "string"
-                      ? subMenuProps.label
-                      : subMenuProps.label}
+                    {typeof subMenuProperties.label === "string"
+                      ? subMenuProperties.label
+                      : subMenuProperties.label}
                   </span>
                 </SidebarMenuButton>
               </Collapsible.Trigger>
               <Collapsible.Content>
                 <SidebarMenuSub>
-                  {renderItem(subMenuProps.children, true).map(
+                  {renderItem(subMenuProperties.children, true).map(
                     (child, childIndex) => {
-                      if (!child) return null;
+                      if (!child) return;
                       // Extract key from child if it's a React element
                       const childKey =
                         React.isValidElement(child) && child.key
@@ -260,5 +262,5 @@ const MenuVertical = ({
   );
 };
 
-export type { MenuVerticalProps };
+export type { MenuVerticalProperties as MenuVerticalProps };
 export { MenuVertical };

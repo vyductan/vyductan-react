@@ -11,7 +11,7 @@ import { Divider } from "../divider";
 import { MenuItem, SubMenu } from "./_components";
 import { MenuVertical } from "./menu-vertical";
 
-type MenuProps = {
+type MenuProperties = {
   className?: string;
   classNames?: {
     item?: string;
@@ -26,7 +26,7 @@ type MenuProps = {
   multiple?: boolean;
 
   selectedKeys?: string[];
-  onSelect?: (args: {
+  onSelect?: (arguments_: {
     item: ItemType;
     key: React.Key;
     selectedKeys: string[];
@@ -56,7 +56,7 @@ const Menu = ({
   // getPopupContainer,
   // subMenuOpenDelay = 0.1,
   // subMenuCloseDelay = 0.1,
-}: MenuProps) => {
+}: MenuProperties) => {
   // Always call hooks before conditional returns (React rules)
   // const [mergedOpenKeys, _setMergedOpenKeys] = useMergedState(
   //   defaultOpenKeys ?? [],
@@ -154,17 +154,17 @@ const Menu = ({
 
       // Handle submenu
       if (item.type === "submenu") {
-        const subMenuProps = item;
+        const subMenuProperties = item;
         return (
           <SubMenu
             type="submenu"
-            key={subMenuProps.key}
-            icon={subMenuProps.icon}
-            popupClassName={subMenuProps.popupClassName}
-            popupOffset={subMenuProps.popupOffset}
-            popupStyle={subMenuProps.popupStyle}
+            key={subMenuProperties.key}
+            icon={subMenuProperties.icon}
+            popupClassName={subMenuProperties.popupClassName}
+            popupOffset={subMenuProperties.popupOffset}
+            popupStyle={subMenuProperties.popupStyle}
           >
-            {renderItem(subMenuProps.children)}
+            {renderItem(subMenuProperties.children)}
           </SubMenu>
         );
       }
@@ -193,7 +193,7 @@ const Menu = ({
       }
 
       // Optionally handle other types (e.g., divider) or return null
-      return null;
+      return;
 
       // if (!item.children) {
       //   const isActive = mergedSelectKeys.some((x) => x.endsWith(key));
@@ -282,5 +282,5 @@ const Menu = ({
   );
 };
 
-export type { MenuProps };
+export type { MenuProperties as MenuProps };
 export { Menu };

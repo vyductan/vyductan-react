@@ -1,4 +1,4 @@
-export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
+export interface MenuDividerType extends Omit<ItemSharedProperties, "ref"> {
   type: "divider";
 
   children?: never;
@@ -6,7 +6,7 @@ export interface MenuDividerType extends Omit<ItemSharedProps, "ref"> {
 
 // export type MenuItemDef = MenuItemType | MenuItemGroupType | MenuDividerType;
 
-interface ItemSharedProps {
+interface ItemSharedProperties {
   ref?: React.Ref<HTMLLIElement | null>;
   style?: React.CSSProperties;
   className?: string;
@@ -14,8 +14,9 @@ interface ItemSharedProps {
 
 export interface SubMenuType<
   T extends MenuItemType = MenuItemType,
-> extends ItemSharedProps {
+> extends ItemSharedProperties {
   icon?: React.ReactNode;
+  extra?: React.ReactNode;
   theme?: "dark" | "filled";
   children: ItemType<T>[];
   type?: "submenu";
@@ -36,7 +37,7 @@ export interface SubMenuType<
   onTitleMouseLeave?: MenuHoverEventHandler;
 }
 
-export interface MenuItemType extends ItemSharedProps {
+export interface MenuItemType extends ItemSharedProperties {
   danger?: boolean;
   icon?: React.ReactNode;
   title?: string;
@@ -53,7 +54,7 @@ export interface MenuItemType extends ItemSharedProps {
 
 export interface MenuItemGroupType<
   T extends MenuItemType = MenuItemType,
-> extends ItemSharedProps {
+> extends ItemSharedProperties {
   type: "group";
   label?: React.ReactNode;
   children?: ItemType<T>[];
@@ -75,7 +76,7 @@ export interface RenderIconInfo {
 }
 export type RenderIconType =
   | React.ReactNode
-  | ((props: RenderIconInfo) => React.ReactNode);
+  | ((properties: RenderIconInfo) => React.ReactNode);
 export interface MenuInfo {
   key: string;
   keyPath: string[];

@@ -6,23 +6,45 @@ type PortalProps = {
   container?: HTMLElement | (() => HTMLElement) | null;
 };
 
-export function Portal({ children, container }: PortalProps) {
-  const [mounted, setMounted] = React.useState(false);
+type MountStore = {
+  getSnapshot: () => boolean;
+  subscribe: (onStoreChange: () => void) => () => void;
+};
 
-  React.useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
+function createMountStore(): MountStore {
+  let mounted = false;
 
-  if (!mounted) return null;
+  return {
+    getSnapshot() {
+      return mounted;
+    },
+    subscribe(onStoreChange) {
+      mounted = true;
+      onStoreChange();
 
-  const getContainer = () => {
-    if (typeof container === "function") {
-      return container();
-    }
-    return container || document.body;
+      return () => {
+        mounted = false;
+      };
+    },
   };
+}
 
-  const target = getContainer();
-  return target ? createPortal(children, target) : null;
+function getServerSnapshot() {
+  return false;
+}
+
+export function Portal({ children, container }: PortalProps) {
+  const mountStore = React.useMemo(() => createMountStore(), []);
+  const mounted = React.useSyncExternalStore(
+    mountStore.subscribe,
+    mountStore.getSnapshot,
+    getServerSnapshot,
+  );
+
+  if (!mounted) return;
+
+  const target =
+    typeof container === "function" ? container() : (container ?? document.body);
+
+  return target ? createPortal(children, target) : undefined;
 }

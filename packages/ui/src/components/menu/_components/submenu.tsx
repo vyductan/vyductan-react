@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import type { MenuContextProps } from "../menu-context";
+import type { MenuContextProps as MenuContextProperties } from "../menu-context";
 import type { SubMenuType } from "../types";
 import MenuContext from "../menu-context";
 
@@ -17,16 +17,16 @@ export interface SubMenuProps extends Omit<
   level?: number;
 }
 
-export const SubMenu = (props: SubMenuProps) => {
+export const SubMenu = (properties: SubMenuProps) => {
   const context = React.useContext(MenuContext);
 
-  const contextValue = React.useMemo<MenuContextProps>(
+  const contextValue = React.useMemo<MenuContextProperties>(
     () => ({ ...context, firstLevel: false }),
     [context],
   );
   return (
     <MenuContext.Provider value={contextValue}>
-      {props.children}
+      {properties.children}
     </MenuContext.Provider>
   );
 };
