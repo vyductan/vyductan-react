@@ -367,46 +367,16 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
     () => collectSortStates<RecordType>(mergedColumns, true),
   );
 
-  // Calculate initial sorting state from columns with defaultSortOrder
-  const initialSortingState: SortingState = React.useMemo(() => {
-    const sortingColumns: SortingState = [];
-
-    // Use collectSortStates to properly extract columns with defaultSortOrder
-    const sortStates = collectSortStates<RecordType>(mergedColumns, true);
-
-    for (const sortState of sortStates) {
-      if (sortState.sortOrder) {
-        sortingColumns.push({
+  const sortingState: SortingState = React.useMemo(
+    () =>
+      sortStates
+        .filter((sortState) => sortState.sortOrder)
+        .map((sortState) => ({
           id: sortState.key as string,
           desc: sortState.sortOrder === "descend",
-        });
-      }
-    }
-
-    return sortingColumns;
-  }, [mergedColumns]);
-
-  const [sortingState, setSortingState] =
-    React.useState<SortingState>(initialSortingState);
-
-  // Update sortingState when columns change with defaultSortOrder
-  React.useEffect(() => {
-    const sortingColumns: SortingState = [];
-
-    // Use collectSortStates to properly extract columns with defaultSortOrder
-    const sortStates = collectSortStates<RecordType>(mergedColumns, true);
-
-    for (const sortState of sortStates) {
-      if (sortState.sortOrder) {
-        sortingColumns.push({
-          id: sortState.key as string,
-          desc: sortState.sortOrder === "descend",
-        });
-      }
-    }
-
-    setSortingState(sortingColumns);
-  }, [mergedColumns]);
+        })),
+    [sortStates],
+  );
 
   const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
     (updaterOrValue) => {
@@ -414,8 +384,6 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
         typeof updaterOrValue === "function"
           ? updaterOrValue(sortingState)
           : updaterOrValue;
-
-      setSortingState(newSorting);
 
       const updatedSortStates: SortState<RecordType>[] = [];
       const sorterResults: SorterResult<RecordType>[] = [];

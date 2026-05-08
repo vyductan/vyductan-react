@@ -18,6 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 
 import type { TableProps } from "@acme/ui/components/table";
+import type { TagProps } from "@acme/ui/components/tag";
 import { Space } from "@acme/ui/components/space";
 import { Table, TableRowSortable } from "@acme/ui/components/table";
 import { Tag } from "@acme/ui/components/tag";
@@ -84,10 +85,9 @@ const columns: TableProps<DataType>["columns"] = [
     render: (_, { tags }) => (
       <div className="flex items-center gap-2">
         {tags.map((tag) => {
-          let color = tag.length > 5 ? "indigo" : "green";
-          if (tag === "loser") {
-            color = "orange";
-          }
+          const color: TagProps["color"] =
+            tag === "loser" ? "orange" : tag.length > 5 ? "indigo" : "green";
+
           return (
             <Tag color={color} key={tag}>
               {tag.toUpperCase()}

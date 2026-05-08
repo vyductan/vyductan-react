@@ -37,10 +37,9 @@ const columns: TableProps<DataType>["columns"] = [
     render: (_, { tags }) => (
       <div className="flex items-center gap-2">
         {tags.map((tag) => {
-          let color = tag.length > 5 ? "indigo" : "green";
-          if (tag === "loser") {
-            color = "orange";
-          }
+          const color: React.ComponentProps<typeof Tag>["color"] =
+            tag === "loser" ? "orange" : tag.length > 5 ? "indigo" : "green";
+
           return (
             <Tag color={color} key={tag}>
               {tag.toUpperCase()}

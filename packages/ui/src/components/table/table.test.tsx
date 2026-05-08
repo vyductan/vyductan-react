@@ -2,18 +2,16 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, test, vi } from "vitest";
 
 import type { ColumnsType } from "./types";
 import * as localeModule from "../locale";
-import useSelection from "./hooks/use-selection";
 import * as tableModule from "./index";
 import { Table } from "./index";
-import { tableLocale_en } from "./locale/en-us";
 
 globalThis.React = React;
 
@@ -107,6 +105,11 @@ function ControlledStringSelectionHarness({
 }
 const tableDocsPath = path.resolve(import.meta.dirname, "./table.mdx");
 const tableSourcePath = path.resolve(import.meta.dirname, "./table.tsx");
+const tableTypesPath = path.resolve(import.meta.dirname, "./types.ts");
+const legacySelectionHookPath = path.resolve(
+  import.meta.dirname,
+  "./hooks/use-selection.tsx",
+);
 
 function ControlledNumericSelectionHarness({
   initialSelectedRowKeys = [1],
@@ -138,53 +141,6 @@ function ControlledNumericSelectionHarness({
         },
       }}
     />
-  );
-}
-
-function SelectionDropdownHarness({
-  getPopupContainer,
-  onSelect,
-}: {
-  getPopupContainer?: (node: HTMLElement) => HTMLElement;
-  onSelect: () => void;
-}) {
-  const transformColumns = useSelection<SelectionHarnessRecord>(
-    {
-      childrenColumnName: "children",
-      data,
-      expandType: null,
-      getPopupContainer,
-      getRecordByKey: (key) => {
-        const record = data.find((candidate) => candidate.key === key);
-
-        if (!record) {
-          throw new Error(`Missing record for key: ${String(key)}`);
-        }
-
-        return record;
-      },
-      getRowKey: (record) => record.key,
-      locale: tableLocale_en.Table,
-      pageData: data,
-    },
-    {
-      selections: [
-        {
-          key: "custom",
-          text: "Run action",
-          onSelect,
-        },
-      ],
-    },
-  )[2];
-
-  const transformedColumns = transformColumns(columns);
-  const title = transformedColumns[0]?.title;
-
-  return typeof title === "function" ? (
-    <>{title({ table: {} as never })}</>
-  ) : (
-    <>{title}</>
   );
 }
 
@@ -231,6 +187,30 @@ describe("Table", () => {
     expect(tableDocs).toContain("DragHandle");
   });
 
+  test("table docs include the AntD-like border title and footer example", () => {
+    const tableDocs = readFileSync(tableDocsPath, "utf8");
+
+    expect(tableDocs).toContain('from "./examples/border-title-footer"');
+    expect(tableDocs).toContain("### Border, Title and Footer");
+    expect(tableDocs).toContain("Add border, title and footer for table.");
+    expect(tableDocs).toContain('src="table/examples/border-title-footer.tsx"');
+    expect(tableDocs).not.toContain('src="table/examples/bordered.tsx"');
+    expect(
+      existsSync(path.join(tableExamplesDir, "border-title-footer.tsx")),
+    ).toBe(true);
+    expect(existsSync(path.join(tableExamplesDir, "bordered.tsx"))).toBe(false);
+  });
+
+  test("table docs include the summary example", () => {
+    const tableDocs = readFileSync(tableDocsPath, "utf8");
+
+    expect(tableDocs).toContain('from "./examples/summary"');
+    expect(tableDocs).toContain("### Summary");
+    expect(tableDocs).toContain("Set summary content by `summary` prop.");
+    expect(tableDocs).toContain('src="table/examples/summary.tsx"');
+    expect(existsSync(path.join(tableExamplesDir, "summary.tsx"))).toBe(true);
+  });
+
   test("re-exports locale hook", () => {
     expect(localeModule).toHaveProperty("useLocale");
   });
@@ -242,11 +222,72 @@ describe("Table", () => {
     expect(tableSource).not.toContain('from "../../shadcn/skeleton"');
   });
 
-  test("table source uses the public Checkbox component for row selection", () => {
+  test("table source owns selection without the legacy useSelection hook", () => {
     const tableSource = readFileSync(tableSourcePath, "utf8");
+    const tableTypes = readFileSync(tableTypesPath, "utf8");
 
     expect(tableSource).toContain('from "../checkbox"');
     expect(tableSource).toContain("<Checkbox");
+    expect(tableSource).not.toContain("./hooks/use-selection");
+    expect(tableTypes).not.toContain("./hooks/use-selection");
+    expect(existsSync(legacySelectionHookPath)).toBe(false);
+  });
+
+  test("opts OwnTable out of React Compiler memoization", () => {
+    const tableSource = readFileSync(tableSourcePath, "utf8");
+
+    expect(tableSource).toMatch(
+      /function OwnTable<TRecord extends AnyObject>\(props: TableProps<TRecord>\) \{\n\s+"use no memo";/,
+    );
+  });
+
+  test("applies classNames.root to the table container", () => {
+    const { container } = render(
+      <Table columns={columns} dataSource={data} classNames={{ root: "root-class" }} />,
+    );
+
+    expect(container.querySelector('[data-slot="table-container"]')).toHaveClass(
+      "root-class",
+    );
+  });
+
+  test("applies classNames.title to the table title slot", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        title={() => "Table title"}
+        classNames={{ title: "title-class" }}
+      />,
+    );
+
+    const title = container.querySelector('[data-slot="table-title"]');
+
+    expect(title).toHaveTextContent("Table title");
+    expect(title).toHaveClass("title-class");
+  });
+
+  test("uses distinct data slots for summary and prop footer", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        summary={() => (
+          <tr>
+            <td>Summary content</td>
+          </tr>
+        )}
+        footer={() => "Footer content"}
+      />,
+    );
+
+    expect(container.querySelector("tfoot")).toHaveAttribute(
+      "data-slot",
+      "table-summary",
+    );
+    expect(container.querySelector('[data-slot="table-footer"]')).toHaveTextContent(
+      "Footer content",
+    );
   });
 
   test("keeps the header selection checkbox inside a stable centering wrapper", () => {
@@ -295,42 +336,63 @@ describe("Table", () => {
     ).toHaveLength(1);
   });
 
-  test("selection actions portal into the requested popup container", async () => {
-    const user = userEvent.setup();
-    const handleSelect = vi.fn();
-    const popupContainer = document.createElement("div");
-    popupContainer.dataset.testid = "popup-root";
-    document.body.append(popupContainer);
-
-    render(
-      <SelectionDropdownHarness
-        getPopupContainer={() => popupContainer}
-        onSelect={handleSelect}
+  test("keeps pagination flush with the table without an extra bottom border gap", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={{ total: 20, pageSize: 10 }}
       />,
     );
 
-    const trigger = document.querySelector<HTMLButtonElement>(
-      'button[aria-haspopup="menu"]',
+    const pagination = container.querySelector("[data-slot='pagination']");
+
+    expect(pagination).not.toBeNull();
+    expect(pagination).toHaveClass("mt-3", "justify-end");
+    expect(pagination).not.toHaveClass("my-4", "border-t");
+  });
+
+  test("uses the bordered table frame as the only bottom border", () => {
+    const { container } = render(
+      <Table columns={columns} dataSource={data} bordered />,
     );
 
-    expect(trigger).not.toBeNull();
+    const table = container.querySelector("table");
+    const tableContainer = container.querySelector('[data-slot="table-container"]');
 
-    if (!trigger) {
-      throw new Error("Missing selection dropdown trigger");
-    }
+    expect(table).toHaveClass("border");
+    expect(table).not.toHaveClass("border-b-0");
+    expect(tableContainer).toHaveClass(
+      "[&_tbody_tr:last-child>td]:border-b-0",
+    );
+  });
 
-    await user.click(trigger);
+  test("keeps the body-to-summary border in bordered tables", () => {
+    const { container } = render(
+      <Table
+        columns={columns}
+        dataSource={data}
+        bordered
+        summary={() => (
+          <tr>
+            <td>Summary content</td>
+          </tr>
+        )}
+      />,
+    );
 
-    const portaledMenuItem = within(popupContainer).getByRole("menuitem", {
-      name: "Run action",
-    });
+    const tableContainer = container.querySelector('[data-slot="table-container"]');
 
-    expect(portaledMenuItem).not.toBeNull();
-    await user.click(portaledMenuItem);
-
-    await waitFor(() => {
-      expect(handleSelect).toHaveBeenCalledTimes(1);
-    });
+    expect(container.querySelector("tfoot")).toHaveAttribute(
+      "data-slot",
+      "table-summary",
+    );
+    expect(tableContainer).not.toHaveClass(
+      "[&_tbody_tr:last-child>td]:border-b-0",
+    );
+    expect(tableContainer).toHaveClass(
+      "[&_tfoot_tr:last-child>td]:border-b-0",
+    );
   });
 
   test("renders a row selection checkbox without hanging", () => {

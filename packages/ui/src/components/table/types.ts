@@ -15,7 +15,6 @@ import type { Placement } from "../../types";
 import type { CheckboxProps } from "../checkbox";
 import type { PaginationProps } from "../pagination";
 import type { TooltipProps } from "../tooltip";
-import type { INTERNAL_SELECTION_ITEM } from "./hooks/use-selection";
 
 declare module "@tanstack/react-table" {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -331,6 +330,12 @@ export interface SelectionItem {
   text: React.ReactNode;
   onSelect?: SelectionItemSelectFn;
 }
+
+export type INTERNAL_SELECTION_ITEM =
+  | SelectionItem
+  | "SELECT_ALL"
+  | "SELECT_INVERT"
+  | "SELECT_NONE";
 
 export type SelectionSelectFn<T = AnyObject> = (
   record: T,

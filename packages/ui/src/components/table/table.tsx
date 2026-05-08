@@ -136,9 +136,11 @@ function SelectionControl({
           aria-label={ariaLabel}
           disabled={disabled}
           className={cn(
-            "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-full border align-middle outline-none transition-colors",
+            "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-full border align-middle transition-colors outline-none",
             "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
-            checked ? "border-primary bg-primary text-primary-foreground" : undefined,
+            checked
+              ? "border-primary bg-primary text-primary-foreground"
+              : undefined,
             className,
           )}
           onClick={(event) => {
@@ -225,6 +227,8 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
 
     bordered?: boolean | "around";
     classNames?: {
+      root?: string;
+      title?: string;
       table?: string;
       body?: string;
       header?: string;
@@ -312,7 +316,9 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     internalHooks?: string;
   };
 
-const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
+function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
+  "use no memo";
+
   const tableConfig = useComponentConfig("table");
   const {
     ref,
@@ -890,6 +896,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
 
   // Create table instance with memoized values and required properties
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: mergedData,
     columns: columnsForTTTable,
@@ -1057,6 +1064,8 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
                 "[&_th]:border-e [&_th:last-child]:border-e-0",
               typeof bordered === "boolean" &&
                 "[&_td]:border-e [&_td:last-child]:border-e-0",
+              !summary && "[&_tbody_tr:last-child>td]:border-b-0",
+              summary && "[&_tfoot_tr:last-child>td]:border-b-0",
             ],
             (!bordered || bordered === "around") && [
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
@@ -1064,6 +1073,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
             // bordered === "around" && [
             // "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md",
             // ],
+            classNames?.root,
             className,
           )}
           style={style}
@@ -1087,7 +1097,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
               <TableWrapperHeader bordered={bordered} size={size}>
                 <div
                   data-slot="table-title"
-                  // className="font-semibold tracking-tight"
+                  className={classNames?.title}
                 >
                   {title?.(mergedData)}
                 </div>
@@ -1395,7 +1405,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
           </div>
           {pagination && (
             <Pagination
-              className="my-4 justify-end"
+              className="mt-3 justify-end"
               {...pagination}
               total={pagination.total ?? dataSource?.length}
             />
@@ -1404,7 +1414,7 @@ const OwnTable = <TRecord extends AnyObject>(props: TableProps<TRecord>) => {
       </Spin>
     </TableStoreProvider>
   );
-};
+}
 export { OwnTable };
 
 export type { TableProps as OwnTableProps, RecordWithCustomRow };

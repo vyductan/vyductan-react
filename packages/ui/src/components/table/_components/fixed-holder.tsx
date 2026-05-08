@@ -15,6 +15,8 @@ import { useTableStore } from "../hooks/use-table";
 import { ColGroup } from "./col-group";
 
 function useColumnWidth(colWidths: readonly number[], columCount: number) {
+  const colWidthsKey = colWidths.join("_");
+
   return useMemo(() => {
     const cloneColumns: number[] = [];
     for (let i = 0; i < columCount; i += 1) {
@@ -26,7 +28,7 @@ function useColumnWidth(colWidths: readonly number[], columCount: number) {
       }
     }
     return cloneColumns;
-  }, [colWidths.join("_"), columCount]);
+  }, [colWidthsKey, columCount]);
 }
 
 export interface FixedHeaderProps<RecordType> extends HeaderProps<RecordType> {
@@ -76,7 +78,7 @@ export const FixedHolder = <TRecord extends AnyObject>({
   } = props;
 
   const { scrollbarSize, isSticky, getComponent } = useTableStore((s) => s);
-  const TableComponent = getComponent(["header", "table"], "table");
+  const tableComponent = getComponent(["header", "table"], "table");
 
   const combinationScrollBarSize = isSticky && !fixHeader ? 0 : scrollbarSize;
 
@@ -165,6 +167,28 @@ export const FixedHolder = <TRecord extends AnyObject>({
 
   const mergedColumnWidth = useColumnWidth(colWidths, columCount);
 
+  const tableChildren = (
+    <>
+      {(!noData || !maxContentScroll || allFlattenColumnsWithWidth) && (
+        <ColGroup
+          colWidths={
+            mergedColumnWidth
+              ? [...mergedColumnWidth, combinationScrollBarSize]
+              : []
+          }
+          columCount={columCount + 1}
+          columns={flattenColumnsWithScrollbar}
+        />
+      )}
+      {children({
+        ...restProps,
+        stickyOffsets: headerStickyOffsets,
+        columns: columnsWithScrollbar,
+        flattenColumns: flattenColumnsWithScrollbar,
+      })}
+    </>
+  );
+
   return (
     <div
       style={{
@@ -176,30 +200,16 @@ export const FixedHolder = <TRecord extends AnyObject>({
       ref={setScrollRef as React.Ref<HTMLDivElement> | undefined}
       className={cn(className, stickyClassName)}
     >
-      <TableComponent
-        style={{
-          tableLayout: "fixed",
-          visibility: noData || mergedColumnWidth ? null : "hidden",
-        }}
-      >
-        {(!noData || !maxContentScroll || allFlattenColumnsWithWidth) && (
-          <ColGroup
-            colWidths={
-              mergedColumnWidth
-                ? [...mergedColumnWidth, combinationScrollBarSize]
-                : []
-            }
-            columCount={columCount + 1}
-            columns={flattenColumnsWithScrollbar}
-          />
-        )}
-        {children({
-          ...restProps,
-          stickyOffsets: headerStickyOffsets,
-          columns: columnsWithScrollbar,
-          flattenColumns: flattenColumnsWithScrollbar,
-        })}
-      </TableComponent>
+      {React.createElement(
+        tableComponent,
+        {
+          style: {
+            tableLayout: "fixed",
+            visibility: noData || mergedColumnWidth ? null : "hidden",
+          },
+        },
+        tableChildren,
+      )}
     </div>
   );
 };

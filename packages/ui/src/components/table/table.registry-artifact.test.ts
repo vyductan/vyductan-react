@@ -63,12 +63,16 @@ function readRegistryFileContent(entryName: string, target: string): string {
 
 function extractModuleSpecifiers(source: string): string[] {
   const specifiers = new Set<string>();
+  const sourceWithoutLineComments = source
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("//"))
+    .join("\n");
   const fromPattern =
     /\b(?:import|export)\s+(?:type\s+)?[^"']*?\sfrom\s+["']([^"']+)["']/g;
   const sideEffectPattern = /\bimport\s+["']([^"']+)["']/g;
 
   for (const pattern of [fromPattern, sideEffectPattern]) {
-    for (const match of source.matchAll(pattern)) {
+    for (const match of sourceWithoutLineComments.matchAll(pattern)) {
       const specifier = match[1];
       if (specifier) {
         specifiers.add(specifier);
@@ -152,10 +156,14 @@ test("table registry tooltip support keeps local shadcn tooltip imports", () => 
   expect(tooltip).toContain('from "@acme/ui/lib/utils"');
 });
 
-test("table registry checkbox support keeps local shadcn checkbox imports", () => {
+test("table registry checkbox support keeps checkbox control artifacts", () => {
   const checkboxComponent = readRegistryFileContent(
     "table",
     "components/checkbox/checkbox.tsx",
+  );
+  const checkboxControl = readRegistryFileContent(
+    "table",
+    "components/checkbox/_components/checkbox-control.tsx",
   );
   const checkboxIndex = readRegistryFileContent(
     "table",
@@ -163,7 +171,8 @@ test("table registry checkbox support keeps local shadcn checkbox imports", () =
   );
   const checkbox = readRegistryFileContent("table", "shadcn/checkbox.tsx");
 
-  expect(checkboxComponent).toContain('from "../../shadcn/checkbox"');
+  expect(checkboxComponent).toContain('from "./_components/checkbox-control"');
+  expect(checkboxControl).toContain('from "radix-ui"');
   expect(checkboxIndex).toContain('from "./checkbox"');
   expect(checkbox).toContain('from "@acme/ui/lib/utils"');
 });
@@ -215,14 +224,19 @@ test("table checkbox support registry declares label shim runtime dependency", (
   expect(item.dependencies).toContain("radix-ui");
 });
 
-test("table registry table runtime keeps local shadcn skeleton imports", () => {
+test("table registry table runtime keeps public skeleton imports", () => {
   const tableRuntime = readRegistryFileContent(
     "table",
     "components/table/table.tsx",
   );
+  const skeletonIndex = readRegistryFileContent(
+    "table",
+    "components/skeleton/index.tsx",
+  );
   const skeleton = readRegistryFileContent("table", "shadcn/skeleton.tsx");
 
-  expect(tableRuntime).toContain('from "../../shadcn/skeleton"');
+  expect(tableRuntime).toContain('from "../skeleton"');
+  expect(skeletonIndex).toContain('from "@acme/ui/shadcn/skeleton"');
   expect(skeleton).toContain('from "@acme/ui/lib/utils"');
 });
 
@@ -299,8 +313,6 @@ test("table registry next closure batch resolves local table barrels and helper 
         issue === "components/table/_components/table-head-advanced.tsx -> ." ||
         issue ===
           "components/table/hooks/use-pagination.ts -> ../../_util/extends-object" ||
-        issue ===
-          "components/table/hooks/use-selection.tsx -> ../../_util/hooks/use-multiple-select" ||
         issue === "components/table/table.tsx -> ./_components",
     ),
   ).toEqual([]);
@@ -334,9 +346,6 @@ test("table registry local control support resolves dropdown radio and button im
   expect(
     unresolvedRelativeImports.filter(
       (issue) =>
-        issue ===
-          "components/table/hooks/use-selection.tsx -> ../../dropdown" ||
-        issue === "components/table/hooks/use-selection.tsx -> ../../radio" ||
         issue === "components/table/types.ts -> ../dropdown" ||
         issue === "components/table/utils/expand-util.tsx -> ../../button",
     ),
@@ -349,13 +358,10 @@ test("table registry selection dropdown keeps popup container support in exporte
   expect(content).toContain("getPopupContainer?: GetPopupContainer;");
 });
 
-test("table registry selection dropdown stays portaled after local dropdown removal", () => {
-  const content = readRegistryFileContent(
-    "table",
-    "components/table/hooks/use-selection.tsx",
-  );
-
-  expect(content).toContain("createPortal(");
+test("table registry does not ship the legacy selection hook", () => {
+  expect(() =>
+    readRegistryFileContent("table", "components/table/hooks/use-selection.tsx"),
+  ).toThrowError("Missing registry file: components/table/hooks/use-selection.tsx");
 });
 
 test("table registry locale support avoids empty and locale hook fanout", () => {

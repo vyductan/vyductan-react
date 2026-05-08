@@ -38,14 +38,14 @@ type TableStoreProviderProps = {
   children: React.ReactNode;
 };
 export const TableStoreProvider = ({ children }: TableStoreProviderProps) => {
-  const storeRef = React.useRef<TableStoreApi>(null);
-  storeRef.current ??= createTableStore({
-    ...defaultInitState,
-  });
+  const [store] = React.useState(() =>
+    createTableStore({
+      ...defaultInitState,
+    }),
+  );
+
   return (
-    <TableStoreContext.Provider value={storeRef.current}>
-      {children}
-    </TableStoreContext.Provider>
+    <TableStoreContext.Provider value={store}>{children}</TableStoreContext.Provider>
   );
 };
 

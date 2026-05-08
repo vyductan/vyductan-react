@@ -1,10 +1,11 @@
 import { ComponentSource } from "@acme/ui/components/mdx";
 
 import TableBasicDemo from "./examples/basic";
-import TableBorderedDemo from "./examples/bordered";
+import TableBorderTitleFooterDemo from "./examples/border-title-footer";
 import TableExpandableDemo from "./examples/expand";
 import TableMultipleSorterDemo from "./examples/multiple-sorter";
 import TableSelectionDemo from "./examples/selection";
+import TableSummaryDemo from "./examples/summary";
 import TableTreeDataDemo from "./examples/tree-data";
 
 # Table
@@ -54,11 +55,13 @@ Simple table with actions.
 
 <ComponentSource src="table/examples/basic.tsx" __comp__={TableBasicDemo} />
 
-### border, title, footer
+### Border, Title and Footer
+
+Add border, title and footer for table.
 
 <ComponentSource
-  src="table/examples/bordered.tsx"
-  __comp__={TableBorderedDemo}
+  src="table/examples/border-title-footer.tsx"
+  __comp__={TableBorderTitleFooterDemo}
 />
 
 ### expandable
@@ -81,6 +84,12 @@ Simple table with actions.
   src="table/examples/selection.tsx"
   __comp__={TableSelectionDemo}
 />
+
+### Summary
+
+Set summary content by `summary` prop.
+
+<ComponentSource src="table/examples/summary.tsx" __comp__={TableSummaryDemo} />
 
 ### tree data
 

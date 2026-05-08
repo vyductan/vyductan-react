@@ -23,7 +23,7 @@ function TableRoot({
       <ShadcnTable
         className={cn(
           "border-separate border-spacing-0",
-          bordered && cn(["rounded-md border border-b-0"]),
+          bordered && cn(["rounded-md border"]),
           className,
         )}
         {...props}
@@ -81,6 +81,7 @@ function TableBody({ className, ...props }: TableBodyProps) {
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
   return (
     <ShadcnTableFooter
+      data-slot="table-summary"
       className={cn(
         // "[&_tr:last-child>td]:border-b-0",
         // "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
@@ -141,6 +142,7 @@ const TableWrapperFooter = ({
 }: TableWrapperFooterProps) => {
   return (
     <div
+      data-slot="table-footer"
       className={cn(
         "bg-muted/50",
         "p-3",

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";
 import * as React from "react";
@@ -105,8 +104,20 @@ export default function useExpand<TRecord extends AnyObject>(
 
   const mergedExpandIcon = expandIcon || renderExpandIcon;
   const mergedChildrenColumnName = childrenColumnName || "children";
+  const hasExpandedRowRender = !!expandedRowRender;
+  const defaultExpandedAllKeys = React.useMemo(
+    () =>
+      defaultExpandAllRows
+        ? findAllChildrenKeys<TRecord>(
+            mergedData,
+            getRowKey,
+            mergedChildrenColumnName,
+          )
+        : [],
+    [defaultExpandAllRows, mergedData, getRowKey, mergedChildrenColumnName],
+  );
   const expandableType = React.useMemo<ExpandableType>(() => {
-    if (expandedRowRender) {
+    if (hasExpandedRowRender) {
       return "row";
     }
 
@@ -133,63 +144,28 @@ export default function useExpand<TRecord extends AnyObject>(
     }
 
     return false;
-  }, [!!expandedRowRender, mergedData]);
+  }, [hasExpandedRowRender, props.expandable, props.internalHooks, mergedData, mergedChildrenColumnName]);
 
-  const [innerExpandedKeys, setInnerExpandedKeys] = React.useState(() => {
-    if (defaultExpandedRowKeys) {
-      return defaultExpandedRowKeys;
-    }
-    if (defaultExpandAllRows) {
-      return findAllChildrenKeys<TRecord>(
-        mergedData,
-        getRowKey,
-        mergedChildrenColumnName,
-      );
-    }
-    return [];
-  });
-  const mergedExpandedKeys = React.useMemo(
-    () => new Set(expandedRowKeys || innerExpandedKeys || []),
-    [expandedRowKeys, innerExpandedKeys],
+  const [innerExpandedKeys, setInnerExpandedKeys] = React.useState<readonly Key[]>(
+    () => defaultExpandedRowKeys ?? [],
   );
-
-  // Sync expanded keys when data arrives after initial render.
-  // Without this, when `defaultExpandAllRows` is true, TanStack's internal
-  // expanded state expands all rows but our custom expand icon (which relies
-  // on `expandedKeys`) may still think rows are collapsed. Recompute keys
-  // on data changes to keep the arrow direction correct.
-  React.useEffect(() => {
-    if (!defaultExpandAllRows) return;
-    // If consumer controls expandedRowKeys, do not override
-    if (expandedRowKeys) return;
-    setInnerExpandedKeys(
-      findAllChildrenKeys<TRecord>(
-        mergedData,
-        getRowKey,
-        mergedChildrenColumnName,
-      ),
-    );
-  }, [
-    defaultExpandAllRows,
-    // Recompute when data or key resolver changes
-    mergedData,
-    getRowKey,
-    mergedChildrenColumnName,
-    expandedRowKeys,
-  ]);
+  const mergedInnerExpandedKeys = defaultExpandAllRows
+    ? defaultExpandedAllKeys
+    : innerExpandedKeys;
+  const mergedExpandedKeys = React.useMemo<Set<Key>>(
+    () => new Set(expandedRowKeys || mergedInnerExpandedKeys || []),
+    [expandedRowKeys, mergedInnerExpandedKeys],
+  );
 
   const onTriggerExpand: TriggerEventHandler<TRecord> = React.useCallback(
     (record: TRecord) => {
       const key = getRowKey(record, mergedData.indexOf(record));
 
-      let newExpandedKeys: Key[];
+      const currentExpandedKeys = [...mergedExpandedKeys];
       const hasKey = mergedExpandedKeys.has(key);
-      if (hasKey) {
-        mergedExpandedKeys.delete(key);
-        newExpandedKeys = [...mergedExpandedKeys];
-      } else {
-        newExpandedKeys = [...mergedExpandedKeys, key];
-      }
+      const newExpandedKeys: Key[] = hasKey
+        ? currentExpandedKeys.filter((expandedKey) => expandedKey !== key)
+        : [...currentExpandedKeys, key];
 
       setInnerExpandedKeys(newExpandedKeys);
       if (onExpand) {
