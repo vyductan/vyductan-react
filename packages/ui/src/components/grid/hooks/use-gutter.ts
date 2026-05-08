@@ -4,13 +4,13 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable unicorn/no-array-for-each */
 import type { Breakpoint, ScreenMap } from "../../_util/responsive-observer";
-import type { RowProps } from "../row";
+import type { RowProps as RowProperties } from "../row";
 import { responsiveArray } from "../../_util/responsive-observer";
 
 type Gap = number | undefined;
 
 export default function useGutter(
-  gutter: RowProps["gutter"],
+  gutter: RowProperties["gutter"],
   screens: ScreenMap | null,
 ): [Gap, Gap] {
   const results: [number | undefined, number | undefined] = [
@@ -31,8 +31,8 @@ export default function useGutter(
 
   normalizedGutter.forEach((g, index) => {
     if (typeof g === "object" && g !== null) {
-      for (let i = 0; i < responsiveArray.length; i++) {
-        const breakpoint: Breakpoint = responsiveArray[i]!;
+      for (let index_ = 0; index_ < responsiveArray.length; index_++) {
+        const breakpoint: Breakpoint = responsiveArray[index_]!;
         if (mergedScreens[breakpoint] && g[breakpoint] !== undefined) {
           results[index] = g[breakpoint] as number;
           break;

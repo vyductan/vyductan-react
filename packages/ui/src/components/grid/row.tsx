@@ -42,41 +42,31 @@ export interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   wrap?: boolean;
 }
 
-function useMergedPropByScreen(
-  oriProp: RowProps["align"] | RowProps["justify"],
+function useMergedPropertyByScreen(
+  oriProperty: RowProps["align"] | RowProps["justify"],
   screen: ScreenMap | null,
 ) {
-  const [prop, setProp] = React.useState(
-    typeof oriProp === "string" ? oriProp : "",
-  );
+  if (typeof oriProperty === "string") {
+    return oriProperty;
+  }
 
-  const calcMergedAlignOrJustify = () => {
-    if (typeof oriProp === "string") {
-      setProp(oriProp);
-    }
-    if (typeof oriProp !== "object") {
-      return;
-    }
-    for (let i = 0; i < responsiveArray.length; i++) {
-      const breakpoint = responsiveArray[i];
-      // if do not match, do nothing
-      if (!screen || !breakpoint || !screen[breakpoint]) {
-        continue;
-      }
-      const curVal = oriProp[breakpoint];
-      if (curVal !== undefined) {
-        setProp(curVal);
-        return;
-      }
-    }
-  };
+  if (typeof oriProperty !== "object" || oriProperty === null) {
+    return "";
+  }
 
-  React.useEffect(() => {
-    calcMergedAlignOrJustify();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(oriProp), screen]);
+  for (let index = 0; index < responsiveArray.length; index++) {
+    const breakpoint = responsiveArray[index];
+    if (!screen || !breakpoint || !screen[breakpoint]) {
+      continue;
+    }
 
-  return prop;
+    const currentValue = oriProperty[breakpoint];
+    if (currentValue !== undefined) {
+      return currentValue;
+    }
+  }
+
+  return "";
 }
 
 const Row = ({
@@ -91,10 +81,10 @@ const Row = ({
 }: RowProps & { ref?: React.Ref<HTMLDivElement> }) => {
   const { direction } = React.useContext(ConfigContext);
 
-  const screens = useBreakpoint(true, null);
+  const screens = useBreakpoint(true);
 
-  const mergedAlign = useMergedPropByScreen(align, screens);
-  const mergedJustify = useMergedPropByScreen(justify, screens);
+  const mergedAlign = useMergedPropertyByScreen(align, screens);
+  const mergedJustify = useMergedPropertyByScreen(justify, screens);
 
   const gutters = useGutter(gutter, screens);
   const classes = cn(
@@ -118,7 +108,7 @@ const Row = ({
   // Add gutter related style
   const rowStyle: React.CSSProperties = {};
   const horizontalGutter =
-    gutters[0] != null && gutters[0] > 0 ? gutters[0] / -2 : undefined;
+    gutters[0] != undefined && gutters[0] > 0 ? gutters[0] / -2 : undefined;
 
   if (horizontalGutter) {
     rowStyle.marginLeft = horizontalGutter;

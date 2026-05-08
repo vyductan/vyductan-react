@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useState } from "react";
 import useLayoutEffect from "rc-util/es/hooks/useLayoutEffect";
 
 import type { ScreenMap } from "../../_util/responsive-observer";
-import useForceUpdate from "../../_util/hooks/use-force-update";
 import useResponsiveObserver from "../../_util/responsive-observer";
 
 function useBreakpoint(
@@ -20,23 +19,20 @@ function useBreakpoint(
   refreshOnChange = true,
   defaultScreens: ScreenMap | null = {} as ScreenMap,
 ): ScreenMap | null {
-  const screensRef = useRef<ScreenMap | null>(defaultScreens);
-  const forceUpdate = useForceUpdate();
+  const [screens, setScreens] = useState<ScreenMap | null>(defaultScreens);
   const responsiveObserver = useResponsiveObserver();
 
   useLayoutEffect(() => {
     const token = responsiveObserver.subscribe((supportScreens) => {
-      screensRef.current = supportScreens;
       if (refreshOnChange) {
-        forceUpdate();
+        setScreens(supportScreens);
       }
     });
 
     return () => responsiveObserver.unsubscribe(token);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshOnChange, responsiveObserver]);
 
-  return screensRef.current;
+  return screens;
 }
 
 export default useBreakpoint;

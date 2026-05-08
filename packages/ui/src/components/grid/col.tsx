@@ -78,7 +78,7 @@ const spanToTailwindClass: Record<number, string> = {
 };
 
 const sizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
-const Col = (props: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
+const Col = (properties: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
   const {
     span,
     order,
@@ -90,51 +90,51 @@ const Col = (props: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
     flex,
     style,
     ...others
-  } = props;
+  } = properties;
   const { direction } = React.useContext(ConfigContext);
   const { gutter, wrap } = React.useContext(RowContext);
 
   // ===================== Size ======================
   const sizeStyle: Record<string, string> = {};
 
-  let sizeClassObj: Record<string, boolean | ColSpanType> = {};
+  let sizeClassObject: Record<string, boolean | ColSpanType> = {};
   sizes.forEach((size) => {
-    let sizeProps: ColSize = {};
-    const propSize = props[size];
-    if (typeof propSize === "number") {
-      sizeProps.span = propSize;
-    } else if (typeof propSize === "object") {
-      sizeProps = propSize || {};
+    let sizeProperties: ColSize = {};
+    const propertySize = properties[size];
+    if (typeof propertySize === "number") {
+      sizeProperties.span = propertySize;
+    } else if (typeof propertySize === "object") {
+      sizeProperties = propertySize || {};
     }
 
     delete others[size];
 
-    sizeClassObj = {
-      ...sizeClassObj,
-      [`${size}-${sizeProps.span}`]: sizeProps.span !== undefined,
-      [`${size}-order-${sizeProps.order}`]:
-        sizeProps.order || sizeProps.order === 0,
-      [`${size}-offset-${sizeProps.offset}`]:
-        sizeProps.offset || sizeProps.offset === 0,
-      [`${size}-push-${sizeProps.push}`]:
-        sizeProps.push || sizeProps.push === 0,
-      [`${size}-pull-${sizeProps.pull}`]:
-        sizeProps.pull || sizeProps.pull === 0,
+    sizeClassObject = {
+      ...sizeClassObject,
+      [`${size}-${sizeProperties.span}`]: sizeProperties.span !== undefined,
+      [`${size}-order-${sizeProperties.order}`]:
+        sizeProperties.order || sizeProperties.order === 0,
+      [`${size}-offset-${sizeProperties.offset}`]:
+        sizeProperties.offset || sizeProperties.offset === 0,
+      [`${size}-push-${sizeProperties.push}`]:
+        sizeProperties.push || sizeProperties.push === 0,
+      [`${size}-pull-${sizeProperties.pull}`]:
+        sizeProperties.pull || sizeProperties.pull === 0,
       [`rtl`]: direction === "rtl",
     };
 
     // Responsive flex layout
-    if (sizeProps.flex) {
-      sizeClassObj[`${size}-flex`] = true;
-      sizeStyle[`--${size}-flex`] = parseFlex(sizeProps.flex);
+    if (sizeProperties.flex) {
+      sizeClassObject[`${size}-flex`] = true;
+      sizeStyle[`--${size}-flex`] = parseFlex(sizeProperties.flex);
     }
 
     // Responsive span layout - add CSS variable for media queries to use
-    if (sizeProps.span !== undefined) {
+    if (sizeProperties.span !== undefined) {
       const spanValue =
-        typeof sizeProps.span === "number"
-          ? sizeProps.span
-          : Number.parseFloat(String(sizeProps.span));
+        typeof sizeProperties.span === "number"
+          ? sizeProperties.span
+          : Number.parseFloat(String(sizeProperties.span));
       if (!Number.isNaN(spanValue)) {
         const percentage = (spanValue / 24) * 100;
         // Store the percentage as CSS variable that can be used in media queries
@@ -164,7 +164,7 @@ const Col = (props: ColProps & { ref?: React.Ref<HTMLDivElement> }) => {
       [`pull-${pull}`]: pull,
     },
     className,
-    sizeClassObj,
+    sizeClassObject,
   );
 
   const mergedStyle: React.CSSProperties = {};
