@@ -8,7 +8,7 @@ beforeEach(() => {
     configurable: true,
     value: {
       writeText: vi.fn().mockImplementation(() => Promise.resolve()),
-    }
+    },
   });
 });
 
@@ -16,7 +16,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("uses custom aria labels, reset delay, and copied callback", async () => {
+test("uses custom aria labels, reset delay, copied callback, and button props", async () => {
   const onCopied = vi.fn();
 
   render(
@@ -50,4 +50,23 @@ test("uses custom aria labels, reset delay, and copied callback", async () => {
       screen.getByRole("button", { name: "Copy install command" }),
     ).toBeTruthy();
   });
+
+  render(
+    <CopyButton
+      value="disabled copy"
+      ariaLabel="Disabled copy"
+      disabled
+      data-testid="disabled-copy-button"
+    />,
+  );
+
+  const disabledButton = screen.getByTestId("disabled-copy-button");
+
+  expect(disabledButton).toHaveProperty("disabled", true);
+
+  fireEvent.click(disabledButton);
+
+  expect(navigator.clipboard.writeText).not.toHaveBeenCalledWith(
+    "disabled copy",
+  );
 });

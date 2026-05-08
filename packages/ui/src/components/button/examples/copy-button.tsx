@@ -5,12 +5,16 @@ import { useEffect, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
+import type { ButtonProps } from "@acme/ui/components/button";
 
 const SNIPPET = "pnpm -F @acme/ui storybook";
 
 type CopyState = "idle" | "copied" | "error";
 
-export type CopyButtonProps = {
+export type CopyButtonProps = Omit<
+  ButtonProps,
+  "children" | "className" | "icon" | "onClick" | "shape" | "type" | "variant"
+> & {
   value: string;
   ariaLabel?: string;
   copiedLabel?: string;
@@ -26,6 +30,7 @@ export function CopyButton({
   resetDelay = 2000,
   onCopied,
   className,
+  ...buttonProps
 }: CopyButtonProps): React.JSX.Element {
   const [copyState, setCopyState] = useState<CopyState>("idle");
 
@@ -61,6 +66,7 @@ export function CopyButton({
 
   return (
     <Button
+      {...buttonProps}
       aria-label={isCopied ? copiedLabel : ariaLabel}
       variant="text"
       shape="icon"
