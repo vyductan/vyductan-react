@@ -97,10 +97,12 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
   const [isInputFocused, setIsInputFocused] = React.useState(false);
   const [hoverPreview, setHoverPreview] = React.useState<DateType>(null);
 
+  const parsedLocalStringValue =
+    typeof localValue === "string" ? parseDateValue(localValue, format) : null;
   const committedInputValue =
-    typeof localValue === "string"
+    typeof localValue === "string" && !parsedLocalStringValue
       ? localValue
-      : formatDateValue(localValue, format);
+      : formatDateValue(parsedLocalStringValue ?? localValue, format);
   const inputValue =
     inputDraft?.format === format && Object.is(inputDraft.value, localValue)
       ? inputDraft.text
