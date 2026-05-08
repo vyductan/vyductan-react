@@ -357,7 +357,9 @@ const Select = <
   const firstSelectedValue = selectedValues.at(0);
   const activeTagOption =
     isTags && internalOpen
-      ? flatDisplayOptions.find((option) => option.value === activeTagOptionValue)
+      ? flatDisplayOptions.find(
+          (option) => option.value === activeTagOptionValue,
+        )
       : undefined;
   const activeTagOptionValueFromOptions = activeTagOption?.value;
 
