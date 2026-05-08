@@ -56,6 +56,9 @@ const App: React.FC = () => (
     bordered
     title={() => "Header"}
     footer={() => "Footer"}
+    classNames={{
+      title: "border-foreground",
+    }}
   />
 );
 

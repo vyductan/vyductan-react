@@ -231,7 +231,6 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
       title?: string;
       table?: string;
       body?: string;
-      header?: string;
       footer?: string;
       row?: string | ((record: TRecord, index: number) => string);
       head?: string;
@@ -1094,14 +1093,14 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
             }}
           >
             {(title || extra) && (
-              <TableWrapperHeader bordered={bordered} size={size}>
-                <div
-                  data-slot="table-title"
-                  className={classNames?.title}
-                >
-                  {title?.(mergedData)}
-                </div>
-                {extra && <div>{extra}</div>}
+              <TableWrapperHeader
+                bordered={bordered}
+                size={size}
+                data-slot="table-title"
+                className={classNames?.title}
+              >
+                <div data-slot="table-title-content">{title?.(mergedData)}</div>
+                {extra && <div data-slot="table-title-extra">{extra}</div>}
               </TableWrapperHeader>
             )}
             <TableRoot
@@ -1150,7 +1149,6 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
                         ? "hsl(var(--background))"
                         : undefined,
                   }}
-                  className={classNames?.header}
                 >
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow

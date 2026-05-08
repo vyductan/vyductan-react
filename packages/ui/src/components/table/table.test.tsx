@@ -251,20 +251,27 @@ describe("Table", () => {
     );
   });
 
-  test("applies classNames.title to the table title slot", () => {
+  test("applies classNames.title to the table title wrapper", () => {
     const { container } = render(
       <Table
         columns={columns}
         dataSource={data}
         title={() => "Table title"}
+        extra="Extra content"
         classNames={{ title: "title-class" }}
       />,
     );
 
-    const title = container.querySelector('[data-slot="table-title"]');
+    const titleHeader = container.querySelector('[data-slot="table-title"]');
+    const titleContent = container.querySelector(
+      '[data-slot="table-title-content"]',
+    );
+    const titleExtra = container.querySelector('[data-slot="table-title-extra"]');
 
-    expect(title).toHaveTextContent("Table title");
-    expect(title).toHaveClass("title-class");
+    expect(titleHeader).toHaveClass("title-class");
+    expect(titleContent).toHaveTextContent("Table title");
+    expect(titleContent).not.toHaveClass("title-class");
+    expect(titleExtra).toHaveTextContent("Extra content");
   });
 
   test("uses distinct data slots for summary and prop footer", () => {
