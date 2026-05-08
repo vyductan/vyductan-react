@@ -217,11 +217,18 @@ export function FindReplacePlugin({
 
   // Find matches when dialog opens
   useEffect(() => {
-    if (actualIsOpen) {
-      findMatches(searchText);
+    if (!actualIsOpen) {
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actualIsOpen, findMatches]);
+
+    const timeoutId = globalThis.setTimeout(() => {
+      findMatches(searchText);
+    });
+
+    return () => {
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, [actualIsOpen, findMatches, searchText]);
 
   return (
     <Dialog open={actualIsOpen} onOpenChange={actualOnOpenChange}>
@@ -238,7 +245,6 @@ export function FindReplacePlugin({
                 value={searchText}
                 onChange={(e) => {
                   setSearchText(e.target.value);
-                  findMatches(e.target.value);
                 }}
                 placeholder="Search..."
                 autoFocus

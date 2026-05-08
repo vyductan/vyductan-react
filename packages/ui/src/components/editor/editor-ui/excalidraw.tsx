@@ -10,10 +10,8 @@ function ClientOnlyExcalidraw(
 ) {
   const [ExcalidrawComponent, setExcalidrawComponent] =
     useState<ComponentType<ExcalidrawProps> | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     // Only import Excalidraw on the client side (useEffect only runs on client)
     import("@excalidraw/excalidraw")
       .then((module_) => {
@@ -24,7 +22,7 @@ function ClientOnlyExcalidraw(
       });
   }, []);
 
-  if (!isMounted || !ExcalidrawComponent) {
+  if (!ExcalidrawComponent) {
     return (properties.fallback ?? (
       <div className="flex h-full w-full items-center justify-center">
         Loading...
