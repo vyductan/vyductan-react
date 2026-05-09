@@ -74,6 +74,13 @@ describe("Form basic example", () => {
     expect(note?.parentElement).toHaveClass("space-y-6");
   });
 
+  test("renders a TimePicker field", () => {
+    render(<BasicExample />);
+
+    expect(screen.getByLabelText(/payment time/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Select payment time")).toBeInTheDocument();
+  });
+
   test("uses compact field spacing for limit fields", () => {
     render(<BasicExample />);
 

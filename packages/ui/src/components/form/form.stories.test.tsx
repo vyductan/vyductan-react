@@ -12,4 +12,12 @@ describe("Form stories", () => {
     expect(source).toContain("./examples/antd-basic");
     expect(source).toContain("export const AntdBasic");
   });
+
+  test("exposes the basic shadcn payment example", () => {
+    const source = storySource();
+
+    expect(source).toContain("./examples/basic-shadcn");
+    expect(source).toContain("export const BasicShadcn");
+    expect(source).not.toContain("./examples/shadcn");
+  });
 });

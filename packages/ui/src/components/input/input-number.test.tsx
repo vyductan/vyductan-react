@@ -27,9 +27,7 @@ describe("InputNumber default mode", () => {
   });
 
   test("keeps controls from inheriting error text color", () => {
-    render(
-      <InputNumber aria-label="Quantity" defaultValue={2} aria-invalid />,
-    );
+    render(<InputNumber aria-label="Quantity" defaultValue={2} aria-invalid />);
 
     const increaseButton = screen.getByRole("button", {
       name: "Increase Value",

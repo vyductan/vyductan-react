@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import AntdBasicDemo from "./examples/antd-basic";
-import ShadcnDemo from "./examples/shadcn";
+import BasicShadcnDemo from "./examples/basic-shadcn";
 
 const meta = {
   title: "Components/Form",
-  component: ShadcnDemo,
+  component: BasicShadcnDemo,
   parameters: {
     layout: "padded",
   },
-} satisfies Meta<typeof ShadcnDemo>;
+} satisfies Meta<typeof BasicShadcnDemo>;
 
 export default meta;
 
@@ -19,8 +19,4 @@ export const AntdBasic: Story = {
   render: () => <AntdBasicDemo />,
 };
 
-export const Shadcn: Story = {};
-
-export const ShadcnWithPasswordError: Story = {
-  render: () => <ShadcnDemo showPasswordError />,
-};
+export const BasicShadcn: Story = {};

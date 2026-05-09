@@ -32,6 +32,7 @@ type PublicInputType =
   | "submit"
   | "tel"
   | "text"
+  | "time"
   | "url"
   | "week";
 

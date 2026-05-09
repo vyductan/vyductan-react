@@ -80,8 +80,8 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       }
       className={
         mode === "spinner"
-          ? "h-4 w-4 text-muted-foreground opacity-70"
-          : "h-2.5 w-4 text-muted-foreground opacity-70"
+          ? "text-muted-foreground h-4 w-4 opacity-70"
+          : "text-muted-foreground h-2.5 w-4 opacity-70"
       }
     />
   );
@@ -94,8 +94,8 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       }
       className={
         mode === "spinner"
-          ? "h-4 w-4 text-muted-foreground opacity-70"
-          : "h-2.5 w-4 text-muted-foreground opacity-70"
+          ? "text-muted-foreground h-4 w-4 opacity-70"
+          : "text-muted-foreground h-2.5 w-4 opacity-70"
       }
     />
   );
