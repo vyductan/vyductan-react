@@ -4,39 +4,58 @@ import { Divider } from "@acme/ui/components/divider";
 import { Flex } from "@acme/ui/components/flex";
 import { Tag } from "@acme/ui/components/tag";
 
-const familyColors = [
+const tailwindColors = [
+  "slate",
+  "gray",
+  "zinc",
+  "neutral",
+  "stone",
   "red",
   "orange",
   "amber",
+  "yellow",
   "lime",
   "green",
+  "emerald",
+  "teal",
   "cyan",
+  "sky",
   "blue",
   "indigo",
+  "violet",
   "purple",
+  "fuchsia",
   "pink",
   "rose",
+  "black",
+  "white",
 ] as const;
 
+const antDesignColors = ["magenta", "volcano", "geekblue", "gold"] as const;
 const hexColors = ["#f50", "#2db7f5", "#87d068", "#108ee9"] as const;
 
 type TagVariant = "filled" | "solid" | "outlined";
 
 const colorfulGroups = [
   {
-    title: "Presets (filled)",
+    title: "Tailwind presets (filled)",
     variant: "filled",
-    colors: familyColors,
+    colors: tailwindColors,
   },
   {
-    title: "Presets (solid)",
+    title: "Tailwind presets (solid)",
     variant: "solid",
-    colors: familyColors,
+    colors: tailwindColors,
   },
   {
-    title: "Presets (outlined)",
+    title: "Tailwind presets (outlined)",
     variant: "outlined",
-    colors: familyColors,
+    colors: tailwindColors,
+  },
+  {
+    title: "Ant Design presets",
+    variant: "filled",
+    colors: antDesignColors,
   },
   {
     title: "Custom (filled)",

@@ -22,7 +22,9 @@ describe("Tag story structure", () => {
     expect(storiesSource).toContain('options: ["filled", "solid", "outlined"]');
     expect(storiesSource).not.toContain('variant: "default"');
     expect(storiesSource).not.toContain("bordered:");
-    expect(storiesSource).not.toContain('"gray"');
+    expect(storiesSource).toContain('"slate"');
+    expect(storiesSource).toContain('"gray"');
+    expect(storiesSource).toContain('"geekblue"');
     expect(storiesSource).toMatch(
       /<ComponentSource[\s\S]*src="tag\/examples\/colorful\.tsx"[\s\S]*__comp__=\{ColorfulExample\}[\s\S]*\/>/,
     );

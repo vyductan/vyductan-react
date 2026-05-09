@@ -88,8 +88,76 @@ describe("Tag", () => {
     expect(screen.getByText("Tag")).not.toHaveClass("bg-primary");
   });
 
-  test("falls back to filled default styling for unsupported legacy color strings", () => {
-    renderTag({ color: "gray" as React.ComponentProps<typeof Tag>["color"] });
+  test("renders Tailwind-only preset colors", () => {
+    const { rerender } = renderTag({ color: "slate" });
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-slate-100",
+      "text-slate-700",
+      "border-transparent",
+    );
+
+    rerender(
+      <Tag variant="solid" color="emerald">
+        Tag
+      </Tag>,
+    );
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-emerald-600",
+      "text-white",
+      "border-emerald-600",
+    );
+
+    rerender(
+      <Tag variant="outlined" color="stone">
+        Tag
+      </Tag>,
+    );
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-stone-50",
+      "text-stone-700",
+      "border-stone-300",
+    );
+  });
+
+  test("renders Ant Design-only preset colors", () => {
+    const { rerender } = renderTag({ color: "magenta" });
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-pink-100",
+      "text-pink-700",
+      "border-transparent",
+    );
+
+    rerender(
+      <Tag variant="solid" color="geekblue">
+        Tag
+      </Tag>,
+    );
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-indigo-600",
+      "text-white",
+      "border-indigo-600",
+    );
+
+    rerender(
+      <Tag variant="outlined" color="volcano">
+        Tag
+      </Tag>,
+    );
+
+    expect(screen.getByText("Tag")).toHaveClass(
+      "bg-orange-50",
+      "text-orange-700",
+      "border-orange-300",
+    );
+  });
+
+  test("falls back to filled default styling for unsupported named color strings", () => {
+    renderTag({ color: "unknown-brand" });
 
     expect(screen.getByText("Tag")).toHaveClass(
       "bg-gray-100",
