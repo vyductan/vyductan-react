@@ -58,4 +58,15 @@ describe("Tabs literal key types", () => {
       children: React.createElement("div"),
     });
   });
+
+  test("root mode does not expose DOM onChange", () => {
+    Tabs({
+      value: "suppliers",
+      // @ts-expect-error Tabs uses onValueChange for root-mode value updates
+      onChange: (event: React.ChangeEvent<HTMLDivElement>) => {
+        void event;
+      },
+      children: React.createElement("div"),
+    });
+  });
 });

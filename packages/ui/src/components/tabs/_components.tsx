@@ -15,7 +15,7 @@ import { TabsProvider, useTabsContext } from "./context";
 
 type TabsRootProperties<TValue extends string = string> = Omit<
   React.ComponentProps<typeof Tabs>,
-  "value" | "defaultValue" | "onValueChange"
+  "value" | "defaultValue" | "onValueChange" | "onChange"
 > & {
   type?: TabsType;
   value?: TValue;
