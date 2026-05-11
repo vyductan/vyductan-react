@@ -86,6 +86,21 @@ export const Default: Story = {
   },
 };
 
+export const LongSelectedLabel: Story = {
+  args: {
+    value: "long",
+    placeholder: "Select an option",
+    options: [
+      {
+        label:
+          "A very long option label that should truncate instead of making the select wider",
+        value: "long",
+      },
+    ],
+    className: "w-[200px]",
+  },
+};
+
 export const Variants: Story = {
   parameters: {
     a11y: {

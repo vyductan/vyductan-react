@@ -35,6 +35,30 @@ describe("Select", () => {
     expect(field.onBlur).toHaveBeenCalledOnce();
   });
 
+  test("keeps long selected labels constrained inside the trigger", () => {
+    render(
+      <Select
+        value="long"
+        placeholder="Select an option"
+        options={[
+          {
+            label:
+              "A very long option label that should truncate instead of making the select wider",
+            value: "long",
+          },
+        ]}
+      />,
+    );
+
+    const trigger = screen.getByRole("combobox", { name: "Select an option" });
+
+    expect(trigger.className).toContain("min-w-0");
+    expect(trigger.className).toContain("text-left");
+    expect(trigger.className).toContain("*:data-[slot=select-value]:min-w-0");
+    expect(trigger.className).toContain("*:data-[slot=select-value]:flex-1");
+    expect(trigger.className).toContain("*:data-[slot=select-value]:block!");
+  });
+
   test("calls onChange when clearing a single select", async () => {
     const handleChange = vi.fn();
 

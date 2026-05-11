@@ -51,13 +51,13 @@ const SelectTrigger = ({
       disabled={disabled}
       className={cn(
         "group relative",
-        "w-full",
+        "w-full min-w-0 text-left",
         inputVariants({ variant, status, disabled }),
         // inputSizeVariants({ size }),
         // controlHeightVariants({ size }),
         "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
         [
-          "*:data-[slot=select-value]:truncate",
+          "*:data-[slot=select-value]:block! *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate",
           !showClearIcon && "*:data-[slot=select-value]:h-[22px]",
         ],
 
