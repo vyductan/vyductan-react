@@ -80,6 +80,12 @@ const buttonExampleInventory: ReadonlyArray<{
     partialImportPath: "./examples/copy-button.mdx",
     partialComponentName: "CopyButtonExample",
   },
+  {
+    heading: "Download Button",
+    sourcePath: "button/examples/download-button.tsx",
+    partialImportPath: "./examples/download-button.mdx",
+    partialComponentName: "DownloadButtonExample",
+  },
 ] as const;
 
 describe("Button docs Storybook config", () => {

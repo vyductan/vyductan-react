@@ -120,6 +120,50 @@ describe("Combobox", () => {
     });
   });
 
+  test("fades the dropdown trigger when allowClear is visible on hover", () => {
+    render(
+      <Combobox
+        value="apple"
+        allowClear
+        placeholder="Pick a fruit"
+        options={[
+          { label: "Apple", value: "apple" },
+          { label: "Banana", value: "banana" },
+        ]}
+      />,
+    );
+
+    const group = getComboboxContainer("Pick a fruit");
+    expect(group).not.toBeNull();
+
+    const trigger = within(group as HTMLElement).getByRole("button", {
+      expanded: false,
+    });
+
+    expect(trigger).toHaveClass("transition-opacity");
+    expect(trigger).toHaveClass("group-hover/input-group:opacity-0");
+  });
+
+  test("renders a dropdown trigger in multiple mode", () => {
+    render(
+      <Combobox
+        mode="multiple"
+        placeholder="Pick fruits"
+        options={[
+          { label: "Apple", value: "apple" },
+          { label: "Banana", value: "banana" },
+        ]}
+      />,
+    );
+
+    const group = getComboboxContainer("Pick fruits");
+    expect(group).not.toBeNull();
+
+    expect(
+      within(group as HTMLElement).getByRole("button", { expanded: false }),
+    ).toBeInTheDocument();
+  });
+
   test("calls onChange with empty arrays when clearing a multiple combobox", async () => {
     const handleChange = vi.fn();
 

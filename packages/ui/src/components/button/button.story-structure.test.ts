@@ -33,6 +33,11 @@ const reusedVisualStories = [
     storyName: "CopyButton",
     renderPattern: "render: () => <CopyButtonDemo />",
   },
+  {
+    importStatement: 'import DownloadButtonDemo from "./examples/download-button";',
+    storyName: "DownloadButton",
+    renderPattern: "render: () => <DownloadButtonDemo />",
+  },
 ] as const;
 
 test("button visual stories reuse shared example components", () => {

@@ -3,6 +3,7 @@
 import * as React from "react";
 import useControlledState from "@rc-component/util/es/hooks/useControlledState";
 
+import { cn } from "@acme/ui/lib/utils";
 import {
   ComboboxChip,
   ComboboxChips,
@@ -15,9 +16,14 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
+  ComboboxTrigger,
   useComboboxAnchor,
 } from "@acme/ui/shadcn/combobox";
-import { InputGroupInput } from "@acme/ui/shadcn/input-group";
+import {
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@acme/ui/shadcn/input-group";
 
 import type { AnyObject } from "../_util/type";
 import type {
@@ -290,6 +296,7 @@ function Combobox<
   const showClearIcon = isMultiple
     ? selectedValues.length > 0
     : internalValue !== undefined;
+  const shouldFadeTrigger = mergedAllowClear && showClearIcon;
 
   const clearValue = React.useCallback(() => {
     if (isMultiple) {
@@ -503,6 +510,18 @@ function Combobox<
                   }
                 }}
               />
+              <InputGroupButton
+                size="icon-xs"
+                variant="ghost"
+                asChild
+                data-slot="input-group-button"
+                className={cn(
+                  "data-pressed:bg-transparent transition-opacity",
+                  shouldFadeTrigger && "group-hover/input-group:opacity-0",
+                )}
+              >
+                <ComboboxTrigger />
+              </InputGroupButton>
             </ComboboxChips>
           </div>
           {mergedAllowClear && (
@@ -543,8 +562,23 @@ function Combobox<
           className="h-8"
           placeholder={placeholder}
           render={<InputGroupInput className="h-8 text-sm" />}
-          showTrigger
-        />
+          showTrigger={false}
+        >
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              size="icon-xs"
+              variant="ghost"
+              asChild
+              data-slot="input-group-button"
+              className={cn(
+                "data-pressed:bg-transparent transition-opacity",
+                shouldFadeTrigger && "group-hover/input-group:opacity-0",
+              )}
+            >
+              <ComboboxTrigger />
+            </InputGroupButton>
+          </InputGroupAddon>
+        </ComboboxInput>
         {mergedAllowClear && (
           <ComboboxClear
             allowClear={allowClear}

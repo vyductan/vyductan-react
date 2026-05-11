@@ -5,6 +5,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 import { Button } from "./button";
 import CopyButtonDemo from "./examples/copy-button";
 import DisabledDemo from "./examples/disabled";
+import DownloadButtonDemo from "./examples/download-button";
 import IconDemo from "./examples/icon";
 import LoadingDemo from "./examples/loading";
 import SizesDemo from "./examples/sizes";
@@ -153,6 +154,10 @@ export const WithIcon: Story = {
 
 export const CopyButton: Story = {
   render: () => <CopyButtonDemo />,
+};
+
+export const DownloadButton: Story = {
+  render: () => <DownloadButtonDemo />,
 };
 
 export const IconOnly: Story = {
