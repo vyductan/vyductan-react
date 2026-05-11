@@ -275,7 +275,11 @@ function Combobox<
     return flatOptions.find((item) => item.value === internalValue);
   }, [flatOptions, internalValue, isMultiple]);
   const selectedSingleInputValue = React.useMemo(() => {
-    if (isMultiple || internalValue === undefined || Array.isArray(internalValue)) {
+    if (
+      isMultiple ||
+      internalValue === undefined ||
+      Array.isArray(internalValue)
+    ) {
       return "";
     }
 
@@ -350,7 +354,8 @@ function Combobox<
   const items = React.useMemo(() => {
     return groupedOptions;
   }, [groupedOptions]);
-  const primitiveInputValue = !isMultiple && !open ? selectedSingleInputValue : inputValue;
+  const primitiveInputValue =
+    !isMultiple && !open ? selectedSingleInputValue : inputValue;
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {

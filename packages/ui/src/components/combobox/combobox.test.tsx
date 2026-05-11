@@ -455,10 +455,7 @@ describe("Combobox", () => {
   });
 
   test("keeps standard input composition delegated to the shadcn combobox input", () => {
-    const source = readFileSync(
-      "src/components/combobox/combobox.tsx",
-      "utf8",
-    );
+    const source = readFileSync("src/components/combobox/combobox.tsx", "utf8");
 
     expect(source).not.toMatch(/function ComboboxInput\(/);
     expect(source).toContain("ComboboxInput,");
