@@ -38,7 +38,7 @@ const ComboboxClear = ({
       tabIndex={showClearIcon ? 0 : -1}
       className={cn(
         "z-10",
-        "absolute right-[11px]",
+        "absolute top-1/2 right-[11px] -translate-y-1/2",
         "flex size-5 items-center justify-center rounded-full transition-opacity",
         "opacity-0",
         !showClearIcon && "pointer-events-none",

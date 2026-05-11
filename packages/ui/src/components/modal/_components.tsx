@@ -23,6 +23,12 @@ const INTERACTIVE_SELECTOR = [
   "[data-slot='dialog-close']",
 ].join(", ");
 
+const FLOATING_CONTENT_SELECTOR = [
+  "[data-slot='combobox-content']",
+  "[data-slot='select-content']",
+  "[data-slot='popover-content']",
+].join(", ");
+
 function shouldStartSelectionDrag(target: Element) {
   if (target.closest(INTERACTIVE_SELECTOR)) {
     return false;
@@ -114,7 +120,8 @@ function DialogContent({
       onInteractOutside={(e) => {
         if (
           e.target instanceof Element &&
-          e.target.closest("[data-sonner-toast]")
+          (e.target.closest("[data-sonner-toast]") ||
+            e.target.closest(FLOATING_CONTENT_SELECTOR))
         ) {
           e.preventDefault();
         }
