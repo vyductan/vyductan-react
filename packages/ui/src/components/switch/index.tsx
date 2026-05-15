@@ -4,18 +4,18 @@ import type { XOR } from "ts-xor";
 import { cn } from "@acme/ui/lib/utils";
 import { Switch as ShadcnSwitch } from "@acme/ui/shadcn/switch";
 
-import type { OwnSwitchProps } from "./switch";
+import type { OwnSwitchProps as OwnSwitchProperties } from "./switch";
 import { Switch as InternalSwitch } from "./switch";
 
-type ShadcnSwitchProps = React.ComponentProps<typeof ShadcnSwitch>;
+type ShadcnSwitchProperties = React.ComponentProps<typeof ShadcnSwitch>;
 
-type SwitchProps = XOR<OwnSwitchProps, ShadcnSwitchProps>;
+type SwitchProperties = XOR<OwnSwitchProperties, ShadcnSwitchProperties>;
 
-const ConditionSwitch = (props: SwitchProps) => {
-  const isShadcnSwitchProps = props.onCheckedChange;
+const ConditionSwitch = (properties: SwitchProperties) => {
+  const isShadcnSwitchProperties = properties.onCheckedChange;
 
-  if (isShadcnSwitchProps) {
-    const { className, ...restProps } = props;
+  if (isShadcnSwitchProperties) {
+    const { className, ...restProperties } = properties;
     return (
       <ShadcnSwitch
         className={cn(
@@ -25,14 +25,17 @@ const ConditionSwitch = (props: SwitchProps) => {
           "**:data-[slot=switch-thumb]:data-[state=checked]:translate-x-[24px]!",
           className,
         )}
-        {...(restProps as ShadcnSwitchProps)}
+        {...(restProperties as ShadcnSwitchProperties)}
       />
     );
   }
-  return <InternalSwitch {...(props as OwnSwitchProps)} />;
+  return <InternalSwitch {...(properties as OwnSwitchProperties)} />;
 };
 
 export { ConditionSwitch as Switch };
-export type { SwitchProps, ShadcnSwitchProps };
+export type {
+  SwitchProperties as SwitchProps,
+  ShadcnSwitchProperties as ShadcnSwitchProps,
+};
 
 export { type OwnSwitchProps } from "./switch";

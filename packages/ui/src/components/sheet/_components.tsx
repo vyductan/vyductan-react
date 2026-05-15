@@ -9,32 +9,35 @@ import { Icon } from "../../icons";
 import { cn } from "../../lib/utils";
 import { Button } from "../button";
 
-type SheetContentProps = React.ComponentProps<typeof ShadcnSheetContent>;
-export const SheetContent = ({ className, ...props }: SheetContentProps) => {
+type SheetContentProperties = React.ComponentProps<typeof ShadcnSheetContent>;
+export const SheetContent = ({
+  className,
+  ...properties
+}: SheetContentProperties) => {
   return (
     <ShadcnSheetContent
       className={cn("sm:max-w-svw [&>button>svg]:hidden", className)}
-      {...props}
+      {...properties}
     />
   );
 };
 
-type SheetHeaderProps = React.ComponentProps<typeof ShadcnSheetHeader> & {
+type SheetHeaderProperties = React.ComponentProps<typeof ShadcnSheetHeader> & {
   extra?: React.ReactNode;
 };
 export const SheetHeader = ({
   className,
   children,
   extra,
-  ...props
-}: SheetHeaderProps) => {
+  ...properties
+}: SheetHeaderProperties) => {
   return (
     <ShadcnSheetHeader
       className={cn(
         "flex flex-row justify-between border-b px-6 py-4",
         className,
       )}
-      {...props}
+      {...properties}
     >
       {children}
       {extra}
@@ -42,8 +45,12 @@ export const SheetHeader = ({
   );
 };
 
-type SheetTitleProps = React.ComponentProps<typeof ShadcnSheetTitle>;
-const SheetTitle = ({ children, className, ...props }: SheetTitleProps) => {
+type SheetTitleProperties = React.ComponentProps<typeof ShadcnSheetTitle>;
+const SheetTitle = ({
+  children,
+  className,
+  ...properties
+}: SheetTitleProperties) => {
   return (
     <div data-slot="sheet-header-title" className="flex items-center">
       <SheetClose
@@ -68,7 +75,7 @@ const SheetTitle = ({ children, className, ...props }: SheetTitleProps) => {
           <span className="sr-only">Close</span>
         </Button>
       </SheetClose>
-      <ShadcnSheetTitle className={className} {...props}>
+      <ShadcnSheetTitle className={className} {...properties}>
         {children}
       </ShadcnSheetTitle>
     </div>

@@ -44,7 +44,9 @@ export function Portal({ children, container }: PortalProps) {
   if (!mounted) return;
 
   const target =
-    typeof container === "function" ? container() : (container ?? document.body);
+    typeof container === "function"
+      ? container()
+      : (container ?? document.body);
 
   return target ? createPortal(children, target) : undefined;
 }

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Check, Download } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
+
 import { AsyncActionButton } from "./async-action-button";
 
 type DownloadMode = "success" | "error";
@@ -30,8 +31,9 @@ function App(): React.JSX.Element {
         <AsyncActionButton
           action={() => downloadReport(mode)}
           errorTooltip="Could not download this report. Try again."
-          idleIcon={<Download />}
+          idleIcon={<Download className="transition-transform duration-200" />}
           successIcon={<Check />}
+          resetDelay={2000}
           type="primary"
         >
           Download

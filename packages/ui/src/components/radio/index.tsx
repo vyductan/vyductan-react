@@ -1,7 +1,7 @@
 import type { XOR } from "ts-xor";
 
 import type { FormValueType } from "../form";
-import type { RadioGroupProps } from "./radio-group";
+import type { RadioGroupProps as RadioGroupProperties } from "./radio-group";
 import { RadioGroupRoot } from "./_components";
 import { RadioGroup } from "./radio-group";
 
@@ -10,22 +10,22 @@ export * from "./types";
 
 // export * from "./_components";
 
-type XorProps<T extends FormValueType = FormValueType> = XOR<
-  RadioGroupProps<T>,
+type XorProperties<T extends FormValueType = FormValueType> = XOR<
+  RadioGroupProperties<T>,
   React.ComponentProps<typeof RadioGroupRoot>
 >;
 const ConditionRadioGroup = <T extends FormValueType = FormValueType>(
-  props: XorProps<T>,
+  properties: XorProperties<T>,
 ) => {
-  const isShadcnRadioGroup = !props.options;
+  const isShadcnRadioGroup = !properties.options;
   if (isShadcnRadioGroup) {
     return (
       <RadioGroupRoot
-        {...(props as React.ComponentProps<typeof RadioGroupRoot>)}
+        {...(properties as React.ComponentProps<typeof RadioGroupRoot>)}
       />
     );
   }
-  return <RadioGroup {...(props as RadioGroupProps<T>)} />;
+  return <RadioGroup {...(properties as RadioGroupProperties<T>)} />;
 };
 
 export {

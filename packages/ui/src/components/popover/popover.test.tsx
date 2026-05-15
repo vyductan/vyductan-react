@@ -5,6 +5,10 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+import * as PopoverInternalExports from "./_component";
+import * as PopoverExports from "./index";
+import { Popover } from "./index";
+
 const { popoverContentPropsSpy } = vi.hoisted(() => ({
   popoverContentPropsSpy: vi.fn(),
 }));
@@ -50,10 +54,6 @@ vi.mock("radix-ui", async () => {
     },
   };
 });
-
-import * as PopoverInternalExports from "./_component";
-import * as PopoverExports from "./index";
-import { Popover } from "./index";
 
 globalThis.React = React;
 

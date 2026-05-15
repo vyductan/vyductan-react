@@ -7,7 +7,7 @@ const getIndeterminateCircle = ({ id, loading }: IndeterminateOption) => {
   if (!loading) {
     return {
       indeterminateStyleProps: {},
-      indeterminateStyleAnimation: null,
+      indeterminateStyleAnimation: undefined,
     };
   }
 

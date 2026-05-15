@@ -5,7 +5,7 @@ const DropdownMenuItem = ({
   className,
   inset,
   variant = "default",
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDropdownMenuItem> & {
   inset?: boolean;
   variant?: "default" | "destructive";
@@ -19,7 +19,7 @@ const DropdownMenuItem = ({
       )}
       inset={inset}
       variant={variant}
-      {...props}
+      {...properties}
     />
   );
 };

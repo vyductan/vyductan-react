@@ -1,7 +1,7 @@
 "use client";
 
-import type { TooltipProps as RduTooltipProps } from "@radix-ui/react-tooltip";
 import * as React from "react";
+import type { Tooltip as TooltipPrimitive } from "radix-ui";
 
 import type { AlignType } from "../../types";
 import {
@@ -29,7 +29,7 @@ export type AbstractTooltipProps = {
 };
 
 type TooltipProps = AbstractTooltipProps &
-  Omit<RduTooltipProps, "side"> & {
+  Omit<React.ComponentProps<typeof TooltipPrimitive.Root>, "side"> & {
     /**
      * The text shown in the tooltip
      */

@@ -1,12 +1,9 @@
-import type {
-  AccordionMultipleProps,
-  AccordionSingleProps,
-} from "@radix-ui/react-accordion";
+import { Accordion } from "radix-ui";
 
 import type {
-  AccordionContentProps,
-  AccordionRootProps,
-  AccordionTriggerProps,
+  AccordionContentProps as AccordionContentProperties,
+  AccordionRootProps as AccordionRootProperties,
+  AccordionTriggerProps as AccordionTriggerProperties,
 } from "./_components";
 import {
   AccordionContent,
@@ -27,8 +24,8 @@ type CollapseItemDef = {
   };
 };
 
-type CollapseProps = Omit<
-  AccordionRootProps,
+type CollapseProperties = Omit<
+  AccordionRootProperties,
   | "type"
   | "collapsible"
   | "value"
@@ -40,8 +37,8 @@ type CollapseProps = Omit<
   defaultActiveKey?: string[];
   items: CollapseItemDef[];
   type?: "single" | "multiple";
-  triggerProps?: AccordionTriggerProps;
-  contentProps?: AccordionContentProps;
+  triggerProps?: AccordionTriggerProperties;
+  contentProps?: AccordionContentProperties;
   onChange?: (activeKeys: string[]) => void;
 
   // antd
@@ -55,9 +52,9 @@ export const Collapse = ({
   onChange,
 
   expandIconPosition,
-  ...props
-}: CollapseProps) => {
-  const singleOrMultipleProps =
+  ...properties
+}: CollapseProperties) => {
+  const singleOrMultipleProperties =
     type === "single"
       ? ({
           type: "single",
@@ -67,15 +64,15 @@ export const Collapse = ({
           onValueChange: (string) => {
             onChange?.([string]);
           },
-        } satisfies AccordionSingleProps)
+        } satisfies Accordion.AccordionSingleProps)
       : ({
           type: "multiple",
           onValueChange: (string) => {
             onChange?.(string);
           },
-        } satisfies AccordionMultipleProps);
+        } satisfies Accordion.AccordionMultipleProps);
   return (
-    <AccordionRoot {...singleOrMultipleProps} {...props}>
+    <AccordionRoot {...singleOrMultipleProperties} {...properties}>
       {items.map((item, index) => {
         const key = item.key ?? index;
         return (

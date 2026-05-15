@@ -5,7 +5,13 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, render } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger } from "./index";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+} from "./index";
 
 const originalReact = globalThis.React;
 const originalResizeObserver = globalThis.ResizeObserver;

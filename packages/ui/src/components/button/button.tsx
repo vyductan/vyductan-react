@@ -2,7 +2,6 @@
 
 import type * as React from "react";
 import type { PartialDeep } from "type-fest";
-import { Slot } from "@radix-ui/react-slot";
 
 import type { IconProps } from "@acme/ui/icons";
 import { GenericSlot } from "@acme/ui/components/slot";
@@ -141,7 +140,7 @@ const Button = ({
 
   // Check if original variant is dashed for border-dashed class
 
-  const Comp = asChild || href ? Slot : "button";
+  const Comp = asChild || href ? GenericSlot : "button";
 
   const ChildrenToRender = (
     <>

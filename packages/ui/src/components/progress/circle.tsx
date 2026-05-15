@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable unicorn/no-new-array */
 
 /* eslint-disable unicorn/prefer-at */
 
@@ -9,7 +8,7 @@ import useId from "@rc-component/util/es/hooks/useId";
 import { cn } from "@acme/ui/lib/utils";
 
 import type {
-  CommonProgressProps,
+  CommonProgressProps as CommonProgressProperties,
   ProgressGradient,
   ProgressStatus,
 } from "./progress";
@@ -23,7 +22,7 @@ import getIndeterminateCircle from "./utils/get-indeterminate-circle";
 
 const CIRCLE_MIN_STROKE_WIDTH = 3;
 
-export type CircleProps = CommonProgressProps & {
+export type CircleProps = CommonProgressProperties & {
   type?: "circle" | "dashboard";
   status?: ProgressStatus;
   children?: React.ReactNode;
@@ -42,7 +41,7 @@ export type CircleProps = CommonProgressProps & {
   gapDegree?: number;
 };
 
-function Circle({ ref: _ref, ...props }: CircleProps) {
+function Circle({ ref: _reference, ...properties }: CircleProps) {
   const {
     id,
     children,
@@ -50,7 +49,7 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
     // max = 100,
     // min = 0,
     size = 100,
-    gapPosition: gapPositionProp,
+    gapPosition: gapPositionProperty,
 
     // gaugePrimaryColor,
     // gaugeSecondaryColor,
@@ -64,17 +63,17 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
     success,
     status,
 
-    gapDegree: gapDegreeProp = 0,
+    gapDegree: gapDegreeProperty = 0,
     classNames,
     styles,
     style,
 
     format: _format,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
   const [width, height] = getSize(size, "circle");
 
-  let { strokeWidth } = props;
+  let { strokeWidth } = properties;
   if (strokeWidth === undefined) {
     strokeWidth = Math.max(getMinPercent(width), 6);
   }
@@ -87,27 +86,28 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
 
   const realGapDegree = React.useMemo(() => {
     // Support gapDeg = 0 when type = 'dashboard'
-    if (gapDegreeProp || gapDegreeProp === 0) {
-      return gapDegreeProp;
+    if (gapDegreeProperty || gapDegreeProperty === 0) {
+      return gapDegreeProperty;
     }
     if (type === "dashboard") {
       return 75;
     }
     return 0;
     // eslint-disable-next-line react-hooks/preserve-manual-memoization
-  }, [gapDegreeProp, type]);
+  }, [gapDegreeProperty, type]);
 
-  const percentArray = getPercentage(props);
+  const percentArray = getPercentage(properties);
   const gapPos =
-    gapPositionProp || (type === "dashboard" && "bottom") || undefined;
+    gapPositionProperty || (type === "dashboard" && "bottom") || undefined;
 
   // using className to style stroke color
   const isGradient =
-    Object.prototype.toString.call(props.strokeColor) === "[object Object]";
+    Object.prototype.toString.call(properties.strokeColor) ===
+    "[object Object]";
 
   // Apply status color if no strokeColor is provided
   const finalStrokeColor =
-    props.strokeColor ||
+    properties.strokeColor ||
     (status ? STATUS_COLORS[status]?.color : STATUS_COLORS.default.color);
 
   const strokeColor = getStrokeColor({
@@ -229,13 +229,13 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
             strokeLinecap={mergedStrokeLinecap}
             strokeWidth={strokeWidth}
             gapDegree={gapDegree}
-            ref={(elem) => {
+            ref={(element) => {
               // https://reactjs.org/docs/refs-and-the-dom.html#callback-refs
               // React will call the ref callback with the DOM element when the component mounts,
               // and call it with `null` when it unmounts.
               // Refs are guaranteed to be up-to-date before componentDidMount or componentDidUpdate fires.
 
-              paths[index] = elem!;
+              paths[index] = element!;
             }}
             size={VIEW_BOX_SIZE}
           />
@@ -250,7 +250,7 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
     const stepPtg = 100 / stepCount;
 
     let stackPtg = 0;
-    return new Array(stepCount).fill(null).map<React.ReactNode>((_, index) => {
+    return Array.from({ length: stepCount }, (_, index) => {
       const color = index <= current - 1 ? strokeColorList[0]! : trailColor;
       const stroke =
         color && typeof color === "object" ? `url(#${gradientId})` : undefined;
@@ -285,8 +285,8 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
           strokeWidth={strokeWidth}
           opacity={1}
           style={{ ...circleStyleForStack, ...styles?.track }}
-          ref={(elem) => {
-            paths[index] = elem!;
+          ref={(element) => {
+            paths[index] = element!;
           }}
         />
       );
@@ -303,7 +303,7 @@ function Circle({ ref: _ref, ...props }: CircleProps) {
       }}
       id={id}
       role="presentation"
-      {...restProps}
+      {...restProperties}
     >
       {!stepCount && (
         <circle

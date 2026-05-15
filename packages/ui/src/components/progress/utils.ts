@@ -3,8 +3,8 @@
 /* eslint-disable unicorn/no-typeof-undefined */
 
 /* eslint-disable unicorn/prefer-switch */
-import type { CircleProps } from "./circle";
-import type { ProgressProps } from "./progress";
+import type { CircleProps as CircleProperties } from "./circle";
+import type { ProgressProps as ProgressProperties } from "./progress";
 
 export function validProgress(progress?: number) {
   if (!progress || progress < 0) {
@@ -16,7 +16,10 @@ export function validProgress(progress?: number) {
   return progress;
 }
 
-export function getSuccessPercent({ success, successPercent }: ProgressProps) {
+export function getSuccessPercent({
+  success,
+  successPercent,
+}: ProgressProperties) {
   let percent = successPercent;
   /** @deprecated Use `percent` instead */
   if (success && "progress" in success) {
@@ -32,7 +35,7 @@ export const getPercentage = ({
   percent,
   success,
   successPercent,
-}: ProgressProps) => {
+}: ProgressProperties) => {
   const realSuccessPercent = validProgress(
     getSuccessPercent({ success, successPercent }),
   );
@@ -45,14 +48,14 @@ export const getPercentage = ({
 export const getStrokeColor = ({
   success = {},
   strokeColor,
-}: Partial<CircleProps>) => {
+}: Partial<CircleProperties>) => {
   const { strokeColor: successColor } = success;
-  return [successColor || "var(--color-green-600)", strokeColor || null!];
+  return [successColor || "var(--color-green-600)", strokeColor || undefined!];
 };
 
 export const getSize = (
-  size: ProgressProps["size"],
-  type: ProgressProps["type"] | "step",
+  size: ProgressProperties["size"],
+  type: ProgressProperties["type"] | "step",
   extra?: {
     steps?: number;
     strokeWidth?: number;

@@ -1,24 +1,24 @@
 import { useMemo } from "react";
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 import { useControlledState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import type {
-  AbstractCheckboxGroupProps,
+  AbstractCheckboxGroupProps as AbstractCheckboxGroupProperties,
   CheckboxOptionType,
 } from "../checkbox/checkbox-group";
 import type { FormValueType } from "../form";
-import type { RadioProps } from "./radio";
+import type { RadioProps as RadioProperties } from "./radio";
 import type { RadioChangeEvent } from "./types";
 import { Radio } from "./radio";
 
 type RadioOptionType<T extends FormValueType = FormValueType> =
   CheckboxOptionType<T>;
 
-type RadioGroupProps<T extends FormValueType = FormValueType> =
-  AbstractCheckboxGroupProps<T> &
-    Pick<RadioProps, "optionType" | "buttonStyle"> & {
+type RadioGroupProperties<T extends FormValueType = FormValueType> =
+  AbstractCheckboxGroupProperties<T> &
+    Pick<RadioProperties, "optionType" | "buttonStyle"> & {
       defaultValue?: T;
       value?: T;
       onChange?: (e: RadioChangeEvent<T>) => void;
@@ -32,8 +32,8 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
   optionType = "default",
   buttonStyle = "outline",
   disabled,
-  ...props
-}: RadioGroupProps<T>) => {
+  ...properties
+}: RadioGroupProperties<T>) => {
   const [internalValue, setInternalValue] = useControlledState(
     defaultValue,
     value,
@@ -62,7 +62,7 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
       value={currentValue as string | undefined}
       // onValueChange={handleValueChange}
       disabled={disabled}
-      {...props}
+      {...properties}
     >
       {memoizedOptions.map((option) => {
         const isDisabled = option.disabled ?? disabled;
@@ -94,4 +94,4 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
 
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
-export type { RadioGroupProps, RadioOptionType };
+export type { RadioGroupProperties as RadioGroupProps, RadioOptionType };

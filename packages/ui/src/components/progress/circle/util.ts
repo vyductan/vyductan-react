@@ -1,4 +1,4 @@
-import type { ProgressProps } from "../progress";
+import type { ProgressProps as ProgressProperties } from "../progress";
 import type { StrokeColorType } from "../types";
 
 export const VIEW_BOX_SIZE = 100;
@@ -10,9 +10,9 @@ export const getCircleStyle = (
   percent: number,
   rotateDeg: number,
   gapDegree: number,
-  gapPosition: ProgressProps["gapPosition"],
+  gapPosition: ProgressProperties["gapPosition"],
   strokeColor: StrokeColorType,
-  strokeLinecap: ProgressProps["strokeLinecap"],
+  strokeLinecap: ProgressProperties["strokeLinecap"],
   strokeWidth: number,
   stepSpace = 0,
 ): React.CSSProperties => {

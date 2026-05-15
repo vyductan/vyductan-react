@@ -1,13 +1,14 @@
-import type { SlotProps } from "@radix-ui/react-slot";
+import { Slot } from "radix-ui";
 import type React from "react";
-import { Slot } from "@radix-ui/react-slot";
 
-type GenericSlotProps<P = React.HTMLAttributes<HTMLElement>> = SlotProps & P;
+type GenericSlotProperties<P = React.HTMLAttributes<HTMLElement>> =
+  Slot.SlotProps & P;
+  
 const GenericSlot = <P = React.HTMLAttributes<HTMLElement>,>(
-  props: GenericSlotProps<P>,
+  properties: GenericSlotProperties<P>,
 ) => {
-  return <Slot {...props} />;
+  return <Slot.Root {...properties} />;
 };
 
-export type { GenericSlotProps };
+export type { GenericSlotProperties as GenericSlotProps };
 export { GenericSlot };

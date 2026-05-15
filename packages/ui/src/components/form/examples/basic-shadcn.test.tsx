@@ -27,6 +27,9 @@ describe("Form basic shadcn demo", () => {
     expect(screen.getByLabelText(/soft limit \/ pax/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/hard limit \/ pax/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/same as shipping address/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("switch", { name: /email notifications/i }),
+    ).toHaveAttribute("aria-checked", "false");
     expect(screen.getByLabelText(/comments/i)).toBeInTheDocument();
     expect(
       screen.getByText(/soft limit must be less than or equal to/i),

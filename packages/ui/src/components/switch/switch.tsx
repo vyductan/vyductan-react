@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import * as SwitchPrimitive from "@radix-ui/react-switch";
+import { Switch as SwitchPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 
@@ -22,7 +22,7 @@ export type OwnSwitchProps = Omit<
   loading?: boolean;
 };
 
-export const Switch = (props: OwnSwitchProps) => {
+export const Switch = (properties: OwnSwitchProps) => {
   const {
     className,
     onChange,
@@ -32,8 +32,8 @@ export const Switch = (props: OwnSwitchProps) => {
     size = "default",
     loading,
     disabled,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
 
   // Use value as alias for checked, with value taking precedence
   // If checked or value is provided, use controlled mode
@@ -58,7 +58,7 @@ export const Switch = (props: OwnSwitchProps) => {
       onCheckedChange={(checked) => {
         onChange?.(checked);
       }}
-      {...restProps}
+      {...restProperties}
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"

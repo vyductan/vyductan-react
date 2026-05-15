@@ -16,6 +16,7 @@ import {
 import { Form, requiredNumberSchema, useForm } from "@acme/ui/components/form";
 import { Input, InputNumber } from "@acme/ui/components/input";
 import { Select } from "@acme/ui/components/select";
+import { Switch } from "@acme/ui/components/switch";
 import { Textarea } from "@acme/ui/components/textarea";
 import { TimePicker } from "@acme/ui/components/time-picker";
 
@@ -35,6 +36,7 @@ const formSchema = z.object({
     min: 1,
   }),
   sameAsShipping: z.boolean().optional(),
+  emailNotifications: z.boolean().optional(),
   comments: z.string().optional(),
 });
 
@@ -51,6 +53,7 @@ function App(): React.JSX.Element {
       softLimitPerPax: undefined,
       hardLimitPerPax: undefined,
       sameAsShipping: true,
+      emailNotifications: false,
       comments: "",
     },
     onSubmit: (data) => {
@@ -188,6 +191,15 @@ function App(): React.JSX.Element {
                 valuePropName="checked"
               >
                 <Checkbox>Same as shipping address</Checkbox>
+              </Field>
+              <Field
+                name="emailNotifications"
+                control={form.control}
+                label="Email Notifications"
+                description="Receive payment and billing updates."
+                valuePropName="checked"
+              >
+                <Switch />
               </Field>
             </FieldGroup>
           </FieldSet>

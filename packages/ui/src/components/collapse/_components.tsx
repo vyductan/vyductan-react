@@ -1,31 +1,33 @@
 "use client";
 
 import type * as React from "react";
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
+import { Accordion as AccordionPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import { Icon } from "../../icons";
 
-type AccordionRootProps = React.ComponentProps<typeof AccordionPrimitive.Root>;
-function AccordionRoot({ ...props }: AccordionRootProps) {
-  return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
+type AccordionRootProperties = React.ComponentProps<
+  typeof AccordionPrimitive.Root
+>;
+function AccordionRoot({ ...properties }: AccordionRootProperties) {
+  return <AccordionPrimitive.Root data-slot="accordion" {...properties} />;
 }
 
 function AccordionItem({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
       className={cn("border-b last:border-b-0", className)}
-      {...props}
+      {...properties}
     />
   );
 }
 
-type AccordionTriggerProps = React.ComponentProps<
+type AccordionTriggerProperties = React.ComponentProps<
   typeof AccordionPrimitive.Trigger
 > & {
   expandIconPosition?: "start" | "end";
@@ -35,8 +37,8 @@ function AccordionTrigger({
   children,
 
   expandIconPosition = "end",
-  ...props
-}: AccordionTriggerProps) {
+  ...properties
+}: AccordionTriggerProperties) {
   const expandIcon = (
     <Icon
       icon="icon-[lucide--chevron-down]"
@@ -59,7 +61,7 @@ function AccordionTrigger({
           expandIconPosition === "start" && "justify-start gap-3",
           className,
         )}
-        {...props}
+        {...properties}
       >
         {expandIconPosition === "start" && expandIcon}
         {children}
@@ -69,14 +71,14 @@ function AccordionTrigger({
   );
 }
 
-type AccordionContentProps = React.ComponentProps<
+type AccordionContentProperties = React.ComponentProps<
   typeof AccordionPrimitive.Content
 >;
 function AccordionContent({
   className,
   children,
-  ...props
-}: AccordionContentProps) {
+  ...properties
+}: AccordionContentProperties) {
   // const Comp = as ?? "div";
   {
     /* <Comp className={cn(className)}>{children}</Comp> */
@@ -86,7 +88,7 @@ function AccordionContent({
       data-slot="accordion-content"
       className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden text-sm"
       // asChild
-      {...props}
+      {...properties}
     >
       <div className={cn("pt-0 pb-4", className)}>{children}</div>
     </AccordionPrimitive.Content>
@@ -94,8 +96,8 @@ function AccordionContent({
 }
 
 export type {
-  AccordionRootProps,
-  AccordionContentProps,
-  AccordionTriggerProps,
+  AccordionRootProperties as AccordionRootProps,
+  AccordionContentProperties as AccordionContentProps,
+  AccordionTriggerProperties as AccordionTriggerProps,
 };
 export { AccordionRoot, AccordionItem, AccordionTrigger, AccordionContent };

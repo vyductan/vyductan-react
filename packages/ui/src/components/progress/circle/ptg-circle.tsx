@@ -2,15 +2,15 @@ import type * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ProgressProps } from "..";
+import type { ProgressProps as ProgressProperties } from "..";
 import type { StrokeColorObject } from "../types";
 
-interface BlockProps {
+interface BlockProperties {
   bg: string;
   children?: React.ReactNode;
 }
 
-const Block: React.FC<BlockProps> = ({ bg, children }) => (
+const Block: React.FC<BlockProperties> = ({ bg, children }) => (
   <div style={{ width: "100%", height: "100%", background: bg }}>
     {children}
   </div>
@@ -31,8 +31,8 @@ export interface ColorGradientProps {
   style: React.CSSProperties;
   ptg: number;
   radius: number;
-  strokeLinecap: ProgressProps["strokeLinecap"];
-  strokeWidth: ProgressProps["strokeWidth"];
+  strokeLinecap: ProgressProperties["strokeLinecap"];
+  strokeWidth: ProgressProperties["strokeWidth"];
   size: number;
   color: string | StrokeColorObject;
   gapDegree: number;

@@ -3,9 +3,9 @@
 /* eslint-disable unicorn/no-array-for-each */
 import { useEffect, useRef } from "react";
 
-import type { ProgressProps } from "../progress";
+import type { ProgressProps as ProgressProperties } from "../progress";
 
-export const defaultProps: Partial<ProgressProps> = {
+export const defaultProps: Partial<ProgressProperties> = {
   percent: 0,
   strokeColor: "#2db7f5",
   strokeLinecap: "round",
@@ -17,14 +17,14 @@ export const defaultProps: Partial<ProgressProps> = {
 };
 
 export const useTransitionDuration = (): SVGPathElement[] => {
-  const pathsRef = useRef<SVGPathElement[]>([]);
-  const prevTimeStamp = useRef<number | null>(null);
+  const pathsReference = useRef<SVGPathElement[]>([]);
+  const previousTimeStamp = useRef<number | null>(null);
 
   useEffect(() => {
     const now = Date.now();
     let updated = false;
 
-    pathsRef.current.forEach((path) => {
+    pathsReference.current.forEach((path) => {
       if (!path) {
         return;
       }
@@ -33,15 +33,15 @@ export const useTransitionDuration = (): SVGPathElement[] => {
       const pathStyle = path.style;
       pathStyle.transitionDuration = ".3s, .3s, .3s, .06s";
 
-      if (prevTimeStamp.current && now - prevTimeStamp.current < 100) {
+      if (previousTimeStamp.current && now - previousTimeStamp.current < 100) {
         pathStyle.transitionDuration = "0s, 0s";
       }
     });
 
     if (updated) {
-      prevTimeStamp.current = Date.now();
+      previousTimeStamp.current = Date.now();
     }
   });
 
-  return pathsRef.current;
+  return pathsReference.current;
 };

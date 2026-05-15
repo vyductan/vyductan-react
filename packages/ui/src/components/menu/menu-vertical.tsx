@@ -2,7 +2,7 @@
 
 import type { KeyboardEvent, MouseEvent } from "react";
 import React from "react";
-import * as Collapsible from "@radix-ui/react-collapsible";
+import { Collapsible } from "radix-ui";
 import { useMergedState } from "@rc-component/util";
 
 import { cn } from "@acme/ui/lib/utils";

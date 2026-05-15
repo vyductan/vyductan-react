@@ -15,8 +15,8 @@ import {
   DrawerTrigger,
 } from "./_components";
 
-type ShadcnDrawerProps = React.ComponentProps<typeof DrawerRoot>;
-type DrawerProps = ShadcnDrawerProps & {
+type ShadcnDrawerProperties = React.ComponentProps<typeof DrawerRoot>;
+type DrawerProperties = ShadcnDrawerProperties & {
   title?: React.ReactNode;
   description?: React.ReactNode;
   children?: React.ReactNode;
@@ -32,7 +32,7 @@ type DrawerProps = ShadcnDrawerProps & {
     content?: string;
     footer?: string;
   };
-  placement?: ShadcnDrawerProps["direction"];
+  placement?: ShadcnDrawerProperties["direction"];
   /**
    * Width of the Drawer dialog. Number is treated as px.
    */
@@ -51,20 +51,20 @@ const Drawer = ({
   placement = "right",
   width = 448,
   closeIcon,
-  ...props
-}: DrawerProps) => {
+  ...properties
+}: DrawerProperties) => {
   const isShadcnDrawer = Children.toArray(children).some(
     (child) => isValidElement(child) && child.type === DrawerContent,
   );
   if (isShadcnDrawer)
     return (
-      <DrawerRoot direction={placement} {...props}>
+      <DrawerRoot direction={placement} {...properties}>
         {children}
       </DrawerRoot>
     );
 
   return (
-    <DrawerRoot direction={placement} handleOnly {...props}>
+    <DrawerRoot direction={placement} handleOnly {...properties}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       <DrawerContent
         style={
@@ -77,7 +77,7 @@ const Drawer = ({
         <div className="flex flex-1 flex-col overflow-hidden">
           <DrawerHeader className={cn(classNames?.header)}>
             <div className="flex flex-1 flex-row items-start gap-2">
-              {closeIcon === false ? null : (
+              {closeIcon === false ? undefined : (
                 <Button variant="text" shape="icon" asChild>
                   <DrawerClose
                     className={cn(
@@ -133,5 +133,5 @@ const Drawer = ({
   );
 };
 
-export type { DrawerProps };
+export type { DrawerProperties as DrawerProps };
 export { Drawer };

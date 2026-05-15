@@ -1,30 +1,31 @@
 import type { XOR } from "ts-xor";
 
-import type { OwnSliderProps } from "./slider";
+import type { OwnSliderProps as OwnSliderProperties } from "./slider";
 import { Slider as ShadcnSlider } from "../../shadcn/slider";
 import { InternalSlider } from "./slider";
 
-type ShadcnSliderProps = React.ComponentProps<typeof ShadcnSlider> & {
+type ShadcnSliderProperties = React.ComponentProps<typeof ShadcnSlider> & {
   ariaLabel?: string;
 };
-type SliderProps = XOR<OwnSliderProps, ShadcnSliderProps>;
+type SliderProperties = XOR<OwnSliderProperties, ShadcnSliderProperties>;
 
-const Slider = (props: SliderProps) => {
+const Slider = (properties: SliderProperties) => {
   const isShadcnSlider =
-    "onValueChange" in props ||
-    "defaultValue" in props ||
-    Array.isArray(props.value);
+    "onValueChange" in properties ||
+    "defaultValue" in properties ||
+    Array.isArray(properties.value);
 
   if (isShadcnSlider) {
-    const { ariaLabel, ...rootProps } = props as ShadcnSliderProps;
+    const { ariaLabel, ...rootProperties } =
+      properties as ShadcnSliderProperties;
 
-    return <ShadcnSlider {...rootProps} aria-label={ariaLabel} />;
+    return <ShadcnSlider {...rootProperties} aria-label={ariaLabel} />;
   }
 
-  return <InternalSlider {...(props as OwnSliderProps)} />;
+  return <InternalSlider {...(properties as OwnSliderProperties)} />;
 };
 
-export type { SliderProps };
+export type { SliderProperties as SliderProps };
 export { Slider };
 
 export type { OwnSliderProps } from "./slider";

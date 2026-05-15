@@ -19,7 +19,6 @@ import {
   URL_MATCHER,
 } from "@lexical/react/LexicalAutoEmbedPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { PopoverPortal } from "@radix-ui/react-popover";
 import {
   CameraIcon,
   MessageCircleIcon,
@@ -334,35 +333,34 @@ export function AutoEmbedPlugin(): JSX.Element {
         ) => {
           return anchorElementReference.current ? (
             <Popover open={true}>
-              <PopoverPortal container={anchorElementReference.current}>
-                <div className="-translate-y-full transform">
-                  <PopoverTrigger />
-                  <PopoverContent
-                    className="w-[200px] p-0"
-                    align="start"
-                    side="right"
-                  >
-                    <CommandRoot>
-                      <CommandList>
-                        <CommandGroup>
-                          {options.map((option) => (
-                            <CommandItem
-                              key={option.key}
-                              value={option.title}
-                              onSelect={() => {
-                                selectOptionAndCleanUp(option);
-                              }}
-                              className="flex items-center gap-2"
-                            >
-                              {option.title}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </CommandRoot>
-                  </PopoverContent>
-                </div>
-              </PopoverPortal>
+              <div className="-translate-y-full transform">
+                <PopoverTrigger />
+                <PopoverContent
+                  container={anchorElementReference.current}
+                  className="w-[200px] p-0"
+                  align="start"
+                  side="right"
+                >
+                  <CommandRoot>
+                    <CommandList>
+                      <CommandGroup>
+                        {options.map((option) => (
+                          <CommandItem
+                            key={option.key}
+                            value={option.title}
+                            onSelect={() => {
+                              selectOptionAndCleanUp(option);
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            {option.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </CommandRoot>
+                </PopoverContent>
+              </div>
             </Popover>
           ) : null;
         }}

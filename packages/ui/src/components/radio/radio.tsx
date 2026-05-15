@@ -1,18 +1,18 @@
 import type * as React from "react";
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ButtonColorVariants } from "../button/button-variants";
-import type { AbstractCheckboxProps } from "../checkbox";
+import type { AbstractCheckboxProps as AbstractCheckboxProperties } from "../checkbox";
 import type { FormValueType } from "../form";
 import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
 import { buttonVariants } from "../button";
 import { buttonColorVariants } from "../button/button-variants";
 
-type RadioProps<T extends FormValueType = FormValueType> =
-  AbstractCheckboxProps<RadioChangeEvent<T>, T> & {
+type RadioProperties<T extends FormValueType = FormValueType> =
+  AbstractCheckboxProperties<RadioChangeEvent<T>, T> & {
     color?: ButtonColorVariants["color"];
     optionType?: "default" | "button";
     buttonStyle?: "outline" | "solid";
@@ -28,8 +28,8 @@ const Radio = <T extends FormValueType = FormValueType>({
   optionType,
   buttonStyle,
   onChange,
-  ...props
-}: RadioProps<T>) => {
+  ...properties
+}: RadioProperties<T>) => {
   const variant =
     buttonStyle === "solid"
       ? checked
@@ -71,13 +71,13 @@ const Radio = <T extends FormValueType = FormValueType>({
         <RadioGroupPrimitive.Item
           value={value as string}
           disabled={disabled}
-          {...props}
+          {...properties}
           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
             if (disabled) return;
             const event: RadioChangeEvent<T> = {
               type: "change" as const,
               target: {
-                ...props,
+                ...properties,
                 value: value as unknown as T,
                 // label: children,
                 disabled,
@@ -92,7 +92,7 @@ const Radio = <T extends FormValueType = FormValueType>({
               nativeEvent: e.nativeEvent,
             };
             onChange?.(event);
-            props.onClick?.(e);
+            properties.onClick?.(e);
           }}
         >
           <span>{children}</span>
@@ -136,13 +136,13 @@ const Radio = <T extends FormValueType = FormValueType>({
           // ],
         )}
         disabled={disabled}
-        {...props}
+        {...properties}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
           if (disabled) return;
           const event: RadioChangeEvent<T> = {
             type: "change" as const,
             target: {
-              ...props,
+              ...properties,
               value: value as unknown as T,
               // label: children,
               disabled,
@@ -157,7 +157,7 @@ const Radio = <T extends FormValueType = FormValueType>({
             nativeEvent: e.nativeEvent,
           };
           onChange?.(event);
-          props.onClick?.(e);
+          properties.onClick?.(e);
         }}
       >
         <RadioGroupPrimitive.Indicator
@@ -182,5 +182,5 @@ const Radio = <T extends FormValueType = FormValueType>({
   );
 };
 
-export type { RadioProps };
+export type { RadioProperties as RadioProps };
 export { Radio };

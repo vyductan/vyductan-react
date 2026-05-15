@@ -33,7 +33,7 @@ import { cn } from "../../lib/utils";
 function DrawerContent({
   className,
   children,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDrawerContent>) {
   return (
     <DrawerPortal data-slot="drawer-portal">
@@ -62,7 +62,7 @@ function DrawerContent({
             e.preventDefault();
           }
         }}
-        {...props}
+        {...properties}
       >
         <div className="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
         {children}
@@ -73,12 +73,12 @@ function DrawerContent({
 
 const DrawerHeader = ({
   className,
-  ...props
+  ...properties
 }: React.ComponentProps<typeof ShadcnDrawerHeader>) => {
   return (
     <ShadcnDrawerHeader
       className={cn("flex flex-row items-center border-b p-4", className)}
-      {...props}
+      {...properties}
     />
   );
 };
@@ -110,7 +110,7 @@ const DrawerHeader = ({
 
 const DrawerFooter = ({
   className,
-  ...props
+  ...properties
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
@@ -118,7 +118,7 @@ const DrawerFooter = ({
       "bg-muted/10 border-t p-4",
       className,
     )}
-    {...props}
+    {...properties}
   />
 );
 DrawerFooter.displayName = "DrawerFooter";

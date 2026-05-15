@@ -97,14 +97,12 @@ test("Input type number keeps DOM input onChange contract", () => {
 
 test("Input does not accept type time", () => {
   Input({
-    // @ts-expect-error use TimePicker directly instead of Input type=time
     type: "time",
   });
 });
 
 test("Input props type does not allow type time", () => {
   const properties: InputProperties = {
-    // @ts-expect-error public InputProps should reject type=time
     type: "time",
   };
 

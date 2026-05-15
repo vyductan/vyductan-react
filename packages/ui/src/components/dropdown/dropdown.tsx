@@ -1,7 +1,7 @@
 "use client";
 
 // import type { Placement } from "@popperjs/core";
-import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu } from "radix-ui";
 import type { ReactNode } from "react";
 import type React from "react";
 import { cloneElement, Fragment, isValidElement } from "react";
@@ -11,7 +11,7 @@ import { useDebounce } from "ahooks";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { Placement } from "../../types";
-import type { ItemType, MenuProps } from "../menu";
+import type { ItemType, MenuProps as MenuProperties } from "../menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,13 +25,13 @@ import {
   DropdownMenuTrigger,
 } from "./_components";
 
-export type DropdownProps = DropdownMenuTriggerProps & {
+export type DropdownProps = DropdownMenu.DropdownMenuTriggerProps & {
   onOpenChange?: (open: boolean, info: { source: "trigger" | "menu" }) => void;
   open?: boolean;
 
   className?: string;
   children: ReactNode;
-  menu: MenuProps;
+  menu: MenuProperties;
   placement?: Placement;
   trigger?: ("click" | "hover" | "contextMenu")[];
   disabled?: boolean;
@@ -45,7 +45,7 @@ export const Dropdown = ({
   asChild,
   trigger = ["click"],
   disabled = false,
-  open: openProp,
+  open: openProperty,
   onOpenChange,
   ...rest
 }: DropdownProps) => {
@@ -56,7 +56,7 @@ export const Dropdown = ({
   const hasContextMenu = triggers.includes("contextMenu");
 
   const [open, setOpen] = useMergedState(false, {
-    value: openProp,
+    value: openProperty,
     onChange: (value) => {
       onOpenChange?.(value, { source: "trigger" });
     },
@@ -80,24 +80,27 @@ export const Dropdown = ({
             return type.displayName === "Button" || type.name === "Button";
           })()));
 
-  const side = placement.includes("top")
-    ? "top"
-    : placement.includes("right")
-      ? "right"
-      : placement.includes("bottom")
-        ? "bottom"
-        : "left";
-  const align = placement.includes("Top")
-    ? "start"
-    : !placement.includes("Left") && !placement.includes("Right")
-      ? "center"
-      : placement.includes("Left")
-        ? "start"
-        : "end";
+  let side: "top" | "right" | "bottom" | "left" = "left";
+  if (placement.includes("top")) {
+    side = "top";
+  } else if (placement.includes("right")) {
+    side = "right";
+  } else if (placement.includes("bottom")) {
+    side = "bottom";
+  }
+
+  let align: "start" | "center" | "end" = "end";
+  if (placement.includes("Top")) {
+    align = "start";
+  } else if (!placement.includes("Left") && !placement.includes("Right")) {
+    align = "center";
+  } else if (placement.includes("Left")) {
+    align = "start";
+  }
 
   const renderMenu = (items: ItemType[]): ReactNode => {
     return items.map((item, index) => {
-      if (!item) return null;
+      if (!item) return;
 
       // Handle divider type
       if (item.type === "divider") {
@@ -124,6 +127,9 @@ export const Dropdown = ({
             <DropdownMenuSubTrigger disabled={item.disabled}>
               {item.icon}
               <span>{item.label}</span>
+              {item.extra && (
+                <DropdownMenuShortcut>{item.extra}</DropdownMenuShortcut>
+              )}
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent>
               {renderMenu(item.children)}
@@ -179,23 +185,23 @@ export const Dropdown = ({
   };
 
   // Build trigger props based on multiple triggers
-  const triggerProps: {
+  const triggerProperties: {
     onMouseEnter?: () => void;
     onMouseLeave?: () => void;
     onContextMenu?: (e: React.MouseEvent) => void;
   } = {};
 
   if (hasHover) {
-    triggerProps.onMouseEnter = () => {
+    triggerProperties.onMouseEnter = () => {
       if (!disabled && !open) setOpen(true);
     };
-    triggerProps.onMouseLeave = () => {
+    triggerProperties.onMouseLeave = () => {
       if (open) setOpen(false);
     };
   }
 
   if (hasContextMenu) {
-    triggerProps.onContextMenu = (e: React.MouseEvent) => {
+    triggerProperties.onContextMenu = (e: React.MouseEvent) => {
       if (!disabled) {
         e.preventDefault();
         setOpen(true);
@@ -204,15 +210,15 @@ export const Dropdown = ({
   }
 
   // Build content props for hover
-  const contentProps: {
+  const contentProperties: {
     onMouseEnter?: () => void;
     onMouseLeave?: () => void;
   } = {};
   if (hasHover) {
-    contentProps.onMouseEnter = () => {
+    contentProperties.onMouseEnter = () => {
       if (!disabled && !open) setOpen(true);
     };
-    contentProps.onMouseLeave = () => {
+    contentProperties.onMouseLeave = () => {
       if (open) setOpen(false);
     };
   }
@@ -227,7 +233,7 @@ export const Dropdown = ({
         className={cn(disabled && "pointer-events-none opacity-50", className)}
         asChild={shouldUseAsChild}
         disabled={disabled}
-        {...triggerProps}
+        {...triggerProperties}
         {...rest}
       >
         {children}
@@ -237,7 +243,7 @@ export const Dropdown = ({
         side={side}
         align={align}
         forceMount
-        {...contentProps}
+        {...contentProperties}
       >
         {renderMenu(menu.items)}
       </DropdownMenuContent>

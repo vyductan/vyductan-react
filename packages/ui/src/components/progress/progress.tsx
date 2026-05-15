@@ -2,14 +2,14 @@
 
 import type { VariantProps } from "tailwind-variants";
 import * as React from "react";
-import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { Progress as ProgressPrimitive } from "radix-ui";
 import { tv } from "tailwind-variants";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { ConfigConsumerProps } from "../config-provider/context";
-import type { CircleProps } from "./circle";
-import { devUseWarning } from "../_util/warning";
+import type { ConfigConsumerProps as ConfigConsumerProperties } from "../config-provider/context";
+import type { CircleProps as CircleProperties } from "./circle";
+import { devUseWarning as developmentUseWarning } from "../_util/warning";
 import { Icon } from "../../icons";
 import { ConfigContext } from "../config-provider/context";
 import { CircularProgress } from "./circle";
@@ -124,14 +124,14 @@ export type CommonProgressProps = ProgressAriaProps & {
   };
   // styles?: Partial<Record<SemanticName, React.CSSProperties>>;
 };
-type LineProps = CommonProgressProps & {
+type LineProperties = CommonProgressProps & {
   type?: "line";
   status?: ProgressStatus;
 };
 
-type ProgressProps = LineProps | CircleProps;
+type ProgressProperties = LineProperties | CircleProperties;
 
-function Progress(props: ProgressProps) {
+function Progress(properties: ProgressProperties) {
   const {
     ref,
     style,
@@ -161,8 +161,8 @@ function Progress(props: ProgressProps) {
     status,
     format,
     // Remove props that should not be passed to DOM elements
-    ..._restProps
-  } = props;
+    ..._restProperties
+  } = properties;
 
   const { align: infoAlign = "end", type: infoPosition = "outer" } =
     percentPosition;
@@ -200,7 +200,7 @@ function Progress(props: ProgressProps) {
 
   // Get stroke color style for progress indicator
   const getStrokeColorStyle = React.useMemo(() => {
-    if (!strokeColor) return null;
+    if (!strokeColor) return;
 
     if (typeof strokeColor === "string") {
       return { backgroundColor: strokeColor };
@@ -238,7 +238,7 @@ function Progress(props: ProgressProps) {
       };
     }
 
-    return null;
+    return;
   }, [strokeColor]);
 
   const percentNumber = React.useMemo<number>(() => {
@@ -262,13 +262,13 @@ function Progress(props: ProgressProps) {
   }, [status, percentNumber]);
 
   const { direction, progress: progressStyle } =
-    React.useContext<ConfigConsumerProps>(ConfigContext);
+    React.useContext<ConfigConsumerProperties>(ConfigContext);
 
   const isLineType = type === "line";
   const isPureLineType = isLineType && !steps;
   const progressInfo = React.useMemo<React.ReactNode>(() => {
     if (!showInfo) {
-      return null;
+      return;
     }
     const computedSuccessPercent = getSuccessPercent({
       success,
@@ -356,14 +356,14 @@ function Progress(props: ProgressProps) {
   }, [showInfo, percent, percentNumber, progressStatus, type, format]);
 
   if (process.env.NODE_ENV !== "production") {
-    const warning = devUseWarning("Progress");
+    const warning = developmentUseWarning("Progress");
 
     warning.deprecated(
-      !("successPercent" in props),
+      !("successPercent" in properties),
       "successPercent",
       "success.percent",
     );
-    warning.deprecated(!("width" in props), "width", "size");
+    warning.deprecated(!("width" in properties), "width", "size");
 
     if (type === "circle" || type === "dashboard") {
       if (Array.isArray(size)) {
@@ -473,5 +473,5 @@ function Progress(props: ProgressProps) {
   );
 }
 
-export type { ProgressProps };
+export type { ProgressProperties as ProgressProps };
 export { Progress };

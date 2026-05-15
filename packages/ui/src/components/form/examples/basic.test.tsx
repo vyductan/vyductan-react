@@ -81,6 +81,16 @@ describe("Form basic example", () => {
     expect(screen.getByPlaceholderText("Select payment time")).toBeInTheDocument();
   });
 
+  test("renders an email notifications switch field", () => {
+    render(<BasicExample />);
+
+    const switchControl = screen.getByRole("switch", {
+      name: /email notifications/i,
+    });
+
+    expect(switchControl).toHaveAttribute("aria-checked", "false");
+  });
+
   test("uses compact field spacing for limit fields", () => {
     render(<BasicExample />);
 

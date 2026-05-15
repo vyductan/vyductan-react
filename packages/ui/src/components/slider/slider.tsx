@@ -1,38 +1,41 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { XOR } from "ts-xor";
-import * as SliderPrimitive from "@radix-ui/react-slider";
+import { Slider as SliderPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 
-type SingleSliderProps = {
+type SingleSliderProperties = {
   range?: false;
   value: number;
   onChange?: (value: number) => void;
 };
-type RangeSliderProps = {
+type RangeSliderProperties = {
   range: true;
   value: [number, number];
   onChange?: (value: [number, number]) => void;
 };
-export type OwnSliderProps = XOR<SingleSliderProps, RangeSliderProps> & {
+export type OwnSliderProps = XOR<
+  SingleSliderProperties,
+  RangeSliderProperties
+> & {
   ariaLabel?: string;
   className?: string;
 };
 
-export const InternalSlider = (props: OwnSliderProps) => {
+export const InternalSlider = (properties: OwnSliderProps) => {
   const {
     range,
-    value: valueProps,
+    value: valueProperties,
     onChange,
     ariaLabel,
     className,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
 
-  const controlledValue = range ? valueProps : [valueProps];
+  const controlledValue = range ? valueProperties : [valueProperties];
   const onValueChange = range
     ? onChange
-    : (val: number[]) => onChange?.(val[0]!);
+    : (value: number[]) => onChange?.(value[0]!);
 
   const thumbCount = Array.isArray(controlledValue)
     ? controlledValue.length
@@ -47,7 +50,7 @@ export const InternalSlider = (props: OwnSliderProps) => {
         "relative flex w-full touch-none items-center select-none data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
         className,
       )}
-      {...restProps}
+      {...restProperties}
     >
       <SliderPrimitive.Track
         data-slot="slider-track"

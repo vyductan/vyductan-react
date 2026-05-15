@@ -19,6 +19,7 @@ import {
 } from "@acme/ui/components/field";
 import { Input, InputNumber } from "@acme/ui/components/input";
 import { Select } from "@acme/ui/components/select";
+import { Switch } from "@acme/ui/components/switch";
 import { Textarea } from "@acme/ui/components/textarea";
 
 const formSchema = z.object({
@@ -37,6 +38,7 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "Please input your hard limit!" }),
   sameAsShipping: z.boolean().optional(),
+  emailNotifications: z.boolean().optional(),
   comments: z.string().optional(),
 });
 
@@ -55,6 +57,7 @@ function App(): React.JSX.Element {
       softLimitPerPax: "",
       hardLimitPerPax: "",
       sameAsShipping: true,
+      emailNotifications: false,
       comments: "",
     },
   });
@@ -303,6 +306,31 @@ function App(): React.JSX.Element {
                     >
                       Same as shipping address
                     </FieldLabel>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="emailNotifications"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field orientation="horizontal" data-invalid={fieldState.invalid}>
+                    <FieldGroup>
+                      <FieldLabel htmlFor="basic-shadcn-email-notifications">
+                        Email Notifications
+                      </FieldLabel>
+                      <FieldDescription>
+                        Receive payment and billing updates.
+                      </FieldDescription>
+                    </FieldGroup>
+                    <Switch
+                      id="basic-shadcn-email-notifications"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      aria-invalid={fieldState.invalid}
+                    />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
                     )}

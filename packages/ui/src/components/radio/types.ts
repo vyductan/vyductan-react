@@ -1,9 +1,9 @@
 import type { FormValueType } from "../form";
-import type { RadioProps } from "./radio";
+import type { RadioProps as RadioProperties } from "./radio";
 
 export interface RadioChangeEventTarget<
   T extends FormValueType = FormValueType,
-> extends Omit<RadioProps<T>, "value"> {
+> extends Omit<RadioProperties<T>, "value"> {
   value: T;
   checked: boolean;
   type: "checkbox" | "radio";

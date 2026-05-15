@@ -12,8 +12,8 @@ import {
   SheetTrigger,
 } from "./_components";
 
-type ShadcnSheetProps = React.ComponentProps<typeof SheetRoot>;
-type OwnSheetProps = {
+type ShadcnSheetProperties = React.ComponentProps<typeof SheetRoot>;
+type OwnSheetProperties = {
   open?: boolean;
   onClose?: () => void;
   onOpenChange?: (open: boolean) => void;
@@ -39,13 +39,13 @@ type OwnSheetProps = {
   placement?: React.ComponentProps<typeof SheetContent>["side"];
 };
 
-type SheetProps = XOR<ShadcnSheetProps, OwnSheetProps>;
-const Sheet = (props: SheetProps) => {
-  const isShadcnSheet = Children.toArray(props.children).some(
+type SheetProperties = XOR<ShadcnSheetProperties, OwnSheetProperties>;
+const Sheet = (properties: SheetProperties) => {
+  const isShadcnSheet = Children.toArray(properties.children).some(
     (child) => isValidElement(child) && child.type === SheetContent,
   );
   if (isShadcnSheet) {
-    return <SheetRoot {...props} />;
+    return <SheetRoot {...properties} />;
   }
 
   const {
@@ -60,8 +60,8 @@ const Sheet = (props: SheetProps) => {
     placement = "right",
     onClose,
     onOpenChange,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
 
   return (
     <SheetRoot
@@ -69,7 +69,7 @@ const Sheet = (props: SheetProps) => {
         if (!open) onClose?.();
         onOpenChange?.(open);
       }}
-      {...restProps}
+      {...restProperties}
     >
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
       <SheetContent
@@ -106,7 +106,7 @@ const Sheet = (props: SheetProps) => {
   );
 };
 
-export type { SheetProps };
+export type { SheetProperties as SheetProps };
 export { Sheet };
 
 export {
