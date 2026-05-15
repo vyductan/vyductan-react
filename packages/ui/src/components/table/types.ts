@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
-import type { DropdownMenuTriggerProps } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu } from "radix-ui";
 import type {
   BuiltInSortingFn,
   Column,
@@ -225,7 +225,7 @@ type RenderCellContext<TRecord> = {
 //       };
 //     }[keyof TRecord]
 //   >
-interface CoverableDropdownProps extends DropdownMenuTriggerProps {
+interface CoverableDropdownProps extends DropdownMenu.DropdownMenuTriggerProps {
   children?: React.ReactNode;
   className?: string;
   disabled?: boolean;

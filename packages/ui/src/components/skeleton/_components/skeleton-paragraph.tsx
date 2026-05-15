@@ -15,8 +15,8 @@ export interface SkeletonParagraphProps {
   active?: boolean;
 }
 
-const getWidth = (index: number, props: SkeletonParagraphProps) => {
-  const { width, rows = 2 } = props;
+const getWidth = (index: number, properties: SkeletonParagraphProps) => {
+  const { width, rows = 2 } = properties;
   if (Array.isArray(width)) {
     return width[index];
   }
@@ -29,15 +29,15 @@ const getWidth = (index: number, props: SkeletonParagraphProps) => {
 
 const SkeletonParagraph: React.FC<SkeletonParagraphProps> = ({
   active,
-  ...props
+  ...properties
 }) => {
-  const { className, style, rows = 0 } = props;
+  const { className, style, rows = 0 } = properties;
   const rowList = Array.from({ length: rows }).map((_, index) => (
     <SkeletonElement
       active={active}
       asChild
       key={index}
-      style={{ width: getWidth(index, props) }}
+      style={{ width: getWidth(index, properties) }}
     >
       <li />
     </SkeletonElement>

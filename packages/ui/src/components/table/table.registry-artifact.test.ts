@@ -360,8 +360,13 @@ test("table registry selection dropdown keeps popup container support in exporte
 
 test("table registry does not ship the legacy selection hook", () => {
   expect(() =>
-    readRegistryFileContent("table", "components/table/hooks/use-selection.tsx"),
-  ).toThrowError("Missing registry file: components/table/hooks/use-selection.tsx");
+    readRegistryFileContent(
+      "table",
+      "components/table/hooks/use-selection.tsx",
+    ),
+  ).toThrowError(
+    "Missing registry file: components/table/hooks/use-selection.tsx",
+  );
 });
 
 test("table registry locale support avoids empty and locale hook fanout", () => {

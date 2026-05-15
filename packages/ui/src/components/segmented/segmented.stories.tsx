@@ -9,20 +9,20 @@ const defaultOptions = [
   { label: "Monthly", value: "monthly" },
 ];
 
-type SegmentedStoryArgs = ComponentProps<typeof Segmented>;
+type SegmentedStoryArguments = ComponentProps<typeof Segmented>;
 
-function renderInBackground(args: SegmentedStoryArgs): JSX.Element {
+function renderInBackground(arguments_: SegmentedStoryArguments): JSX.Element {
   return (
     <div className="bg-background rounded-xl p-6">
-      <Segmented {...args} />
+      <Segmented {...arguments_} />
     </div>
   );
 }
 
-function renderBlock(args: SegmentedStoryArgs): JSX.Element {
+function renderBlock(arguments_: SegmentedStoryArguments): JSX.Element {
   return (
     <div className="bg-background w-96 rounded-xl p-6">
-      <Segmented {...args} />
+      <Segmented {...arguments_} />
     </div>
   );
 }

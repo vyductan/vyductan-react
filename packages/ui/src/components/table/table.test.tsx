@@ -243,12 +243,16 @@ describe("Table", () => {
 
   test("applies classNames.root to the table container", () => {
     const { container } = render(
-      <Table columns={columns} dataSource={data} classNames={{ root: "root-class" }} />,
+      <Table
+        columns={columns}
+        dataSource={data}
+        classNames={{ root: "root-class" }}
+      />,
     );
 
-    expect(container.querySelector('[data-slot="table-container"]')).toHaveClass(
-      "root-class",
-    );
+    expect(
+      container.querySelector('[data-slot="table-container"]'),
+    ).toHaveClass("root-class");
   });
 
   test("applies classNames.title to the table title wrapper", () => {
@@ -266,7 +270,9 @@ describe("Table", () => {
     const titleContent = container.querySelector(
       '[data-slot="table-title-content"]',
     );
-    const titleExtra = container.querySelector('[data-slot="table-title-extra"]');
+    const titleExtra = container.querySelector(
+      '[data-slot="table-title-extra"]',
+    );
 
     expect(titleHeader).toHaveClass("title-class");
     expect(titleContent).toHaveTextContent("Table title");
@@ -292,9 +298,9 @@ describe("Table", () => {
       "data-slot",
       "table-summary",
     );
-    expect(container.querySelector('[data-slot="table-footer"]')).toHaveTextContent(
-      "Footer content",
-    );
+    expect(
+      container.querySelector('[data-slot="table-footer"]'),
+    ).toHaveTextContent("Footer content");
   });
 
   test("keeps the header selection checkbox inside a stable centering wrapper", () => {
@@ -365,13 +371,13 @@ describe("Table", () => {
     );
 
     const table = container.querySelector("table");
-    const tableContainer = container.querySelector('[data-slot="table-container"]');
+    const tableContainer = container.querySelector(
+      '[data-slot="table-container"]',
+    );
 
     expect(table).toHaveClass("border");
     expect(table).not.toHaveClass("border-b-0");
-    expect(tableContainer).toHaveClass(
-      "[&_tbody_tr:last-child>td]:border-b-0",
-    );
+    expect(tableContainer).toHaveClass("[&_tbody_tr:last-child>td]:border-b-0");
   });
 
   test("keeps the body-to-summary border in bordered tables", () => {
@@ -388,7 +394,9 @@ describe("Table", () => {
       />,
     );
 
-    const tableContainer = container.querySelector('[data-slot="table-container"]');
+    const tableContainer = container.querySelector(
+      '[data-slot="table-container"]',
+    );
 
     expect(container.querySelector("tfoot")).toHaveAttribute(
       "data-slot",
@@ -397,9 +405,7 @@ describe("Table", () => {
     expect(tableContainer).not.toHaveClass(
       "[&_tbody_tr:last-child>td]:border-b-0",
     );
-    expect(tableContainer).toHaveClass(
-      "[&_tfoot_tr:last-child>td]:border-b-0",
-    );
+    expect(tableContainer).toHaveClass("[&_tfoot_tr:last-child>td]:border-b-0");
   });
 
   test("renders a row selection checkbox without hanging", () => {

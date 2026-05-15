@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-
 import type { ExpandedState, OnChangeFn } from "@tanstack/react-table";
 import * as React from "react";
 import { useMergedState } from "@rc-component/util";
@@ -144,11 +143,17 @@ export default function useExpand<TRecord extends AnyObject>(
     }
 
     return false;
-  }, [hasExpandedRowRender, props.expandable, props.internalHooks, mergedData, mergedChildrenColumnName]);
+  }, [
+    hasExpandedRowRender,
+    props.expandable,
+    props.internalHooks,
+    mergedData,
+    mergedChildrenColumnName,
+  ]);
 
-  const [innerExpandedKeys, setInnerExpandedKeys] = React.useState<readonly Key[]>(
-    () => defaultExpandedRowKeys ?? [],
-  );
+  const [innerExpandedKeys, setInnerExpandedKeys] = React.useState<
+    readonly Key[]
+  >(() => defaultExpandedRowKeys ?? []);
   const mergedInnerExpandedKeys = defaultExpandAllRows
     ? defaultExpandedAllKeys
     : innerExpandedKeys;

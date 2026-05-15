@@ -17,7 +17,7 @@ import type {
 import type { JSX, ReactElement } from "react";
 import * as React from "react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { DialogTrigger } from "@radix-ui/react-dialog";
+import { Dialog } from "radix-ui";
 
 import { Button } from "@acme/ui/components/button";
 import {
@@ -218,7 +218,7 @@ export function ExcalidrawModal({
 
   return (
     <DialogRoot open={isShown}>
-      <DialogTrigger />
+      <Dialog.DialogTrigger />
       <DialogContent className="h-4/6 max-w-4xl overflow-hidden p-0">
         <div className="relative" role="dialog">
           <div

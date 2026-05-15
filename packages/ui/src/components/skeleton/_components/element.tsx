@@ -16,9 +16,9 @@ export interface SkeletonElementProps {
   children?: React.ReactNode;
 }
 
-const SkeletonElement = (props: SkeletonElementProps) => {
-  const { active, className, style, size, shape, asChild, ...restProps } =
-    props;
+const SkeletonElement = (properties: SkeletonElementProps) => {
+  const { active, className, style, size, shape, asChild, ...restProperties } =
+    properties;
 
   const sizeCls = cn({
     ["h-10 w-10"]: size === "large",
@@ -58,7 +58,7 @@ const SkeletonElement = (props: SkeletonElementProps) => {
       )}
       // className={cn(active ? "" : "animate-none", sizeCls, shapeCls, className)}
       style={{ ...sizeStyle, ...style }}
-      {...restProps}
+      {...restProperties}
     />
   );
 };

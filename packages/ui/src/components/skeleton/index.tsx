@@ -2,24 +2,24 @@ import type { XOR } from "ts-xor";
 
 import { Skeleton as SkeletonShadcn } from "@acme/ui/shadcn/skeleton";
 
-import type { SkeletonProps } from "./skeleton";
+import type { SkeletonProps as SkeletonProperties } from "./skeleton";
 import { SkeletonAvatar } from "./_components/skeleton-avatar";
 import { Skeleton } from "./skeleton";
 
-type XorSkeletonProps = XOR<
-  SkeletonProps,
+type XorSkeletonProperties = XOR<
+  SkeletonProperties,
   React.ComponentProps<typeof SkeletonShadcn>
 >;
-const InternalSkeleton = (props: XorSkeletonProps) => {
-  const { title, ...rest } = props;
+const InternalSkeleton = (properties: XorSkeletonProperties) => {
+  const { title, ...rest } = properties;
   const isShadcnSkeleton =
-    !props.paragraph &&
+    !properties.paragraph &&
     (typeof title === "string" || title === undefined) &&
-    !props.avatar;
+    !properties.avatar;
   if (isShadcnSkeleton) {
     return <SkeletonShadcn title={title} {...rest} />;
   }
-  return <Skeleton {...(props as SkeletonProps)} />;
+  return <Skeleton {...(properties as SkeletonProperties)} />;
 };
 
 type CompoundedComponent = typeof InternalSkeleton & {

@@ -1,19 +1,19 @@
 /* eslint-disable unicorn/prefer-ternary */
 import type { Key } from "react";
-import { Slot } from "@radix-ui/react-slot";
+import { Slot } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
 import { Skeleton as SkeletonShadcn } from "@acme/ui/shadcn/skeleton";
 
-import type { SkeletonAvatarProps } from "./_components/skeleton-avatar";
-import type { SkeletonParagraphProps } from "./_components/skeleton-paragraph";
-import type { SkeletonTitleProps } from "./_components/skeleton-title";
+import type { SkeletonAvatarProps as SkeletonAvatarProperties } from "./_components/skeleton-avatar";
+import type { SkeletonParagraphProps as SkeletonParagraphProperties } from "./_components/skeleton-paragraph";
+import type { SkeletonTitleProps as SkeletonTitleProperties } from "./_components/skeleton-title";
 import { useComponentConfig } from "../config-provider/context";
 import { SkeletonElement } from "./_components/element";
 import { SkeletonParagraph } from "./_components/skeleton-paragraph";
 import { SkeletonTitle } from "./_components/skeleton-title";
 
-interface SkeletonProps {
+interface SkeletonProperties {
   key?: Key;
   asChild?: boolean;
   // children?: React.ReactNode;
@@ -25,16 +25,16 @@ interface SkeletonProps {
   /** Display the skeleton when true */
   loading?: boolean;
   /** Show avatar placeholder */
-  avatar?: SkeletonAvatarProps | boolean;
+  avatar?: SkeletonAvatarProperties | boolean;
   /** Show title placeholder */
-  title?: SkeletonTitleProps | boolean;
+  title?: SkeletonTitleProperties | boolean;
   /** Show paragraph placeholder */
-  paragraph?: SkeletonParagraphProps | boolean;
+  paragraph?: SkeletonParagraphProperties | boolean;
   /**Show paragraph and title radius when true */
   round?: boolean;
 }
 
-function Skeleton(props: SkeletonProps) {
+function Skeleton(properties: SkeletonProperties) {
   const {
     asChild,
     className,
@@ -47,8 +47,8 @@ function Skeleton(props: SkeletonProps) {
     avatar = false,
     title = true,
     paragraph = true,
-    ...restProps
-  } = props;
+    ...restProperties
+  } = properties;
   const {
     direction,
     className: contextClassName,
@@ -56,7 +56,7 @@ function Skeleton(props: SkeletonProps) {
   } = useComponentConfig("skeleton");
   const SkeletonComp = asChild ? Slot : SkeletonShadcn;
 
-  if (loading || !("loading" in props)) {
+  if (loading || !("loading" in properties)) {
     const hasAvatar = !!avatar;
     const hasTitle = !!title;
     const hasParagraph = !!paragraph;
@@ -64,14 +64,14 @@ function Skeleton(props: SkeletonProps) {
     // Avatar
     let avatarNode: React.ReactNode;
     if (hasAvatar) {
-      const avatarProps: SkeletonAvatarProps = {
-        ...getAvatarBasicProps(hasTitle, hasParagraph),
-        ...getComponentProps(avatar),
+      const avatarProperties: SkeletonAvatarProperties = {
+        ...getAvatarBasicProperties(hasTitle, hasParagraph),
+        ...getComponentProperties(avatar),
       };
       // We direct use SkeletonElement as avatar in skeleton internal.
       avatarNode = (
         <div data-slot="skeleton-header" className="table-cell pe-4 align-top">
-          <SkeletonElement active={active} {...avatarProps} />
+          <SkeletonElement active={active} {...avatarProperties} />
         </div>
       );
     }
@@ -81,27 +81,27 @@ function Skeleton(props: SkeletonProps) {
       // Title
       let $title: React.ReactNode;
       if (hasTitle) {
-        const titleProps: SkeletonTitleProps = {
+        const titleProperties: SkeletonTitleProperties = {
           active,
-          ...getTitleBasicProps(hasAvatar, hasParagraph),
-          ...getComponentProps(title),
+          ...getTitleBasicProperties(hasAvatar, hasParagraph),
+          ...getComponentProperties(title),
         };
 
-        $title = <SkeletonTitle className="mt-3" {...titleProps} />;
+        $title = <SkeletonTitle className="mt-3" {...titleProperties} />;
       }
 
       // Paragraph
       let paragraphNode: React.ReactNode;
       if (hasParagraph) {
-        const paragraphProps: SkeletonParagraphProps = {
-          ...getParagraphBasicProps(hasAvatar, hasTitle),
-          ...getComponentProps(paragraph),
+        const paragraphProperties: SkeletonParagraphProperties = {
+          ...getParagraphBasicProperties(hasAvatar, hasTitle),
+          ...getComponentProperties(paragraph),
         };
 
         paragraphNode = (
           <SkeletonParagraph
             active={active}
-            {...paragraphProps}
+            {...paragraphProperties}
             className="mt-7"
           />
         );
@@ -143,23 +143,25 @@ function Skeleton(props: SkeletonProps) {
   //   return <SkeletonAvatar {...avatarProps} />;
   // }
 
-  return <SkeletonComp className={cn(className)} {...restProps} />;
+  return <SkeletonComp className={cn(className)} {...restProperties} />;
 }
 
-export type { SkeletonProps };
+export type { SkeletonProperties as SkeletonProps };
 export { Skeleton };
 
-function getComponentProps<T>(prop?: T | boolean): T | Record<string, string> {
-  if (prop && typeof prop === "object") {
-    return prop;
+function getComponentProperties<T>(
+  property?: T | boolean,
+): T | Record<string, string> {
+  if (property && typeof property === "object") {
+    return property;
   }
   return {};
 }
 
-function getAvatarBasicProps(
+function getAvatarBasicProperties(
   hasTitle: boolean,
   hasParagraph: boolean,
-): SkeletonAvatarProps {
+): SkeletonAvatarProperties {
   if (hasTitle && !hasParagraph) {
     // Square avatar
     return { size: "large", shape: "square" };
@@ -167,10 +169,10 @@ function getAvatarBasicProps(
 
   return { size: "large", shape: "circle" };
 }
-function getTitleBasicProps(
+function getTitleBasicProperties(
   hasAvatar: boolean,
   hasParagraph: boolean,
-): SkeletonTitleProps {
+): SkeletonTitleProperties {
   if (!hasAvatar && hasParagraph) {
     return { width: "38%" };
   }
@@ -182,23 +184,23 @@ function getTitleBasicProps(
   return {};
 }
 
-function getParagraphBasicProps(
+function getParagraphBasicProperties(
   hasAvatar: boolean,
   hasTitle: boolean,
-): SkeletonParagraphProps {
-  const basicProps: SkeletonParagraphProps = {};
+): SkeletonParagraphProperties {
+  const basicProperties: SkeletonParagraphProperties = {};
 
   // Width
   if (!hasAvatar || !hasTitle) {
-    basicProps.width = "61%";
+    basicProperties.width = "61%";
   }
 
   // Rows
   if (!hasAvatar && hasTitle) {
-    basicProps.rows = 3;
+    basicProperties.rows = 3;
   } else {
-    basicProps.rows = 2;
+    basicProperties.rows = 2;
   }
 
-  return basicProps;
+  return basicProperties;
 }

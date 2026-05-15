@@ -45,7 +45,9 @@ export const TableStoreProvider = ({ children }: TableStoreProviderProps) => {
   );
 
   return (
-    <TableStoreContext.Provider value={store}>{children}</TableStoreContext.Provider>
+    <TableStoreContext.Provider value={store}>
+      {children}
+    </TableStoreContext.Provider>
   );
 };
 

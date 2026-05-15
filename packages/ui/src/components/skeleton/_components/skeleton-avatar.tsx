@@ -1,18 +1,18 @@
 "use client";
 
-import type { SkeletonElementProps } from "./element";
+import type { SkeletonElementProps as SkeletonElementProperties } from "./element";
 import { SkeletonElement } from "./element";
 
 export interface SkeletonAvatarProps extends Omit<
-  SkeletonElementProps,
+  SkeletonElementProperties,
   "shape"
 > {
   shape?: "circle" | "square";
 }
 
-const SkeletonAvatar = (props: SkeletonAvatarProps) => {
-  const { shape = "circle", size = "default", ...restProps } = props;
-  return <SkeletonElement shape={shape} size={size} {...restProps} />;
+const SkeletonAvatar = (properties: SkeletonAvatarProps) => {
+  const { shape = "circle", size = "default", ...restProperties } = properties;
+  return <SkeletonElement shape={shape} size={size} {...restProperties} />;
 };
 
 export { SkeletonAvatar };

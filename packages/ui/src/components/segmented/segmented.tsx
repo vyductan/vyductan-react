@@ -2,7 +2,7 @@
 
 import type { VariantProps } from "class-variance-authority";
 import * as React from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { Tabs as TabsPrimitive } from "radix-ui";
 import { cva } from "class-variance-authority";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -84,20 +84,20 @@ const Segmented = React.forwardRef<
       defaultValue,
       onChange,
       disabled,
-      ...props
+      ...properties
     },
-    ref,
+    reference,
   ) => {
     const normalizedOptions = options.map((option) => normalizeOption(option));
 
     return (
       <TabsPrimitive.Root
-        ref={ref}
+        ref={reference}
         value={stringifyValue(value)}
         defaultValue={stringifyValue(defaultValue)}
         onValueChange={onChange}
         className={className}
-        {...props}
+        {...properties}
       >
         <TabsPrimitive.List
           className={cn(segmentedVariants({ size, block }), className)}
