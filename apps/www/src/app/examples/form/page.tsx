@@ -15,7 +15,6 @@ import {
 import FormAntdDemo from "@acme/ui/components/form/examples/antd";
 import FormBasicDemo from "@acme/ui/components/form/examples/basic";
 import FormLayoutMultipleDemo from "@acme/ui/components/form/examples/layout-multiple";
-import FormShadcnDemo from "@acme/ui/components/form/examples/shadcn";
 
 export default function DescriptionsExamples() {
   return (
@@ -68,16 +67,6 @@ export default function DescriptionsExamples() {
         </CardHeader>
         <CardContent>
           <FormAntdDemo />
-        </CardContent>
-      </Card>
-
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Vertical</CardTitle>
-          <CardDescription>Vertical usage of form.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <FormShadcnDemo />
         </CardContent>
       </Card>
     </div>

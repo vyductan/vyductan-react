@@ -71,3 +71,12 @@ dist/
 # storybook
 *storybook.log
 storybook-static
+
+.playwright-mcp/
+.superpowers/
+docs/plans/
+docs/superpowers/
+.understand-anything/
+graphify-out/
+
+AGENTS.md

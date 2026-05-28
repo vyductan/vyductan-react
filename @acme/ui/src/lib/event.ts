@@ -1,0 +1,25 @@
+/**
+ * inspired by https://stackoverflow.com/a/71340077
+ * triggerNativeEventFor(inputRef.current, { event: 'input', value: '' });
+ * triggerNativeEventFor(checkBoxRef.current, { event: 'input', checked: false });
+ */
+export function triggerNativeEventFor<T>(
+  element: T,
+  {
+    event,
+    ...valueObject
+  }: { event: keyof HTMLElementEventMap; [key: string]: string | undefined },
+) {
+  if (!(element instanceof Element)) {
+    throw new TypeError(`Expected an Element but received ${element} instead!`);
+  }
+
+  const [property, value] = Object.entries(valueObject)[0] ?? [];
+
+  const prototype = Object.getPrototypeOf(element);
+
+  const desc = Object.getOwnPropertyDescriptor(prototype, property!);
+
+  desc?.set?.call(element, value);
+  element.dispatchEvent(new Event(event as string, { bubbles: true }));
+}

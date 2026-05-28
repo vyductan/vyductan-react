@@ -1,0 +1,54 @@
+import type React from "react";
+
+import type { Sidebar as ShadcnSidebar } from "@acme/ui/shadcn/sidebar";
+import { SidebarMenuButton as ShadcnSidebarMenuButton } from "@acme/ui/shadcn/sidebar";
+
+import { cn } from "../../lib/utils";
+import { TooltipProvider } from "../tooltip";
+
+const SidebarMenuButton = ({
+  className,
+  ...properties
+}: React.ComponentProps<typeof ShadcnSidebarMenuButton>) => {
+  return (
+    <TooltipProvider>
+      <ShadcnSidebarMenuButton
+        className={cn(
+          "[&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
+          className,
+        )}
+        {...properties}
+      />
+    </TooltipProvider>
+  );
+};
+
+type ShadcnSidebarProperties = React.ComponentProps<typeof ShadcnSidebar>;
+
+export type { ShadcnSidebarProperties as ShadcnSidebarProps };
+export { SidebarMenuButton };
+export {
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuBadge,
+  SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
+  Sidebar as SidebarRoot,
+} from "@acme/ui/shadcn/sidebar";

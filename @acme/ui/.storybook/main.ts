@@ -1,0 +1,187 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import type { StorybookConfig } from "@storybook/react-vite";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import tailwindcss from "@tailwindcss/vite";
+import remarkGfm from "remark-gfm";
+
+function getAbsolutePath(value: string): string {
+  return path.dirname(
+    fileURLToPath(import.meta.resolve(`${value}/package.json`)),
+  );
+}
+
+const config: StorybookConfig = {
+  stories: [
+    {
+      directory: "../src",
+      files: "**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    },
+    {
+      directory: "../src/components",
+      files: "*.mdx",
+      titlePrefix: "Components",
+    },
+    {
+      directory: "../src/components",
+      files: "*/*.mdx",
+      titlePrefix: "Components",
+    },
+  ],
+
+  // addons: [
+  //   getAbsolutePath("@storybook/addon-links"),
+  //   getAbsolutePath("@storybook/addon-a11y"),
+  //   getAbsolutePath("@storybook/addon-themes"),
+  //   getAbsolutePath("@storybook/addon-docs"),
+  //   getAbsolutePath("@storybook/addon-vitest"),
+  //   getAbsolutePath("@chromatic-com/storybook"),
+  // ],
+  addons: [
+    "@storybook/addon-mcp",
+    "@chromatic-com/storybook",
+    "@storybook/addon-vitest",
+    "@storybook/addon-a11y",
+    {
+      name: "@storybook/addon-docs",
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        },
+      },
+    },
+    // NOTE: @storybook/addon-vitest completely removed to prevent mocker bundle
+    // If you need story testing, run tests separately with vitest
+  ],
+
+  framework: {
+    name: getAbsolutePath("@storybook/react-vite"),
+    options: {},
+  },
+
+  async viteFinal(config) {
+    //   const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+    //   // Add Tailwind CSS v4 Vite plugin
+    config.plugins = [tailwindcss(), nodeResolve(), ...(config.plugins ?? [])];
+
+    //   // Configure aliases for @acme/ui package exports and TypeScript paths
+    //   config.resolve = config.resolve ?? {};
+    //   config.resolve.alias = {
+    //     ...(config.resolve.alias ?? {}),
+    //     "@/lib": resolve(projectRoot, "src/lib"),
+    //     "@/hooks": resolve(projectRoot, "src/hooks"),
+    //     "@acme/ui/components": resolve(projectRoot, "src/components"),
+    //     "@/components/icons": resolve(projectRoot, "src/icons"),
+    //   };
+
+    //   // Ensure React is deduplicated
+    //   config.resolve.dedupe = ["react", "react-dom"];
+
+    //   // Disable sourcemaps to avoid warnings
+    config.build = config.build ?? {};
+    config.build.sourcemap = false;
+
+    //   // Suppress "use client" directive warnings (harmless in Storybook)
+    config.build.rolldownOptions = config.build.rolldownOptions ?? {};
+    config.build.rolldownOptions.onLog = (level, log, defaultHandler) => {
+      if (
+        log.message.includes('"use client"') ||
+        log.message.includes(
+          "Module level directives cause errors when bundled",
+        ) ||
+        log.message.includes("Can't resolve original location of error.")
+      ) {
+        return;
+      }
+
+      defaultHandler(level, log);
+    };
+
+    // Manual chunking to improve code splitting
+    // config.build.rolldownOptions.output = {
+    //   ...config.build.rolldownOptions.output,
+    //   // manualChunks: {
+    //   //   "vendor-radix": ['@radix-ui/primitive']
+    //   // },
+    //   manualChunks: (id) => {
+    //     // Vendor chunks for large dependencies
+    //     if (id.includes('node_modules')) {
+    //       // // React ecosystem (largest - ~500KB uncompressed)
+    //       // // Now safe to split since Vitest addon is completely removed
+    //       // if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+    //       //   return 'vendor-react';
+    //       // }
+
+    //       // Storybook core
+    //       // if (id.includes('@storybook/')) {
+    //       //   return 'vendor-storybook';
+    //       // }
+    //       if (id.includes('@storybook/react-vite')) {
+    //         return 'vendor-storybook-nextjs-vite';
+    //       }
+    //       // if (id.includes('@storybook/addon-vitest')) {
+    //       //   return 'vendor-storybook-addon-vitest';
+    //       // }
+    //       // if (id.includes('@storybook/addon-docs')) {
+    //       //   return 'vendor-storybook-addon-docs';
+    //       // }
+    //       if (id.includes('@storybook/addon-a11y')) {
+    //         return 'vendor-storybook-addon-a11y';
+    //       }
+    //       // if (id.includes('@storybook/addon-onboarding')) {
+    //       //   return 'vendor-storybook-addon-onboarding';
+    //       // }
+    //       // if (id.includes('@storybook/addon-themes')) {
+    //       //   return 'vendor-storybook-addon-themes';
+    //       // }
+
+    //       // Radix UI components
+    //       if (id.includes('@radix-ui')) {
+    //         return 'vendor-radix';
+    //       }
+
+    //       // Animations
+    //       if (id.includes('framer-motion')) {
+    //         return 'vendor-animation';
+    //       }
+
+    //       // Form libraries
+    //       if (id.includes('react-hook-form') || id.includes('@hookform')) {
+    //         return 'vendor-forms';
+    //       }
+
+    //       // Date/time libraries
+    //       if (id.includes('dayjs') || id.includes('date-fns')) {
+    //         return 'vendor-datetime';
+    //       }
+
+    //       // Lexical editor (if used)
+    //       if (id.includes('lexical') || id.includes('@lexical')) {
+    //         return 'vendor-lexical';
+    //       }
+
+    //       // Icons
+    //       if (id.includes('lucide-react') || id.includes('react-icons')) {
+    //         return 'vendor-icons';
+    //       }
+
+    //       // Other utilities
+    //       if (id.includes('lodash') || id.includes('clsx') || id.includes('class-variance-authority')) {
+    //         return 'vendor-utils';
+    //       }
+
+    //       // Rest of node_modules
+    //       // return 'vendor-misc';
+    //     }
+    //     return null
+    //   },
+    // };
+
+    return config;
+  },
+};
+
+export default config;

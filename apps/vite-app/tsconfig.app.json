@@ -9,7 +9,7 @@
     "types": ["vite/client", "node"],
     "paths": {
       "~/*": ["./src/*"],
-      "@acme/ui/*": ["../../packages/ui/src/*"]
+      "@acme/ui/*": ["../../@acme/ui/src/*"]
     }
   },
   "include": ["src"]

@@ -6,7 +6,7 @@
     "jsx": "preserve",
     "paths": {
       "~/*": ["./src/*"],
-      "@acme/ui/*": ["../../packages/ui/src/*"]
+      "@acme/ui/*": ["../../@acme/ui/src/*"]
     },
     "plugins": [
       {

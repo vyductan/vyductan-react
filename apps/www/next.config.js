@@ -1,3 +1,4 @@
+import path from "path";
 import { fileURLToPath } from "url";
 import createMDX from "@next/mdx";
 // import bundleAnalyzer from "@next/bundle-analyzer";
@@ -5,6 +6,8 @@ import createJiti from "jiti";
 
 // Import env files to validate at build time. Use jiti so we can load .ts files in here.
 createJiti(fileURLToPath(import.meta.url))("./src/env");
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // const withBundleAnalyzer = bundleAnalyzer({
 //   enabled: process.env.ANALYZE === "true",
@@ -14,7 +17,9 @@ createJiti(fileURLToPath(import.meta.url))("./src/env");
 const config = {
   allowedDevOrigins: ["vyductan.com"],
   transpilePackages: ["@acme/ui"],
-  turbopack: {},
+  turbopack: {
+    root: path.resolve(__dirname, "../.."),
+  },
 
   /** We already do linting and typechecking as separate tasks in CI */
   // eslint: { ignoreDuringBuilds: true },
