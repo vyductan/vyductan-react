@@ -14,7 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRoot,
+  ShadcnSidebar,
 } from "./_component";
 
 type SidebarProperties = {
@@ -129,15 +129,19 @@ const Sidebar = (properties: SidebarProperties) => {
   };
 
   return (
-    <SidebarRoot collapsible="icon" className={className}>
+    <ShadcnSidebar collapsible="icon" className={className}>
       <SidebarHeader className={classNames?.header}>{header}</SidebarHeader>
       <SidebarContent>
-        {contentRender
-          ? contentRender({ itemNodes: renderItems(items) })
-          : renderItems(items)}
+        {contentRender ? (
+          contentRender({ itemNodes: renderItems(items) })
+        ) : items.some((item) => item && item.type === "group") ? (
+          renderItems(items)
+        ) : (
+          <SidebarMenu>{renderItems(items)}</SidebarMenu>
+        )}
       </SidebarContent>
       <SidebarFooter className={classNames?.footer}>{footer}</SidebarFooter>
-    </SidebarRoot>
+    </ShadcnSidebar>
   );
 };
 

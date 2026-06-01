@@ -27,10 +27,10 @@ lerna-debug.log*
 *.sw?
 *.pem
 
-# Local / env files
+# local env files
 .env
-.env*.local
-*.local
+.env*
+!.env.example
 
 # next.js
 .next/
@@ -43,6 +43,10 @@ expo-env.d.ts
 apps/expo/.gitignore
 apps/expo/ios
 apps/expo/android
+
+# tanstack
+.tanstack/
+routeTree.gen.ts
 
 # tauri
 dist-ssr
@@ -72,6 +76,8 @@ dist/
 *storybook.log
 storybook-static
 
+.worktrees/
+.claude/
 .playwright-mcp/
 .superpowers/
 docs/plans/
@@ -80,3 +86,10 @@ docs/superpowers/
 graphify-out/
 
 AGENTS.md
+CLAUDE.md
+
+# _ prefix
+_*.md
+_*.sql
+_*.html
+_*.json

@@ -3,17 +3,9 @@
     "source.fixAll.eslint": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[typescript,typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "editor.formatOnSave": true,
   "eslint.rules.customizations": [{ "rule": "*", "severity": "warn" }],
-  "eslint.runtime": "node",
-  "eslint.workingDirectories": [
-    { "pattern": "apps/*/" },
-    { "pattern": "@acme/*/" },
-    { "pattern": "packages/*/" }
-  ],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
   "files.associations": {
     "*.css": "tailwindcss"
   },
@@ -25,7 +17,7 @@
   },
   "prettier.ignorePath": ".gitignore",
   "tailwindCSS.classFunctions": ["cva", "cx", "cn"],
-  "tailwindCSS.files.exclude": ["@acme/ui/src/shadcn/**"],
+  "tailwindCSS.files.exclude": ["**/@acme/ui/src/shadcn/**"],
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.autoImportFileExcludePatterns": [
     "next/router.d.ts",

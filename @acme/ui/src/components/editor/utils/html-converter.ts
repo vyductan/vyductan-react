@@ -34,7 +34,7 @@ type HtmlConverterOptions = {
 async function defaultCreateServerHtmlDocument(
   html: string,
 ): Promise<Document> {
-  const { JSDOM } = await import("jsdom");
+  const { JSDOM } = await import(/* turbopackIgnore: true */ "jsdom");
   return new JSDOM(html).window.document;
 }
 

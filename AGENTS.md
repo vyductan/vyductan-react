@@ -1,6 +1,7 @@
 # Repository Overview
 
 > **Agent Instruction**: Do not create or use Git worktrees. Always perform your work directly in the current workspace.
+> **Agent Instruction**: ALWAYS use `pnp*` (`pnpm`, `pnpx`) instead of `np*` (`npm`, `npx`) for package management and script execution.
 
 Monorepo for the Vyductan React project using TurboRepo, managing web and mobile applications with shared UI and API packages.
 
@@ -9,7 +10,7 @@ Monorepo for the Vyductan React project using TurboRepo, managing web and mobile
 | Directory                                                                   | Description                           | When to read                                                              |
 | :-------------------------------------------------------------------------- | :------------------------------------ | :------------------------------------------------------------------------ |
 | [`apps/`](file:///Users/vyductan/Developer/vyductan-react/apps/AGENTS.md)   | Application source code (Web, Mobile) | Implementing features, fixing bugs in specific apps, managing deployments |
-| [`@acme/`](file:///Users/vyductan/Developer/vyductan-react/@acme/AGENTS.md) | Shared packages (UI, API, Configs)    | Modifying shared components, updating API logic, changing global configs  |
+|| [`packages/`](file:///Users/vyductan/Developer/vyductan-react/packages/AGENTS.md) | Shared packages (UI, API, Configs)    | Modifying shared components, updating API logic, changing global configs  ||
 
 | File                  | Description                | When to read                                                   |
 | :-------------------- | :------------------------- | :------------------------------------------------------------- |

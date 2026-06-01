@@ -10,17 +10,27 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@acme/ui": "workspace:*",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/plugin-opener": "^2.5.4",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6"
+    "dexie": "^4.4.3",
+    "dexie-react-hooks": "^4.4.0",
+    "lucide-react": "catalog:",
+    "react": "catalog:react19",
+    "react-dom": "catalog:react19"
   },
   "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "@tailwindcss/vite": "catalog:vite",
     "@tauri-apps/cli": "^2.11.1",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:react19",
+    "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "catalog:vite",
-    "typescript": "~6.0.3",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
     "vite": "catalog:vite"
   }
 }

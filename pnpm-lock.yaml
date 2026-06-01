@@ -143,9 +143,9 @@ importers:
 
   '@acme/eslint-config':
     dependencies:
-      '@eslint/compat':
-        specifier: ^2.1.0
-        version: 2.1.0(eslint@10.4.0(jiti@2.7.0))
+      '@eslint/config-helpers':
+        specifier: ^0.6.0
+        version: 0.6.0
       '@eslint/js':
         specifier: 'catalog:'
         version: 10.0.1(eslint@10.4.0(jiti@2.7.0))
@@ -628,33 +628,63 @@ importers:
 
   apps/tauri:
     dependencies:
+      '@acme/ui':
+        specifier: workspace:*
+        version: link:../../@acme/ui
       '@tauri-apps/api':
         specifier: ^2.11.0
         version: 2.11.0
       '@tauri-apps/plugin-opener':
         specifier: ^2.5.4
         version: 2.5.4
+      dexie:
+        specifier: ^4.4.3
+        version: 4.4.3
+      dexie-react-hooks:
+        specifier: ^4.4.0
+        version: 4.4.0(dexie@4.4.3)(react@19.2.6)
+      lucide-react:
+        specifier: 'catalog:'
+        version: 1.16.0(react@19.2.6)
       react:
-        specifier: ^19.2.6
+        specifier: catalog:react19
         version: 19.2.6
       react-dom:
-        specifier: ^19.2.6
+        specifier: catalog:react19
         version: 19.2.6(react@19.2.6)
     devDependencies:
+      '@acme/eslint-config':
+        specifier: workspace:*
+        version: link:../../@acme/eslint-config
+      '@acme/prettier-config':
+        specifier: workspace:*
+        version: link:../../@acme/prettier-config
+      '@acme/tsconfig':
+        specifier: workspace:*
+        version: link:../../@acme/tsconfig
+      '@tailwindcss/vite':
+        specifier: catalog:vite
+        version: 4.3.0(vite@8.0.14(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0))
       '@tauri-apps/cli':
         specifier: ^2.11.1
         version: 2.11.1
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.9.1
       '@types/react':
-        specifier: ^19.1.8
+        specifier: catalog:react19
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.1.6
+        specifier: catalog:react19
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: catalog:vite
         version: 6.0.1(vite@8.0.14(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0)(tsx@4.21.0))
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.0
       typescript:
-        specifier: ~6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
         specifier: catalog:vite
@@ -1858,15 +1888,6 @@ packages:
   '@eslint-community/regexpp@4.12.2':
     resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
-
-  '@eslint/compat@2.1.0':
-    resolution: {integrity: sha512-LgaSCymEpw7tF53xvDw9SNsraPb1IBHxpdABIOM0hW8UAlP8znrjYtuxfR58FSJ3L9BhwD+FaPRFQpZq84Nh6g==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
-    peerDependencies:
-      eslint: ^8.40 || 9 || 10
-    peerDependenciesMeta:
-      eslint:
-        optional: true
 
   '@eslint/config-array@0.23.5':
     resolution: {integrity: sha512-Y3kKLvC1dvTOT+oGlqNQ1XLqK6D1HU2YXPc52NmAlJZbMMWDzGYXMiPRJ8TYD39muD/OTjlZmNJ4ib7dvSrMBA==}
@@ -5741,6 +5762,15 @@ packages:
 
   devlop@1.1.0:
     resolution: {integrity: sha512-RWmIqhcFf1lRYBvNmr7qTNuyCt/7/ns2jbpp1+PalgE/rDQcBT0fioSMUpJ93irlUhC5hrg4cYqe6U+0ImW0rA==}
+
+  dexie-react-hooks@4.4.0:
+    resolution: {integrity: sha512-ObLXBS5+4BJU8vtSvBx6b9fY6zZYgniAtwxzjCHsUQadgbqYN6935X2/1TWw4Rf2N1aZV1io5/ziox4vKuxABA==}
+    peerDependencies:
+      dexie: '>=4.2.0-alpha.1 <5.0.0'
+      react: '>=16'
+
+  dexie@4.4.3:
+    resolution: {integrity: sha512-N+3IGQ3HPlyO2YAkntGAwitm42BpBGV86MttzUMiRzWLa4NGh0pltVRcUVF4ybL/OnXjCrr9k7SDPIKkFYP2Lg==}
 
   diff-match-patch@1.0.5:
     resolution: {integrity: sha512-IayShXAgj/QMXgB0IWmKx+rOPuGMhqm5w6jvFxmVenXKIzRqTAAsbBPT3kWQeGANj3jGgvcvv4yK6SxqYmikgw==}
@@ -9818,12 +9848,6 @@ snapshots:
 
   '@eslint-community/regexpp@4.12.2': {}
 
-  '@eslint/compat@2.1.0(eslint@10.4.0(jiti@2.7.0))':
-    dependencies:
-      '@eslint/core': 1.2.1
-    optionalDependencies:
-      eslint: 10.4.0(jiti@2.7.0)
-
   '@eslint/config-array@0.23.5':
     dependencies:
       '@eslint/object-schema': 3.0.5
@@ -12551,7 +12575,7 @@ snapshots:
 
   '@types/nodemailer@8.0.0':
     dependencies:
-      '@types/node': 25.7.0
+      '@types/node': 25.9.1
 
   '@types/nprogress@0.2.3': {}
 
@@ -12583,7 +12607,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 25.7.0
+      '@types/node': 25.9.1
 
   '@typescript-eslint/eslint-plugin@8.60.0(@typescript-eslint/parser@8.60.0(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.0(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
@@ -13673,6 +13697,13 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
+  dexie-react-hooks@4.4.0(dexie@4.4.3)(react@19.2.6):
+    dependencies:
+      dexie: 4.4.3
+      react: 19.2.6
+
+  dexie@4.4.3: {}
+
   diff-match-patch@1.0.5: {}
 
   doctrine@2.1.0:
@@ -14415,7 +14446,7 @@ snapshots:
 
   happy-dom@20.9.0:
     dependencies:
-      '@types/node': 25.7.0
+      '@types/node': 25.9.1
       '@types/whatwg-mimetype': 3.0.2
       '@types/ws': 8.18.1
       entities: 7.0.1

@@ -4,22 +4,19 @@ import type { Sidebar as ShadcnSidebar } from "@acme/ui/shadcn/sidebar";
 import { SidebarMenuButton as ShadcnSidebarMenuButton } from "@acme/ui/shadcn/sidebar";
 
 import { cn } from "../../lib/utils";
-import { TooltipProvider } from "../tooltip";
 
 const SidebarMenuButton = ({
   className,
   ...properties
 }: React.ComponentProps<typeof ShadcnSidebarMenuButton>) => {
   return (
-    <TooltipProvider>
-      <ShadcnSidebarMenuButton
-        className={cn(
-          "[&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
-          className,
-        )}
-        {...properties}
-      />
-    </TooltipProvider>
+    <ShadcnSidebarMenuButton
+      className={cn(
+        "[&_span[role='img']]:shrink-0 [&_span[role='img']:not([class*='size-'])]:size-4",
+        className,
+      )}
+      {...properties}
+    />
   );
 };
 
@@ -50,5 +47,5 @@ export {
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
-  Sidebar as SidebarRoot,
+  Sidebar as ShadcnSidebar,
 } from "@acme/ui/shadcn/sidebar";

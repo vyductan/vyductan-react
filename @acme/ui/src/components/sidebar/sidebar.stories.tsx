@@ -20,8 +20,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarRoot,
 } from "./_component";
+import { Sidebar as SidebarBase } from "./index";
 import { Sidebar } from "./sidebar";
 
 const meta = {
@@ -155,7 +155,7 @@ export const WithHeaderAndFooter: Story = {
  */
 export const ShadcnComposable: Story = {
   render: () => (
-    <SidebarRoot className="w-64 border-r">
+    <SidebarBase className="w-64 border-r">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
           <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
@@ -196,6 +196,6 @@ export const ShadcnComposable: Story = {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-    </SidebarRoot>
+    </SidebarBase>
   ),
 };

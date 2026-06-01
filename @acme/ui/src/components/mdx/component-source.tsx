@@ -9,11 +9,15 @@ type ComponentSourceProperties = {
   __comp__: React.FC;
 };
 
-const exampleSourceFiles = import.meta.glob("../**/examples/*.{ts,tsx}", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
+const exampleSourceFiles = (
+  typeof (import.meta as { glob?: unknown }).glob === "function"
+    ? import.meta.glob("../**/examples/*.{ts,tsx}", {
+        query: "?raw",
+        import: "default",
+        eager: true,
+      })
+    : {}
+) as Record<string, string>;
 
 const ComponentSource = ({ src, __comp__ }: ComponentSourceProperties) => {
   let language = "tsx";

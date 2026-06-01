@@ -1,9 +1,9 @@
 import path from "node:path";
-import { includeIgnoreFile } from "@eslint/compat";
+import { includeIgnoreFile } from "@eslint/config-helpers";
 import eslint from "@eslint/js";
 import importPlugin from "eslint-plugin-import";
 import turboPlugin from "eslint-plugin-turbo";
-import eslintPluginUnicorn from "eslint-plugin-unicorn";
+// import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
@@ -38,7 +38,7 @@ export const restrictEnvAccess = defineConfig(
 );
 
 export const baseConfig = defineConfig(
-  eslintPluginUnicorn.configs.recommended,
+  // eslintPluginUnicorn.configs.recommended,
   // Ignore files not tracked by VCS and any config files
   includeIgnoreFile(path.join(import.meta.dirname, "../../.gitignore")),
   { ignores: ["**/*.config.*"] },
