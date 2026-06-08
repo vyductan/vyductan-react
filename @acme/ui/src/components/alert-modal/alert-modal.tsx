@@ -67,7 +67,12 @@ export const AlertModal = ({
   const isError = type === "error";
   const isInfo = type === "info";
   const isSuccess = type === "success";
-  const isSimpleType = isWarning || isError || isInfo || isSuccess;
+
+  // info/success: notification style — centered icon on top, single full-width button.
+  const isNotificationType = isInfo || isSuccess;
+  // warning/error: confirm style — icon left of the title, left-aligned text,
+  // two buttons aligned right, with a soft (filled) action colored by type.
+  const isIconConfirmType = isWarning || isError;
 
   const getIconConfig = () => {
     switch (type) {
@@ -79,7 +84,7 @@ export const AlertModal = ({
       }
       case "error": {
         return {
-          icon: "icon-[ix--error-filled]",
+          icon: "icon-[lucide--circle-alert]",
           class: tagColors.error,
         };
       }
@@ -103,49 +108,79 @@ export const AlertModal = ({
 
   const iconConfig = getIconConfig();
 
+  // info/success: big round badge centered on top.
+  const notificationBadge = iconConfig && (
+    <div
+      className={cn(
+        "flex h-16 w-16 items-center justify-center rounded-full",
+        iconConfig.class,
+      )}
+    >
+      <Icon icon={iconConfig.icon} className="size-10" />
+    </div>
+  );
+
+  // warning/error: round badge left of the title — sized close to the title's
+  // leading (text-lg → leading-7) so it aligns with the first line.
+  const confirmIcon = iconConfig && (
+    <span
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-full",
+        iconConfig.class,
+      )}
+    >
+      <Icon icon={iconConfig.icon} className="size-4" />
+    </span>
+  );
+
+  const header = (
+    <AlertDialogHeader
+      className={cn(classNames?.header, isNotificationType && "text-center")}
+    >
+      {title && (
+        <AlertDialogTitle
+          className={cn(classNames?.title, isNotificationType && "text-center")}
+        >
+          {title}
+        </AlertDialogTitle>
+      )}
+      {description && (
+        <AlertDialogDescription
+          className={cn(
+            classNames?.description,
+            isNotificationType && "text-center",
+          )}
+        >
+          {description}
+        </AlertDialogDescription>
+      )}
+    </AlertDialogHeader>
+  );
+
   return (
     <AlertDialog onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
         {media && <AlertDialogMedia>{media}</AlertDialogMedia>}
-        {iconConfig && (
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                "flex h-16 w-16 items-center justify-center rounded-full",
-                iconConfig.class,
-              )}
-            >
-              <Icon icon={iconConfig.icon} className={cn("size-10")} />
-            </div>
+
+        {isIconConfirmType ? (
+          <div className="flex gap-3">
+            {confirmIcon}
+            {header}
           </div>
+        ) : (
+          <>
+            {notificationBadge && (
+              <div className="flex justify-center">{notificationBadge}</div>
+            )}
+            {header}
+          </>
         )}
-        <AlertDialogHeader
-          className={cn(classNames?.header, isSimpleType && "text-center")}
-        >
-          {title && (
-            <AlertDialogTitle
-              className={cn(classNames?.title, isSimpleType && "text-center")}
-            >
-              {title}
-            </AlertDialogTitle>
-          )}
-          {description && (
-            <AlertDialogDescription
-              className={cn(
-                classNames?.description,
-                isSimpleType && "text-center",
-              )}
-            >
-              {description}
-            </AlertDialogDescription>
-          )}
-        </AlertDialogHeader>
 
         <AlertDialogFooter
-          className={cn(classNames?.footer, isSimpleType && "flex-col")}
+          className={cn(classNames?.footer, isNotificationType && "flex-col")}
         >
-          {!isSimpleType && (
+          {!isNotificationType && (
             <AlertDialogCancel
               className={cn(
                 buttonVariants({
@@ -173,9 +208,9 @@ export const AlertModal = ({
                 variant: okButtonProps?.variant ?? "solid",
                 color:
                   okButtonProps?.color ??
-                  (okType === "danger" ? "danger" : "primary"),
+                  (isError || okType === "danger" ? "danger" : "primary"),
               }),
-              isSimpleType && "w-full",
+              isNotificationType && "w-full",
             )}
           >
             {confirmLoading && <LoadingIcon />}

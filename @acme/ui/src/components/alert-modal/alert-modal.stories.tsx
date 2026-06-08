@@ -92,24 +92,13 @@ export const Confirm: Story = {
   },
 };
 
-export const Danger: Story = {
-  render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
-  args: {
-    title: "Delete item",
-    description: "This action cannot be undone.",
-    okText: "Delete",
-    cancelText: "Cancel",
-    type: "confirm",
-    okType: "danger",
-  },
-};
-
 export const Warning: Story = {
   render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
-    title: "Warning",
-    description: "This action may have unintended consequences.",
-    okText: "I Understand",
+    title: "Unsaved changes",
+    description: "You have unsaved changes. Leaving now will discard them.",
+    okText: "Leave anyway",
+    cancelText: "Keep editing",
     type: "warning",
   },
 };
@@ -137,9 +126,10 @@ export const Success: Story = {
 export const Error: Story = {
   render: (arguments_) => <OpenAlertModalStory {...arguments_} />,
   args: {
-    title: "Error",
-    description: "An error occurred while processing your request.",
-    okText: "OK",
+    title: "Delete item",
+    description: "An error occurred. Retry the delete, or cancel to go back.",
+    okText: "Retry delete",
+    cancelText: "Cancel",
     type: "error",
   },
 };
