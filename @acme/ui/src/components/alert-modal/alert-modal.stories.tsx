@@ -4,6 +4,7 @@ import { expect, fn, userEvent, within } from "storybook/test";
 
 import { Button } from "../button";
 import { AlertModal } from "./alert-modal";
+import WithTextareaDemo from "./examples/with-textarea";
 
 const meta = {
   title: "Components/AlertModal",
@@ -132,6 +133,10 @@ export const Error: Story = {
     cancelText: "Cancel",
     type: "error",
   },
+};
+
+export const WithTextarea: Story = {
+  render: () => <WithTextareaDemo />,
 };
 
 export const InteractionConfirm: Story = {

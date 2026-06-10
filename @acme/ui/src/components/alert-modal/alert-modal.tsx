@@ -23,6 +23,9 @@ export type AlertModalProps = Omit<ModalProperties, "onOk"> & {
   onConfirm?: () => void;
   type?: "confirm" | "warning" | "info" | "success" | "error";
   media?: React.ReactNode;
+  /** Body content rendered between the description and the footer
+   * (e.g. a textarea asking for a reason before confirming). */
+  children?: React.ReactNode;
 };
 
 export const AlertModal = ({
@@ -53,15 +56,6 @@ export const AlertModal = ({
     },
     [onOpenChange, onCancel],
   );
-
-  const isShadcnAlertDialog = !!children;
-  if (isShadcnAlertDialog) {
-    return (
-      <AlertDialog onOpenChange={onOpenChange} {...rest}>
-        {children}
-      </AlertDialog>
-    );
-  }
 
   const isWarning = type === "warning";
   const isError = type === "error";
@@ -176,6 +170,8 @@ export const AlertModal = ({
             {header}
           </>
         )}
+
+        {children}
 
         <AlertDialogFooter
           className={cn(classNames?.footer, isNotificationType && "flex-col")}

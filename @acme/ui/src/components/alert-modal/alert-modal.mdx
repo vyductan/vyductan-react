@@ -5,6 +5,7 @@ import { ComponentSource } from "@acme/ui/components/mdx";
 import * as AlertModalStories from "./alert-modal.stories";
 import AlertModalBasicDemo from "./examples/basic";
 import TypesDemo from "./examples/types";
+import WithTextareaDemo from "./examples/with-textarea";
 
 <Meta of={AlertModalStories} />
 
@@ -28,3 +29,12 @@ Display the document sample code for the basic usage of the AlertModal component
 AlertModal supports different types to display different visual styles and icons: `confirm`, `warning`, `info`, `success`, and `error`.
 
 <ComponentSource src="alert-modal/examples/types.tsx" __comp__={TypesDemo} />
+
+### With Body Content
+
+Pass `children` to render extra body content — such as a textarea collecting a reason — between the description and the footer.
+
+<ComponentSource
+  src="alert-modal/examples/with-textarea.tsx"
+  __comp__={WithTextareaDemo}
+/>
