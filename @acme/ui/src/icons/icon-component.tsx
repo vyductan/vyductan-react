@@ -70,8 +70,10 @@ export const Icon = ({
       <>
         <iconify-icon
           icon={normalizedIcon}
-          class={cn("block size-4", className)}
+          className={cn("block size-4", className)}
           style={style}
+          width="100%"
+          height="100%"
           {...properties}
         />
         {srOnly && <span className="sr-only">{srOnly}</span>}
