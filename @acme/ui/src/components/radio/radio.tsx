@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { useId } from "react";
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
@@ -10,27 +11,35 @@ import type { RadioChangeEvent } from "./types";
 import { Icon } from "../../icons";
 import { buttonVariants } from "../button";
 import { buttonColorVariants } from "../button/button-variants";
+import { inputDisabledVariants } from "../input/variants";
 
 type RadioProperties<T extends FormValueType = FormValueType> =
   AbstractCheckboxProperties<RadioChangeEvent<T>, T> & {
     color?: ButtonColorVariants["color"];
     optionType?: "default" | "button";
     buttonStyle?: "outline" | "solid";
+    variant?: "default" | "card";
   };
 
 const Radio = <T extends FormValueType = FormValueType>({
   value,
   checked,
   children,
+  description,
   disabled,
   className,
   color = "default",
   optionType,
   buttonStyle,
+  variant = "default",
   onChange,
   ...properties
 }: RadioProperties<T>) => {
-  const variant =
+  const labelId = useId();
+  const descriptionId = useId();
+  const hasDescription = !!description;
+
+  const buttonColorVariant =
     buttonStyle === "solid"
       ? checked
         ? "solid"
@@ -53,7 +62,7 @@ const Radio = <T extends FormValueType = FormValueType>({
           }),
           buttonColorVariants({
             color: mergedColor,
-            variant,
+            variant: buttonColorVariant,
             disabled,
           }),
           buttonStyle === "outline" && !checked && "border-input",
@@ -104,20 +113,35 @@ const Radio = <T extends FormValueType = FormValueType>({
   return (
     <label
       className={cn(
-        "flex items-center",
+        "flex",
+        hasDescription ? "items-start" : "items-center",
         "cursor-pointer text-sm",
         // disabled &&
         //   "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
-        buttonVariants({
-          size: "middle",
-        }),
-        buttonColorVariants({
-          variant: "link",
-          color,
-          disabled,
-        }),
-        "size-auto gap-0 p-0",
-        color === "default" && "hover:text-foreground",
+        variant === "card"
+          ? [
+              "hover:bg-accent/50 items-start gap-2 rounded-md border",
+              "h-auto min-h-8 px-3 py-2",
+              "has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50",
+              "dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950",
+              inputDisabledVariants({ disabled }),
+              // group-level disabled (children pattern) reaches only the inner
+              // item via Radix context; mirror the disabled look from its
+              // data-disabled attribute
+              "has-data-disabled:pointer-events-none has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50",
+            ]
+          : [
+              buttonVariants({
+                size: "middle",
+              }),
+              buttonColorVariants({
+                variant: "link",
+                color,
+                disabled,
+              }),
+              "size-auto gap-0 p-0",
+              color === "default" && "hover:text-foreground",
+            ],
         className,
       )}
     >
@@ -126,6 +150,11 @@ const Radio = <T extends FormValueType = FormValueType>({
         value={value as string}
         className={cn(
           "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+          (variant === "card" || hasDescription) && "self-start",
+          variant === "card" && [
+            "data-[state=checked]:border-primary-600",
+            "dark:data-[state=checked]:border-primary-700",
+          ],
           // [
           //   buttonVariants({
           //     disabled,
@@ -136,6 +165,8 @@ const Radio = <T extends FormValueType = FormValueType>({
           // ],
         )}
         disabled={disabled}
+        aria-labelledby={hasDescription ? labelId : undefined}
+        aria-describedby={hasDescription ? descriptionId : undefined}
         {...properties}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
           if (disabled) return;
@@ -177,7 +208,39 @@ const Radio = <T extends FormValueType = FormValueType>({
           />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
-      <span className="px-2">{children}</span>
+      {variant === "card" ? (
+        hasDescription ? (
+          <div className="flex w-full flex-col gap-1">
+            <div id={labelId} className="leading-none font-medium">
+              {children}
+            </div>
+            <p
+              id={descriptionId}
+              className="text-muted-foreground text-xs font-normal"
+            >
+              {description}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-px flex w-full flex-col gap-0.5 leading-none font-medium">
+            {children}
+          </div>
+        )
+      ) : hasDescription ? (
+        <div className="flex flex-col gap-1 px-2">
+          <div id={labelId} className="leading-4">
+            {children}
+          </div>
+          <p
+            id={descriptionId}
+            className="text-muted-foreground text-xs font-normal"
+          >
+            {description}
+          </p>
+        </div>
+      ) : (
+        <span className="px-2">{children}</span>
+      )}
     </label>
   );
 };

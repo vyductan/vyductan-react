@@ -18,7 +18,7 @@ type RadioOptionType<T extends FormValueType = FormValueType> =
 
 type RadioGroupProperties<T extends FormValueType = FormValueType> =
   AbstractCheckboxGroupProperties<T> &
-    Pick<RadioProperties, "optionType" | "buttonStyle"> & {
+    Pick<RadioProperties, "optionType" | "buttonStyle" | "variant"> & {
       defaultValue?: T;
       value?: T;
       onChange?: (e: RadioChangeEvent<T>) => void;
@@ -31,6 +31,8 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
   onChange,
   optionType = "default",
   buttonStyle = "outline",
+  variant,
+  optionVariant,
   disabled,
   ...properties
 }: RadioGroupProperties<T>) => {
@@ -53,10 +55,16 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
     [options],
   );
 
+  const mergedVariant = variant ?? optionVariant;
+
   return (
     <RadioGroupPrimitive.Root
       className={cn(
-        optionType === "button" ? "inline-flex" : "flex gap-2",
+        optionType === "button"
+          ? "inline-flex"
+          : mergedVariant === "card"
+            ? "grid gap-3"
+            : "flex gap-2",
         className,
       )}
       value={currentValue as string | undefined}
@@ -75,6 +83,8 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
             disabled={isDisabled}
             optionType={optionType}
             buttonStyle={buttonStyle}
+            variant={mergedVariant}
+            description={option.description}
             onChange={(e) => {
               if (isDisabled) return;
 

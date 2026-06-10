@@ -1,9 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
 import { ComponentSource } from "@acme/ui/components/mdx";
 
 import RadioBasicDemo from "./examples/basic";
 import RadioButtonStyleDemo from "./examples/button-style";
+import CardExample from "./examples/card.mdx";
 import RadioColorDemo from "./examples/color";
 import RadioDisabledDemo from "./examples/disabled";
+import * as RadioStories from "./radio.stories";
+
+<Meta of={RadioStories} />
 
 # Radio
 
@@ -40,3 +46,5 @@ Radio unavailable state.
   src="radio/examples/disabled.tsx"
   __comp__={RadioDisabledDemo}
 />
+
+<CardExample />
