@@ -56,16 +56,16 @@ linkWorkspacePackages: true
 overrides:
   "@types/minimatch": 5.1.2
 
-onlyBuiltDependencies:
-  - "@swc/core"
-  - "@tailwindcss/oxide"
-  - bufferutil
-  - core-js
-  - core-js-pure
-  - esbuild
-  - protobufjs
-  - sharp
-  - supabase
+allowBuilds:
+  "@swc/core": true
+  "@tailwindcss/oxide": true
+  bufferutil: true
+  core-js: true
+  core-js-pure: true
+  esbuild: true
+  protobufjs: true
+  sharp: true
+  supabase: true
 
 publicHoistPattern:
   - "@ianvs/prettier-plugin-sort-imports"
