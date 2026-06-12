@@ -134,6 +134,9 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.8.3
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.0
       turbo:
         specifier: ^2.9.15
         version: 2.9.15

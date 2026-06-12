@@ -29,6 +29,7 @@
     "@turbo/gen": "^2.9.15",
     "@types/minimatch": "^5.1.2",
     "prettier": "catalog:",
+    "tailwindcss": "catalog:",
     "turbo": "^2.9.15",
     "typescript": "catalog:"
   },
