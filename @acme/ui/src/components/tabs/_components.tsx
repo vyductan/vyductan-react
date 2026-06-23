@@ -57,7 +57,7 @@ function TabsList({ className, type, ...properties }: TabsListProperties) {
       className={cn(
         // type === "solid" && "h-9 w-fit justify-center",
         tabsType === "card" &&
-          "group-data-[orientation=horizontal]/tabs:h-auto justify-start gap-0.5 rounded-none bg-transparent p-0 before:absolute before:inset-x-0 before:bottom-0 before:h-px before:bg-border *:data-[slot=tabs-trigger]:flex-none",
+          "before:bg-border justify-start gap-0.5 rounded-none bg-transparent p-0 group-data-[orientation=horizontal]/tabs:h-auto before:absolute before:inset-x-0 before:bottom-0 before:h-px *:data-[slot=tabs-trigger]:flex-none",
         tabsType === "line" &&
           "h-auto justify-start rounded-none border-b bg-transparent p-0 *:data-[slot=tabs-trigger]:flex-none",
         // antd
@@ -91,8 +91,8 @@ function TabsTrigger({
           "h-auto rounded-none rounded-t-lg px-4 py-2",
           "border-border bg-muted text-muted-foreground",
           "hover:text-primary-hover",
-          "data-[state=active]:border-b-transparent data-[state=active]:bg-background data-[state=active]:text-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none",
-          "dark:data-[state=active]:border-border dark:data-[state=active]:border-b-transparent dark:data-[state=active]:bg-background",
+          "data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:border-b-transparent group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none",
+          "dark:data-[state=active]:border-border dark:data-[state=active]:bg-background dark:data-[state=active]:border-b-transparent",
         ],
         type === "line" && [
           "pt-3 pb-[11px]",

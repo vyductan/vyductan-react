@@ -1128,8 +1128,8 @@ export const buttonColorVariants = tv({
       variant: "solid",
       className: [
         "bg-muted/80 border-input text-muted-foreground/50",
-        "hover:!bg-muted/80 hover:!border-input hover:!text-muted-foreground/50",
-        "active:!bg-muted/80 active:!border-input active:!text-muted-foreground/50",
+        "hover:bg-muted/80! hover:border-input! hover:text-muted-foreground/50!",
+        "active:bg-muted/80! active:border-input! active:text-muted-foreground/50!",
       ],
     },
     {
@@ -1137,8 +1137,8 @@ export const buttonColorVariants = tv({
       variant: "outlined",
       className: [
         "border-input text-muted-foreground/50 bg-muted/80",
-        "hover:!border-input hover:!text-muted-foreground/50 hover:!bg-muted/80",
-        "active:!border-input active:!text-muted-foreground/50 active:!bg-muted/80",
+        "hover:border-input! hover:text-muted-foreground/50! hover:bg-muted/80!",
+        "active:border-input! active:text-muted-foreground/50! active:bg-muted/80!",
       ],
     },
     {
@@ -1146,8 +1146,8 @@ export const buttonColorVariants = tv({
       variant: "filled",
       className: [
         "bg-muted/80 text-muted-foreground/50 border-transparent",
-        "hover:!bg-muted/80 hover:!text-muted-foreground/50 hover:!border-transparent",
-        "active:!bg-muted/80 active:!text-muted-foreground/50 active:!border-transparent",
+        "hover:bg-muted/80! hover:text-muted-foreground/50! hover:border-transparent!",
+        "active:bg-muted/80! active:text-muted-foreground/50! active:border-transparent!",
       ],
     },
     {
@@ -1155,8 +1155,8 @@ export const buttonColorVariants = tv({
       variant: "text",
       className: [
         "text-muted-foreground/50 border-transparent bg-transparent",
-        "hover:!text-muted-foreground/50 hover:!border-transparent hover:!bg-transparent",
-        "active:!text-muted-foreground/50 active:!border-transparent active:!bg-transparent",
+        "hover:text-muted-foreground/50! hover:border-transparent! hover:bg-transparent!",
+        "active:text-muted-foreground/50! active:border-transparent! active:bg-transparent!",
       ],
     },
     {
@@ -1164,8 +1164,8 @@ export const buttonColorVariants = tv({
       variant: "link",
       className: [
         "text-muted-foreground/50 border-transparent",
-        "hover:!text-muted-foreground/50 hover:!border-transparent",
-        "active:!text-muted-foreground/50 active:!border-transparent",
+        "hover:text-muted-foreground/50! hover:border-transparent!",
+        "active:text-muted-foreground/50! active:border-transparent!",
       ],
     },
   ],

@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 
-/* eslint-disable unicorn/no-array-for-each */
-
 import * as React from "react";
 
 import type { AnyObject } from "../../_util/type";

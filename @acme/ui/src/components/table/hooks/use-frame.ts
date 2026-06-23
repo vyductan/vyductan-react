@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/refs */
-/* eslint-disable unicorn/no-array-for-each */
 
 import { useEffect, useRef, useState } from "react";
 

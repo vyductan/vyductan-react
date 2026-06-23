@@ -351,7 +351,7 @@ function TreeNode({
                 className={cn(
                   "absolute left-1/2",
                   "h-full",
-                  isLast && "h-[calc(100%/2)]",
+                  isLast && "h-[50%]",
                 )}
                 style={{
                   width: "1px",

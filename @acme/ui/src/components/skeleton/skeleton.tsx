@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/prefer-ternary */
 import type { Key } from "react";
 
 import { cn } from "@acme/ui/lib/utils";

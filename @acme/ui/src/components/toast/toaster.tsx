@@ -3,7 +3,6 @@
 import { cn } from "@acme/ui/lib/utils";
 import { Toaster as Sonner } from "@acme/ui/shadcn/sonner";
 
-const SELECTABLE_TEXT_SELECTOR = "[data-title],[data-description]";
 const INTERACTIVE_SELECTOR = [
   "button",
   "a",
@@ -28,11 +27,11 @@ function shouldBypassSwipeDismiss(target: EventTarget | null) {
     return false;
   }
 
-  if (target.closest(INTERACTIVE_SELECTOR)) {
-    return false;
-  }
-
-  return Boolean(target.closest(SELECTABLE_TEXT_SELECTOR));
+  // Allow starting a text selection anywhere on the toast body (including the
+  // padding/whitespace around the title and description), not only when the
+  // press lands exactly on the text. Swipe-to-dismiss is only kept for
+  // genuinely interactive controls (buttons, links, close button, …).
+  return !target.closest(INTERACTIVE_SELECTOR);
 }
 
 type ToasterProperties = React.ComponentProps<typeof Sonner>;
@@ -53,11 +52,11 @@ const Toaster = ({
         toastOptions?.classNames?.closeButton,
       ),
       success: cn(
-        "!bg-green-100 !text-green-500 !border-green-300",
+        "bg-green-100! text-green-500! border-green-300!",
         toastOptions?.classNames?.success,
       ),
       error: cn(
-        "!bg-red-100 !text-red-500 !border-red-300",
+        "bg-red-100! text-red-500! border-red-300!",
         toastOptions?.classNames?.error,
       ),
     },

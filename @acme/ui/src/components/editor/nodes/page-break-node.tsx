@@ -90,13 +90,13 @@ function PageBreakComponent({ nodeKey }: { nodeKey: NodeKey }) {
     if (pbElement !== null) {
       if (isSelected) {
         pbElement.classList.add(
-          "!border-[var(--editor-color-primary,#4766cb)]",
+          "border-(--editor-color-primary,#4766cb)!",
           "!after:text-[var(--editor-color-primary,#4766cb)]",
           "!before:opacity-100",
         );
       } else {
         pbElement.classList.remove(
-          "!border-[var(--editor-color-primary,#4766cb)]",
+          "border-(--editor-color-primary,#4766cb)!",
           "!after:text-[var(--editor-color-primary,#4766cb)]",
           "!before:opacity-100",
         );
@@ -149,9 +149,9 @@ export class PageBreakNode extends DecoratorNode<React.JSX.Element> {
     element.style.pageBreakAfter = "always";
     element.className = `
       relative block w-[calc(100%+56px)] overflow-visible 
-      -ml-[28px] mt-7 mb-7
-      border-0 border-t border-b border-dashed border-[var(--editor-color-secondary,#eee)]
-      bg-[var(--editor-color-secondary,#eee)]
+      ml-[-28px] mt-7 mb-7
+      border-0 border-t border-b border-dashed border-(--editor-color-secondary,#eee)
+      bg-(--editor-color-secondary,#eee)
       before:content-[''] 
       before:absolute before:top-1/2 before:-translate-y-1/2
       before:left-10 before:opacity-50

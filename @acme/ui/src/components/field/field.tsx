@@ -33,7 +33,10 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   FieldProperties,
   "children" | "name"
 > & {
-  control?: Control<TFieldValues>;
+  // Only TFieldValues (used to infer `name`) is pinned; TContext/TTransformedValues
+  // are left open so `form.control` from a zod schema with `.default()`/`.optional()`
+  // (where input type ≠ output type, so TTransformedValues ≠ TFieldValues) is accepted.
+  control?: Control<TFieldValues, any, any>;
   name?: FieldPath<TFieldValues>;
   label?: React.ReactNode;
   description?: React.ReactNode;

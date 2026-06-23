@@ -197,7 +197,7 @@ export const TimeSelect = ({
       >
         <ul
           ref={hourListReference}
-          className="flex w-14 flex-1 [scrollbar-width:none] flex-col gap-0.5 overflow-y-auto py-24 [&::-webkit-scrollbar]:hidden"
+          className="flex w-14 flex-1 scrollbar-none flex-col gap-0.5 overflow-y-auto py-24 [&::-webkit-scrollbar]:hidden"
           onScroll={(e) => handleInfiniteScroll(e, baseHourOptions.length)}
         >
           {/* <ScrollArea className="h-[227px]"> */}
@@ -253,7 +253,7 @@ export const TimeSelect = ({
         </ul>
         <ul
           ref={minuteListReference}
-          className="flex w-14 [scrollbar-width:none] flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
+          className="flex w-14 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
           onScroll={(e) => handleInfiniteScroll(e, baseMinuteOptions.length)}
         >
           {minuteOptions.map((minute, index) => {
@@ -308,7 +308,7 @@ export const TimeSelect = ({
         {showSeconds && (
           <ul
             ref={secondListReference}
-            className="flex w-14 [scrollbar-width:none] flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
+            className="flex w-14 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
             onScroll={(e) => handleInfiniteScroll(e, baseSecondOptions.length)}
           >
             {secondOptions.map((second, index) => {

@@ -39,9 +39,9 @@ export const richTextSemanticContract = {
   },
   paragraph: cn("leading-[24px]"),
   quote: "border-l-[3px] border-gray-300 pl-3.5 pr-0 my-1 italic text-gray-600",
-  link: "text-inherit underline decoration-[rgba(55,53,47,0.4)] underline-offset-2 hover:decoration-[rgba(55,53,47,0.6)] transition-colors",
+  link: "text-inherit underline decoration-[rgba(55,53,47,0.4)] underline-offset-4 hover:decoration-[rgba(55,53,47,0.6)] transition-colors",
   list: {
-    checklist: "relative !list-none p-0",
+    checklist: "relative list-none! p-0",
     listitem: "mx-0",
     listitemChecked:
       'relative mx-0 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
@@ -52,17 +52,17 @@ export const richTextSemanticContract = {
     },
     ol: "my-1 ml-6 list-decimal [&>li]:mt-1",
     olDepth: [
-      "list-outside !list-decimal",
-      "list-outside !list-[upper-roman]",
-      "list-outside !list-[lower-roman]",
-      "list-outside !list-[upper-alpha]",
-      "list-outside !list-[lower-alpha]",
+      "list-outside list-decimal!",
+      "list-outside list-[upper-roman]!",
+      "list-outside list-[lower-roman]!",
+      "list-outside list-[upper-alpha]!",
+      "list-outside list-[lower-alpha]!",
     ],
     ul: "my-1 ml-6 list-disc [&>li]:mt-1",
     ulDepth: [
-      "list-outside !list-disc",
-      "list-outside !list-[circle]",
-      "list-outside !list-[square]",
+      "list-outside list-disc!",
+      "list-outside list-[circle]!",
+      "list-outside list-[square]!",
     ],
   },
   text: {
@@ -72,7 +72,7 @@ export const richTextSemanticContract = {
     strikethrough: "line-through",
     subscript: "sub",
     superscript: "sup",
-    underline: "underline decoration-[rgba(55,53,47,0.4)] underline-offset-2",
+    underline: "underline decoration-[rgba(55,53,47,0.4)] underline-offset-4",
     underlineStrikethrough: "underline line-through",
   },
   code: "RichTextSemanticContract__code",
@@ -111,13 +111,13 @@ export const richTextSemanticContract = {
   table:
     "RichTextSemanticContract__table w-fit overflow-scroll border-collapse",
   tableCell:
-    "RichTextSemanticContract__tableCell w-24 relative border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
+    "RichTextSemanticContract__tableCell w-24 relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right",
   tableCellHeader:
-    "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
+    "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right",
   hr: 'border-none my-2 mx-0 after:content-[""] after:block after:h-px after:bg-[rgba(55,53,47,0.09)]',
   checkBlock:
-    'flex items-start gap-2 my-1 [&>[data-lexical-text="true"]]:flex-1 [&>[data-lexical-text="true"]]:min-w-0',
-  checkBlockIcon: "mt-0.5 size-4 flex-shrink-0 rounded border border-primary",
+    'flex items-start gap-2 my-1 *:data-[lexical-text="true"]:flex-1 *:data-[lexical-text="true"]:min-w-0',
+  checkBlockIcon: "mt-0.5 size-4 shrink-0 rounded border border-primary",
   checkBlockChecked:
-    '[&>[data-lexical-text="true"]]:line-through [&>[data-lexical-text="true"]]:text-muted-foreground [&>[data-check-icon]]:bg-primary [&>[data-check-icon]]:relative [&>[data-check-icon]]:after:content-[""] [&>[data-check-icon]]:after:absolute [&>[data-check-icon]]:after:top-[3px] [&>[data-check-icon]]:after:left-[5.5px] [&>[data-check-icon]]:after:w-[3px] [&>[data-check-icon]]:after:h-[6px] [&>[data-check-icon]]:after:rotate-45 [&>[data-check-icon]]:after:border-r-2 [&>[data-check-icon]]:after:border-b-2 [&>[data-check-icon]]:after:border-white',
+    '*:data-[lexical-text="true"]:line-through *:data-[lexical-text="true"]:text-muted-foreground *:data-check-icon:bg-primary *:data-check-icon:relative *:data-check-icon:after:content-[""] *:data-check-icon:after:absolute *:data-check-icon:after:top-[3px] *:data-check-icon:after:left-[5.5px] *:data-check-icon:after:w-[3px] *:data-check-icon:after:h-[6px] *:data-check-icon:after:rotate-45 *:data-check-icon:after:border-r-2 *:data-check-icon:after:border-b-2 *:data-check-icon:after:border-white',
 } satisfies RichTextSemanticContract;

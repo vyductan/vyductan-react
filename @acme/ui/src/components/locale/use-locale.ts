@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/no-useless-fallback-in-spread */
-
 import * as React from "react";
 
 import type { Locale } from ".";

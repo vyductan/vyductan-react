@@ -72,7 +72,7 @@ const Drawer = ({
             "--drawer-width": typeof width === "number" ? `${width}px` : width,
           } as React.CSSProperties
         }
-        className={cn("w-[var(--drawer-width)]", className)}
+        className={cn("w-(--drawer-width)", className)}
       >
         <div className="flex flex-1 flex-col overflow-hidden">
           <DrawerHeader className={cn(classNames?.header)}>

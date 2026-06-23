@@ -10,7 +10,7 @@ import FloatButtonGroupContext from "./context";
 import { FloatButton } from "./float-button";
 import { getScrollTarget, scrollTo } from "./utils";
 
-export type BackToTopProps = Omit<FloatButtonProps, "target"> & {
+export type BackToTopProps = Omit<FloatButtonProps, "target" | "ref"> & {
   visibilityHeight?: number;
   // onClick?: React.MouseEventHandler<FloatButtonElement>;
   target?: () => HTMLElement | Window | Document;
@@ -40,7 +40,6 @@ export const FloatButtonBackToTop = ({
 
   const getDefaultTarget = useCallback(
     (): HTMLElement | Document | Window =>
-      // eslint-disable-next-line unicorn/prefer-global-this
       internalRef.current?.ownerDocument ?? window,
     [],
   );

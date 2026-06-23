@@ -1,6 +1,3 @@
-/* eslint-disable unicorn/no-typeof-undefined */
-
-/* eslint-disable unicorn/prefer-switch */
 import type { CircleProps as CircleProperties } from "./circle";
 import type { ProgressProps as ProgressProperties } from "./progress";
 

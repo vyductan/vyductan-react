@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/no-array-for-each */
-
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef } from "react";
 

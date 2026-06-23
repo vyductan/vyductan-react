@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/consistent-function-scoping */
 "use client";
 
 import React from "react";

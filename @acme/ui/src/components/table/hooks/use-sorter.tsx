@@ -1,8 +1,4 @@
-/* eslint-disable unicorn/prefer-ternary */
-
-/* eslint-disable unicorn/no-array-callback-reference */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable unicorn/explicit-length-check */
 
 import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import React from "react";

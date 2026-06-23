@@ -52,7 +52,11 @@ type UseFormProps<
   TContext = any,
   TTransformedValues = TFieldValues,
 > = {
-  schema?: ZodType<TTransformedValues, TFieldValues>;
+  // Output is pinned to TTransformedValues; input is left open (`any`) so zod
+  // schemas with `.default()`/`.optional()` (input type ≠ output type) are
+  // accepted. `unknown` is too strict here — the resolver below needs the
+  // schema assignable to StandardSchemaV1<TFieldValues, TTransformedValues>.
+  schema?: ZodType<TTransformedValues, any>;
   onSubmit?: SubmitHandler<TTransformedValues>;
   onValuesChange?: (
     changedValues: Partial<TFieldValues>,

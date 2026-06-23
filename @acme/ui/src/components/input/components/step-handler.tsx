@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/refs */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
 import useMobile from "@rc-component/util/es/hooks/useMobile";
 import raf from "@rc-component/util/es/raf";

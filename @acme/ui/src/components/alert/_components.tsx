@@ -8,7 +8,7 @@ import { cn } from "@acme/ui/lib/utils";
 export const alertVariants = cva(
   [
     "relative w-full rounded-lg border leading-line-height px-3 py-2 text-sm   has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
-    // "grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr]",
+    // "grid has-[>svg]:grid-cols-[--spacing(4)_1fr] grid-cols-[0_1fr]",
     "flex",
   ],
 

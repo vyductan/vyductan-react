@@ -29,7 +29,7 @@ export const ReadMore = ({ children, className }: ReadMoreProperties) => {
       <p
         ref={reference}
         className={cn(
-          "break-words",
+          "wrap-break-word",
           className,
           isShowingMore && "line-clamp-none",
         )}

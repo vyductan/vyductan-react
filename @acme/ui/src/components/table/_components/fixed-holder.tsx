@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/no-negated-condition */
-/* eslint-disable unicorn/prefer-at */
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 import { useMemo } from "react";

@@ -67,7 +67,6 @@ const Dragger = ({
   function reset() {
     setIsUploading(false);
     // setFile(undefined);
-    // eslint-disable-next-line unicorn/no-useless-undefined
     onChange?.(undefined);
 
     if (preview) {

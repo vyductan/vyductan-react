@@ -18,7 +18,7 @@ import { cn } from "../../lib/utils";
 //     <ShadcnDrawerContent
 //       className={cn(
 //         "flex flex-col [&>div]:flex-1",
-//         "!touch-auto !select-text",
+//         "touch-auto! select-text!",
 //         "data-[vaul-drawer-direction=right]:w-[inheri",
 //         "data-[vaul-drawer-direction=right]:sm:max-w-auto",
 //         className,
@@ -50,7 +50,7 @@ function DrawerContent({
 
           //
           // "flex flex-col [&>div]:flex-1",
-          "!touch-auto !select-text",
+          "touch-auto! select-text!",
           className,
         )}
         // Prevent drawer from closing when clicking on toast notifications (Sonner)

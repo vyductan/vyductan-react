@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-/* eslint-disable unicorn/prefer-logical-operator-over-ternary */
-
-/* eslint-disable unicorn/prefer-spread */
-
 import type { ColumnDef as TTColumnDef } from "@tanstack/react-table";
 import React, { useMemo } from "react";
 import toArray from "@rc-component/util/es/Children/toArray";

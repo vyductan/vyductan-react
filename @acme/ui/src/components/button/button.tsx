@@ -1,5 +1,6 @@
 "use client";
 
+import { isValidElement } from "react";
 import type * as React from "react";
 import type { PartialDeep } from "type-fest";
 
@@ -102,6 +103,13 @@ const Button = ({
     );
   }
 
+  // antd-style warning: `icon` is a ReactNode, not an icon-name string.
+  if (process.env.NODE_ENV !== "production" && typeof icon === "string") {
+    console.warn(
+      `Button: \`icon\` must be a ReactNode element, not a string. Received "${icon}". Wrap it, e.g. icon={<Icon icon="${icon}" />}.`,
+    );
+  }
+
   const size = sizeProperty ?? sizeConfig;
 
   const defaultType = variantProperty ? "default" : "primary";
@@ -142,20 +150,25 @@ const Button = ({
 
   const Comp = asChild || href ? GenericSlot : "button";
 
+  // Radix Slot clones its props onto a single element child, so a non-element
+  // icon (string / number / fragment) would throw "Slot failed to slot onto
+  // its children". Mirror antd's IconWrapper: Slot when it's a real element
+  // (keeps class-merge sizing), otherwise wrap in a <span> so any ReactNode is
+  // safe instead of crashing.
+  const iconChild = loading ? <LoadingIcon /> : icon;
+  const iconNode = isValidElement(iconChild) ? (
+    <GenericSlot<Partial<IconProps>>
+      className={cn("size-4", size === "small" && "size-[14px]")}
+    >
+      {iconChild}
+    </GenericSlot>
+  ) : (
+    <span className="inline-flex items-center justify-center">{iconChild}</span>
+  );
+
   const ChildrenToRender = (
     <>
-      {(!!loading || icon) && (
-        <GenericSlot<Partial<IconProps>>
-          className={cn("size-4", size === "small" && "size-[14px]")}
-          // srOnly={
-          //   srOnly && typeof children === "string"
-          //     ? children
-          //     : undefined
-          // }
-        >
-          {loading ? <LoadingIcon /> : icon}
-        </GenericSlot>
-      )}
+      {(!!loading || icon) && iconNode}
       {srOnly && typeof children === "string" ? (
         <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
           {children}
@@ -186,8 +199,8 @@ const Button = ({
           }),
           className,
         )}
-        disabled={loading ?? disabled}
-        aria-disabled={loading ?? disabled}
+        disabled={disabled || loading}
+        aria-disabled={disabled || loading}
         type={htmlTypeToPass}
         color={htmlColor}
         {...properties}

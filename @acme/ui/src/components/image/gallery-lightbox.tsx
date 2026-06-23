@@ -115,7 +115,7 @@ export function GalleryLightbox({
                 loop: true,
                 startIndex: initialIndex,
               }}
-              className="h-full w-full [&_[data-slot=carousel-content]]:h-full"
+              className="h-full w-full **:data-[slot=carousel-content]:h-full"
               onClick={(e) => {
                 if (
                   (e.target as HTMLElement).closest("button") ||

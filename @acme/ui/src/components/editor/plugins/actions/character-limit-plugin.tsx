@@ -5,7 +5,6 @@ export function CharacterLimitPlugin({
   charset,
 }: {
   maxLength: number;
-  // eslint-disable-next-line unicorn/text-encoding-identifier-case
   charset: "UTF-8" | "UTF-16";
 }) {
   return (

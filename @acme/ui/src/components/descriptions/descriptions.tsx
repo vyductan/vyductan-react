@@ -165,7 +165,7 @@ function DescriptionsTable({
     isHorizontalBorderless && "shrink-0 whitespace-nowrap",
     isHorizontalBorderless &&
       colon !== false &&
-      "after:content-[':'] after:relative after:-mt-[0.5px] after:ml-0.5 after:mr-2",
+      "after:content-[':'] after:relative after:mt-[-0.5px] after:ml-0.5 after:mr-2",
     classNames?.label,
   );
   const childrenClassName = cn(
@@ -201,7 +201,7 @@ function DescriptionsTable({
     classNames?.th,
   );
   const tdClassName = cn(
-    "break-words text-sm",
+    "wrap-break-word text-sm",
     isHorizontal && [
       "pb-4 pr-4 text-sm",
       !bordered && "last:pr-0",

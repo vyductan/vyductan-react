@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/no-array-for-each */
-
 import React from "react";
 
 import {

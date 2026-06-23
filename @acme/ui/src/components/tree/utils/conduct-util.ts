@@ -1,9 +1,3 @@
-/* eslint-disable unicorn/prefer-spread */
-
-/* eslint-disable unicorn/explicit-length-check */
-
-/* eslint-disable unicorn/no-array-for-each */
-/* eslint-disable unicorn/prefer-ternary */
 import warning from "@rc-component/util/es/warning";
 
 import type {

@@ -22,7 +22,10 @@ export type DateType = Dayjs | null | undefined;
 
 type TimePickerProperties<
   TValue extends Dayjs | string | null | undefined = Dayjs,
-> = Omit<React.ComponentProps<"div">, "onBlur" | "onChange" | "defaultValue"> &
+> = Omit<
+  React.ComponentProps<"div">,
+  "onBlur" | "onChange" | "defaultValue" | "ref"
+> &
   Pick<
     InputProperties,
     "name" | "size" | "disabled" | "status" | "placeholder" | "onBlur"

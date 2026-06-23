@@ -14,7 +14,10 @@ import { useRequiredFieldCheck } from "../hooks/use-field-optionality-check";
 import { FormItemRow } from "./form-item-row";
 
 type FormItemProps<TFieldValues extends FieldValues = FieldValues> = {
-  control?: Control<TFieldValues>;
+  // `control` is only used to infer TFieldValues for `name`; it is ignored at
+  // runtime. Accept any TContext/TTransformedValues so forms backed by zod
+  // schemas with `.default()` (input type ≠ output type) still type-check.
+  control?: Control<TFieldValues, any, any>;
 
   name?: FieldPath<TFieldValues>;
   label?: React.ReactNode;

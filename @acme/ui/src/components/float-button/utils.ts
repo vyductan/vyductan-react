@@ -9,7 +9,6 @@ export function getScrollTarget(
   target: HTMLElement | Window | Document | null,
   top: boolean,
 ): number {
-  // eslint-disable-next-line unicorn/prefer-global-this
   if (typeof window === "undefined") {
     return 0;
   }
@@ -47,7 +46,6 @@ interface ScrollToOptions {
 }
 
 export function scrollTo(y: number, options: ScrollToOptions = {}) {
-  // eslint-disable-next-line unicorn/prefer-global-this
   const { getContainer = () => window, callback, duration = 450 } = options;
   const container = getContainer();
   const scrollTop = getScrollTarget(container, true);

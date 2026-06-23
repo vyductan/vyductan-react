@@ -163,11 +163,11 @@ function TableHead({ className, size, ...props }: TableHeadProps) {
     <ShadcnTableHead
       // data-slot="table-head"
       className={cn(
-        // "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap has-[[role=checkbox]]:pr-0 *:[[role=checkbox]]:translate-y-[2px]",
         // own
         "h-auto p-3 whitespace-normal",
         size === "small" && "p-2 leading-[22px]",
-        // "break-words",
+        // "wrap-break-word",
         // "first:rounded-tl-md last:rounded-tr-md",
         "border-b",
         className,
@@ -185,14 +185,14 @@ function TableCell({ className, size, ...props }: TableCellProps) {
     <ShadcnTableCell
       // data-slot="table-cell"
       className={cn(
-        // "align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        // "align-middle has-[[role=checkbox]]:pr-0 *:[[role=checkbox]]:translate-y-[2px]",
         // 'whitespace-nowrap',
         // "p-2",
         // own
         "whitespace-normal",
         "p-3",
         size === "small" && "p-2 leading-[22px]",
-        // "break-words",
+        // "wrap-break-word",
         // "group-hover:bg-background-hover",
         "border-b",
         className,

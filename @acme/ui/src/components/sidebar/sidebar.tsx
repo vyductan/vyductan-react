@@ -6,6 +6,7 @@ import { useMergedState } from "@rc-component/util";
 import type { MenuItemType, MenuProps as MenuProperties } from "../menu";
 import { Divider } from "../divider";
 import {
+  ShadcnSidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -14,7 +15,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  ShadcnSidebar,
 } from "./_component";
 
 type SidebarProperties = {

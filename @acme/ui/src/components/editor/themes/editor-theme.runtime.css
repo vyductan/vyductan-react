@@ -117,7 +117,7 @@
   color: inherit;
   text-decoration: underline;
   text-decoration-color: rgba(55, 53, 47, 0.4);
-  text-underline-offset: 2px;
+  text-underline-offset: 4px;
   transition: text-decoration-color 0.1s ease;
 }
 

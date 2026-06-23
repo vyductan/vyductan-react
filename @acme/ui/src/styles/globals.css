@@ -1,6 +1,5 @@
 /* https://github.com/shadcn-ui/ui/blob/main/apps/v4/app/globals.css */
-@import "tailwindcss";
-
+/* tailwindcss imported via ./shadcn.css (shadcn CLI css entry) */
 @import "./shadcn.css";
 
 @import "./colors.css" layer(base);
@@ -26,6 +25,11 @@
     @apply text-link hover:text-link-hover active:text-link-active cursor-pointer;
   }
 
+  /* Global default underline offset; component `underline-offset-*` utilities still override. */
+  * {
+    @apply underline-offset-4;
+  }
+
   @supports (font: -apple-system-body) and (-webkit-appearance: none) {
     [data-wrapper] {
       @apply min-[1800px]:border-t;
@@ -40,12 +44,12 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
+    background: var(--border);
     border-radius: 5px;
   }
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--border)) transparent;
+    scrollbar-color: var(--border) transparent;
   }
 
   @layer base {

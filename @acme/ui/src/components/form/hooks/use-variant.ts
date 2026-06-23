@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-typeof-undefined */
 import React from "react";
 
 import type { ConfigProviderProps, Variant } from "../../config-provider";

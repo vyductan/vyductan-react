@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/no-lonely-if */
 // Jun 6, 2024
 
 import type { AnyObject } from "../../_util/type";

@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prefer-at */
-
 import React from "react";
 import useId from "@rc-component/util/es/hooks/useId";
 

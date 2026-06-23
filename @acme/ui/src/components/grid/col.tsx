@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable unicorn/no-array-for-each */
 import * as React from "react";
 
 import { cn } from "@acme/ui/lib/utils";

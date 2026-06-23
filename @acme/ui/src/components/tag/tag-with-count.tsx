@@ -24,7 +24,7 @@ export const TagWithCount = ({
     <span className="relative" {...restProps}>
       {children}
       <span
-        className="absolute end-0 top-0 origin-[100%_0%] translate-x-1/2 -translate-y-1/2"
+        className="absolute inset-e-0 top-0 origin-[100%_0%] translate-x-1/2 -translate-y-1/2"
         style={
           offset
             ? {

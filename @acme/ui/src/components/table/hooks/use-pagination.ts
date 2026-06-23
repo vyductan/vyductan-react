@@ -2,7 +2,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable unicorn/no-array-for-each */
 import { useState } from "react";
 
 import type { PaginationProps } from "../../pagination";

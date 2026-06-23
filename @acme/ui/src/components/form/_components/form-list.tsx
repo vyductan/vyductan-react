@@ -19,7 +19,9 @@ type FieldListProps<
   TFieldArrayName extends FieldArrayPath<TFieldValues> =
     FieldArrayPath<TFieldValues>,
 > = {
-  control?: Control<TFieldValues>;
+  // TContext/TTransformedValues left open so `form.control` from a zod schema
+  // with `.default()`/`.optional()` (TTransformedValues ≠ TFieldValues) is accepted.
+  control?: Control<TFieldValues, any, any>;
   name: TFieldArrayName;
   label?: string;
   description?: string;
