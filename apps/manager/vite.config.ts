@@ -7,7 +7,7 @@ export default defineConfig({
   root: resolve(__dirname, 'src'),
   resolve: {
     alias: {
-      "@acme/ui": resolve(__dirname, "../../../@acme/ui/src"),
+      "@acme/ui": resolve(__dirname, "../../@acme/ui/src"),
     },
   },
   base: './',
