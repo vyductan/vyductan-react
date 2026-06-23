@@ -1,7 +1,5 @@
 import type { SyncStatusResult } from "../../lib/acme-sync/types";
 
-import type { SyncStatusResult } from "../../lib/acme-sync/types";
-
 export const buildRsyncStatusFailureState = (): SyncStatusResult => ({
   mode: "rsync",
   state: "unknown",

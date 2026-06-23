@@ -23,8 +23,8 @@ test("builds push and pull cache entries scoped to project and primary path", ()
   const result = buildRsyncPreviewCacheEntries({
     projectPath: "/tmp/project-a",
     primaryPath: "/tmp/primary-a",
-    pushPreview: { summary: { added: 1, modified: 0, deleted: 0 } },
-    pullPreview: { summary: { added: 0, modified: 2, deleted: 1 } },
+    pushPreview: { files: [], summary: { added: 1, modified: 0, deleted: 0 } },
+    pullPreview: { files: [], summary: { added: 0, modified: 2, deleted: 1 } },
   });
 
   assert.deepEqual(Object.keys(result).sort(), [
@@ -32,11 +32,11 @@ test("builds push and pull cache entries scoped to project and primary path", ()
     "/tmp/project-a::/tmp/primary-a::push",
   ]);
   assert.equal(
-    result["/tmp/project-a::/tmp/primary-a::push"].summary.added,
+    result["/tmp/project-a::/tmp/primary-a::push"]?.summary.added,
     1,
   );
   assert.equal(
-    result["/tmp/project-a::/tmp/primary-a::pull"].summary.modified,
+    result["/tmp/project-a::/tmp/primary-a::pull"]?.summary.modified,
     2,
   );
 });

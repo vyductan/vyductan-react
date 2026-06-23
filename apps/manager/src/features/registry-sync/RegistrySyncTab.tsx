@@ -19,11 +19,13 @@ const WORKSPACES = [
   { name: 'Vyductan React', path: '../../../vyductan-react' },
   { name: 'Notes', path: '../../../notes' },
   { name: 'NextJS Turbo Starter', path: '../../../nextjs-turbo-starter' },
-];
+] as const;
 
 export const RegistrySyncTab = () => {
   const [components, setComponents] = useState<RegistryItem[]>([]);
-  const [selectedWorkspace, setSelectedWorkspace] = useState(WORKSPACES[0].path);
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>(
+    WORKSPACES[0]?.path ?? "",
+  );
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

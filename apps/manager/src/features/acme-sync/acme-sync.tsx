@@ -1605,8 +1605,8 @@ export function AcmeSync() {
     });
   };
 
-  const getConfirmPreviewSummary = () => {
-    if (!confirmState) return null;
+  const getConfirmPreview = () => {
+    if (!confirmState) return undefined;
 
     const previewPrimaryPath = resolvePreviewPrimaryPath(
       confirmState.profile.primaryPath,
@@ -1619,7 +1619,11 @@ export function AcmeSync() {
         confirmState.action,
         previewPrimaryPath,
       )
-    ]?.summary;
+    ];
+  };
+
+  const getConfirmPreviewSummary = () => {
+    return getConfirmPreview()?.summary ?? null;
   };
 
   const getOppositePreviewSummary = () => {
@@ -1665,6 +1669,7 @@ export function AcmeSync() {
     confirmState?.profile.mode === "rsync" &&
     hasSummaryChanges(confirmPreviewSummary) &&
     hasSummaryChanges(oppositePreviewSummary);
+  const confirmPreview = getConfirmPreview();
   const confirmUnresolvedConflictCount =
     confirmState?.profile.mode === "rsync" && confirmPreview
       ? getUnresolvedConflictCount(
@@ -2222,7 +2227,7 @@ export function AcmeSync() {
                             const rsyncStatus =
                               latestRsyncStatusByProject[projectPath];
                             const rsyncLabel = formatRsyncStatusLabel(rsyncStatus);
-                            if (!rsyncLabel) {
+                            if (!rsyncLabel || rsyncStatus?.mode !== "rsync") {
                               return null;
                             }
 
@@ -2692,8 +2697,8 @@ export function AcmeSync() {
               <p className="text-muted-foreground">
                 {getAiSyncStepLabels(aiSyncModal.mode).prompt}
               </p>
-              <div className="max-h-[52vh] overflow-auto rounded-md border">
-                <CodeBlock language="markdown" wrap>
+              <div className="max-h-[52vh] overflow-auto rounded-md border [&_pre]:whitespace-pre-wrap [&_pre]:break-words">
+                <CodeBlock language="markdown">
                   {aiSyncModal.prompt}
                 </CodeBlock>
               </div>

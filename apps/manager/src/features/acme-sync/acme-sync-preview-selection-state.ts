@@ -14,7 +14,7 @@ export const getNextConflictResolutionState = (
 });
 
 export const getConflictResolutionOptions = (
-  conflict: Pick<SyncPreviewConflict, "allowedResolutions">,
+  conflict: SyncPreviewConflict,
 ) => {
   return conflict.allowedResolutions.map((resolution) => ({
     value: resolution,
