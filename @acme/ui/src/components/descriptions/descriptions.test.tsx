@@ -69,7 +69,7 @@ describe("Descriptions", () => {
     expect(label).toHaveClass("text-muted-foreground");
     expect(label).toHaveClass("text-sm");
     expect(label).not.toHaveClass("uppercase");
-    expect(label).not.toHaveClass("tracking-[0.05em]");
+    expect(label).not.toHaveClass("tracking-wider");
     expect(value).toHaveClass("text-sm");
     expect(value).not.toHaveClass("font-medium");
     expect(value).toHaveClass("truncate");
@@ -199,7 +199,7 @@ describe("Descriptions", () => {
     );
     const cell = content.closest("td");
 
-    expect(cell).toHaveClass("break-words");
+    expect(cell).toHaveClass("wrap-break-word");
     expect(cell).not.toHaveClass("break-all");
   });
 

@@ -2,10 +2,13 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, test } from "vitest";
 
+import { Button } from "../button";
 import { Modal } from "./modal";
+
+afterEach(() => cleanup());
 
 globalThis.React = React;
 
@@ -63,5 +66,32 @@ describe("Modal", () => {
 
     expect(description).toBeInTheDocument();
     expect(description).toHaveTextContent("Configure per-pax limits for Food.");
+  });
+
+  // Regression: a disabled trigger must not open the modal. The Button used
+  // `loading ?? disabled`, so `loading={false}` discarded `disabled` and the
+  // native disabled attribute was dropped, letting the Radix trigger fire.
+  test.each([
+    { name: "disabled", node: <Button disabled>Open</Button> },
+    {
+      name: "disabled + loading={false}",
+      node: (
+        <Button disabled loading={false}>
+          Open
+        </Button>
+      ),
+    },
+  ])("disabled trigger ($name) does not open the modal", ({ node }) => {
+    render(
+      <Modal title="T" trigger={node}>
+        Body
+      </Modal>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Open" });
+    expect(trigger).toBeDisabled();
+
+    fireEvent.click(trigger);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

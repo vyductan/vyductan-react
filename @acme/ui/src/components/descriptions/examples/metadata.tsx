@@ -9,7 +9,7 @@ import {
 } from "@acme/ui/components/descriptions";
 
 const metadataLabelClassName =
-  "text-[0.6875rem] font-semibold uppercase tracking-[0.05em]";
+  "text-[0.6875rem] font-semibold uppercase tracking-wider";
 const metadataValueClassName = "font-medium";
 
 const App: React.FC = () => (

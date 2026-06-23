@@ -103,7 +103,7 @@ describe("Toaster text selection integration", () => {
     );
     expect(mockSonner).toHaveAttribute(
       "data-success-class",
-      expect.stringContaining("!bg-green-100"),
+      expect.stringContaining("bg-green-100!"),
     );
     expect(mockSonner).toHaveAttribute(
       "data-success-class",
@@ -111,7 +111,7 @@ describe("Toaster text selection integration", () => {
     );
     expect(mockSonner).toHaveAttribute(
       "data-error-class",
-      expect.stringContaining("!bg-red-100"),
+      expect.stringContaining("bg-red-100!"),
     );
     expect(mockSonner).toHaveAttribute(
       "data-close-button-class",

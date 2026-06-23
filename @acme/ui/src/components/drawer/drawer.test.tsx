@@ -21,8 +21,8 @@ describe("DrawerContent", () => {
 
     const content = screen.getByTestId("drawer-content");
 
-    expect(content).toHaveClass("!touch-auto");
-    expect(content).toHaveClass("!select-text");
+    expect(content).toHaveClass("touch-auto!");
+    expect(content).toHaveClass("select-text!");
     expect(content).not.toHaveClass("touch-auto!");
     expect(content).not.toHaveClass("select-text!");
   });

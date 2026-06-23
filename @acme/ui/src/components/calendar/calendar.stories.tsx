@@ -20,7 +20,11 @@ export const Default: Story = {
   render: () => {
     const [value, setValue] = useState(dayjs());
     return (
-      <Calendar mode="single" value={value} onSelect={(date) => setValue(date)} />
+      <Calendar
+        mode="single"
+        value={value}
+        onSelect={(date) => setValue(date)}
+      />
     );
   },
 };

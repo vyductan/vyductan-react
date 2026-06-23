@@ -24,7 +24,7 @@ const App: React.FC = () => {
     <div className="flex flex-wrap items-start gap-8">
       {sizes.map((size) => (
         <div key={size.label} className="flex flex-col items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground">
+          <span className="text-muted-foreground text-sm font-medium">
             {size.label}
           </span>
           <div style={{ zoom: size.zoom }}>
