@@ -12,5 +12,6 @@
       "@acme/ui/*": ["../../@acme/ui/src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [{ "path": "../../@acme/ui/tsconfig.build.json" }]
 }

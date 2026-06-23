@@ -5,56 +5,57 @@ packages:
 catalog:
   "@eslint/js": ^10.0.1
   "@hookform/resolvers": 5.4.0
-  "@tailwindcss/postcss": ^4.3.0
+  "@tailwindcss/postcss": ^4.3.1
   "@tanstack/react-query": ^5.100.14
   "@trpc/client": ^11.17.0
   "@trpc/server": ^11.17.0
   "@trpc/tanstack-react-query": ^11.17.0
   "@types/lodash": ^4.17.24
-  "@types/node": ^25.9.1
+  "@types/node": ^25.9.3
   ahooks: ^3.9.7
   colorjs.io: ^0.6.1
-  date-fns: ^4.3.0
-  dayjs: ^1.11.20
-  eslint: ^10.4.0
+  date-fns: ^4.4.0
+  dayjs: ^1.11.21
+  eslint: ^10.5.0
   lucide-react: 1.16.0
   next-themes: 0.4.6
-  prettier: ^3.8.3
+  prettier: ^3.8.4
   react-hook-form: 7.76.1
-  tailwindcss: ^4.3.0
-  type-fest: ^5.6.0
+  tailwindcss: ^4.3.1
+  type-fest: ^5.7.0
   typescript: ^6.0.3
   usehooks-ts: ^3.1.1
   uuid: ^14.0.0
   zod: 4.4.3
-  "zustand": ^5.0.13
+  "zustand": ^5.0.14
   "@excalidraw/excalidraw": ^0.18.1
   "lodash": ^4.18.1
+  "react-markdown": ^10.1.0
   "remark-gfm": ^4.0.1
   "@testing-library/react": ^16.3.2
   "jsdom": ^29.1.1
-  "@types/jsdom": ^21.1.7
+  "@types/jsdom": ^28.0.3
 
 catalogs:
   react19:
-    "@types/react": ^19.2.14
+    "@types/react": ^19.2.17
     "@types/react-dom": ^19.2.3
-    react: ^19.2.6
-    react-dom: ^19.2.6
+    react: ^19.2.7
+    react-dom: ^19.2.7
   vite:
-    "@tailwindcss/vite": ^4.3.0
-    "@vitejs/plugin-react": ^6.0.1
+    "@tailwindcss/vite": ^4.3.1
+    "@vitejs/plugin-react": ^6.0.2
     vite: 8.0.14
   vitest:
-    "@vitest/browser-playwright": ^4.1.7
-    "@vitest/coverage-v8": ^4.1.7
-    "@vitest/ui": ^4.1.7
-    vitest: ^4.1.7
+    "@vitest/browser-playwright": ^4.1.9
+    "@vitest/coverage-v8": ^4.1.9
+    "@vitest/ui": ^4.1.9
+    vitest: ^4.1.9
 
 linkWorkspacePackages: true
 
 overrides:
-  "@types/minimatch": 5.1.2
+  date-fns: ^4.4.0
 
 allowBuilds:
   "@swc/core": true

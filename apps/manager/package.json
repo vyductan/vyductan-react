@@ -7,26 +7,27 @@
     "dev": "vite",
     "build": "vite build --config src/vite.config.ts",
     "preview": "vite preview",
-    "tauri": "pnpm dlx @tauri-apps/cli"
+    "tauri": "pnpm dlx @tauri-apps/cli",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@acme/ui": "workspace:*",
-    "@tauri-apps/api": "^2.11.0",
+    "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.1",
-    "@tauri-apps/plugin-shell": "^2.3.1",
+    "@tauri-apps/plugin-shell": "^2.3.5",
     "lucide-react": "catalog:",
     "react": "catalog:react19",
     "react-diff-view": "^3.3.3",
     "react-dom": "catalog:react19",
-    "zustand": "^5.0.13"
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@tauri-apps/cli": "^2.11.1",
+    "@tauri-apps/cli": "^2.11.2",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "catalog:vite",
-    "rollup": "^4.60.3",
+    "rollup": "^4.62.0",
     "typescript": "catalog:",
     "vite": "catalog:vite"
   }
