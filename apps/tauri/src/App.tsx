@@ -165,9 +165,9 @@ function App() {
             </button>
 
             <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-white/5"></div>
-              <span className="flex-shrink mx-4 text-slate-600 text-xs uppercase tracking-wider font-bold">HOẶC NHẬP TOKEN</span>
-              <div className="flex-grow border-t border-white/5"></div>
+              <div className="grow border-t border-white/5"></div>
+              <span className="shrink mx-4 text-slate-600 text-xs uppercase tracking-wider font-bold">HOẶC NHẬP TOKEN</span>
+              <div className="grow border-t border-white/5"></div>
             </div>
 
             <form onSubmit={handleVerifyPastedToken} className="space-y-3">
@@ -209,7 +209,7 @@ function App() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Sidebar Navigation */}
-      <div className="w-full md:w-64 bg-slate-900/60 backdrop-blur-md border-r border-white/5 p-4 flex flex-col justify-between flex-shrink-0">
+      <div className="w-full md:w-64 bg-slate-900/60 backdrop-blur-md border-r border-white/5 p-4 flex flex-col justify-between shrink-0">
         <div className="space-y-6">
           {/* Logo Header */}
           <div className="flex items-center gap-2.5 px-2 py-1.5">
@@ -304,7 +304,7 @@ function App() {
       {/* Main Workspace Area */}
       <main className="flex-1 flex flex-col p-4 md:p-6 overflow-hidden min-h-0">
         {/* Main Dashboard Header */}
-        <header className="flex items-center justify-between mb-6 flex-shrink-0">
+        <header className="flex items-center justify-between mb-6 shrink-0">
           <div>
             <h2 className="text-xl font-bold text-white capitalize">{activeTab}</h2>
             <p className="text-xs text-slate-500 mt-0.5">Lập kế hoạch tối ưu cho ngày mới.</p>

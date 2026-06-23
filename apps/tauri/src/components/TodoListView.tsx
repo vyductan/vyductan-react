@@ -109,7 +109,7 @@ export function TodoListView() {
   return (
     <div className="flex flex-col md:flex-row gap-6 h-full">
       {/* Todo Creator Form */}
-      <div className="w-full md:w-80 flex-shrink-0 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-5 shadow-2xl space-y-4">
+      <div className="w-full md:w-80 shrink-0 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-white/10 p-5 shadow-2xl space-y-4">
         <h3 className="text-md font-bold text-white flex items-center gap-2">
           <Plus className="w-4 h-4 text-indigo-400" />
           Thêm công việc mới
@@ -267,7 +267,7 @@ export function TodoListView() {
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <button
                     onClick={() => handleToggleTodo(todo)}
-                    className="mt-0.5 text-slate-400 hover:text-white transition-all flex-shrink-0"
+                    className="mt-0.5 text-slate-400 hover:text-white transition-all shrink-0"
                   >
                     {todo.status === "done" ? (
                       <Check className="w-4 h-4 text-indigo-400 bg-indigo-500/20 border border-indigo-500/30 rounded-md p-0.5" />

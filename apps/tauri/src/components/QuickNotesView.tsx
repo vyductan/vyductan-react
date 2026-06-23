@@ -171,7 +171,7 @@ export function QuickNotesView() {
                   : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
               }`}
             >
-              <FileText className="w-4 h-4 mt-0.5 text-indigo-400 flex-shrink-0" />
+              <FileText className="w-4 h-4 mt-0.5 text-indigo-400 shrink-0" />
               <div className="min-w-0 flex-1">
                 <h4 className="text-sm font-semibold truncate text-white">{note.title || "Ghi chú không tên"}</h4>
                 <p className="text-xs text-slate-500 truncate mt-1">

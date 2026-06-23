@@ -174,7 +174,7 @@ export function TimelineView() {
                 </div>
                 
                 {/* Visual dot on the timeline axis */}
-                <div className={`absolute -left-[30px] top-2 w-3 h-3 rounded-full border-2 transition-all ${
+                <div className={`absolute left-[-30px] top-2 w-3 h-3 rounded-full border-2 transition-all ${
                   hasEvents 
                     ? "bg-indigo-400 border-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.5)]" 
                     : "bg-slate-900 border-slate-700 group-hover:border-slate-500"
