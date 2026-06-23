@@ -4,7 +4,7 @@ import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  root: resolve(__dirname),
+  root: resolve(__dirname, 'src'),
   resolve: {
     alias: {
       "@acme/ui": resolve(__dirname, "../../../@acme/ui/src"),
