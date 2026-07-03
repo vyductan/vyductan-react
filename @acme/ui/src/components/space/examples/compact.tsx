@@ -46,7 +46,10 @@ const App: React.FC = () => (
         defaultValue="git@github.com:ant-design/ant-design.git"
       />
       <Tooltip title="copy git url">
-        <Button icon={<Icon icon="icon-[lucide--copy]" />} />
+        <Button
+          aria-label="Copy git url"
+          icon={<Icon icon="icon-[lucide--copy]" />}
+        />
       </Tooltip>
     </Space.Compact>
     <Space.Compact block>
