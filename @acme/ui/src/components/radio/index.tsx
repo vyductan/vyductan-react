@@ -19,9 +19,19 @@ const ConditionRadioGroup = <T extends FormValueType = FormValueType>(
 ) => {
   const isShadcnRadioGroup = !properties.options;
   if (isShadcnRadioGroup) {
+    // Radix Root only emits `onValueChange`. When wrapped in <Field> (RHF),
+    // the field injects `onChange(value)` — bridge it so selection updates form.
+    const { onChange, onValueChange, ...rest } = properties as Omit<
+      React.ComponentProps<typeof RadioGroupRoot>,
+      "onChange"
+    > & { onChange?: (value: string) => void };
     return (
       <RadioGroupRoot
-        {...(properties as React.ComponentProps<typeof RadioGroupRoot>)}
+        {...rest}
+        onValueChange={(value) => {
+          onValueChange?.(value);
+          onChange?.(value);
+        }}
       />
     );
   }
