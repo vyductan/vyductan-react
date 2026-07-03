@@ -33,7 +33,7 @@ describe("DropdownMenuItem", () => {
       "[&_svg:not([class*='text-'])]:text-muted-foreground",
     );
     expect(screen.getByTestId("destructive-item")).toHaveClass(
-      "data-[variant=destructive]:*:[svg]:text-destructive",
+      "data-[variant=destructive]:*:[svg]:text-destructive!",
     );
     expect(screen.getByTestId("default-item")).not.toHaveClass(
       "[&_span[role='img']:not([class*='text-'])]:text-muted-foreground",

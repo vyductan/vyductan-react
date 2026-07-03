@@ -35,7 +35,7 @@ test("ui package defines a dedicated playwright config for notion clipboard rete
     "utf8",
   );
 
-  expect(configSource).toContain("testDir: './playwright'");
+  expect(configSource).toContain('testDir: "./playwright"');
   expect(configSource).toContain("workers: 1");
 });
 

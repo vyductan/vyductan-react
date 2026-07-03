@@ -23,7 +23,5 @@ describe("DrawerContent", () => {
 
     expect(content).toHaveClass("touch-auto!");
     expect(content).toHaveClass("select-text!");
-    expect(content).not.toHaveClass("touch-auto!");
-    expect(content).not.toHaveClass("select-text!");
   });
 });

@@ -20,6 +20,8 @@
     "lint:fix": "turbo run lint --continue -- --fix --cache --cache-location .cache/.eslintcache",
     "lint:nextjs": "turbo run lint --continue -F nextjs... -- --cache --cache-location .cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
+    "test": "turbo run test",
+    "test:nextjs": "turbo run test -F nextjs...",
     "typecheck": "turbo run typecheck"
   },
   "prettier": "@acme/prettier-config",

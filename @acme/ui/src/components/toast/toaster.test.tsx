@@ -164,7 +164,10 @@ describe("Toaster text selection integration", () => {
     expect(sonnerPointerDown).not.toHaveBeenCalled();
   });
 
-  test("keeps Sonner swipe setup for non-text toast surface drags", () => {
+  // Selection is allowed anywhere on the toast body (including the padding/gap
+  // around the text), so a drag on a non-interactive surface now bypasses the
+  // Sonner swipe setup too. Swipe is only kept for genuinely interactive controls.
+  test("blocks Sonner swipe setup for non-interactive toast surface drags", () => {
     render(<Toaster />);
 
     fireEvent.pointerDown(screen.getByTestId("toast-surface-gap"), {
@@ -172,7 +175,7 @@ describe("Toaster text selection integration", () => {
       pointerId: 1,
     });
 
-    expect(sonnerPointerDown).toHaveBeenCalledTimes(1);
+    expect(sonnerPointerDown).not.toHaveBeenCalled();
   });
 
   test("keeps Sonner pointer handling for action buttons", () => {

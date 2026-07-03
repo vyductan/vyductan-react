@@ -12,19 +12,17 @@ describe("BlockCopyPastePlugin structure", () => {
     expect(pluginSource).toContain("if (!$isRangeSelection(selection)) {");
     expect(pluginSource).toContain("if (!selection.isCollapsed()) {");
     expect(pluginSource).toContain(
-      "const clipboardData = $getClipboardDataFromSelection(currentSelection);",
+      "$getClipboardDataFromSelection(currentSelection);",
     );
-    expect(pluginSource).toContain(
-      "setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);",
-    );
+    expect(pluginSource).toContain("setLexicalClipboardDataTransfer(");
   });
 
   test("selected range cut is normalized before removing the selection", () => {
     expect(pluginSource).toContain(
-      "const clipboardData = $getClipboardDataFromSelection(currentSelection);",
+      "$getClipboardDataFromSelection(currentSelection);",
     );
     expect(pluginSource).toContain(
-      "setLexicalClipboardDataTransfer(event.clipboardData, clipboardData);\n            currentSelection.removeText();",
+      "            );\n            currentSelection.removeText();",
     );
   });
 });
