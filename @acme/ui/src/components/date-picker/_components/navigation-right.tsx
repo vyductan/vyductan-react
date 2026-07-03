@@ -6,6 +6,7 @@ export const NavigationRight = (properties: ButtonProps) => {
   return (
     <Button
       variant="outlined"
+      aria-label="Next"
       icon={<Icon icon="icon-[mingcute--right-fill]" className="size-4" />}
       {...properties}
     />

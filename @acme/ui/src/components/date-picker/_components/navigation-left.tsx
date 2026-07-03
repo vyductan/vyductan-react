@@ -6,6 +6,7 @@ export const NavigationLeft = (properties: ButtonProps) => {
   return (
     <Button
       variant="outlined"
+      aria-label="Previous"
       icon={<Icon icon="icon-[mingcute--left-fill]" className="size-4" />}
       {...properties}
     />
