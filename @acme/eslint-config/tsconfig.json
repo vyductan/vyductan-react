@@ -2,7 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "@acme/tsconfig/base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    // Relative imports between config files carry the .ts extension because
+    // eslint runs them through Node's native TS loader (ESM resolution).
+    "allowImportingTsExtensions": true
   },
   "include": ["."],
   "exclude": ["node_modules"]
