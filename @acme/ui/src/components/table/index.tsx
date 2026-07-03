@@ -2,18 +2,22 @@ import type { XOR } from "ts-xor";
 
 import type { AnyObject } from "../_util/type";
 import type { OwnTableProps, RecordWithCustomRow } from "./table";
+import type { Key } from "./types";
 import { TableRoot } from "./_components/base";
 import { OwnTable } from "./table";
 
 type ShadcnTableProps = React.ComponentProps<typeof TableRoot>;
 
-type XORTableProps<TRecord extends RecordWithCustomRow = AnyObject> = XOR<
-  ShadcnTableProps,
-  OwnTableProps<TRecord>
->;
+type XORTableProps<
+  TRecord extends RecordWithCustomRow = AnyObject,
+  TKey extends Key = Key,
+> = XOR<ShadcnTableProps, OwnTableProps<TRecord, TKey>>;
 
-const Table = <TRecord extends RecordWithCustomRow = AnyObject>(
-  props: XORTableProps<TRecord>,
+const Table = <
+  TRecord extends RecordWithCustomRow = AnyObject,
+  TKey extends Key = Key,
+>(
+  props: XORTableProps<TRecord, TKey>,
 ) => {
   const isShadcnTable = !props.columns;
   if (isShadcnTable) {

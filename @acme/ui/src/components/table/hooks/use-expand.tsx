@@ -22,8 +22,11 @@ import {
   renderExpandIcon,
 } from "../utils/expand-util";
 
-export default function useExpand<TRecord extends AnyObject>(
-  props: OwnTableProps<TRecord>,
+export default function useExpand<
+  TRecord extends AnyObject,
+  TKey extends Key = Key,
+>(
+  props: OwnTableProps<TRecord, TKey>,
   mergedData: readonly TRecord[],
   getRowKey: GetRowKey<TRecord>,
 ): [

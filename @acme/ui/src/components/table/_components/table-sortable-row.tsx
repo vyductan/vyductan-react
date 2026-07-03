@@ -26,6 +26,7 @@ const DragHandle = ({ readOnly, ...props }: DragHandleProps) => {
     <Button
       variant="text"
       size="small"
+      aria-label="Drag to reorder"
       icon={<Icon icon="icon-[octicon--grabber-16]" />}
       {...(readOnly ? {} : listeners)}
       ref={readOnly ? undefined : setActivatorNodeRef}

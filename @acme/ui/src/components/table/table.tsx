@@ -209,7 +209,10 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
       _customCellClassName?: string;
       _customRowStyle?: React.CSSProperties;
     });
-type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
+type TableProps<
+  TRecord extends RecordWithCustomRow = AnyObject,
+  TKey extends Key = Key,
+> = Omit<
   React.ComponentProps<"table">,
   "title" | "onChange" | "summary"
 > &
@@ -260,7 +263,7 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     /** Row key config */
     rowKey?: (string & {}) | keyof TRecord | GetRowKey<TRecord>;
     /** Row selection config */
-    rowSelection?: TableRowSelection<TRecord>;
+    rowSelection?: TableRowSelection<TRecord, TKey>;
 
     pagination?: false | TablePaginationConfig;
     loading?: boolean;
@@ -315,7 +318,9 @@ type TableProps<TRecord extends RecordWithCustomRow = AnyObject> = Omit<
     internalHooks?: string;
   };
 
-function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
+function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
+  props: TableProps<TRecord, TKey>,
+) {
   "use no memo";
 
   const tableConfig = useComponentConfig("table");
@@ -586,16 +591,31 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
   );
 
   const selectionType = rowSelection?.type ?? "checkbox";
-  const recordKeyBySelectionKey = React.useMemo(
-    () =>
-      new Map(
-        flattenedSelectionData.map((record, index) => {
-          const recordKey = getRowKey(record, index);
-          return [String(recordKey), recordKey] as const;
-        }),
-      ),
-    [flattenedSelectionData, getRowKey],
-  );
+  // Maps the normalized (string) selection key back to its ORIGINAL typed key.
+  // Seeded from the controlled `selectedRowKeys`/`defaultSelectedRowKeys` first
+  // so rows that are currently filtered out of view still resolve to their real
+  // key — without this, off-view selected rows fell back to a string key and a
+  // numeric `onChange` consumer received a string. Visible rows are layered on
+  // top (covers freshly toggled rows not yet in `selectedRowKeys`).
+  const recordKeyBySelectionKey = React.useMemo(() => {
+    const map = new Map<string, Key>();
+    for (const key of rowSelection?.selectedRowKeys ?? []) {
+      map.set(String(key), key);
+    }
+    for (const key of rowSelection?.defaultSelectedRowKeys ?? []) {
+      map.set(String(key), key);
+    }
+    for (const [index, record] of flattenedSelectionData.entries()) {
+      const recordKey = getRowKey(record, index);
+      map.set(String(recordKey), recordKey);
+    }
+    return map;
+  }, [
+    flattenedSelectionData,
+    getRowKey,
+    rowSelection?.selectedRowKeys,
+    rowSelection?.defaultSelectedRowKeys,
+  ]);
   const selectedRows = React.useMemo(
     () =>
       selectedRowKeys
@@ -613,9 +633,21 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
       const nextRows = nextKeys
         .map((key) => getRecordByKey(key))
         .filter((record): record is TRecord => record !== undefined);
-      const nextRecordKeys = nextKeys.map(
-        (key) => recordKeyBySelectionKey.get(key) ?? key,
-      );
+      // Resolved back to the original typed keys via recordKeyBySelectionKey
+      // (seeded from selectedRowKeys, so this holds even for off-view rows).
+      // A miss means the key was never seen in the data nor in
+      // selectedRowKeys/defaultSelectedRowKeys: we pass the raw string through
+      // and warn, since a non-string `TKey` consumer would otherwise silently
+      // receive a string it cannot match against its own keys.
+      const nextRecordKeys = nextKeys.map((key) => {
+        const recordKey = recordKeyBySelectionKey.get(key);
+        warning(
+          recordKey !== undefined,
+          "usage",
+          `Selected key \`${key}\` could not be resolved to an original row key, so the raw string is passed to \`rowSelection.onChange\`. Add it to \`selectedRowKeys\`/\`defaultSelectedRowKeys\` so keys with a non-string type keep their type.`,
+        );
+        return recordKey ?? key;
+      }) as TKey[];
 
       rowSelection?.onChange?.(nextRecordKeys, nextRows, { type: method });
     },
@@ -763,6 +795,23 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
       transformSelectionColumns,
     );
 
+  const columnPinning = React.useMemo(() => {
+    const left: string[] = [];
+    const right: string[] = [];
+    for (const col of columnsForTTTable) {
+      const fixed = col.meta?.fixed;
+      if (col.id === undefined) {
+        continue;
+      }
+      if (fixed === "left" || fixed === "start" || fixed === true) {
+        left.push(col.id);
+      } else if (fixed === "right" || fixed === "end") {
+        right.push(col.id);
+      }
+    }
+    return { left, right };
+  }, [columnsForTTTable]);
+
   // ============================ Sorter =============================
   const onSorterChange = (
     sorter: SorterResult<TRecord> | SorterResult<TRecord>[],
@@ -902,6 +951,7 @@ function OwnTable<TRecord extends AnyObject>(props: TableProps<TRecord>) {
     state: {
       sorting: sortingState,
       expanded: expandedState,
+      columnPinning,
     },
     // Core functionality
     getCoreRowModel: getCoreRowModel(),

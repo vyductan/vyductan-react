@@ -373,16 +373,24 @@ export type RowSelectionType = "checkbox" | "radio";
 
 export type RowSelectMethod = "all" | "none" | "invert" | "single" | "multiple";
 
-export type TableRowSelection<TRecord> = {
+export type TableRowSelection<TRecord, TKey extends Key = Key> = {
   /** Keep the selection keys in list even the key not exist in `dataSource` anymore */
   preserveSelectedRowKeys?: boolean;
   type?: RowSelectionType;
-  /** Controlled selected row keys */
-  selectedRowKeys?: Key[];
-  defaultSelectedRowKeys?: Key[];
+  /**
+   * Controlled selected row keys.
+   *
+   * `TKey` defaults to `Key` (string | number). Narrow it — e.g.
+   * `TableRowSelection<Row, number>` — when your `rowKey` resolves to a single
+   * type, so `onChange` hands back that type instead of `Key[]`. The Table
+   * resolves every key (incl. rows filtered out of view) back to its original
+   * `selectedRowKeys` value, so this narrowing is sound, not a cast.
+   */
+  selectedRowKeys?: TKey[];
+  defaultSelectedRowKeys?: TKey[];
   /** Callback executed when selected rows change */
   onChange?: (
-    selectedRowKeys: Key[],
+    selectedRowKeys: TKey[],
     selectedRows: TRecord[],
     info: { type: RowSelectMethod },
   ) => void;

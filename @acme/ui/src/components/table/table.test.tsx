@@ -63,6 +63,17 @@ const numericData: NumericSelectionHarnessRecord[] = [
   },
 ];
 
+const numericFilterData: NumericSelectionHarnessRecord[] = [
+  {
+    id: 1,
+    name: "John Brown",
+  },
+  {
+    id: 2,
+    name: "Jim Green",
+  },
+];
+
 const controlledStringData: ControlledStringSelectionHarnessRecord[] = [
   {
     key: "1",
@@ -133,6 +144,37 @@ function ControlledNumericSelectionHarness({
         },
       ]}
       dataSource={numericData}
+      rowSelection={{
+        selectedRowKeys,
+        onChange: (nextSelectedRowKeys) => {
+          setSelectedRowKeys(nextSelectedRowKeys);
+          onChange?.(nextSelectedRowKeys);
+        },
+      }}
+    />
+  );
+}
+
+function FilteredNumericSelectionHarness({
+  onChange,
+}: {
+  onChange?: (nextSelectedRowKeys: number[]) => void;
+}) {
+  // Row id=2 is selected but filtered OUT of the visible dataSource — mimics a
+  // search/area filter hiding an already-selected row. Only row id=1 renders.
+  const [selectedRowKeys, setSelectedRowKeys] = React.useState<number[]>([2]);
+
+  return (
+    <Table<NumericSelectionHarnessRecord, number>
+      rowKey="id"
+      columns={[
+        {
+          key: "name",
+          dataIndex: "name",
+          title: "Name",
+        },
+      ]}
+      dataSource={numericFilterData.filter((record) => record.id === 1)}
       rowSelection={{
         selectedRowKeys,
         onChange: (nextSelectedRowKeys) => {
@@ -236,8 +278,10 @@ describe("Table", () => {
   test("opts OwnTable out of React Compiler memoization", () => {
     const tableSource = readFileSync(tableSourcePath, "utf8");
 
+    // Tolerant of the generic signature spanning multiple lines (TRecord +
+    // optional TKey); only asserts OwnTable opts out of memoization.
     expect(tableSource).toMatch(
-      /function OwnTable<TRecord extends AnyObject>\(props: TableProps<TRecord>\) \{\n\s+"use no memo";/,
+      /function OwnTable<[\s\S]*?>\([\s\S]*?\) \{\s*\n\s+"use no memo";/,
     );
   });
 
@@ -550,5 +594,28 @@ describe("Table", () => {
     await waitFor(() => {
       expect(handleChange).toHaveBeenCalledWith([1]);
     });
+  });
+
+  test("keeps off-view selected keys numeric when a filtered row is toggled", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+
+    const { container } = render(
+      <FilteredNumericSelectionHarness onChange={handleChange} />,
+    );
+
+    // Only the visible row (id=1) has a checkbox; id=2 is selected-but-hidden.
+    await user.click(
+      within(container).getByRole("checkbox", { name: "Select row" }),
+    );
+
+    await waitFor(() => {
+      // id=2 carries over from the controlled keys; pre-fix it leaked back as
+      // the string "2" because the Table only mapped currently-visible rows.
+      expect(handleChange).toHaveBeenCalledWith([2, 1]);
+    });
+
+    const reported = handleChange.mock.calls.at(-1)?.[0] as unknown[];
+    expect(reported.every((key) => typeof key === "number")).toBe(true);
   });
 });
