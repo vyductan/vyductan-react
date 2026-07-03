@@ -489,18 +489,26 @@ const Select = <
                             : "",
                           item.color && tagColors[item.color],
                         )}
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          triggerChange(item.value);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            triggerChange(item.value);
-                          }
-                        }}
+                        onMouseDown={
+                          isMultiple
+                            ? (e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                triggerChange(item.value);
+                              }
+                            : undefined
+                        }
+                        onKeyDown={
+                          isMultiple
+                            ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  triggerChange(item.value);
+                                }
+                              }
+                            : undefined
+                        }
                       >
                         {optionContent}
                       </SelectItem>
@@ -533,18 +541,26 @@ const Select = <
                     : "",
                   o.color && tagColors[o.color],
                 )}
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  triggerChange(o.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    triggerChange(o.value);
-                  }
-                }}
+                onMouseDown={
+                  isMultiple
+                    ? (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        triggerChange(o.value);
+                      }
+                    : undefined
+                }
+                onKeyDown={
+                  isMultiple
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          triggerChange(o.value);
+                        }
+                      }
+                    : undefined
+                }
               >
                 {optionContent}
               </SelectItem>
@@ -853,6 +869,18 @@ const Select = <
         }
         value={
           isDefault ? (firstSelectedValue as string | undefined) : undefined
+        }
+        onValueChange={
+          isDefault
+            ? (val) => {
+                // Radix returns the item's string value; map it back to the
+                // original option value so numeric (non-string) values survive.
+                const matchedOption = flatOptions.find(
+                  (o) => String(o.value) === val,
+                );
+                triggerChange((matchedOption?.value ?? val) as TValue);
+              }
+            : undefined
         }
         open={internalOpen}
         onOpenChange={handleOpenChange}
