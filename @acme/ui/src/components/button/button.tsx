@@ -1,7 +1,8 @@
 "use client";
 
-import { isValidElement } from "react";
+import { isValidElement, useEffect, useRef } from "react";
 import type * as React from "react";
+import { composeRef } from "@rc-component/util/es/ref";
 import type { PartialDeep } from "type-fest";
 
 import type { IconProps } from "@acme/ui/icons";
@@ -29,6 +30,10 @@ type ColorVariantPairType = [
   color: ButtonColorVariants["color"],
   variant: ButtonColorVariants["variant"],
 ];
+
+// Dev-only: elements already warned about, so each nameless button logs once
+// instead of on every re-render.
+const warnedAccessibleName = new WeakSet<Element>();
 
 const ButtonTypeMap: Partial<Record<ButtonType, ColorVariantPairType>> = {
   default: ["default", "outlined"],
@@ -79,6 +84,7 @@ const Button = ({
   htmlType,
   htmlColor,
   srOnly,
+  ref,
   ...properties
 }: ButtonProps) => {
   const {
@@ -88,20 +94,32 @@ const Button = ({
     variant: variantConfig,
   } = useComponentConfig("button");
 
-  // Validate accessibility for icon-only buttons
-  const isIconOnly = (!!icon || loading) && !children && !srOnly;
-  const hasAccessibleName =
-    !!properties["aria-label"] || properties["aria-labelledby"];
-
-  if (
-    process.env.NODE_ENV !== "production" &&
-    isIconOnly &&
-    !hasAccessibleName
-  ) {
-    console.warn(
-      "Button: Icon-only buttons must have an accessible name. Please provide either 'aria-label' or 'aria-labelledby' prop.",
-    );
-  }
+  // Validate accessibility on the rendered element instead of props: the
+  // accessible name may come from sources props can't see (sr-only text
+  // inside `icon`, `title`, slotted children via asChild).
+  const a11yNameRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    const element = a11yNameRef.current;
+    if (!element || warnedAccessibleName.has(element)) return;
+    const hasAccessibleName =
+      !!element.getAttribute("aria-label") ||
+      !!element.getAttribute("aria-labelledby") ||
+      !!element.getAttribute("title") ||
+      !!element.textContent?.trim();
+    if (!hasAccessibleName) {
+      warnedAccessibleName.add(element);
+      console.warn(
+        "Button: Buttons without visible text must have an accessible name. Provide 'aria-label', 'aria-labelledby', 'title', or sr-only text.",
+        element,
+      );
+    }
+  });
+  const mergedRef =
+    process.env.NODE_ENV === "production"
+      ? ref
+      : // eslint-disable-next-line react-hooks/refs
+        composeRef(ref ?? null, a11yNameRef as React.Ref<HTMLButtonElement>);
 
   // antd-style warning: `icon` is a ReactNode, not an icon-name string.
   if (process.env.NODE_ENV !== "production" && typeof icon === "string") {
@@ -203,6 +221,7 @@ const Button = ({
         aria-disabled={disabled || loading}
         type={htmlTypeToPass}
         color={htmlColor}
+        ref={mergedRef}
         {...properties}
         style={{ ...properties.style }}
       >
