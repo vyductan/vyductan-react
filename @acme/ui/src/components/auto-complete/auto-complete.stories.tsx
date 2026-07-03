@@ -168,3 +168,80 @@ export const InteractionInputSearch: Story = {
     );
   },
 };
+
+const inputModeOptions = [
+  { label: "Ho Chi Minh City", value: "hcm" },
+  { label: "Ha Noi", value: "hn" },
+  { label: "Da Nang", value: "dn" },
+];
+
+export const InteractionInputCloseOnOutside: Story = {
+  args: {
+    options: [...storyOptions],
+  },
+  render: () => (
+    <div className="space-y-2">
+      <div className="w-[320px]">
+        <AutoComplete
+          mode="input"
+          placeholder="Search a city"
+          options={inputModeOptions}
+        />
+      </div>
+      <button type="button" data-testid="outside">
+        outside
+      </button>
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    await step("typing opens the panel", async () => {
+      await userEvent.type(canvas.getByPlaceholderText("Search a city"), "Ha");
+      await waitFor(async () => {
+        await expect(body.getByText("Ha Noi")).toBeInTheDocument();
+      });
+    });
+
+    await step("clicking outside closes the panel", async () => {
+      await userEvent.click(canvas.getByTestId("outside"));
+      await waitFor(async () => {
+        await expect(body.queryByText("Ha Noi")).not.toBeInTheDocument();
+      });
+    });
+  },
+};
+
+export const InteractionInputCloseOnEscape: Story = {
+  args: {
+    options: [...storyOptions],
+  },
+  render: () => (
+    <div className="w-[320px]">
+      <AutoComplete
+        mode="input"
+        placeholder="Search a city"
+        options={inputModeOptions}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    await step("typing opens the panel", async () => {
+      await userEvent.type(canvas.getByPlaceholderText("Search a city"), "Ha");
+      await waitFor(async () => {
+        await expect(body.getByText("Ha Noi")).toBeInTheDocument();
+      });
+    });
+
+    await step("pressing Escape closes the panel", async () => {
+      await userEvent.keyboard("{Escape}");
+      await waitFor(async () => {
+        await expect(body.queryByText("Ha Noi")).not.toBeInTheDocument();
+      });
+    });
+  },
+};

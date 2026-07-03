@@ -224,14 +224,16 @@ const AutoComplete = <
       <Popover
         trigger="click"
         open={open}
+        onOpenChange={gatedSetOpen}
         placement="bottomLeft"
         className={cn("p-0", "w-full min-w-(--radix-popover-trigger-width)")}
         arrow={false}
         content={renderContent}
-        onFocusOutside={(e) => {
-          setOpen(false);
-          onFocusOutside?.(e);
-        }}
+        // Keep focus in the Input when the panel opens (Radix would steal it)
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        // Close on real outside interaction; the Popover wrapper neutralizes onFocusOutside
+        onInteractOutside={() => setOpen(false)}
+        onFocusOutside={onFocusOutside}
       >
         <div style={style}>
           <Input
@@ -246,11 +248,11 @@ const AutoComplete = <
                 setOpen(true);
               }
             }}
-            // onFocus={() => {
-            //   if (!open) {
-            //     setOpen(true);
-            //   }
-            // }}
+            onFocus={() => {
+              if (!open) {
+                setOpen(true);
+              }
+            }}
             onPressEnter={() => {
               if (search.trim().length === 0) return;
               selectFirstIfSingle();

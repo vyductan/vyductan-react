@@ -90,4 +90,25 @@ describe("AutoComplete", () => {
     expect(screen.getByText("Editor")).toBeInTheDocument();
     expect(screen.queryByText("No data.")).not.toBeInTheDocument();
   });
+
+  test("input mode opens the panel when the field receives focus", () => {
+    render(
+      React.createElement(AutoComplete, {
+        mode: "input",
+        placeholder: "Choose a role",
+        options: [
+          { label: "Administrator", value: 1 },
+          { label: "Editor", value: 2 },
+        ],
+      }),
+    );
+
+    const input = screen.getByPlaceholderText("Choose a role");
+    expect(screen.queryByText("Administrator")).not.toBeInTheDocument();
+
+    fireEvent.focus(input);
+
+    expect(screen.getByText("Administrator")).toBeInTheDocument();
+    expect(screen.getByText("Editor")).toBeInTheDocument();
+  });
 });
