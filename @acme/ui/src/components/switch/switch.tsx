@@ -17,7 +17,7 @@ export type OwnSwitchProps = Omit<
   /** Alias for checked prop */
   value?: boolean;
   /** Size of the switch */
-  size?: "small" | "default";
+  size?: "small" | "default" | "large";
   /** Loading state of switch */
   loading?: boolean;
 };
@@ -41,15 +41,15 @@ export const Switch = (properties: OwnSwitchProps) => {
   const isControlled = value !== undefined || checked !== undefined;
   const isChecked = isControlled ? (value ?? checked ?? false) : undefined;
 
-  const isSmall = size === "small";
   const isDisabled = Boolean(loading) || Boolean(disabled);
 
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
+      data-size={size}
       className={cn(
-        "peer data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-        isSmall ? "h-4 w-7" : "h-[22px] w-11",
+        "peer group/switch inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80",
+        "data-[size=small]:h-4 data-[size=small]:w-7 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=large]:h-[22px] data-[size=large]:w-11",
         className,
       )}
       checked={isChecked}
@@ -63,21 +63,14 @@ export const Switch = (properties: OwnSwitchProps) => {
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
         className={cn(
-          "bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none relative block rounded-full ring-0 transition-transform",
-          isSmall ? "size-3" : "size-[18px]",
-          isSmall
-            ? "data-[state=checked]:translate-x-[14px] data-[state=unchecked]:translate-x-px"
-            : "data-[state=checked]:translate-x-[24px] data-[state=unchecked]:translate-x-[2px]",
+          "pointer-events-none relative block rounded-full bg-background ring-0 transition-transform dark:data-[state=checked]:bg-primary-foreground dark:data-[state=unchecked]:bg-foreground",
+          "group-data-[size=small]/switch:size-3 group-data-[size=default]/switch:size-3.5 group-data-[size=large]/switch:size-[18px]",
+          "data-[state=unchecked]:translate-x-px group-data-[size=small]/switch:data-[state=checked]:translate-x-[13px] group-data-[size=default]/switch:data-[state=checked]:translate-x-[15px] group-data-[size=large]/switch:data-[state=checked]:translate-x-[23px]",
         )}
       >
         {loading && (
-          <div
-            className={cn(
-              "absolute inset-px flex items-center justify-center opacity-50",
-              isSmall ? "size-2.5" : "size-4",
-            )}
-          >
-            <LoadingIcon className="size-full" />
+          <div className="absolute inset-0 flex items-center justify-center opacity-50">
+            <LoadingIcon className="group-data-[size=small]/switch:size-2 group-data-[size=default]/switch:size-2.5 group-data-[size=large]/switch:size-3" />
           </div>
         )}
       </SwitchPrimitive.Thumb>

@@ -1,8 +1,7 @@
 import type React from "react";
 import type { XOR } from "ts-xor";
 
-import { cn } from "@acme/ui/lib/utils";
-import { Switch as ShadcnSwitch } from "@acme/ui/shadcn/switch";
+import type { Switch as ShadcnSwitch } from "@acme/ui/shadcn/switch";
 
 import type { OwnSwitchProps as OwnSwitchProperties } from "./switch";
 import { Switch as InternalSwitch } from "./switch";
@@ -12,24 +11,23 @@ type ShadcnSwitchProperties = React.ComponentProps<typeof ShadcnSwitch>;
 type SwitchProperties = XOR<OwnSwitchProperties, ShadcnSwitchProperties>;
 
 const ConditionSwitch = (properties: SwitchProperties) => {
-  const isShadcnSwitchProperties = properties.onCheckedChange;
+  // InternalSwitch already renders the correct sizing natively, so both prop
+  // styles route to it. Normalize the radix-style API (onCheckedChange, size="sm")
+  // onto InternalSwitch's API (onChange, size="small").
+  const { onCheckedChange, size, ...restProperties } = properties as
+    & Omit<OwnSwitchProperties, "size">
+    & {
+      onCheckedChange?: (checked: boolean) => void;
+      size?: "sm" | "small" | "default" | "large";
+    };
 
-  if (isShadcnSwitchProperties) {
-    const { className, ...restProperties } = properties;
-    return (
-      <ShadcnSwitch
-        className={cn(
-          "h-[22px] w-11",
-          "**:data-[slot=switch-thumb]:size-[18px]",
-          "**:data-[slot=switch-thumb]:data-[state=unchecked]:translate-x-[2px]!",
-          "**:data-[slot=switch-thumb]:data-[state=checked]:translate-x-[24px]!",
-          className,
-        )}
-        {...(restProperties as ShadcnSwitchProperties)}
-      />
-    );
-  }
-  return <InternalSwitch {...(properties as OwnSwitchProperties)} />;
+  return (
+    <InternalSwitch
+      {...restProperties}
+      size={size === "sm" ? "small" : size}
+      onChange={onCheckedChange ?? restProperties.onChange}
+    />
+  );
 };
 
 export { ConditionSwitch as Switch };
