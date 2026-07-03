@@ -1,6 +1,7 @@
 "use client";
 
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
+import { Fragment, isValidElement } from "react";
 import { useMergedState } from "@rc-component/util";
 
 import type { MenuItemType, MenuProps as MenuProperties } from "../menu";
@@ -94,13 +95,23 @@ const Sidebar = (properties: SidebarProperties) => {
       }
 
       if (item.type === "item" || !("children" in item)) {
-        const { key, label, title } = item;
+        const { key, label, title, icon } = item;
         const mergedLabel = label ?? title;
         const isActive = selectKeys.some((x) => key.toString().startsWith(x));
-        let labelToRender: ReactNode = mergedLabel;
-        labelToRender = itemRender
-          ? itemRender(item, classNames, labelToRender)
-          : labelToRender;
+
+        const defaultNode = (
+          <>
+            {icon}
+            <span>{mergedLabel}</span>
+          </>
+        );
+        const content = itemRender
+          ? itemRender(item, classNames, defaultNode)
+          : defaultNode;
+
+        // Radix Slot needs exactly one host element — Fragment/string crashes/warns.
+        // isValidElement(<></>) === true, so Fragment must be excluded.
+        const asChild = isValidElement(content) && content.type !== Fragment;
 
         return (
           <SidebarMenuItem
@@ -113,14 +124,14 @@ const Sidebar = (properties: SidebarProperties) => {
             }}
           >
             <SidebarMenuButton
-              asChild
+              asChild={asChild}
               isActive={isActive}
               tooltip={
                 typeof mergedLabel === "string" ? mergedLabel : key.toString()
               }
               className={classNames?.menuButton}
             >
-              {labelToRender}
+              {content}
             </SidebarMenuButton>
           </SidebarMenuItem>
         );
