@@ -4,6 +4,7 @@ import { ComponentSource } from "../mdx/component-source";
 import BasicExample from "./examples/basic";
 import DisabledExample from "./examples/disabled";
 import ItemStatusExample from "./examples/item-status";
+import LabelInsideExample from "./examples/label-inside";
 import SemanticSlotsExample from "./examples/semantic-slots";
 import StatusBarExample from "./examples/status-bar";
 import TitlePlacementExample from "./examples/title-placement";
@@ -27,7 +28,7 @@ const meta = {
     },
     titlePlacement: {
       control: "radio",
-      options: ["horizontal", "vertical"],
+      options: ["horizontal", "vertical", "inside"],
     },
     responsive: {
       control: "boolean",
@@ -63,6 +64,15 @@ export const TitlePlacement: ExampleStory = {
     <ComponentSource
       src="steps/examples/title-placement.tsx"
       __comp__={TitlePlacementExample}
+    />
+  ),
+};
+
+export const LabelInside: ExampleStory = {
+  render: () => (
+    <ComponentSource
+      src="steps/examples/label-inside.tsx"
+      __comp__={LabelInsideExample}
     />
   ),
 };

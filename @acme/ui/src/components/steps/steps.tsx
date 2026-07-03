@@ -18,7 +18,7 @@ import useBreakpoint from "../grid/hooks/use-breakpoint";
 export type StepStatus = "wait" | "process" | "finish" | "error";
 export type StepsDirection = "horizontal" | "vertical";
 export type StepsSize = "small" | "default" | "large";
-export type StepsTitlePlacement = "horizontal" | "vertical";
+export type StepsTitlePlacement = "horizontal" | "vertical" | "inside";
 
 export type StepItemDef = {
   title: ReactNode;
@@ -101,6 +101,10 @@ function getEffectiveTitlePlacement(
   responsive: boolean,
   screens: ReturnType<typeof useBreakpoint>,
 ): StepsTitlePlacement {
+  if (titlePlacement === "inside") {
+    return "inside";
+  }
+
   if (direction === "vertical" || !responsive) {
     return titlePlacement;
   }
@@ -154,7 +158,7 @@ function getRailLayoutClassName(
     return "ms-4 mt-2 h-12 w-px";
   }
 
-  if (titlePlacement === "vertical") {
+  if (titlePlacement === "vertical" || titlePlacement === "inside") {
     return cn(
       "absolute left-[calc(50%+var(--steps-icon-half-width)+0.25rem)] h-px w-[calc(100%-var(--steps-icon-half-width)-var(--steps-next-icon-half-width)-0.5rem)]",
       size === "large" ? "top-7" : size === "small" ? "top-3" : "top-4",
@@ -262,6 +266,9 @@ function Steps(properties: StepsProps) {
           item.actions !== null &&
           item.actions !== false;
         const hasCustomIcon = Object.hasOwn(item, "icon");
+        const isInside = effectiveTitlePlacement === "inside";
+        const usesStackedLayout =
+          effectiveTitlePlacement === "vertical" || isInside;
         const isHorizontalTitlePlacement =
           effectiveTitlePlacement === "horizontal";
         const shouldRenderRailInHeader =
@@ -273,17 +280,24 @@ function Steps(properties: StepsProps) {
         const shouldRenderActionsInSection =
           hasActiveActions &&
           (isHorizontalTitlePlacement || !shouldPromoteTitleToIcon);
+        const hasSectionContent =
+          !isInside ||
+          shouldRenderActionsInSection ||
+          Boolean(item.subTitle) ||
+          Boolean(item.content);
         const oriNode = getGeneratedIconNode(
           itemStatus,
           index,
           item.title,
-          shouldPromoteTitleToIcon,
+          shouldPromoteTitleToIcon || isInside,
         );
-        const icon = hasCustomIcon
-          ? item.icon
-          : iconRender
-            ? iconRender(oriNode, { index, active, item })
-            : oriNode;
+        const icon = isInside
+          ? oriNode
+          : hasCustomIcon
+            ? item.icon
+            : iconRender
+              ? iconRender(oriNode, { index, active, item })
+              : oriNode;
         const iconHalfWidth = (iconWidths[index] ?? defaultIconWidth) / 2;
         const nextIconHalfWidth =
           (iconWidths[index + 1] ?? defaultIconWidth) / 2;
@@ -317,7 +331,7 @@ function Steps(properties: StepsProps) {
               direction === "horizontal"
                 ? cn(
                     "relative flex-1 items-start",
-                    effectiveTitlePlacement !== "vertical" && "last:flex-none",
+                    !usesStackedLayout && "last:flex-none",
                   )
                 : "w-full",
               itemStatus === "wait" && "text-muted-foreground",
@@ -335,7 +349,7 @@ function Steps(properties: StepsProps) {
                 "flex min-w-0",
                 direction === "vertical"
                   ? "w-full items-start"
-                  : effectiveTitlePlacement === "vertical"
+                  : usesStackedLayout
                     ? "w-full flex-col items-center"
                     : "w-full items-center",
                 classNames?.itemWrapper,
@@ -349,7 +363,7 @@ function Steps(properties: StepsProps) {
                   "flex min-w-0 shrink-0",
                   direction === "vertical"
                     ? "flex-col items-center"
-                    : effectiveTitlePlacement === "vertical"
+                    : usesStackedLayout
                       ? "w-full flex-col items-center"
                       : "items-center",
                   classNames?.itemHeader,
@@ -387,67 +401,71 @@ function Steps(properties: StepsProps) {
                 {shouldRenderRailInHeader ? rail : undefined}
               </div>
 
-              <div
-                data-slot="steps-item-section"
-                className={cn(
-                  "min-w-0",
-                  direction === "vertical"
-                    ? "ms-4"
-                    : effectiveTitlePlacement === "vertical"
-                      ? "mt-3 flex w-full flex-col items-center text-center"
-                      : "ms-4 flex flex-col",
-                  classNames?.itemSection,
-                )}
-                style={styles?.itemSection}
-              >
+              {hasSectionContent ? (
                 <div
-                  data-slot="steps-item-title"
+                  data-slot="steps-item-section"
                   className={cn(
-                    "font-medium",
-                    size === "large" && "text-base",
-                    size === "small" && "text-xs",
-                    itemStatus === "wait"
-                      ? "text-muted-foreground"
-                      : "text-foreground",
-                    classNames?.itemTitle,
+                    "min-w-0",
+                    direction === "vertical"
+                      ? "ms-4"
+                      : usesStackedLayout
+                        ? "mt-3 flex w-full flex-col items-center text-center"
+                        : "ms-4 flex flex-col",
+                    classNames?.itemSection,
                   )}
-                  style={styles?.itemTitle}
+                  style={styles?.itemSection}
                 >
-                  {shouldPromoteTitleToIcon ? item.actions : item.title}
-                </div>
-                {shouldRenderActionsInSection ? (
-                  <div data-slot="steps-item-actions" className="mt-2">
-                    {item.actions}
-                  </div>
-                ) : undefined}
-                {item.subTitle ? (
-                  <div
-                    data-slot="steps-item-subtitle"
-                    className={cn(
-                      "text-muted-foreground text-xs",
-                      classNames?.itemSubtitle,
-                    )}
-                    style={styles?.itemSubtitle}
-                  >
-                    {item.subTitle}
-                  </div>
-                ) : undefined}
+                  {isInside ? undefined : (
+                    <div
+                      data-slot="steps-item-title"
+                      className={cn(
+                        "font-medium",
+                        size === "large" && "text-base",
+                        size === "small" && "text-xs",
+                        itemStatus === "wait"
+                          ? "text-muted-foreground"
+                          : "text-foreground",
+                        classNames?.itemTitle,
+                      )}
+                      style={styles?.itemTitle}
+                    >
+                      {shouldPromoteTitleToIcon ? item.actions : item.title}
+                    </div>
+                  )}
+                  {shouldRenderActionsInSection ? (
+                    <div data-slot="steps-item-actions" className="mt-2">
+                      {item.actions}
+                    </div>
+                  ) : undefined}
+                  {item.subTitle ? (
+                    <div
+                      data-slot="steps-item-subtitle"
+                      className={cn(
+                        "text-muted-foreground text-xs",
+                        classNames?.itemSubtitle,
+                      )}
+                      style={styles?.itemSubtitle}
+                    >
+                      {item.subTitle}
+                    </div>
+                  ) : undefined}
 
-                {item.content ? (
-                  <div
-                    data-slot="steps-item-content"
-                    className={cn(
-                      "text-muted-foreground",
-                      size === "large" ? "mt-0 w-full text-sm" : "mt-1",
-                      size === "small" ? "text-xs" : "text-sm",
-                      classNames?.itemContent,
-                    )}
-                    style={styles?.itemContent}
-                  >
-                    {item.content}
-                  </div>
-                ) : undefined}
-              </div>
+                  {item.content ? (
+                    <div
+                      data-slot="steps-item-content"
+                      className={cn(
+                        "text-muted-foreground",
+                        size === "large" ? "mt-0 w-full text-sm" : "mt-1",
+                        size === "small" ? "text-xs" : "text-sm",
+                        classNames?.itemContent,
+                      )}
+                      style={styles?.itemContent}
+                    >
+                      {item.content}
+                    </div>
+                  ) : undefined}
+                </div>
+              ) : undefined}
               {shouldRenderRailInHeader ? undefined : rail}
             </div>
           </div>
