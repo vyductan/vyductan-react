@@ -8,7 +8,7 @@
 import type { TableCellNode } from "@lexical/table";
 import type { LexicalNode } from "lexical";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -84,9 +84,12 @@ function isInTableContext(node: LexicalNode): boolean {
 
 export function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
-  const [contextMenuCellKey, setContextMenuCellKey] = useState<string | null>(
-    null,
-  );
+  // Store the right-clicked cell key in a ref rather than React state: the
+  // context-menu option closures are captured during the same synchronous
+  // `contextmenu` event that records the target cell, so a state update would
+  // never reach the already-captured `$onSelect` closures. A ref is read live
+  // at click time and always reflects the most recently right-clicked cell.
+  const contextMenuCellKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     const rootElement = editor.getRootElement();
@@ -103,7 +106,7 @@ export function ContextMenuPlugin(): JSX.Element {
         nextContextMenuCellKey = tableCell?.getKey() ?? null;
       });
 
-      setContextMenuCellKey(nextContextMenuCellKey);
+      contextMenuCellKeyRef.current = nextContextMenuCellKey;
     };
 
     rootElement.addEventListener("contextmenu", handleContextMenu);
@@ -113,6 +116,7 @@ export function ContextMenuPlugin(): JSX.Element {
   }, [editor]);
 
   const selectContextMenuTableCell = () => {
+    const contextMenuCellKey = contextMenuCellKeyRef.current;
     if (!contextMenuCellKey) {
       return false;
     }
