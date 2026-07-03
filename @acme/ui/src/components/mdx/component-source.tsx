@@ -9,15 +9,25 @@ type ComponentSourceProperties = {
   __comp__: React.FC;
 };
 
-const exampleSourceFiles = (
-  typeof (import.meta as { glob?: unknown }).glob === "function"
-    ? import.meta.glob("../**/examples/*.{ts,tsx}", {
-        query: "?raw",
-        import: "default",
-        eager: true,
-      })
-    : {}
-) as Record<string, string>;
+// `import.meta.glob` is a compile-time Vite macro: the literal call below is
+// statically replaced with a baked file map at build time. A runtime
+// `typeof import.meta.glob === "function"` guard is always false in the browser
+// (the bare property is never injected, only the call is rewritten), so it would
+// silently discard the map. Call it directly and fall back to `{}` only in
+// non-Vite runtimes (e.g. webpack/turbopack), where the call throws at runtime.
+function loadExampleSources(): Record<string, string> {
+  try {
+    return import.meta.glob("../**/examples/*.{ts,tsx}", {
+      query: "?raw",
+      import: "default",
+      eager: true,
+    }) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+const exampleSourceFiles = loadExampleSources();
 
 const ComponentSource = ({ src, __comp__ }: ComponentSourceProperties) => {
   let language = "tsx";
