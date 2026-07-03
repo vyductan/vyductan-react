@@ -255,6 +255,7 @@ const Upload = ({
                     <Button
                       variant="text"
                       color="success"
+                      aria-label="Download file"
                       icon={<DownloadIcon />}
                       onClick={async () => {
                         await downloadService?.({
@@ -265,6 +266,7 @@ const Upload = ({
                     <Button
                       variant="text"
                       color="danger"
+                      aria-label="Remove file"
                       icon={<DeleteIcon />}
                       onClick={() => {
                         setFiles(files.filter((_, fi) => fi !== index));
