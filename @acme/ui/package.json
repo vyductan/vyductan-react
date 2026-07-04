@@ -16,7 +16,7 @@
     "./postcss.cjs": "./postcss.cjs"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json --noCheck",
+    "build": "tsc -p tsconfig.build.json",
     "chromatic": "chromatic --project-token=chpt_c9c2d477ce70b1e --exit-zero-on-changes",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../.gitignore --ignore-path ./.prettierignore",
