@@ -194,12 +194,25 @@ const Command = <TValue extends CommandValueType = string>(
 
   return (
     <CommandRoot filter={filter}>
-      <CommandInput
-        placeholder={placeholder ?? defaultPlaceholder}
-        onValueChange={onSearchChange}
-        value={searchValue}
-        className={cn(hideSearchInput ? "sr-only" : undefined)}
-      />
+      {/* When hidden, wrap the whole input chrome (search icon + border) in
+          sr-only so the row disappears but the input stays mounted to drive
+          filtering. Applying sr-only to CommandInput's className only hides the
+          inner <input>, leaving the icon/border row visible. */}
+      {hideSearchInput ? (
+        <div className="sr-only">
+          <CommandInput
+            placeholder={placeholder ?? defaultPlaceholder}
+            onValueChange={onSearchChange}
+            value={searchValue}
+          />
+        </div>
+      ) : (
+        <CommandInput
+          placeholder={placeholder ?? defaultPlaceholder}
+          onValueChange={onSearchChange}
+          value={searchValue}
+        />
+      )}
       {PanelComp}
       {dropdownFooter && (
         <div data-slot="command-footer" className="border-t p-1">
