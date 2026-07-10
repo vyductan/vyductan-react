@@ -26,7 +26,6 @@ export * from "./_components/form-description";
 export * from "./_components/form-list";
 export * from "./_components/form-control";
 export * from "./_components/form-controller";
-export * from "./_components/form-item";
 export * from "./types";
 export { requiredNumberSchema } from "./utils";
 

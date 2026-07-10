@@ -40,11 +40,6 @@
           "type": "registry:file"
         },
         {
-          "path": "components/form/_components/form-field.tsx",
-          "target": "components/form/_components/form-field.tsx",
-          "type": "registry:file"
-        },
-        {
           "path": "components/form/_components/form-item-row.tsx",
           "target": "components/form/_components/form-item-row.tsx",
           "type": "registry:file"
@@ -57,11 +52,6 @@
         {
           "path": "components/form/_components/form-root.tsx",
           "target": "components/form/_components/form-root.tsx",
-          "type": "registry:file"
-        },
-        {
-          "path": "components/form/_components/form-item.tsx",
-          "target": "components/form/_components/form-item.tsx",
           "type": "registry:file"
         },
         {
