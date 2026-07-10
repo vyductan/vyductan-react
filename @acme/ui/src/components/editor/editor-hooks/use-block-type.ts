@@ -13,7 +13,7 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 
-import { blockTypeToBlockName } from "../plugins/toolbar/block-format/block-format-data";
+import { blockTypeToBlockName } from "../plugins/toolbar/block-format-data";
 
 /**
  * Hook to detect the current block type in the Lexical editor

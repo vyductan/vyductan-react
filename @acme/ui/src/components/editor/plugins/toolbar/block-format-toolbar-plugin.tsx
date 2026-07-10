@@ -30,7 +30,7 @@ import {
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
-import { blockTypeToBlockName } from "../../plugins/toolbar/block-format/block-format-data";
+import { blockTypeToBlockName } from "./block-format-data";
 
 // Need $isHeadingNode for the check above
 function $isHeadingNode(node: unknown): node is { getTag: () => string } {

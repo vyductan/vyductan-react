@@ -7,7 +7,7 @@ import { $getRoot } from "lexical";
 import { cn } from "@acme/ui/lib/utils";
 
 import { useBlockType } from "../editor-hooks/use-block-type";
-import { blockTypeToBlockName } from "../plugins/toolbar/block-format/block-format-data";
+import { blockTypeToBlockName } from "../plugins/toolbar/block-format-data";
 import { editorTheme } from "../themes/editor-theme";
 
 type Properties = {

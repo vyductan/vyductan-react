@@ -33,7 +33,7 @@ const getIsApple = () => {
 
 export function HistoryToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
-  const { activeEditor, $updateToolbar } = useToolbarContext();
+  const { activeEditor } = useToolbarContext();
   const [isEditable, setIsEditable] = useState(editor.isEditable());
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
@@ -48,11 +48,6 @@ export function HistoryToolbarPlugin() {
     return mergeRegister(
       editor.registerEditableListener((editable) => {
         setIsEditable(editable);
-      }),
-      activeEditor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          $updateToolbar();
-        });
       }),
       activeEditor.registerCommand<boolean>(
         CAN_UNDO_COMMAND,
@@ -71,7 +66,7 @@ export function HistoryToolbarPlugin() {
         COMMAND_PRIORITY_CRITICAL,
       ),
     );
-  }, [$updateToolbar, activeEditor, editor]);
+  }, [activeEditor, editor]);
 
   return (
     <div className="flex items-center gap-1">
