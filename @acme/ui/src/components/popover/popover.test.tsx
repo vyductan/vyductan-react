@@ -105,6 +105,18 @@ describe("Popover", () => {
     );
   });
 
+  test("keeps content clickable (pointer-events-auto) and selectable (select-text) when a modal (Drawer/Dialog) locks the body", () => {
+    render(
+      <Popover open content={<div>Content</div>}>
+        <button type="button">Trigger</button>
+      </Popover>,
+    );
+
+    const className = popoverContentPropsSpy.mock.calls.at(-1)?.[0]?.className;
+    expect(className).toContain("pointer-events-auto");
+    expect(className).toContain("select-text");
+  });
+
   test("does not expose PopoverRoot from the public popover API", () => {
     expect(PopoverExports).not.toHaveProperty("PopoverRoot");
   });

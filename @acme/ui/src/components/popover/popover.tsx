@@ -9,6 +9,7 @@ import type { AlignType } from "../../types";
 import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
 import {
+  PopoverAnchor,
   Popover as InternalPopover,
   PopoverContent,
   PopoverDescription,
@@ -85,12 +86,19 @@ export const Popover = (props: PopoverProps) => {
   const alignOffset = domAlign?.offset?.[0];
   const sideOffset = domAlign?.offset?.[1];
 
+  // In "focus" mode use an Anchor instead of a Trigger: the Anchor only
+  // positions the panel and never toggles `open` on click. Opening is driven by
+  // focus (below) and closing by the consumer (outside/escape/selection). This
+  // avoids the click-toggle fighting a consumer-driven focus-open, which causes
+  // the panel to flicker open/closed on the first focus.
+  const TriggerComp = trigger === "focus" ? PopoverAnchor : PopoverTrigger;
+
   return (
     <InternalPopover
       open={trigger === "hover" ? debouncedOpen : open}
       onOpenChange={setOpen}
     >
-      <PopoverTrigger
+      <TriggerComp
         asChild
         {...(trigger === "hover"
           ? {
@@ -102,9 +110,16 @@ export const Popover = (props: PopoverProps) => {
               },
             }
           : {})}
+        {...(trigger === "focus"
+          ? {
+              onFocus: () => {
+                if (!open) setOpen(true);
+              },
+            }
+          : {})}
       >
         {children}
-      </PopoverTrigger>
+      </TriggerComp>
 
       <PopoverContent
         side={side}
