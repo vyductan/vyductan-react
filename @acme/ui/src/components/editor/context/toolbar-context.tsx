@@ -1,22 +1,17 @@
 import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext } from "react";
 
 const Context = createContext<{
   activeEditor: LexicalEditor;
-  $updateToolbar: () => void;
   blockType: string;
   setBlockType: (blockType: string) => void;
   showModal: (
     title: string,
     showModal: (onClose: () => void) => JSX.Element,
   ) => void;
-  formatHandledRef: React.MutableRefObject<boolean>;
 }>({
   activeEditor: {} as LexicalEditor,
-  $updateToolbar: () => {
-    //
-  },
   blockType: "paragraph",
   setBlockType: () => {
     //
@@ -24,19 +19,16 @@ const Context = createContext<{
   showModal: () => {
     //
   },
-  formatHandledRef: { current: false },
 });
 
 export function ToolbarContext({
   activeEditor,
-  $updateToolbar,
   blockType,
   setBlockType,
   showModal,
   children,
 }: {
   activeEditor: LexicalEditor;
-  $updateToolbar: () => void;
   blockType: string;
   setBlockType: (blockType: string) => void;
   showModal: (
@@ -45,17 +37,13 @@ export function ToolbarContext({
   ) => void;
   children: React.ReactNode;
 }) {
-  const formatHandledReference = useRef(false);
-
   return (
     <Context.Provider
       value={{
         activeEditor,
-        $updateToolbar,
         blockType,
         setBlockType,
         showModal,
-        formatHandledRef: formatHandledReference,
       }}
     >
       {children}

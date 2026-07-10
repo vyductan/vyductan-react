@@ -7,10 +7,6 @@ import { COMMAND_PRIORITY_CRITICAL, SELECTION_CHANGE_COMMAND } from "lexical";
 import { ToolbarContext } from "../../context/toolbar-context";
 import { useEditorModal } from "../../editor-hooks/use-modal";
 
-const $updateToolbar = () => {
-  //
-};
-
 export function ToolbarPlugin({
   children,
 }: {
@@ -37,7 +33,6 @@ export function ToolbarPlugin({
   return (
     <ToolbarContext
       activeEditor={activeEditor}
-      $updateToolbar={$updateToolbar}
       blockType={blockType}
       setBlockType={setBlockType}
       showModal={showModal}
