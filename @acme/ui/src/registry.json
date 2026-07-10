@@ -691,6 +691,40 @@
       ]
     },
     {
+      "name": "table-empty-support",
+      "title": "Table Empty Support",
+      "path": "components/empty",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/empty/index.tsx",
+          "target": "components/empty/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/empty.tsx",
+          "target": "components/empty/empty.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/empty-icon.tsx",
+          "target": "components/empty/empty-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/simple.tsx",
+          "target": "components/empty/simple.tsx",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "ts-xor"
+      ]
+    },
+    {
       "name": "table",
       "title": "Table",
       "path": "components/table",
@@ -709,7 +743,8 @@
         "table-tooltip-support",
         "table-spin-support",
         "table-checkbox-support",
-        "table-pagination-support"
+        "table-pagination-support",
+        "table-empty-support"
       ],
       "files": [
         {

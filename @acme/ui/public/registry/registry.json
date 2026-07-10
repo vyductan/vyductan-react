@@ -20,11 +20,6 @@
           "type": "registry:file"
         },
         {
-          "path": "components/form/context/index-v1.tsx",
-          "target": "components/form/context/index-v1.tsx",
-          "type": "registry:file"
-        },
-        {
           "path": "components/form/utils.ts",
           "target": "components/form/utils.ts",
           "type": "registry:file"
@@ -42,11 +37,6 @@
         {
           "path": "components/form/_components/form-control.tsx",
           "target": "components/form/_components/form-control.tsx",
-          "type": "registry:file"
-        },
-        {
-          "path": "components/form/_components/form-item-control-input.tsx",
-          "target": "components/form/_components/form-item-control-input.tsx",
           "type": "registry:file"
         },
         {
@@ -97,11 +87,6 @@
         {
           "path": "components/form/_components/form-description.tsx",
           "target": "components/form/_components/form-description.tsx",
-          "type": "registry:file"
-        },
-        {
-          "path": "components/form/hooks/use-extra-props.ts",
-          "target": "components/form/hooks/use-extra-props.ts",
           "type": "registry:file"
         },
         {
@@ -309,16 +294,6 @@
           "type": "registry:file"
         },
         {
-          "path": "components/_util/hooks/use-force-update.ts",
-          "target": "components/_util/hooks/use-force-update.ts",
-          "type": "registry:file"
-        },
-        {
-          "path": "components/_util/hooks/use-multiple-select.ts",
-          "target": "components/_util/hooks/use-multiple-select.ts",
-          "type": "registry:file"
-        },
-        {
           "path": "components/config-provider/context.ts",
           "target": "components/config-provider/context.ts",
           "type": "registry:file"
@@ -469,14 +444,21 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": ["clsx", "iconify-icon", "rc-util", "tailwind-merge"]
+      "dependencies": [
+        "clsx",
+        "iconify-icon",
+        "rc-util",
+        "tailwind-merge"
+      ]
     },
     {
       "name": "table-tooltip-support",
       "title": "Table Tooltip Support",
       "path": "components/tooltip",
       "type": "registry:component",
-      "registryDependencies": ["table-shared-core"],
+      "registryDependencies": [
+        "table-shared-core"
+      ],
       "files": [
         {
           "path": "components/tooltip/index.ts",
@@ -499,14 +481,18 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": ["radix-ui"]
+      "dependencies": [
+        "radix-ui"
+      ]
     },
     {
       "name": "table-spin-support",
       "title": "Table Spin Support",
       "path": "components/spin",
       "type": "registry:component",
-      "registryDependencies": ["table-shared-core"],
+      "registryDependencies": [
+        "table-shared-core"
+      ],
       "files": [
         {
           "path": "components/spin/index.ts",
@@ -524,14 +510,18 @@
           "type": "registry:file"
         }
       ],
-      "dependencies": ["class-variance-authority"]
+      "dependencies": [
+        "class-variance-authority"
+      ]
     },
     {
       "name": "table-checkbox-support",
       "title": "Table Checkbox Support",
       "path": "components/checkbox",
       "type": "registry:component",
-      "registryDependencies": ["table-shared-core"],
+      "registryDependencies": [
+        "table-shared-core"
+      ],
       "files": [
         {
           "path": "components/checkbox/index.tsx",
@@ -642,7 +632,9 @@
       "title": "Table Pagination Support",
       "path": "components/pagination",
       "type": "registry:component",
-      "registryDependencies": ["table-shared-core"],
+      "registryDependencies": [
+        "table-shared-core"
+      ],
       "files": [
         {
           "path": "components/pagination/index.ts",
@@ -699,6 +691,40 @@
       ]
     },
     {
+      "name": "table-empty-support",
+      "title": "Table Empty Support",
+      "path": "components/empty",
+      "type": "registry:component",
+      "registryDependencies": [
+        "table-shared-core"
+      ],
+      "files": [
+        {
+          "path": "components/empty/index.tsx",
+          "target": "components/empty/index.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/empty.tsx",
+          "target": "components/empty/empty.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/empty-icon.tsx",
+          "target": "components/empty/empty-icon.tsx",
+          "type": "registry:file"
+        },
+        {
+          "path": "components/empty/simple.tsx",
+          "target": "components/empty/simple.tsx",
+          "type": "registry:file"
+        }
+      ],
+      "dependencies": [
+        "ts-xor"
+      ]
+    },
+    {
       "name": "table",
       "title": "Table",
       "path": "components/table",
@@ -717,7 +743,8 @@
         "table-tooltip-support",
         "table-spin-support",
         "table-checkbox-support",
-        "table-pagination-support"
+        "table-pagination-support",
+        "table-empty-support"
       ],
       "files": [
         {

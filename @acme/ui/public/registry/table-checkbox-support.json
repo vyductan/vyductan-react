@@ -9,7 +9,9 @@
     "radix-ui",
     "ts-xor"
   ],
-  "registryDependencies": ["table-shared-core"],
+  "registryDependencies": [
+    "table-shared-core"
+  ],
   "files": [
     {
       "path": "components/checkbox/index.tsx",
@@ -73,7 +75,7 @@
     },
     {
       "path": "components/label/label.tsx",
-      "content": "import { cn } from \"../../lib/utils\";\nimport { Label as ShadLabel } from \"../../shadcn/label\";\n\nconst Label = ({\n  className,\n  children,\n  required,\n  colon,\n  asChild,\n  ...properties\n}: React.ComponentProps<typeof ShadLabel> & {\n  required?: boolean;\n  colon?: boolean;\n}) => {\n  if (asChild) {\n    return (\n      <ShadLabel asChild className={className} {...properties}>\n        {children}\n      </ShadLabel>\n    );\n  }\n  return (\n    <ShadLabel className={cn(\"gap-0 select-text\", className)} {...properties}>\n      {children}\n      {colon && \":\"}\n      {required && <span className=\"ml-1 text-red-600\">*</span>}\n    </ShadLabel>\n  );\n};\n\nexport { Label };\n",
+      "content": "import { Slot } from \"radix-ui\";\n\nimport { cn } from \"../../lib/utils\";\nimport type { Label as ShadLabel } from \"../../shadcn/label\";\n\n// Base classes mirror ../../shadcn/label but with select-none -> select-text so\n// double-click selects the label text. Keep in sync if the shadcn CLI updates\n// that file. gap-0 overrides the shadcn gap-2 default for this wrapper.\nconst labelClassName =\n  \"flex items-center gap-0 text-sm leading-none font-medium select-text group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50\";\n\nconst Label = ({\n  className,\n  children,\n  required,\n  colon,\n  asChild,\n  ...properties\n}: React.ComponentProps<typeof ShadLabel> & {\n  required?: boolean;\n  colon?: boolean;\n}) => {\n  // Slot.Root (not Radix ShadLabel) so asChild merges props onto the consumer's\n  // element without Radix's onMouseDown block on double-click text selection.\n  if (asChild) {\n    return (\n      <Slot.Root\n        data-slot=\"label\"\n        className={cn(labelClassName, className)}\n        {...properties}\n      >\n        {children}\n      </Slot.Root>\n    );\n  }\n  // Native <label> instead of Radix ShadLabel: Radix blocks double-click text\n  // selection via onMouseDown preventDefault (detail > 1). Native allows it.\n  return (\n    <label\n      data-slot=\"label\"\n      className={cn(labelClassName, className)}\n      {...properties}\n    >\n      {children}\n      {colon && \":\"}\n      {required && <span className=\"ml-1 text-red-600\">*</span>}\n    </label>\n  );\n};\n\nexport { Label };\n",
       "type": "registry:file",
       "target": "components/label/label.tsx"
     },
