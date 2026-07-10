@@ -294,16 +294,6 @@
           "type": "registry:file"
         },
         {
-          "path": "components/_util/hooks/use-force-update.ts",
-          "target": "components/_util/hooks/use-force-update.ts",
-          "type": "registry:file"
-        },
-        {
-          "path": "components/_util/hooks/use-multiple-select.ts",
-          "target": "components/_util/hooks/use-multiple-select.ts",
-          "type": "registry:file"
-        },
-        {
           "path": "components/config-provider/context.ts",
           "target": "components/config-provider/context.ts",
           "type": "registry:file"
