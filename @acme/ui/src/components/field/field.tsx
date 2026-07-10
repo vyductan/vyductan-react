@@ -14,6 +14,7 @@ import {
 
 import { FormController } from "../form/_components/form-controller";
 import { useFormContext } from "../form/context";
+import { buildFieldChildProps } from "../form/field-binding";
 import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check";
 import { FieldLabel } from "./field-label";
 
@@ -47,26 +48,6 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   normalize?: (value: any, previousValue: any) => unknown;
 };
 
-function getFormValue(
-  value: unknown,
-  previousValue: unknown,
-  normalize?: SmartFieldProps["normalize"],
-): unknown {
-  const nextValue = value === undefined ? null : value;
-
-  if (!normalize) {
-    return nextValue;
-  }
-
-  const normalizedValue = normalize(nextValue, previousValue);
-
-  if (normalizedValue === undefined) {
-    return null;
-  }
-
-  return normalizedValue;
-}
-
 function renderFieldChild(
   children: React.ReactNode,
   properties: FieldChildProps,
@@ -97,7 +78,6 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   const formId = formContext?.id;
   const required = useRequiredFieldCheck(name, defaultRequired);
   const inputId = name ? `${formId ?? generatedId}-${name}` : generatedId;
-  const finalValuePropName = valuePropName ?? "value";
   const mergedControl = (control ?? form?.control) as
     | Control<TFieldValues>
     | undefined;
@@ -139,26 +119,21 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
               {label}
             </FieldLabel>
           )}
-          {renderFieldChild(children, {
-            ...field,
-            id: inputId,
-            name,
-            "aria-invalid": fieldState.invalid,
-            [finalValuePropName]: field.value,
-            ...(getValueProps ? getValueProps(field.value) : {}),
-            onBlur: (event: unknown) => {
-              if (React.isValidElement<FieldChildProps>(children)) {
-                children.props.onBlur?.(event);
-              }
-              field.onBlur();
-            },
-            onChange: (event: unknown) => {
-              if (React.isValidElement<FieldChildProps>(children)) {
-                children.props.onChange?.(event);
-              }
-              field.onChange(getFormValue(event, field.value, normalize));
-            },
-          })}
+          {renderFieldChild(
+            children,
+            buildFieldChildProps({
+              field,
+              id: inputId,
+              name,
+              invalid: fieldState.invalid,
+              valuePropName,
+              getValueProps,
+              normalize,
+              childProps: React.isValidElement<FieldChildProps>(children)
+                ? children.props
+                : undefined,
+            }),
+          )}
           {description && <FieldDescription>{description}</FieldDescription>}
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </ShadField>

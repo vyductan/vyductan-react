@@ -10,6 +10,7 @@ import type { ColProps } from "../../grid";
 import type { FormLabelAlign, FormLayout } from "../types";
 import type { Rule } from "../utils";
 import { useFormContext } from "../context";
+import { buildFieldChildProps } from "../field-binding";
 import { useRequiredFieldCheck } from "../hooks/use-field-optionality-check";
 import { FormItemRow } from "./form-item-row";
 
@@ -110,7 +111,6 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
       control={form.control}
       name={name}
       render={({ field, fieldState }) => {
-        const finalValuePropName = valuePropName ?? "value";
         return (
           <FormItemRow
             id={id}
@@ -129,34 +129,19 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
             errors={[fieldState.error]}
           >
             {children &&
-              React.cloneElement(children, {
-                ...field,
-                id: `${id}-${name}`,
-                name,
-                "aria-invalid": fieldState.invalid,
-                [finalValuePropName]: field.value,
-                // Apply getValueProps if provided
-                ...(getValueProps ? getValueProps(field.value) : {}),
-                onBlur: (event: any) => {
-                  children.props.onBlur?.(event);
-                  field.onBlur();
-                },
-                onChange: (event: any) => {
-                  children.props.onChange?.(event);
-
-                  const value = event === undefined ? null : event; // fix react-hook-form doesn't support undefined value
-
-                  const normalizedValue = normalize?.(value, field.value);
-
-                  field.onChange(
-                    normalize
-                      ? normalizedValue === undefined
-                        ? null
-                        : normalizedValue
-                      : value,
-                  );
-                },
-              })}
+              React.cloneElement(
+                children,
+                buildFieldChildProps({
+                  field,
+                  id: `${id}-${name}`,
+                  name,
+                  invalid: fieldState.invalid,
+                  valuePropName,
+                  getValueProps,
+                  normalize,
+                  childProps: children.props,
+                }),
+              )}
           </FormItemRow>
         );
       }}
