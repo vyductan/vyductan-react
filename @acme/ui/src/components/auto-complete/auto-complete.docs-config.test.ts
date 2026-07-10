@@ -57,6 +57,12 @@ const autoCompleteExampleInventory: ReadonlyArray<{
     partialComponentName: "CustomOptionRenderExample",
   },
   {
+    heading: "Option Label Prop",
+    sourcePath: "auto-complete/examples/option-label-prop.tsx",
+    partialImportPath: "./examples/option-label-prop.mdx",
+    partialComponentName: "OptionLabelPropExample",
+  },
+  {
     heading: "Search & Filter",
     sourcePath: "auto-complete/examples/search-filter.tsx",
     partialImportPath: "./examples/search-filter.mdx",

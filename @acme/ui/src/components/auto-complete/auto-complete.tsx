@@ -135,6 +135,9 @@ const AutoComplete = <
   });
 
   const [search, setSearch] = React.useState<string>("");
+  // Wraps the input in "input" mode; used as the Popover anchor. Interactions
+  // inside it must not dismiss the panel (see onInteractOutside below).
+  const inputWrapperRef = React.useRef<HTMLDivElement>(null);
   const selectedOption = options.find((option) => option.value === value);
   const selectedTagColor = tagColors[selectedOption?.color ?? ""];
   const selectedHoverTagColor =
@@ -222,7 +225,7 @@ const AutoComplete = <
 
     return (
       <Popover
-        trigger="click"
+        trigger="focus"
         open={open}
         onOpenChange={gatedSetOpen}
         placement="bottomLeft"
@@ -231,11 +234,20 @@ const AutoComplete = <
         content={renderContent}
         // Keep focus in the Input when the panel opens (Radix would steal it)
         onOpenAutoFocus={(e) => e.preventDefault()}
-        // Close on real outside interaction; the Popover wrapper neutralizes onFocusOutside
-        onInteractOutside={() => setOpen(false)}
+        // Close on real outside interaction only. Since the input is the anchor
+        // (not a Radix trigger), clicking it counts as "outside the content";
+        // skip those so clicking the input keeps the panel open (AntD-like).
+        onInteractOutside={(e) => {
+          const target = e.detail.originalEvent.target as Node | null;
+          if (target && inputWrapperRef.current?.contains(target)) {
+            e.preventDefault();
+            return;
+          }
+          setOpen(false);
+        }}
         onFocusOutside={onFocusOutside}
       >
-        <div style={style}>
+        <div ref={inputWrapperRef} style={style}>
           <Input
             size={size}
             disabled={disabled}

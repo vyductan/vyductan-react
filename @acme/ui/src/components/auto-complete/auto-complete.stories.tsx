@@ -245,3 +245,95 @@ export const InteractionInputCloseOnEscape: Story = {
     });
   },
 };
+
+export const InteractionInputHidesSearchRow: Story = {
+  args: {
+    options: [...storyOptions],
+  },
+  render: () => (
+    <div className="w-[320px]">
+      <AutoComplete
+        mode="input"
+        placeholder="Search a city"
+        searchPlaceholder="Type to filter"
+        options={inputModeOptions}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    await step("typing opens the panel", async () => {
+      await userEvent.type(canvas.getByPlaceholderText("Search a city"), "Ha");
+      await waitFor(async () => {
+        await expect(body.getByText("Ha Noi")).toBeInTheDocument();
+      });
+    });
+
+    await step(
+      "internal Command search row is hidden (no duplicate search box)",
+      async () => {
+        // Regression: input mode must not render a second search row inside the
+        // dropdown. The Command input stays mounted (so it keeps driving the
+        // filter) but its chrome — search icon + border row — must be wrapped
+        // in sr-only. Previously sr-only landed on the inner <input> only,
+        // leaving the icon/border row visible.
+        const searchInput = document.body.querySelector(
+          '[data-slot="command-input"]',
+        );
+        await expect(searchInput).not.toBeNull();
+
+        const searchRow = document.body.querySelector(
+          '[data-slot="command-input-wrapper"]',
+        );
+        await expect(searchRow).not.toBeNull();
+        await expect(searchRow?.closest(".sr-only")).not.toBeNull();
+      },
+    );
+  },
+};
+
+export const InteractionInputClickKeepsOpen: Story = {
+  args: {
+    options: [...storyOptions],
+  },
+  render: () => (
+    <div className="w-[320px]">
+      <AutoComplete
+        mode="input"
+        placeholder="Search a city"
+        options={inputModeOptions}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+
+    await step("typing opens the panel", async () => {
+      await userEvent.type(canvas.getByPlaceholderText("Search a city"), "Ha");
+      await waitFor(async () => {
+        await expect(body.getByText("Ha Noi")).toBeInTheDocument();
+      });
+    });
+
+    await step(
+      "clicking the already-focused input keeps the panel open",
+      async () => {
+        // Regression: input mode must anchor (not click-toggle) the panel.
+        // With the old `trigger="click"` a click on the focused input toggled
+        // the panel closed (and flickered on first focus). The panel must stay
+        // open — close is driven by outside click / Escape / selection instead.
+        await userEvent.click(canvas.getByPlaceholderText("Search a city"));
+        await waitFor(async () => {
+          const content = document.body.querySelector(
+            '[data-slot="popover-content"]',
+          );
+          await expect(content).not.toBeNull();
+          await expect(content).toHaveAttribute("data-state", "open");
+        });
+      },
+    );
+  },
+};
