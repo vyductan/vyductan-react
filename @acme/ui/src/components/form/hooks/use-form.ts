@@ -246,9 +246,17 @@ const useForm = <
     return () => subscription.unsubscribe();
   }, [methods, onValuesChange]);
 
+  // The instance is cached once (stable identity for consumers/effects), so
+  // every member that closes over render-scoped values MUST be refreshed here
+  // — a member left out keeps its first-render closure and goes stale (e.g.
+  // resetFields once froze the initial defaultValues prop).
   _formControl.current.submit = submit;
   _formControl.current.formState = methods.formState;
   _formControl.current.validateFields = validateFields;
+  _formControl.current.resetFields = resetFields;
+  _formControl.current.setFieldsValue = setFieldsValue;
+  _formControl.current.schema = schema;
+  _formControl.current.defaultValues = props?.defaultValues;
 
   return _formControl.current;
 };
