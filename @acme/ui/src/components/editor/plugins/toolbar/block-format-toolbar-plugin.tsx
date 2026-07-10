@@ -4,21 +4,13 @@ import type { HeadingTagType } from "@lexical/rich-text";
 import type { BaseSelection } from "lexical";
 import { $createCodeNode } from "@lexical/code";
 import {
-  $isListNode,
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
-  ListNode,
 } from "@lexical/list";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
-import { $findMatchingParent, $getNearestNodeOfType } from "@lexical/utils";
-import {
-  $createParagraphNode,
-  $getSelection,
-  $isRangeSelection,
-  $isRootOrShadowRoot,
-} from "lexical";
+import { $createParagraphNode, $getSelection, $isRangeSelection } from "lexical";
 
 import {
   Select,
@@ -30,55 +22,18 @@ import {
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
+import { $resolveBlockType } from "../../utils/resolve-block-type";
 import { blockTypeToBlockName } from "./block-format-data";
-
-// Need $isHeadingNode for the check above
-function $isHeadingNode(node: unknown): node is { getTag: () => string } {
-  return (
-    typeof node === "object" &&
-    node !== null &&
-    "__type" in node &&
-    (node as { __type: string }).__type === "heading"
-  );
-}
 
 export function BlockFormatDropDown() {
   const { activeEditor, blockType, setBlockType } = useToolbarContext();
 
   function $updateToolbar(selection: BaseSelection) {
-    if ($isRangeSelection(selection)) {
-      const anchorNode = selection.anchor.getNode();
-      let element =
-        anchorNode.getKey() === "root"
-          ? anchorNode
-          : $findMatchingParent(anchorNode, (e) => {
-              const parent = e.getParent();
-              return parent !== null && $isRootOrShadowRoot(parent);
-            });
-
-      element ??= anchorNode.getTopLevelElementOrThrow();
-
-      const elementDOM = activeEditor.getElementByKey(element.getKey());
-
-      if (elementDOM !== null) {
-        if ($isListNode(element)) {
-          const parentList = $getNearestNodeOfType<ListNode>(
-            anchorNode,
-            ListNode,
-          );
-          const type = parentList
-            ? parentList.getListType()
-            : (element as ListNode).getListType();
-          setBlockType(type);
-        } else {
-          const type = $isHeadingNode(element) // Check if import is available or use generic check
-            ? element.getTag()
-            : element.getType();
-          if (type in blockTypeToBlockName) {
-            setBlockType(type);
-          }
-        }
-      }
+    const type = $resolveBlockType(selection, (key) =>
+      activeEditor.getElementByKey(key),
+    );
+    if (type !== null) {
+      setBlockType(type);
     }
   }
 
