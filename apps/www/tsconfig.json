@@ -17,6 +17,8 @@
     "strictNullChecks": true
   },
   "include": [".", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  // eslint.config.ts pulls @acme/eslint-config source (.ts imports needing
+  // allowImportingTsExtensions); that package typechecks itself. Matches manager.
+  "exclude": ["node_modules", "eslint.config.ts"],
   "references": [{ "path": "../../@acme/ui/tsconfig.build.json" }]
 }
