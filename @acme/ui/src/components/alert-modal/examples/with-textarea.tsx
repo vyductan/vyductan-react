@@ -35,6 +35,8 @@ const WithTextareaDemo: React.FC = () => {
           onChange={(event) => setReason(event.target.value)}
           placeholder="Tell us why you're deleting this (optional)…"
           rows={4}
+          className="resize-none"
+          aria-label="Reason for deletion"
         />
       </AlertModal>
     </>

@@ -160,7 +160,10 @@ export const AlertModal = ({
         {isIconConfirmType ? (
           <div className="flex gap-3">
             {confirmIcon}
-            {header}
+            <div className="flex-1 space-y-4">
+              {header}
+              {children}
+            </div>
           </div>
         ) : (
           <>
@@ -168,10 +171,9 @@ export const AlertModal = ({
               <div className="flex justify-center">{notificationBadge}</div>
             )}
             {header}
+            {children}
           </>
         )}
-
-        {children}
 
         <AlertDialogFooter
           className={cn(classNames?.footer, isNotificationType && "flex-col")}
