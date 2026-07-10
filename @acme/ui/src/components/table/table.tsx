@@ -995,8 +995,6 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
   // );
 
   // Convert map to number width
-  // const colsKeys = getColumnsKey(flattenColumns);
-  // const pureColWidths = colsKeys.map((columnKey) => colsWidths.get(columnKey)!);
 
   // const colWidths = React.useMemo(
   //   () => pureColWidths,
