@@ -17,8 +17,8 @@ const { mockUseResponsive } = vi.hoisted(() => ({
   mockUseResponsive: vi.fn(),
 }));
 
-vi.mock("@acme/ui/hooks/use-responsive", () => ({
-  useResponsive: mockUseResponsive,
+vi.mock("../grid/hooks/use-breakpoint", () => ({
+  default: mockUseResponsive,
 }));
 
 globalThis.React = React;

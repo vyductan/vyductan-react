@@ -9,7 +9,7 @@ import type {
 import { Fragment } from "react";
 
 import type { Screens } from "@acme/ui/types";
-import { useResponsive } from "@acme/ui/hooks/use-responsive";
+import useBreakpoint from "../grid/hooks/use-breakpoint";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DescriptionsItem, VerticalCell } from "./types";
@@ -125,7 +125,7 @@ function DescriptionsTable({
   colon = true,
   ...properties
 }: DescriptionsTableProperties): ReactElement {
-  const responsiveInfo = useResponsive();
+  const responsiveInfo = useBreakpoint();
 
   const mergedColumn =
     typeof column === "number"
