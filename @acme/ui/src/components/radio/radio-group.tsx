@@ -62,9 +62,11 @@ export const RadioGroup = <T extends FormValueType = FormValueType>({
       className={cn(
         optionType === "button"
           ? "inline-flex"
-          : mergedVariant === "card"
-            ? "grid gap-3"
-            : "flex gap-2",
+          : optionType === "tag" || mergedVariant === "pill"
+            ? "flex flex-wrap gap-2"
+            : mergedVariant === "card"
+              ? "grid gap-3"
+              : "flex gap-2",
         className,
       )}
       value={currentValue as string | undefined}

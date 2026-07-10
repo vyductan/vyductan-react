@@ -9,6 +9,8 @@ import CardExample from "./examples/card";
 import CardComposableExample from "./examples/card-composable";
 import ColorExample from "./examples/color";
 import DisabledExample from "./examples/disabled";
+import PillExample from "./examples/pill";
+import TagExample from "./examples/tag";
 import { Radio } from "./radio";
 
 const meta = {
@@ -24,7 +26,7 @@ const meta = {
     },
     variant: {
       control: "select",
-      options: ["default", "card"],
+      options: ["default", "card", "pill"],
     },
   },
 } satisfies Meta<typeof Radio>;
@@ -50,6 +52,18 @@ export const ButtonStyle: Story = {
 export const Color: Story = {
   render: () => (
     <ComponentSource src="radio/examples/color.tsx" __comp__={ColorExample} />
+  ),
+};
+
+export const Tag: Story = {
+  render: () => (
+    <ComponentSource src="radio/examples/tag.tsx" __comp__={TagExample} />
+  ),
+};
+
+export const Pill: Story = {
+  render: () => (
+    <ComponentSource src="radio/examples/pill.tsx" __comp__={PillExample} />
   ),
 };
 

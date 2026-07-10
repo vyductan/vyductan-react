@@ -16,9 +16,9 @@ import { inputDisabledVariants } from "../input/variants";
 type RadioProperties<T extends FormValueType = FormValueType> =
   AbstractCheckboxProperties<RadioChangeEvent<T>, T> & {
     color?: ButtonColorVariants["color"];
-    optionType?: "default" | "button";
+    optionType?: "default" | "button" | "tag";
     buttonStyle?: "outline" | "solid";
-    variant?: "default" | "card";
+    variant?: "default" | "card" | "pill";
   };
 
 const Radio = <T extends FormValueType = FormValueType>({
@@ -50,6 +50,102 @@ const Radio = <T extends FormValueType = FormValueType>({
   let mergedColor = color;
   if (checked && buttonStyle === "outline" && color === "default") {
     mergedColor = "primary";
+  }
+
+  const emitChange = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+    const event: RadioChangeEvent<T> = {
+      type: "change" as const,
+      target: {
+        ...properties,
+        value: value as unknown as T,
+        disabled,
+        color,
+        optionType,
+        buttonStyle,
+        checked: true,
+        type: "radio" as const,
+      },
+      stopPropagation: () => e.stopPropagation(),
+      preventDefault: () => e.preventDefault(),
+      nativeEvent: e.nativeEvent,
+    };
+    onChange?.(event);
+    properties.onClick?.(e);
+  };
+
+  if (optionType === "tag") {
+    // Chip rời: chưa chọn = chữ màu nền trong suốt (text variant),
+    // chọn = pill nền đặc (solid variant).
+    const tagColor = color === "default" ? "primary" : color;
+    return (
+      <label
+        className={cn(
+          buttonVariants({ size: "middle" }),
+          "cursor-pointer rounded-full",
+          buttonColorVariants({
+            color: tagColor,
+            variant: checked ? "solid" : "text",
+            disabled,
+          }),
+          className,
+        )}
+      >
+        <RadioGroupPrimitive.Item
+          value={value as string}
+          disabled={disabled}
+          className="rounded-full outline-none"
+          {...properties}
+          onClick={emitChange}
+        >
+          <span>{children}</span>
+        </RadioGroupPrimitive.Item>
+      </label>
+    );
+  }
+
+  if (variant === "pill") {
+    // Pill giữ nút radio circle: chưa chọn = chữ màu nền trong (text),
+    // chọn = chip nền soft màu (filled). Circle ăn theo currentColor.
+    const pillColor = color === "default" ? "primary" : color;
+    return (
+      <label
+        className={cn(
+          buttonVariants({ size: "middle" }),
+          "cursor-pointer gap-2 rounded-full",
+          buttonColorVariants({
+            color: pillColor,
+            variant: checked ? "filled" : "text",
+            disabled,
+          }),
+          className,
+        )}
+      >
+        <RadioGroupPrimitive.Item
+          data-slot="radio-group-item"
+          value={value as string}
+          className={cn(
+            "aspect-square size-4 shrink-0 rounded-full border border-current text-current shadow-xs outline-none",
+            "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+          )}
+          disabled={disabled}
+          {...properties}
+          onClick={emitChange}
+        >
+          <RadioGroupPrimitive.Indicator
+            data-slot="radio-group-indicator"
+            className="relative flex items-center justify-center"
+          >
+            <Icon
+              icon="icon-[bi--circle-fill]"
+              className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 fill-current"
+            />
+          </RadioGroupPrimitive.Indicator>
+        </RadioGroupPrimitive.Item>
+        <span>{children}</span>
+      </label>
+    );
   }
 
   if (optionType === "button") {
