@@ -1,5 +1,3 @@
-import type { XOR } from "ts-xor";
-
 import type { Button as ShadcnButton } from "@acme/ui/shadcn/button";
 
 import type { ButtonProps as ButtonProperties } from "./button";
@@ -9,7 +7,20 @@ export { buttonVariants, buttonColorVariants } from "./button-variants";
 export { LoadingIcon } from "./loading-icon";
 
 type ShadcnButtonProperties = React.ComponentProps<typeof ShadcnButton>;
-type ConditionButtonProperties = XOR<ButtonProperties, ShadcnButtonProperties>;
+
+// Accept BOTH vocabularies on the same call:
+//  - antd-style   size "small" | "middle" | "large", variant "solid" | "text" | …
+//  - shadcn-style size "sm" | "lg" | "icon" | …,      variant "ghost" | "outline" | …
+// Previously this was XOR<ButtonProperties, ShadcnButtonProperties>, which pinned
+// every prop to one side — so an antd-only prop like `loading` could not be
+// combined with a shadcn-only value like size="sm" (matched neither branch).
+// ConditionButton already normalises both vocabularies at runtime (the switch
+// statements below), so widening here is purely additive and reflects real
+// behaviour — no previously-valid call becomes invalid.
+type ConditionButtonProperties = Omit<ButtonProperties, "size" | "variant"> & {
+  size?: ButtonProperties["size"] | ShadcnButtonProperties["size"];
+  variant?: ButtonProperties["variant"] | ShadcnButtonProperties["variant"];
+};
 
 const ConditionButton = ({
   size,
