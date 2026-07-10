@@ -14,7 +14,12 @@ import type {
 import type { InputStatus, InputVariant } from "./variants";
 import { Icon } from "../../icons";
 import RcInputNumber from "./components/rc-input-number";
-import { inputSizeVariants, inputVariants } from "./variants";
+import {
+  controlHeightBySize,
+  controlTextBySize,
+  inputSizeVariants,
+  inputVariants,
+} from "./variants";
 
 interface InputNumberProperties<
   TNumberValue extends NumberValueType = NumberValueType,
@@ -126,9 +131,9 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
   // Check if has affix (prefix/suffix/allowClear) - when true, affixWrapper is rendered
   const hasAffix = !!(!!prefix || !!suffix || (!spinnerMode && !!allowClear));
   const spinnerSizeClassNameBySize: Record<NonNullable<SizeType>, string> = {
-    small: "h-6",
-    middle: "h-8 text-sm",
-    large: "h-10 text-base",
+    small: controlHeightBySize.small,
+    middle: cn(controlHeightBySize.middle, controlTextBySize.middle),
+    large: cn(controlHeightBySize.large, controlTextBySize.large),
   };
   const spinnerSizeClass = spinnerMode
     ? spinnerSizeClassNameBySize[mergedSize ?? "middle"]

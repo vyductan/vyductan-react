@@ -80,13 +80,24 @@ const inputVariants = tv({
 });
 const inputInlineInsetClassName = "pl-3";
 
+// Single source for the size -> control-height/text invariant. Every input-
+// family size table (plain input, affix wrapper, InputNumber spinner) derives
+// from these; do not restate h-6/h-8/h-10 elsewhere.
+const controlHeightBySize = {
+  small: "h-6",
+  middle: "h-8",
+  large: "h-10",
+} as const;
+
+const controlTextBySize = {
+  small: "",
+  middle: "text-sm",
+  large: "text-base",
+} as const;
+
 const inputAffixWrapperSizeVariants = tv({
   variants: {
-    size: {
-      small: "h-6",
-      middle: "h-8",
-      large: "h-10",
-    },
+    size: controlHeightBySize,
   },
   defaultVariants: {
     size: "middle",
@@ -96,14 +107,9 @@ const inputAffixWrapperSizeVariants = tv({
 const inputSizeVariants = tv({
   variants: {
     size: {
-      // sm: "px-[7px] py-px",
-      // default: "h-8 px-[11px] py-[5px]",
-      // lg: "px-[11px] py-[9px]",
-      // xl: "px-[11px] py-[13px]",
-      small: "h-6 px-2 py-1",
-      middle: "h-8 px-3 py-1 text-sm",
-      large: "h-10 px-3 py-2 text-base",
-      // xl: "px-[11px] py-[13px]",
+      small: [controlHeightBySize.small, "px-2 py-1"],
+      middle: [controlHeightBySize.middle, "px-3 py-1", controlTextBySize.middle],
+      large: [controlHeightBySize.large, "px-3 py-2", controlTextBySize.large],
     },
   },
   defaultVariants: {
@@ -122,4 +128,6 @@ export {
   inputInlineInsetClassName,
   inputAffixWrapperSizeVariants,
   inputSizeVariants,
+  controlHeightBySize,
+  controlTextBySize,
 };
