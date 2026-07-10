@@ -48,6 +48,7 @@ import { devUseWarning } from "../_util/warning";
 import { cn } from "../../lib/utils";
 import { Checkbox } from "../checkbox";
 import { ConfigContext, useComponentConfig } from "../config-provider/context";
+import { Empty } from "../empty";
 import defaultLocale from "../locale/en-us";
 import { Pagination } from "../pagination";
 import { Skeleton } from "../skeleton";
@@ -1427,13 +1428,16 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                         colSpan={allLeafColumns.length}
                         className={cn(
                           "text-muted-foreground h-48 text-center",
-                          bordered && "border-e",
                         )}
                       >
                         {!loading &&
-                          (typeof tableLocale.emptyText === "function"
-                            ? tableLocale.emptyText()
-                            : tableLocale.emptyText)}
+                          (tableLocale.emptyText == null ? (
+                            <Empty />
+                          ) : typeof tableLocale.emptyText === "function" ? (
+                            tableLocale.emptyText()
+                          ) : (
+                            tableLocale.emptyText
+                          ))}
                       </TableCell>
                     </TableRow>
                   )}
