@@ -76,6 +76,8 @@ dist/
 *storybook.log
 storybook-static
 
+test-results/
+
 .worktrees/
 .claude/
 .playwright-mcp/
@@ -84,6 +86,7 @@ docs/plans/
 docs/superpowers/
 .understand-anything/
 graphify-out/
+
 
 AGENTS.md
 CLAUDE.md
