@@ -14,10 +14,9 @@ const schema = z.object({
 });
 
 /**
- * One <Form> at a single size. `size` is passed to every control — Input,
- * InputNumber, Select, and the submit Button all share the SizeType scale
- * (small=h-6, middle=h-8, large=h-10). <Form> itself has no size prop; sizing
- * flows per-control (or via config-provider's SizeContext).
+ * One <Form> at a single size. `<Form size>` sets the ambient SizeContext, so
+ * controls (Input, InputNumber, Select), Button, and <Field> (label font + gap
+ * + radius) all scale from one prop — no per-control wiring.
  */
 const SizedForm = ({ size }: { size: SizeType }) => {
   const form = useForm({
@@ -30,18 +29,18 @@ const SizedForm = ({ size }: { size: SizeType }) => {
     <Form
       name={`sizes-${size ?? "middle"}`}
       form={form}
+      size={size}
       className="flex flex-col gap-4"
     >
-      <div className="text-muted-foreground mb-4 text-sm font-medium">
+      <div className="text-muted-foreground mb-1 text-sm font-medium">
         size=&quot;{size ?? "middle"}&quot;
       </div>
       <Field name="name" control={form.control} label="Name">
-        <Input placeholder="Evil Rabbit" size={size} />
+        <Input placeholder="Evil Rabbit" />
       </Field>
       <Field name="plan" control={form.control} label="Plan">
         <Select
           placeholder="Select a plan"
-          size={size}
           options={[
             { label: "Free", value: "free" },
             { label: "Pro", value: "pro" },
@@ -50,9 +49,9 @@ const SizedForm = ({ size }: { size: SizeType }) => {
         />
       </Field>
       <Field name="seats" control={form.control} label="Seats">
-        <InputNumber placeholder="0" size={size} min={1} />
+        <InputNumber placeholder="0" min={1} />
       </Field>
-      <Button type="submit" size={size} className="self-start">
+      <Button type="submit" className="self-start">
         Submit
       </Button>
     </Form>

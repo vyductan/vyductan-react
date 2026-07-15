@@ -12,6 +12,8 @@ import {
   FieldGroup as ShadFieldGroup,
 } from "@acme/ui/shadcn/field";
 
+import useSize from "../config-provider/hooks/use-size";
+
 import { FormController } from "../form/_components/form-controller";
 import { useFormContext } from "../form/context";
 import { buildFieldChildProps } from "../form/field-binding";
@@ -82,6 +84,11 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
     | Control<TFieldValues>
     | undefined;
 
+  // Tighten the label/control/description spacing at the small size; middle and
+  // large keep the current gap-2.
+  const size = useSize();
+  const fieldGap = size === "small" ? "gap-1.5" : "gap-2";
+
   if (!name || !mergedControl) {
     return (
       <ShadField
@@ -110,7 +117,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <ShadField
-          className={cn("gap-2", className)}
+          className={cn(fieldGap, className)}
           data-invalid={fieldState.invalid}
           {...properties}
         >

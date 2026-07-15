@@ -31,6 +31,7 @@ import { BaseInput } from "./components/base-input";
 import useCount from "./hooks/use-count";
 import { resolveOnChange, triggerFocus } from "./utils/common-utils";
 import {
+  controlRadiusBySize,
   inputAffixWrapperSizeVariants,
   inputSizeVariants,
   inputVariants,
@@ -450,6 +451,7 @@ const Input = (properties: InputProperties) => {
       classNames={{
         variant: cn(
           inputVariants({ variant, status, disabled }),
+          controlRadiusBySize[mergedSize ?? "middle"],
           rest.readOnly && "cursor-default bg-muted",
           classNames?.variant,
         ),

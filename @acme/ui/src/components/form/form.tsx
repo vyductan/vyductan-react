@@ -5,10 +5,12 @@ import type { ReactNode } from "react";
 import type { DefaultValues, FieldErrors, FieldValues } from "react-hook-form";
 import React from "react";
 
+import type { SizeType } from "../config-provider/size-context";
 import type { FormRootProps } from "./_components/form-root";
 // import type { FormBaseProps, FormContextValue } from "./context";
 import type { FormInstance, UseFormProps } from "./hooks/use-form";
 import { useComponentConfig } from "../config-provider/context";
+import { SizeContextProvider } from "../config-provider/size-context";
 import { FormProvider } from "./_components/form-root";
 import { useForm } from "./hooks/use-form";
 
@@ -68,8 +70,11 @@ type FormProps<
   | "wrapperCol"
   | "colon"
   | "classNames"
-> &
-  (
+> & {
+  /** Control size for every field inside — sets the ambient SizeContext, so
+   * inputs, selects, and field labels/gaps/radius all scale from one prop. */
+  size?: SizeType;
+} & (
     | (FormConfigProps<TFieldValues, TContext, TTransformedValues> & {
         children: ReactNode;
       })
@@ -85,6 +90,7 @@ const Form = <
 >({
   id: idProps,
   form,
+  size,
   layout: layoutProp,
   labelAlign,
   labelCol,
@@ -107,9 +113,30 @@ const Form = <
 
   if (form) {
     return (
-      <FormProvider<TFieldValues, TContext, TTransformedValues>
+      <SizeContextProvider size={size}>
+        <FormProvider<TFieldValues, TContext, TTransformedValues>
+          id={id}
+          form={form}
+          layout={layout}
+          labelAlign={labelAlign}
+          labelCol={labelCol}
+          labelWrap={labelWrap}
+          wrapperCol={wrapperCol}
+          colon={colon}
+          classNames={classNames}
+        >
+          <form id={id} onSubmit={form.submit} {...props}>
+            {children}
+          </form>
+        </FormProvider>
+      </SizeContextProvider>
+    );
+  }
+
+  return (
+    <SizeContextProvider size={size}>
+      <FormWithoutFormProp
         id={id}
-        form={form}
         layout={layout}
         labelAlign={labelAlign}
         labelCol={labelCol}
@@ -117,28 +144,11 @@ const Form = <
         wrapperCol={wrapperCol}
         colon={colon}
         classNames={classNames}
+        {...props}
       >
-        <form id={id} onSubmit={form.submit} {...props}>
-          {children}
-        </form>
-      </FormProvider>
-    );
-  }
-
-  return (
-    <FormWithoutFormProp
-      id={id}
-      layout={layout}
-      labelAlign={labelAlign}
-      labelCol={labelCol}
-      labelWrap={labelWrap}
-      wrapperCol={wrapperCol}
-      colon={colon}
-      classNames={classNames}
-      {...props}
-    >
-      {children}
-    </FormWithoutFormProp>
+        {children}
+      </FormWithoutFormProp>
+    </SizeContextProvider>
   );
 };
 

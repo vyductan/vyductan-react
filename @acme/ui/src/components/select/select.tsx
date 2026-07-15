@@ -17,8 +17,9 @@ import type {
   SelectOption,
   SelectValueType,
 } from "./types";
+import useSize from "../config-provider/hooks/use-size";
 import { Empty } from "../empty";
-import { inputVariants } from "../input";
+import { controlRadiusBySize, inputVariants } from "../input";
 import { PopoverContent, PopoverTrigger } from "../popover";
 import { Popover } from "../popover/_component";
 import {
@@ -160,6 +161,10 @@ const Select = <
   } = properties;
 
   void showSearch;
+
+  // Resolve size from the ambient SizeContext when not set explicitly, so a
+  // <SizeContextProvider>/ConfigProvider drives the trigger like Input does.
+  const mergedSize = useSize((context) => size ?? context);
 
   // ======================= TAGS/MULTIPLE MODE =======================
   const isDefault = !mode;
@@ -779,6 +784,7 @@ const Select = <
                 className={cn(
                   "group min-h-control relative flex w-full items-center rounded-md",
                   inputVariants({ variant, status, disabled }),
+                  controlRadiusBySize[mergedSize ?? "middle"],
                   "h-auto py-1 pr-8 pl-[3px]",
                   className,
                 )}
@@ -899,7 +905,7 @@ const Select = <
             className,
           )}
           variant={variant}
-          size={size}
+          size={mergedSize}
           status={status}
           allowClear={allowClear}
           showClearIcon={selectedValues.length > 0}

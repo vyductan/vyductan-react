@@ -12,10 +12,12 @@ import type {
   InputNumberProps as RcInputNumberProperties,
 } from "./components/rc-input-number";
 import type { InputStatus, InputVariant } from "./variants";
+import useSize from "../config-provider/hooks/use-size";
 import { Icon } from "../../icons";
 import RcInputNumber from "./components/rc-input-number";
 import {
   controlHeightBySize,
+  controlRadiusBySize,
   controlTextBySize,
   inputSizeVariants,
   inputVariants,
@@ -119,7 +121,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
 
   const mergedStatus =
     customStatus ?? (others["aria-invalid"] ? "error" : undefined);
-  const mergedSize = customizeSize;
+  const mergedSize = useSize((context) => customizeSize ?? context);
   const spinnerMode = mode === "spinner";
 
   // ===================== Disabled =====================
@@ -175,6 +177,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           // Only apply variant to outer element when no addon
           !hasAddon &&
             inputVariants({ status: mergedStatus, variant: customVariant }),
+          !hasAddon && controlRadiusBySize[mergedSize ?? "middle"],
           // Spinner mode owns its inner layout; do not add input shell padding to the group root
           !hasAddon && !spinnerMode && inputSizeVariants({ size: mergedSize }),
           spinnerSizeClass,
@@ -203,6 +206,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
         variant: cn(
           hasAddon &&
             inputVariants({ status: mergedStatus, variant: customVariant }),
+          hasAddon && controlRadiusBySize[mergedSize ?? "middle"],
           hasAddon && inputSizeVariants({ size: mergedSize }),
           readOnly && "cursor-default bg-muted",
         ),

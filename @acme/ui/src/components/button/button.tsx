@@ -9,9 +9,11 @@ import type { IconProps } from "@acme/ui/icons";
 import { GenericSlot } from "@acme/ui/components/slot";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { SizeType } from "../config-provider/size-context";
 import type { ButtonColorVariants, ButtonVariants } from "./button-variants";
 import Wave from "../../lib/wave";
 import { useComponentConfig } from "../config-provider/context";
+import useSize from "../config-provider/hooks/use-size";
 import { buttonColorVariants, buttonVariants } from "./button-variants";
 import { LoadingIcon } from "./loading-icon";
 
@@ -128,7 +130,10 @@ const Button = ({
     );
   }
 
-  const size = sizeProperty ?? sizeConfig;
+  // Explicit prop > ConfigProvider button.size > ambient SizeContext (e.g.
+  // <Form size> / <SizeContextProvider>). Falls back to buttonVariants' middle.
+  const ctxSize = useSize<SizeType>();
+  const size = sizeProperty ?? sizeConfig ?? ctxSize;
 
   const defaultType = variantProperty ? "default" : "primary";
   const type = typeProperty ?? typeConfig ?? defaultType;

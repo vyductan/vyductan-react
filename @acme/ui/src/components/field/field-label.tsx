@@ -5,6 +5,7 @@ import { FieldLabel as ShadFieldLabel } from "@acme/ui/shadcn/field";
 
 import type { FormLabelAlign } from "../form";
 import type { ColProps as ColProperties } from "../grid";
+import useSize from "../config-provider/hooks/use-size";
 import { useFormContext } from "../form";
 import { FormFieldContext } from "../form/context";
 import { useRequiredFieldCheck } from "../form/hooks/use-field-optionality-check";
@@ -39,10 +40,15 @@ const FieldLabel = ({
   const inferredRequired = useRequiredFieldCheck(formFieldContext?.name);
   const mergedRequired = required ?? inferredRequired ?? false;
 
+  // Shrink the label one step at the small size so it stops dominating a
+  // compact (h-6) control; middle/large keep the default text-sm.
+  const size = useSize();
+
   const labelNode = (
     <ShadFieldLabel
       className={cn(
         "inline-flex gap-0 select-text",
+        size === "small" && "text-xs",
         // layout === "vertical" ? "pb-2" : "",
         layout === "horizontal" && !mergedLabelCol ? "h-control" : "",
         // Label alignment

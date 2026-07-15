@@ -95,6 +95,16 @@ const controlTextBySize = {
   large: "text-base",
 } as const;
 
+// Single source for the size -> border-radius invariant, applied to the OUTER
+// control box (where inputVariants' rounded-md lives). Repo --radius scale:
+// rounded-sm=6px, rounded-md=8px (default/middle), rounded-lg=10px. Small feels
+// sharper, large softer; middle stays at the current rounded-md.
+const controlRadiusBySize = {
+  small: "rounded-sm",
+  middle: "rounded-md",
+  large: "rounded-lg",
+} as const;
+
 const inputAffixWrapperSizeVariants = tv({
   variants: {
     size: controlHeightBySize,
@@ -130,4 +140,5 @@ export {
   inputSizeVariants,
   controlHeightBySize,
   controlTextBySize,
+  controlRadiusBySize,
 };
