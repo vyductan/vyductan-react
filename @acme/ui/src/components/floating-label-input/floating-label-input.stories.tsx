@@ -3,7 +3,11 @@ import { expect, userEvent, within } from "storybook/test";
 
 import { FloatingLabelInput } from "./floating-label-input";
 import { FloatingLabelSelect } from "./floating-label-select";
-import { FloatingLabelTextarea } from "./floating-label-textarea";
+import BasicExample from "./examples/basic";
+import SelectExample from "./examples/select";
+import ShowcaseExample from "./examples/showcase";
+import SizesExample from "./examples/sizes";
+import TextareaExample from "./examples/textarea";
 
 const meta = {
   title: "Components/FloatingLabelInput",
@@ -31,6 +35,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// ---- arg-driven playground stories (direct component) ----
+
 export const Default: Story = {};
 
 export const Filled: Story = {
@@ -53,70 +59,15 @@ export const Disabled: Story = {
   args: { label: "Disabled", defaultValue: "read only", disabled: true },
 };
 
-/** md (56px) vs sm (48px), side by side. */
-export const Sizes: Story = {
-  render: () => (
-    <div className="flex flex-col gap-5">
-      <FloatingLabelInput label="Medium (md)" size="md" defaultValue="hello" />
-      <FloatingLabelInput label="Compact (sm)" size="sm" defaultValue="hello" />
-    </div>
-  ),
-};
+// ---- composite demos (see ./examples) ----
 
-/** Textarea + Select share the same outlined look, sizes and required mark. */
-export const Textarea: Story = {
-  render: () => (
-    <div className="flex flex-col gap-5">
-      <FloatingLabelTextarea label="Message" required />
-      <FloatingLabelTextarea
-        label="Bio"
-        size="sm"
-        defaultValue="Prefilled content floats the label."
-      />
-      <FloatingLabelTextarea
-        label="Notes"
-        status="error"
-        defaultValue="Something invalid"
-      />
-    </div>
-  ),
-};
+export const Basic: Story = { render: () => <BasicExample /> };
+export const Sizes: Story = { render: () => <SizesExample /> };
+export const Textarea: Story = { render: () => <TextareaExample /> };
+export const Select: Story = { render: () => <SelectExample /> };
+export const Showcase: Story = { render: () => <ShowcaseExample /> };
 
-export const Select: Story = {
-  render: () => (
-    <div className="flex flex-col gap-5">
-      <FloatingLabelSelect label="Country" required>
-        <option value="vn">Vietnam</option>
-        <option value="us">United States</option>
-        <option value="jp">Japan</option>
-      </FloatingLabelSelect>
-      <FloatingLabelSelect label="Plan (sm)" size="sm" defaultValue="pro">
-        <option value="free">Free</option>
-        <option value="pro">Pro</option>
-        <option value="team">Team</option>
-      </FloatingLabelSelect>
-      <FloatingLabelSelect label="Role" status="error">
-        <option value="admin">Admin</option>
-        <option value="user">User</option>
-      </FloatingLabelSelect>
-    </div>
-  ),
-};
-
-/** Everything together, as it would look on a form. */
-export const Showcase: Story = {
-  render: () => (
-    <div className="flex w-[360px] flex-col gap-5">
-      <FloatingLabelInput label="Full name" required />
-      <FloatingLabelInput label="Email" type="email" defaultValue="a@b.com" />
-      <FloatingLabelSelect label="Country" required>
-        <option value="vn">Vietnam</option>
-        <option value="us">United States</option>
-      </FloatingLabelSelect>
-      <FloatingLabelTextarea label="Message" size="sm" />
-    </div>
-  ),
-};
+// ---- interaction tests ----
 
 export const TypingFloatsLabel: Story = {
   play: async ({ canvasElement, step }) => {

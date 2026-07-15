@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import AntdBasicDemo from "./examples/antd-basic";
 import BasicShadcnDemo from "./examples/basic-shadcn";
+import FloatingLabelSizesDemo from "./examples/floating-label-sizes";
+import FormSizesDemo from "./examples/sizes";
 
 const meta = {
   title: "Components/Form",
@@ -20,3 +22,11 @@ export const AntdBasic: Story = {
 };
 
 export const BasicShadcn: Story = {};
+
+export const FloatingLabelSizes: Story = {
+  render: () => <FloatingLabelSizesDemo />,
+};
+
+export const Sizes: Story = {
+  render: () => <FormSizesDemo />,
+};

@@ -56,7 +56,10 @@ const FloatingLabelSelect = ({
 }: FloatingLabelSelectProps & { ref?: React.Ref<HTMLSelectElement> }) => {
   const generatedId = React.useId();
   const inputId = id ?? generatedId;
-  const isError = status === "error";
+  const ariaInvalid = properties["aria-invalid"];
+  // status="error" OR a truthy aria-invalid (e.g. bound through <Field>)
+  const isError =
+    status === "error" || (!!ariaInvalid && ariaInvalid !== "false");
 
   const [mergedValue, setMergedValue] = useMergedState<
     React.ComponentProps<"select">["value"]
@@ -73,7 +76,7 @@ const FloatingLabelSelect = ({
         id={inputId}
         ref={ref}
         disabled={disabled}
-        aria-invalid={isError || properties["aria-invalid"]}
+        aria-invalid={isError || undefined}
         value={mergedValue}
         onChange={(event) => {
           setMergedValue(event.target.value);
