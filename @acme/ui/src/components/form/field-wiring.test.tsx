@@ -166,3 +166,53 @@ for (const entry of ["form-item", "field"] as const) {
     });
   });
 }
+
+// AntD-style `extra`: a persistent hint that stays put when a validation error
+// appears, and renders AFTER the error (not above it like `description`).
+describe("field extra prop", () => {
+  const requiredSchema = z.object({
+    name: z.string().min(1, { message: "Required" }),
+  });
+
+  function ExtraHarness() {
+    const form = useForm({
+      schema: requiredSchema,
+      defaultValues: { name: "" },
+      onSubmit: () => {},
+    });
+    return (
+      <Form form={form} name="extra">
+        <Field
+          name="name"
+          control={form.control}
+          label="Name"
+          extra="Persistent hint"
+        >
+          <input />
+        </Field>
+        <button type="submit">submit</button>
+      </Form>
+    );
+  }
+
+  test("renders the hint and keeps it below the error after validation", async () => {
+    render(<ExtraHarness />);
+
+    // Present before any error.
+    expect(screen.getByText("Persistent hint")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "submit" }));
+
+    // Error shows and the hint survives alongside it.
+    expect(await screen.findByText("Required")).toBeInTheDocument();
+    const error = screen.getByText("Required");
+    const extra = screen.getByText("Persistent hint");
+    expect(extra).toBeInTheDocument();
+
+    // DOM order: error precedes extra.
+    expect(
+      error.compareDocumentPosition(extra) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+});

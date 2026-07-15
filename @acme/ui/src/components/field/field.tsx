@@ -43,6 +43,9 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   name?: FieldPath<TFieldValues>;
   label?: React.ReactNode;
   description?: React.ReactNode;
+  /** Persistent helper text rendered below the error (AntD `extra`). Unlike
+   * `description`, it stays put when a validation error appears. */
+  extra?: React.ReactNode;
   children?: React.ReactNode;
   required?: boolean;
   valuePropName?: string;
@@ -66,6 +69,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   name,
   label,
   description,
+  extra,
   children,
   required: defaultRequired,
   valuePropName,
@@ -92,7 +96,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   if (!name || !mergedControl) {
     return (
       <ShadField
-        className={cn("gap-2", className)}
+        className={cn(fieldGap, className)}
         data-invalid={false}
         {...properties}
       >
@@ -107,6 +111,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
           "aria-invalid": false,
         })}
         {description && <FieldDescription>{description}</FieldDescription>}
+        {extra && <FieldDescription>{extra}</FieldDescription>}
       </ShadField>
     );
   }
@@ -143,6 +148,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
           )}
           {description && <FieldDescription>{description}</FieldDescription>}
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          {extra && <FieldDescription>{extra}</FieldDescription>}
         </ShadField>
       )}
     />
