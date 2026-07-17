@@ -12,6 +12,7 @@ import {
   Modal,
 } from ".";
 import { Button } from "../button";
+import { message } from "../message";
 
 const meta = {
   title: "Components/Modal",
@@ -213,6 +214,41 @@ export const ShadcnStyle: Story = {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    );
+  },
+};
+
+/**
+ * Regression guard: while a modal is open, text inside a Sonner toast must
+ * still be selectable (drag + double-click). Radix's modal scroll-lock and
+ * overlay otherwise eat the selection; DialogContent arms a document-level
+ * workaround for `[data-sonner-toast]` targets.
+ */
+export const TextSelectionWithToast: Story = {
+  render: () => {
+    const [open, setOpen] = useState(true);
+    return (
+      <Modal
+        open={open}
+        onOpenChange={setOpen}
+        title="Selection while modal open"
+        description="Fire a toast, then try to select its text."
+        trigger={<Button onClick={() => setOpen(true)}>Open Modal</Button>}
+        onOk={() => setOpen(false)}
+        onCancel={() => setOpen(false)}
+      >
+        <div className="space-y-3 p-4">
+          <Button
+            onClick={() =>
+              message.info(
+                "Selectable toast content while the modal is open ABCDEF",
+              )
+            }
+          >
+            Show toast
+          </Button>
+        </div>
+      </Modal>
     );
   },
 };
