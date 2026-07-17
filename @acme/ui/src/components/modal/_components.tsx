@@ -29,6 +29,27 @@ const FLOATING_CONTENT_SELECTOR = [
   "[data-slot='popover-content']",
 ].join(", ");
 
+/**
+ * Keep the dialog open when an "interact outside" actually landed on something
+ * that is inside from the user's point of view: a Sonner toast, floating
+ * content (select/combobox/popover), or another dialog stacked on top (its
+ * content). Radix reports these as outside because they live in separate
+ * portals. A bare backdrop / outside click matches none of these → the dialog
+ * closes as normal (Esc + close button are separate handlers, unaffected).
+ *
+ * Note: we do NOT rely on a `[data-slot='dialog-portal']` wrapper — Radix's
+ * Dialog.Portal renders via `asChild`, so no such element exists in the DOM;
+ * overlay and content are portaled into <body> as bare siblings.
+ */
+function shouldKeepDialogOpen(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  return Boolean(
+    target.closest("[data-sonner-toast]") ||
+      target.closest(FLOATING_CONTENT_SELECTOR) ||
+      target.closest("[data-slot='dialog-content']"),
+  );
+}
+
 function shouldStartSelectionDrag(target: Element) {
   if (target.closest(INTERACTIVE_SELECTOR)) {
     return false;
@@ -116,13 +137,8 @@ function DialogContent({
         }
         onPointerDownCapture?.(e);
       }}
-      // Prevent dialog from closing when clicking on toast notifications (Sonner)
       onInteractOutside={(e) => {
-        if (
-          e.target instanceof Element &&
-          (e.target.closest("[data-sonner-toast]") ||
-            e.target.closest(FLOATING_CONTENT_SELECTOR))
-        ) {
+        if (shouldKeepDialogOpen(e.target)) {
           e.preventDefault();
         }
         onInteractOutside?.(e);
@@ -186,6 +202,7 @@ export {
   DialogHeader,
   DialogOverlay,
   DialogTitle,
+  shouldKeepDialogOpen,
 };
 export {
   Dialog,
