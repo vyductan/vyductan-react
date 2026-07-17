@@ -22,6 +22,8 @@ import { Empty } from "../empty";
 import { controlRadiusBySize, inputVariants } from "../input";
 import { PopoverContent, PopoverTrigger } from "../popover";
 import { Popover } from "../popover/_component";
+import { Spin } from "../spin";
+import { Icon } from "../../icons";
 import {
   SelectContent,
   SelectGroup,
@@ -112,6 +114,12 @@ type SelectProperties<
     // Base
     showSearch?: boolean;
     children?: React.ReactNode;
+    // Popover-mode (controlled-open single / tags) dismiss control. Forwarded
+    // to Radix PopoverContent — `preventDefault()` to keep the panel open for a
+    // given outside target (e.g. a related button) while other clicks close it.
+    onPointerDownOutside?: React.ComponentProps<
+      typeof PopoverContent
+    >["onPointerDownOutside"];
   } & React.AriaAttributes;
 
 const Select = <
@@ -155,6 +163,7 @@ const Select = <
     name,
     onBlur,
     ref,
+    onPointerDownOutside,
     showSearch, // Destructure to prevent it from being passed to DOM
     empty,
     ...triggerProperties
@@ -767,6 +776,97 @@ const Select = <
     </div>
   );
 
+  // Controlled-open single select renders through Popover (non-modal) instead
+  // of Radix Select, which locks scroll + `pointer-events:none`s everything
+  // outside the panel (hideOthers). AntD keeps the page interactive while open;
+  // this matches it. Scoped to controlled `open` so normal usage keeps Radix
+  // Select's native listbox a11y + form integration.
+  if (isDefault && open !== undefined) {
+    return (
+      <SelectContext.Provider
+        value={{
+          selectedValues,
+          triggerChange: triggerChange as (value?: SelectValueType) => void,
+        }}
+      >
+        <Popover open={internalOpen} onOpenChange={handleOpenChange}>
+          <PopoverTrigger asChild>
+            <div
+              id={id}
+              role="combobox"
+              aria-expanded={internalOpen}
+              aria-label={placeholder}
+              className={cn(
+                "group min-h-control relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-3 text-left",
+                inputVariants({ variant, status, disabled }),
+                controlRadiusBySize[mergedSize ?? "middle"],
+                className,
+              )}
+              {...triggerProperties}
+            >
+              <span
+                className={cn(
+                  "min-w-0 flex-1 truncate",
+                  firstSelectedValue === undefined && "text-muted-foreground",
+                )}
+              >
+                {firstSelectedValue === undefined
+                  ? placeholder
+                  : getTagLabel(firstSelectedValue)}
+              </span>
+              <Icon
+                icon={
+                  loading
+                    ? "icon-[lucide--loader]"
+                    : "icon-[lucide--chevron-down]"
+                }
+                className={cn(
+                  "size-4 shrink-0 opacity-50",
+                  loading && "animate-spin",
+                  !loading &&
+                    !disabled &&
+                    allowClear &&
+                    selectedValues.length > 0 &&
+                    "group-hover:opacity-0",
+                )}
+              />
+              {!disabled && allowClear && (
+                <SelectClear
+                  allowClear={allowClear}
+                  showClearIcon={selectedValues.length > 0}
+                  onPointerDown={() => {
+                    if (disabled) return;
+                    clearValue();
+                    setKey(+Date.now());
+                  }}
+                  onClear={() => {
+                    if (disabled) return;
+                    clearValue();
+                    setKey(+Date.now());
+                  }}
+                />
+              )}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            side="bottom"
+            sideOffset={4}
+            className="w-(--radix-popover-trigger-width) p-0"
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+            }}
+            onPointerDownOutside={onPointerDownOutside}
+          >
+            <Spin spinning={loading ?? false} size="small">
+              {tagsContent}
+            </Spin>
+          </PopoverContent>
+        </Popover>
+      </SelectContext.Provider>
+    );
+  }
+
   if (isTags) {
     return (
       <SelectContext.Provider
@@ -820,28 +920,22 @@ const Select = <
                   }}
                   placeholder={placeholder}
                 />
-                <SelectClear
-                  allowClear={!disabled && allowClear}
-                  showClearIcon={!disabled && selectedValues.length > 0}
-                  onPointerDown={() => {
-                    if (disabled) return;
-
-                    if (allowClear) {
+                {!disabled && allowClear && (
+                  <SelectClear
+                    allowClear={allowClear}
+                    showClearIcon={selectedValues.length > 0}
+                    onPointerDown={() => {
+                      if (disabled) return;
                       clearValue();
-                    }
-
-                    setKey(+Date.now());
-                  }}
-                  onClear={() => {
-                    if (disabled) return;
-
-                    if (allowClear) {
+                      setKey(+Date.now());
+                    }}
+                    onClear={() => {
+                      if (disabled) return;
                       clearValue();
-                    }
-
-                    setKey(+Date.now());
-                  }}
-                />
+                      setKey(+Date.now());
+                    }}
+                  />
+                )}
               </div>
             </div>
           </PopoverTrigger>
@@ -853,8 +947,11 @@ const Select = <
             onOpenAutoFocus={(event) => {
               event.preventDefault();
             }}
+            onPointerDownOutside={onPointerDownOutside}
           >
-            {tagsContent}
+            <Spin spinning={loading ?? false} size="small">
+              {tagsContent}
+            </Spin>
           </PopoverContent>
         </Popover>
       </SelectContext.Provider>
@@ -955,7 +1052,9 @@ const Select = <
           //   viewport: options.some((o) => o.color) ? "space-y-2" : "",
           // }}
         >
-          {ContentComp}
+          <Spin spinning={loading ?? false} size="small">
+            {ContentComp}
+          </Spin>
         </SelectContent>
       </ShadcnSelect>
     </SelectContext.Provider>

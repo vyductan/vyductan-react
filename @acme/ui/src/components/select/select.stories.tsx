@@ -11,6 +11,8 @@ import {
 
 import type { SelectProps as SelectProperties } from "./select";
 import type { OptionType } from "./types";
+import NonModalControlledOpenExample from "./examples/non-modal-controlled-open";
+import TallTriggerExample from "./examples/tall-trigger";
 import { Select } from "./select";
 
 const meta = {
@@ -192,6 +194,19 @@ export const Loading: Story = {
     options: basicOptions,
     className: "w-[200px]",
   },
+};
+
+// Controlled `open` on a single select → renders through Popover (non-modal).
+// Page outside the panel stays interactive (hover/cursor), unlike Radix
+// Select's modal behavior. Hover the button while the panel is open.
+export const NonModalControlledOpen: Story = {
+  render: () => <NonModalControlledOpenExample />,
+};
+
+// Trigger height grows to a multi-line custom option label — checks that the
+// chevron and clear icon don't both show at once on a tall control.
+export const TallTrigger: Story = {
+  render: () => <TallTriggerExample />,
 };
 
 export const Disabled: Story = {
