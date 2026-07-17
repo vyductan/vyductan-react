@@ -13,7 +13,6 @@ import getMiniDecimal, {
 import { useLayoutUpdateEffect } from "@rc-component/util/es/hooks/useLayoutEffect";
 import proxyObject from "@rc-component/util/es/proxyObject";
 import raf from "@rc-component/util/es/raf";
-import { useHover } from "ahooks";
 
 import { Button } from "@acme/ui/components/button";
 import { ButtonGroup } from "@acme/ui/components/button-group";
@@ -755,6 +754,8 @@ const InputNumber = <T extends ValueType = ValueType>({
   disabled,
   style,
   value,
+  defaultValue,
+  onChange,
   prefix,
   suffix,
   addonBefore,
@@ -772,7 +773,25 @@ const InputNumber = <T extends ValueType = ValueType>({
   const holderReference = React.useRef<HolderReference>(null);
   const inputNumberDomReference = React.useRef<HTMLDivElement>(null);
   const inputFocusReference = React.useRef<HTMLInputElement>(null);
-  const isHovering = useHover(inputNumberDomReference);
+
+  // Bridge uncontrolled → controlled so the outer wrapper always knows the
+  // current value (needed for the clear icon visibility + reset). When `value`
+  // is provided the component stays fully controlled.
+  const [innerValue, setInnerValue] = React.useState<T | null | undefined>(
+    value ?? defaultValue,
+  );
+  const mergedValue = value === undefined ? innerValue : value;
+  const hasValue =
+    mergedValue !== undefined &&
+    mergedValue !== null &&
+    String(mergedValue) !== "";
+
+  const handleChange = (nextValue: T | null) => {
+    if (value === undefined) {
+      setInnerValue(nextValue);
+    }
+    onChange?.(nextValue);
+  };
 
   // Track disabled states from InternalInputNumber
   const [upDisabled, setUpDisabled] = useState(false);
@@ -790,7 +809,7 @@ const InputNumber = <T extends ValueType = ValueType>({
   }, []);
 
   const handleReset = () => {
-    rest.onChange?.(null);
+    handleChange(null);
     focus();
   };
 
@@ -860,20 +879,20 @@ const InputNumber = <T extends ValueType = ValueType>({
     };
   }, [stopSpinnerStep]);
 
-  // Render clear icon for InputNumber (only show on hover)
+  // Render clear icon for InputNumber (reveal on hover/focus, reserve width to avoid jitter).
+  // Controls take priority: when the spinner controls are enabled we suppress the
+  // clear icon so both don't crowd the input. Clear only shows when controls={false}.
   const clearIcon =
-    mode === "input" && !!allowClear && !!value && !!isHovering ? (
-      <ClearIcon
-        visible
-        onClick={() => handleReset()}
-        className="relative z-10 order-2 ml-1"
-      />
+    mode === "input" && !controls && !!allowClear && hasValue ? (
+      <div className="relative z-10 order-2 ml-1 flex items-center opacity-0 transition-opacity group-focus-within/spinner:opacity-100 group-hover/spinner:opacity-100">
+        <ClearIcon visible onClick={() => handleReset()} />
+      </div>
     ) : null;
 
   // Render controls as suffix - override absolute positioning
   const controlsNode =
     mode === "input" && controls ? (
-      <div className="order-3 flex flex-col justify-center [&>div]:static [&>div]:right-auto [&>div]:w-auto">
+      <div className="order-3 flex flex-col justify-center opacity-0 transition-opacity group-focus-within/spinner:opacity-100 group-hover/spinner:opacity-100 [&>div]:static [&>div]:right-auto [&>div]:w-auto">
         <StepHandler
           upNode={upHandler}
           downNode={downHandler}
@@ -886,14 +905,17 @@ const InputNumber = <T extends ValueType = ValueType>({
       </div>
     ) : null;
 
-  // Combine clear icon and controls as suffix
-  const combinedSuffix = (
-    <>
-      {clearIcon}
-      {controlsNode}
-      {suffix && <span className="mx-1 flex items-center">{suffix}</span>}
-    </>
-  );
+  // Combine clear icon and controls as suffix. Leave undefined when there is
+  // nothing to show (e.g. controls={false} without clear/suffix) so BaseInput
+  // does not render an empty suffix span.
+  const combinedSuffix =
+    clearIcon || controlsNode || suffix ? (
+      <>
+        {clearIcon}
+        {controlsNode}
+        {suffix && <span className="mx-1 flex items-center">{suffix}</span>}
+      </>
+    ) : undefined;
 
   React.useImperativeHandle(ref, () => {
     const target = inputFocusReference.current;
@@ -966,7 +988,7 @@ const InputNumber = <T extends ValueType = ValueType>({
         <BaseInput
           className="min-w-0 flex-1 border-none shadow-none"
           triggerFocus={focus}
-          value={value}
+          value={mergedValue}
           disabled={disabled}
           prefix={prefix}
           suffix={middleSuffix}
@@ -999,6 +1021,7 @@ const InputNumber = <T extends ValueType = ValueType>({
               input: cn("text-center", classNames?.input),
             }}
             {...rest}
+            onChange={handleChange}
           />
         </BaseInput>
 
@@ -1036,14 +1059,17 @@ const InputNumber = <T extends ValueType = ValueType>({
     <BaseInput
       className={cn("w-[90px]", className)}
       triggerFocus={focus}
-      value={value}
+      value={mergedValue}
       disabled={disabled}
       style={style}
       prefix={prefix}
       suffix={combinedSuffix}
       addonAfter={addonAfter}
       addonBefore={addonBefore}
-      classNames={classNames}
+      classNames={{
+        ...classNames,
+        affixWrapper: cn("group/spinner", classNames?.affixWrapper),
+      }}
       components={{
         affixWrapper: "div",
         groupWrapper: "div",
@@ -1066,6 +1092,7 @@ const InputNumber = <T extends ValueType = ValueType>({
           input: classNames?.input,
         }}
         {...rest}
+        onChange={handleChange}
       />
     </BaseInput>
   );

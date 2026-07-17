@@ -46,6 +46,12 @@ interface InputNumberProperties<
    */
   variant?: InputVariant;
   allowClear?: boolean | { clearIcon?: React.ReactNode };
+  /**
+   * Horizontal alignment of the value text inside the field.
+   * Handy for right-aligned currency / accounting inputs.
+   * @default "left"
+   */
+  align?: "left" | "center" | "right";
 }
 
 const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
@@ -70,6 +76,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
     mode = "input",
     variant: customVariant,
     allowClear,
+    align = "left",
 
     onKeyDown,
     onChange,
@@ -189,7 +196,10 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
         input: cn(
           "flex-1",
           spinnerMode && "min-w-0 w-full",
-          !spinnerMode && "text-left",
+          !spinnerMode &&
+            { left: "text-left", center: "text-center", right: "text-right" }[
+              align
+            ],
           "bg-transparent",
           "text-foreground",
           // "placeholder:text-muted-foreground",
