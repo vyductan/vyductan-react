@@ -50,18 +50,6 @@ function shouldKeepDialogOpen(target: EventTarget | null): boolean {
   );
 }
 
-function shouldStartSelectionDrag(target: Element) {
-  if (target.closest(INTERACTIVE_SELECTOR)) {
-    return false;
-  }
-
-  return Boolean(
-    target.closest(
-      "[data-slot='dialog-title'], [data-slot='dialog-description']",
-    ),
-  );
-}
-
 /**
  * Sonner toasts render in their own portal, OUTSIDE the dialog's focus scope.
  * While a modal dialog is open, Radix's trapped FocusScope + scroll-lock stop
@@ -187,84 +175,20 @@ function useToastSelectionDrag() {
 
 function DialogContent({
   onInteractOutside,
-  onPointerDownCapture,
   className,
   ...properties
 }: React.ComponentProps<typeof ShadcnDialogContent>) {
-  const [selectionDragActive, setSelectionDragActive] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!selectionDragActive) {
-      return;
-    }
-
-    const stopSelectionDrag = () => setSelectionDragActive(false);
-
-    globalThis.addEventListener("pointerup", stopSelectionDrag);
-    globalThis.addEventListener("pointercancel", stopSelectionDrag);
-    globalThis.addEventListener("blur", stopSelectionDrag);
-
-    return () => {
-      globalThis.removeEventListener("pointerup", stopSelectionDrag);
-      globalThis.removeEventListener("pointercancel", stopSelectionDrag);
-      globalThis.removeEventListener("blur", stopSelectionDrag);
-    };
-  }, [selectionDragActive]);
-
-  React.useEffect(() => {
-    if (!selectionDragActive) {
-      return;
-    }
-
-    const { body } = document;
-    const previousUserSelect = body.style.userSelect;
-    const previousWebkitUserSelect = body.style.webkitUserSelect;
-
-    body.style.userSelect = "none";
-    body.style.webkitUserSelect = "none";
-
-    return () => {
-      body.style.userSelect = previousUserSelect;
-      body.style.webkitUserSelect = previousWebkitUserSelect;
-    };
-  }, [selectionDragActive]);
-
-  React.useEffect(() => {
-    if (!selectionDragActive) {
-      return;
-    }
-
-    const overlay = document.querySelector<HTMLElement>(
-      "[data-slot='dialog-overlay'][data-state='open']",
-    );
-    if (!overlay) {
-      return;
-    }
-
-    const previousPointerEvents = overlay.style.pointerEvents;
-    overlay.style.pointerEvents = "none";
-
-    return () => {
-      overlay.style.pointerEvents = previousPointerEvents;
-    };
-  }, [selectionDragActive]);
-
-  // Toasts live outside the dialog's focus scope; drive their text selection
-  // manually so Radix's trapped focus + scroll-lock can't swallow it.
+  // The dialog's own title/description select natively (they live inside the
+  // focus scope). Only toasts need help — see useToastSelectionDrag.
   useToastSelectionDrag();
 
   return (
     <ShadcnDialogContent
       className={cn("select-text", className)}
-      onPointerDownCapture={(e) => {
-        if (e.target instanceof Element && shouldStartSelectionDrag(e.target)) {
-          setSelectionDragActive(true);
-        } else {
-          setSelectionDragActive(false);
-        }
-        onPointerDownCapture?.(e);
-      }}
       onInteractOutside={(e) => {
+        // Keep the dialog open when the "outside" interaction actually landed
+        // on a toast / floating content / stacked dialog (separate portals).
+        // https://github.com/radix-ui/primitives/issues/2690
         if (shouldKeepDialogOpen(e.target)) {
           e.preventDefault();
         }
