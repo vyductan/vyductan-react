@@ -50,19 +50,6 @@ function shouldKeepDialogOpen(target: EventTarget | null): boolean {
   );
 }
 
-// Regions whose text we drive manually while a modal is open. Toasts live in a
-// separate portal OUTSIDE the dialog's focus scope, where Radix's trapped
-// FocusScope + scroll-lock stop the browser from ever starting a native
-// selection (no `selectstart` fires). The dialog's own title/description select
-// natively, but a native drag/triple-click there spills across block
-// boundaries and copies stray "\n". Driving all of them by hand with a Range
-// clamped to a single element gives clean, newline-free copies everywhere.
-const SELECTABLE_TEXT_SELECTOR = [
-  "[data-sonner-toast]",
-  "[data-slot='dialog-title']",
-  "[data-slot='dialog-description']",
-].join(", ");
-
 function caretRangeFromPoint(x: number, y: number): Range | null {
   // Firefox/Chrome: caretPositionFromPoint; WebKit: caretRangeFromPoint.
   const documentWithCaret = document as Document & {
@@ -90,39 +77,38 @@ function setSelection(range: Range) {
   selection?.addRange(range);
 }
 
-function useDialogTextSelection() {
+/**
+ * Sonner toasts render in their own portal, OUTSIDE the dialog's focus scope.
+ * While a modal is open, Radix's trapped FocusScope + scroll-lock stop the
+ * browser from ever starting a native selection there (no `selectstart` fires),
+ * so drag/double-click can't select toast text. Programmatic Range selection
+ * still works, so we drive it by hand — clamped to the toast so it stays clean.
+ * Interactive controls (close/action buttons) are skipped so they keep working.
+ */
+function useToastTextSelection() {
   React.useEffect(() => {
     let anchor: Range | null = null;
-    let root: Element | null = null;
+    let toast: Element | null = null;
 
-    const selectableTarget = (target: EventTarget | null) => {
+    const hitToast = (target: EventTarget | null) => {
       if (!(target instanceof Element)) return null;
       if (target.closest(INTERACTIVE_SELECTOR)) return null;
-      return target.closest(SELECTABLE_TEXT_SELECTOR);
+      return target.closest("[data-sonner-toast]");
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      const hit = selectableTarget(event.target);
+      const hit = hitToast(event.target);
       if (!hit) return;
-      // Take over: block Radix / sonner from swallowing the gesture.
       event.preventDefault();
       anchor = caretRangeFromPoint(event.clientX, event.clientY);
-      root = hit;
+      toast = hit;
       if (anchor) setSelection(anchor.cloneRange());
     };
 
     const onPointerMove = (event: PointerEvent) => {
       if (!anchor || event.buttons !== 1) return;
       const focus = caretRangeFromPoint(event.clientX, event.clientY);
-      // Clamp the selection to the element the drag started on so it never
-      // spills across block boundaries (which would copy a stray "\n").
-      if (
-        !focus ||
-        !(focus.startContainer instanceof Node) ||
-        !root?.contains(focus.startContainer)
-      ) {
-        return;
-      }
+      if (!focus || !toast?.contains(focus.startContainer)) return;
       const range = document.createRange();
       const anchorBeforeFocus =
         anchor.compareBoundaryPoints(Range.START_TO_START, focus) <= 0;
@@ -138,23 +124,21 @@ function useDialogTextSelection() {
 
     const onPointerUp = () => {
       anchor = null;
-      root = null;
+      toast = null;
     };
 
-    // Multi-click (native selection is suppressed by the preventDefault above):
-    // 2 clicks = word (Unicode-aware, works on non-ASCII), 3+ = whole element.
+    // Multi-click (native is suppressed by preventDefault): 2 = word
+    // (Unicode-aware), 3+ = whole toast.
     const isWordChar = (character: string) => /[\p{L}\p{N}_]/u.test(character);
     const onClick = (event: MouseEvent) => {
-      const hit = selectableTarget(event.target);
+      const hit = hitToast(event.target);
       if (!hit || event.detail < 2) return;
-
       if (event.detail >= 3) {
         const range = document.createRange();
         range.selectNodeContents(hit);
         setSelection(range);
         return;
       }
-
       const caret = caretRangeFromPoint(event.clientX, event.clientY);
       const node = caret?.startContainer;
       if (!node || node.nodeType !== Node.TEXT_NODE) return;
@@ -185,14 +169,74 @@ function useDialogTextSelection() {
   }, []);
 }
 
+/**
+ * The dialog's own content selects natively — including across the title,
+ * description, and body in one drag (matches AntD). The only defect is that a
+ * drag straying onto the overlay / the page behind the modal grabs garbage
+ * (stray "\n"). While a selection drag that started inside the content is
+ * active, lock everything else out: body `user-select: none` (the content
+ * keeps its own `select-text`, so its text — and only its text — stays
+ * selectable) and overlay `pointer-events: none`. Done imperatively (no React
+ * state) so it never re-renders mid-gesture and interrupts the selection.
+ */
+function useDialogSelectionContainment() {
+  React.useEffect(() => {
+    let release: (() => void) | null = null;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (target.closest("[data-sonner-toast]")) return; // toasts: other hook
+      if (!target.closest("[data-slot='dialog-content']")) return;
+      if (target.closest(INTERACTIVE_SELECTOR)) return;
+
+      const { body } = document;
+      const overlay = document.querySelector<HTMLElement>(
+        "[data-slot='dialog-overlay'][data-state='open']",
+      );
+      const previous = {
+        userSelect: body.style.userSelect,
+        webkitUserSelect: body.style.webkitUserSelect,
+        overlayPointerEvents: overlay?.style.pointerEvents,
+      };
+      body.style.userSelect = "none";
+      body.style.webkitUserSelect = "none";
+      if (overlay) overlay.style.pointerEvents = "none";
+
+      release = () => {
+        body.style.userSelect = previous.userSelect;
+        body.style.webkitUserSelect = previous.webkitUserSelect;
+        if (overlay) {
+          overlay.style.pointerEvents = previous.overlayPointerEvents ?? "";
+        }
+        release = null;
+      };
+    };
+
+    const onPointerUp = () => release?.();
+
+    document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("pointerup", onPointerUp, true);
+    document.addEventListener("pointercancel", onPointerUp, true);
+    return () => {
+      release?.();
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("pointerup", onPointerUp, true);
+      document.removeEventListener("pointercancel", onPointerUp, true);
+    };
+  }, []);
+}
+
 function DialogContent({
   onInteractOutside,
   className,
   ...properties
 }: React.ComponentProps<typeof ShadcnDialogContent>) {
-  // Drive text selection for toasts + the dialog's own title/description so
-  // copies are clean (no stray "\n") while the modal traps focus.
-  useDialogTextSelection();
+  // Toasts: native selection is impossible outside the focus scope → drive it.
+  // Content: native selection (cross-block, like AntD), just kept from spilling
+  // onto the overlay/page behind while dragging.
+  useToastTextSelection();
+  useDialogSelectionContainment();
 
   return (
     <ShadcnDialogContent
