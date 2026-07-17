@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { ShadcnCalendarProps } from "../calendar/_components";
 import type { InputRef as InputReference } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
 import type { DisabledDate } from "./types";
@@ -77,6 +78,12 @@ type DatePickerBaseProperties = InputVariants &
     allowClear?: boolean;
     className?: string;
     suffix?: React.ReactNode;
+    /** Show a loading spinner in the suffix and block opening the calendar. */
+    loading?: boolean;
+    /** react-day-picker day modifiers, forwarded to the underlying Calendar (e.g. mark days that have slots). */
+    modifiers?: ShadcnCalendarProps["modifiers"];
+    /** Class names applied per matching modifier, forwarded to the underlying Calendar. */
+    modifiersClassNames?: ShadcnCalendarProps["modifiersClassNames"];
 
     // to use default month and year dropdown
     captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years";
@@ -130,6 +137,10 @@ const DatePicker = (properties: DatePickerProperties) => {
     classNames: _,
     styles: __,
     disabled,
+    loading = false,
+    suffix: suffixProperty,
+    modifiers,
+    modifiersClassNames,
     allowClear = false,
     variant,
     size,
@@ -689,8 +700,9 @@ const DatePicker = (properties: DatePickerProperties) => {
         placement="bottomLeft"
         className="w-auto p-0 max-sm:p-0"
         arrow={false}
-        open={open}
+        open={loading ? false : open}
         onOpenChange={(open) => {
+          if (loading) return;
           setOpen(open);
           if (!open) {
             // If requested, commit the selected year when panel closes
@@ -725,6 +737,8 @@ const DatePicker = (properties: DatePickerProperties) => {
               mode="single"
               required={true}
               captionLayout={captionLayoutConfig}
+              modifiers={modifiers}
+              modifiersClassNames={modifiersClassNames}
               // initialFocus // disable default focus (in shadcn default is true)
               // defaultMonth={value && toDate(value)}
               month={month}
@@ -809,11 +823,21 @@ const DatePicker = (properties: DatePickerProperties) => {
             htmlSize={12}
             disabled={disabled}
             suffix={
-              <Icon
-                aria-hidden="true"
-                icon="icon-[mingcute--calendar-2-line]"
-                className="ml-auto size-4 opacity-50"
-              />
+              loading ? (
+                <Icon
+                  aria-hidden="true"
+                  icon="icon-[lucide--loader]"
+                  className="ml-auto size-4 animate-spin opacity-50"
+                />
+              ) : (
+                (suffixProperty ?? (
+                  <Icon
+                    aria-hidden="true"
+                    icon="icon-[mingcute--calendar-2-line]"
+                    className="ml-auto size-4 opacity-50"
+                  />
+                ))
+              )
             }
             classNames={{
               input: cn(
@@ -831,6 +855,7 @@ const DatePicker = (properties: DatePickerProperties) => {
             }}
             onKeyUp={(event) => {
               event.stopPropagation();
+              if (loading) return;
               if (event.key === "Enter") {
                 handleChangeInput(event.currentTarget.value);
                 setOpen(false);
@@ -847,6 +872,7 @@ const DatePicker = (properties: DatePickerProperties) => {
               }
             }}
             onChange={(event) => {
+              if (loading) return;
               const newValue = event.currentTarget.value;
               setInputValue(newValue);
 

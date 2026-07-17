@@ -47,6 +47,9 @@ const meta = {
     showTime: {
       control: "boolean",
     },
+    loading: {
+      control: "boolean",
+    },
   },
 } satisfies Meta<typeof DatePicker>;
 
@@ -99,6 +102,55 @@ export const Status: Story = {
       <DatePicker {...arguments_} status="warning" placeholder="Warning" />
     </div>
   ),
+};
+
+export const Loading: Story = {
+  args: {
+    placeholder: "Loading...",
+    loading: true,
+    className: "w-[240px]",
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Loading...");
+
+    await step("typing is blocked while loading", async () => {
+      await userEvent.type(input, "2024-01-01");
+      await expect(input).toHaveValue("");
+    });
+
+    await step("clicking does not open the calendar", async () => {
+      await userEvent.click(input);
+      await expect(
+        document.querySelector('[data-slot="calendar"]'),
+      ).toBeNull();
+    });
+  },
+};
+
+export const WithDayModifiers: Story = {
+  args: {
+    placeholder: "Has-slots demo",
+    defaultValue: dayjs("2024-06-10"),
+    className: "w-[240px]",
+    modifiers: {
+      hasSlots: [dayjs("2024-06-12").toDate(), dayjs("2024-06-18").toDate()],
+    },
+    modifiersClassNames: {
+      hasSlots:
+        "relative after:absolute after:bottom-1.5 after:left-1/2 after:h-1 after:w-1 after:-translate-x-1/2 after:rounded-full after:bg-green-500 after:content-[''] font-medium",
+    },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("marked days render the modifier class when open", async () => {
+      await userEvent.click(canvas.getByPlaceholderText("Has-slots demo"));
+      await expect(
+        document.querySelector('[class*="after:bg-green-500"]'),
+      ).not.toBeNull();
+    });
+  },
 };
 
 export const PickerModes: Story = {
