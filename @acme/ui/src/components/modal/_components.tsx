@@ -50,16 +50,19 @@ function shouldKeepDialogOpen(target: EventTarget | null): boolean {
   );
 }
 
-/**
- * Sonner toasts render in their own portal, OUTSIDE the dialog's focus scope.
- * While a modal dialog is open, Radix's trapped FocusScope + scroll-lock stop
- * the browser from starting a native text selection on that outside content
- * (a `selectstart` never fires), so users can't drag-select or double-click
- * toast text. Programmatic Range selection still works, so we drive it by hand:
- * anchor a caret on pointerdown over a toast, then extend it on pointermove.
- * Scoped to `[data-sonner-toast]` and non-interactive targets so toast buttons
- * (close/action) keep working; only runs while a DialogContent is mounted.
- */
+// Regions whose text we drive manually while a modal is open. Toasts live in a
+// separate portal OUTSIDE the dialog's focus scope, where Radix's trapped
+// FocusScope + scroll-lock stop the browser from ever starting a native
+// selection (no `selectstart` fires). The dialog's own title/description select
+// natively, but a native drag/triple-click there spills across block
+// boundaries and copies stray "\n". Driving all of them by hand with a Range
+// clamped to a single element gives clean, newline-free copies everywhere.
+const SELECTABLE_TEXT_SELECTOR = [
+  "[data-sonner-toast]",
+  "[data-slot='dialog-title']",
+  "[data-slot='dialog-description']",
+].join(", ");
+
 function caretRangeFromPoint(x: number, y: number): Range | null {
   // Firefox/Chrome: caretPositionFromPoint; WebKit: caretRangeFromPoint.
   const documentWithCaret = document as Document & {
@@ -81,35 +84,42 @@ function caretRangeFromPoint(x: number, y: number): Range | null {
     : null;
 }
 
-function useToastSelectionDrag() {
+function setSelection(range: Range) {
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
+
+function useDialogTextSelection() {
   React.useEffect(() => {
     let anchor: Range | null = null;
-    let toastRoot: Element | null = null;
+    let root: Element | null = null;
+
+    const selectableTarget = (target: EventTarget | null) => {
+      if (!(target instanceof Element)) return null;
+      if (target.closest(INTERACTIVE_SELECTOR)) return null;
+      return target.closest(SELECTABLE_TEXT_SELECTOR);
+    };
 
     const onPointerDown = (event: PointerEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const toast = target.closest("[data-sonner-toast]");
-      if (!toast || target.closest(INTERACTIVE_SELECTOR)) return;
+      const hit = selectableTarget(event.target);
+      if (!hit) return;
       // Take over: block Radix / sonner from swallowing the gesture.
       event.preventDefault();
       anchor = caretRangeFromPoint(event.clientX, event.clientY);
-      toastRoot = toast;
-      if (anchor) {
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(anchor.cloneRange());
-      }
+      root = hit;
+      if (anchor) setSelection(anchor.cloneRange());
     };
 
     const onPointerMove = (event: PointerEvent) => {
       if (!anchor || event.buttons !== 1) return;
       const focus = caretRangeFromPoint(event.clientX, event.clientY);
-      // Keep the selection inside the toast the drag started on.
+      // Clamp the selection to the element the drag started on so it never
+      // spills across block boundaries (which would copy a stray "\n").
       if (
         !focus ||
         !(focus.startContainer instanceof Node) ||
-        !toastRoot?.contains(focus.startContainer)
+        !root?.contains(focus.startContainer)
       ) {
         return;
       }
@@ -123,24 +133,28 @@ function useToastSelectionDrag() {
         range.setStart(focus.startContainer, focus.startOffset);
         range.setEnd(anchor.startContainer, anchor.startOffset);
       }
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+      setSelection(range);
     };
 
     const onPointerUp = () => {
       anchor = null;
-      toastRoot = null;
+      root = null;
     };
 
-    // Double-click selects the whole word (native word-select is suppressed by
-    // the preventDefault above). Unicode-aware so it works on non-ASCII text.
+    // Multi-click (native selection is suppressed by the preventDefault above):
+    // 2 clicks = word (Unicode-aware, works on non-ASCII), 3+ = whole element.
     const isWordChar = (character: string) => /[\p{L}\p{N}_]/u.test(character);
-    const onDoubleClick = (event: MouseEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      if (!target.closest("[data-sonner-toast]")) return;
-      if (target.closest(INTERACTIVE_SELECTOR)) return;
+    const onClick = (event: MouseEvent) => {
+      const hit = selectableTarget(event.target);
+      if (!hit || event.detail < 2) return;
+
+      if (event.detail >= 3) {
+        const range = document.createRange();
+        range.selectNodeContents(hit);
+        setSelection(range);
+        return;
+      }
+
       const caret = caretRangeFromPoint(event.clientX, event.clientY);
       const node = caret?.startContainer;
       if (!node || node.nodeType !== Node.TEXT_NODE) return;
@@ -153,22 +167,20 @@ function useToastSelectionDrag() {
       const range = document.createRange();
       range.setStart(node, start);
       range.setEnd(node, end);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+      setSelection(range);
     };
 
     document.addEventListener("pointerdown", onPointerDown, true);
     document.addEventListener("pointermove", onPointerMove, true);
     document.addEventListener("pointerup", onPointerUp, true);
     document.addEventListener("pointercancel", onPointerUp, true);
-    document.addEventListener("dblclick", onDoubleClick, true);
+    document.addEventListener("click", onClick, true);
     return () => {
       document.removeEventListener("pointerdown", onPointerDown, true);
       document.removeEventListener("pointermove", onPointerMove, true);
       document.removeEventListener("pointerup", onPointerUp, true);
       document.removeEventListener("pointercancel", onPointerUp, true);
-      document.removeEventListener("dblclick", onDoubleClick, true);
+      document.removeEventListener("click", onClick, true);
     };
   }, []);
 }
@@ -178,9 +190,9 @@ function DialogContent({
   className,
   ...properties
 }: React.ComponentProps<typeof ShadcnDialogContent>) {
-  // The dialog's own title/description select natively (they live inside the
-  // focus scope). Only toasts need help — see useToastSelectionDrag.
-  useToastSelectionDrag();
+  // Drive text selection for toasts + the dialog's own title/description so
+  // copies are clean (no stray "\n") while the modal traps focus.
+  useDialogTextSelection();
 
   return (
     <ShadcnDialogContent
