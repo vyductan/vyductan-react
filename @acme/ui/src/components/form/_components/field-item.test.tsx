@@ -187,7 +187,9 @@ describe("Field", () => {
     render(<InputNumberTestForm />);
 
     const input = screen.getByRole("spinbutton", { name: /cvv/i });
-    const affixWrapper = input.closest('[data-slot="affix-wrapper"]');
+    // border-error lands on the input-number wrapper (this InputNumber has no
+    // prefix/suffix, so BaseInput renders no affix-wrapper).
+    const inputNumberBox = input.closest('[data-slot="input-number"]');
 
     expect(input).toHaveAttribute("aria-invalid", "false");
     expect(input).toHaveClass("placeholder:text-placeholder");
@@ -201,8 +203,8 @@ describe("Field", () => {
     expect(input).toHaveClass("placeholder:text-placeholder");
     expect(input).toHaveClass("text-foreground");
     expect(input).not.toHaveClass("placeholder:text-error");
-    expect(affixWrapper).toHaveClass("border-error");
-    expect(affixWrapper).toHaveClass("focus-within:border-error");
+    expect(inputNumberBox).toHaveClass("border-error");
+    expect(inputNumberBox).toHaveClass("focus-within:border-error");
   });
 
   test("keeps prefixed Input placeholder color in invalid state", async () => {
