@@ -17,6 +17,10 @@ type FieldLabelProperties = React.ComponentProps<typeof ShadFieldLabel> & {
   labelWrap?: boolean;
   colon?: boolean;
   required?: boolean;
+  /** Node pinned to the far right of the label row (e.g. a "Forgot?" link).
+   * Rendered as a sibling of the <label>, not a child, so interactive content
+   * keeps its own focus target. Intended for the vertical layout. */
+  labelExtra?: React.ReactNode;
 };
 const FieldLabel = ({
   className,
@@ -25,6 +29,7 @@ const FieldLabel = ({
   labelWrap,
   colon,
   required,
+  labelExtra,
   children,
   ...properties
 }: FieldLabelProperties) => {
@@ -67,7 +72,21 @@ const FieldLabel = ({
     </ShadFieldLabel>
   );
 
-  return labelCol ? <Col {...labelCol}>{labelNode}</Col> : labelNode;
+  // Pin labelExtra to the row's far right, as a SIBLING of the <label> (so a
+  // link/button inside it keeps its own focus target instead of triggering the
+  // label). Vertical-focused: the label spans the row above the control.
+  const rowNode = labelExtra ? (
+    <div className="flex w-full items-center justify-between gap-2">
+      {labelNode}
+      <span className="text-muted-foreground text-xs font-normal">
+        {labelExtra}
+      </span>
+    </div>
+  ) : (
+    labelNode
+  );
+
+  return labelCol ? <Col {...labelCol}>{rowNode}</Col> : rowNode;
 };
 
 export { FieldLabel };

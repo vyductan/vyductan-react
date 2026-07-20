@@ -42,6 +42,9 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   control?: Control<TFieldValues, any, any>;
   name?: FieldPath<TFieldValues>;
   label?: React.ReactNode;
+  /** Node pinned to the far right of the label row (e.g. a "Forgot?" link).
+   * Only renders when `label` is set; intended for the vertical layout. */
+  labelExtra?: React.ReactNode;
   description?: React.ReactNode;
   /** Persistent helper text rendered below the error (AntD `extra`). Unlike
    * `description`, it stays put when a validation error appears. */
@@ -68,6 +71,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   control,
   name,
   label,
+  labelExtra,
   description,
   extra,
   children,
@@ -101,7 +105,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
         {...properties}
       >
         {label && (
-          <FieldLabel htmlFor={inputId} required={required}>
+          <FieldLabel htmlFor={inputId} required={required} labelExtra={labelExtra}>
             {label}
           </FieldLabel>
         )}
@@ -127,7 +131,11 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
           {...properties}
         >
           {label && (
-            <FieldLabel htmlFor={inputId} required={required}>
+            <FieldLabel
+              htmlFor={inputId}
+              required={required}
+              labelExtra={labelExtra}
+            >
               {label}
             </FieldLabel>
           )}

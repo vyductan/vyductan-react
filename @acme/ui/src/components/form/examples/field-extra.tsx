@@ -14,9 +14,10 @@ const schema = z.object({
 });
 
 /**
- * `description` vs `extra`. `description` (Username) sits between the control
- * and the error slot. `extra` (Password) is a persistent hint rendered BELOW
- * the error — it stays put when validation fails, matching AntD's `extra`.
+ * `description` vs `extra` vs `labelExtra`. `description` (Username) sits
+ * between the control and the error slot. `extra` (Password) is a persistent
+ * hint BELOW the error — it stays put when validation fails (AntD `extra`).
+ * `labelExtra` (Password) pins an action to the far right of the label row.
  */
 const FieldExtraDemo = () => {
   const form = useForm({
@@ -41,6 +42,11 @@ const FieldExtraDemo = () => {
         name="password"
         control={form.control}
         label="Password"
+        labelExtra={
+          <a href="#reset" className="text-primary-500 hover:underline">
+            Forgot?
+          </a>
+        }
         extra="Password must contain letters and numbers."
       >
         <InputPassword placeholder="Password" />

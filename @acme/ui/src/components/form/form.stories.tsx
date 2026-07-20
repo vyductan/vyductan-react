@@ -43,6 +43,11 @@ export const FieldExtra: Story = {
       canvas.getByText("Password must contain letters and numbers."),
     ).toBeInTheDocument();
 
+    // `labelExtra` renders as a real link, not swallowed by the label.
+    const forgot = canvas.getByRole("link", { name: "Forgot?" });
+    await expect(forgot).toBeInTheDocument();
+    await expect(forgot.closest("label")).toBeNull();
+
     // Submit empty to surface the password error.
     await userEvent.click(canvas.getByRole("button", { name: "Submit" }));
 

@@ -59,6 +59,28 @@ describe("Field", () => {
     expect(screen.getByText("Section helper text")).toHaveClass("text-sm");
   });
 
+  test("renders labelExtra as a sibling of the label, not inside it", () => {
+    render(
+      <Field
+        label="Password"
+        labelExtra={<a href="#reset">Forgot?</a>}
+        data-testid="field"
+      >
+        <input />
+      </Field>,
+    );
+
+    const forgot = screen.getByRole("link", { name: "Forgot?" });
+
+    // Present, but NOT nested inside the <label> (would steal its focus).
+    expect(forgot).toBeInTheDocument();
+    expect(forgot.closest("label")).toBeNull();
+
+    // Label text and the action share one justify-between row.
+    const row = forgot.parentElement?.parentElement;
+    expect(row).toHaveClass("justify-between");
+  });
+
   test("reserves error message height before an error appears", () => {
     const { container, rerender } = render(<FieldError errors={[]} />);
 
