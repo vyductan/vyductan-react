@@ -53,6 +53,9 @@ type SmartFieldProps<TFieldValues extends FieldValues = FieldValues> = Omit<
   required?: boolean;
   valuePropName?: string;
   getValueProps?: (value: any) => Record<string, unknown>;
+  /** Extract the value from the child's onChange arguments before `normalize`
+   * (AntD `getValueFromEvent`), e.g. `(e) => e.target.value`. */
+  getValueFromEvent?: (...args: any[]) => unknown;
   normalize?: (value: any, previousValue: any) => unknown;
 };
 
@@ -78,6 +81,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   required: defaultRequired,
   valuePropName,
   getValueProps,
+  getValueFromEvent,
   normalize,
   className,
   ...properties
@@ -148,6 +152,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
               invalid: fieldState.invalid,
               valuePropName,
               getValueProps,
+              getValueFromEvent,
               normalize,
               childProps: React.isValidElement<FieldChildProps>(children)
                 ? children.props

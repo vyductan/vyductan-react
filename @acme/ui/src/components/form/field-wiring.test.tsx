@@ -164,8 +164,66 @@ for (const entry of ["form-item", "field"] as const) {
       fireEvent.click(screen.getByRole("button", { name: "emit-blur" }));
       expect(childBlur).toHaveBeenCalledWith("blur-event");
     });
+
+    test("getValueFromEvent extracts the value before normalize runs", () => {
+      render(
+        <Harness
+          entry={entry}
+          fieldProps={{
+            getValueFromEvent: (raw: unknown) => `picked:${raw}`,
+            normalize: (value: unknown) => `norm:${value}`,
+          }}
+        />,
+      );
+      fireEvent.click(screen.getByRole("button", { name: "emit-typed" }));
+      expect(screen.getByTestId("value")).toHaveTextContent(
+        '"norm:picked:typed"',
+      );
+    });
   });
 }
+
+// getValueFromEvent receives ALL of the child's onChange arguments, matching
+// AntD (e.g. DatePicker emits (date, dateString)).
+describe("getValueFromEvent multi-arg", () => {
+  // Captures the onChange that the binding injects, so the test can fire it
+  // with several arguments like a real multi-arg control would.
+  function Capture(props: { onChange?: (...args: unknown[]) => void }) {
+    (globalThis as any).__injectedOnChange = props.onChange;
+    return <div data-testid="pick-value">{JSON.stringify(props)}</div>;
+  }
+
+  function Harness2({ getValueFromEvent }: { getValueFromEvent: any }) {
+    const form = useForm({
+      schema: z.object({ pick: z.any() }),
+      defaultValues: { pick: "" },
+      onSubmit: () => {},
+    });
+    return (
+      <Form form={form} name="multi">
+        <Field
+          name="pick"
+          control={form.control}
+          getValueFromEvent={getValueFromEvent}
+        >
+          <Capture />
+        </Field>
+      </Form>
+    );
+  }
+
+  test("passes every onChange argument to getValueFromEvent", () => {
+    const spy = vi.fn((_date: unknown, _dateString: unknown) => "combined");
+    render(<Harness2 getValueFromEvent={spy} />);
+
+    const onChange = (globalThis as any).__injectedOnChange as (
+      ...args: unknown[]
+    ) => void;
+    onChange("2024-01-01", "extra-arg");
+
+    expect(spy).toHaveBeenCalledWith("2024-01-01", "extra-arg");
+  });
+});
 
 // AntD-style `extra`: a persistent hint that stays put when a validation error
 // appears, and renders AFTER the error (not above it like `description`).

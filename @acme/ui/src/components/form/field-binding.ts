@@ -8,6 +8,9 @@
  *   - the committed value is injected as `value` (or `valuePropName`)
  *   - `getValueProps(value)` output is spread onto the child
  *   - the child's own onChange/onBlur run before the form commit
+ *   - `getValueFromEvent(...args)` extracts a value from the child's onChange
+ *     arguments (e.g. `e.target.value`) before `normalize`; without it the raw
+ *     first argument (an event for native inputs) flows straight to `normalize`
  *   - `undefined` events commit as `null` (react-hook-form cannot hold
  *     undefined), and a `normalize` returning undefined also commits `null`
  *
@@ -23,7 +26,7 @@ interface BindableField {
 }
 
 interface BindableChildProps {
-  onChange?: (event: any) => void;
+  onChange?: (...args: any[]) => void;
   onBlur?: (event: any) => void;
 }
 
@@ -38,6 +41,8 @@ interface FieldBindingOptions {
   valuePropName?: string;
   /** extra props derived from the committed value, spread last */
   getValueProps?: (value: any) => Record<string, any>;
+  /** extract the value from the child's onChange arguments before normalize */
+  getValueFromEvent?: (...args: any[]) => any;
   /** transform (value, previousValue) before committing */
   normalize?: (value: any, previousValue: any) => any;
   /** the child element's own handlers, chained before the commit */
@@ -69,6 +74,7 @@ export function buildFieldChildProps({
   invalid,
   valuePropName,
   getValueProps,
+  getValueFromEvent,
   normalize,
   childProps,
 }: FieldBindingOptions): Record<string, any> {
@@ -83,9 +89,13 @@ export function buildFieldChildProps({
       childProps?.onBlur?.(event);
       field.onBlur();
     },
-    onChange: (event: any) => {
-      childProps?.onChange?.(event);
-      field.onChange(getFormValue(event, field.value, normalize));
+    onChange: (...args: any[]) => {
+      childProps?.onChange?.(...args);
+      // AntD order: pull the value out of the onChange arguments first, then
+      // normalize. Without getValueFromEvent the raw first arg (an event for
+      // native inputs) is what normalize receives.
+      const rawValue = getValueFromEvent ? getValueFromEvent(...args) : args[0];
+      field.onChange(getFormValue(rawValue, field.value, normalize));
     },
   };
 }

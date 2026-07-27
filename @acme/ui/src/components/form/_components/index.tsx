@@ -41,6 +41,7 @@ type FormItemProps<TFieldValues extends FieldValues = FieldValues> = {
 
   valuePropName?: string;
   getValueProps?: (value: any) => Record<string, any>;
+  getValueFromEvent?: (...args: any[]) => any;
   normalize?: (value: any, prevValue: any) => any;
 
   rules?: Rule[];
@@ -63,6 +64,7 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
 
   valuePropName,
   getValueProps,
+  getValueFromEvent,
   normalize,
 }: FormItemProps<TFieldValues>) => {
   const formContext = useFormContext();
@@ -138,6 +140,7 @@ const FormItem = <TFieldValues extends FieldValues = FieldValues>({
                   invalid: fieldState.invalid,
                   valuePropName,
                   getValueProps,
+                  getValueFromEvent,
                   normalize,
                   childProps: children.props,
                 }),
