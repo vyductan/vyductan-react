@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 
 import type React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 
@@ -222,6 +222,75 @@ describe("getValueFromEvent multi-arg", () => {
     onChange("2024-01-01", "extra-arg");
 
     expect(spy).toHaveBeenCalledWith("2024-01-01", "extra-arg");
+  });
+});
+
+// Default extraction (no getValueFromEvent): events yield target[valuePropName]
+// so normalize sees a value, non-events pass through — matching AntD.
+describe("default value extraction", () => {
+  function Capture3(props: { onChange?: (...args: unknown[]) => void }) {
+    (globalThis as any).__onChange = props.onChange;
+    return <div />;
+  }
+
+  function DefaultHarness({
+    valuePropName,
+    normalize,
+  }: {
+    valuePropName?: string;
+    normalize?: (value: unknown) => unknown;
+  }) {
+    const form = useForm({
+      schema: z.object({ f: z.any() }),
+      defaultValues: { f: "" },
+      onSubmit: () => {},
+    });
+    (globalThis as any).__form = form;
+    return (
+      <Form form={form} name="def">
+        <Field
+          name="f"
+          control={form.control}
+          valuePropName={valuePropName}
+          normalize={normalize}
+        >
+          <Capture3 />
+        </Field>
+      </Form>
+    );
+  }
+
+  const fire = (arg: unknown) =>
+    act(() => {
+      ((globalThis as any).__onChange as (a: unknown) => void)(arg);
+    });
+  const committed = () => ((globalThis as any).__form).getValues().f;
+
+  test("extracts event.target.value so normalize receives the value", () => {
+    let seen: unknown = "UNSET";
+    render(
+      <DefaultHarness
+        normalize={(value) => {
+          seen = value;
+          return value;
+        }}
+      />,
+    );
+    fire({ target: { value: "hello" } });
+    expect(seen).toBe("hello");
+    expect(committed()).toBe("hello");
+  });
+
+  test("passes a non-event value straight through", () => {
+    render(<DefaultHarness />);
+    fire("raw-value");
+    expect(committed()).toBe("raw-value");
+  });
+
+  test("uses valuePropName to extract event.target.checked", () => {
+    render(<DefaultHarness valuePropName="checked" />);
+    fire({ target: { checked: true } });
+    expect(committed()).toBe(true);
   });
 });
 

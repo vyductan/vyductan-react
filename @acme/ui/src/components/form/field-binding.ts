@@ -8,9 +8,11 @@
  *   - the committed value is injected as `value` (or `valuePropName`)
  *   - `getValueProps(value)` output is spread onto the child
  *   - the child's own onChange/onBlur run before the form commit
- *   - `getValueFromEvent(...args)` extracts a value from the child's onChange
- *     arguments (e.g. `e.target.value`) before `normalize`; without it the raw
- *     first argument (an event for native inputs) flows straight to `normalize`
+ *   - the value is extracted from the child's onChange arguments before
+ *     `normalize`: a custom `getValueFromEvent(...args)` wins, otherwise the
+ *     default extractor pulls `event.target[valuePropName]` for events (and
+ *     passes non-event values through) — so `normalize` always sees a value,
+ *     matching AntD
  *   - `undefined` events commit as `null` (react-hook-form cannot hold
  *     undefined), and a `normalize` returning undefined also commits `null`
  *
@@ -47,6 +49,31 @@ interface FieldBindingOptions {
   normalize?: (value: any, previousValue: any) => any;
   /** the child element's own handlers, chained before the commit */
   childProps?: BindableChildProps;
+}
+
+/**
+ * Default value extraction, mirroring AntD's rc-field-form: if the first
+ * onChange argument is an event, pull `event.target[valuePropName]` (value /
+ * checked); otherwise pass the argument through unchanged (custom controls that
+ * already emit a value). Runs whenever no explicit `getValueFromEvent` is set,
+ * so `normalize` receives a real value — not the raw event.
+ */
+export function defaultGetValueFromEvent(
+  valuePropName: string,
+  ...args: any[]
+): any {
+  const event = args[0];
+  if (
+    event &&
+    typeof event === "object" &&
+    "target" in event &&
+    event.target &&
+    typeof event.target === "object" &&
+    valuePropName in event.target
+  ) {
+    return event.target[valuePropName];
+  }
+  return event;
 }
 
 /** Resolve the value to commit: undefined → null, then normalize (→ null). */
@@ -91,10 +118,13 @@ export function buildFieldChildProps({
     },
     onChange: (...args: any[]) => {
       childProps?.onChange?.(...args);
-      // AntD order: pull the value out of the onChange arguments first, then
-      // normalize. Without getValueFromEvent the raw first arg (an event for
-      // native inputs) is what normalize receives.
-      const rawValue = getValueFromEvent ? getValueFromEvent(...args) : args[0];
+      // AntD order: extract the value from the onChange arguments first, then
+      // normalize. A custom getValueFromEvent wins; otherwise the default
+      // extractor pulls event.target[valuePropName] (so normalize sees a value,
+      // not the raw event).
+      const rawValue = getValueFromEvent
+        ? getValueFromEvent(...args)
+        : defaultGetValueFromEvent(valuePropName ?? "value", ...args);
       field.onChange(getFormValue(rawValue, field.value, normalize));
     },
   };
