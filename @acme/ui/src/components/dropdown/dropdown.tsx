@@ -165,6 +165,16 @@ export const Dropdown = ({
                   domEvent: e as unknown as React.MouseEvent<HTMLElement>,
                 });
               }
+              // `menu` is a MenuProps, which declares onSelect — Menu honours
+              // it, so Dropdown has to as well. It used to be accepted and
+              // silently dropped, leaving callers that only pass a menu-level
+              // handler (rather than a per-item onClick) with a dead menu.
+              menu.onSelect?.({
+                item,
+                key: String(key),
+                selectedKeys: [String(key)],
+                event: e as unknown as React.MouseEvent<HTMLLIElement>,
+              });
             }}
           >
             {icon &&

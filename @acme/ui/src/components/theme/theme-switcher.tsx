@@ -18,9 +18,9 @@ function ThemeSwitcher(properties: ButtonProps) {
         menu={{
           items: [
             {
-              key: "filled",
+              key: "light",
               type: "item",
-              label: "filled",
+              label: "Light",
             },
             {
               key: "dark",
@@ -34,7 +34,7 @@ function ThemeSwitcher(properties: ButtonProps) {
             },
           ],
           onSelect: ({ key }) => {
-            if (key === "filled" || key === "dark" || key === "system") {
+            if (key === "light" || key === "dark" || key === "system") {
               setTheme(key);
             }
           },
