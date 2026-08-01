@@ -419,7 +419,7 @@ function FloatingLinkEditor({
   return (
     <div
       ref={editorReference}
-      className="absolute top-0 left-0 z-50 w-full max-w-sm rounded-md border border-gray-200 bg-white shadow-lg transition-opacity duration-200"
+      className="border-border bg-popover text-popover-foreground absolute top-0 left-0 z-50 w-full max-w-sm rounded-md border shadow-lg transition-opacity duration-200"
       style={{
         opacity: isVisible ? 1 : 0,
         pointerEvents: isVisible ? "auto" : "none",
@@ -454,7 +454,7 @@ function FloatingLinkEditor({
     >
       {isLinkEditMode ? (
         // Show input field when in edit mode (creating or editing link)
-        <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-sm">
+        <div className="border-border bg-popover flex items-center gap-2 rounded-md border p-2 shadow-sm">
           <Input
             ref={inputReference}
             value={editedLinkUrl}
@@ -509,7 +509,7 @@ function FloatingLinkEditor({
         </div>
       ) : isLink ? (
         // Show link URL with edit/delete buttons when link is selected
-        <div className="flex items-center justify-between gap-2 rounded-md border border-gray-200 bg-white p-2 shadow-sm">
+        <div className="border-border bg-popover flex items-center justify-between gap-2 rounded-md border p-2 shadow-sm">
           <a
             href={sanitizeUrl(linkUrl)}
             target="_blank"

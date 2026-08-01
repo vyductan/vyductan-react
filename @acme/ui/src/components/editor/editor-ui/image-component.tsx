@@ -116,7 +116,7 @@ function LazyImage({
 function BrokenImage(): JSX.Element {
   return (
     <div
-      className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-100"
+      className="border-border bg-muted flex items-center justify-center rounded-lg border"
       style={{
         height: 200,
         width: 200,
@@ -124,7 +124,7 @@ function BrokenImage(): JSX.Element {
     >
       <div className="flex flex-col items-center gap-2 p-4 text-center">
         <svg
-          className="h-12 w-12 text-gray-400"
+          className="text-muted-foreground h-12 w-12"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -136,7 +136,9 @@ function BrokenImage(): JSX.Element {
             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        <span className="text-sm text-gray-500">Image failed to load</span>
+        <span className="text-muted-foreground text-sm">
+          Image failed to load
+        </span>
       </div>
     </div>
   );
@@ -541,9 +543,9 @@ export default function ImageComponent({
               <div className="relative">
                 {loading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
-                    <div className="flex flex-col items-center gap-2 rounded-lg bg-white/90 p-3 shadow-lg">
+                    <div className="bg-popover/90 flex flex-col items-center gap-2 rounded-lg p-3 shadow-lg">
                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                      <span className="text-xs font-medium text-gray-700">
+                      <span className="text-popover-foreground text-xs font-medium">
                         Uploading...
                       </span>
                     </div>
@@ -578,7 +580,7 @@ export default function ImageComponent({
           </div>
 
           {showCaption && (
-            <div className="image-caption-container absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t bg-white/90 p-0">
+            <div className="image-caption-container bg-popover/90 text-popover-foreground absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t p-0">
               <LexicalNestedComposer initialEditor={caption}>
                 <AutoFocusPlugin />
                 <MentionsPlugin />

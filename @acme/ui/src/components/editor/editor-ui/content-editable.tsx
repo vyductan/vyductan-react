@@ -45,7 +45,7 @@ function getPlaceholderForBlockType(
  */
 function getPlaceholderClassName(blockType: string): string {
   const baseClasses =
-    "pointer-events-none absolute left-12 top-4 text-gray-400 select-none";
+    "text-muted-foreground pointer-events-none absolute top-4 left-12 select-none";
 
   // Get theme classes for the block type
   let themeClasses = "";

@@ -250,7 +250,7 @@ export function FindReplacePlugin({
                 autoFocus
               />
               {matchCount > 0 && (
-                <div className="flex items-center gap-1 text-sm text-gray-500">
+                <div className="text-muted-foreground flex items-center gap-1 text-sm">
                   <span>
                     {currentMatchIndex + 1} / {matchCount}
                   </span>

@@ -334,7 +334,7 @@ export function DraggableBlockPlugin({
           <PopoverTrigger asChild>
             <div
               className={cn(
-                "group/drag flex cursor-grab items-center justify-center rounded text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700 active:scale-95 active:cursor-grabbing active:bg-gray-200 dark:hover:bg-gray-800 dark:hover:text-gray-300",
+                "group/drag text-muted-foreground hover:bg-accent hover:text-accent-foreground active:bg-muted flex cursor-grab items-center justify-center rounded transition-all duration-200 active:scale-95 active:cursor-grabbing",
                 isSmall ? "h-4 w-3.5" : "h-6 w-5",
               )}
             >

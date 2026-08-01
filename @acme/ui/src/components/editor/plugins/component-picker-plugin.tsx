@@ -690,7 +690,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
             ? createPortal(
                 <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
                   {/* Menu */}
-                  <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <div className="border-border bg-popover text-popover-foreground overflow-hidden rounded-lg border shadow-lg">
                     <CommandRoot
                       onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
@@ -724,18 +724,18 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                 }}
                                 className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                                   selectedIndex === index
-                                    ? "bg-gray-100 text-gray-900"
-                                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                    ? "bg-accent text-accent-foreground"
+                                    : "text-foreground hover:bg-accent/50 active:bg-accent"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <span className="shrink-0 text-gray-500">
+                                  <span className="text-muted-foreground shrink-0">
                                     {option.icon}
                                   </span>
                                   <span className="flex-1">{option.title}</span>
                                 </div>
                                 {option.keyboardShortcut && (
-                                  <span className="text-xs text-gray-400">
+                                  <span className="text-muted-foreground text-xs">
                                     {option.keyboardShortcut}
                                   </span>
                                 )}
@@ -762,7 +762,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
                               return (
                                 <CommandGroup key={category}>
-                                  <div className="px-3 py-1.5 text-xs font-medium text-gray-500">
+                                  <div className="text-muted-foreground px-3 py-1.5 text-xs font-medium">
                                     {CATEGORY_LABELS[category]}
                                   </div>
                                   {categoryOptions.map((item, itemIndex) => {
@@ -777,12 +777,12 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                         }}
                                         className={`flex touch-manipulation items-center justify-between gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
                                           selectedIndex === globalIndex
-                                            ? "bg-gray-100 text-gray-900"
-                                            : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                                            ? "bg-accent text-accent-foreground"
+                                            : "text-foreground hover:bg-accent/50 active:bg-accent"
                                         }`}
                                       >
                                         <div className="flex items-center gap-3">
-                                          <span className="shrink-0 text-gray-500">
+                                          <span className="text-muted-foreground shrink-0">
                                             {item.option.icon}
                                           </span>
                                           <span className="flex-1">
@@ -790,7 +790,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                           </span>
                                         </div>
                                         {item.option.keyboardShortcut && (
-                                          <span className="text-xs text-gray-400">
+                                          <span className="text-muted-foreground text-xs">
                                             {item.option.keyboardShortcut}
                                           </span>
                                         )}
@@ -805,9 +805,9 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                       </CommandList>
 
                       {/* Footer */}
-                      <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2 text-xs text-gray-400">
+                      <div className="border-border text-muted-foreground flex items-center justify-between border-t px-3 py-2 text-xs">
                         <span>Type '' on the page</span>
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">
+                        <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-mono">
                           esc
                         </span>
                       </div>

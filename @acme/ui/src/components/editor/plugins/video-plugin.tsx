@@ -141,7 +141,7 @@ export function InsertVideoUploadedDialogBody({
           onChange={handleFileUpload}
           data-test-id="video-modal-upload-input"
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-muted-foreground text-xs">
           Supported formats: MP4, WebM, OGG (Max 100MB)
         </p>
       </div>

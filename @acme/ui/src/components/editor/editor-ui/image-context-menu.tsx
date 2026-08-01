@@ -111,7 +111,7 @@ export function ImageContextMenu({
   return (
     <div
       ref={menuReference}
-      className="fixed z-50 min-w-[220px] rounded-lg border border-gray-200 bg-white shadow-lg"
+      className="border-border bg-popover text-popover-foreground fixed z-50 min-w-[220px] rounded-lg border shadow-lg"
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
@@ -126,13 +126,15 @@ export function ImageContextMenu({
             className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
               item.variant === "danger"
                 ? "text-red-600 hover:bg-red-50"
-                : "text-gray-700 hover:bg-gray-100"
+                : "text-popover-foreground hover:bg-accent"
             }`}
           >
             <span className={`${item.icon} size-4 shrink-0`} />
             <span className="flex-1">{item.label}</span>
             {item.shortcut && (
-              <span className="text-xs text-gray-400">{item.shortcut}</span>
+              <span className="text-muted-foreground text-xs">
+                {item.shortcut}
+              </span>
             )}
           </button>
         ))}

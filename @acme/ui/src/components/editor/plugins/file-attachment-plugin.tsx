@@ -175,7 +175,7 @@ export function InsertFileAttachmentUploadedDialogBody({
           disabled={isUploading}
           data-test-id="file-attachment-modal-upload-input"
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-muted-foreground text-xs">
           {isUploading
             ? "Uploading file..."
             : "Supported: PDF, DOCX, XLSX, PPTX, ZIP, etc. (Max 50MB)"}

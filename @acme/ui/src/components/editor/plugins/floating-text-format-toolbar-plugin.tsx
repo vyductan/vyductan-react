@@ -770,7 +770,7 @@ function TextFormatFloatingToolbar({
   return (
     <div
       ref={popupCharStylesEditorReference}
-      className="absolute top-0 left-0 z-50 flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-0.5 rounded-lg border border-gray-200 bg-white/95 px-1 py-1.5 shadow-lg backdrop-blur-sm transition-opacity duration-200 will-change-transform sm:max-w-none sm:gap-0.5 sm:bg-white/95 sm:px-1 sm:py-1.5"
+      className="border-border bg-popover/95 text-popover-foreground sm:bg-popover/95 absolute top-0 left-0 z-50 flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-0.5 rounded-lg border px-1 py-1.5 shadow-lg backdrop-blur-sm transition-opacity duration-200 will-change-transform sm:max-w-none sm:gap-0.5 sm:px-1 sm:py-1.5"
       style={{
         opacity: 0,
         transform: "translate(-10000px, -10000px)",
@@ -878,7 +878,7 @@ function TextFormatFloatingToolbar({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
               }}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <BoldIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -889,7 +889,7 @@ function TextFormatFloatingToolbar({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
               }}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <ItalicIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -900,7 +900,7 @@ function TextFormatFloatingToolbar({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
               }}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <UnderlineIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -911,7 +911,7 @@ function TextFormatFloatingToolbar({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
               }}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <StrikethroughIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -923,7 +923,7 @@ function TextFormatFloatingToolbar({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
               }}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <CodeIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -932,7 +932,7 @@ function TextFormatFloatingToolbar({
               aria-label="Toggle link"
               onClick={insertLink}
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
             >
               <LinkIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
             </ToggleGroupItem>
@@ -945,7 +945,7 @@ function TextFormatFloatingToolbar({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+                className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
                 title="Inline Math"
                 onClick={onMath}
               >
@@ -977,7 +977,7 @@ function TextFormatFloatingToolbar({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+                  className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
                   title="Text color"
                 >
                   <div className="flex h-4 w-4 items-center justify-center sm:h-3.5 sm:w-3.5">
@@ -994,7 +994,7 @@ function TextFormatFloatingToolbar({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 touch-manipulation p-0 active:bg-gray-200 sm:h-7 sm:w-7"
+              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
               title="More options"
             >
               <MoreHorizontalIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />

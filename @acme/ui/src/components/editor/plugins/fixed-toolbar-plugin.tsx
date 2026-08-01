@@ -34,7 +34,7 @@ export function FixedToolbarPlugin({
   containerRef,
 }: FixedToolbarPluginProperties) {
   return (
-    <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-2 shadow-sm">
+    <div className="border-border bg-card sticky top-0 z-10 border-b p-2 shadow-sm">
       <ToolbarPlugin>
         {({ blockType }) => (
           <div className="flex w-full items-start justify-between gap-2">

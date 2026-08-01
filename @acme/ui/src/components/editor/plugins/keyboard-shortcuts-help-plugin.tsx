@@ -72,7 +72,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
 
 function ShortcutKey({ keyText }: { keyText: string }) {
   return (
-    <kbd className="inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-gray-300 bg-gray-50 px-1.5 text-xs font-medium text-gray-700 shadow-sm">
+    <kbd className="border-border bg-muted/50 text-foreground inline-flex h-5 min-w-[20px] items-center justify-center rounded border px-1.5 text-xs font-medium shadow-sm">
       {keyText}
     </kbd>
   );
@@ -132,16 +132,16 @@ export function KeyboardShortcutsHelpPlugin(): ReactElement | null {
         <div className="space-y-6 py-4">
           {SHORTCUT_GROUPS.map((group) => (
             <div key={group.title}>
-              <h3 className="mb-3 text-sm font-semibold text-gray-900">
+              <h3 className="text-foreground mb-3 text-sm font-semibold">
                 {group.title}
               </h3>
               <div className="space-y-2">
                 {group.shortcuts.map((shortcut, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between rounded-md px-3 py-2 hover:bg-gray-50"
+                    className="hover:bg-accent flex items-center justify-between rounded-md px-3 py-2"
                   >
-                    <span className="text-sm text-gray-700">
+                    <span className="text-foreground text-sm">
                       {shortcut.description}
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -152,14 +152,16 @@ export function KeyboardShortcutsHelpPlugin(): ReactElement | null {
                         >
                           {isMac &&
                           (key === "⌘" || key === "⌥" || key === "⇧") ? (
-                            <kbd className="inline-flex h-6 min-w-[24px] items-center justify-center rounded border border-gray-300 bg-gray-50 px-2 text-xs font-medium text-gray-700 shadow-sm">
+                            <kbd className="border-border bg-muted/50 text-foreground inline-flex h-6 min-w-[24px] items-center justify-center rounded border px-2 text-xs font-medium shadow-sm">
                               {key}
                             </kbd>
                           ) : (
                             <ShortcutKey keyText={key} />
                           )}
                           {keyIndex < formatKeys(shortcut.keys).length - 1 && (
-                            <span className="mx-1 text-gray-400">+</span>
+                            <span className="text-muted-foreground mx-1">
+                              +
+                            </span>
                           )}
                         </span>
                       ))}
@@ -169,24 +171,24 @@ export function KeyboardShortcutsHelpPlugin(): ReactElement | null {
               </div>
             </div>
           ))}
-          <div className="border-t border-gray-200 pt-4">
-            <p className="text-xs text-gray-500">
+          <div className="border-border border-t pt-4">
+            <p className="text-muted-foreground text-xs">
               Tip: Press{" "}
               {isMac ? (
                 <>
-                  <kbd className="mx-1 rounded border border-gray-300 bg-gray-50 px-1.5 py-0.5 text-xs">
+                  <kbd className="border-border bg-muted/50 mx-1 rounded border px-1.5 py-0.5 text-xs">
                     ⌘
                   </kbd>{" "}
                 </>
               ) : (
                 <>
-                  <kbd className="mx-1 rounded border border-gray-300 bg-gray-50 px-1.5 py-0.5 text-xs">
+                  <kbd className="border-border bg-muted/50 mx-1 rounded border px-1.5 py-0.5 text-xs">
                     Ctrl
                   </kbd>{" "}
                   +
                 </>
               )}{" "}
-              <kbd className="mx-1 rounded border border-gray-300 bg-gray-50 px-1.5 py-0.5 text-xs">
+              <kbd className="border-border bg-muted/50 mx-1 rounded border px-1.5 py-0.5 text-xs">
                 /
               </kbd>{" "}
               to open this menu anytime

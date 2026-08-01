@@ -168,18 +168,22 @@ export default function FileAttachmentComponent({
   return (
     <div
       data-lexical-file-attachment
-      className={`my-2 flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 transition-colors ${
-        isSelected ? "ring-2 ring-blue-500" : "hover:bg-gray-50"
+      className={`border-border bg-card text-card-foreground my-2 flex items-center gap-3 rounded-lg border p-3 transition-colors ${
+        isSelected ? "ring-2 ring-blue-500" : "hover:bg-accent"
       }`}
     >
-      <div className="shrink-0 text-gray-400">{getFileIcon(mimeType)}</div>
+      <div className="text-muted-foreground shrink-0">
+        {getFileIcon(mimeType)}
+      </div>
       <div className="min-w-0 flex-1">
-        <div className="font-medium text-gray-900">{fileName}</div>
+        <div className="text-card-foreground font-medium">{fileName}</div>
         {description && (
-          <div className="mt-1 text-sm text-gray-500">{description}</div>
+          <div className="text-muted-foreground mt-1 text-sm">
+            {description}
+          </div>
         )}
         {fileSize && (
-          <div className="mt-1 text-xs text-gray-400">
+          <div className="text-muted-foreground mt-1 text-xs">
             {formatFileSize(fileSize)}
           </div>
         )}

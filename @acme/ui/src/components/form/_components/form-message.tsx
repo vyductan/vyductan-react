@@ -9,7 +9,7 @@ const validateStatusVariants = tv({
   base: "",
   variants: {
     validateStatus: {
-      default: "text-gray-500",
+      default: "text-muted-foreground",
       success: "text-green-500",
       warning: "text-yellow-500",
       error: "text-red-500",

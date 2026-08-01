@@ -144,7 +144,7 @@ export function InsertImageUploadedDialogBody({
             className="cursor-pointer"
             disabled={isLoading}
           />
-          <p className="mt-1.5 text-xs text-gray-500">
+          <p className="text-muted-foreground mt-1.5 text-xs">
             {isLoading
               ? "Processing image..."
               : "Drag and drop an image here, or click to browse"}
@@ -152,7 +152,7 @@ export function InsertImageUploadedDialogBody({
         </div>
       </div>
       {source && (
-        <div className="relative rounded-lg border border-gray-200 p-2">
+        <div className="border-border relative rounded-lg border p-2">
           <picture>
             <img
               src={source}
@@ -163,8 +163,8 @@ export function InsertImageUploadedDialogBody({
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex flex-col items-center gap-2">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-                <span className="text-sm font-medium text-gray-700">
+                <div className="border-border h-8 w-8 animate-spin rounded-full border-4 border-t-blue-600"></div>
+                <span className="text-foreground text-sm font-medium">
                   Loading...
                 </span>
               </div>

@@ -101,7 +101,7 @@ export function FontColorToolbarPlugin() {
       >
         <BaselineIcon className="h-4 w-4" />
         <div
-          className="h-1 w-5 rounded-sm border border-gray-200"
+          className="border-border h-1 w-5 rounded-sm border"
           style={{ backgroundColor: fontColor }}
         />
       </Button>

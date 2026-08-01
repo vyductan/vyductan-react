@@ -233,8 +233,8 @@ const Dragger = ({
           <div
             className={cn(
               "absolute z-3 flex size-full flex-col items-center justify-center rounded-md px-10 transition-all",
-              dragActive && "border-2 border-black",
-              "cursor-pointer bg-white opacity-100 hover:bg-gray-50",
+              dragActive && "border-foreground border-2",
+              "bg-background hover:bg-muted/50 cursor-pointer opacity-100",
             )}
             // className={`${
             //   dragActive ? "border-2 border-black" : ""
@@ -247,7 +247,7 @@ const Dragger = ({
             <svg
               className={`${
                 dragActive ? "scale-110" : "scale-100"
-              } size-7 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
+              } text-muted-foreground size-7 transition-all duration-75 group-hover:scale-110 group-active:scale-95`}
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -262,10 +262,10 @@ const Dragger = ({
               <path d="M12 12v9"></path>
               <path d="m16 16-4-4-4 4"></path>
             </svg>
-            <p className="mt-2 text-center text-sm text-gray-500">
+            <p className="text-muted-foreground mt-2 text-center text-sm">
               Drag and drop or click to upload.
             </p>
-            <p className="mt-2 text-center text-sm text-gray-500">
+            <p className="text-muted-foreground mt-2 text-center text-sm">
               Max file size: 50MB
             </p>
             <span className="sr-only">File upload</span>
