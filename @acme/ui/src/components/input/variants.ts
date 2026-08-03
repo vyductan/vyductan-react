@@ -105,6 +105,15 @@ const controlRadiusBySize = {
   large: "rounded-lg",
 } as const;
 
+// Single source for size -> control padding. Shared by inputSizeVariants and
+// the Select trigger so every control (input, autocomplete, datepicker, select)
+// pads identically; do not restate px-2/px-3 elsewhere.
+const controlPaddingBySize = {
+  small: "px-2 py-1",
+  middle: "px-3 py-1",
+  large: "px-3 py-2",
+} as const;
+
 const inputAffixWrapperSizeVariants = tv({
   variants: {
     size: controlHeightBySize,
@@ -117,9 +126,17 @@ const inputAffixWrapperSizeVariants = tv({
 const inputSizeVariants = tv({
   variants: {
     size: {
-      small: [controlHeightBySize.small, "px-2 py-1"],
-      middle: [controlHeightBySize.middle, "px-3 py-1", controlTextBySize.middle],
-      large: [controlHeightBySize.large, "px-3 py-2", controlTextBySize.large],
+      small: [controlHeightBySize.small, controlPaddingBySize.small],
+      middle: [
+        controlHeightBySize.middle,
+        controlPaddingBySize.middle,
+        controlTextBySize.middle,
+      ],
+      large: [
+        controlHeightBySize.large,
+        controlPaddingBySize.large,
+        controlTextBySize.large,
+      ],
     },
   },
   defaultVariants: {
@@ -141,4 +158,5 @@ export {
   controlHeightBySize,
   controlTextBySize,
   controlRadiusBySize,
+  controlPaddingBySize,
 };

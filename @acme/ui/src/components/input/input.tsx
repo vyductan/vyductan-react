@@ -449,6 +449,10 @@ const Input = (properties: InputProperties) => {
       styles={styles}
       ref={holderReference}
       classNames={{
+        // BaseInput renders the affix slots, so the caller's classes have to
+        // travel with it — dropping them here made them silently no-ops.
+        prefix: classNames?.prefix,
+        suffix: classNames?.suffix,
         variant: cn(
           inputVariants({ variant, status, disabled }),
           controlRadiusBySize[mergedSize ?? "middle"],
