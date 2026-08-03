@@ -8,6 +8,7 @@ export default defineConfig({
     "modal-title-selection.spec.mjs",
     "modal-trigger-selection.spec.mjs",
     "dialog-selection.spec.mjs",
+    "alert-modal-selection.spec.mjs",
   ],
   timeout: 120000,
   workers: 1,

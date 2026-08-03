@@ -139,6 +139,28 @@ export const App: React.FC<AppProps> & {
     setModalState((prev) => ({ ...prev, visible: false }));
   }, [modalState.config]);
 
+  // Escape-to-close for the global modal.
+  //
+  // This modal is rendered at the App root, but it's often stacked on top of a
+  // vaul Drawer. vaul and radix-ui bundle DIFFERENT copies of Radix's
+  // DismissableLayer (separate `layers` Sets), and the drawer's copy — mounted
+  // first — handles Escape first and calls preventDefault(). radix-ui's copy
+  // then sees `event.defaultPrevented` and refuses to close THIS modal, so
+  // Escape does nothing. Beat that race with a window-capture listener (capture
+  // on window fires before document-level listeners), close ourselves, and stop
+  // the event so the drawer underneath doesn't react to it either.
+  React.useEffect(() => {
+    if (!modalState.visible) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      handleCancel();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [modalState.visible, handleCancel]);
+
   // Message functions (placeholder - can be extended later)
   const message = React.useMemo(
     () => ({
