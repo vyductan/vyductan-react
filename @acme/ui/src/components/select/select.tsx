@@ -19,7 +19,11 @@ import type {
 } from "./types";
 import useSize from "../config-provider/hooks/use-size";
 import { Empty } from "../empty";
-import { controlRadiusBySize, inputVariants } from "../input";
+import {
+  controlPaddingBySize,
+  controlRadiusBySize,
+  inputVariants,
+} from "../input";
 import { PopoverContent, PopoverTrigger } from "../popover";
 import { Popover } from "../popover/_component";
 import { Spin } from "../spin";
@@ -205,6 +209,24 @@ const Select = <
       selectedValues = [internalValue];
     }
   }
+
+  // Radix Select keeps the last displayed label when the controlled `value`
+  // is reset to undefined externally (radix #1569). The `key` remount below
+  // only fires on the internal clear button, so remount here too when a
+  // parent clears the value. Guarded to defined -> undefined transitions in
+  // single mode so it never remounts on mount or on value -> value changes
+  // (which would drop focus / search state mid-interaction).
+  const previousValueReference = React.useRef(value);
+  React.useEffect(() => {
+    if (
+      isDefault &&
+      previousValueReference.current !== undefined &&
+      value === undefined
+    ) {
+      setKey(+Date.now());
+    }
+    previousValueReference.current = value;
+  }, [value, isDefault]);
 
   const createOption = (value: TValue): OptionType<TValue, TRecord> =>
     ({
@@ -797,7 +819,8 @@ const Select = <
               aria-expanded={internalOpen}
               aria-label={placeholder}
               className={cn(
-                "group min-h-control relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-3 text-left",
+                "group min-h-control relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md text-left",
+                controlPaddingBySize[mergedSize ?? "middle"],
                 inputVariants({ variant, status, disabled }),
                 controlRadiusBySize[mergedSize ?? "middle"],
                 className,

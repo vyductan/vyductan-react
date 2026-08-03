@@ -188,11 +188,31 @@ export const WithClear: Story = {
 };
 
 export const Loading: Story = {
-  args: {
-    placeholder: "Loading...",
-    loading: true,
-    options: basicOptions,
-    className: "w-[200px]",
+  render: (arguments_: SelectPreviewArguments) => {
+    return (
+      <div className="flex w-[240px] flex-col gap-4">
+        <SingleSelectPreview
+          {...arguments_}
+          size="small"
+          loading
+          placeholder="Loading (small)"
+          options={basicOptions}
+        />
+        <SingleSelectPreview
+          {...arguments_}
+          loading
+          placeholder="Loading (middle)"
+          options={basicOptions}
+        />
+        <SingleSelectPreview
+          {...arguments_}
+          size="large"
+          loading
+          placeholder="Loading (large)"
+          options={basicOptions}
+        />
+      </div>
+    );
   },
 };
 

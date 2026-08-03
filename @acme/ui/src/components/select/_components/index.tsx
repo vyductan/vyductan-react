@@ -9,7 +9,7 @@ import { SelectTrigger as ShacnSelectTrigger } from "@acme/ui/shadcn/select";
 import type { inputSizeVariants } from "../../input";
 import type { SelectClearProps as SelectClearProperties } from "./select-clear";
 import { Icon } from "../../../icons";
-import { inputVariants } from "../../input";
+import { controlPaddingBySize, inputVariants } from "../../input";
 import { SelectClear } from "./select-clear";
 
 const SelectTrigger = ({
@@ -57,6 +57,8 @@ const SelectTrigger = ({
         "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
         // Size-aware radius: sharper when small, softer when large.
         "data-[size=default]:rounded-md data-[size=sm]:rounded-sm data-[size=lg]:rounded-lg",
+        // Shared size -> padding source, same as input/autocomplete/datepicker.
+        controlPaddingBySize[size ?? "middle"],
         [
           "*:data-[slot=select-value]:block! *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:flex-1 *:data-[slot=select-value]:truncate",
           !showClearIcon && "*:data-[slot=select-value]:h-[22px]",
@@ -96,7 +98,16 @@ const SelectTrigger = ({
         <span className="flex items-center">
           <Icon
             icon="icon-[lucide--loader]"
-            className="flex size-5 animate-spin items-center justify-center pl-1 opacity-50 transition-opacity"
+            className={cn(
+              "flex animate-spin items-center justify-center pl-1 opacity-50 transition-opacity",
+              // Match the chevron scale it replaces; size-5 was oversized on
+              // the small control.
+              size === "small"
+                ? "size-3.5"
+                : size === "large"
+                  ? "size-5"
+                  : "size-4",
+            )}
           />
         </span>
       )}
