@@ -1,6 +1,7 @@
 import { ComponentSource } from "@acme/ui/components/mdx";
 
 import BasicDemo from "./examples/basic";
+import DisabledTimeDemo from "./examples/disabled-time";
 import HourMinuteDemo from "./examples/hour-minute";
 
 # TimePicker
@@ -31,6 +32,18 @@ While part of `format` is omitted, the corresponding column in panel will disapp
 <ComponentSource
   src="time-picker/examples/hour-minute.tsx"
   __comp__={HourMinuteDemo}
+/>
+
+### Disabled Time
+
+Provide `disabledTime` (AntD parity) to reject specific hours/minutes/seconds.
+Rejected options are greyed in the panel and blocked when typed; pass
+`hideDisabledOptions` to hide them instead. The **Now** button greys out when
+the current time itself falls in a disabled range.
+
+<ComponentSource
+  src="time-picker/examples/disabled-time.tsx"
+  __comp__={DisabledTimeDemo}
 />
 
 ### Form Integration
@@ -93,6 +106,8 @@ function FormExample() {
 | `onOpenChange` | `(open: boolean) => void`                                        | -               | Callback when open state changes        |
 | `disabled`     | `boolean`                                                        | `false`         | Whether the time picker is disabled     |
 | `status`       | `"error" \| "warning"`                                           | -               | Validation status                       |
+| `disabledTime` | `(now: Dayjs) => { disabledHours?; disabledMinutes?; disabledSeconds? }` | -       | Return disabled hours/minutes/seconds (AntD parity) |
+| `hideDisabledOptions` | `boolean`                                                 | `false`         | Hide (instead of grey) disabled options |
 
 ## Migration from Ant Design
 

@@ -39,6 +39,17 @@ type TimePickerProperties<
     defaultValue?: TValue;
     value?: TValue;
     onChange?: (time: TValue, timeString: string | undefined) => void;
+    /**
+     * AntD-parity: return the disabled hours/minutes/seconds for the given
+     * time. `now` is the currently selected value, or `dayjs()` when empty.
+     */
+    disabledTime?: (now: Dayjs) => {
+      disabledHours?: () => number[];
+      disabledMinutes?: (selectedHour: number) => number[];
+      disabledSeconds?: (selectedHour: number, selectedMinute: number) => number[];
+    };
+    /** Hide (instead of greying) options rejected by `disabledTime`. */
+    hideDisabledOptions?: boolean;
   };
 const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
   properties: TimePickerProperties<TValue>,
@@ -54,6 +65,8 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     defaultValue = null,
     value,
     onChange,
+    disabledTime,
+    hideDisabledOptions,
 
     // input props
     ref,
@@ -119,6 +132,24 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     [setLocalValue],
   );
 
+  // AntD-parity: reject a fully-typed time that any `disabledTime` predicate
+  // rejects, so typing can't bypass the panel's disabled options.
+  const isTimeDisabled = React.useCallback(
+    (date: Dayjs): boolean => {
+      if (!disabledTime) return false;
+      const config = disabledTime(date);
+      const hour = date.hour();
+      const minute = date.minute();
+      const second = date.second();
+      return (
+        (config.disabledHours?.().includes(hour) ?? false) ||
+        (config.disabledMinutes?.(hour).includes(minute) ?? false) ||
+        (config.disabledSeconds?.(hour, minute).includes(second) ?? false)
+      );
+    },
+    [disabledTime],
+  );
+
   // ========================= Refs =========================
   const rootReference = React.useRef<HTMLDivElement>(null);
   const inputReference = React.useRef<InputReference>(null);
@@ -154,7 +185,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
       strictFormatOnly: true,
     });
 
-    if (parsedDate) {
+    if (parsedDate && !isTimeDisabled(parsedDate)) {
       handleChange(parsedDate);
     }
   };
@@ -180,6 +211,8 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
         ? parseDateValue(localValue, format)
         : (localValue as DateType);
 
+    const disabledConfig = disabledTime?.(dateValue ?? dayjs());
+
     return (
       <div className="flex flex-col">
         <TimeSelect
@@ -189,6 +222,11 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
           onHoverChange={handleHoverChange}
           onOk={handleOk}
           onNow={handleNow}
+          disabledHours={disabledConfig?.disabledHours}
+          disabledMinutes={disabledConfig?.disabledMinutes}
+          disabledSeconds={disabledConfig?.disabledSeconds}
+          hideDisabledOptions={hideDisabledOptions}
+          nowDisabled={isTimeDisabled(dayjs())}
         />
       </div>
     );
@@ -199,6 +237,9 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     handleHoverChange,
     handleOk,
     handleNow,
+    disabledTime,
+    hideDisabledOptions,
+    isTimeDisabled,
   ]);
 
   return (
