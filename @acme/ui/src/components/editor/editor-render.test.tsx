@@ -161,6 +161,41 @@ describe("EditorRender", () => {
     expect(paragraph).toHaveTextContent("Line oneLine two");
   });
 
+  test("renders the inline styles the toolbar plugins persist", () => {
+    const styled = render(
+      <EditorRender value={editorRenderFixtures.inlineStyledText.content} />,
+    );
+
+    expect(screen.getByText("Colored")).toHaveStyle({ color: "#eb5757" });
+    expect(screen.getByText("highlighted")).toHaveStyle({
+      backgroundColor: "#fff3bf",
+    });
+    expect(screen.getByText("enlarged")).toHaveStyle({ fontSize: "20px" });
+
+    // A styled node keeps its format tag; the style wraps it so the tag inherits.
+    const boldColored = screen.getByText("bold colored", {
+      selector: "strong",
+    });
+    expect(boldColored.closest("span")).toHaveStyle({ color: "#eb5757" });
+
+    // Unstyled siblings must stay bare text rather than gain wrapper elements.
+    const paragraph = styled.container.querySelector("p");
+    expect(paragraph).toHaveTextContent("plain");
+    expect(
+      [...(paragraph?.querySelectorAll("span") ?? [])].some(
+        (node) => node.textContent === " plain",
+      ),
+    ).toBe(false);
+  });
+
+  test("drops style declarations outside the allowlist", () => {
+    render(<EditorRender value={editorRenderFixtures.inlineStyledText.content} />);
+
+    const partiallyDropped = screen.getByText("partially dropped");
+    expect(partiallyDropped).toHaveStyle({ color: "#2f9e44" });
+    expect(partiallyDropped.style.position).toBe("");
+  });
+
   test("renders bullet, number, and checklist list semantics including nesting", () => {
     const bullet = render(
       <EditorRender value={editorRenderFixtures.bulletList.content} />,
@@ -504,6 +539,7 @@ describe("EditorRender", () => {
       "horizontalRule",
       "table",
       "formattedText",
+      "inlineStyledText",
       "inlineCode",
       "softBreak",
     ]);

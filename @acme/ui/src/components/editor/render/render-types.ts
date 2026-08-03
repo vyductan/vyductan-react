@@ -198,6 +198,7 @@ export type CanonicalEditorRenderFixtureName =
   | "horizontalRule"
   | "table"
   | "formattedText"
+  | "inlineStyledText"
   | "inlineCode"
   | "softBreak";
 

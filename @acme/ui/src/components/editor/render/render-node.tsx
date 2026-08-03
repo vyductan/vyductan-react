@@ -17,6 +17,7 @@ import type {
 } from "./render-types";
 import { richTextSemanticContract } from "../themes/rich-text-semantic-contract";
 import { sanitizeUrl } from "../utils/url";
+import { parseInlineStyle } from "./parse-inline-style";
 
 const TEXT_FORMAT_BOLD = 1;
 const TEXT_FORMAT_ITALIC = 1 << 1;
@@ -405,7 +406,7 @@ function renderCodeHighlightNode(
     : undefined;
 
   return (
-    <span key={key} className={className}>
+    <span key={key} className={className} style={parseInlineStyle(node.style)}>
       {node.text}
     </span>
   );
@@ -467,6 +468,18 @@ function renderTextNode(node: EditorRenderTextNode, key: string): ReactNode {
   if (hasFormat(node.format, TEXT_FORMAT_SUPERSCRIPT)) {
     hasMarkup = true;
     content = <sup key={`${key}-sup`}>{content}</sup>;
+  }
+
+  // Outermost so the format tags above inherit the color rather than fight it.
+  const inlineStyle = parseInlineStyle(node.style);
+
+  if (inlineStyle) {
+    hasMarkup = true;
+    content = (
+      <span key={`${key}-style`} style={inlineStyle}>
+        {content}
+      </span>
+    );
   }
 
   if (!hasMarkup) {

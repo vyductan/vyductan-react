@@ -35,6 +35,16 @@ const text = (value: string, format = 0) => ({
   version: 1,
 });
 
+const styledText = (value: string, style: string, format = 0) => ({
+  detail: 0,
+  format,
+  mode: "normal",
+  style,
+  text: value,
+  type: "text" as const,
+  version: 1,
+});
+
 const linebreak = () => ({
   type: "linebreak" as const,
   version: 1,
@@ -284,6 +294,17 @@ const canonicalFixtures = {
       text(" plain"),
     ),
   ]),
+  inlineStyledText: createRoot([
+    paragraph(
+      styledText("Colored", "color: #eb5757"),
+      styledText(" highlighted", "background-color: #fff3bf"),
+      styledText(" enlarged", "font-size: 20px"),
+      styledText(" bold colored", "color: #eb5757", 1),
+      // Only the allowlisted declaration of the pair should survive.
+      styledText(" partially dropped", "position: fixed; color: #2f9e44"),
+      text(" plain"),
+    ),
+  ]),
   inlineCode: createRoot([
     paragraph(text("Prefix "), inlineCode("const value = 1"), text(" suffix")),
   ]),
@@ -462,6 +483,7 @@ export const canonicalEditorRenderFixtureNames = [
   "horizontalRule",
   "table",
   "formattedText",
+  "inlineStyledText",
   "inlineCode",
   "softBreak",
 ] as const satisfies readonly CanonicalEditorRenderFixtureName[];

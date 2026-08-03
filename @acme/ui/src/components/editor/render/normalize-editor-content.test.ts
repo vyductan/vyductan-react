@@ -104,6 +104,7 @@ describe("normalizeEditorContent", () => {
       "horizontalRule",
       "table",
       "formattedText",
+      "inlineStyledText",
       "inlineCode",
       "softBreak",
     ]);

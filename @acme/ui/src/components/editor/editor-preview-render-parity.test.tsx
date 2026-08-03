@@ -206,6 +206,27 @@ function cssToken(value: string) {
   return value.split(/\s+/).find((token) => !/[[:]/.test(token));
 }
 
+/**
+ * Preview and publish reach the same colors through different mechanisms:
+ * Lexical writes the node `style` onto whichever element carries the text,
+ * while the renderer wraps it in a span. Comparing the text/color pairs rather
+ * than the element tree keeps that difference from reading as a regression.
+ */
+function getInlineStyleSummary(container: HTMLElement) {
+  return [...container.querySelectorAll<HTMLElement>("[style]")]
+    .filter(
+      (node) =>
+        node.style.color || node.style.backgroundColor || node.style.fontSize,
+    )
+    .map((node) => ({
+      text: node.textContent?.replaceAll(/\s+/g, " ").trim(),
+      color: node.style.color,
+      backgroundColor: node.style.backgroundColor,
+      fontSize: node.style.fontSize,
+    }))
+    .sort((a, b) => (a.text ?? "").localeCompare(b.text ?? ""));
+}
+
 describe("EditorPreview and EditorRender parity", () => {
   test("keeps paragraph inline mark semantics aligned", async () => {
     const { preview, publish } = await renderPreviewAndPublish(
@@ -223,6 +244,25 @@ describe("EditorPreview and EditorRender parity", () => {
     expect(previewSummary).toEqual(publishSummary);
     expect(preview.container.querySelectorAll("p")).toHaveLength(1);
     expect(publish.container.querySelectorAll("p")).toHaveLength(1);
+  });
+
+  test("keeps inline text colors aligned", async () => {
+    const { preview, publish } = await renderPreviewAndPublish(
+      editorRenderFixtures.inlineStyledText.content,
+      "Colored highlighted enlarged bold colored partially dropped plain",
+      "json",
+    );
+
+    const previewSummary = getInlineStyleSummary(preview.container);
+    const publishSummary = getInlineStyleSummary(publish.container);
+
+    expect(publishSummary).toContainEqual({
+      text: "Colored",
+      color: "rgb(235, 87, 87)",
+      backgroundColor: "",
+      fontSize: "",
+    });
+    expect(publishSummary).toEqual(previewSummary);
   });
 
   test("keeps json, markdown, and html paragraph semantics aligned", async () => {
