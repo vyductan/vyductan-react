@@ -9,6 +9,22 @@ import {
 
 import { cn } from "../../lib/utils";
 
+/**
+ * A vaul Drawer is built on its OWN copy of `@radix-ui/react-dialog`, so it has
+ * a DismissableLayer stack separate from the app's `radix-ui` Modal/AlertModal.
+ * The two stacks don't cross-gate: an Escape / outside-click that dismisses a
+ * Radix dialog stacked ON TOP of the drawer also reaches the drawer (the top of
+ * vaul's own stack) and closes it — taking everything inside it down too. Guard
+ * against that — while any Radix dialog/alert-dialog is open, the drawer must
+ * not self-dismiss. (A closing dialog flips to data-state="closed", so once the
+ * top dialog is gone the drawer dismisses normally again.)
+ */
+function hasOpenDialogAbove() {
+  return !!document.querySelector(
+    "[data-slot='dialog-content'][data-state='open'], [data-slot='alert-dialog-content'][data-state='open']",
+  );
+}
+
 // const DrawerContent = ({
 //   className,
 //   children,
@@ -33,6 +49,7 @@ import { cn } from "../../lib/utils";
 function DrawerContent({
   className,
   children,
+  onInteractOutside,
   ...properties
 }: React.ComponentProps<typeof ShadcnDrawerContent>) {
   return (
@@ -53,14 +70,22 @@ function DrawerContent({
           "touch-auto! select-text!",
           className,
         )}
-        // Prevent drawer from closing when clicking on toast notifications (Sonner)
+        // Keep the drawer open when the interaction is a Sonner toast, or when
+        // a Radix dialog/alert-modal is stacked on top (its own dismiss handles
+        // the close; see hasOpenDialogAbove). NOTE: Escape is NOT guarded here —
+        // preventing default on the Escape keydown would leak across to the
+        // stacked dialog's own copy of Radix (it checks event.defaultPrevented)
+        // and stop IT from closing too. The Escape path is guarded by the
+        // onOpenChange gate in drawer.tsx instead, which never touches the event.
         onInteractOutside={(e) => {
           if (
-            e.target instanceof Element &&
-            e.target.closest("[data-sonner-toast]")
+            hasOpenDialogAbove() ||
+            (e.target instanceof Element &&
+              e.target.closest("[data-sonner-toast]"))
           ) {
             e.preventDefault();
           }
+          onInteractOutside?.(e);
         }}
         {...properties}
       >
@@ -123,7 +148,7 @@ const DrawerFooter = ({
 );
 DrawerFooter.displayName = "DrawerFooter";
 
-export { DrawerContent, DrawerHeader, DrawerFooter };
+export { DrawerContent, DrawerHeader, DrawerFooter, hasOpenDialogAbove };
 export {
   Drawer as DrawerRoot,
   DrawerDescription,

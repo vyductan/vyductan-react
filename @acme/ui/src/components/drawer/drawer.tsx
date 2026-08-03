@@ -13,6 +13,7 @@ import {
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
+  hasOpenDialogAbove,
 } from "./_components";
 
 type ShadcnDrawerProperties = React.ComponentProps<typeof DrawerRoot>;
@@ -51,20 +52,41 @@ const Drawer = ({
   placement = "right",
   width = 448,
   closeIcon,
+  onOpenChange,
   ...properties
 }: DrawerProperties) => {
+  // A vaul Drawer dismisses on its own Escape / outside-click, but it lives in
+  // a DismissableLayer stack separate from the app's radix-ui Modal/AlertModal.
+  // When a Radix dialog is stacked on top, that dialog handles its own close —
+  // so ignore the drawer's close request to stop the whole stack collapsing.
+  // Done here (not via preventDefault on the Escape event) so the keypress
+  // stays un-prevented and the stacked dialog can still close itself.
+  const handleOpenChange = (open: boolean) => {
+    if (!open && hasOpenDialogAbove()) return;
+    onOpenChange?.(open);
+  };
+
   const isShadcnDrawer = Children.toArray(children).some(
     (child) => isValidElement(child) && child.type === DrawerContent,
   );
   if (isShadcnDrawer)
     return (
-      <DrawerRoot direction={placement} {...properties}>
+      <DrawerRoot
+        direction={placement}
+        onOpenChange={handleOpenChange}
+        {...properties}
+      >
         {children}
       </DrawerRoot>
     );
 
   return (
-    <DrawerRoot direction={placement} handleOnly {...properties}>
+    <DrawerRoot
+      direction={placement}
+      handleOnly
+      onOpenChange={handleOpenChange}
+      {...properties}
+    >
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
       <DrawerContent
         style={
