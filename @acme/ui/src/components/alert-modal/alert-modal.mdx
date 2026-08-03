@@ -38,3 +38,11 @@ Pass `children` to render extra body content — such as a textarea collecting a
   src="alert-modal/examples/with-textarea.tsx"
   __comp__={WithTextareaDemo}
 />
+
+## Text selection
+
+Title, description, and body text select and copy in one drag, same as Modal. The
+alert box is short, so a drag usually leaves it — dragging out past the
+bottom/right selects through to the end of its text, past the top/left back to
+the start, instead of losing the selection. Footer button labels are treated as
+chrome and never end up in the copy.
