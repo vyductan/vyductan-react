@@ -1,0 +1,20 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import MediaGalleryExample from "./media-gallery";
+
+<Meta isTemplate />
+
+### Media Gallery
+
+`MediaGallery` is the whole surface in one component: `MediaMosaic` on desktop,
+a swipeable carousel below `md`, and a shared `GalleryLightbox` opened from
+either. It owns the open/index state, so callers pass data and nothing else.
+
+Resize the preview past the `md` breakpoint to swap between the two layouts.
+
+<ComponentSource
+  src="image/examples/media-gallery.tsx"
+  __comp__={MediaGalleryExample}
+/>

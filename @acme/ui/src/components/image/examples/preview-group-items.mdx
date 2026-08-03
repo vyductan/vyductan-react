@@ -1,0 +1,22 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import PreviewGroupItemsExample from "./preview-group-items";
+
+<Meta isTemplate />
+
+### Preview Group Items & Control
+
+Pass `items` to decide the preview list independently of what the page renders —
+one thumbnail can stand in for a whole album. The `preview` object then makes
+the overlay controllable: `open` / `current` drive it, `onOpenChange` and
+`onChange` report back, and `countRender` replaces the counter.
+
+Because the state lives outside, the overlay can be opened from anything — a
+button, a table row, a keyboard shortcut.
+
+<ComponentSource
+  src="image/examples/preview-group-items.tsx"
+  __comp__={PreviewGroupItemsExample}
+/>

@@ -1,0 +1,188 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import BasicExample from "./examples/basic.mdx";
+import FallbackExample from "./examples/fallback.mdx";
+import GalleryLightboxExample from "./examples/gallery-lightbox.mdx";
+import ImagePreviewExample from "./examples/image-preview.mdx";
+import MediaGalleryLayoutsExample from "./examples/media-gallery-layouts.mdx";
+import MediaGalleryExample from "./examples/media-gallery.mdx";
+import PlaceholderExample from "./examples/placeholder.mdx";
+import PreviewGroupItemsExample from "./examples/preview-group-items.mdx";
+import PreviewGroupExample from "./examples/preview-group.mdx";
+import PreviewExample from "./examples/preview.mdx";
+import SeekableVideoExample from "./examples/seekable-video.mdx";
+import VideoSyncExample from "./examples/video-sync.mdx";
+import * as ImageStories from "./image.stories";
+
+<Meta of={ImageStories} />
+
+# Image
+
+An `<img>` wrapper that handles the three states a raw tag leaves to you —
+loading, error, and preview — with an Ant Design-shaped API.
+
+## Features
+
+- 🦴 **Loading placeholder** — `Skeleton` by default, any node via `placeholder`
+- 🩹 **Fallback on error** — built-in data URI, overridable with `fallback`
+- 🔍 **Click to preview** — `preview` opens a full-screen overlay
+- 🗂️ **Grouped preview** — `Image.PreviewGroup` shares one overlay with prev/next
+- 🖼️ **Standalone overlay** — `ImagePreview` for non-image triggers
+- 🎞️ **Full gallery** — `GalleryLightbox` with carousel, zoom, pan, rotate, flip, thumbnails
+- 📼 **Mixed media** — the gallery renders images and videos in one strip
+- 🧱 **Mosaic layout** — hero-plus-tiles grid with a `+N` badge for the overflow
+- 📱 **Responsive surface** — `MediaGallery` swaps mosaic for a carousel below `md`
+
+## Examples
+
+<BasicExample />
+
+<PlaceholderExample />
+
+<FallbackExample />
+
+<PreviewExample />
+
+<PreviewGroupExample />
+
+<PreviewGroupItemsExample />
+
+<ImagePreviewExample />
+
+<GalleryLightboxExample />
+
+<SeekableVideoExample />
+
+<VideoSyncExample />
+
+<MediaGalleryExample />
+
+<MediaGalleryLayoutsExample />
+
+## API Reference
+
+### Image
+
+Extends `React.ImgHTMLAttributes<HTMLImageElement>`. Unlisted props (`alt`,
+`loading`, `sizes`, `onLoad`, …) are forwarded to the underlying `<img>`.
+
+| Property      | Type               | Default                     | Description                                                             |
+| ------------- | ------------------ | --------------------------- | ----------------------------------------------------------------------- |
+| `src`         | `string`           | -                           | Image source.                                                           |
+| `width`       | `number \| string` | -                           | Sizes the wrapper box and the `<img>`, reserving space before load.     |
+| `height`      | `number \| string` | -                           | Sizes the wrapper box and the `<img>`, reserving space before load.     |
+| `fallback`    | `string`           | `ImagePlaceholderSrc`       | Source rendered after the request fails.                                |
+| `placeholder` | `React.ReactNode`  | `<Skeleton />`              | Overlay shown until the image finishes loading. Pass `null` to disable. |
+| `preview`     | `boolean`          | `false` (`true` in a group) | Opens a full-screen overlay when the image is clicked.                  |
+| `cover`       | `React.ReactNode`  | eye + "Preview"             | Hover overlay shown while previewable. `null` removes it.               |
+| `className`   | `string`           | -                           | Applied to the wrapper element, not the `<img>`.                        |
+| `bucket`      | `string`           | -                           | Reserved for storage-backed sources; currently unused.                  |
+| `quality`     | `number`           | -                           | Reserved for a future transform pipeline; currently unused.             |
+
+### Image.PreviewGroup
+
+| Property   | Type                          | Default | Description                                                                      |
+| ---------- | ----------------------------- | ------- | -------------------------------------------------------------------------------- |
+| `items`    | `(string \| PreviewItem)[]`   | -       | Explicit preview list. Omit to collect the `<Image>` descendants in mount order. |
+| `fallback` | `string`                      | -       | Fallback source inherited by every `<Image>` in the group.                       |
+| `preview`  | `boolean \| PreviewGroupType` | `true`  | Preview configuration; `false` disables previewing.                              |
+
+`PreviewItem` is `{ src: string }` plus any `<img>` attribute (`alt`,
+`crossOrigin`, `loading`, …), which is forwarded to the previewed element.
+
+### PreviewGroupType
+
+| Property        | Type                                                                     | Default | Description                                           |
+| --------------- | ------------------------------------------------------------------------ | ------- | ----------------------------------------------------- |
+| `open`          | `boolean`                                                                | -       | Controlled open state.                                |
+| `current`       | `number`                                                                 | -       | Controlled index of the previewed item.               |
+| `onOpenChange`  | `(open: boolean, info: { current: number }) => void`                     | -       | Fired when the overlay opens or closes.               |
+| `onChange`      | `(current: number, previousCurrent: number) => void`                     | -       | Fired when the previewed item changes.                |
+| `minScale`      | `number`                                                                 | `1`     | Minimum zoom scale.                                   |
+| `maxScale`      | `number`                                                                 | `50`    | Maximum zoom scale.                                   |
+| `scaleStep`     | `number`                                                                 | `0.5`   | Amount added or removed per zoom step.                |
+| `movable`       | `boolean`                                                                | `true`  | Whether a zoomed image can be dragged to pan.         |
+| `countRender`   | `(current: number, total: number) => React.ReactNode`                    | -       | Replaces the counter.                                 |
+| `closeIcon`     | `React.ReactNode`                                                        | -       | Replaces the close icon.                              |
+| `imageRender`   | `(originalNode, info: { transform, image, current }) => React.ReactNode` | -       | Replaces the previewed content.                       |
+| `actionsRender` | `(originalNode, info: ToolbarRenderInfo) => React.ReactNode`             | -       | Replaces the toolbar; `info` carries icons + actions. |
+| `mask`          | `boolean \| { enabled?, blur?, closable? }`                              | `true`  | Backdrop behind the preview.                          |
+| `onTransform`   | `(info: { transform, action }) => void`                                  | -       | Fired on every zoom, rotate, flip, or pan.            |
+
+Not implemented from Ant Design's surface: `getContainer` (the overlay always
+portals to the body), `focusTrap` (always on, via `Dialog`), and the
+`classNames` / `styles` semantic-DOM maps.
+
+### ImagePreview
+
+| Property       | Type                      | Default | Description                                    |
+| -------------- | ------------------------- | ------- | ---------------------------------------------- |
+| `open`         | `boolean`                 | -       | Controlled open state.                         |
+| `onOpenChange` | `(open: boolean) => void` | -       | Called when the overlay opens or closes.       |
+| `children`     | `React.ReactNode`         | -       | Overlay content, rendered on a black backdrop. |
+
+### GalleryLightbox
+
+| Property        | Type                      | Default | Description                                                                       |
+| --------------- | ------------------------- | ------- | --------------------------------------------------------------------------------- |
+| `open`          | `boolean`                 | -       | Controlled open state.                                                            |
+| `onOpenChange`  | `(open: boolean) => void` | -       | Called when the lightbox opens or closes.                                         |
+| `media`         | `GalleryMedia[]`          | -       | Slides to render, in order.                                                       |
+| `initialIndex`  | `number`                  | `0`     | Slide to show when opening.                                                       |
+| `onDownloadAll` | `() => void`              | -       | When provided, renders a "Download All" action.                                   |
+| `minScale`      | `number`                  | `0.2`   | Lower bound for the zoom-out button.                                              |
+| `maxScale`      | `number`                  | `8`     | Upper bound for the zoom-in button.                                               |
+| `scaleStep`     | `number`                  | `0.5`   | Amount added or removed per zoom step.                                            |
+| `movable`       | `boolean`                 | `true`  | Whether a zoomed image can be dragged to pan.                                     |
+| `seekableVideo` | `boolean`                 | `false` | Buffer videos to a blob: URL so scrubbing works on origins without Range support. |
+| `videoSync`     | `GalleryVideoSync`        | -       | Carries a video's position in from a copy playing elsewhere.                      |
+
+`GalleryVideoSync` is `{ index, startTime, onTimeUpdate? }` — `startTime` seeks
+and resumes the video at `index` once it is ready, and `onTimeUpdate` mirrors
+the position back out.
+
+Once zoomed past 1:1 the image can be dragged to pan. The drag is captured
+before it reaches the carousel, so panning never swipes to the next slide, and
+the offset resets on zoom-out, slide change, and reopen.
+
+### MediaGallery
+
+| Property        | Type               | Default                | Description                                           |
+| --------------- | ------------------ | ---------------------- | ----------------------------------------------------- |
+| `media`         | `GalleryMedia[]`   | -                      | Items shown in the mosaic, carousel, and lightbox.    |
+| `alt`           | `string`           | `"Media"`              | Base label for every item.                            |
+| `max`           | `number`           | `5`                    | Mosaic tiles before the `+N` badge.                   |
+| `height`        | `number \| string` | `450`                  | Height of the desktop mosaic.                         |
+| `onDownloadAll` | `() => void`       | -                      | Adds a "Download All" action to the lightbox.         |
+| `seekableVideo` | `boolean`          | `false`                | Forwarded to the lightbox; see `GalleryLightbox`.     |
+| `viewAllLabel`  | `string`           | `"View all photos"`    | Label of the corner action shown when items overflow. |
+| `empty`         | `React.ReactNode`  | `"No media available"` | Rendered when `media` is empty.                       |
+
+### GalleryMedia
+
+| Property   | Type                 | Description                            |
+| ---------- | -------------------- | -------------------------------------- |
+| `type`     | `"image" \| "video"` | Element used to render the slide.      |
+| `url`      | `string`             | Media source.                          |
+| `fileName` | `string`             | Display name, also used for downloads. |
+
+## Notes
+
+- `className` targets the wrapper because the `<img>` owns the load/error
+  opacity transition. Reach the image itself with `style` or a descendant
+  selector such as `[&_img]:object-cover`.
+- The `preview` overlay is rendered inline, while `GalleryLightbox` uses
+  `Dialog` and therefore portals to the body — prefer the gallery inside
+  scroll containers or transformed ancestors.
+- The mosaic is a mosaic, not a masonry: tile spans come from the visible count
+  and every tile is cropped to its cell. Use a masonry layout when item height
+  should follow the content instead.
+- `MediaGallery` mounts both layouts and hides one with CSS, so the browser
+  fetches each source twice. That keeps the swap free of hydration mismatches;
+  drop to the private mosaic if a route only ever renders one breakpoint.
+- Mapping domain records to `GalleryMedia` stays with the caller — the sort
+  order, cover flag, and MIME detection are application concerns.
+- `seekableVideo` downloads each video in full before it helps. The cache is
+  capped (128 MB per file, 256 MB total, LRU with revoke), and anything larger
+  keeps streaming from the network. Leave it off unless your storage actually
+  refuses Range requests.

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Download,
   FlipHorizontal,
@@ -21,7 +21,10 @@ import {
   CarouselPrevious,
 } from "@acme/ui/components/carousel";
 import { Dialog, DialogContent, DialogTitle } from "@acme/ui/components/dialog";
+import { SeekableVideo } from "@acme/ui/components/video";
 import { cn } from "@acme/ui/lib/utils";
+
+import { useImageTransform } from "./_components/use-image-transform";
 
 export type GalleryMedia = {
   type: "image" | "video";
@@ -35,7 +38,31 @@ export interface GalleryLightboxProps {
   media: GalleryMedia[];
   initialIndex?: number;
   onDownloadAll?: () => void;
+  /** Lower bound for the zoom-out button. */
+  minScale?: number;
+  /** Upper bound for the zoom-in button. */
+  maxScale?: number;
+  /** Amount added or removed per zoom step. */
+  scaleStep?: number;
+  /** Whether a zoomed image can be dragged to pan. */
+  movable?: boolean;
+  /**
+   * Buffer videos to a local blob: URL so scrubbing works even when the origin
+   * doesn't honour Range requests. Costs a full download per video.
+   */
+  seekableVideo?: boolean;
+  /** Carries a video's playback position in from a copy playing elsewhere. */
+  videoSync?: GalleryVideoSync;
 }
+
+export type GalleryVideoSync = {
+  /** Index in `media` of the video to hand the position to. */
+  index: number;
+  /** Seconds to seek to — and resume from — once that video is ready. */
+  startTime: number;
+  /** Mirrors the position back out on every timeupdate while it plays. */
+  onTimeUpdate?: (time: number) => void;
+};
 
 export function GalleryLightbox({
   open,
@@ -43,12 +70,30 @@ export function GalleryLightbox({
   media,
   initialIndex = 0,
   onDownloadAll,
+  minScale = 0.2,
+  maxScale = 8,
+  scaleStep = 0.5,
+  movable = true,
+  seekableVideo = false,
+  videoSync,
 }: GalleryLightboxProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(initialIndex);
-  const [scale, setScale] = useState(1);
-  const [rotate, setRotate] = useState(0);
-  const [flipX, setFlipX] = useState(1);
-  const [flipY, setFlipY] = useState(1);
+
+  const {
+    css: activeTransform,
+    isPannable,
+    isDragging,
+    canZoomIn,
+    canZoomOut,
+    reset: resetTransform,
+    zoomIn,
+    zoomOut,
+    rotateLeft,
+    rotateRight,
+    flipHorizontal,
+    flipVertical,
+    panHandlers,
+  } = useImageTransform({ minScale, maxScale, scaleStep, movable });
 
   const [previousOpen, setPreviousOpen] = useState(open);
 
@@ -57,24 +102,52 @@ export function GalleryLightbox({
   if (open && !previousOpen) {
     setPreviousOpen(true);
     setCurrentImageIndex(initialIndex);
-    setScale(1);
-    setRotate(0);
-    setFlipX(1);
-    setFlipY(1);
+    resetTransform();
   } else if (!open && previousOpen) {
     setPreviousOpen(false);
   }
 
   const [lightboxCarouselApi, setLightboxCarouselApi] = useState<CarouselApi>();
 
-  const resetTransform = () => {
-    setScale(1);
-    setRotate(0);
-    setFlipX(1);
-    setFlipY(1);
-  };
-
   const videoReferences = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // Radix unmounts the dialog's content while closed, so each open() builds a
+  // brand-new video element. An effect watching `open` races that: it can run
+  // before Radix has inserted the element, with no later re-check. The ref
+  // callback is the one thing guaranteed to fire exactly when the element
+  // exists, so the seek lives there.
+  const videoSyncReference = useRef(videoSync);
+  useEffect(() => {
+    videoSyncReference.current = videoSync;
+  }, [videoSync]);
+
+  // One stable callback for every slide — a per-index closure would be a new
+  // function each render, so React would detach and re-attach it constantly and
+  // re-run the seek. The slide index rides along on a data attribute, and the
+  // returned cleanup means React never calls this with `null`.
+  const attachVideoRef = useCallback((element: HTMLVideoElement) => {
+    const index = Number(element.dataset.index);
+    videoReferences.current[index] = element;
+
+    const sync = videoSyncReference.current;
+    if (sync?.index === index) {
+      const seekAndPlay = () => {
+        element.currentTime = sync.startTime;
+        void element.play().catch(() => {
+          // Autoplay can be refused without a fresh gesture; the user can still
+          // press play.
+        });
+      };
+      if (element.readyState >= 1) seekAndPlay();
+      else {
+        element.addEventListener("loadedmetadata", seekAndPlay, { once: true });
+      }
+    }
+
+    return () => {
+      videoReferences.current[index] = null;
+    };
+  }, []);
 
   // Pause all non-active videos and pause all videos when closing
   useEffect(() => {
@@ -148,20 +221,31 @@ export function GalleryLightbox({
                       }}
                     >
                       {item.type === "video" ? (
-                        <video
-                          ref={(element) => {
-                            videoReferences.current[index] = element;
-                          }}
+                        <SeekableVideo
+                          ref={attachVideoRef}
+                          data-index={index}
                           src={item.url}
+                          seekable={seekableVideo}
                           controls
                           playsInline
                           onClick={(e) => e.stopPropagation()}
-                          className="max-h-full max-w-full cursor-auto object-contain transition-transform duration-200"
+                          // Keep drags on the scrub bar from reaching the
+                          // carousel, which would swipe to the next slide.
+                          onPointerDown={(e) => e.stopPropagation()}
+                          onPointerMove={(e) => e.stopPropagation()}
+                          onTimeUpdate={(e) => {
+                            if (index === videoSync?.index) {
+                              videoSync.onTimeUpdate?.(
+                                e.currentTarget.currentTime,
+                              );
+                            }
+                          }}
+                          // Without an explicit box the element starts at the
+                          // 300x150 default and jumps once metadata arrives.
+                          className="h-full max-h-full w-full max-w-full cursor-auto object-contain transition-transform duration-200"
                           style={
                             index === currentImageIndex
-                              ? {
-                                  transform: `scale(${scale}) rotate(${rotate}deg) scaleX(${flipX}) scaleY(${flipY})`,
-                                }
+                              ? { transform: activeTransform }
                               : {}
                           }
                         />
@@ -170,15 +254,26 @@ export function GalleryLightbox({
                           <img
                             src={item.url}
                             alt={`Gallery Image ${index + 1}`}
-                            className="max-h-full max-w-full cursor-auto object-contain transition-transform duration-200 select-none"
+                            className={cn(
+                              "max-h-full max-w-full object-contain select-none",
+                              // Transitioning every pointermove makes the drag
+                              // trail the cursor, so only animate zoom/rotate.
+                              isDragging
+                                ? undefined
+                                : "transition-transform duration-200",
+                              index === currentImageIndex && isPannable
+                                ? "cursor-grab touch-none active:cursor-grabbing"
+                                : "cursor-auto",
+                            )}
                             style={
                               index === currentImageIndex
-                                ? {
-                                    transform: `scale(${scale}) rotate(${rotate}deg) scaleX(${flipX}) scaleY(${flipY})`,
-                                  }
+                                ? { transform: activeTransform }
                                 : {}
                             }
                             onClick={(e) => e.stopPropagation()}
+                            {...(index === currentImageIndex
+                              ? panHandlers
+                              : {})}
                           />
                         </picture>
                       )}
@@ -232,16 +327,18 @@ export function GalleryLightbox({
           <div className="pointer-events-auto mb-6 flex items-center gap-4 rounded-full border border-white/10 bg-black/30 px-6 py-3 text-white/80 shadow-2xl backdrop-blur-md sm:gap-6">
             <button
               type="button"
-              onClick={() => setScale((s) => s + 0.5)}
-              className="transition-all hover:scale-110 hover:text-white"
+              onClick={zoomIn}
+              disabled={!canZoomIn}
+              className="transition-all hover:scale-110 hover:text-white disabled:opacity-40 disabled:hover:scale-100"
               title="Zoom In"
             >
               <ZoomIn className="h-5 w-5" />
             </button>
             <button
               type="button"
-              onClick={() => setScale((s) => Math.max(0.2, s - 0.5))}
-              className="transition-all hover:scale-110 hover:text-white"
+              onClick={zoomOut}
+              disabled={!canZoomOut}
+              className="transition-all hover:scale-110 hover:text-white disabled:opacity-40 disabled:hover:scale-100"
               title="Zoom Out"
             >
               <ZoomOut className="h-5 w-5" />
@@ -257,7 +354,7 @@ export function GalleryLightbox({
             <div className="h-5 w-px bg-white/20" />
             <button
               type="button"
-              onClick={() => setRotate((r) => r - 90)}
+              onClick={rotateLeft}
               className="transition-all hover:scale-110 hover:text-white"
               title="Rotate Left"
             >
@@ -265,7 +362,7 @@ export function GalleryLightbox({
             </button>
             <button
               type="button"
-              onClick={() => setRotate((r) => r + 90)}
+              onClick={rotateRight}
               className="transition-all hover:scale-110 hover:text-white"
               title="Rotate Right"
             >
@@ -274,7 +371,7 @@ export function GalleryLightbox({
             <div className="h-5 w-px bg-white/20" />
             <button
               type="button"
-              onClick={() => setFlipX((x) => x * -1)}
+              onClick={flipHorizontal}
               className="transition-all hover:scale-110 hover:text-white"
               title="Flip Horizontal"
             >
@@ -282,7 +379,7 @@ export function GalleryLightbox({
             </button>
             <button
               type="button"
-              onClick={() => setFlipY((y) => y * -1)}
+              onClick={flipVertical}
               className="transition-all hover:scale-110 hover:text-white"
               title="Flip Vertical"
             >

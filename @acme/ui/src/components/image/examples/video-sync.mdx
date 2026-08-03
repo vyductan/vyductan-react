@@ -1,0 +1,27 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import VideoSyncExample from "./video-sync";
+
+<Meta isTemplate />
+
+### Video Playback Sync
+
+When a cover video is already playing on the page, opening the lightbox
+normally restarts it from 0:00. `videoSync` hands the position across:
+`startTime` seeks (and resumes) the video at `index` once it is ready, and
+`onTimeUpdate` mirrors the position back so the page copy stays aligned.
+
+The seek is wired through the element's ref callback rather than an effect —
+`Dialog` unmounts its content while closed, so every open builds a new video
+element and an effect watching `open` can run before that element exists.
+
+`SeekableVideo` is used for the cover here too, so dragging the scrub bar works
+on origins that don't honour Range requests. Pass `seekableVideo` to the
+lightbox for the same treatment inside the overlay.
+
+<ComponentSource
+  src="image/examples/video-sync.tsx"
+  __comp__={VideoSyncExample}
+/>

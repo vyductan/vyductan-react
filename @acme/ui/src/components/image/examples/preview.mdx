@@ -1,0 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import PreviewExample from "./preview";
+
+<Meta isTemplate />
+
+### Preview
+
+Set `preview` to make the image clickable. It opens a full-screen overlay with
+the image scaled to fit; clicking anywhere closes it. Each `Image` owns its own
+overlay state, so no wiring is needed for a grid of thumbnails.
+
+<ComponentSource src="image/examples/preview.tsx" __comp__={PreviewExample} />

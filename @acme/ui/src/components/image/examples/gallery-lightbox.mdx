@@ -1,0 +1,20 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import GalleryLightboxExample from "./gallery-lightbox";
+
+<Meta isTemplate />
+
+### Gallery Lightbox
+
+`GalleryLightbox` is the full viewer: a looping carousel over mixed
+image/video `media`, zoom, rotate, flip, a thumbnail strip, and an optional
+`onDownloadAll` action. Drive it from a thumbnail grid — `initialIndex` picks
+the slide to land on, and transforms reset every time it opens or the slide
+changes.
+
+<ComponentSource
+  src="image/examples/gallery-lightbox.tsx"
+  __comp__={GalleryLightboxExample}
+/>

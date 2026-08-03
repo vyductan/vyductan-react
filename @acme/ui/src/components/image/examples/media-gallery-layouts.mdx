@@ -1,0 +1,21 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import MediaGalleryLayoutsExample from "./media-gallery-layouts";
+
+<Meta isTemplate />
+
+### Mosaic Layouts
+
+The mosaic arranges itself from the number of visible tiles: a hero tile plus
+supporting tiles that fill the remaining tracks with no empty cells. Anything
+past `max` collapses into a `+N` badge on the last tile.
+
+This is a mosaic, not a masonry — every tile is cropped to its cell rather than
+sized by its own aspect ratio.
+
+<ComponentSource
+  src="image/examples/media-gallery-layouts.tsx"
+  __comp__={MediaGalleryLayoutsExample}
+/>

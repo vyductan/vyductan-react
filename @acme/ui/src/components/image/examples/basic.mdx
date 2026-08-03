@@ -1,0 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import BasicExample from "./basic";
+
+<Meta isTemplate />
+
+### Basic Usage
+
+`Image` renders a native `<img>` inside a sized wrapper. `width` and `height`
+reserve the box up front so the placeholder does not cause layout shift while
+the image is still downloading.
+
+<ComponentSource src="image/examples/basic.tsx" __comp__={BasicExample} />

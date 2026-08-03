@@ -1,0 +1,22 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import PreviewGroupExample from "./preview-group";
+
+<Meta isTemplate />
+
+### Preview Group
+
+`Image.PreviewGroup` gives every `<Image>` inside it one shared overlay with
+prev/next navigation and a running count, instead of the per-image overlay a
+lone `preview` produces. Children are previewable by default — no `preview`
+prop needed — and the order comes from mount order, so it matches how the grid
+reads.
+
+Zoomed past 1:1 the image can be dragged to pan.
+
+<ComponentSource
+  src="image/examples/preview-group.tsx"
+  __comp__={PreviewGroupExample}
+/>

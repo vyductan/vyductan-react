@@ -1,0 +1,19 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import ImagePreviewExample from "./image-preview";
+
+<Meta isTemplate />
+
+### ImagePreview Overlay
+
+`ImagePreview` is the bare overlay used by `preview`, exposed on its own for
+cases where the trigger is not an image — a button, a table row, a menu item.
+It accepts arbitrary `children` and is controlled through `open` /
+`onOpenChange` (uncontrolled if you omit both).
+
+<ComponentSource
+  src="image/examples/image-preview.tsx"
+  __comp__={ImagePreviewExample}
+/>

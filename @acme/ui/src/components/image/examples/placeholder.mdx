@@ -1,0 +1,19 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import PlaceholderExample from "./placeholder";
+
+<Meta isTemplate />
+
+### Placeholder
+
+While the image is loading, `Image` fills the wrapper with a `Skeleton`. Pass
+any node to `placeholder` to replace it, or `placeholder={null}` to render
+nothing. The placeholder is absolutely positioned inside the wrapper, so it
+inherits the `width` / `height` box.
+
+<ComponentSource
+  src="image/examples/placeholder.tsx"
+  __comp__={PlaceholderExample}
+/>

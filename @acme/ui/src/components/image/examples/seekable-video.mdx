@@ -1,0 +1,38 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import SeekableVideoExample from "./seekable-video";
+
+<Meta isTemplate />
+
+### Seekable Video
+
+Some storage backends serve video objects without honouring HTTP Range
+requests. The browser then can't seek: every drag on the scrub bar snaps back
+to 0:00, even for parts it has already buffered. `SeekableVideo` downloads the
+file once and plays it back from a local `blob:` URL, where seeking never needs
+a network round trip.
+
+Paste your own URL below to find out which side you're on — the probe issues a
+one-byte Range request and reports whether the origin answers `206`.
+
+Measured against a 5 MB faststart mp4 served two ways:
+
+| Origin                       | Playback     | Seek to 12s |
+| ---------------------------- | ------------ | ----------- |
+| `accept-ranges: none`, `200` | direct `src` | **0.00s**   |
+| `accept-ranges: none`, `200` | via `blob:`  | 12.00s      |
+| `206 Partial Content`        | direct `src` | 12.00s      |
+
+The cost is memory: the whole file sits in RAM. The cache is bounded — 128 MB
+per file, 256 MB total, LRU with `URL.revokeObjectURL` on eviction — and
+anything larger keeps streaming from the network. Leave it off unless your
+storage actually refuses Range.
+
+`GalleryLightbox` and `MediaGallery` expose the same switch as `seekableVideo`.
+
+<ComponentSource
+  src="image/examples/seekable-video.tsx"
+  __comp__={SeekableVideoExample}
+/>

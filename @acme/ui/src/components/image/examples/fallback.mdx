@@ -1,0 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import FallbackExample from "./fallback";
+
+<Meta isTemplate />
+
+### Fallback
+
+When the request fails, `Image` swaps in `fallback`. It defaults to the built-in
+`ImagePlaceholderSrc` data URI, so a broken `src` never leaves an empty hole in
+the layout. Pass any URL to `fallback` to override it.
+
+<ComponentSource src="image/examples/fallback.tsx" __comp__={FallbackExample} />
