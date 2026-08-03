@@ -213,10 +213,7 @@ type RecordWithCustomRow<TRecord extends AnyObject = AnyObject> =
 type TableProps<
   TRecord extends RecordWithCustomRow = AnyObject,
   TKey extends Key = Key,
-> = Omit<
-  React.ComponentProps<"table">,
-  "title" | "onChange" | "summary"
-> &
+> = Omit<React.ComponentProps<"table">, "title" | "onChange" | "summary"> &
   Omit<LegacyExpandableProps<TRecord>, "showExpandColumn"> & {
     columns?: ColumnsType<TRecord>;
     dataSource?: TRecord[] | undefined;
@@ -1396,7 +1393,7 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                           </TableRowComp>
                           {row.getIsExpanded() &&
                             expandableConfig.expandedRowRender && (
-                              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                              <TableRow className="bg-muted/50 hover:bg-muted/50">
                                 {/* 2nd row is a custom 1 cell row */}
                                 <TableCell
                                   colSpan={row.getVisibleCells().length}
@@ -1424,9 +1421,7 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                     >
                       <TableCell
                         colSpan={allLeafColumns.length}
-                        className={cn(
-                          "text-muted-foreground h-48 text-center",
-                        )}
+                        className={cn("text-muted-foreground h-48 text-center")}
                       >
                         {!loading &&
                           (tableLocale.emptyText == null ? (
