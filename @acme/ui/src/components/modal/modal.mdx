@@ -30,9 +30,46 @@ The simplest way to use Modal with state management.
 
 ### Trigger Prop
 
-Use the `trigger` prop to automatically handle modal opening.
+Pass a `trigger` element and Radix owns the open state — no `useState`, no
+`open`/`onOpenChange`. The trigger button, the modal, and its open logic all
+live in one JSX block.
 
 <ComponentSource src="modal/examples/trigger.tsx" __comp__={TriggerDemo} />
+
+#### `trigger` vs controlled `open` — which to use
+
+Both are supported. Pick by how the modal is opened, not by preference.
+
+**Use `trigger`** when a single, fixed control opens this one modal and the two
+belong together — a "New item" button, an edit button bound to one record, a
+help/info popover. You get three things for free:
+
+- **Colocation** — button + modal + state in one place; grep once, no chasing an
+  `open` flag across files.
+- **Accessibility** — Radix wires `aria-haspopup`, `aria-expanded`,
+  `aria-controls`, and returns focus to the trigger on close, automatically.
+- **No state to desync** — Radix holds `open`; there is no `useState` to forget
+  to reset.
+
+**Use controlled `open` / `onOpenChange`** (the default in this codebase) when
+the open state lives outside a single button:
+
+- Opened from several places (row action **and** bulk action), or from a menu
+  item, or after an async result.
+- The modal is its own named component reused across screens.
+- You must open/close it programmatically (e.g. close on mutation success).
+
+> [!TIP]
+> Want colocation **and** controlled flexibility? Don't reach for `trigger` —
+> wrap both in a small local component that holds its own `useState` (e.g.
+> `<EditReservationButton>` renders the button and a controlled `<Modal>`). Same
+> "find it in one place" benefit, but the modal can still be opened from
+> elsewhere later. Reserve `trigger` for the genuinely one-off, one-button case.
+
+> [!NOTE]
+> A `trigger` that is a `disabled` button will not open the modal — the click is
+> blocked at the DOM level, as expected. (Make sure your button renders the
+> native `disabled` attribute, not only `aria-disabled`.)
 
 ### Custom Footer
 

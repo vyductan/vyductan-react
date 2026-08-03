@@ -99,6 +99,43 @@ const Modal = ({
     return variables;
   }, [responsiveWidth]);
 
+  // ponytail: scroll affordance — a soft edge gradient on the side of the
+  // scroll body that has more content, so a long body reads as scrollable (the
+  // thin Radix scrollbar is easy to miss). The gradients are OVERLAY nodes so
+  // they paint ON TOP of the content — an inset box-shadow paints under it and
+  // gets covered by any opaque row (e.g. a highlighted total). Presence of the
+  // data-scroll-up / data-scroll-down attrs (toggled here) drives their opacity.
+  //
+  // A callback ref (not useEffect) is required: Radix's Portal mounts the dialog
+  // body one render LATER than the Modal commits, so a useEffect would run
+  // before the viewport exists and never see it. The callback ref fires exactly
+  // when the wrapper — and the Radix viewport inside it — actually mount.
+  const affordanceCleanup = React.useRef<(() => void) | null>(null);
+  const scrollRef = React.useCallback((root: HTMLDivElement | null) => {
+    affordanceCleanup.current?.();
+    affordanceCleanup.current = null;
+    const viewport = root?.querySelector<HTMLElement>(
+      "[data-radix-scroll-area-viewport]",
+    );
+    if (!root || !viewport) return;
+    const update = () => {
+      root.toggleAttribute("data-scroll-up", viewport.scrollTop > 1);
+      root.toggleAttribute(
+        "data-scroll-down",
+        viewport.scrollTop + viewport.clientHeight < viewport.scrollHeight - 1,
+      );
+    };
+    update();
+    viewport.addEventListener("scroll", update, { passive: true });
+    const observer = new ResizeObserver(update);
+    observer.observe(viewport);
+    if (viewport.firstElementChild) observer.observe(viewport.firstElementChild);
+    affordanceCleanup.current = () => {
+      viewport.removeEventListener("scroll", update);
+      observer.disconnect();
+    };
+  }, []);
+
   // const CancelBtn = () => (
   //   <DialogClose asChild onClick={onCancel}>
   //     <Button variant="outlined">Cancel</Button>
@@ -199,9 +236,24 @@ const Modal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 max-sm:px-2 [&>[data-radix-scroll-area-viewport]>div]:block!">
-          {children}
-        </ScrollArea>
+        {/* Scroll-affordance wrapper: caps the body height and hosts the edge
+            gradients (absolute, on top of the scrolling content). */}
+        <div
+          ref={scrollRef}
+          className="group/scroll relative max-h-[80vh] min-h-0"
+        >
+          <ScrollArea className="h-full max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 max-sm:px-2 [&>[data-radix-scroll-area-viewport]>div]:block!">
+            {children}
+          </ScrollArea>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-up]/scroll:opacity-100"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-down]/scroll:opacity-100"
+          />
+        </div>
 
         <DialogFooter className={cn("px-6", classNames?.footer)}>
           {footerToRender}
