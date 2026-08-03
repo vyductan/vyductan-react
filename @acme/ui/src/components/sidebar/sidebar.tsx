@@ -11,7 +11,7 @@ import type {
   SubMenuType,
 } from "../menu";
 import { Icon } from "../../icons";
-import { Divider } from "../divider";
+import { cn } from "../../lib/utils";
 import {
   ShadcnSidebar,
   SidebarContent,
@@ -43,6 +43,8 @@ type SidebarProperties = {
   ) => ReactNode;
   contentRender?: (properties: {
     itemNodes: React.ReactNode;
+    /** Drill path of the level being rendered; empty at the root. */
+    openKeys: string[];
   }) => React.ReactNode;
 
   header?: ReactNode;
@@ -167,10 +169,14 @@ const Sidebar = (properties: SidebarProperties) => {
   const isDrilldown = mode === "drilldown";
   const isControlled = openKeysProperty !== undefined;
 
-  const isActiveKey = (key: React.Key) =>
-    selectKeys.some((selected) => key.toString().startsWith(selected));
+  // Exact match, like Menu/Tree/NavigationMenu. A prefix match would light up
+  // every item nested under the selected route (all of /projects/*, say).
+  const isSelectedKey = (key: React.Key) => selectKeys.includes(String(key));
+  // A section counts as active when the selection lives somewhere inside it.
+  const containsSelectedKey = (item: SubMenuType<MenuItemType>) =>
+    findDrillPath(item.children, isSelectedKey) !== null;
 
-  const routePath = findDrillPath(items, isActiveKey) ?? [];
+  const routePath = findDrillPath(items, isSelectedKey) ?? [];
 
   const [innerOpenKeys, setInnerOpenKeys] = useState<string[]>(
     defaultOpenKeys ?? routePath,
@@ -200,10 +206,14 @@ const Sidebar = (properties: SidebarProperties) => {
     return items.map((item, index) => {
       if (!item) return <></>;
       if (item.type === "divider") {
+        // A plain <li>: SidebarMenu is a <ul>, and Divider treats children as
+        // its centre label, so `asChild` there renders a notched rule.
         return (
-          <Divider key={index} role="separator" className="border-t" asChild>
-            <li />
-          </Divider>
+          <li
+            key={index}
+            role="separator"
+            className={cn("bg-sidebar-border my-1 h-px", item.className)}
+          />
         );
       }
 
@@ -239,7 +249,7 @@ const Sidebar = (properties: SidebarProperties) => {
           <SidebarMenuItem key={key}>
             <SidebarMenuButton
               asChild={asChild}
-              isActive={isActiveKey(key)}
+              isActive={containsSelectedKey(item)}
               tooltip={typeof label === "string" ? label : key}
               className={classNames?.menuButton}
               // Slot merges this onto the rendered child, so a submenu whose
@@ -255,7 +265,7 @@ const Sidebar = (properties: SidebarProperties) => {
       if (item.type === "item" || !("children" in item)) {
         const { key, label, title, icon } = item;
         const mergedLabel = label ?? title;
-        const isActive = isActiveKey(key);
+        const isActive = isSelectedKey(key);
 
         const defaultNode = (
           <>
@@ -322,7 +332,8 @@ const Sidebar = (properties: SidebarProperties) => {
           </SidebarMenu>
         )}
         {contentRender ? (
-          contentRender({ itemNodes })
+          // Flat mode always renders the root, whatever the drill state holds.
+          contentRender({ itemNodes, openKeys: isDrilldown ? openKeys : [] })
         ) : levelItems.some((item) => item && item.type === "group") ? (
           itemNodes
         ) : (

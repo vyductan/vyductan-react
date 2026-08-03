@@ -72,6 +72,7 @@ const items: MenuProps["items"] = [
     type: "submenu",
     children: [
       { key: "/finance", label: "Overview", type: "item" },
+      { type: "divider" },
       { key: "/finance/budgets", label: "Budgets", type: "item" },
     ],
   },
@@ -123,6 +124,64 @@ describe("Sidebar drilldown", () => {
 
     expect(screen.getByText("Budgets")).toBeInTheDocument();
     expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
+  });
+
+  test("renders a divider as a single rule directly inside the menu", async () => {
+    const user = userEvent.setup();
+    const { container } = renderSidebar({ mode: "drilldown" });
+
+    await user.click(screen.getByText("Finance"));
+
+    const separators = container.querySelectorAll('[role="separator"]');
+    expect(separators).toHaveLength(1);
+    // SidebarMenu is a <ul>; anything but an <li> child is invalid markup.
+    expect(separators[0]?.tagName).toBe("LI");
+    expect(separators[0]?.textContent).toBe("");
+  });
+
+  test("marks only the exactly selected item active", () => {
+    renderSidebar({
+      mode: "drilldown",
+      selectedKeys: ["/finance"],
+      openKeys: ["/finance"],
+    });
+
+    const active = [...document.querySelectorAll('[data-active="true"]')].map(
+      (element) => element.textContent,
+    );
+
+    // "/finance/budgets" starts with "/finance" but is a different route.
+    expect(active).toEqual(["Overview"]);
+  });
+
+  test("marks a section active when the selection sits inside it", () => {
+    renderSidebar({
+      mode: "drilldown",
+      selectedKeys: ["/finance/budgets"],
+      // Held at the root, so the section row itself is what renders.
+      openKeys: [],
+    });
+
+    const finance = screen.getByText("Finance").closest("button");
+    expect(finance).toHaveAttribute("data-active", "true");
+  });
+
+  test("contentRender receives the drill path of the level it renders", async () => {
+    const user = userEvent.setup();
+    const seen: string[][] = [];
+
+    renderSidebar({
+      mode: "drilldown",
+      contentRender: ({ itemNodes, openKeys }) => {
+        seen.push(openKeys);
+        return <ul>{itemNodes}</ul>;
+      },
+    });
+
+    await user.click(screen.getByText("Finance"));
+
+    expect(seen.at(0)).toEqual([]);
+    expect(seen.at(-1)).toEqual(["/finance"]);
   });
 
   test("openKeys is controllable and reports changes", async () => {
