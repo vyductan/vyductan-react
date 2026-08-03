@@ -40,6 +40,113 @@ afterEach(() => {
   cleanup();
 });
 
+describe("DatePicker classNames", () => {
+  test("forwards each semantic slot to the element it names", () => {
+    render(
+      <DatePicker
+        defaultValue={dayjs("2024-06-15")}
+        className="root-from-className"
+        classNames={{
+          root: "root-from-classNames",
+          input: "input-slot",
+          suffix: "suffix-slot",
+        }}
+        styles={{
+          root: { marginTop: "4px" },
+          input: { color: "rgb(1, 2, 3)" },
+        }}
+      />,
+    );
+
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveClass("input-slot");
+    expect(input).toHaveStyle({ color: "rgb(1, 2, 3)" });
+
+    const root = document.querySelector('[data-slot="picker-input"]');
+    expect(root).toHaveClass("root-from-className", "root-from-classNames");
+    expect(root).toHaveStyle({ marginTop: "4px" });
+
+    expect(document.querySelector(".suffix-slot")).toBeTruthy();
+  });
+
+  test("classNames.input does not clobber the component's own input classes", () => {
+    render(
+      <DatePicker
+        defaultValue={dayjs("2024-06-15")}
+        classNames={{ input: "input-slot" }}
+      />,
+    );
+
+    const input = screen.getByRole("textbox");
+    expect(input).toHaveClass("input-slot");
+    // Base styling from Input survives the merge.
+    expect(input).toHaveClass("text-foreground");
+  });
+});
+
+describe("DateRangePicker classNames", () => {
+  test("forwards shared and per-field slots to the right inputs", () => {
+    render(
+      <DateRangePicker
+        defaultValue={[dayjs("2024-06-15"), dayjs("2024-06-20")]}
+        className="root-from-className"
+        classNames={{
+          root: "root-from-classNames",
+          input: "both-slot",
+          start: "start-slot",
+          end: "end-slot",
+          suffix: "suffix-slot",
+        }}
+        styles={{
+          root: { marginTop: "4px" },
+          input: { letterSpacing: "1px" },
+          end: { color: "rgb(1, 2, 3)" },
+        }}
+      />,
+    );
+
+    const [start, end] = screen.getAllByRole("textbox");
+    if (!start || !end) throw new Error("Expected both range inputs");
+
+    expect(start).toHaveClass("both-slot", "start-slot");
+    expect(start).not.toHaveClass("end-slot");
+    expect(end).toHaveClass("both-slot", "end-slot");
+    expect(end).not.toHaveClass("start-slot");
+
+    // Shared `input` style applies to both; `end` narrows to one field.
+    expect(start).toHaveStyle({ letterSpacing: "1px" });
+    expect(end).toHaveStyle({ letterSpacing: "1px", color: "rgb(1, 2, 3)" });
+
+    const root = document.querySelector('[data-slot="picker-input"]');
+    expect(root).toHaveClass("root-from-className", "root-from-classNames");
+    expect(root).toHaveStyle({ marginTop: "4px" });
+
+    expect(document.querySelector(".suffix-slot")).toBeTruthy();
+  });
+});
+
+describe("DateRangePicker prop routing", () => {
+  test("renders a custom suffix once, beside the fields rather than inside each", () => {
+    render(
+      <DateRangePicker suffix={<span data-testid="range-suffix">S</span>} />,
+    );
+
+    // Regression: `{...rest}` was spread onto both <Input>s, so a suffix
+    // rendered twice — once inside each field.
+    expect(screen.getAllByTestId("range-suffix")).toHaveLength(1);
+  });
+
+  test("does not leak picker-level props onto the input elements", () => {
+    render(<DateRangePicker defaultValue={[dayjs("2024-06-15"), null]} />);
+
+    for (const input of screen.getAllByRole("textbox")) {
+      expect(input).not.toHaveAttribute("modifiers");
+      expect(input).not.toHaveAttribute("captionlayout");
+      expect(input).not.toHaveAttribute("commityearonclose");
+    }
+  });
+});
+
 describe("DatePicker period validation", () => {
   test("rejects month selection when any day in the month is before minDate", async () => {
     const onChange = vi.fn();
@@ -433,5 +540,46 @@ describe("DatePicker disabled time validation", () => {
     fireEvent.keyUp(startInput, { key: "Enter" });
 
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("DateRangePicker showTime", () => {
+  test("renders a time column and keeps the panel open while picking", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <RangePicker
+        showTime
+        format="YYYY-MM-DD HH:mm"
+        defaultValue={[dayjs("2026-05-05 09:30"), dayjs("2026-05-20 14:00")]}
+        onChange={onChange}
+      />,
+    );
+
+    const startInput = screen.getAllByRole("textbox")[0];
+    if (!startInput) throw new Error("Expected range start input");
+    await user.click(startInput);
+
+    // Time column + shared footer are shown (regression: showTime had no UI).
+    expect(
+      document.querySelector('[data-slot="range-picker-time"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-slot="range-picker-footer"]'),
+    ).toBeTruthy();
+
+    const day = document.querySelector<HTMLButtonElement>(
+      '[data-day="5/12/2026"]',
+    );
+    if (!day) throw new Error("Expected day button for 5/12/2026");
+    await user.click(day);
+
+    // Panel stays open for time editing (regression: closed immediately).
+    await waitFor(() => {
+      expect(
+        document.querySelector('[data-slot="range-picker-footer"]'),
+      ).toBeTruthy();
+    });
   });
 });

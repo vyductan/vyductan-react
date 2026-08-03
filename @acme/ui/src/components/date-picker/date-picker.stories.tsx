@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import dayjs from "dayjs";
-import { expect, fireEvent, fn, userEvent, within } from "storybook/test";
+import {
+  expect,
+  fireEvent,
+  fn,
+  userEvent,
+  waitFor,
+  within,
+} from "storybook/test";
 
 import { DatePicker } from "./date-picker";
 import DisabledDateTimeDemo from "./examples/disabled-date-time";
@@ -239,8 +246,154 @@ export const PickerModes: Story = {
 export const WithTime: Story = {
   args: {
     showTime: true,
+    defaultValue: dayjs("2024-06-10 09:30"),
     placeholder: "Select date & time",
     className: "w-[240px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Select date & time");
+
+    await step("time column is rendered when panel opens", async () => {
+      await userEvent.click(input);
+      await expect(
+        document.querySelector('[data-slot="picker-time"]'),
+      ).not.toBeNull();
+    });
+
+    await step("picking a day keeps the panel open and preserves time", async () => {
+      const day = document.querySelector<HTMLButtonElement>(
+        '[data-day="6/15/2024"]',
+      );
+      if (!day) throw new Error("Expected day button for 6/15/2024");
+      await userEvent.click(day);
+      // Move the mouse off the day so the input shows the committed value
+      // instead of the hover preview.
+      await userEvent.unhover(day);
+
+      // Panel must stay open (regression: previously closed immediately).
+      await expect(
+        document.querySelector('[data-slot="picker-time"]'),
+      ).not.toBeNull();
+      // Default showTime shows seconds (AntD parity): HH:mm:ss.
+      await expect(input).toHaveValue("2024-06-15 09:30:00");
+    });
+
+    await step("Ok closes the panel", async () => {
+      await userEvent.click(
+        within(document.body).getByRole("button", { name: "Ok" }),
+      );
+      await waitFor(() =>
+        expect(
+          document.querySelector('[data-slot="picker-time"]'),
+        ).toBeNull(),
+      );
+    });
+  },
+};
+
+export const WithTimeDefaultOpen: Story = {
+  args: {
+    showTime: { defaultOpenValue: dayjs("08:15:00", "HH:mm:ss") },
+    format: "YYYY-MM-DD HH:mm:ss",
+    placeholder: "Pick date & time",
+    className: "w-[240px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Pick date & time");
+
+    await step(
+      "picking a day on an empty picker applies defaultOpenValue time",
+      async () => {
+        await userEvent.click(input);
+        // Any enabled in-grid day; only the applied time is asserted.
+        const day = [
+          ...document.querySelectorAll<HTMLButtonElement>("button[data-day]"),
+        ].filter((b) => !b.disabled)[15];
+        if (!day) throw new Error("Expected an enabled day button");
+        await userEvent.click(day);
+        await expect((input as HTMLInputElement).value).toMatch(/ 08:15:00$/);
+      },
+    );
+  },
+};
+
+export const WithTimeForwardedOptions: Story = {
+  args: {
+    showTime: { format: "HH:mm", showNow: false, minuteStep: 15 },
+    format: "YYYY-MM-DD HH:mm",
+    defaultValue: dayjs("2024-06-10 09:30"),
+    placeholder: "Forwarded showTime opts",
+    className: "w-[240px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByPlaceholderText("Forwarded showTime opts"),
+    );
+
+    await step("format hides the seconds column", async () => {
+      const panel = document.querySelector('[data-slot="picker-time"]');
+      if (!panel) throw new Error("Expected time panel");
+      await expect(panel.querySelectorAll("ul")).toHaveLength(2);
+    });
+
+    await step("showNow:false hides the Now button", async () => {
+      await expect(
+        within(document.body).queryByRole("button", { name: "Now" }),
+      ).toBeNull();
+    });
+
+    await step("minuteStep:15 steps the minute column", async () => {
+      const cols = document
+        .querySelector('[data-slot="picker-time"]')!
+        .querySelectorAll("ul");
+      const minutes = [...cols[1]!.querySelectorAll("li")].map(
+        (li) => li.textContent,
+      );
+      await expect(minutes).toContain("15");
+      await expect(minutes).not.toContain("14");
+    });
+  },
+};
+
+export const WithTime12Hours: Story = {
+  args: {
+    showTime: { use12Hours: true },
+    defaultValue: dayjs("2024-06-10 14:30:00"),
+    placeholder: "12-hour time",
+    className: "w-[260px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("12-hour time");
+
+    await step("input renders 12h time with meridiem", async () => {
+      await expect(input).toHaveValue("2024-06-10 02:30:00 PM");
+    });
+
+    await userEvent.click(input);
+
+    await step("panel adds an AM/PM column, PM selected for 14:30", async () => {
+      const panel = document.querySelector('[data-slot="picker-time"]');
+      if (!panel) throw new Error("Expected time panel");
+      const cols = panel.querySelectorAll("ul");
+      // hour, minute, second, meridiem
+      await expect(cols).toHaveLength(4);
+      const meridiem = [...cols[3]!.querySelectorAll("li")].map(
+        (li) => li.textContent,
+      );
+      await expect(meridiem).toEqual(["AM", "PM"]);
+      const selectedMeridiem = [...cols[3]!.querySelectorAll("li")].find((li) =>
+        li.className.includes("bg-primary-200"),
+      );
+      await expect(selectedMeridiem?.textContent).toBe("PM");
+    });
   },
 };
 

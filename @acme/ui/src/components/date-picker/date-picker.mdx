@@ -86,8 +86,8 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
 
   // Styling
   className?: string;
-  classNames?: Record<string, string>;
-  styles?: Record<string, React.CSSProperties>;
+  classNames?: Partial<Record<"root" | "input" | "suffix", string>>;
+  styles?: Partial<Record<"root" | "input" | "suffix", React.CSSProperties>>;
 }
 ```
 
@@ -282,16 +282,26 @@ const isValidDate = (date: dayjs.Dayjs) => {
 
 ### Custom Styling
 
+Semantic slots — `root` is the `[data-slot="picker-input"]` wrapper, `input` is the
+text field itself, `suffix` is the calendar icon / loading spinner. `styles` takes the
+same keys.
+
+`className` and `classNames.root` both land on the wrapper; `classNames.root` is
+merged last, so it wins on conflicting utilities.
+
 ```typescript
 <DatePicker
   className="my-custom-datepicker"
   classNames={{
-    input: 'custom-input',
-    calendar: 'custom-calendar',
-    selected: 'custom-selected',
+    root: 'custom-root',
+    input: 'text-red-600 font-medium',
+    suffix: 'opacity-100',
   }}
 />
 ```
+
+Target the `input` slot rather than the wrapper: the underlying `Input` sets
+`text-foreground` on the field, so a text colour on `root` is overridden.
 
 ## Troubleshooting
 

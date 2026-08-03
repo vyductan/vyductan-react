@@ -13,15 +13,18 @@ import type { InputRef as InputReference } from "../input";
 import type {
   DatePickerBaseProps as DatePickerBaseProperties,
   DisabledTimeConfig,
+  ShowTimeConfig,
 } from "./date-picker";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
+import { Button } from "../button";
 import { Calendar } from "../calendar";
 import { RangeCalendar } from "../calendar/range-calendar";
 import { useComponentConfig } from "../config-provider/context";
 import { inputSizeVariants, inputVariants } from "../input";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import { TimeSelect } from "../time-picker/_components/time-select";
 import { parseInputDate } from "./parse-input-date";
 
 type RangeValueType = [Dayjs | null, Dayjs | null];
@@ -31,8 +34,34 @@ type DisabledRangeTime = (
   type: RangePickerType,
 ) => DisabledTimeConfig;
 
-type DateRangePickerProperties = DatePickerBaseProperties & {
+/**
+ * Slots a caller can target with `classNames` / `styles`. `input` hits both
+ * fields; `start` / `end` narrow it to one and are merged after `input`.
+ */
+type DateRangePickerSemanticName =
+  | "root"
+  | "input"
+  | "start"
+  | "end"
+  | "suffix";
+
+/**
+ * Calendar-panel options the range picker does not implement are omitted rather
+ * than accepted and ignored — passing them is now a type error, not a no-op.
+ */
+type DateRangePickerProperties = Omit<
+  DatePickerBaseProperties,
+  | "loading"
+  | "modifiers"
+  | "modifiersClassNames"
+  | "captionLayout"
+  | "commitYearOnClose"
+  | "showTime"
+> & {
   ref?: React.Ref<InputReference>;
+
+  /** `defaultOpenValue` is a `[start, end]` tuple for range pickers. */
+  showTime?: ShowTimeConfig<[Dayjs, Dayjs]>;
 
   value?: RangeValueType | null;
   defaultValue?: RangeValueType | null;
@@ -51,12 +80,8 @@ type DateRangePickerProperties = DatePickerBaseProperties & {
   disabledTime?: DisabledRangeTime;
 
   style?: React.CSSProperties;
-  styles?: {
-    root?: React.CSSProperties;
-  };
-  classNames?: {
-    root?: string;
-  };
+  styles?: Partial<Record<DateRangePickerSemanticName, React.CSSProperties>>;
+  classNames?: Partial<Record<DateRangePickerSemanticName, string>>;
 };
 
 const DateRangePicker = (properties: DateRangePickerProperties) => {
@@ -73,9 +98,10 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     showTime,
 
     style,
-    classNames: _,
-    styles: __,
+    classNames,
+    styles,
     disabled,
+    suffix: suffixProperty,
     allowClear = false,
     variant,
     size,
@@ -87,7 +113,6 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     disabledTime,
 
     className,
-    ...rest
   } = properties;
   const {
     format: formatConfig,
@@ -100,9 +125,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
   const [isHovering, setIsHovering] = useState(false);
 
   // ====================== Format Date =======================
+  const datePart = formatConfig ?? "YYYY-MM-DD";
   const fallbackFormat = showTime
-    ? `${formatConfig ?? "YYYY-MM-DD"} HH:mm`
-    : (formatConfig ?? "YYYY-MM-DD");
+    ? typeof showTime === "object" && showTime.use12Hours
+      ? `${datePart} hh:mm:ss A`
+      : `${datePart} HH:mm:ss`
+    : datePart;
   const format = formatProperty ?? fallbackFormat;
 
   const isDateAllowed = React.useCallback(
@@ -269,6 +297,68 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     }
   };
 
+  // ====================== Time selection ======================
+  const showTimeEnabled = !!showTime;
+  const showTimeConfig = typeof showTime === "object" ? showTime : undefined;
+  const defaultOpenTuple = showTimeConfig?.defaultOpenValue;
+  const use12Hours = showTimeConfig?.use12Hours ?? false;
+  // `showTime.format` overrides the time columns; otherwise derive from
+  // `format`, switching to 12h tokens when use12Hours is set.
+  const derivedTimeFormat = use12Hours
+    ? format.includes("ss")
+      ? "hh:mm:ss A"
+      : "hh:mm A"
+    : format.includes("ss")
+      ? "HH:mm:ss"
+      : "HH:mm";
+  const timeFormat = showTimeConfig?.format ?? derivedTimeFormat;
+  const timeShowNow = showTimeConfig?.showNow ?? true;
+  // Fallback time per side when that side has no value yet. AntD defaults to
+  // the current time; `showTime.defaultOpenValue` (a [start, end] tuple)
+  // overrides it. Memoized per popover-open so the wheel stays stable.
+  const now = React.useMemo(() => dayjs(), [open]);
+  // Which side the time column edits (defaults to start until a side is active).
+  const activeSide: RangePickerType = activeInput === "end" ? "end" : "start";
+  const activeTimeValue =
+    activeSide === "end" ? (value?.[1] ?? null) : (value?.[0] ?? null);
+  const activeDefaultOpen =
+    activeSide === "end" ? defaultOpenTuple?.[1] : defaultOpenTuple?.[0];
+  const fallbackTime = activeDefaultOpen ?? now;
+  const timeConfig =
+    showTimeEnabled && disabledTime
+      ? disabledTime(activeTimeValue ?? dayjs(), activeSide)
+      : undefined;
+
+  const applyTime = React.useCallback(
+    (target: Dayjs, source: Dayjs | null | undefined) =>
+      target
+        .hour(source?.hour() ?? 0)
+        .minute(source?.minute() ?? 0)
+        .second(source?.second() ?? 0)
+        .millisecond(source?.millisecond() ?? 0),
+    [],
+  );
+
+  const handleTimeChange = React.useCallback(
+    (next: Dayjs | null | undefined) => {
+      if (!next) return;
+      if (activeSide === "end") {
+        setValue([value?.[0] ?? null, next]);
+        setEndInputValue(next.format(format));
+      } else {
+        setValue([next, value?.[1] ?? null]);
+        setStartInputValue(next.format(format));
+      }
+    },
+    [activeSide, format, setEndInputValue, setStartInputValue, setValue, value],
+  );
+
+  const handleTimeNow = React.useCallback(() => {
+    handleTimeChange(dayjs());
+    setActiveInput(null);
+    setOpen(false);
+  }, [handleTimeChange]);
+
   const CalendarComponent = React.useMemo(() => {
     // If separateCalendars is true, render 2 separate calendars using RangeCalendar
     if (separateCalendars) {
@@ -352,7 +442,15 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
         }
         disabled={(date: Date) => disabled || !isDateAllowed(dayjs(date))}
         onSelect={(_selected, triggerDate) => {
-          const selectedDate = dayjs(triggerDate);
+          const rawDate = dayjs(triggerDate);
+          // Preserve the active side's time-of-day when showTime is enabled;
+          // fall back to that side's default (or now) when it has no value yet.
+          const sideValue = activeInput === "end" ? value?.[1] : value?.[0];
+          const sideDefault =
+            activeInput === "end" ? defaultOpenTuple?.[1] : defaultOpenTuple?.[0];
+          const selectedDate = showTimeEnabled
+            ? applyTime(rawDate, sideValue ?? sideDefault ?? now)
+            : rawDate;
           if (!isDateAllowed(selectedDate)) return;
 
           // Use activeInput to determine which date to set
@@ -393,8 +491,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               setValue([startDate, selectedDate]);
               setEndInputValue(selectedDate.format(format));
             }
-            setActiveInput(null);
-            setOpen(false);
+            // With showTime keep the panel open so the user can adjust the time
+            // and confirm via "Ok".
+            if (!showTimeEnabled) {
+              setActiveInput(null);
+              setOpen(false);
+            }
           } else {
             // No active input - default to start
             setValue([selectedDate, null]);
@@ -422,6 +524,10 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     hoverPreview,
     isDateAllowed,
     setHoverPreview,
+    showTimeEnabled,
+    applyTime,
+    defaultOpenTuple,
+    now,
   ]);
 
   // prevent click label to focus input (open popover)
@@ -455,7 +561,72 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
         onOpenAutoFocus={(event) => {
           event.preventDefault();
         }}
-        content={<div className="flex">{CalendarComponent}</div>}
+        content={
+          <div className="flex flex-col">
+            <div className="flex">
+              {CalendarComponent}
+              {showTimeEnabled && (
+                <div
+                  data-slot="range-picker-time"
+                  className="flex flex-col border-l"
+                >
+                  <TimeSelect
+                    value={activeTimeValue ?? fallbackTime}
+                    format={timeFormat}
+                    showFooter={false}
+                    header={
+                      activeTimeValue ? (
+                        activeTimeValue.format(timeFormat)
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {timeFormat.replace(/[Hms]/g, "-")}
+                        </span>
+                      )
+                    }
+                    disabledHours={timeConfig?.disabledHours}
+                    disabledMinutes={timeConfig?.disabledMinutes}
+                    disabledSeconds={timeConfig?.disabledSeconds}
+                    hideDisabledOptions={showTimeConfig?.hideDisabledOptions}
+                    hourStep={showTimeConfig?.hourStep}
+                    minuteStep={showTimeConfig?.minuteStep}
+                    secondStep={showTimeConfig?.secondStep}
+                    use12Hours={use12Hours}
+                    onChange={handleTimeChange}
+                  />
+                </div>
+              )}
+            </div>
+            {showTimeEnabled && (
+              <div
+                data-slot="range-picker-footer"
+                className="flex items-center justify-between border-t px-3 py-2"
+              >
+                {timeShowNow ? (
+                  <Button
+                    size="small"
+                    type="link"
+                    className="px-0"
+                    onClick={handleTimeNow}
+                  >
+                    Now
+                  </Button>
+                ) : (
+                  <span />
+                )}
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={() => {
+                    setActiveInput(null);
+                    setOpen(false);
+                  }}
+                >
+                  Ok
+                </Button>
+              </div>
+            )}
+          </div>
+        }
       >
         <div
           role="combobox"
@@ -466,10 +637,11 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
             "inline-flex items-center gap-2",
             activeInput && "border-primary ring-primary/20 ring-2",
             className,
+            classNames?.root,
           )}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          style={style}
+          style={{ ...style, ...styles?.root }}
         >
           <div className="relative flex-1">
             <Input
@@ -494,7 +666,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                     activeInput === "start" &&
                     !value?.[0]?.isSame(hoverPreview, "day") &&
                     "text-muted-foreground",
+                  classNames?.input,
+                  classNames?.start,
                 ),
+              }}
+              styles={{
+                input: { ...styles?.input, ...styles?.start },
               }}
               onClick={(e) => {
                 if (open) {
@@ -579,7 +756,6 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   setValue([null, value?.[1] ?? null]);
                 }
               }}
-              {...rest}
             />
             {activeInput === "start" && (
               <div className="bg-primary absolute right-0 bottom-0 left-0 h-0.5" />
@@ -611,7 +787,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                     activeInput === "end" &&
                     !value?.[1]?.isSame(hoverPreview, "day") &&
                     "text-muted-foreground",
+                  classNames?.input,
+                  classNames?.end,
                 ),
+              }}
+              styles={{
+                input: { ...styles?.input, ...styles?.end },
               }}
               onClick={(e) => {
                 if (open) {
@@ -705,7 +886,6 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                 }
                 setOpen(false);
               }}
-              {...rest}
             />
             {activeInput === "end" && (
               <div className="bg-primary absolute right-0 bottom-0 left-0 h-0.5" />
@@ -714,7 +894,11 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
           {allowClear && isHovering && (value?.[0] || value?.[1]) ? (
             <button
               type="button"
-              className="ml-auto flex size-4 shrink-0 items-center justify-center opacity-50 transition-opacity hover:opacity-100"
+              className={cn(
+                "ml-auto flex size-4 shrink-0 items-center justify-center opacity-50 transition-opacity hover:opacity-100",
+                classNames?.suffix,
+              )}
+              style={styles?.suffix}
               onClick={(e) => {
                 e.stopPropagation();
                 setValue(undefined);
@@ -728,11 +912,18 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               />
             </button>
           ) : (
-            <Icon
-              aria-hidden="true"
-              icon="icon-[mingcute--calendar-2-line]"
-              className="ml-auto size-4 shrink-0 opacity-50"
-            />
+            <span
+              className={cn("ml-auto flex shrink-0", classNames?.suffix)}
+              style={styles?.suffix}
+            >
+              {suffixProperty ?? (
+                <Icon
+                  aria-hidden="true"
+                  icon="icon-[mingcute--calendar-2-line]"
+                  className="size-4 opacity-50"
+                />
+              )}
+            </span>
           )}
         </div>
       </Popover>

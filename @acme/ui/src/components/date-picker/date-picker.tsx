@@ -26,6 +26,8 @@ import { CustomCalendarDayButton } from "../calendar/_components";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
+import type { TimeSelectOptions } from "../time-picker/_components/time-select";
+import { TimeSelect } from "../time-picker/_components/time-select";
 import { MonthSelect } from "./month-select";
 import { parseInputDate } from "./parse-input-date";
 import { YearSelect } from "./year-select";
@@ -61,12 +63,17 @@ type DisabledTimeConfig = {
 
 type DisabledTime = (date: Dayjs) => DisabledTimeConfig;
 
-type ShowTimeConfig =
+// `TDefault` differs by picker: a single picker takes one `Dayjs`, a range
+// picker takes a `[start, end]` tuple. Sharing one non-generic type let a
+// tuple be passed to the single picker and silently ignored.
+// Besides `defaultOpenValue`, the object form forwards presentation options
+// (format, showNow, step, hideDisabledOptions) to the internal time panel,
+// mirroring how AntD forwards `showTime` props to its TimePicker.
+type ShowTimeConfig<TDefault = Dayjs> =
   | boolean
-  | {
-      defaultOpenValue?: Dayjs | [Dayjs, Dayjs];
-      hideDisabledOptions?: boolean;
-    };
+  | (TimeSelectOptions & {
+      defaultOpenValue?: TDefault;
+    });
 
 type DatePickerBaseProperties = InputVariants &
   InputSizeVariants & {
@@ -95,6 +102,9 @@ type DatePickerBaseProperties = InputVariants &
     maxDate?: Dayjs;
   };
 
+/** Slots a caller can target with `classNames` / `styles`. */
+type DatePickerSemanticName = "root" | "input" | "suffix";
+
 type DatePickerProperties = DatePickerBaseProperties & {
   ref?: React.Ref<InputReference>;
   defaultValue?: Dayjs | null;
@@ -107,12 +117,8 @@ type DatePickerProperties = DatePickerBaseProperties & {
   picker?: PickerMode;
 
   style?: React.CSSProperties;
-  styles?: {
-    root?: React.CSSProperties;
-  };
-  classNames?: {
-    root?: string;
-  };
+  styles?: Partial<Record<DatePickerSemanticName, React.CSSProperties>>;
+  classNames?: Partial<Record<DatePickerSemanticName, string>>;
 };
 
 const DatePicker = (properties: DatePickerProperties) => {
@@ -134,8 +140,8 @@ const DatePicker = (properties: DatePickerProperties) => {
     maxDate,
 
     style,
-    classNames: _,
-    styles: __,
+    classNames,
+    styles,
     disabled,
     loading = false,
     suffix: suffixProperty,
@@ -246,7 +252,13 @@ const DatePicker = (properties: DatePickerProperties) => {
   } else if (picker === "quarter") {
     fallbackFormat = "YYYY-[Q]Q";
   } else if (showTime) {
-    fallbackFormat = `${formatConfig ?? datePickerFormat} HH:mm`;
+    // AntD default shows seconds; a custom `format` prop overrides this.
+    // use12Hours switches the display to 12h tokens with a meridiem.
+    const datePart = formatConfig ?? datePickerFormat ?? "YYYY-MM-DD";
+    const twelve = typeof showTime === "object" && showTime.use12Hours;
+    fallbackFormat = twelve
+      ? `${datePart} hh:mm:ss A`
+      : `${datePart} HH:mm:ss`;
   }
 
   const format = formatProperty ?? fallbackFormat;
@@ -563,11 +575,53 @@ const DatePicker = (properties: DatePickerProperties) => {
     ],
   );
 
+  // ====================== Time selection ======================
+  const showTimeEnabled = !!showTime;
+  const showTimeConfig = typeof showTime === "object" ? showTime : undefined;
+  const defaultOpenTime = showTimeConfig?.defaultOpenValue;
+  const use12Hours = showTimeConfig?.use12Hours ?? false;
+  // `showTime.format` overrides the time columns; otherwise derive from
+  // `format`, switching to 12h tokens when use12Hours is set.
+  const derivedTimeFormat = use12Hours
+    ? format.includes("ss")
+      ? "hh:mm:ss A"
+      : "hh:mm A"
+    : format.includes("ss")
+      ? "HH:mm:ss"
+      : "HH:mm";
+  const timeFormat = showTimeConfig?.format ?? derivedTimeFormat;
+  const timeShowNow = showTimeConfig?.showNow ?? true;
+  // Fallback time when nothing is selected yet. AntD defaults to the current
+  // time; `defaultOpenValue` overrides it. Memoized per popover-open so the
+  // wheel does not re-highlight (and "now" does not drift) on every render.
+  const now = React.useMemo(() => dayjs(), [open]);
+  const fallbackTime = defaultOpenTime ?? now;
+  // Evaluate disabledTime for the current value so the time wheel can grey out
+  // the rejected hours/minutes/seconds (AntD parity).
+  const timeConfig =
+    showTimeEnabled && disabledTime
+      ? disabledTime(value ?? dayjs())
+      : undefined;
+
+  const applyTime = React.useCallback(
+    (target: Dayjs, source: Dayjs | null | undefined) =>
+      target
+        .hour(source?.hour() ?? 0)
+        .minute(source?.minute() ?? 0)
+        .second(source?.second() ?? 0)
+        .millisecond(source?.millisecond() ?? 0),
+    [],
+  );
+
   const commitCalendarSelection = React.useCallback(
     (date: Date | Dayjs) => {
       const dayjsDate = dayjs(date);
-      const nextValue =
+      const periodValue =
         picker === "week" ? getPeriodStart(dayjsDate, "week") : dayjsDate;
+      // Keep the currently selected time-of-day when picking a day with showTime.
+      const nextValue = showTimeEnabled
+        ? applyTime(periodValue, value ?? fallbackTime)
+        : periodValue;
 
       if (
         (picker === "week" && !isWholePeriodAllowed(nextValue, "week")) ||
@@ -584,9 +638,13 @@ const DatePicker = (properties: DatePickerProperties) => {
       setPendingYearCommit(false);
       setHoverPreview(undefined);
       setStickyPreview(undefined);
-      setOpen(false);
+      // With showTime, keep the panel open so the user can pick a time and
+      // confirm via the "Ok" button; otherwise close immediately.
+      if (!showTimeEnabled) setOpen(false);
     },
     [
+      applyTime,
+      fallbackTime,
       formatValue,
       getPeriodStart,
       isDateAllowed,
@@ -596,8 +654,30 @@ const DatePicker = (properties: DatePickerProperties) => {
       setMonth,
       setOpen,
       setValue,
+      showTimeEnabled,
+      value,
     ],
   );
+
+  const handleTimeChange = React.useCallback(
+    (next: Dayjs | null | undefined) => {
+      if (!next) return;
+      // TimeSelect preserves the date part of the value it was given, so `next`
+      // already carries the correct day (or today when no day is selected yet).
+      setValue(next);
+      setInputValue(formatValue(next));
+      setMonth(next.toDate());
+    },
+    [formatValue, setInputValue, setMonth, setValue],
+  );
+
+  const handleTimeNow = React.useCallback(() => {
+    const now = dayjs();
+    setValue(now);
+    setInputValue(formatValue(now));
+    setMonth(now.toDate());
+    setOpen(false);
+  }, [formatValue, setInputValue, setMonth, setOpen, setValue]);
 
   const CalendarDayButton = React.useCallback(
     (properties: React.ComponentProps<typeof CustomCalendarDayButton>) => (
@@ -728,86 +808,145 @@ const DatePicker = (properties: DatePickerProperties) => {
         }}
         content={
           <div
-            className="flex"
+            className="flex flex-col"
             onMouseDown={() => {
               interactingInsidePanelReference.current = true;
             }}
           >
-            <Calendar
-              mode="single"
-              required={true}
-              captionLayout={captionLayoutConfig}
-              modifiers={modifiers}
-              modifiersClassNames={modifiersClassNames}
-              // initialFocus // disable default focus (in shadcn default is true)
-              // defaultMonth={value && toDate(value)}
-              month={month}
-              onMonthChange={(m) => {
-                setMonth(m);
-                const next = dayjs(m).startOf("month");
-                setStickyPreview(next);
-                setHoverPreview(next);
+            <div className="flex">
+              <Calendar
+                mode="single"
+                required={true}
+                captionLayout={captionLayoutConfig}
+                modifiers={modifiers}
+                modifiersClassNames={modifiersClassNames}
+                // initialFocus // disable default focus (in shadcn default is true)
+                // defaultMonth={value && toDate(value)}
+                month={month}
+                onMonthChange={(m) => {
+                  setMonth(m);
+                  const next = dayjs(m).startOf("month");
+                  setStickyPreview(next);
+                  setHoverPreview(next);
 
-                if (captionLayoutConfig === "dropdown") {
-                  setPendingYearCommit(true);
+                  if (captionLayoutConfig === "dropdown") {
+                    setPendingYearCommit(true);
+                  }
+                }}
+                onDayMouseEnter={(date, modifiers) => {
+                  if (!modifiers.disabled) {
+                    const hoveredDate = dayjs(date);
+                    const basePreview =
+                      picker === "week"
+                        ? getPeriodStart(hoveredDate, "week")
+                        : hoveredDate;
+                    // Preview the hovered day with the currently selected time.
+                    const preview = showTimeEnabled
+                      ? applyTime(basePreview, value ?? defaultOpenTime)
+                      : basePreview;
+                    setHoverPreview((previous) =>
+                      previous?.isSame(preview, "minute") ? previous : preview,
+                    );
+                  }
+                }}
+                onDayMouseLeave={(_, modifiers) => {
+                  if (!modifiers.disabled) {
+                    setHoverPreview(stickyPreview ?? undefined);
+                  }
+                }}
+                selected={selectedDate}
+                startMonth={
+                  minDate?.toDate() ??
+                  dayjs().subtract(50, "year").startOf("year").toDate()
                 }
-              }}
-              onDayMouseEnter={(date, modifiers) => {
-                if (!modifiers.disabled) {
-                  const hoveredDate = dayjs(date);
-                  const preview =
-                    picker === "week"
-                      ? getPeriodStart(hoveredDate, "week")
-                      : hoveredDate;
-                  setHoverPreview((previous) =>
-                    previous?.isSame(preview, "day") ? previous : preview,
-                  );
+                endMonth={
+                  maxDate?.toDate() ??
+                  dayjs().add(50, "year").endOf("year").toDate()
                 }
-              }}
-              onDayMouseLeave={(_, modifiers) => {
-                if (!modifiers.disabled) {
-                  setHoverPreview(stickyPreview ?? undefined);
-                }
-              }}
-              selected={selectedDate}
-              startMonth={
-                minDate?.toDate() ??
-                dayjs().subtract(50, "year").startOf("year").toDate()
-              }
-              endMonth={
-                maxDate?.toDate() ??
-                dayjs().add(50, "year").endOf("year").toDate()
-              }
-              onSelect={(date) => {
-                if (!date) return;
-                commitCalendarSelection(date);
-              }}
-              disabled={(date) => !isDateAllowed(getDestinationValue(date))}
-              components={{
-                CaptionLabel: BaseCaptionLabel,
-                DayButton: CalendarDayButton,
-                ...(pickerMode === "year"
-                  ? {
-                      MonthGrid: YearModeMonthGrid,
-                      CaptionLabel: YearModeCaptionLabel,
+                onSelect={(date) => {
+                  if (!date) return;
+                  commitCalendarSelection(date);
+                }}
+                disabled={(date) => !isDateAllowed(getDestinationValue(date))}
+                components={{
+                  CaptionLabel: BaseCaptionLabel,
+                  DayButton: CalendarDayButton,
+                  ...(pickerMode === "year"
+                    ? {
+                        MonthGrid: YearModeMonthGrid,
+                        CaptionLabel: YearModeCaptionLabel,
+                      }
+                    : {}),
+                  ...(pickerMode === "month"
+                    ? {
+                        MonthGrid: MonthModeMonthGrid,
+                        CaptionLabel: MonthModeCaptionLabel,
+                      }
+                    : {}),
+                }}
+              />
+              {showTimeEnabled && (
+                <div data-slot="picker-time" className="flex flex-col border-l">
+                  <TimeSelect
+                    value={value ?? fallbackTime}
+                    format={timeFormat}
+                    showFooter={false}
+                    header={
+                      value ? (
+                        value.format(timeFormat)
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {timeFormat.replace(/[Hms]/g, "-")}
+                        </span>
+                      )
                     }
-                  : {}),
-                ...(pickerMode === "month"
-                  ? {
-                      MonthGrid: MonthModeMonthGrid,
-                      CaptionLabel: MonthModeCaptionLabel,
-                    }
-                  : {}),
-              }}
-            />
+                    disabledHours={timeConfig?.disabledHours}
+                    disabledMinutes={timeConfig?.disabledMinutes}
+                    disabledSeconds={timeConfig?.disabledSeconds}
+                    hideDisabledOptions={showTimeConfig?.hideDisabledOptions}
+                    hourStep={showTimeConfig?.hourStep}
+                    minuteStep={showTimeConfig?.minuteStep}
+                    secondStep={showTimeConfig?.secondStep}
+                    use12Hours={use12Hours}
+                    onChange={handleTimeChange}
+                  />
+                </div>
+              )}
+            </div>
+            {showTimeEnabled && (
+              <div
+                data-slot="picker-footer"
+                className="flex items-center justify-between border-t px-3 py-2"
+              >
+                {timeShowNow ? (
+                  <Button
+                    size="small"
+                    type="link"
+                    className="px-0"
+                    onClick={handleTimeNow}
+                  >
+                    Now
+                  </Button>
+                ) : (
+                  <span />
+                )}
+                <Button
+                  size="small"
+                  type="primary"
+                  onClick={() => setOpen(false)}
+                >
+                  Ok
+                </Button>
+              </div>
+            )}
           </div>
         }
       >
         <div
           role="combobox"
           data-slot="picker-input"
-          className={cn("inline-flex", className)}
-          style={style}
+          className={cn("inline-flex", className, classNames?.root)}
+          style={{ ...style, ...styles?.root }}
         >
           <Input
             ref={composedReference}
@@ -845,7 +984,13 @@ const DatePicker = (properties: DatePickerProperties) => {
                   hoverPreview &&
                   !value?.isSame(hoverPreview, "day") &&
                   "text-muted-foreground",
+                classNames?.input,
               ),
+              suffix: classNames?.suffix,
+            }}
+            styles={{
+              input: styles?.input,
+              suffix: styles?.suffix,
             }}
             onClick={(e) => {
               if (open) {
