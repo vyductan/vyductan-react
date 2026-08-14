@@ -12,11 +12,14 @@ import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
 import { WordCountPlugin } from "./plugins/word-count-plugin";
 import { editorTheme } from "./themes/editor-theme";
+import { inlineStyleHtmlImportMap } from "./utils/html-inline-style-import";
 
 const editorConfig: InitialConfigType = {
   namespace: "Editor",
   theme: editorTheme,
   nodes,
+  // Without this, opening saved HTML drops every inline color it contained.
+  html: { import: inlineStyleHtmlImportMap },
   onError: (error: Error) => {
     console.error(error);
   },
@@ -43,6 +46,15 @@ type EditorPropertiesBase = {
   className?: string;
   contentClassName?: string;
   placeholderClassName?: string;
+  /**
+   * Take the caret on mount. Opt-in, like the DOM attribute of the same name:
+   * an editor placed in a form is one field among several, and focusing itself
+   * is a decision only the surrounding screen can make.
+   *
+   * It is not merely "the first field wins" — Lexical's AutoFocusPlugin calls
+   * `editor.focus()` from an effect, which runs after a dialog has focused its
+   * own first field and therefore takes the caret off it.
+   */
   autoFocus?: boolean;
   size?: SizeType;
 };
@@ -85,7 +97,7 @@ export function Editor({
   className,
   contentClassName,
   placeholderClassName,
-  autoFocus = true,
+  autoFocus = false,
   size = "middle",
 }: EditorProps) {
   const isMarkdownMode = format === "markdown";
