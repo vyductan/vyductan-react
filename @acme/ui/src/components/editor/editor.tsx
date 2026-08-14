@@ -12,6 +12,7 @@ import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
 import { WordCountPlugin } from "./plugins/word-count-plugin";
 import { editorTheme } from "./themes/editor-theme";
+import { toEditorState } from "./to-editor-state";
 import { inlineStyleHtmlImportMap } from "./utils/html-inline-style-import";
 
 const editorConfig: InitialConfigType = {
@@ -108,16 +109,7 @@ export function Editor({
   let initialEditorState: string | undefined;
   if (typeof rawEditorState === "string") {
     if (rawEditorState.trim()) {
-      try {
-        JSON.parse(rawEditorState);
-        initialEditorState = rawEditorState;
-      } catch (error) {
-        console.error(
-          "Editor: invalid JSON in editorState, ignoring value",
-          error,
-        );
-        initialEditorState = undefined;
-      }
+      initialEditorState = toEditorState(rawEditorState);
     } else {
       initialEditorState = undefined;
     }
