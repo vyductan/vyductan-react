@@ -214,10 +214,11 @@ const useForm = <
   );
 
   const submit = useCallback(
-    (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
-      return onSubmit
-        ? methods.handleSubmit(onSubmit)(event)
-        : Promise.resolve();
+    // `handleSubmit` resolves with whatever the handler returns, so the result
+    // is dropped here to keep `submit` on its `Promise<void>` contract.
+    async (event?: BaseSyntheticEvent<object, unknown, unknown>) => {
+      if (!onSubmit) return;
+      await methods.handleSubmit(onSubmit)(event);
     },
     [methods, onSubmit],
   );

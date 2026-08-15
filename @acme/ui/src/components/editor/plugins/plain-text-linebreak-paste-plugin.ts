@@ -45,7 +45,8 @@ export function PlainTextLinebreakPastePlugin(): null {
   useEffect(() => {
     return editor.registerCommand(
       PASTE_COMMAND,
-      (event: ClipboardEvent) => {
+      (event) => {
+        if (!event || !("clipboardData" in event)) return false;
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) {
           return false;

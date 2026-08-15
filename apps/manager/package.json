@@ -13,21 +13,21 @@
   "dependencies": {
     "@acme/ui": "workspace:*",
     "@tauri-apps/api": "^2.11.1",
-    "@tauri-apps/plugin-dialog": "^2.7.1",
+    "@tauri-apps/plugin-dialog": "^2.7.2",
     "@tauri-apps/plugin-shell": "^2.3.5",
     "lucide-react": "catalog:",
     "react": "catalog:react19",
     "react-diff-view": "^3.3.3",
     "react-dom": "catalog:react19",
-    "zustand": "^5.0.14"
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@tauri-apps/cli": "^2.11.2",
+    "@tauri-apps/cli": "^2.11.4",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "catalog:vite",
-    "rollup": "^4.62.0",
+    "rollup": "^4.62.4",
     "typescript": "catalog:",
     "vite": "catalog:vite"
   }

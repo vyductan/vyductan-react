@@ -141,7 +141,10 @@ export function BlockCopyPastePlugin(): null {
   useEffect(() => {
     return editor.registerCommand(
       COPY_COMMAND,
-      (event: ClipboardEvent) => {
+      (event) => {
+        // Lexical widened this payload to keyboard/input events and null; this
+        // handler only knows how to fill a real clipboard.
+        if (!event || !("clipboardData" in event)) return false;
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) {
           return false;
@@ -265,7 +268,8 @@ export function BlockCopyPastePlugin(): null {
   useEffect(() => {
     return editor.registerCommand(
       CUT_COMMAND,
-      (event: ClipboardEvent) => {
+      (event) => {
+        if (!event || !("clipboardData" in event)) return false;
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) {
           return false;
@@ -373,7 +377,8 @@ export function BlockCopyPastePlugin(): null {
   useEffect(() => {
     return editor.registerCommand(
       PASTE_COMMAND,
-      (event: ClipboardEvent) => {
+      (event) => {
+        if (!event || !("clipboardData" in event)) return false;
         const clipboardData = event.clipboardData;
         if (!clipboardData) return false;
 

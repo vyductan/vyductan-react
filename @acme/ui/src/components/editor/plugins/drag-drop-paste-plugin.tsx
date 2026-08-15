@@ -177,7 +177,8 @@ export function DragDropPastePlugin({
       ),
       editor.registerCommand(
         PASTE_COMMAND,
-        (event: ClipboardEvent) => {
+        (event) => {
+          if (!event || !("clipboardData" in event)) return false;
           const { clipboardData } = event;
           if (!clipboardData) {
             return false;

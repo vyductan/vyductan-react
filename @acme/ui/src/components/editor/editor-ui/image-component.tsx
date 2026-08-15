@@ -233,7 +233,9 @@ export default function ImageComponent({
   );
 
   const $onEnter = useCallback(
-    (event: KeyboardEvent) => {
+    // Lexical dispatches this command with a null payload when the Enter did
+    // not come from a keyboard event.
+    (event: KeyboardEvent | null) => {
       const latestSelection = $getSelection();
       const buttonElement = buttonReference.current;
       if (
@@ -244,14 +246,14 @@ export default function ImageComponent({
         if (showCaption) {
           // Move focus into nested editor
           $setSelection(null);
-          event.preventDefault();
+          event?.preventDefault();
           caption.focus();
           return true;
         } else if (
           buttonElement !== null &&
           buttonElement !== document.activeElement
         ) {
-          event.preventDefault();
+          event?.preventDefault();
           buttonElement.focus();
           return true;
         }
