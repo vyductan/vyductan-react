@@ -19,6 +19,24 @@ export const getCommonPinningStyles = <T>(column: Column<T>): CSSProperties => {
   return {
     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
+    /**
+     * A pinned cell must be opaque or the columns scrolling underneath show
+     * through it. That background lives HERE rather than in the class list for
+     * two reasons: an inline style cannot lose a class-order race, and routing
+     * it through a CSS variable lets a row retint its own pinned cells.
+     *
+     * A hardcoded `bg-background` used to win over every row background, so a
+     * tinted row (a group banner, a highlighted row) came out blank in the
+     * pinned column while the rest of the row kept its tint.
+     *
+     * To retint, set the variable on the row:
+     *   `[--table-pinned-cell-bg:transparent]` — let the row's own background
+     *      show through (safe when the pinned cell has nothing to occlude)
+     *   `[--table-pinned-cell-bg:var(--color-muted)]` — paint an opaque tint
+     */
+    backgroundColor: isPinned
+      ? "var(--table-pinned-cell-bg, var(--color-background))"
+      : undefined,
   };
 };
 export const getCommonPinningClassName = <T>(
@@ -33,7 +51,8 @@ export const getCommonPinningClassName = <T>(
     isPinned === "right" && column.getIsFirstColumn("right");
   return cn(
     // isPinned && !isHeader && "bg-surface",
-    isPinned ? "sticky z-10 bg-background" : "relative",
+    // Background comes from getCommonPinningStyles — see the note there.
+    isPinned ? "sticky z-10" : "relative",
     isLastLeftPinnedColumn && [
       "after:absolute after:inset-y-0 after:right-0 after:w-[30px] after:translate-x-full",
       scrollLeft !== 0 &&
