@@ -23,6 +23,15 @@ const FALLBACK_DATE_FORMATS = [
   "M/D/YYYY",
   "MM/DD/YYYY HH:mm",
   "M/D/YYYY HH:mm",
+  // Month-name variants (e.g. "2027-Jan-15 10:00:00", "15 Jan 2027").
+  "YYYY-MMM-DD",
+  "YYYY-MMM-DD HH:mm",
+  "YYYY-MMM-DD HH:mm:ss",
+  "DD-MMM-YYYY",
+  "DD MMM YYYY",
+  "DD MMM YYYY HH:mm",
+  "MMM D, YYYY",
+  "MMMM D, YYYY",
 ] as const;
 
 export const parseInputDate = (rawValue: string, preferredFormat: string) => {

@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import type { MultipleDatePickerProps } from "./date-picker-multiple";
 import type { ShadcnCalendarProps } from "../calendar/_components";
 import type { InputRef as InputReference } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
@@ -28,6 +29,7 @@ import { Input } from "../input/input";
 import { Popover } from "../popover";
 import type { TimeSelectOptions } from "../time-picker/_components/time-select";
 import { TimeSelect } from "../time-picker/_components/time-select";
+import { MultipleDatePicker } from "./date-picker-multiple";
 import { MonthSelect } from "./month-select";
 import { parseInputDate } from "./parse-input-date";
 import { YearSelect } from "./year-select";
@@ -105,6 +107,15 @@ type DatePickerBaseProperties = InputVariants &
 /** Slots a caller can target with `classNames` / `styles`. */
 type DatePickerSemanticName = "root" | "input" | "suffix";
 
+/** Info passed to `cellRender` (AntD-compatible subset). */
+type CellRenderInfo = {
+  /** The default cell node — wrap it to keep the built-in appearance. */
+  originNode: React.ReactNode;
+  today: Dayjs;
+  /** Cell type. Only date cells are customizable for now. */
+  type: "date";
+};
+
 type DatePickerProperties = DatePickerBaseProperties & {
   ref?: React.Ref<InputReference>;
   defaultValue?: Dayjs | null;
@@ -114,6 +125,17 @@ type DatePickerProperties = DatePickerBaseProperties & {
   disabledTime?: DisabledTime;
   placeholder?: string;
 
+  /** Customize the content of each date cell (AntD `cellRender`). */
+  cellRender?: (current: Dayjs, info: CellRenderInfo) => React.ReactNode;
+
+  /** Single mode (default). Pass `multiple` for multi-date selection. */
+  multiple?: false;
+
+  /** Controlled open state of the panel. */
+  open?: boolean;
+  /** Callback when the panel open state changes. */
+  onOpenChange?: (open: boolean) => void;
+
   picker?: PickerMode;
 
   style?: React.CSSProperties;
@@ -121,7 +143,7 @@ type DatePickerProperties = DatePickerBaseProperties & {
   classNames?: Partial<Record<DatePickerSemanticName, string>>;
 };
 
-const DatePicker = (properties: DatePickerProperties) => {
+const SingleDatePicker = (properties: DatePickerProperties) => {
   const {
     ref,
     id,
@@ -136,6 +158,9 @@ const DatePicker = (properties: DatePickerProperties) => {
     picker,
     disabledDate,
     disabledTime,
+    cellRender,
+    open: openProperty,
+    onOpenChange,
     minDate,
     maxDate,
 
@@ -233,7 +258,19 @@ const DatePicker = (properties: DatePickerProperties) => {
     [getPeriodStart, isDateAllowed],
   );
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useMergedState(false, {
+    value: openProperty,
+  });
+  // Wrap the setter so `onOpenChange` fires on every open change — including
+  // programmatic closes (e.g. selecting a date) which useMergedState's own
+  // effect-based onChange skips when the picker is controlled.
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      setOpenState(next);
+      onOpenChange?.(next);
+    },
+    [onOpenChange, setOpenState],
+  );
   const {
     format: formatConfig,
     captionLayout: captionLayoutConfig,
@@ -300,7 +337,8 @@ const DatePicker = (properties: DatePickerProperties) => {
   const preInputValue = value ? formatValue(value) : "";
   const [inputValue, setInputValue] = useMergedState(preInputValue);
 
-  // Sync input value when value changes
+  // Sync input value when the committed value changes. Typing does NOT change
+  // `value` (it commits on blur/Enter), so this never clobbers in-progress text.
   useEffect(() => {
     const newInputValue = value ? formatValue(value) : "";
     setInputValue(newInputValue);
@@ -688,9 +726,17 @@ const DatePicker = (properties: DatePickerProperties) => {
           event.preventDefault();
           properties.onMouseDown?.(event);
         }}
-      />
+      >
+        {cellRender
+          ? cellRender(dayjs(properties.day.date), {
+              originNode: properties.children,
+              today: dayjs(),
+              type: "date",
+            })
+          : properties.children}
+      </CustomCalendarDayButton>
     ),
-    [],
+    [cellRender],
   );
 
   const BaseCaptionLabel = React.useCallback(
@@ -909,6 +955,11 @@ const DatePicker = (properties: DatePickerProperties) => {
                     secondStep={showTimeConfig?.secondStep}
                     use12Hours={use12Hours}
                     onChange={handleTimeChange}
+                    onHoverChange={(hovered) => {
+                      // Preview the hovered time in the input; on mouse-leave
+                      // (undefined) fall back to the sticky preview.
+                      setHoverPreview(hovered ?? stickyPreview ?? undefined);
+                    }}
                   />
                 </div>
               )}
@@ -982,7 +1033,10 @@ const DatePicker = (properties: DatePickerProperties) => {
               input: cn(
                 open &&
                   hoverPreview &&
-                  !value?.isSame(hoverPreview, "day") &&
+                  !value?.isSame(
+                    hoverPreview,
+                    showTimeEnabled ? "second" : "day",
+                  ) &&
                   "text-muted-foreground",
                 classNames?.input,
               ),
@@ -1021,17 +1075,14 @@ const DatePicker = (properties: DatePickerProperties) => {
               const newValue = event.currentTarget.value;
               setInputValue(newValue);
 
-              // Update calendar month and selected date when typing
+              // Navigate the calendar to preview what's being typed, but do NOT
+              // commit yet — committing per keystroke re-formats the field and
+              // clobbers partial input. The value commits on blur / Enter.
               if (newValue.trim()) {
                 const parsed = parseInputDate(newValue, format);
                 if (parsed && isSelectableValue(parsed)) {
-                  // Commit immediately so form state is updated even before blur
-                  setValue(parsed);
                   setMonth(parsed.toDate());
                 }
-              } else {
-                // Keep form state in sync when clearing input
-                setValue(undefined);
               }
             }}
             onBlur={(e) => {
@@ -1090,8 +1141,39 @@ const DatePicker = (properties: DatePickerProperties) => {
   );
 };
 
+// One widened public prop type covering both modes. A discriminated union
+// would give sharper autocomplete but breaks callers that spread props with
+// single-only keys (e.g. `picker`); this superset keeps every caller working.
+type DatePickerProps = Omit<
+  DatePickerProperties,
+  "value" | "defaultValue" | "onChange" | "multiple"
+> & {
+  /** Enable multiple date selection (renders removable tags). */
+  multiple?: boolean;
+  value?: Dayjs | Dayjs[] | null;
+  defaultValue?: Dayjs | Dayjs[] | null;
+  onChange?:
+    | ((date: Dayjs | null | undefined, dateString: string) => void)
+    | ((dates: Dayjs[], dateStrings: string[]) => void);
+  /** Multiple mode only: max tags before collapsing to a "+N" placeholder. */
+  maxTagCount?: MultipleDatePickerProps["maxTagCount"];
+  maxTagPlaceholder?: MultipleDatePickerProps["maxTagPlaceholder"];
+};
+
+// Dispatch on `multiple`: separate components keep the single-mode hooks and
+// the multi-select tags UI fully isolated.
+const DatePicker = (properties: DatePickerProps) =>
+  properties.multiple ? (
+    <MultipleDatePicker
+      {...(properties as unknown as MultipleDatePickerProps)}
+    />
+  ) : (
+    <SingleDatePicker {...(properties as unknown as DatePickerProperties)} />
+  );
+
 export type {
-  DatePickerProperties as DatePickerProps,
+  DatePickerProps,
+  MultipleDatePickerProps,
   DatePickerBaseProperties as DatePickerBaseProps,
   DisabledTime,
   DisabledTimeConfig,

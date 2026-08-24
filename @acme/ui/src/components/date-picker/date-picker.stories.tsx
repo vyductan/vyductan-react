@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import dayjs from "dayjs";
 import {
   expect,
@@ -393,6 +394,192 @@ export const WithTime12Hours: Story = {
         li.className.includes("bg-primary-200"),
       );
       await expect(selectedMeridiem?.textContent).toBe("PM");
+    });
+  },
+};
+
+export const ControlledOpen: Story = {
+  args: { onOpenChange: fn(), defaultValue: dayjs("2024-06-10") },
+  render: (args) => {
+    const [open, setOpen] = useState(false);
+    return (
+      <div className="flex flex-col items-start gap-2">
+        <button
+          type="button"
+          className="rounded border px-2 py-1 text-sm"
+          onClick={() => setOpen((previous) => !previous)}
+        >
+          Toggle
+        </button>
+        <DatePicker
+          {...args}
+          open={open}
+          onOpenChange={(next) => {
+            args.onOpenChange?.(next);
+            setOpen(next);
+          }}
+          placeholder="Controlled open"
+          className="w-[240px]"
+        />
+      </div>
+    );
+  },
+  play: async ({ canvasElement, step, args }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Controlled open");
+
+    await step("clicking the input fires onOpenChange and opens (controlled)", async () => {
+      await userEvent.click(input);
+      // Panel is controlled: it only opens because the handler set state from
+      // the onOpenChange(true) callback.
+      await expect(args.onOpenChange).toHaveBeenCalledWith(true);
+      await expect(
+        document.querySelector('[data-slot="calendar"]'),
+      ).not.toBeNull();
+    });
+
+    await step("closing fires onOpenChange(false)", async () => {
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() =>
+        expect(args.onOpenChange).toHaveBeenCalledWith(false),
+      );
+      await waitFor(() =>
+        expect(document.querySelector('[data-slot="calendar"]')).toBeNull(),
+      );
+    });
+  },
+};
+
+export const WithCellRender: Story = {
+  args: {
+    defaultValue: dayjs("2024-06-10"),
+    placeholder: "Cell render",
+    className: "w-[240px]",
+    cellRender: (current, info) => {
+      if (info.type !== "date") return info.originNode;
+      return (
+        <div className="relative">
+          {info.originNode}
+          {current.date() === 1 && (
+            <span
+              data-testid="cell-dot"
+              className="absolute bottom-0.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-green-500"
+            />
+          )}
+        </div>
+      );
+    },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByPlaceholderText("Cell render"));
+
+    await step("custom cell content renders in the day grid", async () => {
+      await expect(
+        document.querySelector('[data-testid="cell-dot"]'),
+      ).not.toBeNull();
+    });
+  },
+};
+
+export const TypingCommits: Story = {
+  args: {
+    showTime: true,
+    placeholder: "Type a date",
+    className: "w-[260px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step, args }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Type a date");
+
+    await step("typed text is not clobbered mid-typing", async () => {
+      await userEvent.click(input);
+      await userEvent.type(input, "2027-01-15 10:00:00");
+      await expect(input).toHaveValue("2027-01-15 10:00:00");
+    });
+
+    await step("Enter commits the typed value", async () => {
+      await userEvent.keyboard("{Enter}");
+      await expect(input).toHaveValue("2027-01-15 10:00:00");
+      await expect(args.onChange).toHaveBeenCalled();
+    });
+  },
+};
+
+export const TypingMonthName: Story = {
+  args: {
+    placeholder: "Type month name",
+    className: "w-[240px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByPlaceholderText("Type month name");
+    await userEvent.click(input);
+    await userEvent.type(input, "2027-Jan-15");
+    await userEvent.keyboard("{Enter}");
+    // Parsed via the MMM fallback and re-formatted to the picker's format.
+    await expect(input).toHaveValue("2027-01-15");
+    await expect(args.onChange).toHaveBeenCalled();
+  },
+};
+
+export const Multiple: Story = {
+  args: {
+    multiple: true,
+    placeholder: "Select dates",
+    defaultValue: [
+      dayjs("2024-06-05"),
+      dayjs("2024-06-12"),
+      dayjs("2024-06-20"),
+    ],
+    className: "w-[340px]",
+    onChange: fn(),
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("each selected date renders as its own tag", async () => {
+      await expect(canvas.getByText("2024-06-05")).toBeTruthy();
+      await expect(canvas.getByText("2024-06-12")).toBeTruthy();
+      await expect(canvas.getByText("2024-06-20")).toBeTruthy();
+    });
+
+    await step("picking another day adds a tag, panel stays open", async () => {
+      await userEvent.click(canvas.getByRole("combobox"));
+      const day = document.querySelector<HTMLButtonElement>(
+        '[data-day="6/15/2024"]',
+      );
+      if (!day) throw new Error("Expected day button for 6/15/2024");
+      await userEvent.click(day);
+      await expect(canvas.getByText("2024-06-15")).toBeTruthy();
+      await expect(
+        document.querySelector('[data-slot="calendar"]'),
+      ).not.toBeNull();
+    });
+  },
+};
+
+export const MultipleMaxTagCount: Story = {
+  args: {
+    multiple: true,
+    placeholder: "Select dates",
+    maxTagCount: 2,
+    defaultValue: [
+      dayjs("2024-06-05"),
+      dayjs("2024-06-12"),
+      dayjs("2024-06-20"),
+      dayjs("2024-06-25"),
+    ],
+    className: "w-[300px]",
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    await step("collapses extra tags into a +N placeholder", async () => {
+      await expect(canvas.getByText("2024-06-05")).toBeTruthy();
+      await expect(canvas.getByText("2024-06-12")).toBeTruthy();
+      await expect(canvas.getByText(/\+ ?2/)).toBeTruthy();
     });
   },
 };

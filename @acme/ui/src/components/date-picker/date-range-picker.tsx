@@ -68,6 +68,11 @@ type DateRangePickerProperties = Omit<
   /** Callback function, can be executed when the selected time is changing */
   onChange?: (dates: RangeValueType | null) => void;
 
+  /** Controlled open state of the panel. */
+  open?: boolean;
+  /** Callback when the panel open state changes. */
+  onOpenChange?: (open: boolean) => void;
+
   placeholder?: [string, string];
 
   variant?: "outlined" | "filled" | "borderless";
@@ -96,6 +101,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     placeholder,
     format: formatProperty,
     showTime,
+    open: openProperty,
+    onOpenChange,
 
     style,
     classNames,
@@ -120,7 +127,19 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     // commitYearOnClose: commitYearOnCloseConfig,
   } = useComponentConfig("datePicker");
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useMergedState(false, {
+    value: openProperty,
+  });
+  // Wrap the setter so `onOpenChange` fires on every open change — including
+  // programmatic closes (e.g. selecting a date) which useMergedState's own
+  // effect-based onChange skips when the picker is controlled.
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      setOpenState(next);
+      onOpenChange?.(next);
+    },
+    [onOpenChange, setOpenState],
+  );
   const [activeInput, setActiveInput] = useState<"start" | "end" | null>(null);
   const [isHovering, setIsHovering] = useState(false);
 

@@ -469,7 +469,7 @@ export const TimeSelect = ({
           </ul>
         )}
         {use12Hours && (
-          <ul className="flex w-14 min-h-0 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden">
+          <ul className="flex w-14 min-h-0 flex-col gap-0.5 border-l">
             {(["AM", "PM"] as const).map((mer) => (
               <li
                 key={mer}

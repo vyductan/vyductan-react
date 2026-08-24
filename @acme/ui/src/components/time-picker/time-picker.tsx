@@ -50,6 +50,8 @@ type TimePickerProperties<
     };
     /** Hide (instead of greying) options rejected by `disabledTime`. */
     hideDisabledOptions?: boolean;
+    /** 12-hour clock: hours show 12/1..11 with an AM/PM column. */
+    use12Hours?: boolean;
   };
 const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
   properties: TimePickerProperties<TValue>,
@@ -61,12 +63,14 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     className,
 
     // picker props
-    format = "HH:mm:ss",
+    format: formatProperty,
+    showNow,
     defaultValue = null,
     value,
     onChange,
     disabledTime,
     hideDisabledOptions,
+    use12Hours = false,
 
     // input props
     ref,
@@ -82,6 +86,10 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     // trigger props
     ...restProperties
   } = properties;
+
+  // AntD default: use12Hours with no explicit format falls back to "h:mm:ss A".
+  const format =
+    formatProperty ?? (use12Hours ? "h:mm:ss A" : "HH:mm:ss");
   const [open, setOpen] = useMergedState(false, {
     value: openProperty,
     onChange: onOpenChange,
@@ -110,7 +118,6 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     text: string;
     value: TValue;
   }>();
-  const [isInputFocused, setIsInputFocused] = React.useState(false);
   const [hoverPreview, setHoverPreview] = React.useState<DateType>(null);
 
   const parsedLocalStringValue =
@@ -123,6 +130,12 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     inputDraft?.format === format && Object.is(inputDraft.value, localValue)
       ? inputDraft.text
       : committedInputValue;
+  // The committed value as a Dayjs (string values parsed), for comparing
+  // against the hover preview to decide whether to dim the input text.
+  const localDayjs: DateType =
+    typeof localValue === "string"
+      ? parsedLocalStringValue
+      : (localValue as DateType);
 
   const handleChange = React.useCallback(
     (newValue: DateType) => {
@@ -227,6 +240,8 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
           disabledSeconds={disabledConfig?.disabledSeconds}
           hideDisabledOptions={hideDisabledOptions}
           nowDisabled={isTimeDisabled(dayjs())}
+          use12Hours={use12Hours}
+          showNow={showNow}
         />
       </div>
     );
@@ -240,6 +255,8 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
     disabledTime,
     hideDisabledOptions,
     isTimeDisabled,
+    use12Hours,
+    showNow,
   ]);
 
   return (
@@ -280,23 +297,25 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
             name={name}
             autoComplete="off"
             value={
-              !isInputFocused && open && hoverPreview
+              // Show the hovered option as a preview while the panel is open,
+              // unless the user is mid-typing (an uncommitted draft exists).
+              open && hoverPreview && !inputDraft
                 ? formatDateValue(hoverPreview, format)
                 : inputValue
             }
             onChange={handleInputChange}
             classNames={{
+              // Dim the input while showing a hover preview that differs from
+              // the committed value (or when nothing is committed yet), matching
+              // DatePicker / AntD.
               input: cn(
                 open &&
                   hoverPreview &&
-                  localValue &&
-                  typeof localValue !== "string" &&
-                  !localValue.isSame(hoverPreview, "minute") &&
+                  !localDayjs?.isSame(hoverPreview, "second") &&
                   "text-muted-foreground",
               ),
             }}
             onFocus={(e) => {
-              setIsInputFocused(true);
               // Select all text on focus for better UX
               e.target.select();
             }}
@@ -326,9 +345,6 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
               }
             }}
             onBlur={onBlur}
-            onBlurCapture={() => {
-              setIsInputFocused(false);
-            }}
             aria-invalid={ariaInvalid}
             aria-describedby={ariaDescribedBy}
           />

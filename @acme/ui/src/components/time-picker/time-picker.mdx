@@ -3,6 +3,7 @@ import { ComponentSource } from "@acme/ui/components/mdx";
 import BasicDemo from "./examples/basic";
 import DisabledTimeDemo from "./examples/disabled-time";
 import HourMinuteDemo from "./examples/hour-minute";
+import Use12HoursDemo from "./examples/use12-hours";
 
 # TimePicker
 
@@ -44,6 +45,16 @@ the current time itself falls in a disabled range.
 <ComponentSource
   src="time-picker/examples/disabled-time.tsx"
   __comp__={DisabledTimeDemo}
+/>
+
+### 12 Hours
+
+Pass `use12Hours` to render a 12-hour clock (hours `12/1..11`) with an AM/PM
+column. When no `format` is given it defaults to `h:mm:ss A`.
+
+<ComponentSource
+  src="time-picker/examples/use12-hours.tsx"
+  __comp__={Use12HoursDemo}
 />
 
 ### Form Integration
@@ -108,6 +119,8 @@ function FormExample() {
 | `status`       | `"error" \| "warning"`                                           | -               | Validation status                       |
 | `disabledTime` | `(now: Dayjs) => { disabledHours?; disabledMinutes?; disabledSeconds? }` | -       | Return disabled hours/minutes/seconds (AntD parity) |
 | `hideDisabledOptions` | `boolean`                                                 | `false`         | Hide (instead of grey) disabled options |
+| `use12Hours`   | `boolean`                                                        | `false`         | 12-hour clock with AM/PM column (default format `h:mm:ss A`) |
+| `showNow`      | `boolean`                                                        | `true`          | Show the "Now" footer button            |
 
 ## Migration from Ant Design
 

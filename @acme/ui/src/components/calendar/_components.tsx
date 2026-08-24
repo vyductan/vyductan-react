@@ -57,13 +57,31 @@ const CustomCalendar = ({
   formatters,
   locale,
   onWeeksMouseLeave,
+  className,
+  modifiersClassNames,
   ...properties
 }: ShadcnCalendarProps) => {
   const DayButtonComponent = components?.DayButton ?? CustomCalendarDayButton;
   const WeeksComponent = components?.Weeks;
+  const isMultiple = properties.mode === "multiple";
 
   return (
     <ShadcnCalendar
+      // In multiple mode, put a gap between the day cells (the week row is a
+      // flexbox) so adjacent selected days read as separate boxes instead of
+      // merging into a range-like bar. `size-full` + `min-w-0` makes the day
+      // button fill its cell so a selected day paints edge-to-edge ("fills the
+      // whole cell"). Range mode is left untouched — highlight stays continuous.
+      className={cn(
+        isMultiple &&
+          "[&_tr]:gap-1 [&_td]:size-(--cell-size) [&_td]:p-0 [&_td>button]:size-full [&_td>button]:min-w-0",
+        className,
+      )}
+      // In multiple mode, modifier styling is applied to the day BUTTON (see
+      // the DayButton wrapper) instead of the cell, so a marker (border/ring)
+      // is concentric with the selected fill on the same box. Other modes keep
+      // the default cell-level behavior.
+      modifiersClassNames={isMultiple ? undefined : modifiersClassNames}
       fixedWeeks={fixedWeeks}
       locale={locale}
       formatters={{
@@ -79,14 +97,29 @@ const CustomCalendar = ({
       }}
       components={{
         ...components,
-        DayButton: (dayButtonProperties) => (
-          <DayButtonComponent
-            {...dayButtonProperties}
-            data-day={dayButtonProperties.day.date.toLocaleDateString(
-              locale?.code,
-            )}
-          />
-        ),
+        DayButton: (dayButtonProperties) => {
+          const modifierClassName =
+            isMultiple && modifiersClassNames
+              ? Object.entries(modifiersClassNames)
+                  .filter(
+                    ([key]) =>
+                      (
+                        dayButtonProperties.modifiers as Record<string, boolean>
+                      )[key],
+                  )
+                  .map(([, cls]) => cls)
+                  .join(" ")
+              : undefined;
+          return (
+            <DayButtonComponent
+              {...dayButtonProperties}
+              className={cn(dayButtonProperties.className, modifierClassName)}
+              data-day={dayButtonProperties.day.date.toLocaleDateString(
+                locale?.code,
+              )}
+            />
+          );
+        },
         Weeks: ({ children, onMouseLeave, ...weekProperties }) => {
           const handleMouseLeave = (
             e: React.MouseEvent<HTMLTableSectionElement>,
