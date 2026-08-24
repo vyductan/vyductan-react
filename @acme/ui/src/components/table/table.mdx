@@ -4,6 +4,7 @@ import TableBasicDemo from "./examples/basic";
 import TableBorderTitleFooterDemo from "./examples/border-title-footer";
 import TableExpandableDemo from "./examples/expand";
 import TableFilteredSelectionDemo from "./examples/filtered-selection";
+import TableFixedColumnsDemo from "./examples/fixed-columns";
 import TableMultipleSorterDemo from "./examples/multiple-sorter";
 import TableSelectionDemo from "./examples/selection";
 import TableSizeDemo from "./examples/size";
@@ -97,6 +98,18 @@ string, so the selection stays a valid `number[]`.
 <ComponentSource
   src="table/examples/filtered-selection.tsx"
   __comp__={TableFilteredSelectionDemo}
+/>
+
+### fixed columns
+
+Pin a column to either edge with `fixed: "left"` or `fixed: "right"`. A pinned
+cell is opaque, so the columns scrolling underneath do not show through it; a
+row can opt out with `[--table-pinned-cell-bg:transparent]` to let its own tint
+show. `scroll.x` takes a number here rather than Ant Design's `"max-content"`.
+
+<ComponentSource
+  src="table/examples/fixed-columns.tsx"
+  __comp__={TableFixedColumnsDemo}
 />
 
 ### size

@@ -5,6 +5,7 @@ import { expect, fireEvent, fn, waitFor } from "storybook/test";
 import type { ColumnsType } from "./types";
 import DragSortingFullRowDemo from "./examples/drag-sorting-full-row";
 import DragSortingWithHandleDemo from "./examples/drag-sorting-with-handle";
+import FixedColumnsDemo from "./examples/fixed-columns";
 import SizeDemo from "./examples/size";
 import { OwnTable as Table } from "./table";
 
@@ -168,6 +169,10 @@ export const Empty: Story = {
     columns: columns as any,
     dataSource: [],
   },
+};
+
+export const FixedColumns: Story = {
+  render: () => <FixedColumnsDemo />,
 };
 
 export const Size: Story = {
