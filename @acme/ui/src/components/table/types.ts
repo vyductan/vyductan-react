@@ -90,8 +90,7 @@ export type CellEllipsisType =
   | boolean;
 type ColumnSharedType<TRecord> = {
   title?:
-    | React.ReactNode
-    | ((ctx: { table: Table<TRecord> }) => React.ReactNode);
+    React.ReactNode | ((ctx: { table: Table<TRecord> }) => React.ReactNode);
   key?: string;
   className?: string;
   hidden?: boolean;
@@ -139,13 +138,7 @@ export interface ColumnGroupType<RecordType = AnyObject> extends Omit<
 }
 
 export type AlignType =
-  | "start"
-  | "end"
-  | "left"
-  | "right"
-  | "center"
-  | "justify"
-  | "match-parent";
+  "start" | "end" | "left" | "right" | "center" | "justify" | "match-parent";
 
 export interface ColumnFilterItem {
   text: React.ReactNode;
@@ -164,14 +157,12 @@ export interface ColumnTitleProps<RecordType = AnyObject> {
 }
 
 export type ColumnTitle<RecordType = AnyObject> =
-  | React.ReactNode
-  | ((props: ColumnTitleProps<RecordType>) => React.ReactNode);
+  React.ReactNode | ((props: ColumnTitleProps<RecordType>) => React.ReactNode);
 
 export type FilterValue = (Key | boolean)[];
 export type FilterKey = (string | number)[] | null;
 export type FilterSearchType<RecordType = AnyObject> =
-  | boolean
-  | ((input: string, record: RecordType) => boolean);
+  boolean | ((input: string, record: RecordType) => boolean);
 export interface FilterConfirmProps {
   closeDropdown: boolean;
 }
@@ -286,8 +277,7 @@ export type ColumnType<TRecord> = ColumnSharedType<TRecord> & {
   filtered?: boolean;
   filters?: ColumnFilterItem[];
   filterDropdown?:
-    | React.ReactNode
-    | ((props: FilterDropdownProps) => React.ReactNode);
+    React.ReactNode | ((props: FilterDropdownProps) => React.ReactNode);
   filterOnClose?: boolean;
   filterMultiple?: boolean;
   filteredValue?: FilterValue | null;
@@ -321,8 +311,7 @@ export type ColumnType<TRecord> = ColumnSharedType<TRecord> & {
 };
 
 export type ColumnsType<TRecord = AnyObject> = (
-  | ColumnGroupType<TRecord>
-  | ColumnType<TRecord>
+  ColumnGroupType<TRecord> | ColumnType<TRecord>
 )[];
 
 export interface SelectionItem {
@@ -332,10 +321,7 @@ export interface SelectionItem {
 }
 
 export type INTERNAL_SELECTION_ITEM =
-  | SelectionItem
-  | "SELECT_ALL"
-  | "SELECT_INVERT"
-  | "SELECT_NONE";
+  SelectionItem | "SELECT_ALL" | "SELECT_INVERT" | "SELECT_NONE";
 
 export type SelectionSelectFn<T = AnyObject> = (
   record: T,
@@ -420,8 +406,7 @@ export type TableRowSelection<TRecord, TKey extends Key = Key> = {
   fixed?: FixedType;
   columnWidth?: string | number;
   columnTitle?:
-    | React.ReactNode
-    | ((checkboxNode: React.ReactNode) => React.ReactNode);
+    React.ReactNode | ((checkboxNode: React.ReactNode) => React.ReactNode);
   checkStrictly?: boolean;
   /** Set the alignment of the selection column */
   align?: "left" | "center" | "right";
@@ -670,22 +655,21 @@ export type DeepNamePath<
         : never
     : Store extends any[] // Check if `Store` is `any[]`
       ? // Connect path. e.g. { a: { b: string }[] }
-          // Get: [a] | [ a,number] | [ a ,number , b]
-          | [...ParentNamePath, number]
-          | DeepNamePath<Store[number], [...ParentNamePath, number]>
+        // Get: [a] | [ a,number] | [ a ,number , b]
+        | [...ParentNamePath, number]
+        | DeepNamePath<Store[number], [...ParentNamePath, number]>
       : keyof Store extends never // unknown
         ? Store
         : {
             // Convert `Store` to <key, value>. We mark key a `FieldKey`
             [FieldKey in keyof Store]: Store[FieldKey] extends Function
               ? never
-              :
-                  | (ParentNamePath["length"] extends 0 ? FieldKey : never) // If `ParentNamePath` is empty, it can use `FieldKey` without array path
-                  | [...ParentNamePath, FieldKey] // Exist `ParentNamePath`, connect it
-                  | DeepNamePath<
-                      Required<Store>[FieldKey],
-                      [...ParentNamePath, FieldKey]
-                    >; // If `Store[FieldKey]` is object
+              : | (ParentNamePath["length"] extends 0 ? FieldKey : never) // If `ParentNamePath` is empty, it can use `FieldKey` without array path
+                | [...ParentNamePath, FieldKey] // Exist `ParentNamePath`, connect it
+                | DeepNamePath<
+                    Required<Store>[FieldKey],
+                    [...ParentNamePath, FieldKey]
+                  >; // If `Store[FieldKey]` is object
           }[keyof Store];
 
 export interface SorterResult<RecordType = AnyObject> {

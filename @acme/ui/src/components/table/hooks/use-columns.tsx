@@ -163,8 +163,7 @@ export const useColumns = <TRecord extends AnyObject>(
     childrenColumnName?: string;
   },
   transformColumns:
-    | null
-    | ((columns: ColumnsType<TRecord>) => ColumnsType<TRecord>),
+    null | ((columns: ColumnsType<TRecord>) => ColumnsType<TRecord>),
 ): [
   columns: ColumnsType<TRecord>,
   columnsForTTTable: TTColumnDef<TRecord>[],
