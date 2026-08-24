@@ -1219,8 +1219,9 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                     : {}),
               }}
               bordered={bordered}
-              // Same condition the header below uses to go `position: sticky`.
-              stickyHeader={Boolean(sticky || scroll?.y)}
+              // A sticky header and either scroll axis all need the scrollport
+              // to be one of ours rather than shadcn's inner wrapper.
+              outerScrollport={Boolean(sticky || scroll?.y || scroll?.x)}
               {...restProps}
             >
               {bodyColGroup}

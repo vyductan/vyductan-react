@@ -906,7 +906,7 @@ describe("Table bordered corner cells", () => {
   });
 });
 
-describe("Table sticky header scrollport", () => {
+describe("Table scrollport ownership", () => {
   type Row = { id: number; name: string };
 
   const rows: Row[] = [{ id: 1, name: "John Brown" }];
@@ -916,10 +916,12 @@ describe("Table sticky header scrollport", () => {
 
   /**
    * shadcn's `<Table>` wraps the `<table>` in its own `overflow-x-auto` div,
-   * and `overflow-x: auto` drags `overflow-y` to `auto` — making that div the
-   * header's nearest scrollport, with no scroll range of its own, so a
-   * `position: sticky` header scrolls away instead of sticking. It takes no
-   * className, so `TableRoot` neutralises it from the parent.
+   * and `overflow-x: auto` drags `overflow-y` to `auto` — so that div becomes a
+   * scrollport on both axes and takes over from the one this table means to
+   * use. A sticky header then has no scroll range to resolve against, and the
+   * pinned columns' shadows never see a scroll offset because the outer wrapper
+   * `wrapperRef` watches is not what scrolls. It takes no className, so
+   * `TableRoot` neutralises it from the parent.
    */
   const NEUTRALISE = "[&>[data-slot=table-container]]:overflow-visible";
 
@@ -937,29 +939,37 @@ describe("Table sticky header scrollport", () => {
   test.each([
     ["sticky", { sticky: true }],
     ["scroll.y", { scroll: { y: 200 } }],
-    ["both", { sticky: true, scroll: { y: 200 } }],
-  ] as const)("frees the header's scrollport for %s", (_label, props) => {
+    ["scroll.x", { scroll: { x: 1200 } }],
+    ["both axes", { scroll: { x: 1200, y: 200 } }],
+    ["sticky and scroll.y", { sticky: true, scroll: { y: 200 } }],
+  ] as const)("claims the scrollport for %s", (_label, props) => {
     expect(renderRoot(props)).toHaveClass(NEUTRALISE);
   });
 
-  test("leaves the wrapper alone without a sticky header", () => {
+  test("leaves the wrapper alone for a table with no scrollport of its own", () => {
     // That wrapper is the only thing keeping an over-wide table scrollable
     // instead of spilling out of its container, so it stays for plain tables.
     expect(renderRoot()).not.toHaveClass(NEUTRALISE);
-    expect(renderRoot({ scroll: { x: 1200 } })).not.toHaveClass(NEUTRALISE);
   });
 
-  test("tracks the same condition the header uses to go sticky", () => {
+  test("tracks the conditions that need a scrollport of our own", () => {
     const source = readFileSync(
       path.resolve(import.meta.dirname, "./table.tsx"),
       "utf8",
     );
 
-    // If these drift, a table can render a sticky header while the wrapper
-    // that blocks it is left in place — the original bug.
-    expect(source).toContain("stickyHeader={Boolean(sticky || scroll?.y)}");
+    // If these drift, a table can render a sticky header — or ask the outer
+    // wrapper for its scroll offsets — while the wrapper that swallows both is
+    // left in place. That was the original bug, in two flavours.
+    expect(source).toContain(
+      "outerScrollport={Boolean(sticky || scroll?.y || scroll?.x)}",
+    );
     expect(source).toContain(
       'position: sticky || scroll?.y ? "sticky" : undefined',
     );
+    expect(source).toContain(
+      'scroll?.x && "overflow-x-auto overflow-y-hidden"',
+    );
+    expect(source).toContain("const wrapperScroll = useScroll(wrapperRef)");
   });
 });

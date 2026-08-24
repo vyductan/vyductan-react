@@ -88,15 +88,17 @@ const CELL_LEADING_CLASS = "leading-[22px]";
 function TableRoot({
   className,
   bordered,
-  stickyHeader,
+  outerScrollport,
   ...props
 }: React.ComponentProps<"table"> & {
   bordered?: OwnTableProps["bordered"];
   /**
-   * Whether this table renders a `position: sticky` header — see the note on
-   * the neutralising class below. Mirrors table.tsx's `sticky || scroll?.y`.
+   * Whether the scrollport this table cares about lives OUTSIDE shadcn's own
+   * wrapper — the page, or the table's own scroll container. See the note on
+   * the neutralising class below. Mirrors table.tsx's
+   * `sticky || scroll?.y || scroll?.x`.
    */
-  stickyHeader?: boolean;
+  outerScrollport?: boolean;
 }) {
   return (
     <div
@@ -108,36 +110,32 @@ function TableRoot({
          * around the `<table>`, and it takes no className, so it can only be
          * neutralised from here. `overflow-x: auto` also drags `overflow-y` to
          * `auto` (a `visible` axis computes to `auto` when the other axis is
-         * not `visible`), which makes that wrapper the nearest SCROLLPORT for
-         * the header. `position: sticky` then measures against a box with no
-         * scroll range of its own, so the header simply scrolls away instead of
-         * sticking — whether the real scrollport is the window or this table's
-         * own `scroll.y` container.
+         * not `visible`), so that wrapper becomes a SCROLLPORT on both axes and
+         * silently takes over from the one this table means to use. Two things
+         * break as a result:
          *
-         * Only neutralise it when a sticky header is actually wanted: for every
-         * other table that wrapper is the one thing that keeps an over-wide
-         * table scrollable (a long unbreakable cell value can push the table
-         * past its container even with no `scroll.x`) rather than spilling out.
+         * - a `position: sticky` header resolves against it, and it has no
+         *   scroll range of its own, so the header scrolls away instead of
+         *   sticking;
+         * - it, not the outer wrapper, is what actually scrolls horizontally,
+         *   so `wrapperRef`'s scroll offsets stay at 0 and the pinned columns'
+         *   shadows never track the scroll (see `getCommonPinningClassName`).
          *
-         * This does not rescue every sticky table. A horizontal scrollport is
-         * a port on BOTH axes for the same reason, so where the header's
-         * nearest port has no vertical range of its own the header still
-         * cannot stick:
+         * Only neutralise it when this table has a scrollport of its own to use
+         * — a sticky header, `scroll.y` or `scroll.x`. Everywhere else that
+         * wrapper is the one thing keeping an over-wide table scrollable (a
+         * long unbreakable cell value can push the table past its container
+         * even with no `scroll.x`) rather than spilling out of its container.
          *
-         *   `sticky` alone                  -> works (port: the window)
-         *   `scroll.y` (± `scroll.x`)       -> works (port: the outer wrapper,
-         *                                      which owns the vertical scroll)
-         *   `sticky` + `scroll.x`, no `y`   -> still broken; the outer wrapper
-         *                                      is `overflow-y-hidden`, so the
-         *                                      header resolves against a box
-         *                                      with no range while the PAGE
-         *                                      scrolls behind it
-         *
-         * Fixing that last pair needs Ant Design's approach — a cloned header
-         * rendered outside the scroll container — which this table does not
-         * implement.
+         * One combination still cannot work: `sticky` with `scroll.x` but no
+         * `scroll.y`. The outer wrapper is `overflow-y-hidden` there — set
+         * deliberately, so dragging a row does not auto-scroll it — so the
+         * header again resolves against a box with no vertical range while the
+         * PAGE scrolls behind it. That one needs Ant Design's approach, a
+         * cloned header rendered outside the scroll container, which this
+         * table does not implement.
          */
-        stickyHeader && "[&>[data-slot=table-container]]:overflow-visible",
+        outerScrollport && "[&>[data-slot=table-container]]:overflow-visible",
       )}
     >
       <ShadcnTable
