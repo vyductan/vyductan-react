@@ -29,3 +29,19 @@ render through the field binding:
 `Form.List` is a presenter shell only: it renders a `Field` with no
 name/control (label wrapper) and hands `(fields, ctx)` to children; the
 rows inside wire themselves via `Form.Item`/`Field`.
+
+### Size tier
+
+One of `small`, `middle` or `large` — a position on a scale shared by every
+component that takes a `size`, with `middle` as the tier an unset `size`
+resolves to.
+
+A tier names _how dense_, not _what changes_: each component family decides
+which quantity its tiers control. The input family (input, select, date picker,
+autocomplete) maps tiers to control **height**; a table cell has no height of
+its own — it grows with its content — so `Table` maps them to cell **padding**.
+Both use the same `SizeType`, so the labels line up while the quantities do
+not. A family's tier map is therefore never derived from another family's;
+`input/variants.ts` and `table/_components/base.tsx` each own theirs.
+
+_Avoid_: density, scale, variant (a `variant` selects an appearance, not a tier).

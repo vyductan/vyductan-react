@@ -5,6 +5,7 @@ import { expect, fireEvent, fn, waitFor } from "storybook/test";
 import type { ColumnsType } from "./types";
 import DragSortingFullRowDemo from "./examples/drag-sorting-full-row";
 import DragSortingWithHandleDemo from "./examples/drag-sorting-with-handle";
+import SizeDemo from "./examples/size";
 import { OwnTable as Table } from "./table";
 
 interface DataType {
@@ -167,6 +168,10 @@ export const Empty: Story = {
     columns: columns as any,
     dataSource: [],
   },
+};
+
+export const Size: Story = {
+  render: () => <SizeDemo />,
 };
 
 export const DragSortingWithHandle: Story = {

@@ -7,7 +7,7 @@ import type { TableHeadProps } from "./base";
 import { Icon } from "../../../icons";
 import { cn } from "../../../lib/utils";
 import { Tooltip } from "../../tooltip";
-import { TableHead } from "./base";
+import { TableHead, tableSorterBoxClass } from "./base";
 
 interface TableHeadAdvancedProps<TData, TValue> extends TableHeadProps {
   column: Column<TData, TValue>;
@@ -52,6 +52,21 @@ export function TableHeadAdvanced<TData, TValue>({
       }.`
     : `Not sorted. Click to sort ${nextSortOrder === "asc" ? "ascending" : "descending"}.`;
 
+  // Always trails the label; body cells compensate with a right gutter.
+  const sortIcon = (
+    <Icon
+      icon={
+        column.getIsSorted() === "desc"
+          ? "icon-[lucide--arrow-down]"
+          : column.getIsSorted() === "asc"
+            ? "icon-[lucide--arrow-up]"
+            : "icon-[lucide--chevrons-up-down]"
+      }
+      className="ml-1 size-4"
+      aria-hidden="true"
+    />
+  );
+
   return (
     <TableHead
       size={size}
@@ -75,34 +90,23 @@ export function TableHeadAdvanced<TData, TValue>({
       >
         <div
           className={cn(
-            "-my-2 p-2",
-            size === "small" && "p-1",
+            tableSorterBoxClass(size),
             "flex w-full items-center justify-between",
             "hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md border-none",
           )}
           onClick={column.getToggleSortingHandler()}
         >
-          {align === "center" && <span className="mr-2.5 size-4"></span>}
+          {/*
+            The icon always trails the label (matching Ant Design). It therefore
+            consumes width at the cell's right edge, which is why right-aligned
+            columns give their BODY cells a matching right gutter — see
+            SORTER_GUTTER_CLASS in base.tsx — so the values line up under the
+            label instead of under the icon. `center` gets a counterweight spacer
+            for the same reason.
+          */}
+          {align === "center" && <span className="mr-1 size-4"></span>}
           <span className="flex-1">{children}</span>
-          {column.getCanSort() && column.getIsSorted() === "desc" ? (
-            <Icon
-              icon="icon-[lucide--arrow-down]"
-              className="ml-2.5 size-4"
-              aria-hidden="true"
-            />
-          ) : column.getIsSorted() === "asc" ? (
-            <Icon
-              icon="icon-[lucide--arrow-up]"
-              className="ml-2.5 size-4"
-              aria-hidden="true"
-            />
-          ) : (
-            <Icon
-              icon="icon-[lucide--chevrons-up-down]"
-              className="ml-2.5 size-4"
-              aria-hidden="true"
-            />
-          )}
+          {sortIcon}
         </div>
       </Tooltip>
     </TableHead>

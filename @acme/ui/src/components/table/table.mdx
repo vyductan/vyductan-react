@@ -6,6 +6,7 @@ import TableExpandableDemo from "./examples/expand";
 import TableFilteredSelectionDemo from "./examples/filtered-selection";
 import TableMultipleSorterDemo from "./examples/multiple-sorter";
 import TableSelectionDemo from "./examples/selection";
+import TableSizeDemo from "./examples/size";
 import TableSummaryDemo from "./examples/summary";
 import TableTreeDataDemo from "./examples/tree-data";
 
@@ -97,6 +98,18 @@ string, so the selection stays a valid `number[]`.
   src="table/examples/filtered-selection.tsx"
   __comp__={TableFilteredSelectionDemo}
 />
+
+### size
+
+Set the cell padding tier with `size`. `small` is 8px, `middle` (the default)
+12px and `large` 16px; the table's title and footer take the same tier, and a
+right-aligned sortable column's gutter tracks it too.
+
+Note two deliberate divergences from Ant Design: the default tier here is
+`middle` rather than `large`, and `middle` keeps a symmetric 12px instead of
+AntD's 12/8. See `docs/adr/0001-table-size-tiers.md`.
+
+<ComponentSource src="table/examples/size.tsx" __comp__={TableSizeDemo} />
 
 ### Summary
 

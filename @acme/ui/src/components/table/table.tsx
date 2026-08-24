@@ -60,6 +60,7 @@ import {
   TableHeader,
   TableRoot,
   TableRow,
+  tableSorterGutterClass,
   TableWrapperFooter,
   TableWrapperHeader,
 } from "./_components/base";
@@ -381,6 +382,18 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
 
   const warning = devUseWarning("Table");
 
+  /**
+   * `devUseWarning` reads context, so it hands back a NEW function on every
+   * render. A memoised callback that closed over it directly would have to list
+   * it as a dependency and would therefore be rebuilt every render — and
+   * `setSelectedRows` feeds `transformSelectionColumns`, so that churn would
+   * rebuild the whole column set. Keeping the latest one in a ref leaves
+   * dev-only diagnostics out of the dependency graph. The assignment is
+   * idempotent, so a StrictMode double render is harmless.
+   */
+  const warningRef = React.useRef(warning);
+  warningRef.current = warning;
+
   if (process.env.NODE_ENV !== "production") {
     warning(
       !(typeof rowKey === "function" && rowKey.length > 1),
@@ -639,7 +652,7 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
       // receive a string it cannot match against its own keys.
       const nextRecordKeys = nextKeys.map((key) => {
         const recordKey = recordKeyBySelectionKey.get(key);
-        warning(
+        warningRef.current(
           recordKey !== undefined,
           "usage",
           `Selected key \`${key}\` could not be resolved to an original row key, so the raw string is passed to \`rowSelection.onChange\`. Add it to \`selectedRowKeys\`/\`defaultSelectedRowKeys\` so keys with a non-string type keep their type.`,
@@ -1111,6 +1124,39 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                 "[&_td]:border-e [&_td:last-child]:border-e-0",
               !summary && "[&_tbody_tr:last-child>td]:border-b-0",
               summary && "[&_tfoot_tr:last-child>td]:border-b-0",
+              /**
+               * Round the four CORNER cells' own backgrounds, or they cover the
+               * table's rounded corners.
+               *
+               * The outer border and its radius live on the `<table>`, while
+               * every cell is a POSITIONED descendant of it — pinned cells are
+               * `sticky` (styles.ts) and the rest are `relative`. A positioned
+               * descendant paints after its ancestor's border, so any cell with
+               * an OPAQUE background covers the arc with its square corner. In
+               * practice that is the pinned column (a pinned cell must be opaque
+               * or the columns scrolling underneath show through), which is why
+               * only pinned tables look wrong — but the cause is the opaque
+               * background, not `sticky` or its z-index, so lowering the
+               * z-index would not help.
+               *
+               * The radius is the table's OUTER radius (`rounded-md` =
+               * `--radius` - 2px) less the 1px border the cell sits inside, so
+               * the cell's corner nests exactly inside the arc instead of
+               * cutting across it or leaving a sliver.
+               *
+               * Corners only, and only where the table is actually rounded
+               * there: a title/footer squares off that edge (`rounded-t-none` /
+               * `rounded-b-none` below), and which row is the last one painted
+               * follows the same summary check as the border-b-0 rule above.
+               */
+              !(title || extra) &&
+                (showHeader === false
+                  ? "[&_tbody_tr:first-child>td:first-child]:rounded-tl-[calc(var(--radius)_-_3px)] [&_tbody_tr:first-child>td:last-child]:rounded-tr-[calc(var(--radius)_-_3px)]"
+                  : "[&_thead_tr:first-child>th:first-child]:rounded-tl-[calc(var(--radius)_-_3px)] [&_thead_tr:first-child>th:last-child]:rounded-tr-[calc(var(--radius)_-_3px)]"),
+              !footer &&
+                (summary
+                  ? "[&_tfoot_tr:last-child>td:first-child]:rounded-bl-[calc(var(--radius)_-_3px)] [&_tfoot_tr:last-child>td:last-child]:rounded-br-[calc(var(--radius)_-_3px)]"
+                  : "[&_tbody_tr:last-child>td:first-child]:rounded-bl-[calc(var(--radius)_-_3px)] [&_tbody_tr:last-child>td:last-child]:rounded-br-[calc(var(--radius)_-_3px)]"),
             ],
             (!bordered || bordered === "around") && [
               "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
@@ -1156,7 +1202,6 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                 // bordered
                 // bordered &&
                 //   "border-separate border-spacing-0 rounded-md border-s border-t",
-                // size === "small" ? "[&_th]:" : "",
                 (title || extra) && "rounded-t-none",
                 footer && "rounded-b-none",
                 classNames?.table,
@@ -1174,6 +1219,8 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                     : {}),
               }}
               bordered={bordered}
+              // Same condition the header below uses to go `position: sticky`.
+              stickyHeader={Boolean(sticky || scroll?.y)}
               {...restProps}
             >
               {bodyColGroup}
@@ -1271,7 +1318,14 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                         <TableRow key={index} className="hover:bg-transparent">
                           {table.getVisibleFlatColumns().map((x) => {
                             return (
-                              <TableCell key={x.id}>
+                              <TableCell
+                                key={x.id}
+                                className={cn(
+                                  x.columnDef.meta?.align === "right" &&
+                                    x.getCanSort() &&
+                                    tableSorterGutterClass(size),
+                                )}
+                              >
                                 <Skeleton className="h-4 w-full" />
                               </TableCell>
                             );
@@ -1353,6 +1407,12 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                                       "center" && "text-center",
                                     cell.column.columnDef.meta?.align ===
                                       "right" && "text-right",
+                                    // keep values under the header LABEL, not
+                                    // under the trailing sorter icon
+                                    cell.column.columnDef.meta?.align ===
+                                      "right" &&
+                                      cell.column.getCanSort() &&
+                                      tableSorterGutterClass(size),
                                     // pinning
                                     // scroll?.x &&
                                     getCommonPinningClassName(cell.column, {
