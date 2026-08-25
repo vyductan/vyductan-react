@@ -19,7 +19,7 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import type { ZodType } from "zod";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import _ from "lodash";
 import { useForm as __useForm } from "react-hook-form";
@@ -95,16 +95,21 @@ const useForm = <
 ): FormInstance<TFieldValues, TContext, TTransformedValues> => {
   const { schema, onSubmit, ...restProps } = props ?? {};
 
+  // Memoize the resolver so it isn't rebuilt on every render (stable per schema).
+  const resolver = useMemo(
+    () =>
+      schema
+        ? standardSchemaResolver<TFieldValues, TContext, TTransformedValues>(
+            schema,
+          )
+        : undefined,
+    [schema],
+  );
+
   const methods = __useForm<TFieldValues, TContext, TTransformedValues>(
     props
       ? {
-          resolver: schema
-            ? standardSchemaResolver<
-                TFieldValues,
-                TContext,
-                TTransformedValues
-              >(schema)
-            : undefined,
+          resolver,
           // defaultValues: props.defaultValues,
           // values: props.values,
           ...restProps,
