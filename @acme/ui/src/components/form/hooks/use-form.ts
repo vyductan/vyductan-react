@@ -187,7 +187,11 @@ const useForm = <
         return acc;
       };
 
-      const errorFieldsAll = buildErrorFields(methods.formState.errors);
+      // Read the non-proxy state so calling validateFields() does not escalate
+      // the root formState proxy to 'all' (which would re-render the whole form
+      // on every subsequent errors emission). Identity does not matter here —
+      // it is read imperatively inside the callback, not as a dependency.
+      const errorFieldsAll = buildErrorFields(methods.control._formState.errors);
       const errorFields = names
         ? errorFieldsAll.filter((e) =>
             names.some((n) => e.name.join(".") === String(n)),
