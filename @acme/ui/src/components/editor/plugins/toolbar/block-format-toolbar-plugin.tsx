@@ -10,7 +10,11 @@ import {
 } from "@lexical/list";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
-import { $createParagraphNode, $getSelection, $isRangeSelection } from "lexical";
+import {
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+} from "lexical";
 
 import {
   Select,
@@ -19,6 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@acme/ui/components/select";
+import { cn } from "@acme/ui/lib/utils";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
@@ -146,25 +151,49 @@ export function BlockFormatDropDown() {
     "quote",
   ]);
 
+  const selectableTypes = Object.entries(blockTypeToBlockName).filter(([key]) =>
+    allowedBlockTypes.has(key),
+  );
+  const activeLabel = blockTypeToBlockName[blockType]?.label;
+
   return (
     <Select value={blockType} onValueChange={handleBlockTypeChange}>
       <SelectTrigger className="h-8 w-min gap-1">
         {blockTypeToBlockName[blockType]?.icon}
-        <span>{blockTypeToBlockName[blockType]?.label}</span>
+        {/*
+          Sizing the trigger to its current label made the whole toolbar slide
+          sideways whenever the caret crossed from a paragraph into a heading
+          ("Numbered List" is 28px wider than "Paragraph"). Every label is laid
+          out in one grid cell so the width settles on the widest of them, which
+          keeps holding once these strings are translated — a fixed px width
+          would not.
+        */}
+        <span className="grid">
+          {selectableTypes.map(([key, value]) => (
+            <span
+              aria-hidden={value.label !== activeLabel}
+              className={cn(
+                "col-start-1 row-start-1 text-left",
+                value.label !== activeLabel && "invisible",
+              )}
+              key={key}
+            >
+              {value.label}
+            </span>
+          ))}
+        </span>
       </SelectTrigger>
       <SelectContent position="popper">
         <SelectGroup>
           {/* Inline items instead of children */}
-          {Object.entries(blockTypeToBlockName)
-            .filter(([key]) => allowedBlockTypes.has(key))
-            .map(([key, value]) => (
-              <SelectItem key={key} value={key}>
-                <div className="flex items-center gap-1 font-normal">
-                  {value.icon}
-                  {value.label}
-                </div>
-              </SelectItem>
-            ))}
+          {selectableTypes.map(([key, value]) => (
+            <SelectItem key={key} value={key}>
+              <div className="flex items-center gap-1 font-normal">
+                {value.icon}
+                {value.label}
+              </div>
+            </SelectItem>
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
