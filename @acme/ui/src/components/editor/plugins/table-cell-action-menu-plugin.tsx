@@ -744,10 +744,16 @@ function TableCellActionMenuInner({
       const isInsideOpenMenu =
         element?.closest('[data-slot="dropdown-menu-content"]') !== null ||
         element?.closest('[data-slot="dropdown-menu-sub-content"]') !== null;
+      // The column resizer is portalled out of the table, so `closest("td, th")`
+      // finds nothing while the pointer sits on it and the handles would tear
+      // themselves down exactly as the user reaches for the line they were
+      // aiming at. Reaching for a table affordance is not leaving the table.
+      const isOnColumnResizer =
+        element?.closest("[data-table-column-resizer]") != null;
       const cell = element?.closest<HTMLTableCellElement>("td, th") ?? null;
       const table = cell?.closest<HTMLTableElement>("table") ?? null;
 
-      if (isOnActionHandle || isInsideOpenMenu) {
+      if (isOnActionHandle || isInsideOpenMenu || isOnColumnResizer) {
         return;
       }
 

@@ -165,24 +165,59 @@ function TableHoverActionsInner({
       }
     };
 
-    const handleMouseLeave = () => {
+    // Both of these live outside the editor root, so crossing onto either one
+    // raises `mouseleave` even though the pointer is still working on the
+    // table. Tearing down there is what hid the button under the user's cursor.
+    const tableAffordances = [
+      "[data-table-hover-btn]",
+      "[data-table-column-resizer]",
+    ];
+
+    const handleMouseLeave = (event: MouseEvent) => {
+      const relatedTarget = event.relatedTarget;
+      const movingToAffordance =
+        relatedTarget instanceof Element &&
+        tableAffordances.some(
+          (selector) => relatedTarget.closest(selector) !== null,
+        );
+      if (movingToAffordance) return;
+
       // Small delay so moving to the stripe/button doesn't flicker
       setTimeout(() => {
-        const isOnButton =
-          document.querySelector("[data-table-hover-btn]:hover") !== null;
-        if (!isOnButton) {
-          setButtonState(null);
-          activeTableReference.current = null;
-        }
+        const stillOnAffordance = tableAffordances.some(
+          (selector) => document.querySelector(`${selector}:hover`) !== null,
+        );
+        if (stillOnAffordance) return;
+        setButtonState(null);
+        activeTableReference.current = null;
       }, 50);
+    };
+
+    /**
+     * Notion hides this button as soon as you type: the cell grows under the
+     * caret and a button measured before the keystroke is left sitting in the
+     * middle of the text. The next pointer move brings it back, correctly
+     * placed. Only content-changing keys count — arrows and modifiers move the
+     * caret without reflowing anything.
+     */
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      const isTextKey = [...event.key].length === 1;
+      const isEditKey =
+        event.key === "Enter" ||
+        event.key === "Backspace" ||
+        event.key === "Delete";
+      if (isTextKey || isEditKey) setButtonState(null);
     };
 
     document.addEventListener("mousemove", handleMouseMove, { passive: true });
     editorRoot.addEventListener("mouseleave", handleMouseLeave);
+    editorRoot.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       editorRoot.removeEventListener("mouseleave", handleMouseLeave);
+      editorRoot.removeEventListener("keydown", handleKeyDown);
     };
   }, [editor]);
 

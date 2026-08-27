@@ -1,5 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, userEvent, waitFor } from "storybook/test";
+import {
+  expect,
+  fireEvent,
+  fn,
+  userEvent,
+  waitFor,
+  within,
+} from "storybook/test";
 
 import { Editor } from "./editor";
 import { MIN_COLUMN_WIDTH } from "./plugins/table-column-resize-model";
@@ -503,6 +510,128 @@ export const RulerGrowsWithTheTable: Story = {
       keys: "[/MouseLeft]",
       target: grabber,
       coords: { clientX: startX - 400, clientY: y },
+    });
+  },
+};
+
+/**
+ * Reaching for the resize line must not dismiss the things around it. The
+ * grabber is portalled outside the `contenteditable`, so every plugin that
+ * resolves the pointer through `closest("td, th")` — or treats `mouseleave` on
+ * the editor root as "pointer left the table" — tears its own affordance down
+ * as the pointer arrives.
+ */
+export const NeighbouringAffordancesSurviveTheGrabber: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const table = await tableOf(canvasElement);
+    const lastCell = [...(table.rows[0]?.cells ?? [])].at(-1);
+    if (!lastCell) throw new Error("fixture needs a last cell");
+
+    // Focus a cell so the row/column handles are up, and sit in the right
+    // stripe so the add-column button is up too.
+    fireEvent.mouseUp(lastCell);
+    const cellBox = lastCell.getBoundingClientRect();
+    await userEvent.pointer({
+      target: lastCell,
+      coords: {
+        clientX: cellBox.right - 14,
+        clientY: cellBox.top + cellBox.height / 2,
+      },
+    });
+
+    await waitFor(() => {
+      expect(canvas.getByRole("button", { name: /row actions/i })).toBeTruthy();
+      expect(
+        canvasElement.querySelector("[data-table-hover-btn]"),
+      ).not.toBeNull();
+    });
+
+    // Now step onto the grabber on that same edge.
+    await userEvent.pointer({
+      target: lastCell,
+      coords: {
+        clientX: cellBox.right,
+        clientY: cellBox.top + cellBox.height / 2,
+      },
+    });
+
+    const grabber = await waitFor(() => {
+      const node = canvasElement.querySelector<HTMLElement>(
+        "[data-table-column-resizer]",
+      );
+      if (!node) throw new Error("grabber never appeared");
+      return node;
+    });
+
+    const grabberBox = grabber.getBoundingClientRect();
+    await userEvent.pointer({
+      target: grabber,
+      coords: {
+        clientX: grabberBox.left + grabberBox.width / 2,
+        clientY: grabberBox.top + grabberBox.height / 2,
+      },
+    });
+
+    // mouseleave on the editor root is dispatched with the grabber as the
+    // relatedTarget, which is what actually happens when the pointer crosses.
+    const editorRoot = canvasElement.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    editorRoot?.dispatchEvent(
+      new MouseEvent("mouseleave", { bubbles: false, relatedTarget: grabber }),
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(
+      canvas.queryByRole("button", { name: /row actions/i }),
+    ).not.toBeNull();
+    expect(
+      canvas.queryByRole("button", { name: /column actions/i }),
+    ).not.toBeNull();
+    expect(
+      canvasElement.querySelector("[data-table-hover-btn]"),
+    ).not.toBeNull();
+  },
+};
+
+/**
+ * Notion hides the add-row/add-column affordance while you type. Ours stayed
+ * parked at the coordinates it was measured at, so it sat in the middle of the
+ * text as the cell grew.
+ */
+export const AddButtonHidesWhileTyping: Story = {
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const lastRow = [...table.rows].at(-1);
+    const lastCell = [...(lastRow?.cells ?? [])].at(-1);
+    if (!lastCell) throw new Error("fixture needs a last cell");
+
+    // Click inside the bottom hover stripe: that places the caret in the cell
+    // AND leaves the pointer where the add-row button is live, which is the
+    // situation the bug needs — the pointer never moves again, so nothing but
+    // the keystroke itself can take the button down.
+    const cellBox = lastCell.getBoundingClientRect();
+    const coords = {
+      clientX: cellBox.left + 20,
+      clientY: cellBox.bottom - 6,
+    };
+    await userEvent.pointer([
+      { target: lastCell, coords },
+      { keys: "[MouseLeft]", target: lastCell, coords },
+    ]);
+
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector("[data-table-hover-btn]"),
+      ).not.toBeNull();
+    });
+
+    await userEvent.keyboard("typing");
+
+    await waitFor(() => {
+      expect(canvasElement.querySelector("[data-table-hover-btn]")).toBeNull();
     });
   },
 };
