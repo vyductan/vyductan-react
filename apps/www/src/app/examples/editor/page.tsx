@@ -9,6 +9,7 @@ import {
 } from "@acme/ui/components/card";
 import EditorDemo from "@acme/ui/components/editor/examples/basic";
 import EditorInlineColorDemo from "@acme/ui/components/editor/examples/inline-color";
+import EditorKitchenSinkDemo from "@acme/ui/components/editor/examples/kitchen-sink";
 import { PageContainer } from "@acme/ui/components/layout";
 
 export default function CheckboxExamples() {
@@ -48,6 +49,20 @@ export default function CheckboxExamples() {
         </CardHeader>
         <CardContent>
           <EditorInlineColorDemo />
+        </CardContent>
+      </Card>
+
+      {/* Full-coverage document across all three renderers */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Kitchen sink</CardTitle>
+          <CardDescription>
+            Every block and inline feature in one document, viewable through the
+            editor, the read-only preview, and the published renderer.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EditorKitchenSinkDemo />
         </CardContent>
       </Card>
     </PageContainer>
