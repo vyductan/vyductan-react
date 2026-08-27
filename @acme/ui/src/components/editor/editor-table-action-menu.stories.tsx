@@ -22,6 +22,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * The resting mark has to read as a line, not a lozenge. Notion's own bar is
+ * 18x6, but our cells are narrower (96px against Notion's 150px), so the same
+ * bar carries more visual weight and we run 2px thinner. Pinned because a
+ * future "match Notion exactly" pass would otherwise fatten it back silently.
+ */
+const MAX_HANDLE_BAR_THICKNESS = 4;
+const MIN_HANDLE_BAR_LENGTH = 16;
+
 export const Interactions: Story = {
   args: {
     value: editorRenderFixtures.table.serialized,
@@ -544,5 +553,57 @@ export const HandlesArePositionedAgainstTheAnchor: Story = {
     expect(globalThis.getComputedStyle(addButton).position).toBe("absolute");
     const addBox = addButton.getBoundingClientRect();
     expect(Math.abs(addBox.left - tableBox.right)).toBeLessThan(8);
+  },
+};
+
+export const HandleBarsReadAsThinLines: Story = {
+  args: {
+    value: editorRenderFixtures.table.serialized,
+    variant: "simple",
+    autoFocus: false,
+    onChange: fn(),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const table = canvasElement.querySelector("table");
+
+    if (!(table instanceof HTMLTableElement)) {
+      throw new TypeError("Expected rendered table element");
+    }
+
+    const cell = table.rows[0]?.cells[0];
+    if (!cell) throw new Error("fixture needs a cell");
+
+    await userEvent.hover(cell);
+
+    const rowHandle = await waitFor(() =>
+      canvas.getByRole("button", { name: /row actions/i }),
+    );
+    const columnHandle = canvas.getByRole("button", {
+      name: /column actions/i,
+    });
+
+    const barOf = (handle: HTMLElement) => {
+      const bar = handle.querySelector('[data-slot="table-handle-bar"]');
+      if (!bar) throw new Error("handle has no bar");
+      return bar.getBoundingClientRect();
+    };
+
+    // Measured on the box, not the class, so a padding or scale change that
+    // fattens the rendered bar fails here too.
+    for (const box of [barOf(rowHandle), barOf(columnHandle)]) {
+      expect(Math.min(box.width, box.height)).toBeLessThanOrEqual(
+        MAX_HANDLE_BAR_THICKNESS,
+      );
+      expect(Math.max(box.width, box.height)).toBeGreaterThanOrEqual(
+        MIN_HANDLE_BAR_LENGTH,
+      );
+    }
+
+    // The bar got thinner; the thing you have to hit did not.
+    for (const handle of [rowHandle, columnHandle]) {
+      const box = handle.getBoundingClientRect();
+      expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(14);
+    }
   },
 };
