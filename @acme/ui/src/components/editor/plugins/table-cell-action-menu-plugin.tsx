@@ -35,6 +35,20 @@ import { Switch } from "@acme/ui/components/switch";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
 
+/*
+ * Handle sizing lives in the className of each button, measured off Notion's
+ * own `notion-simple-table-selector`: an 18x6 bar with a 4px radius, centred on
+ * the grid line (`top: 234` against a `tableTop` of 236) so it reads as part of
+ * the row or column it acts on. Notion keeps a 16x16 grip glyph inside that
+ * 6px-tall box, clipped until the pointer arrives — at rest a bar, under the
+ * pointer a button. Here the bar is a child of a larger transparent button so
+ * the 6px mark is not the hit target, and the glyph swaps in on hover.
+ *
+ * Both wrappers position by CENTRE rather than by corner: Button re-adds
+ * horizontal padding whenever it holds an svg, so any arithmetic off its box
+ * drifts the bar off the line.
+ */
+
 type FocusedCellState = {
   cell: HTMLTableCellElement;
   table: HTMLTableElement;
@@ -59,9 +73,7 @@ type DropIndicatorState = {
 } | null;
 
 type ColorSummary =
-  | { kind: "none" }
-  | { kind: "single"; value: string }
-  | { kind: "mixed" };
+  { kind: "none" } | { kind: "single"; value: string } | { kind: "mixed" };
 
 const TABLE_COLOR_PRESETS = [
   { key: "default", label: "Default", value: null },
@@ -156,6 +168,8 @@ function TableCellActionMenuInner({
   anchorElem: HTMLElement;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
+  /** Last cell the pointer was over, so mousemove only acts on a change. */
+  const hoveredCellReference = useRef<HTMLTableCellElement | null>(null);
   const [focusedCellState, setFocusedCellState] =
     useState<FocusedCellState | null>(null);
   const [openMenu, setOpenMenu] = useState<"row" | "column" | null>(null);
@@ -167,6 +181,14 @@ function TableCellActionMenuInner({
   const focusedTable = focusedCellState?.table ?? null;
   const focusedCellRect = focusedCell?.getBoundingClientRect() ?? null;
   const focusedTableRect = focusedTable?.getBoundingClientRect() ?? null;
+  /**
+   * The portal target (`div.group.relative` in plugins.tsx) lives INSIDE the
+   * scroll container, so it translates with the table. Offsets taken against it
+   * are therefore scroll-invariant, which is what lets these overlays be
+   * `absolute` with no scroll listener — the same formula
+   * code-action-menu-plugin and both floating toolbars already use.
+   */
+  const anchorRect = anchorElem.getBoundingClientRect();
 
   const handleInsertRow = (insertAfter: boolean) => {
     if (!focusedCell) return;
@@ -749,6 +771,13 @@ function TableCellActionMenuInner({
     };
 
     const syncFocusedCellFromSelection = () => {
+      // The pointer owns the handles. This runs on every editor update, so
+      // without the guard a keystroke would drag the bars back to the caret's
+      // cell while the pointer rested on another one.
+      if (hoveredCellReference.current) {
+        return;
+      }
+
       editor.getEditorState().read(() => {
         const selection = $getSelection();
         if ($isTableSelection(selection)) {
@@ -787,6 +816,32 @@ function TableCellActionMenuInner({
       setFocusedCellFromElement(event.target as HTMLElement | null);
     };
 
+    /**
+     * The handles belong to the cell under the POINTER, not to the caret. Left
+     * on mouseup alone they sat wherever the last click landed and did not move
+     * as the pointer crossed into another column, which reads as stuck.
+     *
+     * Guarded on the cell actually changing: mousemove fires per pixel, and
+     * re-setting the same state would re-render the whole plugin on every one.
+     */
+    const handleMouseMove = (event: MouseEvent) => {
+      if (dragStateReference.current) {
+        return;
+      }
+
+      const cell =
+        (event.target as HTMLElement | null)?.closest<HTMLTableCellElement>(
+          "td, th",
+        ) ?? null;
+
+      if (cell === hoveredCellReference.current) {
+        return;
+      }
+
+      hoveredCellReference.current = cell;
+      setFocusedCellFromElement(event.target as HTMLElement | null);
+    };
+
     const handleDocumentDragOver = (event: DragEvent) => {
       handleRowDragOver(event);
       handleColumnDragOver(event);
@@ -813,12 +868,16 @@ function TableCellActionMenuInner({
       }),
       (() => {
         document.addEventListener("mouseup", handleMouseUp);
+        document.addEventListener("mousemove", handleMouseMove, {
+          passive: true,
+        });
         document.addEventListener("dragover", handleDocumentDragOver);
         document.addEventListener("drop", handleDocumentDrop);
         document.addEventListener("dragend", clearDragState);
 
         return () => {
           document.removeEventListener("mouseup", handleMouseUp);
+          document.removeEventListener("mousemove", handleMouseMove);
           document.removeEventListener("dragover", handleDocumentDragOver);
           document.removeEventListener("drop", handleDocumentDrop);
           document.removeEventListener("dragend", clearDragState);
@@ -1021,12 +1080,12 @@ function TableCellActionMenuInner({
       <div
         aria-hidden="true"
         className={cn(
-          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none fixed z-40 rounded-md border-2",
+          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none absolute z-40 rounded-md border-2",
           activeAxis === "row" ? "opacity-100" : "opacity-0",
         )}
         style={{
-          top: focusedCellRect.top,
-          left: focusedTableRect.left,
+          top: focusedCellRect.top - anchorRect.top,
+          left: focusedTableRect.left - anchorRect.left,
           width: focusedTableRect.width,
           height: focusedCellRect.height,
         }}
@@ -1034,12 +1093,12 @@ function TableCellActionMenuInner({
       <div
         aria-hidden="true"
         className={cn(
-          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none fixed z-40 rounded-md border-2",
+          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none absolute z-40 rounded-md border-2",
           activeAxis === "column" ? "opacity-100" : "opacity-0",
         )}
         style={{
-          top: focusedTableRect.top,
-          left: focusedCellRect.left,
+          top: focusedTableRect.top - anchorRect.top,
+          left: focusedCellRect.left - anchorRect.left,
           width: focusedCellRect.width,
           height: focusedTableRect.height,
         }}
@@ -1051,8 +1110,8 @@ function TableCellActionMenuInner({
           data-table-drop-index={dropIndicator.index}
           className="EditorTheme__tableCellActionMenuDropIndicator"
           style={{
-            top: dropIndicator.top,
-            left: dropIndicator.left,
+            top: dropIndicator.top - anchorRect.top,
+            left: dropIndicator.left - anchorRect.left,
             width: dropIndicator.width,
             height: dropIndicator.height,
           }}
@@ -1060,9 +1119,14 @@ function TableCellActionMenuInner({
       ) : null}
       <div
         style={{
-          position: "fixed",
-          top: focusedCellRect.top + focusedCellRect.height / 2 - 10,
-          left: focusedTableRect.left - 28,
+          position: "absolute",
+          display: "flex",
+          // Positioned by centre, not by corner: Button re-adds padding around
+          // an svg child, so arithmetic off its box drifts the bar off the line.
+          top:
+            focusedCellRect.top + focusedCellRect.height / 2 - anchorRect.top,
+          left: focusedTableRect.left - anchorRect.left,
+          transform: "translate(-50%, -50%)",
           zIndex: 50,
         }}
       >
@@ -1078,10 +1142,9 @@ function TableCellActionMenuInner({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
             aria-label="Row actions"
             draggable
-            className="EditorTheme__tableCellActionMenuHandle bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground h-5 w-5 rounded-md border"
+            className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
             onMouseEnter={() => setActiveAxis("row")}
             onMouseLeave={() => {
               if (openMenu !== "row" && !dragState) {
@@ -1098,15 +1161,24 @@ function TableCellActionMenuInner({
             onDragEnd={clearDragState}
             data-table-row-index={rowIndex}
           >
-            <GripVertical className="size-3.5" />
+            {/* A bar at rest, the grip once the pointer is on it. */}
+            <span
+              aria-hidden="true"
+              data-slot="table-handle-bar"
+              className="bg-muted-foreground/70 h-[18px] w-[6px] shrink-0 rounded-[4px] group-hover/handle:hidden"
+            />
+            <GripVertical className="hidden size-3.5 group-hover/handle:block" />
           </Button>
         </Dropdown>
       </div>
       <div
         style={{
-          position: "fixed",
-          top: focusedTableRect.top - 28,
-          left: focusedCellRect.left + focusedCellRect.width / 2 - 10,
+          position: "absolute",
+          display: "flex",
+          top: focusedTableRect.top - anchorRect.top,
+          left:
+            focusedCellRect.left + focusedCellRect.width / 2 - anchorRect.left,
+          transform: "translate(-50%, -50%)",
           zIndex: 50,
         }}
       >
@@ -1122,10 +1194,9 @@ function TableCellActionMenuInner({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
             aria-label="Column actions"
             draggable
-            className="EditorTheme__tableCellActionMenuHandle bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground h-5 w-5 rounded-md border"
+            className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
             onMouseEnter={() => setActiveAxis("column")}
             onMouseLeave={() => {
               if (openMenu !== "column" && !dragState) {
@@ -1144,7 +1215,13 @@ function TableCellActionMenuInner({
             onDragEnd={clearDragState}
             data-table-column-index={columnIndex}
           >
-            <GripHorizontal className="size-3.5" />
+            {/* A bar at rest, the grip once the pointer is on it. */}
+            <span
+              aria-hidden="true"
+              data-slot="table-handle-bar"
+              className="bg-muted-foreground/70 h-[6px] w-[18px] shrink-0 rounded-[4px] group-hover/handle:hidden"
+            />
+            <GripHorizontal className="hidden size-3.5 group-hover/handle:block" />
           </Button>
         </Dropdown>
       </div>

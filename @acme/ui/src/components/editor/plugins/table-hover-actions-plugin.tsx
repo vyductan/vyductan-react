@@ -71,6 +71,15 @@ function TableHoverActionsInner({
         (e.target as HTMLElement)?.closest("[data-table-hover-btn]") !== null;
       if (isOnButton) return;
 
+      // Same for the column resizer, which shares the table's right edge with
+      // this button and is portalled outside the table too. The `nearRight`
+      // fallback below already covers the pointer sitting on the LAST column's
+      // boundary; this makes the intent explicit and also covers the case where
+      // no table has been seen yet, so `previousTable` is null.
+      if (target.closest("[data-table-column-resizer]")) {
+        return;
+      }
+
       if (!table || !editorRoot.contains(table)) {
         // Check if mouse is close enough to the previously active table
         const previousTable = activeTableReference.current;
@@ -201,6 +210,7 @@ function TableHoverActionsInner({
     setButtonState(null);
   };
 
+  const anchorRect = anchorElem.getBoundingClientRect();
   const isHoverMode = buttonState !== null;
   const isColumn = buttonState?.kind === "column";
 
@@ -212,19 +222,27 @@ function TableHoverActionsInner({
     <div
       data-table-hover-btn
       style={{
-        position: "fixed",
+        // Absolute against the portal target, not fixed against the viewport.
+        // `fixed` silently re-anchors to any ancestor that establishes a
+        // containing block (a transform, filter, or `contain`), which is what a
+        // Storybook docs page does — the button then lands hundreds of px from
+        // its table. The portal target also lives inside the scroll container,
+        // so these offsets need no scroll listener.
+        position: "absolute",
         pointerEvents: "none",
         zIndex: 50,
         ...(isColumn
           ? {
-              top: buttonState.y - buttonState.stripeHeight / 2,
-              left: buttonState.x,
+              top:
+                buttonState.y - buttonState.stripeHeight / 2 - anchorRect.top,
+              left: buttonState.x - anchorRect.left,
               width: 24,
               height: buttonState.stripeHeight,
             }
           : {
-              top: buttonState.y,
-              left: buttonState.x - buttonState.stripeWidth / 2,
+              top: buttonState.y - anchorRect.top,
+              left:
+                buttonState.x - buttonState.stripeWidth / 2 - anchorRect.left,
               width: buttonState.stripeWidth,
               height: 24,
             }),

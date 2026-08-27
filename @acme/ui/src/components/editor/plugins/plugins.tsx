@@ -56,6 +56,7 @@ import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-p
 import { PollPlugin } from "../plugins/poll-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
+import { TableColumnResizePlugin } from "../plugins/table-column-resize-plugin";
 import { TableHoverActionsPlugin } from "../plugins/table-hover-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
 import { VideoPlugin } from "../plugins/video-plugin";
@@ -187,6 +188,9 @@ export function Plugins({
       )}
       {editable && (
         <TableHoverActionsPlugin anchorElem={floatingAnchorElement} />
+      )}
+      {editable && (
+        <TableColumnResizePlugin anchorElem={floatingAnchorElement} />
       )}
       <TOCPlugin />
       <ListPlugin />
