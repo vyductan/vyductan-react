@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest";
 
+import {
+  EDITOR_HIGHLIGHT_COLORS,
+  EDITOR_TEXT_COLORS,
+} from "../plugins/toolbar/editor-color-palette";
 import { parseInlineStyle } from "./parse-inline-style";
 
 describe("parseInlineStyle", () => {
@@ -28,6 +32,21 @@ describe("parseInlineStyle", () => {
     expect(parseInlineStyle("color: oklch(65% 0.191 256)")).toEqual({
       color: "oklch(65% 0.191 256)",
     });
+  });
+
+  test("keeps the palette values the toolbar writes", () => {
+    for (const swatch of EDITOR_TEXT_COLORS) {
+      expect(parseInlineStyle(`color: ${swatch.value}`)).toEqual({
+        color: swatch.value,
+      });
+    }
+
+    // Highlights carry an alpha component, so the slash form has to survive too.
+    for (const swatch of EDITOR_HIGHLIGHT_COLORS) {
+      expect(parseInlineStyle(`background-color: ${swatch.value}`)).toEqual({
+        backgroundColor: swatch.value,
+      });
+    }
   });
 
   test("parses multiple declarations and tolerates loose formatting", () => {

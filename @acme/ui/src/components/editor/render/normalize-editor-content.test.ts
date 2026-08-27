@@ -4,6 +4,7 @@ import { normalizeEditorContent } from "./normalize-editor-content";
 import {
   canonicalEditorRenderFixtureNames,
   editorRenderFixtures,
+  editorRenderTableWithColumnWidthsFixture,
   invalidEditorRenderFixtureNames,
   unsupportedEditorRenderFixtureNames,
 } from "./render-fixtures";
@@ -24,6 +25,40 @@ describe("normalizeEditorContent", () => {
       expect(normalizeEditorContent(fixture.serialized)).toEqual(
         fixture.content,
       );
+    }
+  });
+
+  test("accepts a table's column widths", () => {
+    expect(
+      normalizeEditorContent(editorRenderTableWithColumnWidthsFixture),
+    ).toBe(editorRenderTableWithColumnWidthsFixture);
+  });
+
+  test("accepts a table with no widths, and one with null widths", () => {
+    // Back-compat: documents authored before column resizing carry no field,
+    // and hand-written fixtures already carry `null`.
+    expect(normalizeEditorContent(editorRenderFixtures.table.content)).toBe(
+      editorRenderFixtures.table.content,
+    );
+
+    const withNull = structuredClone(
+      editorRenderFixtures.table.content,
+    ) as Record<string, { children: Record<string, unknown>[] }>;
+    const tableNode = withNull.root?.children?.[0];
+    if (tableNode) tableNode.colWidths = null;
+
+    expect(normalizeEditorContent(withNull)).toBe(withNull);
+  });
+
+  test("rejects widths that would reach the DOM as NaN", () => {
+    for (const colWidths of [["a"], [Number.NaN], [Number.POSITIVE_INFINITY]]) {
+      const broken = structuredClone(
+        editorRenderFixtures.table.content,
+      ) as Record<string, { children: Record<string, unknown>[] }>;
+      const tableNode = broken.root?.children?.[0];
+      if (tableNode) tableNode.colWidths = colWidths;
+
+      expect(normalizeEditorContent(broken)).toBeNull();
     }
   });
 

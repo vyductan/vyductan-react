@@ -1,121 +1,179 @@
-.RichTextSemanticContract__code {
-  background-color: rgba(247, 246, 243, 1);
-  font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
-  display: block;
-  padding: 16px;
-  line-height: 1.5;
-  font-size: 14px;
-  margin: 4px 0;
-  overflow-x: auto;
-  border: none;
-  position: relative;
-  border-radius: 3px;
-  tab-size: 2;
-  color: rgba(55, 53, 47, 0.9);
-}
+/*
+ * Publish-safe rich-text styles: the CSS hooks that render-node.tsx and the
+ * Lexical theme share, so the editor and the published view agree.
+ *
+ * Wrapped in `@layer components` on purpose. Unlayered rules outrank every
+ * Tailwind utility, so while this file sat outside a layer it silently beat the
+ * classes in richTextSemanticContract — `tableCellHeader`'s `bg-muted` was dead
+ * code. Inside a layer, utilities win again and a consumer can override.
+ *
+ * Colors reference theme tokens rather than literals so published content
+ * follows the host's palette, light or dark, instead of carrying a baked-in
+ * light theme.
+ */
 
-.RichTextSemanticContract__table {
-  border-collapse: collapse;
-  border-spacing: 0;
-  overflow-y: auto;
-  overflow-x: auto;
-  table-layout: fixed;
-  width: 100%;
-  margin: 4px 0;
-  border-radius: 3px;
-  border: 1px solid rgba(55, 53, 47, 0.09);
-}
-
-.RichTextSemanticContract__tableCell {
-  border: 1px solid rgba(55, 53, 47, 0.09);
-  padding: 8px 12px;
-  min-width: 100px;
-}
-
-.RichTextSemanticContract__tableCellHeader {
-  background-color: rgba(55, 53, 47, 0.03);
-  font-weight: 600;
-}
-
-.RichTextSemanticContract__tokenComment {
-  color: slategray;
-}
-
-.RichTextSemanticContract__tokenPunctuation {
-  color: #999;
-}
-
-.RichTextSemanticContract__tokenProperty {
-  color: #905;
-}
-
-.RichTextSemanticContract__tokenSelector {
-  color: #690;
-}
-
-.RichTextSemanticContract__tokenOperator {
-  color: #9a6e3a;
-}
-
-.RichTextSemanticContract__tokenAttr {
-  color: #07a;
-}
-
-.RichTextSemanticContract__tokenVariable {
-  color: #e90;
-}
-
-.RichTextSemanticContract__tokenFunction {
-  color: #dd4a68;
-}
-
-.RichTextSemanticContract__code ::selection {
-  background-color: rgba(55, 53, 47, 0.2);
-}
-
-.RichTextSemanticContract__table tbody tr {
-  transition: background-color 0.1s ease;
-}
-
-.RichTextSemanticContract__table tbody tr:hover {
-  background-color: rgba(55, 53, 47, 0.03);
-}
-
-.EditorTheme__tableCellActionMenuHandle {
-  transition:
-    transform 120ms ease,
-    background-color 120ms ease,
-    color 120ms ease,
-    border-color 120ms ease;
-}
-
-.EditorTheme__tableCellActionMenuHandle:hover,
-.EditorTheme__tableCellActionMenuHandle[data-state="open"] {
-  transform: scale(1.05);
-}
-
-.EditorTheme__tableCellActionMenuHighlight {
-  transition: opacity 120ms ease;
-}
-
-.EditorTheme__tableCellActionMenuDropIndicator {
-  position: fixed;
-  z-index: 45;
-  background-color: rgb(59 130 246);
-  box-shadow: 0 0 0 1px rgb(59 130 246 / 0.15);
-}
-
-@media (max-width: 640px) {
+@layer components {
   .RichTextSemanticContract__code {
-    font-size: 13px;
-    padding: 12px;
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
+    display: block;
+    padding: 16px;
+    line-height: 1.5;
+    font-size: 14px;
+    margin: 4px 0;
+    overflow-x: auto;
+    border: none;
+    position: relative;
+    border-radius: 3px;
+    tab-size: 2;
   }
 
   .RichTextSemanticContract__table {
-    font-size: 14px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    overflow-y: auto;
+    overflow-x: auto;
+    table-layout: fixed;
+    width: 100%;
+    margin: 4px 0;
+    border-radius: 3px;
+    border: 1px solid var(--border);
   }
 
   .RichTextSemanticContract__tableCell {
-    padding: 6px 8px;
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    /* Matches MIN_COLUMN_WIDTH in plugins/table-column-resize-model.ts. */
+    min-width: 35px;
+  }
+
+  .RichTextSemanticContract__tableCellHeader {
+    font-weight: 600;
+    /* The header carries the same floor. Without it a column's real floor was
+       whichever row refused to shrink, so resizing behaved differently
+       depending on whether the table had a header. */
+    min-width: 35px;
+  }
+
+  /*
+   * Syntax colors are the one place a host cannot help: no CMS ships a
+   * highlighting palette, so both themes are defined here. Light values are
+   * Prism's defaults; dark values are lifted a step to hold contrast against a
+   * dark code background.
+   */
+  .RichTextSemanticContract__tokenComment {
+    color: slategray;
+  }
+
+  .RichTextSemanticContract__tokenPunctuation {
+    color: #999;
+  }
+
+  .RichTextSemanticContract__tokenProperty {
+    color: #905;
+  }
+
+  .RichTextSemanticContract__tokenSelector {
+    color: #690;
+  }
+
+  .RichTextSemanticContract__tokenOperator {
+    color: #9a6e3a;
+  }
+
+  .RichTextSemanticContract__tokenAttr {
+    color: #07a;
+  }
+
+  .RichTextSemanticContract__tokenVariable {
+    color: #e90;
+  }
+
+  .RichTextSemanticContract__tokenFunction {
+    color: #dd4a68;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenComment {
+    color: #8b949e;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenPunctuation {
+    color: #c9d1d9;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenProperty {
+    color: #ff7b72;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenSelector {
+    color: #7ee787;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenOperator {
+    color: #d2a8ff;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenAttr {
+    color: #79c0ff;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenVariable {
+    color: #ffa657;
+  }
+
+  :is(.dark *).RichTextSemanticContract__tokenFunction {
+    color: #d2a8ff;
+  }
+
+  .RichTextSemanticContract__code ::selection {
+    background-color: var(--accent);
+  }
+
+  .RichTextSemanticContract__table tbody tr {
+    transition: background-color 0.1s ease;
+  }
+
+  .RichTextSemanticContract__table tbody tr:hover {
+    background-color: var(--muted);
+  }
+
+  .EditorTheme__tableCellActionMenuHandle {
+    transition:
+      transform 120ms ease,
+      background-color 120ms ease,
+      color 120ms ease,
+      border-color 120ms ease;
+  }
+
+  .EditorTheme__tableCellActionMenuHandle:hover,
+  .EditorTheme__tableCellActionMenuHandle[data-state="open"] {
+    transform: scale(1.05);
+  }
+
+  .EditorTheme__tableCellActionMenuHighlight {
+    transition: opacity 120ms ease;
+  }
+
+  .EditorTheme__tableCellActionMenuDropIndicator {
+    position: absolute;
+    z-index: 45;
+    background-color: var(--primary);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 15%, transparent);
+  }
+
+  @media (max-width: 640px) {
+    .RichTextSemanticContract__code {
+      font-size: 13px;
+      padding: 12px;
+    }
+
+    .RichTextSemanticContract__table {
+      font-size: 14px;
+    }
+
+    .RichTextSemanticContract__tableCell {
+      padding: 6px 8px;
+    }
   }
 }

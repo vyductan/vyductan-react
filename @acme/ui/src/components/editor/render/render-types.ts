@@ -140,6 +140,12 @@ export type EditorRenderTableNode = Omit<
 > & {
   children: EditorRenderTableRowNode[];
   type: "table";
+  /**
+   * Explicit column widths in px, as `TableNode.colWidths` serializes them.
+   * Absent on a table that has never been resized, and nullable because
+   * hand-authored fixtures already write `colWidths: null`.
+   */
+  colWidths?: readonly number[] | null;
 };
 
 export type EditorRenderTableRowNode = Omit<

@@ -286,6 +286,17 @@ function isTableNode(node: unknown): boolean {
   return (
     isElementNodeBase(node) &&
     node.type === "table" &&
+    // Validated only when present: tables authored before column resizing carry
+    // no `colWidths`, and hand-written fixtures carry `null`. A wrong shape is
+    // rejected rather than passed through, since it would reach the DOM as a
+    // NaN width.
+    (!("colWidths" in node) ||
+      node.colWidths === null ||
+      node.colWidths === undefined ||
+      (Array.isArray(node.colWidths) &&
+        node.colWidths.every(
+          (width) => typeof width === "number" && Number.isFinite(width),
+        ))) &&
     node.children.every(
       (child) =>
         isNode(child, true) && isRecord(child) && child.type === "tablerow",

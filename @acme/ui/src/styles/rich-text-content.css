@@ -1,0 +1,201 @@
+/*
+ * Publish-facing stylesheet for rich text the app renders but did not author:
+ * sanitized HTML from the editor and markdown rendered at runtime.
+ *
+ * Everything is a descendant selector hanging off one wrapper class because that
+ * content carries no class attributes of its own — `sanitize-html.ts` leaves
+ * `class` out of ALLOWED_ATTR on purpose — so the wrapper is the only hook the
+ * call site can hand us.
+ *
+ * This replaces `@tailwindcss/typography`'s `prose`, which came with a baked-in
+ * palette that ignored the host tokens and a near-black `<pre>` background that
+ * turned indented plain text into black boxes. Colors here reference theme
+ * tokens, so dark mode follows the host.
+ *
+ * Wrapped in `@layer components` and written with `:where()` so every rule sits
+ * at specificity 0: a call site's Tailwind utility or arbitrary variant still
+ * wins, the same arrangement editor-theme.css uses.
+ */
+
+@layer components {
+  .rich-text-content {
+    color: var(--foreground);
+    line-height: 1.65;
+  }
+
+  .rich-text-content :where(p) {
+    margin-block: 0.5rem;
+  }
+
+  .rich-text-content :where(ul) {
+    list-style-type: disc;
+    padding-inline-start: 1.5rem;
+    margin-block: 0.5rem;
+  }
+
+  .rich-text-content :where(ol) {
+    list-style-type: decimal;
+    padding-inline-start: 1.5rem;
+    margin-block: 0.5rem;
+  }
+
+  .rich-text-content :where(li) {
+    margin-block: 0.25rem;
+  }
+
+  .rich-text-content :where(li)::marker {
+    color: var(--muted-foreground);
+  }
+
+  .rich-text-content :where(ul ul, ul ol, ol ul, ol ol) {
+    margin-block: 0.25rem;
+  }
+
+  .rich-text-content :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--foreground);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-block: 1.25rem 0.5rem;
+  }
+
+  .rich-text-content :where(h1) {
+    font-size: 1.5rem;
+  }
+
+  .rich-text-content :where(h2) {
+    font-size: 1.25rem;
+  }
+
+  .rich-text-content :where(h3) {
+    font-size: 1.125rem;
+  }
+
+  .rich-text-content :where(h4) {
+    font-size: 1rem;
+  }
+
+  .rich-text-content :where(h5, h6) {
+    font-size: 0.875rem;
+  }
+
+  .rich-text-content :where(strong, b) {
+    font-weight: 600;
+    color: inherit;
+  }
+
+  .rich-text-content :where(em, i) {
+    font-style: italic;
+  }
+
+  .rich-text-content :where(a) {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
+  .rich-text-content :where(a):hover {
+    color: var(--color-link-hover);
+  }
+
+  .rich-text-content :where(blockquote) {
+    border-inline-start: 3px solid var(--border);
+    padding-inline-start: 1rem;
+    margin-block: 0.75rem;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  .rich-text-content :where(hr) {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin-block: 1.5rem;
+  }
+
+  .rich-text-content :where(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 3px;
+  }
+
+  .rich-text-content :where(table) {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    margin-block: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+
+  .rich-text-content :where(th, td) {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .rich-text-content :where(th) {
+    font-weight: 600;
+    background-color: var(--muted);
+  }
+
+  .rich-text-content :where(figure) {
+    margin-block: 1rem;
+  }
+
+  .rich-text-content :where(figcaption) {
+    margin-block-start: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--muted-foreground);
+    text-align: center;
+  }
+
+  /* Muted card, matching `.RichTextSemanticContract__code`, so an authored code
+     block reads as a quiet panel instead of prose's near-black slab. */
+  .rich-text-content :where(pre) {
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    padding: 16px;
+    margin-block: 0.5rem;
+    border-radius: 3px;
+    overflow-x: auto;
+    tab-size: 2;
+  }
+
+  .rich-text-content :where(code) {
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-family: "SFMono-Regular", Menlo, Consolas, Monaco, monospace;
+    font-size: 0.875em;
+    padding: 0.125rem 0.3rem;
+    border-radius: 3px;
+  }
+
+  /* Inside a `<pre>` the panel is already drawn, so the inner `<code>` only
+     inherits it. */
+  .rich-text-content :where(pre code) {
+    background-color: transparent;
+    padding: 0;
+    font-size: inherit;
+    border-radius: 0;
+  }
+
+  /*
+   * Bodies that are plain text rather than authored markup. The reminder email
+   * body is one: the DB template indents its lines by four spaces, which the
+   * markdown parser reads as an indented code block, so any `<pre>` here is a
+   * parser artifact and not an author's code block. It has to read as ordinary
+   * email text while keeping the line breaks and indentation the template put
+   * there.
+   */
+  .rich-text-content--plain-source :where(pre, code) {
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    white-space: pre-wrap;
+  }
+}

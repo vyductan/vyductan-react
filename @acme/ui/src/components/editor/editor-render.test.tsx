@@ -11,6 +11,7 @@ import {
   canonicalEditorRenderFixtureNames,
   editorRenderFixtures,
   editorRenderSourceFixtures,
+  editorRenderTableWithColumnWidthsFixture,
   unsupportedEditorRenderFixtureNames,
 } from "./render/render-fixtures";
 import { richTextSemanticContract } from "./themes/rich-text-semantic-contract";
@@ -189,7 +190,9 @@ describe("EditorRender", () => {
   });
 
   test("drops style declarations outside the allowlist", () => {
-    render(<EditorRender value={editorRenderFixtures.inlineStyledText.content} />);
+    render(
+      <EditorRender value={editorRenderFixtures.inlineStyledText.content} />,
+    );
 
     const partiallyDropped = screen.getByText("partially dropped");
     expect(partiallyDropped).toHaveStyle({ color: "#2f9e44" });
@@ -297,6 +300,27 @@ describe("EditorRender", () => {
     const hr = hrRender.container.querySelector("hr");
     expect(hr).not.toBeNull();
     expect(hr).toHaveClass(richTextSemanticContract.hr);
+  });
+
+  test("carries column widths into the published view", () => {
+    // The editor stores widths on the table node; before this the published
+    // renderer dropped them, so a resized table read differently once shared.
+    const { container } = render(
+      <EditorRender value={editorRenderTableWithColumnWidthsFixture} />,
+    );
+
+    const cols = [...container.querySelectorAll("col")];
+
+    expect(cols).toHaveLength(2);
+    expect(cols.map((col) => col.style.width)).toEqual(["120px", "240px"]);
+  });
+
+  test("emits no colgroup for a table that was never resized", () => {
+    const { container } = render(
+      <EditorRender value={editorRenderFixtures.table.content} />,
+    );
+
+    expect(container.querySelector("colgroup")).toBeNull();
   });
 
   test("renders table structure semantically", () => {

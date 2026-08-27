@@ -55,17 +55,15 @@ const INLINE_STYLE_RULES = new Map<string, InlineStyleRule>([
   ],
 ]);
 
-/**
- * Returns the allowlisted subset of a Lexical node `style` string, or
- * `undefined` when nothing survives. `undefined` matters: it lets callers keep
- * rendering bare text instead of wrapping it in an element with an empty style.
- */
-export function parseInlineStyle(style: string): CSSProperties | undefined {
+function collectAllowedDeclarations(
+  style: string,
+): { property: string; rule: InlineStyleRule; value: string }[] {
   if (!style.trim()) {
-    return undefined;
+    return [];
   }
 
-  let parsedStyle: Record<string, string> | undefined;
+  const allowed: { property: string; rule: InlineStyleRule; value: string }[] =
+    [];
 
   for (const declaration of style.split(";")) {
     const separatorIndex = declaration.indexOf(":");
@@ -82,9 +80,43 @@ export function parseInlineStyle(style: string): CSSProperties | undefined {
       continue;
     }
 
-    parsedStyle ??= {};
+    allowed.push({ property, rule, value });
+  }
+
+  return allowed;
+}
+
+/**
+ * Returns the allowlisted subset of a Lexical node `style` string as React style
+ * props, or `undefined` when nothing survives. `undefined` matters: it lets
+ * callers keep rendering bare text instead of wrapping it in an element with an
+ * empty style.
+ */
+export function parseInlineStyle(style: string): CSSProperties | undefined {
+  const allowed = collectAllowedDeclarations(style);
+
+  if (allowed.length === 0) {
+    return undefined;
+  }
+
+  const parsedStyle: Record<string, string> = {};
+
+  for (const { rule, value } of allowed) {
     parsedStyle[rule.styleKey] = value;
   }
 
   return parsedStyle;
+}
+
+/**
+ * The same allowlist expressed back as a CSS declaration string, for the HTML
+ * import path: Lexical stores text styling as raw CSS on the node, so carrying a
+ * `<span style>` from saved markup into the editor means handing it a string,
+ * not React props. Sharing `collectAllowedDeclarations` keeps one allowlist
+ * governing both directions.
+ */
+export function sanitizeInlineStyle(style: string): string {
+  return collectAllowedDeclarations(style)
+    .map(({ property, value }) => `${property}: ${value}`)
+    .join("; ");
 }

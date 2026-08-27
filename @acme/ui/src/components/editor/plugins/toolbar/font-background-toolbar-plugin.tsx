@@ -1,5 +1,5 @@
 import type { BaseSelection, RangeSelection } from "lexical";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
@@ -8,26 +8,24 @@ import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
 import { PaintBucketIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
-import { ColorPicker } from "@acme/ui/components/color-picker";
-import { AggregationColor } from "@acme/ui/components/color-picker/color";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
+import { ColorSwatchPicker } from "./color-swatch-picker";
+import { EDITOR_HIGHLIGHT_COLORS } from "./editor-color-palette";
 
 export function FontBackgroundToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
   const selectionReference = useRef<RangeSelection | null>(null);
 
-  const [bgColor, setBgColor] = useState("#ffffff");
+  // Empty means no highlight at all, which is not the same as a white fill:
+  // a white fill would stay white on a dark page.
+  const [bgColor, setBgColor] = useState("");
 
   const $updateToolbar = (selection: BaseSelection) => {
     if ($isRangeSelection(selection)) {
       setBgColor(
-        $getSelectionStyleValueForProperty(
-          selection,
-          "background-color",
-          "#fff",
-        ),
+        $getSelectionStyleValueForProperty(selection, "background-color", ""),
       );
     }
   };
@@ -53,26 +51,10 @@ export function FontBackgroundToolbarPlugin() {
     [activeEditor],
   );
 
-  const currentColor = useMemo(() => {
-    try {
-      return new AggregationColor(bgColor);
-    } catch {
-      return;
-    }
-  }, [bgColor]);
-
-  const onFontColorSelect = useCallback(
-    (color?: AggregationColor) => {
-      const nextColor = color?.toHexString();
-
-      if (!nextColor) {
-        applyStyleText({ "background-color": "" });
-        setBgColor("#000000");
-        return;
-      }
-
-      setBgColor(nextColor);
-      applyStyleText({ "background-color": nextColor });
+  const onBackgroundColorSelect = useCallback(
+    (color: string | undefined) => {
+      setBgColor(color ?? "");
+      applyStyleText({ "background-color": color ?? "" });
     },
     [applyStyleText],
   );
@@ -92,23 +74,32 @@ export function FontBackgroundToolbarPlugin() {
   );
 
   return (
-    <ColorPicker
-      value={currentColor}
-      onChange={onFontColorSelect}
+    <ColorSwatchPicker
+      swatches={EDITOR_HIGHLIGHT_COLORS}
+      value={bgColor || undefined}
+      onSelect={onBackgroundColorSelect}
       onOpenChange={onOpenChange}
+      defaultLabel="No highlight"
+      renderSwatch={(swatch) => (
+        <span
+          aria-hidden="true"
+          className="size-full rounded-sm"
+          style={{ backgroundColor: swatch.value }}
+        />
+      )}
     >
       <Button
         variant="ghost"
         size="sm"
         className="flex h-8 w-8 flex-col gap-0 p-0"
-        title="Background Color"
+        title="Highlight Color"
       >
         <PaintBucketIcon className="h-4 w-4" />
         <div
           className="border-border h-1 w-5 rounded-sm border"
-          style={{ backgroundColor: bgColor }}
+          style={{ backgroundColor: bgColor || "transparent" }}
         />
       </Button>
-    </ColorPicker>
+    </ColorSwatchPicker>
   );
 }

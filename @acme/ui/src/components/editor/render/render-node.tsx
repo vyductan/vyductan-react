@@ -91,8 +91,26 @@ export function renderNode(
       return <hr key={key} className={richTextSemanticContract.hr} />;
     }
     case "table": {
+      const colWidths = Array.isArray(node.colWidths) ? node.colWidths : null;
+
       return (
         <table key={key} className={richTextSemanticContract.table}>
+          {/*
+            Without this the published view drops every column width, even
+            though the sanitizer already whitelists colgroup/col for exactly
+            this. The `width ? …` guard mirrors Lexical's own $updateColgroup, so
+            a falsy entry means "no opinion" in both renderers.
+          */}
+          {colWidths && colWidths.length > 0 ? (
+            <colgroup>
+              {colWidths.map((width, index) => (
+                <col
+                  key={index}
+                  style={width ? { width: `${width}px` } : undefined}
+                />
+              ))}
+            </colgroup>
+          ) : null}
           <tbody>
             {node.children.map((child, index) =>
               renderNode(child, `${key}-${index}`, depth),

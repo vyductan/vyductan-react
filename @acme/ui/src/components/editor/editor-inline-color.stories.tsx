@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { Editor } from "./editor";
 import InlineColorDemo from "./examples/inline-color";
@@ -51,5 +51,36 @@ export const Parity: Story = {
         "rgb(255, 243, 191)",
       );
     }
+  },
+};
+
+/**
+ * Locks the design decision behind the palette: the picker offers a fixed set
+ * and no free-form entry. A hex field would let `#000000` into stored content,
+ * and that is the one value that disappears when the page is read in dark mode.
+ */
+export const PaletteIsClosed: Story = {
+  render: () => <InlineColorDemo />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByTitle("Text Color"));
+
+    // The popover portals to document.body, so the canvas cannot see it.
+    const body = within(document.body);
+
+    const defaultButton = await waitFor(() =>
+      body.getByRole("button", { name: "Default" }),
+    );
+
+    const popover = defaultButton.closest('[data-slot="popover-content"]');
+    expect(popover).toBeTruthy();
+
+    expect(body.getAllByRole("button", { name: "Red" }).length).toBeGreaterThan(
+      0,
+    );
+
+    // No field of any kind inside the popover: entry is swatch-only.
+    expect(popover?.querySelectorAll("input")).toHaveLength(0);
   },
 };

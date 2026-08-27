@@ -1,5 +1,5 @@
 import type { BaseSelection, RangeSelection } from "lexical";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
@@ -8,23 +8,23 @@ import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
 import { BaselineIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
-import { ColorPicker } from "@acme/ui/components/color-picker";
-import { AggregationColor } from "@acme/ui/components/color-picker/color";
 
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
+import { ColorSwatchPicker } from "./color-swatch-picker";
+import { EDITOR_TEXT_COLORS } from "./editor-color-palette";
 
 export function FontColorToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
   const selectionReference = useRef<RangeSelection | null>(null);
 
-  const [fontColor, setFontColor] = useState("#000000");
+  // Empty means "inherit the page color" rather than any particular color, so
+  // untouched text keeps following the theme instead of being pinned to black.
+  const [fontColor, setFontColor] = useState("");
 
   const $updateToolbar = (selection: BaseSelection) => {
     if ($isRangeSelection(selection)) {
-      setFontColor(
-        $getSelectionStyleValueForProperty(selection, "color", "#000"),
-      );
+      setFontColor($getSelectionStyleValueForProperty(selection, "color", ""));
     }
   };
 
@@ -49,26 +49,10 @@ export function FontColorToolbarPlugin() {
     [activeEditor],
   );
 
-  const currentColor = useMemo(() => {
-    try {
-      return new AggregationColor(fontColor);
-    } catch {
-      return;
-    }
-  }, [fontColor]);
-
   const onFontColorSelect = useCallback(
-    (color?: AggregationColor) => {
-      const nextColor = color?.toHexString();
-
-      if (!nextColor) {
-        applyStyleText({ color: "" });
-        setFontColor("#000000");
-        return;
-      }
-
-      setFontColor(nextColor);
-      applyStyleText({ color: nextColor });
+    (color: string | undefined) => {
+      setFontColor(color ?? "");
+      applyStyleText({ color: color ?? "" });
     },
     [applyStyleText],
   );
@@ -88,10 +72,13 @@ export function FontColorToolbarPlugin() {
   );
 
   return (
-    <ColorPicker
-      value={currentColor}
-      onChange={onFontColorSelect}
+    <ColorSwatchPicker
+      swatches={EDITOR_TEXT_COLORS}
+      value={fontColor || undefined}
+      onSelect={onFontColorSelect}
       onOpenChange={onOpenChange}
+      defaultLabel="Default"
+      renderSwatch={(swatch) => <span style={{ color: swatch.value }}>A</span>}
     >
       <Button
         variant="ghost"
@@ -102,9 +89,9 @@ export function FontColorToolbarPlugin() {
         <BaselineIcon className="h-4 w-4" />
         <div
           className="border-border h-1 w-5 rounded-sm border"
-          style={{ backgroundColor: fontColor }}
+          style={{ backgroundColor: fontColor || "transparent" }}
         />
       </Button>
-    </ColorPicker>
+    </ColorSwatchPicker>
   );
 }

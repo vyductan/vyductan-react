@@ -4,6 +4,7 @@ import { $getRoot, $insertNodes } from "lexical";
 
 import type { LexicalEditorContent } from "../types";
 import { nodes } from "../nodes/nodes";
+import { inlineStyleHtmlImportMap } from "./html-inline-style-import";
 
 export function createBrowserHtmlDocument(html: string): Document {
   return new DOMParser().parseFromString(html, "text/html");
@@ -56,6 +57,9 @@ export function tryHtmlDocumentToLexicalContent(
     const editor = createHtmlEditor({
       namespace: "temp-html-converter",
       nodes: nodes as never,
+      // Publishing goes through this converter too, so it needs the same style
+      // import as the live editor or EditorRender drops colors the editor keeps.
+      html: { import: inlineStyleHtmlImportMap },
       onError: (error) => {
         throw error;
       },

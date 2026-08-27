@@ -202,13 +202,17 @@ const tableRow = (...children: Array<ReturnType<typeof tableCell>>) => ({
   children,
 });
 
-const table = (...children: Array<ReturnType<typeof tableRow>>) => ({
+const table = (
+  children: Array<ReturnType<typeof tableRow>>,
+  colWidths?: readonly number[],
+) => ({
   type: "table" as const,
   direction: null,
   format: "",
   indent: 0,
   version: 1,
   children,
+  ...(colWidths ? { colWidths } : {}),
 });
 
 const unsupportedRoot = (type: string) => ({
@@ -281,10 +285,10 @@ const canonicalFixtures = {
   codeBlock: createRoot([codeBlock("typescript", "const answer = 42;")]),
   horizontalRule: createRoot([horizontalRule()]),
   table: createRoot([
-    table(
+    table([
       tableRow(tableCell("Header A", 1), tableCell("Header B", 1)),
       tableRow(tableCell("Cell A1"), tableCell("Cell B1")),
-    ),
+    ]),
   ]),
   formattedText: createRoot([
     paragraph(
@@ -468,6 +472,23 @@ export const editorRenderSourceFixtures = {
     html: '<img src="https://example.com/image.png" alt="Unsupported image" />',
   },
 } as const;
+
+/**
+ * Deliberately outside `editorRenderFixtures`: the cross-format parity test
+ * compares json/markdown/html summaries of every canonical fixture, and the
+ * markdown and html sources have nowhere to carry a column width. Widening the
+ * shared `table` fixture would fail that comparison for a reason that is not a
+ * bug.
+ */
+export const editorRenderTableWithColumnWidthsFixture = createRoot([
+  table(
+    [
+      tableRow(tableCell("Header A", 1), tableCell("Header B", 1)),
+      tableRow(tableCell("Cell A1"), tableCell("Cell B1")),
+    ],
+    [120, 240],
+  ),
+]);
 
 export const canonicalEditorRenderFixtureNames = [
   "paragraph",

@@ -2,6 +2,12 @@ import { Suspense, use } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
 
+// The publish-safe half of the theme, carrying the RichTextSemanticContract__*
+// hooks that render-node.tsx references. Imported here rather than inherited
+// from editor.tsx so a route that only publishes content still gets code block
+// and table styling without pulling in Lexical.
+import "./themes/editor-theme.css";
+
 import type { EditorRenderInputFormat } from "./render/resolve-editor-render-content";
 import type { LexicalEditorContent } from "./types";
 import { normalizeEditorContent } from "./render/normalize-editor-content";

@@ -6,6 +6,7 @@
 @import "./token.css";
 /* @import ".2/token.css" layer(base); */
 @import "./utilities.css";
+@import "./rich-text-content.css";
 
 @plugin "@iconify/tailwind4";
 @plugin "@tailwindcss/typography";
@@ -24,7 +25,35 @@
   a:not([data-slot]) {
     @apply text-link hover:text-link-hover active:text-link-active cursor-pointer;
   }
+}
 
+/*
+ * @tailwindcss/typography ships its own near-black link color, and `.prose` sits
+ * in the components layer while the anchor rule above is in base — so prose wins
+ * on layer order regardless of specificity, and published rich text ends up with
+ * black links while every other link on the page follows --color-link.
+ *
+ * Pointing the plugin's own variables at the tokens fixes it once for every
+ * `prose` block instead of per call site.
+ *
+ * `utilities`, not `components`: the plugin registers through the legacy
+ * `addComponents` API, and Tailwind v4 emits those into the utilities layer. A
+ * components-layer override loses to it on layer order no matter the specificity.
+ */
+@layer utilities {
+  .prose {
+    --tw-prose-links: var(--color-link);
+    --tw-prose-invert-links: var(--color-link);
+  }
+
+  /* The plugin sets no hover color, so without this the base rule's hover is
+     lost along with its color. */
+  .prose :where(a):hover {
+    color: var(--color-link-hover);
+  }
+}
+
+@layer base {
   /* Global default underline offset; component `underline-offset-*` utilities still override. */
   * {
     @apply underline-offset-4;

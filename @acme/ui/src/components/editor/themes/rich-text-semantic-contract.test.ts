@@ -110,7 +110,7 @@ describe("richTextSemanticContract", () => {
       tableCellHeader: expect.stringContaining(
         "RichTextSemanticContract__tableCellHeader",
       ),
-      hr: expect.stringContaining("after:bg-[rgba(55,53,47,0.09)]"),
+      hr: expect.stringContaining("after:bg-border"),
       checkBlock: expect.any(String),
       checkBlockIcon: expect.any(String),
       checkBlockChecked: expect.any(String),
@@ -156,6 +156,45 @@ describe("richTextSemanticContract", () => {
     expect(editorThemeCss).not.toContain(".Collapsible__");
     expect(editorThemeCss).not.toContain(".editor-image");
     expect(editorThemeCss).not.toContain(".inline-editor-image");
+  });
+
+  test("expresses color through theme tokens rather than literals", () => {
+    // Published content has to follow the host's palette. A literal here pins it
+    // to whichever theme the author happened to be looking at.
+    const serialized = JSON.stringify(richTextSemanticContract);
+
+    expect(serialized).not.toMatch(/rgba?\(/);
+    expect(serialized).not.toMatch(/#[\da-f]{3,8}/i);
+    expect(serialized).not.toMatch(/-(gray|slate|zinc|neutral|stone)-\d{2,3}/);
+  });
+
+  test("stylesheets are layered so utilities can still win", () => {
+    // Unlayered rules outrank every Tailwind utility, which is how the CSS here
+    // silently beat the contract's own classes.
+    for (const css of [editorThemeCss, editorRuntimeCss]) {
+      expect(css).toContain("@layer components");
+      expect(css).not.toContain("rgba(55, 53, 47");
+      expect(css).not.toContain("rgba(247, 246, 243");
+    }
+
+    // Prism's palette is the deliberate exception — no host ships syntax colors —
+    // so it carries both themes itself.
+    expect(editorThemeCss).toContain(
+      ":is(.dark *).RichTextSemanticContract__tokenProperty",
+    );
+  });
+
+  test("EditorRender carries the publish-safe stylesheet itself", () => {
+    // Without this import the renderer only looks styled on routes that also
+    // mount the editor: a publish-only route would silently lose the code block
+    // and table styling, which no rendering assertion would catch.
+    const editorRenderSource = readFileSync(
+      path.resolve(import.meta.dirname, "../editor-render.tsx"),
+      "utf8",
+    );
+
+    expect(editorRenderSource).toContain('import "./themes/editor-theme.css"');
+    expect(editorRenderSource).not.toContain("editor-theme.runtime.css");
   });
 
   test("editor runtime CSS keeps editor-only classes out of the shared artifact", () => {
