@@ -38,6 +38,63 @@ type ButtonState = {
   anchorCell: HTMLTableCellElement;
 } | null;
 
+/**
+ * Where the button belongs for a pointer at this point over this table, or null
+ * if it does not belong anywhere. Every read is live off the DOM, so calling it
+ * after a resize places the button against the column's new width.
+ */
+function resolveButtonState(
+  table: HTMLTableElement,
+  clientX: number,
+  clientY: number,
+): ButtonState {
+  const tableRect = table.getBoundingClientRect();
+  const distributionToRight = tableRect.right - clientX;
+  const distributionToBottom = tableRect.bottom - clientY;
+
+  const inRightStripe =
+    distributionToRight >= 0 &&
+    distributionToRight <= HOVER_MARGIN_PX &&
+    clientY >= tableRect.top &&
+    clientY <= tableRect.bottom;
+
+  const inBottomStripe =
+    distributionToBottom >= 0 &&
+    distributionToBottom <= HOVER_MARGIN_PX &&
+    clientX >= tableRect.left &&
+    clientX <= tableRect.right;
+
+  if (!inRightStripe && !inBottomStripe) return null;
+
+  const rows = table.rows;
+  const firstRowLastCell = rows[0] ? [...rows[0].cells].at(-1) : undefined;
+  const lastRow = [...rows].at(-1);
+  const lastRowLastCell = lastRow ? [...lastRow.cells].at(-1) : undefined;
+
+  // A row with no cells cannot anchor an insert, so there is nothing to show.
+  if (inRightStripe) {
+    if (!firstRowLastCell) return null;
+    return {
+      kind: "column",
+      x: tableRect.right,
+      y: tableRect.top + tableRect.height / 2,
+      stripeHeight: tableRect.height,
+      stripeWidth: 0,
+      anchorCell: firstRowLastCell,
+    };
+  }
+
+  if (!lastRowLastCell) return null;
+  return {
+    kind: "row",
+    x: tableRect.left + tableRect.width / 2,
+    y: tableRect.bottom,
+    stripeHeight: 0,
+    stripeWidth: tableRect.width,
+    anchorCell: lastRowLastCell,
+  };
+}
+
 function TableHoverActionsInner({
   anchorElem,
 }: {
@@ -48,20 +105,34 @@ function TableHoverActionsInner({
   // Track the table element that is currently "active" so we can keep the
   // button visible while the user moves the mouse along the stripe.
   const activeTableReference = useRef<HTMLTableElement | null>(null);
-  // A ref, not state: the mousemove handler below is registered once and has to
-  // read the live value, and nothing about a drag needs a re-render here.
+  // Refs, not state: the mousemove handler below is registered once and has to
+  // read live values, and none of this needs a re-render of its own.
   const columnDragActiveReference = useRef(false);
 
   useEffect(
     () =>
       editor.registerCommand(
         TABLE_COLUMN_RESIZE_DRAG_COMMAND,
-        (active) => {
-          columnDragActiveReference.current = active;
-          if (active) setButtonState(null);
-          // The button comes back on the next pointer move, positioned against
-          // the column's new width — restoring it here would place it against
-          // the old one.
+        (payload) => {
+          columnDragActiveReference.current = payload.active;
+
+          if (payload.active) {
+            setButtonState(null);
+            return false;
+          }
+
+          // Releasing the grabber brings the button straight back rather than
+          // waiting for a pointer move: the pointer is sitting on the boundary
+          // it just dragged, which is the table's right edge when that was the
+          // last column. Re-resolved rather than restored, because the drag
+          // moved that edge — and the DOM already carries the new widths, since
+          // every pointermove wrote them to the <col> elements.
+          const table = activeTableReference.current;
+          if (table) {
+            setButtonState(
+              resolveButtonState(table, payload.clientX, payload.clientY),
+            );
+          }
           return false;
         },
         COMMAND_PRIORITY_LOW,
@@ -136,63 +207,7 @@ function TableHoverActionsInner({
       }
 
       activeTableReference.current = table;
-      const tableRect = table.getBoundingClientRect();
-
-      // Determine if we're in the "right stripe" or the "bottom stripe"
-      const distributionToRight = tableRect.right - clientX;
-      const distributionToBottom = tableRect.bottom - clientY;
-
-      const inRightStripe =
-        distributionToRight >= 0 &&
-        distributionToRight <= HOVER_MARGIN_PX &&
-        clientY >= tableRect.top &&
-        clientY <= tableRect.bottom;
-
-      const inBottomStripe =
-        distributionToBottom >= 0 &&
-        distributionToBottom <= HOVER_MARGIN_PX &&
-        clientX >= tableRect.left &&
-        clientX <= tableRect.right;
-
-      if (!inRightStripe && !inBottomStripe) {
-        setButtonState(null);
-        return;
-      }
-
-      // Pick the last cell of the last row as the anchor for inserting
-      const rows = table.rows;
-      if (rows.length === 0) {
-        setButtonState(null);
-        return;
-      }
-      const lastRow = [...rows].at(-1);
-      const firstRow = rows[0];
-      const firstRowLastCell = firstRow
-        ? [...firstRow.cells].at(-1)
-        : undefined;
-      const lastRowLastCell = lastRow ? [...lastRow.cells].at(-1) : undefined;
-
-      if (inRightStripe) {
-        if (!firstRowLastCell) return;
-        setButtonState({
-          kind: "column",
-          x: tableRect.right,
-          y: tableRect.top + tableRect.height / 2,
-          stripeHeight: tableRect.height,
-          stripeWidth: 0,
-          anchorCell: firstRowLastCell,
-        });
-      } else {
-        if (!lastRowLastCell) return;
-        setButtonState({
-          kind: "row",
-          x: tableRect.left + tableRect.width / 2,
-          y: tableRect.bottom,
-          stripeHeight: 0,
-          stripeWidth: tableRect.width,
-          anchorCell: lastRowLastCell,
-        });
-      }
+      setButtonState(resolveButtonState(table, clientX, clientY));
     };
 
     // Both of these live outside the editor root, so crossing onto either one

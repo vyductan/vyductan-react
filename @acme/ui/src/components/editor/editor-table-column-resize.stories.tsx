@@ -715,10 +715,90 @@ export const AddButtonHidesWhileDraggingTheGrabber: Story = {
       expect(addButton()).toBeNull();
     }
 
+    // Deliberately ends mid-drag. A release has to be issued from the same
+    // pointer() call as its press or userEvent emits no pointerup at all, and
+    // splitting this story's asserts across calls matters more here than
+    // finishing the gesture — AddButtonReturnsAfterTheDrag covers the release.
+  },
+};
+
+/**
+ * Releasing the grabber brings the button back on the spot — no pointer move
+ * needed — and against the column's new edge, not the one it had before the
+ * drag.
+ */
+export const AddButtonReturnsAfterTheDrag: Story = {
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const lastCell = [...(table.rows[0]?.cells ?? [])].at(-1);
+    if (!lastCell) throw new Error("fixture needs a last cell");
+
+    const cellBox = lastCell.getBoundingClientRect();
+    const midY = cellBox.top + cellBox.height / 2;
+    const addButton = () =>
+      canvasElement.querySelector<HTMLElement>("[data-table-hover-btn]");
+
     await userEvent.pointer({
-      keys: "[/MouseLeft]",
-      target: grabber,
-      coords: { clientX: x - 40, clientY: y },
+      target: lastCell,
+      coords: { clientX: cellBox.right - 14, clientY: midY },
     });
+    await waitFor(() => {
+      expect(addButton()).not.toBeNull();
+    });
+
+    await userEvent.pointer({
+      target: lastCell,
+      coords: { clientX: cellBox.right, clientY: midY },
+    });
+    const grabber = await waitFor(() => {
+      const node = canvasElement.querySelector<HTMLElement>(
+        "[data-table-column-resizer]",
+      );
+      if (!node) throw new Error("grabber never appeared");
+      return node;
+    });
+
+    const grabberBox = grabber.getBoundingClientRect();
+    const x = grabberBox.left + grabberBox.width / 2;
+    const y = grabberBox.top + grabberBox.height / 2;
+    const dragTo = x - 30;
+    const widthBefore = lastCell.getBoundingClientRect().width;
+
+    // Press, drag and release in ONE pointer() call: userEvent keeps its
+    // pressed-button state per call, so a release issued from a separate call
+    // is a no-op and pointerup — the whole commit path — never fires.
+    await userEvent.pointer([
+      {
+        keys: "[MouseLeft>]",
+        target: grabber,
+        coords: { clientX: x, clientY: y },
+      },
+      { target: grabber, coords: { clientX: dragTo, clientY: y } },
+      {
+        keys: "[/MouseLeft]",
+        target: grabber,
+        coords: { clientX: dragTo, clientY: y },
+      },
+    ]);
+
+    // The drag has to have actually resized something, or "the button came
+    // back" would prove nothing about re-measuring.
+    expect(lastCell.getBoundingClientRect().width).toBeLessThan(
+      widthBefore - 10,
+    );
+
+    // Back with no further pointer movement...
+    const button = await waitFor(() => {
+      const node = addButton();
+      if (!node) throw new Error("add button never came back after release");
+      return node;
+    });
+
+    // ...and on the edge the drag left behind.
+    const buttonBox = button.getBoundingClientRect();
+    const tableRight = table.getBoundingClientRect().right;
+    expect(
+      Math.abs(buttonBox.left + buttonBox.width / 2 - tableRight),
+    ).toBeLessThan(16);
   },
 };

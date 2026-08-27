@@ -36,16 +36,23 @@ import {
 } from "./table-column-resize-model";
 
 /**
- * True while a column is being dragged, false when the drag ends either way.
+ * A drag starting, or ending with the pointer position it ended at.
  *
- * TableHoverActionsPlugin needs this: during a drag the pointer is captured by
- * the grabber, so every mousemove it sees is "still on a table affordance" and
- * its add-row/add-column button stayed parked across the table being resized.
+ * TableHoverActionsPlugin needs both halves: during a drag the pointer is
+ * captured by the grabber, so every mousemove it sees is "still on a table
+ * affordance" and its add-row/add-column button stayed parked across the table
+ * being resized. The end carries coordinates because that plugin cannot get
+ * them any other way — a captured drag emits pointermove, not mousemove, so its
+ * own document listener never sees where the drag went.
+ *
  * A command rather than a DOM flag because both plugins already share the
- * editor, and this keeps the direction of knowledge one-way — the resizer
+ * editor, and it keeps the direction of knowledge one-way: the resizer
  * announces, nothing reaches back into it.
  */
-export const TABLE_COLUMN_RESIZE_DRAG_COMMAND: LexicalCommand<boolean> =
+export type TableColumnResizeDragPayload =
+  { active: true } | { active: false; clientX: number; clientY: number };
+
+export const TABLE_COLUMN_RESIZE_DRAG_COMMAND: LexicalCommand<TableColumnResizeDragPayload> =
   createCommand("TABLE_COLUMN_RESIZE_DRAG");
 
 /** Width of the invisible grab strip, centred on the boundary. */
@@ -102,6 +109,21 @@ function TableColumnResizeInner({
     height: number;
   } | null>(null);
   const dragReference = useRef<Drag | null>(null);
+  /**
+   * Where the pointer was last seen during a drag. The Escape abort has no
+   * pointer event of its own, and the listener on the other side needs a
+   * position either way.
+   */
+  const dragPointReference = useRef<{ x: number; y: number } | null>(null);
+
+  const announceDragEnd = useCallback(() => {
+    const point = dragPointReference.current;
+    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, {
+      active: false,
+      clientX: point?.x ?? 0,
+      clientY: point?.y ?? 0,
+    });
+  }, [editor]);
 
   /**
    * Push widths straight onto the colgroup rather than through `editor.update`.
@@ -305,7 +327,8 @@ function TableColumnResizeInner({
       top: startRect.top,
       height: startRect.height,
     });
-    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, true);
+    dragPointReference.current = { x: event.clientX, y: event.clientY };
+    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, { active: true });
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -313,6 +336,8 @@ function TableColumnResizeInner({
     if (!drag || !grabber) {
       return;
     }
+
+    dragPointReference.current = { x: event.clientX, y: event.clientY };
 
     const next = applyResizeToColWidths(
       drag.startWidths,
@@ -340,7 +365,8 @@ function TableColumnResizeInner({
     const drag = dragReference.current;
     dragReference.current = null;
     setRuler(null);
-    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, false);
+    dragPointReference.current = { x: event.clientX, y: event.clientY };
+    announceDragEnd();
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -395,7 +421,7 @@ function TableColumnResizeInner({
       const drag = dragReference.current;
       dragReference.current = null;
       setRuler(null);
-      editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, false);
+      announceDragEnd();
 
       if (!drag || !grabber) {
         return;
@@ -415,7 +441,7 @@ function TableColumnResizeInner({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [editor, grabber, previewWidths, ruler]);
+  }, [announceDragEnd, editor, grabber, previewWidths, ruler]);
 
   if (!grabber) {
     return null;
