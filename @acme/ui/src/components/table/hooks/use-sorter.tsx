@@ -358,9 +358,26 @@ export const useFilterSorter = <RecordType extends AnyObject = AnyObject>(
     onSorterChange,
   } = props;
 
-  const [sortStates, setSortStates] = React.useState<SortState<RecordType>[]>(
-    () => collectSortStates<RecordType>(mergedColumns, true),
-  );
+  const [internalSortStates, setSortStates] = React.useState<
+    SortState<RecordType>[]
+  >(() => collectSortStates<RecordType>(mergedColumns, true));
+
+  /**
+   * A CONTROLLED column (one that passes `sortOrder`) must win on every render,
+   * not just at mount.
+   *
+   * The useState initializer above runs once, so without this the header keeps
+   * whatever the last click produced and can disagree with the data it heads —
+   * e.g. clearing a sort on a list that re-applies a default sort left the arrow
+   * blank above rows that were still ordered.
+   *
+   * `collectSortStates(..., false)` only yields entries for controlled columns,
+   * so an uncontrolled table falls through to the internal state unchanged.
+   */
+  const sortStates = React.useMemo(() => {
+    const controlled = collectSortStates<RecordType>(mergedColumns, false);
+    return controlled.length > 0 ? controlled : internalSortStates;
+  }, [mergedColumns, internalSortStates]);
 
   const sortingState: SortingState = React.useMemo(
     () =>

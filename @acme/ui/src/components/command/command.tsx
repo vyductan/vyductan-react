@@ -175,7 +175,9 @@ const Command = <TValue extends CommandValueType = string>(
                 )}
               >
                 {optionRender?.icon ? (
-                  <span className="mr-2">{optionRender.icon(o)}</span>
+                  <span className="mr-2 inline-flex shrink-0 items-center">
+                    {optionRender.icon(o)}
+                  </span>
                 ) : (
                   o.icon && <Icon icon={o.icon} />
                 )}

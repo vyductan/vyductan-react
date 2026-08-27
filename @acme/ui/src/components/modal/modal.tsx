@@ -242,7 +242,32 @@ const Modal = ({
           ref={scrollRef}
           className="group/scroll relative max-h-[80vh] min-h-0"
         >
-          <ScrollArea className="h-full max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 max-sm:px-2 [&>[data-radix-scroll-area-viewport]>div]:block!">
+          <ScrollArea
+            className={cn(
+              // `h-full` is load-bearing: Radix's ScrollArea.Root doesn't clip
+              // (it only sets position:relative), the Viewport does — and the
+              // Viewport is sized `size-full`, a percentage that resolves to
+              // `auto` unless its parent has a DEFINITE height. With only
+              // max-h-[80vh] here the Root stays height:auto, the Viewport grows
+              // to the full content height, nothing scrolls, and tall content
+              // (e.g. a rich-text Editor) paints outside the dialog box.
+              "h-full max-h-[80vh] px-5 *:data-radix-scroll-area-viewport:px-1 max-sm:px-2 [&>[data-radix-scroll-area-viewport]>div]:block!",
+              // A couple of px of slack at the bottom of the scrollable
+              // viewport. Without it, short content whose `scrollHeight` comes
+              // out 1-2px taller than its `clientHeight` — line-box metrics of
+              // text/inputs can exceed their own bounding-rect height by that
+              // much, a browser quirk with no CSS fix at the text level — reads
+              // as "this content overflows" and Radix shows a sliver of
+              // scrollbar for a modal that has nothing to scroll. Measured on
+              // the End Job modal (label + DatePicker): clientHeight 52 vs
+              // scrollHeight 54, and on hover a thumb 48 of 52px tall. The
+              // buffer takes it to 56/56 and the scrollbar stops mounting; for
+              // content genuinely taller than max-h-[80vh] the 4px is
+              // negligible. Keep BOTH this and `h-full` — dropping `h-full`
+              // also hides the sliver, but only by breaking scrolling outright.
+              "*:data-radix-scroll-area-viewport:pb-1",
+            )}
+          >
             {children}
           </ScrollArea>
           <div
