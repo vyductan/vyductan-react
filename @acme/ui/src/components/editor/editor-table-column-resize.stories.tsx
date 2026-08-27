@@ -951,3 +951,50 @@ export const AddButtonAppearsArrivingFromOutsideTheTable: Story = {
     });
   },
 };
+
+/**
+ * Hovering the rightmost column anywhere raises the add-column button, not only
+ * within a fixed margin of the edge. The fixture's columns are 96px wide, so the
+ * middle of the last cell sits 48px in — outside the 36px band that used to be
+ * the whole rule, which is why hovering the last column looked dead.
+ */
+export const AddButtonAppearsAnywhereInTheLastColumn: Story = {
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const lastCell = [...(table.rows[0]?.cells ?? [])].at(-1);
+    if (!lastCell) throw new Error("fixture needs a last cell");
+
+    const cellBox = lastCell.getBoundingClientRect();
+    const distanceFromEdge = cellBox.width / 2;
+    expect(distanceFromEdge).toBeGreaterThan(36);
+
+    await userEvent.pointer({
+      target: lastCell,
+      coords: {
+        clientX: cellBox.left + cellBox.width / 2,
+        clientY: cellBox.top + cellBox.height / 2,
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector("[data-table-hover-btn]"),
+      ).not.toBeNull();
+    });
+
+    // A non-last column still raises nothing, so this did not become "any cell".
+    const firstCell = table.rows[0]?.cells[0];
+    if (!firstCell) throw new Error("fixture needs a first cell");
+    const firstBox = firstCell.getBoundingClientRect();
+    await userEvent.pointer({
+      target: firstCell,
+      coords: {
+        clientX: firstBox.left + firstBox.width / 2,
+        clientY: firstBox.top + firstBox.height / 2,
+      },
+    });
+    await waitFor(() => {
+      expect(canvasElement.querySelector("[data-table-hover-btn]")).toBeNull();
+    });
+  },
+};

@@ -47,25 +47,48 @@ type ButtonState = {
  * as much as inside: a pointer approaching the right edge across the margin
  * resolves to no cell at all, and while this only looked inward, arriving that
  * way raised nothing.
+ *
+ * Being anywhere in the last column also counts, margin or not. A fixed 36px
+ * band is measured from the edge, so on a wide column the middle of the
+ * rightmost cell falls outside it and hovering the last column appeared to do
+ * nothing. `cell` is optional because the drag-end path has no cell to offer;
+ * it falls back to the band alone.
  */
 function resolveButtonState(
   table: HTMLTableElement,
   clientX: number,
   clientY: number,
+  cell?: HTMLTableCellElement | null,
 ): ButtonState {
   const tableRect = table.getBoundingClientRect();
   const distributionToRight = tableRect.right - clientX;
   const distributionToBottom = tableRect.bottom - clientY;
 
-  const inRightStripe =
-    Math.abs(distributionToRight) <= HOVER_MARGIN_PX &&
-    clientY >= tableRect.top &&
-    clientY <= tableRect.bottom;
+  const row = cell?.parentElement;
+  const inLastColumn =
+    row instanceof HTMLTableRowElement &&
+    cell !== null &&
+    cell !== undefined &&
+    cell.cellIndex === row.cells.length - 1;
 
-  const inBottomStripe =
-    Math.abs(distributionToBottom) <= HOVER_MARGIN_PX &&
-    clientX >= tableRect.left &&
-    clientX <= tableRect.right;
+  const verticallyInside =
+    clientY >= tableRect.top && clientY <= tableRect.bottom;
+  const horizontallyInside =
+    clientX >= tableRect.left && clientX <= tableRect.right;
+
+  const nearRightEdge =
+    Math.abs(distributionToRight) <= HOVER_MARGIN_PX && verticallyInside;
+  const nearBottomEdge =
+    Math.abs(distributionToBottom) <= HOVER_MARGIN_PX && horizontallyInside;
+
+  // The bands keep their old precedence — right beats bottom — and the
+  // last-column rule only fills the gap they leave: deep inside the last
+  // column, far from either edge. Without the `nearBottomEdge` exclusion the
+  // bottom-right cell would offer nothing but "add column", losing add-row
+  // exactly where a table is most often extended.
+  const inRightStripe =
+    nearRightEdge || (inLastColumn && verticallyInside && !nearBottomEdge);
+  const inBottomStripe = nearBottomEdge;
 
   if (!inRightStripe && !inBottomStripe) return null;
 
@@ -200,7 +223,7 @@ function TableHoverActionsInner({
       }
 
       activeTableReference.current = table;
-      setButtonState(resolveButtonState(table, clientX, clientY));
+      setButtonState(resolveButtonState(table, clientX, clientY, cell));
     };
 
     // Both of these live outside the editor root, so crossing onto either one
