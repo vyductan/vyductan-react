@@ -14,7 +14,7 @@ const App: React.FC = () => (
         alt="Unavailable photo"
         width={240}
         height={160}
-        className="overflow-hidden rounded-lg"
+        className="rounded-lg"
       />
     </div>
 
@@ -26,7 +26,7 @@ const App: React.FC = () => (
         alt="Unavailable photo"
         width={240}
         height={160}
-        className="overflow-hidden rounded-lg"
+        className="rounded-lg"
       />
     </div>
   </div>

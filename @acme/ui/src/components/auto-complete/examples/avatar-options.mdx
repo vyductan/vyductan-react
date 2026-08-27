@@ -1,0 +1,18 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import AvatarOptionsDemo from "./avatar-options";
+
+<Meta isTemplate />
+
+### Avatar Options
+
+Render an avatar per option through `optionRender.icon`. The trigger lays the icon
+and label out as a flex row, so the avatar keeps its size and the label truncates on
+its own — a long name never squeezes the avatar out of shape.
+
+<ComponentSource
+  src="auto-complete/examples/avatar-options.tsx"
+  __comp__={AvatarOptionsDemo}
+/>

@@ -3,6 +3,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 import BasicExample from "./examples/basic.mdx";
 import FallbackExample from "./examples/fallback.mdx";
 import GalleryLightboxExample from "./examples/gallery-lightbox.mdx";
+import HoverPeekExample from "./examples/hover-peek.mdx";
 import ImagePreviewExample from "./examples/image-preview.mdx";
 import MediaGalleryLayoutsExample from "./examples/media-gallery-layouts.mdx";
 import MediaGalleryExample from "./examples/media-gallery.mdx";
@@ -25,7 +26,7 @@ loading, error, and preview — with an Ant Design-shaped API.
 
 - 🦴 **Loading placeholder** — `Skeleton` by default, any node via `placeholder`
 - 🩹 **Fallback on error** — built-in data URI, overridable with `fallback`
-- 🔍 **Click to preview** — `preview` opens a full-screen overlay
+- 🔍 **Click to preview** — on by default; `preview={false}` opts out
 - 🗂️ **Grouped preview** — `Image.PreviewGroup` shares one overlay with prev/next
 - 🖼️ **Standalone overlay** — `ImagePreview` for non-image triggers
 - 🎞️ **Full gallery** — `GalleryLightbox` with carousel, zoom, pan, rotate, flip, thumbnails
@@ -42,6 +43,8 @@ loading, error, and preview — with an Ant Design-shaped API.
 <FallbackExample />
 
 <PreviewExample />
+
+<HoverPeekExample />
 
 <PreviewGroupExample />
 
@@ -66,18 +69,56 @@ loading, error, and preview — with an Ant Design-shaped API.
 Extends `React.ImgHTMLAttributes<HTMLImageElement>`. Unlisted props (`alt`,
 `loading`, `sizes`, `onLoad`, …) are forwarded to the underlying `<img>`.
 
-| Property      | Type               | Default                     | Description                                                             |
-| ------------- | ------------------ | --------------------------- | ----------------------------------------------------------------------- |
-| `src`         | `string`           | -                           | Image source.                                                           |
-| `width`       | `number \| string` | -                           | Sizes the wrapper box and the `<img>`, reserving space before load.     |
-| `height`      | `number \| string` | -                           | Sizes the wrapper box and the `<img>`, reserving space before load.     |
-| `fallback`    | `string`           | `ImagePlaceholderSrc`       | Source rendered after the request fails.                                |
-| `placeholder` | `React.ReactNode`  | `<Skeleton />`              | Overlay shown until the image finishes loading. Pass `null` to disable. |
-| `preview`     | `boolean`          | `false` (`true` in a group) | Opens a full-screen overlay when the image is clicked.                  |
-| `cover`       | `React.ReactNode`  | eye + "Preview"             | Hover overlay shown while previewable. `null` removes it.               |
-| `className`   | `string`           | -                           | Applied to the wrapper element, not the `<img>`.                        |
-| `bucket`      | `string`           | -                           | Reserved for storage-backed sources; currently unused.                  |
-| `quality`     | `number`           | -                           | Reserved for a future transform pipeline; currently unused.             |
+| Property        | Type                          | Default               | Description                                                             |
+| --------------- | ----------------------------- | --------------------- | ----------------------------------------------------------------------- |
+| `src`           | `string`                      | -                     | Image source.                                                           |
+| `width`         | `number \| string`            | -                     | Sizes the wrapper box and the `<img>`, reserving space before load.     |
+| `height`        | `number \| string`            | -                     | Sizes the wrapper box and the `<img>`, reserving space before load.     |
+| `fallback`      | `string`                      | `ImagePlaceholderSrc` | Source rendered after the request fails.                                |
+| `placeholder`   | `React.ReactNode`             | `<Skeleton />`        | Overlay shown until the image finishes loading. Pass `null` to disable. |
+| `preview`       | `boolean \| ImagePreviewType` | `true`                | Opens the preview viewer when the image is clicked. `false` opts out.   |
+| `className`     | `string`                      | -                     | Applied to the `<img>`, as in Ant Design — put sizing utilities here.   |
+| `rootClassName` | `string`                      | -                     | Applied to the wrapper element.                                         |
+| `bucket`        | `string`                      | -                     | Reserved for storage-backed sources; currently unused.                  |
+| `quality`       | `number`                      | -                     | Reserved for a future transform pipeline; currently unused.             |
+
+### ImagePreviewType
+
+A lone `<Image preview>` opens the same viewer a group does — toolbar, zoom,
+pan, close — so `preview` accepts the same configuration minus the multi-image
+keys. Everything in [PreviewGroupType](#previewgrouptype) applies except
+`current` and `onChange`, plus:
+
+| Property | Type                           | Default | Description                                                         |
+| -------- | ------------------------------ | ------- | ------------------------------------------------------------------- |
+| `src`    | `string`                       | -       | Source shown in the viewer; defaults to the image's own `src`.      |
+| `cover`  | `React.ReactNode`              | -       | Content of the hover mask. Empty by default, matching Ant Design 6. |
+| `hover`  | `boolean \| ImageHoverPreview` | `false` | Float a larger copy while the pointer rests on the image.           |
+
+The hover mask dims the image but carries no icon or label of its own — Ant
+Design 6 removed those defaults. Pass `preview={{ cover: … }}` to put content
+back.
+
+The counter is hidden for a single image, since `1 / 1` says nothing.
+
+### ImageHoverPreview
+
+| Property     | Type                                     | Default    | Description                                                 |
+| ------------ | ---------------------------------------- | ---------- | ----------------------------------------------------------- |
+| `width`      | `number`                                 | `320`      | Width of the floating copy.                                 |
+| `src`        | `string`                                 | -          | Larger source to peek at; defaults to the previewed source. |
+| `openDelay`  | `number`                                 | `150`      | Delay before the peek appears.                              |
+| `closeDelay` | `number`                                 | `100`      | Delay before it disappears.                                 |
+| `side`       | `"top" \| "right" \| "bottom" \| "left"` | `"right"`  | Preferred side; flips on collision.                         |
+| `align`      | `"start" \| "center" \| "end"`           | `"center"` | Alignment along that side.                                  |
+
+Pointer-only: Radix ignores touch for hover cards, so a tap on mobile opens the
+viewer directly rather than needing one tap to peek and another to open. The
+peek stays closed while the viewer is up.
+
+The peek source starts downloading the moment the pointer arrives, so the open
+delay and the fetch overlap. Without that, a `hover.src` larger than the
+thumbnail would leave an empty card until it landed.
 
 ### Image.PreviewGroup
 
@@ -168,9 +209,9 @@ the offset resets on zoom-out, slide change, and reopen.
 
 ## Notes
 
-- `className` targets the wrapper because the `<img>` owns the load/error
-  opacity transition. Reach the image itself with `style` or a descendant
-  selector such as `[&_img]:object-cover`.
+- `className` lands on the `<img>` and `rootClassName` on the wrapper, matching
+  Ant Design. Sizing belongs on the image: the hover mask tracks the wrapper, so
+  an image left unconstrained would outgrow it and only be half-dimmed.
 - The `preview` overlay is rendered inline, while `GalleryLightbox` uses
   `Dialog` and therefore portals to the body — prefer the gallery inside
   scroll containers or transformed ancestors.

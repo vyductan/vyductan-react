@@ -36,7 +36,7 @@ const App: React.FC = () => {
           alt="Album cover"
           width={220}
           height={148}
-          className="overflow-hidden rounded-lg"
+          className="rounded-lg"
         />
       </Image.PreviewGroup>
 

@@ -8,7 +8,7 @@ const App: React.FC = () => (
     alt="Mountain lake at sunrise"
     width={300}
     height={200}
-    className="overflow-hidden rounded-lg"
+    className="rounded-lg"
   />
 );
 

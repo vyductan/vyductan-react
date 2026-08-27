@@ -14,7 +14,7 @@ const App: React.FC = () => (
           alt={seed}
           width={180}
           height={120}
-          className="overflow-hidden rounded-lg"
+          className="rounded-lg"
         />
       ))}
     </div>

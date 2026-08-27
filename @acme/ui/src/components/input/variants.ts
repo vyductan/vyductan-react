@@ -32,24 +32,31 @@ const inputVariants = tv({
         "hover:border-primary-500",
         "focus-within:border-primary-500 focus-within:ring-primary-500/20",
         "focus-visible:border-primary-500 focus-visible:ring-primary-500/20",
+        // Keep the control highlighted while its dropdown is open (combobox
+        // trigger loses focus to the popup). aria-expanded covers the Radix
+        // Select trigger + the Popover-mode div; inert on plain inputs.
+        "aria-expanded:border-primary-500 aria-expanded:ring-primary-500/20",
       ],
       error: [
         "border-error",
         "hover:border-error-hover",
         "focus-within:border-error focus-within:ring-error/20",
         "focus-visible:border-error focus-visible:ring-error/20",
+        "aria-expanded:border-error aria-expanded:ring-error/20",
       ],
       warning: [
         "border-warning",
         "hover:border-warning-hover",
         "focus-within:border-warning focus-within:ring-warning/20",
         "focus-visible:border-warning focus-visible:ring-warning/20",
+        "aria-expanded:border-warning aria-expanded:ring-warning/20",
       ],
       success: [
         "border-success",
         "hover:border-success-hover",
         "focus-within:border-success focus-within:ring-success/20",
         "focus-visible:border-success focus-visible:ring-success/20",
+        "aria-expanded:border-success aria-expanded:ring-success/20",
       ],
     },
     variant: {
@@ -58,6 +65,7 @@ const inputVariants = tv({
         "rounded-md",
         "transition-colors",
         "focus-within:ring-[3px]",
+        "aria-expanded:ring-[3px]",
       ],
       filled: [
         "bg-accent rounded-md border-none shadow-none",
@@ -105,13 +113,23 @@ const controlRadiusBySize = {
   large: "rounded-lg",
 } as const;
 
+// Inline half of controlPaddingBySize. Needed on its own when an outer box owns
+// the height/vertical padding but the inline inset still has to be applied to
+// the inner control — e.g. an input with addons, where the addons must touch the
+// border (wrapper is p-0) while the value must stay inset.
+const controlPaddingXBySize = {
+  small: "px-2",
+  middle: "px-3",
+  large: "px-3",
+} as const;
+
 // Single source for size -> control padding. Shared by inputSizeVariants and
 // the Select trigger so every control (input, autocomplete, datepicker, select)
 // pads identically; do not restate px-2/px-3 elsewhere.
 const controlPaddingBySize = {
-  small: "px-2 py-1",
-  middle: "px-3 py-1",
-  large: "px-3 py-2",
+  small: `${controlPaddingXBySize.small} py-1`,
+  middle: `${controlPaddingXBySize.middle} py-1`,
+  large: `${controlPaddingXBySize.large} py-2`,
 } as const;
 
 const inputAffixWrapperSizeVariants = tv({
@@ -159,4 +177,5 @@ export {
   controlTextBySize,
   controlRadiusBySize,
   controlPaddingBySize,
+  controlPaddingXBySize,
 };

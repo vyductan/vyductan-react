@@ -152,11 +152,15 @@ const AutoComplete = <
 
   const buttonText = (() => {
     if (!value) {
-      return placeholder ?? <span className="opacity-0"></span>;
+      return placeholder ? (
+        <span className="truncate">{placeholder}</span>
+      ) : (
+        <span className="opacity-0"></span>
+      );
     }
 
     if (!selectedOption) {
-      return value;
+      return <span className="truncate">{value}</span>;
     }
 
     const label = optionRender?.label
@@ -164,14 +168,16 @@ const AutoComplete = <
       : getOptionLabel(selectedOption);
 
     return (
-      <>
+      <span className="flex min-w-0 items-center">
         {optionRender?.icon ? (
-          <span className="mr-2">{optionRender.icon(selectedOption)}</span>
+          <span className="mr-2 inline-flex shrink-0 items-center">
+            {optionRender.icon(selectedOption)}
+          </span>
         ) : (
           selectedOption.icon && <Icon icon={selectedOption.icon} />
         )}
-        {label}
-      </>
+        <span className="truncate">{label}</span>
+      </span>
     );
   })();
 
@@ -324,7 +330,10 @@ const AutoComplete = <
           className,
         )}
       >
-        <span data-slot="select-selection-item" className="truncate">
+        <span
+          data-slot="select-selection-item"
+          className="flex min-w-0 flex-1 items-center truncate"
+        >
           {buttonText}
         </span>
 

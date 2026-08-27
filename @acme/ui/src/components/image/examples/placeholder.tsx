@@ -26,7 +26,7 @@ const App: React.FC = () => {
             alt="Forest path"
             width={240}
             height={160}
-            className="overflow-hidden rounded-lg"
+            className="rounded-lg"
           />
         </div>
 
@@ -40,7 +40,7 @@ const App: React.FC = () => {
             alt="City skyline"
             width={240}
             height={160}
-            className="overflow-hidden rounded-lg"
+            className="rounded-lg"
             placeholder={
               <div className="bg-muted text-muted-foreground flex size-full animate-pulse items-center justify-center text-xs">
                 Loading…

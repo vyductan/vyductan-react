@@ -4,6 +4,7 @@ import { expect, userEvent, within } from "storybook/test";
 import BasicDemo from "./examples/basic";
 import FallbackDemo from "./examples/fallback";
 import GalleryLightboxDemo from "./examples/gallery-lightbox";
+import HoverPeekDemo from "./examples/hover-peek";
 import ImagePreviewDemo from "./examples/image-preview";
 import MediaGalleryDemo from "./examples/media-gallery";
 import MediaGalleryLayoutsDemo from "./examples/media-gallery-layouts";
@@ -60,7 +61,7 @@ export const Default: Story = {
     alt: "Mountain lake at sunrise",
     width: 300,
     height: 200,
-    className: "overflow-hidden rounded-lg",
+    className: "rounded-lg",
   },
 };
 
@@ -78,6 +79,11 @@ export const Fallback: Story = {
 
 export const Preview: Story = {
   render: () => <PreviewDemo />,
+};
+
+export const HoverPeek: Story = {
+  parameters: { layout: "padded" },
+  render: () => <HoverPeekDemo />,
 };
 
 export const PreviewGroup: Story = {
@@ -127,22 +133,37 @@ export const InteractionPreview: Story = {
     preview: true,
     width: 200,
     height: 140,
-    className: "overflow-hidden rounded-lg",
+    className: "rounded-lg",
     // Keep the box stable in the test run even before the network settles.
     placeholder: null,
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
+    // The overlay is a `Dialog`, so it portals out of the story canvas.
+    const body = within(document.body);
 
-    await step("only the thumbnail is rendered initially", async () => {
-      await expect(canvas.getAllByRole("img")).toHaveLength(1);
+    await step("no overlay before the thumbnail is clicked", async () => {
+      await expect(body.queryByRole("dialog")).toBeNull();
     });
 
-    await step("clicking the thumbnail opens the overlay", async () => {
+    await step("clicking the thumbnail opens the viewer", async () => {
       await userEvent.click(canvas.getByAltText("Clickable thumbnail"));
-
-      // The overlay renders a second copy of the same source on top.
-      await expect(await canvas.findAllByRole("img")).toHaveLength(2);
+      // The dialog animates in, so assert it exists rather than that it has
+      // already reached full opacity.
+      await expect(await body.findByRole("dialog")).toBeInTheDocument();
     });
+
+    await step(
+      "a lone image gets the full toolbar, not a bare backdrop",
+      async () => {
+        const dialog = within(await body.findByRole("dialog"));
+        for (const label of ["Zoom In", "Zoom Out", "Reset", "Rotate Right"]) {
+          await expect(await dialog.findByTitle(label)).toBeInTheDocument();
+        }
+        await expect(await dialog.findByLabelText("Close")).toBeInTheDocument();
+        // Nothing to count with a single image, so the badge stays away.
+        await expect(dialog.queryByText("1 / 1")).toBeNull();
+      },
+    );
   },
 };

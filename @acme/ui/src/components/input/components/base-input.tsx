@@ -13,6 +13,20 @@ import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
 import { ClearIcon } from "./clear-icon";
 
+/**
+ * shadcn's `InputGroupAddon` pulls itself 0.45rem towards the input whenever it
+ * holds a `button`, to absorb the padding its own `InputGroupButton` carries.
+ * Nothing this component puts in an addon has that padding — `prefix`/`suffix`
+ * are plain icon nodes and `ClearIcon` is a bare `size-4` box — so the inset
+ * only shifts them off-centre. Most visible with `allowClear` + `suffix`, where
+ * the clear icon replaces the suffix on hover and would land 7.2px right of the
+ * icon it replaced. Cancelled under the same variant so `cn` drops the original
+ * declaration instead of leaving two to be settled on specificity — a plain
+ * `mx-0` would lose to `:has(> button)`. The addon's own `pl-3`/`pr-3` keeps
+ * doing the spacing.
+ */
+const ADDON_NO_BUTTON_INSET = "has-[>button]:mx-0";
+
 export interface HolderRef {
   /** Provider holder ref. Will return `null` if not wrap anything */
   nativeElement: HTMLElement | null;
@@ -163,7 +177,7 @@ const BaseInput = (
         {prefix && (
           <InputGroupAddon
             align="inline-start"
-            className={classNames?.prefix}
+            className={cn(ADDON_NO_BUTTON_INSET, classNames?.prefix)}
             style={styles?.prefix}
           >
             {prefix}
@@ -173,7 +187,7 @@ const BaseInput = (
         {(!!suffix || allowClear) && (
           <InputGroupAddon
             align="inline-end"
-            className={classNames?.suffix}
+            className={cn(ADDON_NO_BUTTON_INSET, classNames?.suffix)}
             style={styles?.suffix}
           >
             {suffixNode}

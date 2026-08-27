@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Lock, Mail, Search, User } from "lucide-react";
 import { expect, fn, userEvent, within } from "storybook/test";
 
+import { ComponentSource } from "../mdx/component-source";
+import AddonExample from "./examples/addon";
+import AddonSizesExample from "./examples/addon-sizes";
 import { Input } from "./input";
 
 const meta = {
@@ -82,6 +85,21 @@ export const WithIcons: Story = {
         placeholder="Email"
       />
     </div>
+  ),
+};
+
+export const WithAddons: Story = {
+  render: () => (
+    <ComponentSource src="input/examples/addon.tsx" __comp__={AddonExample} />
+  ),
+};
+
+export const AddonSizes: Story = {
+  render: () => (
+    <ComponentSource
+      src="input/examples/addon-sizes.tsx"
+      __comp__={AddonSizesExample}
+    />
   ),
 };
 

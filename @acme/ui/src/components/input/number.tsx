@@ -17,6 +17,7 @@ import { Icon } from "../../icons";
 import RcInputNumber from "./components/rc-input-number";
 import {
   controlHeightBySize,
+  controlPaddingXBySize,
   controlRadiusBySize,
   controlTextBySize,
   inputSizeVariants,
@@ -206,11 +207,11 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
           "placeholder:text-placeholder",
           "border-none outline-hidden",
           !spinnerMode && "w-px",
-          // Add padding when has addon (match Input behavior)
-          // hasAddon && addonBefore && "pl-[11px]",
-          // hasAddon && addonAfter && "pr-[11px]",
-          // hasAddon && !addonBefore && "pl-[11px]",
-          // hasAddon && !addonAfter && "pr-[11px]",
+          // With addons the size variant moves to the wrapper, and BaseInput
+          // forces the wrapper to p-0 so the addons can touch the border. That
+          // leaves the value flush against the border unless the inline inset is
+          // restored here (plain Input keeps it via inputSizeVariants).
+          hasAddon && controlPaddingXBySize[mergedSize ?? "middle"],
         ),
         // When has addon, apply variant and size to wrapper instead
         variant: cn(
@@ -226,6 +227,17 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
         // getStatusClassNames(prefixCls, mergedStatus, hasFeedback),
         affixWrapper: cn(
           hasAffix && inputSizeVariants({ size: mergedSize }),
+          // The affix wrapper only exists when something fills a prefix/suffix
+          // slot (prefix, suffix, clear icon, or the spinner controls), and with
+          // allowClear that flips with the value. So when it IS rendered it takes
+          // over the inset from the input via an element-scoped selector, which
+          // outranks the input's own px-* regardless of class order.
+          hasAddon &&
+            cn(
+              controlPaddingXBySize[mergedSize ?? "middle"],
+              controlTextBySize[mergedSize ?? "middle"],
+              "[&_input]:px-0",
+            ),
           readOnly && "cursor-default bg-muted",
         ),
         // {

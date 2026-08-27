@@ -166,7 +166,7 @@ export function PreviewOverlay({
   const imageInfo: ImgInfo = { url: source, alt };
 
   const originalImage = (
-    <picture>
+    <picture className="contents">
       <img
         {...imgRest}
         src={source}
@@ -319,11 +319,15 @@ export function PreviewOverlay({
             : originalImage}
         </div>
 
-        <div className="absolute top-4 left-4 flex h-10 items-center rounded-full border border-white/10 bg-black/30 px-4 text-sm font-medium text-white/90 shadow-lg backdrop-blur-md md:top-6 md:left-6">
-          {countRender
-            ? countRender(current + 1, total)
-            : `${current + 1} / ${total}`}
-        </div>
+        {/* A lone image has nothing to count, so the badge only earns its
+            place once there is more than one. */}
+        {(total > 1 || countRender) && (
+          <div className="absolute top-4 left-4 flex h-10 items-center rounded-full border border-white/10 bg-black/30 px-4 text-sm font-medium text-white/90 shadow-lg backdrop-blur-md md:top-6 md:left-6">
+            {countRender
+              ? countRender(current + 1, total)
+              : `${current + 1} / ${total}`}
+          </div>
+        )}
 
         <button
           type="button"

@@ -250,7 +250,7 @@ export function GalleryLightbox({
                           }
                         />
                       ) : (
-                        <picture>
+                        <picture className="contents">
                           <img
                             src={item.url}
                             alt={`Gallery Image ${index + 1}`}

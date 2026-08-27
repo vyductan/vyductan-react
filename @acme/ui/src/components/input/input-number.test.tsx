@@ -234,3 +234,78 @@ describe("InputNumber spinner mode", () => {
     expect(input).toHaveValue("4");
   });
 });
+
+describe("InputNumber addon inset", () => {
+  // With addons the wrapper is forced to p-0 (addons must touch the border), so
+  // the inline inset has to be restored on the inner box or the value renders
+  // flush against the border. The affix wrapper only exists when a prefix/suffix
+  // slot is filled (spinner controls count, and allowClear flips with the value),
+  // so both boxes carry it and the wrapper zeroes the input's copy.
+  const insetBySize = { small: "px-2", middle: "px-3", large: "px-3" } as const;
+
+  test.each(["small", "middle", "large"] as const)(
+    "keeps the value inset with an addon at size %s",
+    (size) => {
+      render(
+        <InputNumber
+          aria-label="Quantity"
+          size={size}
+          value={4}
+          addonAfter="days"
+        />,
+      );
+
+      const input = screen.getByRole("spinbutton", { name: "Quantity" });
+      expect(input).toHaveClass(insetBySize[size]);
+
+      const affixWrapper = input.closest('[data-slot="affix-wrapper"]');
+      expect(affixWrapper).toHaveClass(insetBySize[size], "[&_input]:px-0");
+    },
+  );
+
+  test("keeps the value inset with an addon and no affix wrapper", () => {
+    render(
+      <InputNumber
+        aria-label="Quantity"
+        value={4}
+        controls={false}
+        addonBefore="$"
+      />,
+    );
+
+    const input = screen.getByRole("spinbutton", { name: "Quantity" });
+    expect(input.closest('[data-slot="affix-wrapper"]')).toBeNull();
+    expect(input).toHaveClass("px-3");
+  });
+
+  test("does not double the inset when a prefix renders the affix wrapper", () => {
+    render(
+      <InputNumber
+        aria-label="Quantity"
+        value={4}
+        prefix="#"
+        addonAfter="days"
+      />,
+    );
+
+    const affixWrapper = screen
+      .getByRole("spinbutton", { name: "Quantity" })
+      .closest('[data-slot="affix-wrapper"]');
+
+    expect(affixWrapper).toHaveClass("px-3", "[&_input]:px-0");
+  });
+
+  test("leaves spinner mode untouched (addons are dropped there)", () => {
+    render(
+      <InputNumber
+        mode="spinner"
+        aria-label="Quantity"
+        value={4}
+        addonAfter="days"
+      />,
+    );
+
+    const input = screen.getByRole("spinbutton", { name: "Quantity" });
+    expect(input).not.toHaveClass("px-3");
+  });
+});

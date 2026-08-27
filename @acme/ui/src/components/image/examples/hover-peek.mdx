@@ -1,0 +1,35 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+import { ComponentSource } from "@acme/ui/components/mdx";
+
+import HoverPeekExample from "./hover-peek";
+
+<Meta isTemplate />
+
+### Hover to Peek
+
+A thumbnail small enough to fit a table row is too small to read. `preview.hover`
+floats a larger copy while the pointer rests on it, so scanning a list doesn't
+mean opening and closing the viewer for every row. Clicking still opens the full
+viewer — the peek is a faster first step, not a replacement.
+
+Off by default: on a page of large images the floating copy is noise. Turn it on
+where the rendered size is smaller than the content needs.
+
+```tsx
+<Image preview={{ hover: true }} />
+<Image preview={{ hover: { width: 480, side: "left" } }} />
+```
+
+Pointer-only. Radix ignores touch for hover cards, so on mobile a tap goes
+straight to the viewer instead of needing one tap to peek and another to open.
+
+Point `hover.src` at a larger rendition than the row shows. The fetch starts on
+pointer enter rather than when the card mounts, so it overlaps the 150ms open
+delay instead of following it — measured here, the request leaves at ~28ms and
+the image is painted the instant the card appears at ~172ms.
+
+<ComponentSource
+  src="image/examples/hover-peek.tsx"
+  __comp__={HoverPeekExample}
+/>
