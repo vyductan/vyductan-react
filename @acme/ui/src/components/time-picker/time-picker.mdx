@@ -1,3 +1,7 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="TimePicker" />
+
 import { ComponentSource } from "@acme/ui/components/mdx";
 
 import BasicDemo from "./examples/basic";
@@ -106,21 +110,21 @@ function FormExample() {
 
 ### TimePicker Props
 
-| Property       | Type                                                             | Default         | Description                             |
-| -------------- | ---------------------------------------------------------------- | --------------- | --------------------------------------- |
-| `value`        | `Dayjs \| string \| null \| undefined`                           | -               | The current time value                  |
-| `defaultValue` | `Dayjs \| string \| null \| undefined`                           | -               | The default time value                  |
-| `onChange`     | `(time: Dayjs \| null, timeString: string \| undefined) => void` | -               | Callback when time changes              |
-| `format`       | `string`                                                         | `"HH:mm:ss"`    | The time format                         |
-| `placeholder`  | `string`                                                         | `"Select time"` | Placeholder text                        |
-| `open`         | `boolean`                                                        | -               | Whether the picker is open (controlled) |
-| `onOpenChange` | `(open: boolean) => void`                                        | -               | Callback when open state changes        |
-| `disabled`     | `boolean`                                                        | `false`         | Whether the time picker is disabled     |
-| `status`       | `"error" \| "warning"`                                           | -               | Validation status                       |
-| `disabledTime` | `(now: Dayjs) => { disabledHours?; disabledMinutes?; disabledSeconds? }` | -       | Return disabled hours/minutes/seconds (AntD parity) |
-| `hideDisabledOptions` | `boolean`                                                 | `false`         | Hide (instead of grey) disabled options |
-| `use12Hours`   | `boolean`                                                        | `false`         | 12-hour clock with AM/PM column (default format `h:mm:ss A`) |
-| `showNow`      | `boolean`                                                        | `true`          | Show the "Now" footer button            |
+| Property              | Type                                                                     | Default         | Description                                                  |
+| --------------------- | ------------------------------------------------------------------------ | --------------- | ------------------------------------------------------------ |
+| `value`               | `Dayjs \| string \| null \| undefined`                                   | -               | The current time value                                       |
+| `defaultValue`        | `Dayjs \| string \| null \| undefined`                                   | -               | The default time value                                       |
+| `onChange`            | `(time: Dayjs \| null, timeString: string \| undefined) => void`         | -               | Callback when time changes                                   |
+| `format`              | `string`                                                                 | `"HH:mm:ss"`    | The time format                                              |
+| `placeholder`         | `string`                                                                 | `"Select time"` | Placeholder text                                             |
+| `open`                | `boolean`                                                                | -               | Whether the picker is open (controlled)                      |
+| `onOpenChange`        | `(open: boolean) => void`                                                | -               | Callback when open state changes                             |
+| `disabled`            | `boolean`                                                                | `false`         | Whether the time picker is disabled                          |
+| `status`              | `"error" \| "warning"`                                                   | -               | Validation status                                            |
+| `disabledTime`        | `(now: Dayjs) => { disabledHours?; disabledMinutes?; disabledSeconds? }` | -               | Return disabled hours/minutes/seconds (AntD parity)          |
+| `hideDisabledOptions` | `boolean`                                                                | `false`         | Hide (instead of grey) disabled options                      |
+| `use12Hours`          | `boolean`                                                                | `false`         | 12-hour clock with AM/PM column (default format `h:mm:ss A`) |
+| `showNow`             | `boolean`                                                                | `true`          | Show the "Now" footer button                                 |
 
 ## Migration from Ant Design
 

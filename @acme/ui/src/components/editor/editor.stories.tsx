@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { fn } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 
 import { Editor } from "./editor";
 import PlaygroundDemo from "./examples/playground";
@@ -101,284 +101,87 @@ export const Playground: Story = {
   render: () => <PlaygroundDemo />,
 };
 
-// Markdown Editor Stories
-const markdownMeta = {
-  title: "Components/Editor/With Markdown",
-  component: Editor,
-  parameters: {
-    layout: "padded",
+const VARIANTS = [
+  {
+    variant: "default",
+    title: "default",
+    blurb:
+      "The full document surface: slash commands, a drag handle on every block, and every embed — images, video, files, polls, layouts, equations, Excalidraw. Formatting comes from a toolbar that floats over the selection.",
   },
-  argTypes: {
-    placeholder: {
-      control: "text",
-      description: "Placeholder text for the editor",
-    },
-    value: {
-      control: "text",
-      description: "Markdown content",
-    },
+  {
+    variant: "simple",
+    title: "simple",
+    blurb:
+      "Trades the floating toolbar for a fixed one at the top and drops the document-level extras. Images still work. Suited to a form field whose controls have to be visible before the user selects anything.",
   },
-} satisfies Meta<typeof Editor>;
-
-type MarkdownStory = StoryObj<typeof markdownMeta>;
-
-// Basic markdown editor
-export const MarkdownDefault: MarkdownStory = {
-  args: {
-    value: "",
-    placeholder: "Start typing in markdown...",
-
-    onChange: fn(),
-    format: "markdown",
+  {
+    variant: "minimal",
+    title: "minimal",
+    blurb:
+      "No toolbar of its own beyond the floating one, and no images. Rich text down to what typing produces — markdown shortcuts, links, mentions, emoji. This is what Composer builds on.",
   },
-  render: (arguments_) => <Editor {...arguments_} format="markdown" />,
-};
+] as const;
 
-// Markdown editor with initial content
-export const MarkdownWithContent: MarkdownStory = {
-  args: {
-    value: `# Welcome to the Editor
+/**
+ * The three surfaces side by side. What separates them is which plugins mount,
+ * so the differences are behavioural rather than cosmetic and are easiest to
+ * judge by typing in each one.
+ */
+export const Variants: Story = {
+  parameters: { layout: "fullscreen" },
+  render: () => (
+    <div className="mx-auto flex max-w-3xl flex-col gap-8 p-6">
+      {VARIANTS.map(({ variant, title, blurb }) => (
+        <section
+          className="flex flex-col gap-2"
+          data-variant={variant}
+          key={variant}
+        >
+          <header>
+            <h3 className="font-mono text-sm font-semibold">{title}</h3>
+            <p className="text-muted-foreground text-sm">{blurb}</p>
+          </header>
 
-This is a **rich text editor** with *markdown* support.
-
-## Features
-
-- Easy to use
-- Markdown compatible
-- Rich formatting options
-
-\`\`\`javascript
-const hello = "world";
-console.log(hello);
-\`\`\`
-
-Try editing this content!`,
-    placeholder: "Start typing...",
-
-    onChange: fn(),
-    format: "markdown",
-  },
-  render: (arguments_) => <Editor {...arguments_} format="markdown" />,
-};
-
-// Interactive markdown editor with state
-export const MarkdownInteractive: MarkdownStory = {
-  render: () => {
-    const [markdown, setMarkdown] = useState(
-      `# Interactive Editor
-
-Edit this content and see the markdown output below.
-
-**Bold text** and *italic text* are supported.`,
-    );
-    const [stats, setStats] = useState({
-      wordCount: 0,
-      characterCount: 0,
-      readingTimeMinutes: 0,
+          <div className="rounded-md border">
+            {/*
+              Padding is left at the default on purpose: `default` positions a
+              drag handle in the left gutter, so narrowing it puts the handle on
+              top of the first characters.
+            */}
+            <Editor
+              placeholder={`Type here — this is the ${title} editor…`}
+              variant={variant}
+            />
+          </div>
+        </section>
+      ))}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    // Counted by contenteditable rather than by role: the toolbars contribute
+    // textboxes of their own, so the role count is not the editor count.
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelectorAll('[contenteditable="true"]'),
+      ).toHaveLength(VARIANTS.length);
     });
 
-    return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-gray-200">
-          <Editor
-            format="markdown"
-            value={markdown}
-            onChange={(markdown) => setMarkdown(markdown)}
-            onStatsChange={setStats}
-            placeholder="Type something..."
-          />
-        </div>
-        <div className="space-y-2">
-          <div className="flex gap-4 text-sm text-gray-600">
-            <span>Words: {stats.wordCount}</span>
-            <span>Characters: {stats.characterCount}</span>
-            <span>Reading time: {stats.readingTimeMinutes} min</span>
-          </div>
-          <div className="space-y-2">
-            <div className="text-sm font-semibold">Markdown Output:</div>
-            <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs">
-              {markdown || "No content yet"}
-            </pre>
-          </div>
-        </div>
-      </div>
-    );
+    const panelFor = (variant: string) => {
+      const node = canvasElement.querySelector<HTMLElement>(
+        `[data-variant="${variant}"]`,
+      );
+      if (!node) throw new Error(`no panel for ${variant}`);
+      return node;
+    };
+
+    // The block-type dropdown belongs to the fixed toolbar, which only `simple`
+    // mounts — the cheapest observable proof that the variant prop reached the
+    // plugin list rather than being quietly ignored.
+    await waitFor(() => {
+      expect(within(panelFor("simple")).getByRole("combobox")).toBeVisible();
+    });
+
+    expect(within(panelFor("default")).queryByRole("combobox")).toBeNull();
+    expect(within(panelFor("minimal")).queryByRole("combobox")).toBeNull();
   },
 };
-
-// Markdown editor with sync demonstration
-export const MarkdownSync: MarkdownStory = {
-  render: (arguments_) => {
-    const [markdown, setMarkdown] = useState(
-      String.raw`# Hello World\n\nThis is a test.`,
-    );
-
-    return (
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">Edit markdown directly:</div>
-          <textarea
-            className="w-full rounded border border-gray-300 p-3 font-mono text-sm"
-            rows={6}
-            value={markdown}
-            onChange={(e) => setMarkdown(e.target.value)}
-            placeholder="Enter markdown here..."
-          />
-        </div>
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">Preview:</div>
-          <div className="rounded border border-gray-200">
-            <Editor
-              {...arguments_}
-              format="markdown"
-              value={markdown}
-              onChange={(markdown) => setMarkdown(markdown)}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  },
-  args: {
-    value: String.raw`# Hello World\n\nThis is a test.`,
-    placeholder: "Type something...",
-    onChange: fn(),
-    format: "markdown",
-  },
-};
-
-// Markdown editor with full features
-export const MarkdownFullFeatures: MarkdownStory = {
-  render: (arguments_) => {
-    const [markdown, setMarkdown] = useState(
-      `# Full Featured Editor
-
-## Rich Text Features
-
-This editor supports:
-
-1. **Headings** (H1 through H6)
-2. **Lists** (ordered and unordered)
-3. **Bold** and *italic* text
-4. \`Inline code\`
-5. Links and more!
-
-### Code Blocks
-
-\`\`\`typescript
-interface User {
-  name: string;
-  age: number;
-}
-\`\`\`
-
-### Blockquotes
-
-> This is a blockquote.
-> It can span multiple lines.
-
-Try editing to see all features in action!`,
-    );
-
-    return (
-      <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl border-2 border-gray-200 bg-white shadow-lg">
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Markdown Editor
-            </h3>
-            <p className="text-sm text-gray-600">
-              Full-featured editor with markdown support
-            </p>
-          </div>
-          <div className="p-6">
-            <Editor
-              {...arguments_}
-              format="markdown"
-              value={markdown}
-              onChange={(markdown) => setMarkdown(markdown)}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  },
-  args: {
-    value: "",
-    placeholder: "Start typing...",
-    onChange: fn(),
-    format: "markdown",
-  },
-};
-
-export const MarkdownEditorMeta = markdownMeta;
-
-// HTML Editor Stories
-const htmlMeta = {
-  title: "Components/Editor/With HTML",
-  component: Editor,
-  parameters: {
-    layout: "padded",
-  },
-  argTypes: {
-    placeholder: {
-      control: "text",
-      description: "Placeholder text for the editor",
-    },
-    value: {
-      control: "text",
-      description: "HTML content",
-    },
-  },
-} satisfies Meta<typeof Editor>;
-
-type HtmlStory = StoryObj<typeof htmlMeta>;
-
-export const HtmlDefault: HtmlStory = {
-  args: {
-    value: "",
-    placeholder: "Start typing in html...",
-    onChange: fn(),
-    format: "html",
-  },
-  render: (arguments_) => <Editor {...arguments_} format="html" />,
-};
-
-export const HtmlWithContent: HtmlStory = {
-  args: {
-    value: `<h1>Welcome to the Editor</h1><p>This is a <b>rich text editor</b> with <i>HTML</i> support.</p><ul><li>Easy to use</li><li>HTML compatible</li><li>Rich formatting options</li></ul><p>Try editing this content!</p>`,
-    placeholder: "Start typing...",
-    onChange: fn(),
-    format: "html",
-  },
-  render: (arguments_) => <Editor {...arguments_} format="html" />,
-};
-
-export const HtmlInteractive: HtmlStory = {
-  render: () => {
-    const [html, setHtml] = useState(
-      `<h1>Interactive Editor</h1><p>Edit this content and see the HTML output below.</p><p><b>Bold text</b> and <i>italic text</i> are supported.</p>`,
-    );
-
-    return (
-      <div className="space-y-4">
-        <div className="rounded-lg border border-gray-200">
-          <Editor
-            format="html"
-            value={html}
-            onChange={(html) => setHtml(html)}
-            placeholder="Type something..."
-          />
-        </div>
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">HTML Output:</div>
-          <pre className="max-h-48 overflow-auto rounded bg-gray-100 p-3 text-xs whitespace-pre-wrap">
-            {html || "No content yet"}
-          </pre>
-        </div>
-      </div>
-    );
-  },
-};
-
-export const HtmlEditorMeta = htmlMeta;
