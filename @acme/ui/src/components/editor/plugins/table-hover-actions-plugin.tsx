@@ -42,6 +42,11 @@ type ButtonState = {
  * Where the button belongs for a pointer at this point over this table, or null
  * if it does not belong anywhere. Every read is live off the DOM, so calling it
  * after a resize places the button against the column's new width.
+ *
+ * The stripes reach HOVER_MARGIN_PX to BOTH sides of the edge. Outside matters
+ * as much as inside: a pointer approaching the right edge across the margin
+ * resolves to no cell at all, and while this only looked inward, arriving that
+ * way raised nothing.
  */
 function resolveButtonState(
   table: HTMLTableElement,
@@ -53,14 +58,12 @@ function resolveButtonState(
   const distributionToBottom = tableRect.bottom - clientY;
 
   const inRightStripe =
-    distributionToRight >= 0 &&
-    distributionToRight <= HOVER_MARGIN_PX &&
+    Math.abs(distributionToRight) <= HOVER_MARGIN_PX &&
     clientY >= tableRect.top &&
     clientY <= tableRect.bottom;
 
   const inBottomStripe =
-    distributionToBottom >= 0 &&
-    distributionToBottom <= HOVER_MARGIN_PX &&
+    Math.abs(distributionToBottom) <= HOVER_MARGIN_PX &&
     clientX >= tableRect.left &&
     clientX <= tableRect.right;
 
@@ -182,27 +185,17 @@ function TableHoverActionsInner({
       }
 
       if (!table || !editorRoot.contains(table)) {
-        // Check if mouse is close enough to the previously active table
+        // Off any cell: the pointer may still be in the margin alongside the
+        // table it was last on. Resolve against that table rather than keeping
+        // whatever was already up — keeping meant a pointer that entered the
+        // margin from outside raised nothing, since there was nothing to keep.
         const previousTable = activeTableReference.current;
-        if (previousTable) {
-          const rect = previousTable.getBoundingClientRect();
-          const nearRight =
-            clientX >= rect.right - 4 &&
-            clientX <= rect.right + HOVER_MARGIN_PX &&
-            clientY >= rect.top &&
-            clientY <= rect.bottom;
-          const nearBottom =
-            clientY >= rect.bottom - 4 &&
-            clientY <= rect.bottom + HOVER_MARGIN_PX &&
-            clientX >= rect.left &&
-            clientX <= rect.right;
-          if (nearRight || nearBottom) {
-            // Keep existing button state
-            return;
-          }
-        }
-        setButtonState(null);
-        activeTableReference.current = null;
+        const next = previousTable
+          ? resolveButtonState(previousTable, clientX, clientY)
+          : null;
+
+        setButtonState(next);
+        if (!next) activeTableReference.current = null;
         return;
       }
 

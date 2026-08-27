@@ -802,3 +802,152 @@ export const AddButtonReturnsAfterTheDrag: Story = {
     ).toBeLessThan(16);
   },
 };
+
+/**
+ * Whatever happened before, hovering the right stripe has to raise the button
+ * again. Three ways to get the plugin into a non-resting state — a completed
+ * drag, a press on the grabber that never became a drag, and typing — each
+ * followed by a plain hover.
+ */
+const hoverRaisesAddButtonAfter = (
+  prepare: (context: {
+    canvasElement: HTMLElement;
+    table: HTMLTableElement;
+    lastCell: HTMLTableCellElement;
+  }) => Promise<void>,
+): Story => ({
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const lastCell = [...(table.rows[0]?.cells ?? [])].at(-1);
+    const firstCell = table.rows[0]?.cells[0];
+    if (!lastCell || !firstCell) throw new Error("fixture incomplete");
+
+    await prepare({ canvasElement, table, lastCell });
+
+    // Park somewhere with no affordance so the assertion cannot pass on a
+    // button left over from the setup.
+    const firstBox = firstCell.getBoundingClientRect();
+    await userEvent.pointer({
+      target: firstCell,
+      coords: {
+        clientX: firstBox.left + 6,
+        clientY: firstBox.top + firstBox.height / 2,
+      },
+    });
+    await waitFor(() => {
+      expect(canvasElement.querySelector("[data-table-hover-btn]")).toBeNull();
+    });
+
+    // Then hover the right stripe, as a user would.
+    const cellBox = lastCell.getBoundingClientRect();
+    await userEvent.pointer({
+      target: lastCell,
+      coords: {
+        clientX: cellBox.right - 12,
+        clientY: cellBox.top + cellBox.height / 2,
+      },
+    });
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector("[data-table-hover-btn]"),
+      ).not.toBeNull();
+    });
+  },
+});
+
+export const HoverStillRaisesAddButtonAfterADrag: Story =
+  hoverRaisesAddButtonAfter(async ({ canvasElement, table }) => {
+    const grabber = await grabBoundary(
+      canvasElement,
+      table,
+      (table.rows[0]?.cells.length ?? 1) - 1,
+    );
+    const box = grabber.getBoundingClientRect();
+    const x = box.left + box.width / 2;
+    const y = box.top + box.height / 2;
+    await userEvent.pointer([
+      {
+        keys: "[MouseLeft>]",
+        target: grabber,
+        coords: { clientX: x, clientY: y },
+      },
+      { target: grabber, coords: { clientX: x - 25, clientY: y } },
+      {
+        keys: "[/MouseLeft]",
+        target: grabber,
+        coords: { clientX: x - 25, clientY: y },
+      },
+    ]);
+  });
+
+export const HoverStillRaisesAddButtonAfterAGrabberClick: Story =
+  hoverRaisesAddButtonAfter(async ({ canvasElement, table }) => {
+    const grabber = await grabBoundary(
+      canvasElement,
+      table,
+      (table.rows[0]?.cells.length ?? 1) - 1,
+    );
+    const box = grabber.getBoundingClientRect();
+    const coords = {
+      clientX: box.left + box.width / 2,
+      clientY: box.top + box.height / 2,
+    };
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: grabber, coords },
+      { keys: "[/MouseLeft]", target: grabber, coords },
+    ]);
+  });
+
+export const HoverStillRaisesAddButtonAfterTyping: Story =
+  hoverRaisesAddButtonAfter(async ({ lastCell }) => {
+    await userEvent.click(lastCell);
+    await userEvent.keyboard("hi");
+  });
+
+/**
+ * Arriving at the right stripe from OUTSIDE the table, not out of a cell. The
+ * pointer resolves to no cell there, and the near-table fallback only kept
+ * whatever state was already up — so a pointer that came in from the margin
+ * raised nothing at all.
+ */
+export const AddButtonAppearsArrivingFromOutsideTheTable: Story = {
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const firstCell = table.rows[0]?.cells[0];
+    if (!firstCell) throw new Error("fixture needs a cell");
+
+    // Establish the table as the active one, then leave with nothing showing.
+    const firstBox = firstCell.getBoundingClientRect();
+    await userEvent.pointer({
+      target: firstCell,
+      coords: {
+        clientX: firstBox.left + 6,
+        clientY: firstBox.top + firstBox.height / 2,
+      },
+    });
+    await waitFor(() => {
+      expect(canvasElement.querySelector("[data-table-hover-btn]")).toBeNull();
+    });
+
+    // Now approach the right edge from the margin outside the table.
+    const tableBox = table.getBoundingClientRect();
+    const editorRoot = canvasElement.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    if (!editorRoot) throw new Error("no editor root");
+
+    await userEvent.pointer({
+      target: editorRoot,
+      coords: {
+        clientX: tableBox.right + 12,
+        clientY: tableBox.top + tableBox.height / 2,
+      },
+    });
+
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector("[data-table-hover-btn]"),
+      ).not.toBeNull();
+    });
+  },
+};
