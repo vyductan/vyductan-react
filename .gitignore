@@ -51,6 +51,10 @@ routeTree.gen.ts
 # tauri
 dist-ssr
 
+# drizzle-kit pull output — a snapshot of the live schema for eyeballing drift,
+# never a migration. Migrations live in supabase/migrations.
+.drizzle-introspect/
+
 # production
 build
 

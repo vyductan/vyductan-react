@@ -1,3 +1,5 @@
+"use client";
+
 import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { createContext, useContext } from "react";
