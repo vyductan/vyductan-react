@@ -1,5 +1,6 @@
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState } from "lexical";
+import type { ReactNode } from "react";
 import { lazy, Suspense } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
@@ -58,6 +59,13 @@ type EditorPropertiesBase = {
    */
   autoFocus?: boolean;
   size?: SizeType;
+  /**
+   * Extra Lexical plugins, rendered inside the composer so they can reach the
+   * editor through useLexicalComposerContext. The seam exists so behaviour that
+   * belongs to one consumer — chat's submit-on-Enter, for instance — stays out of
+   * the shared editor.
+   */
+  children?: ReactNode;
 };
 
 type JsonEditorProperties = EditorPropertiesBase & {
@@ -79,9 +87,7 @@ type HtmlEditorProperties = EditorPropertiesBase & {
 };
 
 export type EditorProps =
-  | JsonEditorProperties
-  | MarkdownEditorProperties
-  | HtmlEditorProperties;
+  JsonEditorProperties | MarkdownEditorProperties | HtmlEditorProperties;
 
 export function Editor({
   value,
@@ -100,6 +106,7 @@ export function Editor({
   placeholderClassName,
   autoFocus = false,
   size = "middle",
+  children,
 }: EditorProps) {
   const isMarkdownMode = format === "markdown";
   const isHtmlMode = format === "html";
@@ -171,6 +178,8 @@ export function Editor({
           )}
 
           {onStatsChange && <WordCountPlugin onStatsChange={onStatsChange} />}
+
+          {children}
         </div>
       </EditorProviders>
     </LexicalComposer>

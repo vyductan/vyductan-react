@@ -2,13 +2,16 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable as LexicalContentEditable } from "@lexical/react/LexicalContentEditable";
-import { $getRoot } from "lexical";
+import { $getRoot, $isParagraphNode } from "lexical";
 
 import { cn } from "@acme/ui/lib/utils";
 
 import { useBlockType } from "../editor-hooks/use-block-type";
 import { blockTypeToBlockName } from "../plugins/toolbar/block-format-data";
 import { editorTheme } from "../themes/editor-theme";
+
+/** Shared by the editable and its placeholder so the two cannot drift. */
+const CONTENT_PADDING = "px-12 py-4";
 
 type Properties = {
   placeholder: string;
@@ -44,8 +47,12 @@ function getPlaceholderForBlockType(
  * Reuses classes from editorTheme to avoid duplication
  */
 function getPlaceholderClassName(blockType: string): string {
+  // Inset to the box, then padded like the editable itself, rather than offset
+  // by a hard-coded copy of that padding: the prompt has to start exactly where
+  // the caret will, and a second literal of the same number drifts the moment a
+  // consumer retunes contentClassName.
   const baseClasses =
-    "text-muted-foreground pointer-events-none absolute top-4 left-12 select-none";
+    "text-muted-foreground pointer-events-none absolute inset-0 select-none";
 
   // Get theme classes for the block type
   let themeClasses = "";
@@ -69,13 +76,23 @@ export function ContentEditable({
   const blockType = useBlockType();
   const [isEmpty, setIsEmpty] = useState(true);
 
-  // Check if editor is empty
   useEffect(() => {
     const updateIsEmpty = () => {
       editor.getEditorState().read(() => {
-        const root = $getRoot();
-        const textContent = root.getTextContent().trim();
-        setIsEmpty(textContent === "");
+        const children = $getRoot().getChildren();
+
+        // Emptiness is structural, not textual. Typing `1. ` turns the paragraph
+        // into a list whose only item has no text yet — text-only emptiness kept
+        // reporting empty there, so the placeholder sat on top of the list the
+        // author had just created. The same held for an empty quote or code block.
+        const firstChild = children[0];
+        setIsEmpty(
+          children.length === 0 ||
+            (children.length === 1 &&
+              firstChild !== undefined &&
+              $isParagraphNode(firstChild) &&
+              firstChild.getTextContentSize() === 0),
+        );
       });
     };
 
@@ -88,15 +105,19 @@ export function ContentEditable({
     });
   }, [editor]);
 
-  // Calculate dynamic placeholder based on block type
   const dynamicPlaceholder = getPlaceholderForBlockType(blockType, placeholder);
 
   return (
     <div className="relative">
       {isEmpty && dynamicPlaceholder && (
         <div
+          data-slot="editor-placeholder"
           className={cn(
             getPlaceholderClassName(blockType),
+            CONTENT_PADDING,
+            // The same class the editable gets, so a retuned padding or text
+            // size moves both together.
+            className,
             placeholderClassName,
           )}
         >
@@ -108,7 +129,8 @@ export function ContentEditable({
           unicodeBidi: "plaintext",
         }}
         className={cn(
-          "px-12 py-4 wrap-break-word whitespace-break-spaces focus:outline-none",
+          CONTENT_PADDING,
+          "wrap-break-word whitespace-break-spaces focus:outline-none",
           className,
         )}
         aria-placeholder={dynamicPlaceholder}
