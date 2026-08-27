@@ -635,3 +635,90 @@ export const AddButtonHidesWhileTyping: Story = {
     });
   },
 };
+
+/**
+ * Hovering the grabber keeps the add-column button (the pointer is still working
+ * on the table); pressing it must take the button down, and it has to stay down
+ * for the whole drag. Pointer capture means every mousemove during a drag
+ * targets the grabber, which the hover plugin reads as "still on an affordance"
+ * — so without an explicit drag signal the button sat parked over the table
+ * being resized.
+ */
+export const AddButtonHidesWhileDraggingTheGrabber: Story = {
+  play: async ({ canvasElement }) => {
+    const table = await tableOf(canvasElement);
+    const lastCell = [...(table.rows[0]?.cells ?? [])].at(-1);
+    if (!lastCell) throw new Error("fixture needs a last cell");
+
+    const cellBox = lastCell.getBoundingClientRect();
+    const midY = cellBox.top + cellBox.height / 2;
+    const addButton = () =>
+      canvasElement.querySelector("[data-table-hover-btn]");
+
+    // The table's right edge is both the add-column stripe and a resize
+    // boundary, so one spot raises both affordances.
+    await userEvent.pointer({
+      target: lastCell,
+      coords: { clientX: cellBox.right - 14, clientY: midY },
+    });
+    await waitFor(() => {
+      expect(addButton()).not.toBeNull();
+    });
+
+    await userEvent.pointer({
+      target: lastCell,
+      coords: { clientX: cellBox.right, clientY: midY },
+    });
+    const grabber = await waitFor(() => {
+      const node = canvasElement.querySelector<HTMLElement>(
+        "[data-table-column-resizer]",
+      );
+      if (!node) throw new Error("grabber never appeared");
+      return node;
+    });
+
+    // Hovering it is not pressing it.
+    expect(addButton()).not.toBeNull();
+
+    const grabberBox = grabber.getBoundingClientRect();
+    const x = grabberBox.left + grabberBox.width / 2;
+    const y = grabberBox.top + grabberBox.height / 2;
+
+    await userEvent.pointer({
+      keys: "[MouseLeft>]",
+      target: grabber,
+      coords: { clientX: x, clientY: y },
+    });
+    await waitFor(() => {
+      expect(addButton()).toBeNull();
+    });
+
+    // Still hidden across the whole drag, including where the pointer travels
+    // over other cells and off the table entirely — the points where a plugin
+    // that re-measures on mousemove would put the button back.
+    const firstCell = table.rows[0]?.cells[0];
+    for (const point of [
+      { clientX: x - 40, clientY: y },
+      firstCell
+        ? (() => {
+            const box = firstCell.getBoundingClientRect();
+            return {
+              clientX: box.left + box.width / 2,
+              clientY: box.top + box.height / 2,
+            };
+          })()
+        : { clientX: x - 80, clientY: y },
+      { clientX: table.getBoundingClientRect().left - 60, clientY: y },
+      { clientX: x - 20, clientY: table.getBoundingClientRect().bottom + 20 },
+    ]) {
+      await userEvent.pointer({ target: grabber, coords: point });
+      expect(addButton()).toBeNull();
+    }
+
+    await userEvent.pointer({
+      keys: "[/MouseLeft]",
+      target: grabber,
+      coords: { clientX: x - 40, clientY: y },
+    });
+  },
+};

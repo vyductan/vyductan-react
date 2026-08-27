@@ -1168,14 +1168,14 @@ function TableCellActionMenuInner({
             data-table-row-index={rowIndex}
           >
             {/* A bar at rest, the grip once the pointer is on it. Notion's own
-                bar measures 18x6 at r4; ours is deliberately 2px thinner
+                bar measures 18x6 at r4; ours is deliberately half as thick
                 because our cells are narrower (96px vs Notion's 150px), so the
                 same bar reads heavier against them. MAX_HANDLE_BAR_THICKNESS in
                 editor-table-action-menu.stories.tsx pins this. */}
             <span
               aria-hidden="true"
               data-slot="table-handle-bar"
-              className="bg-muted-foreground/70 h-[18px] w-[4px] shrink-0 rounded-full group-hover/handle:hidden"
+              className="bg-muted-foreground/70 h-[18px] w-[3px] shrink-0 rounded-full group-hover/handle:hidden"
             />
             <GripVertical className="hidden size-3.5 group-hover/handle:block" />
           </Button>
@@ -1226,14 +1226,14 @@ function TableCellActionMenuInner({
             data-table-column-index={columnIndex}
           >
             {/* A bar at rest, the grip once the pointer is on it. Notion's own
-                bar measures 18x6 at r4; ours is deliberately 2px thinner
+                bar measures 18x6 at r4; ours is deliberately half as thick
                 because our cells are narrower (96px vs Notion's 150px), so the
                 same bar reads heavier against them. MAX_HANDLE_BAR_THICKNESS in
                 editor-table-action-menu.stories.tsx pins this. */}
             <span
               aria-hidden="true"
               data-slot="table-handle-bar"
-              className="bg-muted-foreground/70 h-[4px] w-[18px] shrink-0 rounded-full group-hover/handle:hidden"
+              className="bg-muted-foreground/70 h-[3px] w-[18px] shrink-0 rounded-full group-hover/handle:hidden"
             />
             <GripHorizontal className="hidden size-3.5 group-hover/handle:block" />
           </Button>

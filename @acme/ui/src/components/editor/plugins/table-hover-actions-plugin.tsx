@@ -14,9 +14,11 @@ import {
   $insertTableRowAtSelection,
   $isTableCellNode,
 } from "@lexical/table";
-import { $getNearestNodeFromDOMNode } from "lexical";
+import { $getNearestNodeFromDOMNode, COMMAND_PRIORITY_LOW } from "lexical";
 import { PlusIcon } from "lucide-react";
 import { createPortal } from "react-dom";
+
+import { TABLE_COLUMN_RESIZE_DRAG_COMMAND } from "./table-column-resize-plugin";
 
 // How many px outside the table boundary we still consider "hovering the table"
 const HOVER_MARGIN_PX = 36;
@@ -46,12 +48,40 @@ function TableHoverActionsInner({
   // Track the table element that is currently "active" so we can keep the
   // button visible while the user moves the mouse along the stripe.
   const activeTableReference = useRef<HTMLTableElement | null>(null);
+  // A ref, not state: the mousemove handler below is registered once and has to
+  // read the live value, and nothing about a drag needs a re-render here.
+  const columnDragActiveReference = useRef(false);
+
+  useEffect(
+    () =>
+      editor.registerCommand(
+        TABLE_COLUMN_RESIZE_DRAG_COMMAND,
+        (active) => {
+          columnDragActiveReference.current = active;
+          if (active) setButtonState(null);
+          // The button comes back on the next pointer move, positioned against
+          // the column's new width — restoring it here would place it against
+          // the old one.
+          return false;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    [editor],
+  );
 
   useEffect(() => {
     const editorRoot = editor.getRootElement();
     if (!editorRoot) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Backstop only. Pointer capture retargets the compatibility mouse events
+      // to the grabber for the duration of a drag, so the resizer guard below
+      // already catches every move — verified by removing this line and having
+      // the drag story stay green, even dragging across other cells and off the
+      // table. Kept because that retargeting is the one thing here we rely on a
+      // browser to get right, and the check is a boolean read.
+      if (columnDragActiveReference.current) return;
+
       const { clientX, clientY } = e;
 
       // Walk up from the hovered element to find a table cell / table

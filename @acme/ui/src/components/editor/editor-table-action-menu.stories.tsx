@@ -25,10 +25,10 @@ type Story = StoryObj<typeof meta>;
 /**
  * The resting mark has to read as a line, not a lozenge. Notion's own bar is
  * 18x6, but our cells are narrower (96px against Notion's 150px), so the same
- * bar carries more visual weight and we run 2px thinner. Pinned because a
- * future "match Notion exactly" pass would otherwise fatten it back silently.
+ * bar carries more visual weight and we run at half the thickness. Pinned
+ * because a future "match Notion exactly" pass would fatten it back silently.
  */
-const MAX_HANDLE_BAR_THICKNESS = 4;
+const MAX_HANDLE_BAR_THICKNESS = 3;
 const MIN_HANDLE_BAR_LENGTH = 16;
 
 export const Interactions: Story = {

@@ -12,6 +12,7 @@
  * the `<TablePlugin />` this editor mounts.
  */
 
+import type { LexicalCommand } from "lexical";
 import type { JSX, PointerEvent as ReactPointerEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -20,7 +21,11 @@ import {
   $isSimpleTable,
   $isTableNode,
 } from "@lexical/table";
-import { $getNearestNodeFromDOMNode, $getNodeByKey } from "lexical";
+import {
+  $getNearestNodeFromDOMNode,
+  $getNodeByKey,
+  createCommand,
+} from "lexical";
 import { createPortal } from "react-dom";
 
 import {
@@ -29,6 +34,19 @@ import {
   RESIZE_HIT_PX,
   resolveColWidths,
 } from "./table-column-resize-model";
+
+/**
+ * True while a column is being dragged, false when the drag ends either way.
+ *
+ * TableHoverActionsPlugin needs this: during a drag the pointer is captured by
+ * the grabber, so every mousemove it sees is "still on a table affordance" and
+ * its add-row/add-column button stayed parked across the table being resized.
+ * A command rather than a DOM flag because both plugins already share the
+ * editor, and this keeps the direction of knowledge one-way — the resizer
+ * announces, nothing reaches back into it.
+ */
+export const TABLE_COLUMN_RESIZE_DRAG_COMMAND: LexicalCommand<boolean> =
+  createCommand("TABLE_COLUMN_RESIZE_DRAG");
 
 /** Width of the invisible grab strip, centred on the boundary. */
 const GRABBER_WIDTH = 8;
@@ -287,6 +305,7 @@ function TableColumnResizeInner({
       top: startRect.top,
       height: startRect.height,
     });
+    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, true);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -321,6 +340,7 @@ function TableColumnResizeInner({
     const drag = dragReference.current;
     dragReference.current = null;
     setRuler(null);
+    editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, false);
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -375,6 +395,7 @@ function TableColumnResizeInner({
       const drag = dragReference.current;
       dragReference.current = null;
       setRuler(null);
+      editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, false);
 
       if (!drag || !grabber) {
         return;
