@@ -43,6 +43,55 @@ describe("Modal", () => {
     expect(content).not.toHaveClass("sm:max-w-auto");
   });
 
+  // Regression: `className="max-w-5xl"` used to land in the DOM and do nothing.
+  // The default width emitted `sm:max-w-(--modal-width)`, and an `sm:` utility
+  // outranks an unprefixed one at every width >= 640px, so the caller's class
+  // lost to the 520px default with no warning.
+  test("a caller max-w-* class governs the width when no width prop is given", () => {
+    render(
+      <Modal open title="Wide" className="max-w-5xl">
+        Body
+      </Modal>,
+    );
+
+    const content = screen.getByRole("dialog");
+
+    expect(content).toHaveClass("max-w-5xl");
+    expect(content).not.toHaveClass("sm:max-w-(--modal-width)");
+    expect(content).not.toHaveClass("w-(--modal-width)");
+    // DialogContent's own phone gutter is a base `max-w-*`, so the caller's
+    // class replaces it; it comes back under `max-sm:`.
+    expect(content).toHaveClass("max-sm:max-w-[calc(100%-2rem)]");
+  });
+
+  test("an explicit width still wins over a caller max-w-* class", () => {
+    render(
+      <Modal open title="Wide" width={800} className="max-w-5xl">
+        Body
+      </Modal>,
+    );
+
+    const content = screen.getByRole("dialog");
+
+    expect(content).toHaveClass("sm:max-w-(--modal-width)");
+    expect(content).toHaveClass("w-(--modal-width)");
+  });
+
+  test("a caller sm:max-w-* class is left to tailwind-merge", () => {
+    // Same variant group as ours, so the caller's class already wins on merge
+    // order — stepping aside here would drop the width entirely instead.
+    render(
+      <Modal open title="Narrow" className="sm:max-w-[500px]">
+        Body
+      </Modal>,
+    );
+
+    const content = screen.getByRole("dialog");
+
+    expect(content).toHaveClass("w-(--modal-width)");
+    expect(content).toHaveClass("sm:max-w-[500px]");
+  });
+
   test("wraps fragment descriptions with DialogDescription", () => {
     render(
       <Modal

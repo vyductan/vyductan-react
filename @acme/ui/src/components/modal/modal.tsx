@@ -51,7 +51,7 @@ type ModalProperties = React.ComponentProps<typeof Dialog> & {
   onCancel?: (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 };
 const Modal = ({
-  width = 520,
+  width,
   className,
   classNames,
   children,
@@ -71,17 +71,27 @@ const Modal = ({
   ...rest
 }: ModalProperties) => {
   // =========================== Width ============================
+  // The dialog is capped with `sm:max-w-(--modal-width)`, and an `sm:` utility
+  // outranks an unprefixed one at every width >= 640px. So a caller writing
+  // `className="max-w-5xl"` gets the class into the DOM and no wider dialog —
+  // it silently loses to the 520px default. When the caller sizes the dialog
+  // themselves and passes no `width`, stand down and let their class govern.
+  // An explicit `width` still wins over a caller class: the prop is the more
+  // specific instruction of the two.
+  const callerCapsWidth = /(^|\s)max-w-/.test(className ?? "");
+  const resolvedWidth = width ?? (callerCapsWidth ? undefined : 520);
+
   const [numberWidth, responsiveWidth] = React.useMemo<
     [
       string | number | undefined,
       Partial<Record<Breakpoint, string | number>> | undefined,
     ]
   >(() => {
-    if (width && typeof width === "object") {
-      return [undefined, width];
+    if (resolvedWidth && typeof resolvedWidth === "object") {
+      return [undefined, resolvedWidth];
     }
-    return [width, undefined];
-  }, [width]);
+    return [resolvedWidth, undefined];
+  }, [resolvedWidth]);
 
   const responsiveWidthVariables = React.useMemo(() => {
     const variables: Record<string, string> = {};
@@ -129,7 +139,8 @@ const Modal = ({
     viewport.addEventListener("scroll", update, { passive: true });
     const observer = new ResizeObserver(update);
     observer.observe(viewport);
-    if (viewport.firstElementChild) observer.observe(viewport.firstElementChild);
+    if (viewport.firstElementChild)
+      observer.observe(viewport.firstElementChild);
     affordanceCleanup.current = () => {
       viewport.removeEventListener("scroll", update);
       observer.disconnect();
@@ -210,6 +221,11 @@ const Modal = ({
         className={cn(
           "px-0 text-sm select-text",
           numberWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],
+          // DialogContent's own `max-w-[calc(100%-2rem)]` phone gutter is a
+          // base utility, so a caller's base `max-w-*` replaces it outright.
+          // Re-state it under `max-sm:` — a different variant group, so it
+          // survives alongside their class and still wins below 640px.
+          callerCapsWidth && "max-sm:max-w-[calc(100%-2rem)]",
           className,
         )}
         style={{
@@ -272,11 +288,11 @@ const Modal = ({
           </ScrollArea>
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-up]/scroll:opacity-100"
+            className="from-foreground/20 pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-up]/scroll:opacity-100"
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-down]/scroll:opacity-100"
+            className="from-foreground/20 pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-down]/scroll:opacity-100"
           />
         </div>
 
