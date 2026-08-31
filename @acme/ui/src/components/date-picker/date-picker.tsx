@@ -1162,7 +1162,7 @@ type DatePickerProps = Omit<
 
 // Dispatch on `multiple`: separate components keep the single-mode hooks and
 // the multi-select tags UI fully isolated.
-const DatePicker = (properties: DatePickerProps) =>
+const renderDatePicker = (properties: DatePickerProps) =>
   properties.multiple ? (
     <MultipleDatePicker
       {...(properties as unknown as MultipleDatePickerProps)}
@@ -1170,6 +1170,40 @@ const DatePicker = (properties: DatePickerProps) =>
   ) : (
     <SingleDatePicker {...(properties as unknown as DatePickerProperties)} />
   );
+
+/**
+ * Call signatures, not one widened prop type, because `DatePickerProps.onChange`
+ * is a UNION OF TWO FUNCTION SIGNATURES and TypeScript only contextually types a
+ * callback when there is exactly one. With the union, every
+ * `onChange={(date) => …}` lost its parameter type and failed `noImplicitAny`
+ * (TS7006) — 28 call sites across the dashboards, each forced to re-annotate
+ * `(date: Dayjs | null | undefined)` by hand.
+ *
+ * Overload order is load-bearing:
+ *   1. single mode — `multiple` absent or literal false. Matches the inline-JSX
+ *      caller, which is what restores `onChange` inference.
+ *   2. multi mode — `multiple: true`.
+ *   3. the widened `DatePickerProps`. Callers that SPREAD an already-built props
+ *      object (`<DatePicker picker="year" {...rest} />` in year-picker.tsx, and
+ *      the stories' `{...arguments_}`) carry `multiple?: boolean`, which proves
+ *      neither `?: false` nor `: true`, so they match nothing without this. It
+ *      is last so `ComponentProps<typeof DatePicker>` — which reads the final
+ *      overload, and is what Storybook's `Meta<typeof DatePicker>` resolves —
+ *      keeps meaning the full prop set, exactly as before.
+ *
+ * A discriminated union on `multiple` would give sharper autocomplete but drops
+ * case 3 entirely; that is why the earlier attempt was reverted.
+ */
+interface DatePickerComponent {
+  (properties: DatePickerProperties & { multiple?: false }): React.ReactElement;
+  (properties: MultipleDatePickerProps): React.ReactElement;
+  (properties: DatePickerProps): React.ReactElement;
+}
+
+// The one cast the overloads need: the implementation takes the widened props,
+// and TypeScript cannot check an implementation signature against its overload
+// set for arrow functions the way it does for `function` declarations.
+const DatePicker = renderDatePicker as DatePickerComponent;
 
 export type {
   DatePickerProps,
