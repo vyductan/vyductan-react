@@ -4,6 +4,7 @@ import { useDebounce } from "ahooks";
 import { Popover as PopoverPrimitive } from "radix-ui";
 
 import { cn } from "@acme/ui/lib/utils";
+import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
 
 import type { AlignType } from "../../types";
 import type { AbstractTooltipProps } from "../tooltip";
@@ -38,6 +39,18 @@ export const Popover = (props: PopoverProps) => {
   const debouncedOpen = useDebounce(open, {
     wait: 100,
   });
+
+  // Claim Escape while open, so a closed-but-still-mounted layer above cannot
+  // swallow it (see registerEscapeTarget).
+  const contentReference = React.useRef<HTMLDivElement>(null);
+  React.useEffect(
+    () =>
+      registerEscapeTarget(
+        () => contentReference.current,
+        () => setOpen(false),
+      ),
+    [setOpen],
+  );
 
   const isShadcnPopover = React.Children.toArray(props.children).some(
     (child) =>
@@ -122,11 +135,20 @@ export const Popover = (props: PopoverProps) => {
       </TriggerComp>
 
       <PopoverContent
+        ref={contentReference}
         side={side}
         {...(sideOffset === undefined ? {} : { sideOffset })}
         align={align}
         {...(alignOffset === undefined ? {} : { alignOffset })}
         className={cn(arrow ? "border-none" : "", "w-auto", className)}
+        // Close from here rather than leaving it to Radix's dismiss, which is
+        // gated on `event.defaultPrevented` — a flag any layer resolving this
+        // same keydown may have set. PopoverContent only calls through when this
+        // popover is NOT parked behind a modal layer, so reaching here already
+        // means "my turn".
+        onEscapeKeyDown={() => {
+          setOpen(false);
+        }}
         {...(trigger === "hover"
           ? {
               onMouseOver: () => {

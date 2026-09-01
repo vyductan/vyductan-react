@@ -5,6 +5,7 @@ import * as React from "react";
 import type { ButtonProps } from "@acme/ui/components/button";
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
+import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
 
 import type { Breakpoint } from "../_util/responsive-observer";
 import { ScrollArea } from "../scroll-area";
@@ -205,6 +206,19 @@ const Modal = ({
   // ??
   // const ref = React.useRef<HTMLDivElement>(null);
   // ref.current?.scrollTo(0, ref.current.scrollHeight);
+  // Claim Escape while open — see registerEscapeTarget. Radix routes Escape to
+  // the highest MOUNTED layer in its own stack, which a closed panel still
+  // occupies until its exit animation ends.
+  const escapeReference = React.useRef<HTMLDivElement>(null);
+  const closeFromEscape = React.useCallback(() => {
+    rest.onOpenChange?.(false);
+    onCancel?.();
+  }, [rest, onCancel]);
+  React.useEffect(
+    () => registerEscapeTarget(() => escapeReference.current, closeFromEscape),
+    [closeFromEscape],
+  );
+
   return (
     <Dialog
       {...rest}
@@ -218,6 +232,16 @@ const Modal = ({
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : undefined}
 
       <DialogContent
+        ref={escapeReference}
+        // Close from here rather than leaving it to Radix's dismiss, which is
+        // gated on `event.defaultPrevented`: a Drawer below this modal marks the
+        // keydown when it stands down for us (see lib/modal-layers), which would
+        // otherwise leave this dialog stuck open. Radix only calls this back for
+        // the highest layer in its own stack.
+        onEscapeKeyDown={() => {
+          rest.onOpenChange?.(false);
+          onCancel?.();
+        }}
         className={cn(
           "px-0 text-sm select-text",
           numberWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],

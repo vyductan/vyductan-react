@@ -1,6 +1,7 @@
 import React from "react";
 
 import { cn } from "@acme/ui/lib/utils";
+import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
 
 import type { ModalProps as ModalProperties } from "../modal";
 import { Icon } from "../../icons";
@@ -55,6 +56,18 @@ export const AlertModal = ({
       }
     },
     [onOpenChange, onCancel],
+  );
+
+  // See Modal: Escape is claimed here rather than left to Radix's mounted-layer
+  // routing.
+  const escapeReference = React.useRef<HTMLDivElement>(null);
+  React.useEffect(
+    () =>
+      registerEscapeTarget(
+        () => escapeReference.current,
+        () => handleOpenChange(false),
+      ),
+    [handleOpenChange],
   );
 
   const isWarning = type === "warning";
@@ -154,7 +167,15 @@ export const AlertModal = ({
   return (
     <AlertDialog onOpenChange={handleOpenChange} {...rest}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent className={className}>
+      <AlertDialogContent
+        ref={escapeReference}
+        className={className}
+        // See Modal: Radix's dismiss is gated on `event.defaultPrevented`, and a
+        // Drawer below marks the keydown when it stands down for this layer.
+        onEscapeKeyDown={() => {
+          handleOpenChange(false);
+        }}
+      >
         {media && <AlertDialogMedia>{media}</AlertDialogMedia>}
 
         {isIconConfirmType ? (

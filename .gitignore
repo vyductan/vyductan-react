@@ -100,3 +100,6 @@ _*.md
 _*.sql
 _*.html
 _*.json
+
+# vitest browser-mode output
+.vitest-attachments/

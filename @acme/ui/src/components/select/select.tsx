@@ -6,6 +6,7 @@ import useControlledState from "@rc-component/util/es/hooks/useControlledState";
 
 import { tagColors } from "@acme/ui/components/tag";
 import { cn } from "@acme/ui/lib/utils";
+import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
 
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
@@ -195,6 +196,20 @@ const Select = <
     setInternalOpen(open);
     onOpenChange?.(open);
   };
+
+  // Claim Escape while the panel is open — see registerEscapeTarget. Radix's own
+  // routing is unusable here: a closed panel keeps its layer registration until
+  // its exit animation ends, and while it does, every layer beneath it is deaf.
+  const escapeReference = React.useRef<HTMLDivElement>(null);
+  React.useEffect(
+    () =>
+      registerEscapeTarget(
+        () => escapeReference.current,
+        () => handleOpenChange(false),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- claimed once; the node is resolved at keypress time
+    [],
+  );
 
   // =========================== Values ===========================
   const [internalValue, setInternalValue] = useControlledState(
@@ -1063,8 +1078,18 @@ const Select = <
           )}
         </SelectTrigger>
         <SelectContent
+          ref={escapeReference}
           position="popper"
           sideOffset={4}
+          // Close from here rather than leaving it to Radix's dismiss, which is
+          // gated on `event.defaultPrevented`. A layer BELOW this one — a vaul
+          // Drawer, whose escape listener registered earlier — marks the keydown
+          // while standing down for us, which would otherwise leave this panel
+          // stuck open. This callback is invoked unconditionally, and only when
+          // Radix considers this the highest layer in its own stack.
+          onEscapeKeyDown={() => {
+            handleOpenChange(false);
+          }}
           className={cn(
             "",
             flatOptions.some((o) => o.color)

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Content } from "vaul";
 
 import type { DrawerContent as ShadcnDrawerContent } from "@acme/ui/shadcn/drawer";
@@ -8,6 +9,7 @@ import {
 } from "@acme/ui/shadcn/drawer";
 
 import { cn } from "../../lib/utils";
+import { hasEscapeClaimantAfter, hasOpenDialog } from "../../lib/modal-layers";
 
 /**
  * A vaul Drawer is built on its OWN copy of `@radix-ui/react-dialog`, so it has
@@ -20,9 +22,7 @@ import { cn } from "../../lib/utils";
  * top dialog is gone the drawer dismisses normally again.)
  */
 function hasOpenDialogAbove() {
-  return !!document.querySelector(
-    "[data-slot='dialog-content'][data-state='open'], [data-slot='alert-dialog-content'][data-state='open']",
-  );
+  return hasOpenDialog();
 }
 
 // const DrawerContent = ({
@@ -49,14 +49,40 @@ function hasOpenDialogAbove() {
 function DrawerContent({
   className,
   children,
+  ref,
   onInteractOutside,
+  onEscapeKeyDown,
   ...properties
 }: React.ComponentProps<typeof ShadcnDrawerContent>) {
+  const panelReference = useRef<HTMLDivElement>(null);
+
   return (
     <DrawerPortal data-slot="drawer-portal">
       <DrawerOverlay />
       <Content
+        ref={(node) => {
+          panelReference.current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) ref.current = node;
+        }}
         data-slot="drawer-content"
+        // Stand down when a Select / Popover / menu / dialog opened ON TOP of
+        // this drawer: Escape belongs to it. Radix calls this back before it
+        // checks `defaultPrevented`, so preventing here is the only way to stop
+        // vaul's layer from dismissing — and vaul's layer registered earlier
+        // than the one above, so without this it acts first and takes the drawer
+        // down with the panel the user was actually trying to close.
+        //
+        // This marks the keydown, which would normally silence the layer above
+        // too. Our floating wrappers close themselves from their own
+        // `onEscapeKeyDown` (also called unconditionally) rather than relying on
+        // Radix's gated dismiss, so they stay immune to that.
+        onEscapeKeyDown={(event) => {
+          if (hasEscapeClaimantAfter(panelReference.current)) {
+            event.preventDefault();
+          }
+          onEscapeKeyDown?.(event);
+        }}
         className={cn(
           "group/drawer-content bg-background fixed z-50 flex h-auto flex-col",
           "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",

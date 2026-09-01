@@ -1,7 +1,7 @@
 import path, { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
-// import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from "@tailwindcss/vite";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 
@@ -38,6 +38,54 @@ export default defineConfig({
           name: "unit",
           environment: "jsdom",
           include: ["src/**/*.{test,spec}.{ts,tsx}"],
+          // *.touch.test.tsx needs a real device context — see the `touch`
+          // project below. jsdom has no layout and no media queries, so running
+          // them here would only ever produce false passes.
+          exclude: [
+            "**/node_modules/**",
+            "**/dist/**",
+            "src/**/*.touch.test.{ts,tsx}",
+            "src/**/*.browser.test.{ts,tsx}",
+          ],
+        },
+      },
+      {
+        // Real browser INPUT, not synthetic DOM events. `storybook/test` and
+        // `@testing-library/user-event` both dispatch events straight at the
+        // DOM, so a story cannot tell whether the browser's own key delivery
+        // reaches the page — which is exactly the gap that matters for Escape
+        // routing. Vitest's browser `userEvent` goes through Playwright/CDP.
+        extends: true,
+        plugins: [tailwindcss()],
+        test: {
+          name: "browser",
+          include: ["src/**/*.browser.test.{ts,tsx}"],
+          setupFiles: ["./vitest-setup.touch.ts"],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{ browser: "chromium" }],
+          },
+        },
+      },
+      {
+        // Capability media queries (`pointer`, `any-pointer`, `hover`) describe
+        // the DEVICE, so they can only be exercised by a browser context that
+        // was created as one. Chromium flips `any-pointer` to coarse from
+        // `hasTouch` alone — `isMobile` is not needed.
+        extends: true,
+        plugins: [tailwindcss()],
+        test: {
+          name: "touch",
+          include: ["src/**/*.touch.test.{ts,tsx}"],
+          setupFiles: ["./vitest-setup.touch.ts"],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({ contextOptions: { hasTouch: true } }),
+            instances: [{ browser: "chromium" }],
+          },
         },
       },
       {
