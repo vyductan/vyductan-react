@@ -1,11 +1,14 @@
 import type { LexicalEditor } from "lexical";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $createParagraphNode,
+  $createTextNode,
   $getRoot,
   COMMAND_PRIORITY_HIGH,
+  KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
 } from "lexical";
 
@@ -58,6 +61,17 @@ type ComposerSubmitPluginProperties = {
    */
   bindSubmit: (submit: () => void) => void;
   disabled?: boolean;
+  /**
+   * Let an empty text box be sent. Set it when the message carries something
+   * other than text — an attached image, say — otherwise a picture-only
+   * message can be attached but never sent.
+   */
+  allowEmpty?: boolean;
+  /**
+   * Earlier messages, newest first. Arrow Up walks back through them the way a
+   * shell history does; empty disables the behaviour entirely.
+   */
+  history?: string[];
 };
 
 /**
@@ -73,8 +87,27 @@ export function ComposerSubmitPlugin({
   onSubmit,
   bindSubmit,
   disabled = false,
+  allowEmpty = false,
+  history = [],
 }: ComposerSubmitPluginProperties) {
   const [editor] = useLexicalComposerContext();
+
+  // -1 means "composing something new"; 0 and up index into `history`.
+  const historyIndex = useRef(-1);
+
+  const replaceContent = useCallback(
+    (text: string) => {
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+        const paragraph = $createParagraphNode();
+        if (text) paragraph.append($createTextNode(text));
+        root.append(paragraph);
+        paragraph.selectEnd();
+      });
+    },
+    [editor],
+  );
 
   const submit = useCallback(() => {
     if (disabled) {
@@ -83,17 +116,18 @@ export function ComposerSubmitPlugin({
 
     // Emptiness is decided on the text, not the serialized value: an empty
     // document still serializes to a non-empty json envelope.
-    if (!readPlainText(editor).trim()) {
+    if (!allowEmpty && !readPlainText(editor).trim()) {
       return;
     }
 
     const value = readValue(editor, format);
 
-    if (!value.trim()) {
+    if (!allowEmpty && !value.trim()) {
       return;
     }
 
     onSubmit(value);
+    historyIndex.current = -1;
 
     editor.update(() => {
       const root = $getRoot();
@@ -108,11 +142,53 @@ export function ComposerSubmitPlugin({
       paragraph.select();
     });
     editor.focus();
-  }, [disabled, editor, format, onSubmit]);
+  }, [allowEmpty, disabled, editor, format, onSubmit]);
 
   useEffect(() => {
     bindSubmit(submit);
   }, [bindSubmit, submit]);
+
+  useEffect(() => {
+    if (history.length === 0) return;
+
+    // Only recall from an empty composer. Arrow Up inside a draft has to keep
+    // moving the caret, or multiline editing becomes impossible — which is the
+    // same rule a shell follows.
+    const unregisterUp = editor.registerCommand(
+      KEY_ARROW_UP_COMMAND,
+      (event) => {
+        if (historyIndex.current === -1 && readPlainText(editor).trim()) {
+          return false;
+        }
+        const next = Math.min(historyIndex.current + 1, history.length - 1);
+        const entry = history[next];
+        if (entry === undefined) return false;
+        event?.preventDefault();
+        historyIndex.current = next;
+        replaceContent(entry);
+        return true;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+
+    const unregisterDown = editor.registerCommand(
+      KEY_ARROW_DOWN_COMMAND,
+      (event) => {
+        if (historyIndex.current < 0) return false;
+        event?.preventDefault();
+        const next = historyIndex.current - 1;
+        historyIndex.current = next;
+        replaceContent(next < 0 ? "" : (history[next] ?? ""));
+        return true;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+
+    return () => {
+      unregisterUp();
+      unregisterDown();
+    };
+  }, [editor, history, replaceContent]);
 
   useEffect(() => {
     return editor.registerCommand(

@@ -42,7 +42,16 @@ export type ComposerProps = {
    * the group to the right.
    */
   actions?: ReactNode;
+  /**
+   * Let the box be sent while its text is empty. Set it when the message
+   * carries something else — an attached image, say. Without it an attachment
+   * can be picked and previewed but never sent, because emptiness is measured
+   * on the text alone.
+   */
+  allowEmptySubmit?: boolean;
   onStop?: () => void;
+  /** Earlier messages, newest first — Arrow Up walks back through them. */
+  history?: string[];
   autoFocus?: boolean;
   className?: string;
 };
@@ -54,7 +63,9 @@ export function Composer({
   busy = false,
   attachments,
   actions,
+  allowEmptySubmit = false,
   onStop,
+  history,
   autoFocus = false,
   className,
 }: ComposerProps) {
@@ -112,7 +123,9 @@ export function Composer({
               variant="minimal"
             >
               <ComposerSubmitPlugin
+                allowEmpty={allowEmptySubmit}
                 bindSubmit={bindSubmit}
+                history={history}
                 disabled={busy}
                 format={format}
                 onSubmit={onSubmit}
@@ -123,7 +136,7 @@ export function Composer({
           <div className="shrink-0 pr-2 pb-2">
             <InputGroupButton
               aria-label={busy ? "Stop generating" : "Send message"}
-              disabled={busy ? !onStop : isEmpty}
+              disabled={busy ? !onStop : isEmpty && !allowEmptySubmit}
               onClick={() => {
                 if (busy) {
                   onStop?.();
