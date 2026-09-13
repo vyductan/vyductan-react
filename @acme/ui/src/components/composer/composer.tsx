@@ -49,6 +49,12 @@ export type ComposerProps = {
    * on the text alone.
    */
   allowEmptySubmit?: boolean;
+  /**
+   * Hands out a setter for the box's content. Use it to put a draft back —
+   * restoring a message taken back for correction, for instance. The editor
+   * reads its `value` once, so this is the only way to write to it later.
+   */
+  bindSetValue?: (setValue: (text: string) => void) => void;
   onStop?: () => void;
   /** Earlier messages, newest first — Arrow Up walks back through them. */
   history?: string[];
@@ -64,6 +70,7 @@ export function Composer({
   attachments,
   actions,
   allowEmptySubmit = false,
+  bindSetValue,
   onStop,
   history,
   autoFocus = false,
@@ -124,6 +131,7 @@ export function Composer({
             >
               <ComposerSubmitPlugin
                 allowEmpty={allowEmptySubmit}
+                bindSetValue={bindSetValue}
                 bindSubmit={bindSubmit}
                 history={history}
                 disabled={busy}

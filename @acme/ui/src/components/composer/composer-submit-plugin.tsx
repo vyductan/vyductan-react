@@ -60,6 +60,12 @@ type ComposerSubmitPluginProperties = {
    * identical path rather than two implementations that drift.
    */
   bindSubmit: (submit: () => void) => void;
+  /**
+   * Hands out a setter for the box's content, so a caller can put a draft back
+   * in — taking a sent message back for correction, say. The editor takes
+   * `value` as an initial state only, so there is no prop that could do this.
+   */
+  bindSetValue?: (setValue: (text: string) => void) => void;
   disabled?: boolean;
   /**
    * Let an empty text box be sent. Set it when the message carries something
@@ -86,6 +92,7 @@ export function ComposerSubmitPlugin({
   format,
   onSubmit,
   bindSubmit,
+  bindSetValue,
   disabled = false,
   allowEmpty = false,
   history = [],
@@ -147,6 +154,10 @@ export function ComposerSubmitPlugin({
   useEffect(() => {
     bindSubmit(submit);
   }, [bindSubmit, submit]);
+
+  useEffect(() => {
+    bindSetValue?.(replaceContent);
+  }, [bindSetValue, replaceContent]);
 
   useEffect(() => {
     if (history.length === 0) return;
