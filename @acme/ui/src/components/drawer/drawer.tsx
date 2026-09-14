@@ -117,7 +117,7 @@ const Drawer = ({
   // stays un-prevented and the stacked dialog can still close itself.
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      if (!open && hasOpenDialogAbove()) return;
+      if (!open && hasOpenDialogAbove(contentReference.current)) return;
       if (!open) onClose?.();
       onOpenChange?.(open);
     },

@@ -20,12 +20,41 @@ const OPEN_MODAL_LAYERS = [
 ];
 
 /**
- * Is a Radix dialog / alert-dialog open? Used by the Drawer, for which any open
- * dialog is by definition above it — a dialog opened from inside a drawer still
- * portals to the body after it.
+ * Is a Radix dialog / alert-dialog open anywhere?
+ *
+ * Prefer {@link hasOpenDialogAfter} when the asking layer has a node: this
+ * cannot tell a dialog stacked ABOVE the asker from one it was opened FROM, and
+ * a layer that treats the second as the first can never dismiss itself.
  */
 export function hasOpenDialog() {
   return !!document.querySelector(OPEN_DIALOG_LAYERS.join(", "));
+}
+
+/**
+ * Is a Radix dialog / alert-dialog stacked ABOVE `node`?
+ *
+ * "Above" is document order, the same reading {@link hasModalLayerAfter} uses:
+ * portalled layers are appended to the body in mount order, so a dialog that
+ * FOLLOWS `node` opened later and is the one handling the dismiss.
+ *
+ * This is the distinction a plain {@link hasOpenDialog} cannot make, and both
+ * directions occur:
+ *
+ * - dialog opened from INSIDE a drawer  → dialog follows → above → the drawer
+ *   must not self-dismiss, or the dialog's own Escape takes the stack down
+ * - drawer opened from INSIDE a dialog  → dialog precedes → NOT above → the
+ *   drawer dismisses normally, which is what its close button and its overlay
+ *   are for
+ *
+ * With no node the answer falls back to {@link hasOpenDialog}: nothing can be
+ * ordered against an unmounted layer, and staying open is the safer failure.
+ */
+export function hasOpenDialogAfter(node: Element | null | undefined) {
+  if (!node) return hasOpenDialog();
+
+  return [...document.querySelectorAll(OPEN_DIALOG_LAYERS.join(", "))].some(
+    (layer) => isAfter(node, layer),
+  );
 }
 
 /**

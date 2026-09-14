@@ -9,7 +9,10 @@ import {
 } from "@acme/ui/shadcn/drawer";
 
 import { cn } from "../../lib/utils";
-import { hasEscapeClaimantAfter, hasOpenDialog } from "../../lib/modal-layers";
+import {
+  hasEscapeClaimantAfter,
+  hasOpenDialogAfter,
+} from "../../lib/modal-layers";
 
 /**
  * A vaul Drawer is built on its OWN copy of `@radix-ui/react-dialog`, so it has
@@ -17,12 +20,17 @@ import { hasEscapeClaimantAfter, hasOpenDialog } from "../../lib/modal-layers";
  * The two stacks don't cross-gate: an Escape / outside-click that dismisses a
  * Radix dialog stacked ON TOP of the drawer also reaches the drawer (the top of
  * vaul's own stack) and closes it — taking everything inside it down too. Guard
- * against that — while any Radix dialog/alert-dialog is open, the drawer must
- * not self-dismiss. (A closing dialog flips to data-state="closed", so once the
- * top dialog is gone the drawer dismisses normally again.)
+ * against that — while a Radix dialog/alert-dialog is open ABOVE the drawer, it
+ * must not self-dismiss. (A closing dialog flips to data-state="closed", so once
+ * the top dialog is gone the drawer dismisses normally again.)
+ *
+ * The panel is what makes "above" answerable. Without it the guard also fires
+ * for the dialog a drawer was opened FROM, and since every close path funnels
+ * through it — the header's close button included — such a drawer has no way
+ * out at all.
  */
-function hasOpenDialogAbove() {
-  return hasOpenDialog();
+function hasOpenDialogAbove(panel: Element | null | undefined) {
+  return hasOpenDialogAfter(panel);
 }
 
 // const DrawerContent = ({
@@ -105,7 +113,7 @@ function DrawerContent({
         // onOpenChange gate in drawer.tsx instead, which never touches the event.
         onInteractOutside={(e) => {
           if (
-            hasOpenDialogAbove() ||
+            hasOpenDialogAbove(panelReference.current) ||
             (e.target instanceof Element &&
               e.target.closest("[data-sonner-toast]"))
           ) {

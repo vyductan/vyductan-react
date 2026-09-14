@@ -3,6 +3,7 @@ import { useState } from "react";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { Button } from "../button";
+import { Modal } from "../modal";
 import { Popover } from "../popover";
 import { Select } from "../select";
 import { Drawer } from "./drawer";
@@ -192,6 +193,55 @@ export const EscapeWithASelectInsideStaysOpen: Story = {
         ).toBeNull(),
       );
       expect(body.queryByText("Nested layers")).not.toBeNull();
+    });
+  },
+};
+
+/**
+ * Found in the operator dashboard: a Drawer opened from INSIDE a Modal could not
+ * be closed at all — not by Escape, not by its close button — because every
+ * close path funnels through the same guard, and the guard answered "a dialog is
+ * open, stand down" without asking whether that dialog was above the drawer or
+ * the thing that opened it.
+ */
+export const OpenedFromInsideAModalStillCloses: Story = {
+  render: () => {
+    const ModalThenDrawer = () => {
+      const [modalOpen, setModalOpen] = useState(true);
+      const [drawerOpen, setDrawerOpen] = useState(false);
+
+      return (
+        <Modal open={modalOpen} onOpenChange={setModalOpen} title="Booking">
+          <Button onClick={() => setDrawerOpen(true)}>Open drawer</Button>
+          <Drawer
+            open={drawerOpen}
+            title="Drawer from a modal"
+            onClose={() => setDrawerOpen(false)}
+          >
+            <Button>Body control</Button>
+          </Drawer>
+        </Modal>
+      );
+    };
+
+    return <ModalThenDrawer />;
+  },
+  play: async ({ step }) => {
+    const body = within(document.body);
+
+    await step("open the drawer from inside the modal", async () => {
+      await userEvent.click(body.getByRole("button", { name: /open drawer/i }));
+      await waitFor(() =>
+        expect(body.getByText("Drawer from a modal")).toBeVisible(),
+      );
+    });
+
+    await step("its close button closes it, modal stays", async () => {
+      await userEvent.click(body.getByRole("button", { name: "Close" }));
+      await waitFor(() =>
+        expect(body.queryByText("Drawer from a modal")).toBeNull(),
+      );
+      expect(body.queryByText("Booking")).not.toBeNull();
     });
   },
 };
