@@ -128,11 +128,18 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     } = serializedNode;
     const node = $createImageNode({
       altText,
-      height,
+      /*
+       * 0 is how exportJSON below spells "inherit" — the serialized shape is
+       * numeric, so the sentinel had to be a number. Passed through as a real
+       * 0, it reaches __width/__height and the image is drawn 0x0: in the DOM,
+       * fully loaded, and invisible. Every unsized image came back that way,
+       * which on a task body reads as work the save lost.
+       */
+      height: height || undefined,
       maxWidth,
       showCaption,
       src,
-      width,
+      width: width || undefined,
       loading,
     });
     const nestedEditor = node.__caption;
