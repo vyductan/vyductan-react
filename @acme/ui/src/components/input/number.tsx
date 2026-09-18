@@ -24,6 +24,30 @@ import {
   inputVariants,
 } from "./variants";
 
+const NAVIGATION_KEYS = new Set([
+  "Backspace",
+  "Delete",
+  "Tab",
+  "Escape",
+  "Enter",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Home",
+  "End",
+]);
+
+const CLIPBOARD_KEYS = new Set(["a", "c", "v", "x", "z"]);
+
+// Which characters can build a number in this field. `decimalSeparator` is a
+// public prop that rc's parser maps back to "." and its formatter renders on
+// blur, so a key filter that only ever allowed "." made the prop unusable: the
+// value could be displayed with a comma but never typed. "." stays allowed
+// either way because the parser treats it as canonical.
+const isNumberEntryKey = (key: string, decimalSeparator: string | undefined) =>
+  /^[0-9]$/.test(key) || key === "." || key === (decimalSeparator ?? ".");
+
 interface InputNumberProperties<
   TNumberValue extends NumberValueType = NumberValueType,
 > extends Omit<
@@ -78,6 +102,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
     variant: customVariant,
     allowClear,
     align = "left",
+    decimalSeparator,
 
     onKeyDown,
     onChange,
@@ -178,6 +203,7 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       //   )
       // }
       allowClear={spinnerMode ? undefined : allowClear}
+      decimalSeparator={decimalSeparator}
       mode={mode}
       disabled={mergedDisabled}
       className={
@@ -264,39 +290,22 @@ const InputNumber = <TNumberValue extends NumberValueType = NumberValueType>({
       }}
       // prevent user enter non-numeric characters || https://stackoverflow.com/a/74850574
       onKeyDown={(e) => {
-        // Allow: backspace, delete, tab, escape, enter, arrows, home, end, ctrl/cmd+a, ctrl/cmd+c, ctrl/cmd+v, ctrl/cmd+x
-        if (
-          // Navigation and control keys
-          [
-            "Backspace",
-            "Delete",
-            "Tab",
-            "Escape",
-            "Enter",
-            "ArrowLeft",
-            "ArrowRight",
-            "ArrowUp",
-            "ArrowDown",
-            "Home",
-            "End",
-          ].includes(e.key) ||
-          // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+        const allowed =
+          NAVIGATION_KEYS.has(e.key) ||
+          // Ctrl/Cmd + A, C, V, X, Z
           ((e.metaKey || e.ctrlKey) &&
-            ["a", "c", "v", "x", "z"].includes(e.key)) ||
-          // Allow: numbers, numpad numbers
-          /^[0-9]$/.test(e.key) ||
-          // Allow: decimal point
-          e.key === "." ||
-          // Allow: minus sign only at the start of input
+            CLIPBOARD_KEYS.has(e.key.toLowerCase())) ||
+          isNumberEntryKey(e.key, decimalSeparator) ||
+          // Minus sign only at the start of input
           (e.key === "-" &&
-            (!e.currentTarget.value || e.currentTarget.selectionStart === 0))
-        ) {
-          // Let it happen, don't do anything
-          return;
+            (!e.currentTarget.value || e.currentTarget.selectionStart === 0));
+
+        if (!allowed) {
+          e.preventDefault();
         }
 
-        // Block the key press if it's a letter or other character
-        e.preventDefault();
+        // Always forward. This used to run only for the keys that had just been
+        // blocked, so a caller's handler never saw a digit or Enter.
         onKeyDown?.(e);
       }}
       onChange={onChange}

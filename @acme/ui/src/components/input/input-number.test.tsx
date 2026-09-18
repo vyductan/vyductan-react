@@ -309,3 +309,78 @@ describe("InputNumber addon inset", () => {
     expect(input).not.toHaveClass("px-3");
   });
 });
+
+describe("InputNumber key filtering", () => {
+  test("lets the configured decimal separator be typed", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+
+    render(
+      <InputNumber
+        aria-label="Amount"
+        decimalSeparator=","
+        onChange={onChange}
+      />,
+    );
+
+    const input = screen.getByRole("spinbutton", { name: "Amount" });
+    await user.type(input, "1,5");
+
+    expect(input).toHaveValue("1,5");
+    expect(onChange).toHaveBeenLastCalledWith(1.5);
+  });
+
+  test("still accepts the canonical dot when a comma separator is configured", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+
+    render(
+      <InputNumber
+        aria-label="Amount"
+        decimalSeparator=","
+        onChange={onChange}
+      />,
+    );
+
+    await user.type(screen.getByRole("spinbutton", { name: "Amount" }), "1.5");
+
+    expect(onChange).toHaveBeenLastCalledWith(1.5);
+  });
+
+  test("blocks the comma when no decimal separator is configured", async () => {
+    const user = userEvent.setup();
+
+    render(<InputNumber aria-label="Amount" />);
+
+    const input = screen.getByRole("spinbutton", { name: "Amount" });
+    await user.type(input, "1,5");
+
+    expect(input).toHaveValue("15");
+  });
+
+  test("blocks letters and other non-numeric characters", async () => {
+    const user = userEvent.setup();
+
+    render(<InputNumber aria-label="Amount" />);
+
+    const input = screen.getByRole("spinbutton", { name: "Amount" });
+    await user.type(input, "1a2$3");
+
+    expect(input).toHaveValue("123");
+  });
+
+  test("forwards keydown to the caller for accepted keys, not just blocked ones", async () => {
+    const user = userEvent.setup();
+    const onKeyDown = vi.fn();
+
+    render(<InputNumber aria-label="Amount" onKeyDown={onKeyDown} />);
+
+    const input = screen.getByRole("spinbutton", { name: "Amount" });
+    await user.type(input, "1");
+    await user.keyboard("{Enter}");
+
+    const keys = onKeyDown.mock.calls.map(([event]) => event.key as string);
+    expect(keys).toContain("1");
+    expect(keys).toContain("Enter");
+  });
+});
