@@ -32,6 +32,7 @@ import type {
   SelectOption,
   SelectValueType,
 } from "../select/types";
+import { inputAffixGapClassName } from "../input/variants";
 import { ComboboxClear } from "./_components/combobox-clear";
 import { ComboboxPrimitive } from "./primitive-combobox";
 
@@ -78,9 +79,7 @@ type ComboboxOnChangeMultiple<
 > = (value?: TValue[], option?: OptionType<TValue, TRecord>[]) => void;
 
 type ComboboxValue<TValue extends SelectValueType = SelectValueType> =
-  | TValue
-  | TValue[]
-  | undefined;
+  TValue | TValue[] | undefined;
 
 type ComboboxGroupOption<
   TValue extends SelectValueType = SelectValueType,
@@ -399,9 +398,7 @@ function Combobox<
   const handleValueChange = React.useCallback(
     (
       nextValue:
-        | OptionType<TValue, TRecord>[]
-        | OptionType<TValue, TRecord>
-        | null,
+        OptionType<TValue, TRecord>[] | OptionType<TValue, TRecord> | null,
     ) => {
       if (nextValue === null) {
         return;
@@ -559,7 +556,7 @@ function Combobox<
     >
       <div className="group/input-group relative w-auto">
         <ComboboxInput
-          className="h-8"
+          className={cn("h-8", inputAffixGapClassName)}
           placeholder={placeholder}
           render={<InputGroupInput className="h-8 text-sm" />}
           showTrigger={false}

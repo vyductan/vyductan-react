@@ -88,6 +88,18 @@ const inputVariants = tv({
 });
 const inputInlineInsetClassName = "pl-3";
 
+// Gap between an inline affix (prefix icon, clear button, chevron) and the
+// value. shadcn's InputGroup hardcodes 8px via
+// `has-[>[data-align=inline-start]]:[&>input]:pl-2`, sized for its own h-9
+// shell; this package replaces that shell with the 24/32/40 control scale in
+// controlHeightBySize, where the matching affix gap is 4px (AntD's
+// inputAffixPadding = paddingXXS = sizeXXS). BaseInput's non-group branch
+// already spaces its affixes with mr-1/ml-1, so 4px is what the other half of
+// the same component does. Needs `!`: shadcn's rule is
+// `:has(>[data-align=...]) > input`, which outranks a plain utility.
+const inputAffixGapClassName =
+  "has-[>[data-align=inline-start]]:[&>input]:pl-1! has-[>[data-align=inline-end]]:[&>input]:pr-1!";
+
 // Single source for the size -> control-height/text invariant. Every input-
 // family size table (plain input, affix wrapper, InputNumber spinner) derives
 // from these; do not restate h-6/h-8/h-10 elsewhere.
@@ -171,6 +183,7 @@ export {
   inputVariants,
   inputDisabledVariants,
   inputInlineInsetClassName,
+  inputAffixGapClassName,
   inputAffixWrapperSizeVariants,
   inputSizeVariants,
   controlHeightBySize,

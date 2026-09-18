@@ -65,7 +65,28 @@ export const Sizes: Story = {
   ),
 };
 
-export const WithIcons: Story = {
+export const PrefixAndSuffix: Story = {
+  name: "Prefix and Suffix",
+  // Measured, not asserted as classes: shadcn's InputGroup spaces affixes with
+  // `has-[>[data-align=...]]:[&>input]:p{l,r}-2` (8px, sized for its h-9 shell),
+  // and this package overrides it to 4px for the 24/32/40 scale. Only the
+  // browser can tell which of the two rules actually won.
+  play: async ({ canvasElement }) => {
+    const inputs = [...canvasElement.querySelectorAll("input")];
+    expect(inputs.length).toBeGreaterThan(0);
+
+    for (const input of inputs) {
+      const style = getComputedStyle(input);
+      const group = input.parentElement!;
+      const align = (side: string) =>
+        group.querySelector(
+          `[data-slot="input-group-addon"][data-align="${side}"]`,
+        );
+
+      if (align("inline-start")) expect(style.paddingLeft).toBe("4px");
+      if (align("inline-end")) expect(style.paddingRight).toBe("4px");
+    }
+  },
   render: (arguments_) => (
     <div className="flex w-[300px] flex-col gap-4">
       <Input

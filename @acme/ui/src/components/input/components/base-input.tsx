@@ -11,6 +11,7 @@ import type { BaseInputProps as BaseInputProperties } from "../types";
 import { InputGroup, InputGroupAddon } from "../../input-group";
 import { GenericSlot } from "../../slot";
 import { hasAddon, hasPrefixSuffix } from "../utils/common-utils";
+import { inputAffixGapClassName } from "../variants";
 import { ClearIcon } from "./clear-icon";
 
 /**
@@ -162,6 +163,7 @@ const BaseInput = (
       <InputGroup
         data-slot="input-group"
         className={cn(
+          inputAffixGapClassName,
           isAddon
             ? "border-none bg-transparent p-0 shadow-none outline-none"
             : "transition-all",

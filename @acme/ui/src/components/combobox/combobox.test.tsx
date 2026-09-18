@@ -506,3 +506,22 @@ describe("Combobox", () => {
     expect(source).toContain('} from "@acme/ui/shadcn/combobox";');
   });
 });
+
+describe("Combobox affix spacing", () => {
+  test("carries the package affix-gap override on its input group", () => {
+    const { container } = render(
+      <Combobox
+        options={[{ label: "Apple", value: "apple" }]}
+        placeholder="pick"
+      />,
+    );
+
+    // shadcn's ComboboxInput renders the shell, so the 8px default arrives from
+    // a vendor file this package does not edit; the override travels in on the
+    // className instead. Class presence only — the 4px is measured in the
+    // Input Prefix and Suffix story, which shares this constant.
+    expect(
+      container.querySelector('[data-slot="input-group"]')?.className,
+    ).toContain("[&>input]:pr-1!");
+  });
+});
