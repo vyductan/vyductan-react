@@ -145,116 +145,69 @@ export const TimeSelect = ({
     [],
   );
 
-  // Instant scroll to selected values when component mounts (no animation)
-  // Use useLayoutEffect to ensure scroll happens after DOM render but before paint
+  // Scroll a column so the option at `baseIndex` (in the MIDDLE copy of the
+  // tripled list) sits flush at the top. Scoped to the <ul> — sets the
+  // container's own scrollTop instead of element.scrollIntoView, which walks up
+  // and would also scroll the popover/modal ("stops mid-way"). Instant: a
+  // "smooth" scroll fights the onScroll infinite-loop reset and stalls partway.
+  // Landing in the middle set keeps scrollTop inside [0.5, 2.5]·set so the reset
+  // does not immediately snap it and cause a visible jump.
+  const scrollColumnToBaseIndex = React.useCallback(
+    (
+      reference: React.RefObject<HTMLUListElement | null>,
+      baseLength: number,
+      baseIndex: number,
+    ) => {
+      const container = reference.current;
+      if (!container) return;
+      const element = container.children[baseLength + Math.max(0, baseIndex)];
+      if (element instanceof HTMLElement) {
+        container.scrollTop +=
+          element.getBoundingClientRect().top -
+          container.getBoundingClientRect().top;
+      }
+    },
+    [],
+  );
+
+  // On open, jump the columns to the selected value (or to 00 when empty).
+  // useLayoutEffect so it lands before paint (no flash of the top of the list).
   React.useLayoutEffect(() => {
-    const scrollToSelected = () => {
-      const hourLength = baseHourOptions.length;
-      const minuteLength = baseMinuteOptions.length;
-      const secondLength = baseSecondOptions.length;
+    if (!value) {
+      scrollColumnToBaseIndex(hourListReference, baseHourOptions.length, 0);
+      scrollColumnToBaseIndex(minuteListReference, baseMinuteOptions.length, 0);
+      if (showSeconds)
+        scrollColumnToBaseIndex(
+          secondListReference,
+          baseSecondOptions.length,
+          0,
+        );
+      return;
+    }
 
-      // If no value, scroll to start of middle set to show 00 at top
-      if (!value) {
-        if (hourListReference.current) {
-          const targetIndex = hourLength; // Start of middle set
-          const hourElement = hourListReference.current.children[
-            targetIndex
-          ] as HTMLElement | undefined;
-          if (hourElement) {
-            hourElement.scrollIntoView?.({
-              behavior: "auto",
-              block: "start",
-            });
-          }
-        }
-
-        if (minuteListReference.current) {
-          const targetIndex = minuteLength;
-          const minuteElement = minuteListReference.current.children[
-            targetIndex
-          ] as HTMLElement | undefined;
-          if (minuteElement) {
-            minuteElement.scrollIntoView?.({
-              behavior: "auto",
-              block: "start",
-            });
-          }
-        }
-
-        if (showSeconds && secondListReference.current) {
-          const targetIndex = secondLength;
-          const secondElement = secondListReference.current.children[
-            targetIndex
-          ] as HTMLElement | undefined;
-          if (secondElement) {
-            secondElement.scrollIntoView?.({
-              behavior: "auto",
-              block: "start",
-            });
-          }
-        }
-        return;
-      }
-
-      // If value exists, scroll to selected value. Use the value's INDEX in the
-      // base options (not the raw value) so 12h and stepped columns land right.
-      const hourIndex = baseHourOptions.indexOf(
-        use12Hours ? to12(value.hour()) : value.hour(),
+    // Use the value's INDEX in the base options (not the raw value) so 12h and
+    // stepped columns land right.
+    scrollColumnToBaseIndex(
+      hourListReference,
+      baseHourOptions.length,
+      baseHourOptions.indexOf(use12Hours ? to12(value.hour()) : value.hour()),
+    );
+    scrollColumnToBaseIndex(
+      minuteListReference,
+      baseMinuteOptions.length,
+      baseMinuteOptions.indexOf(value.minute()),
+    );
+    if (showSeconds)
+      scrollColumnToBaseIndex(
+        secondListReference,
+        baseSecondOptions.length,
+        baseSecondOptions.indexOf(value.second()),
       );
-      const minuteIndex = baseMinuteOptions.indexOf(value.minute());
-
-      // Scroll to middle set (offset by one full set) for infinite scroll effect
-      if (hourListReference.current) {
-        const targetIndex = hourLength + Math.max(0, hourIndex);
-        const hourElement = hourListReference.current.children[targetIndex] as
-          | HTMLElement
-          | undefined;
-        if (hourElement) {
-          hourElement.scrollIntoView?.({
-            behavior: "auto", // instant scroll, no animation
-            block: "start",
-          });
-        }
-      }
-
-      if (minuteListReference.current) {
-        const targetIndex = minuteLength + Math.max(0, minuteIndex);
-        const minuteElement = minuteListReference.current.children[
-          targetIndex
-        ] as HTMLElement | undefined;
-        if (minuteElement) {
-          minuteElement.scrollIntoView?.({
-            behavior: "auto", // instant scroll, no animation
-            block: "start",
-          });
-        }
-      }
-
-      // Scroll second list to selected second if seconds are shown
-      if (showSeconds && secondListReference.current) {
-        const secondIndex = baseSecondOptions.indexOf(value.second());
-        const targetIndex = secondLength + Math.max(0, secondIndex);
-        const secondElement = secondListReference.current.children[
-          targetIndex
-        ] as HTMLElement | undefined;
-        if (secondElement) {
-          secondElement.scrollIntoView?.({
-            behavior: "auto", // instant scroll, no animation
-            block: "start",
-          });
-        }
-      }
-    };
-
-    scrollToSelected();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    // NOTE: 'value' is intentionally NOT in deps to preserve smooth scroll UX:
-    // - On mount: useLayoutEffect runs ONCE with instant scroll (behavior: "auto")
-    // - On click: onClick handler provides smooth scroll (behavior: "smooth")
-    // If 'value' were in deps, every value change would trigger instant scroll,
-    // overriding the smooth animation from onClick and degrading UX.
-    // value,
+    // 'value' intentionally excluded: this runs once on open; clicks scroll via
+    // their own onClick. Including it would re-jump the column on every
+    // hover/change and fight the click scroll.
     showSeconds,
     baseHourOptions.length,
     baseMinuteOptions.length,
@@ -325,15 +278,13 @@ export const TimeSelect = ({
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   onChange?.(setHour());
-
-                  // Scroll to top
-                  const target = e.currentTarget;
-                  target.scrollIntoView?.({
-                    behavior: "smooth",
-                    block: "start",
-                  });
+                  scrollColumnToBaseIndex(
+                    hourListReference,
+                    baseHourOptions.length,
+                    index % baseHourOptions.length,
+                  );
                 }}
               >
                 {actualHour.toString().padStart(2, "0")}
@@ -380,7 +331,7 @@ export const TimeSelect = ({
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                onClick={(e) => {
+                onClick={() => {
                   const newDate = value
                     ? value.minute(actualMinute)
                     : dayjs()
@@ -390,13 +341,11 @@ export const TimeSelect = ({
                         .millisecond(0)
                         .minute(actualMinute);
                   onChange?.(newDate);
-
-                  // Scroll to top
-                  const target = e.currentTarget;
-                  target.scrollIntoView?.({
-                    behavior: "smooth",
-                    block: "start",
-                  });
+                  scrollColumnToBaseIndex(
+                    minuteListReference,
+                    baseMinuteOptions.length,
+                    index % baseMinuteOptions.length,
+                  );
                 }}
               >
                 {actualMinute.toString().padStart(2, "0")}
@@ -443,7 +392,7 @@ export const TimeSelect = ({
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  onClick={(e) => {
+                  onClick={() => {
                     const newDate = value
                       ? value.second(actualSecond)
                       : dayjs()
@@ -453,13 +402,11 @@ export const TimeSelect = ({
                           .millisecond(0)
                           .second(actualSecond);
                     onChange?.(newDate);
-
-                    // Scroll to top
-                    const target = e.currentTarget;
-                    target.scrollIntoView?.({
-                      behavior: "smooth",
-                      block: "start",
-                    });
+                    scrollColumnToBaseIndex(
+                      secondListReference,
+                      baseSecondOptions.length,
+                      index % baseSecondOptions.length,
+                    );
                   }}
                 >
                   {actualSecond.toString().padStart(2, "0")}
