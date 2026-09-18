@@ -75,6 +75,16 @@ type EditorPropertiesBase = {
    * the shared editor.
    */
   children?: ReactNode;
+  /**
+   * Every change, without serializing the document.
+   *
+   * `onChange` has to build the whole string on each keystroke, which is O(the
+   * document) — on a long note that alone blocked typing for ~200ms per key.
+   * Most callers only want the string later (a debounced save), and an
+   * EditorState is an immutable snapshot, so it can be held and serialized then
+   * instead. Reach for this when you do not need the string on every key.
+   */
+  onChangeEditorState?: (editorState: EditorState) => void;
 };
 
 type JsonEditorProperties = EditorPropertiesBase & {
@@ -117,6 +127,7 @@ export function Editor({
   autoFocus = false,
   size = "middle",
   children,
+  onChangeEditorState,
 }: EditorProps) {
   const isMarkdownMode = format === "markdown";
   const isHtmlMode = format === "html";
@@ -158,13 +169,29 @@ export function Editor({
             size={size}
           />
 
-          {!isMarkdownMode && !isHtmlMode && (
+          {/*
+            Gated on `onChange`: serializing walks the entire document, so it
+            only happens when a caller actually asked for the string.
+          */}
+          {!isMarkdownMode && !isHtmlMode && onChange && (
             <OnChangePlugin
               ignoreSelectionChange={true}
               onChange={(editorState) => {
                 const jsonString = JSON.stringify(editorState.toJSON());
-                onChange?.(jsonString, editorState);
+                onChange(jsonString, editorState);
               }}
+            />
+          )}
+
+          {/*
+            Its own listener rather than a branch inside the one above, so it
+            reports in every format and never becomes an inert prop in markdown
+            or html mode.
+          */}
+          {onChangeEditorState && (
+            <OnChangePlugin
+              ignoreSelectionChange={true}
+              onChange={onChangeEditorState}
             />
           )}
 
