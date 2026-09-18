@@ -23,6 +23,14 @@ export default defineConfig({
     },
   },
   test: {
+    // Four projects run together and three of them each drive a chromium
+    // instance, so a full run oversubscribes the machine (load ~2x core count).
+    // Under that contention the heaviest tests — a Lexical editor mounting a
+    // table, a story's first browser paint — overshoot vitest's 5s default and
+    // fail with "Test timed out", while passing in ~1s on their own. Give them
+    // headroom here; a genuine hang still surfaces well inside 15s.
+    testTimeout: 15_000,
+    hookTimeout: 15_000,
     // globals: true,
     // environment: "jsdom",
     // setupFiles: ["./.storybook/vitest-setup.ts"],
