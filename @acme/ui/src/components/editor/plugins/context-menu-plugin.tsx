@@ -6,9 +6,9 @@
  *
  */
 import type { TableCellNode } from "@lexical/table";
-import type { LexicalNode } from "lexical";
+import type { LexicalEditor, LexicalNode } from "lexical";
 import type { JSX } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -82,14 +82,19 @@ function isInTableContext(node: LexicalNode): boolean {
   return getTableCellFromNode(node) !== null;
 }
 
+/**
+ * The cell the user last right-clicked, per editor.
+ *
+ * Both ends of this value live outside React: a DOM `contextmenu` listener
+ * writes it, and an option's `$onSelect` reads it back at click time. React
+ * state would never reach the already-captured `$onSelect` closures, and a ref
+ * would claim render-time ownership of something render never touches — so the
+ * value is keyed by the editor instance it actually belongs to.
+ */
+const contextMenuCellKeys = new WeakMap<LexicalEditor, string>();
+
 export function ContextMenuPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
-  // Store the right-clicked cell key in a ref rather than React state: the
-  // context-menu option closures are captured during the same synchronous
-  // `contextmenu` event that records the target cell, so a state update would
-  // never reach the already-captured `$onSelect` closures. A ref is read live
-  // at click time and always reflects the most recently right-clicked cell.
-  const contextMenuCellKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     const rootElement = editor.getRootElement();
@@ -106,7 +111,11 @@ export function ContextMenuPlugin(): JSX.Element {
         nextContextMenuCellKey = tableCell?.getKey() ?? null;
       });
 
-      contextMenuCellKeyRef.current = nextContextMenuCellKey;
+      if (nextContextMenuCellKey === null) {
+        contextMenuCellKeys.delete(editor);
+      } else {
+        contextMenuCellKeys.set(editor, nextContextMenuCellKey);
+      }
     };
 
     rootElement.addEventListener("contextmenu", handleContextMenu);
@@ -116,7 +125,7 @@ export function ContextMenuPlugin(): JSX.Element {
   }, [editor]);
 
   const selectContextMenuTableCell = () => {
-    const contextMenuCellKey = contextMenuCellKeyRef.current;
+    const contextMenuCellKey = contextMenuCellKeys.get(editor);
     if (!contextMenuCellKey) {
       return false;
     }

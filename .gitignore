@@ -73,6 +73,10 @@ dist/
 # vercel
 .vercel
 
+# vitest browser-mode output
+.vitest-attachments/
+__screenshots__/
+
 # intlayer
 .intlayer/
 
@@ -101,5 +105,3 @@ _*.sql
 _*.html
 _*.json
 
-# vitest browser-mode output
-.vitest-attachments/

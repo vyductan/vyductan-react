@@ -1,3 +1,4 @@
+import type { ParagraphNode } from "lexical";
 import { createHeadlessEditor } from "@lexical/headless";
 import { $getRoot, $createParagraphNode } from "lexical";
 import { describe, expect, test } from "vitest";
@@ -45,7 +46,9 @@ const roundTrip = (payload: { width?: number; height?: number }) => {
   reloaded.setEditorState(reloaded.parseEditorState(exported as never));
   let node: ImageNode | null = null;
   reloaded.read(() => {
-    node = $getRoot().getFirstChild()?.getFirstChild() as ImageNode;
+    node =
+      $getRoot().getFirstChild<ParagraphNode>()?.getFirstChild<ImageNode>() ??
+      null;
   });
   return node as unknown as ImageNode;
 };
