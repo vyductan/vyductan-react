@@ -17,6 +17,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import type { MentionData } from "../plugins/mentions-plugin";
+import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
@@ -52,6 +53,7 @@ import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugi
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
+import { PasteAsPlugin } from "../plugins/paste-as-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
@@ -73,6 +75,7 @@ export function Plugins({
   editable = true,
   variant = "default",
   mentionsData,
+  resolvePasteLink,
   className,
   contentClassName,
   placeholderClassName,
@@ -84,6 +87,7 @@ export function Plugins({
   editable?: boolean;
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
+  resolvePasteLink?: ResolvePasteLink;
   className?: string;
   contentClassName?: string;
   placeholderClassName?: string;
@@ -245,6 +249,12 @@ export function Plugins({
       )}
       {editable && <MarkdownPastePlugin />}
       {editable && <PlainTextLinebreakPastePlugin />}
+      {editable && resolvePasteLink && (
+        <PasteAsPlugin
+          anchorElem={floatingAnchorElement}
+          resolvePasteLink={resolvePasteLink}
+        />
+      )}
       {editable && <EmojiPickerPlugin />}
 
       {editable && (

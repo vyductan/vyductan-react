@@ -43,7 +43,18 @@ export const richTextSemanticContract = {
   // No color and no decoration color: the link takes both from whatever page it
   // lands on. Published content has to look native in its host, and the host is
   // the only thing that knows its own link color.
-  link: "text-inherit underline underline-offset-4",
+  // A link inserted through "Paste as -> Mention" carries rel="mention" and
+  // reads as a pill rather than as underlined text. It is expressed here, as
+  // utilities on the link class, rather than in the stylesheet: this contract is
+  // the one thing the editor theme and the published renderer share, so both
+  // surfaces pick the pill up from a single place — and utilities outrank the
+  // stylesheet's `@layer components`, which could not have turned the underline
+  // off from there.
+  link: cn(
+    "text-inherit underline underline-offset-4",
+    "[&[rel~=mention]]:no-underline [&[rel~=mention]]:rounded-sm",
+    "[&[rel~=mention]]:bg-muted [&[rel~=mention]]:px-1 [&[rel~=mention]]:py-0.5",
+  ),
   list: {
     checklist: "relative list-none! p-0",
     listitem: "mx-0",

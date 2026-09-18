@@ -8,6 +8,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import type { SizeType } from "../config-provider/size-context";
 import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
 import type { MentionData } from "./plugins/mentions-plugin";
+import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
@@ -45,6 +46,14 @@ type EditorPropertiesBase = {
   }) => void;
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
+  /**
+   * Identify a pasted URL, so the editor can offer to insert it as a readable
+   * mention instead of a bare URL. Returning null declines the offer, and
+   * leaving the prop out turns the whole feature off — the editor has no
+   * network access and no knowledge of any host's URL space, so recognising a
+   * link is the consumer's job.
+   */
+  resolvePasteLink?: ResolvePasteLink;
   className?: string;
   contentClassName?: string;
   placeholderClassName?: string;
@@ -101,6 +110,7 @@ export function Editor({
   format = "json",
   variant = "default",
   mentionsData,
+  resolvePasteLink,
   className,
   contentClassName,
   placeholderClassName,
@@ -140,6 +150,7 @@ export function Editor({
             onImageUpload={onImageUpload}
             variant={variant}
             mentionsData={mentionsData}
+            resolvePasteLink={resolvePasteLink}
             className={className}
             contentClassName={contentClassName}
             placeholderClassName={placeholderClassName}
