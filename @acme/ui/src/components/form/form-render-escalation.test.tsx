@@ -1,5 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
+
 import {
   act,
   cleanup,
@@ -122,5 +125,81 @@ describe("form errors notification purpose", () => {
     expect(arg.description).toContain("hidden: Hidden required");
     // The mounted field's error is surfaced inline, not in the notification.
     expect(arg.description.some((d) => d.startsWith("shown"))).toBe(false);
+  });
+});
+
+// Static guard for the regression vector the fix exists to close: ANY read of
+// the root `formState` proxy latches _proxyFormState[key] = 'all' for the
+// lifetime of that control, re-rendering every form on each emission of that
+// key. Scoped reads (useFormState) and the raw non-proxy store (_formState) are
+// fine. This catches a future read the runtime tests above would miss, because
+// they only exercise the components they happen to mount.
+describe("no root formState proxy reads", () => {
+  const ESCALATING_KEYS = [
+    "errors",
+    "isValid",
+    "isDirty",
+    "isValidating",
+    "isLoading",
+    "isSubmitting",
+    "isSubmitted",
+    "isSubmitSuccessful",
+    "submitCount",
+    "touchedFields",
+    "dirtyFields",
+    "validatingFields",
+    "defaultValues",
+    "disabled",
+  ];
+
+  const collect = (dir: string): string[] => {
+    const out: string[] = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        out.push(...collect(full));
+      } else if (
+        /\.tsx?$/.test(entry.name) &&
+        !/\.test\.tsx?$/.test(entry.name) &&
+        !/\.stories\.tsx?$/.test(entry.name)
+      ) {
+        out.push(full);
+      }
+    }
+    return out;
+  };
+
+  test("form and field source never read the root formState proxy", () => {
+    const roots = [
+      path.resolve(import.meta.dirname, "."),
+      path.resolve(import.meta.dirname, "../field"),
+    ];
+    const offenders: string[] = [];
+
+    for (const root of roots) {
+      for (const file of collect(root)) {
+        const source = readFileSync(file, "utf8");
+        source.split("\n").forEach((line, index) => {
+          const trimmed = line.trim();
+          // Prose mentions the bad pattern by name; only code counts.
+          if (
+            trimmed.startsWith("//") ||
+            trimmed.startsWith("*") ||
+            trimmed.startsWith("/*")
+          ) {
+            return;
+          }
+          for (const key of ESCALATING_KEYS) {
+            // `_formState.x` (raw store) and `useFormState` are the safe forms.
+            const pattern = new RegExp(`(?<!_)\\bformState\\.${key}\\b`);
+            if (pattern.test(line)) {
+              offenders.push(`${path.basename(file)}:${index + 1} → ${line.trim()}`);
+            }
+          }
+        });
+      }
+    }
+
+    expect(offenders).toStrictEqual([]);
   });
 });

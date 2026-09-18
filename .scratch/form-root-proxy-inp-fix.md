@@ -1,5 +1,10 @@
 # Fix: `<Form>` re-renders the whole form on every validation error emission
 
+> **STATUS: IMPLEMENTED** — shipped in `e2ae1f03` (primary + secondary fix + regression test)
+> and `f75a3a6a` (the optional `useMemo` resolver hygiene). A static guard test now also fails
+> the build on any new root-`formState` proxy read. Downstream copies (nlabs apps, vyductan.dev)
+> were synced by hand. Kept for the mechanism write-up; do not re-implement.
+
 ## TL;DR
 
 `FormErrorsNotification` reads react-hook-form's **root** `formState` proxy at render time. That single read permanently latches `control._proxyFormState.errors = 'all'`, which promotes *every* `errors` state emission into a full re-render of the component that owns `useForm()` — i.e. the entire form subtree. Because `FormErrorsNotification` is mounted unconditionally by every `<Form>` / `FormProvider`, **every form in every consuming app pays this**, on submit *and* on per-keystroke validation.
