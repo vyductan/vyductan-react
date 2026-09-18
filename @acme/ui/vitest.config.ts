@@ -45,6 +45,7 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "jsdom",
+          setupFiles: ["./vitest-setup.unit.ts"],
           include: ["src/**/*.{test,spec}.{ts,tsx}"],
           // *.touch.test.tsx needs a real device context — see the `touch`
           // project below. jsdom has no layout and no media queries, so running

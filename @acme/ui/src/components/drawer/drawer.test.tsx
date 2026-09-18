@@ -2,7 +2,7 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
@@ -28,7 +28,14 @@ describe("DrawerContent", () => {
 });
 
 describe("Drawer onClose", () => {
-  afterEach(() => document.body.replaceChildren());
+  afterEach(() => {
+    // Unmount React first: replaceChildren() alone rips RTL's container out
+    // from under it, and the global cleanup then fails to remove a node that
+    // is no longer a child. Radix/vaul portal into <body> as bare siblings, so
+    // the wipe still has to follow.
+    cleanup();
+    document.body.replaceChildren();
+  });
 
   test("fires when the user dismisses the drawer", async () => {
     const onClose = vi.fn();
@@ -68,7 +75,14 @@ describe("Drawer onClose", () => {
 });
 
 describe("Drawer resizable", () => {
-  afterEach(() => document.body.replaceChildren());
+  afterEach(() => {
+    // Unmount React first: replaceChildren() alone rips RTL's container out
+    // from under it, and the global cleanup then fails to remove a node that
+    // is no longer a child. Radix/vaul portal into <body> as bare siblings, so
+    // the wipe still has to follow.
+    cleanup();
+    document.body.replaceChildren();
+  });
 
   // jsdom has no layout, so the panel reports a 0-size rect. Stub the one
   // measurement the drag reads.
@@ -196,7 +210,14 @@ describe("Drawer resizable", () => {
 });
 
 describe("Drawer resize persistence", () => {
-  afterEach(() => document.body.replaceChildren());
+  afterEach(() => {
+    // Unmount React first: replaceChildren() alone rips RTL's container out
+    // from under it, and the global cleanup then fails to remove a node that
+    // is no longer a child. Radix/vaul portal into <body> as bare siblings, so
+    // the wipe still has to follow.
+    cleanup();
+    document.body.replaceChildren();
+  });
 
   test("a dragged size survives close and reopen while the Drawer stays mounted", async () => {
     const Harness = ({ open }: { open: boolean }) => (

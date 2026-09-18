@@ -2,7 +2,7 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import { render } from "@testing-library/react";
+import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
 
 import { Dialog, DialogContent, shouldKeepDialogOpen } from "./_components";
@@ -26,6 +26,9 @@ function add(html: string) {
 }
 
 afterEach(() => {
+  // Unmount React before wiping: replaceChildren() would otherwise remove
+  // RTL's container behind its back and the global cleanup would throw.
+  cleanup();
   document.body.replaceChildren();
 });
 
