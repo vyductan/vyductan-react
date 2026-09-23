@@ -1,6 +1,7 @@
 import type { LexicalNode, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { $createCodeNode } from "@lexical/code";
 import { $generateNodesFromDOM } from "@lexical/html";
 import {
@@ -34,6 +35,7 @@ import {
 } from "@acme/ui/components/command";
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from "@acme/ui/components/popover";
@@ -104,12 +106,39 @@ export function DraggableBlockPlugin({
   useEffect(() => {
     isMenuShowingReference.current = isMenuOpen || isTurnIntoOpen;
   }, [isMenuOpen, isTurnIntoOpen]);
-  const [menuElement, setMenuElement] = useState<HTMLElement | null>(null);
   const turnIntoAnchorReference = useRef<HTMLDivElement>(null);
 
-  const setMenuReference = useCallback((element: HTMLDivElement | null) => {
-    menuReference.current = element;
-    setMenuElement(element);
+  /**
+   * Where the handle was standing when the menu was opened.
+   *
+   * The menu cannot be anchored to the handle itself. @lexical/react drops the
+   * handle on a `mouseleave` of the editor's scroller — with no `isOnMenu`
+   * guard — and then hides it, collapsing its rect to 0,0. Reaching for a menu
+   * item takes the pointer off the editor, so the anchor disappeared mid-reach
+   * and the menu jumped to the top-left corner of the screen on the next
+   * render. Freezing the position at open time and anchoring to a node of our
+   * own, outside the editor, leaves nothing for the plugin to take away.
+   */
+  const [anchorBox, setAnchorBox] = useState<{
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
+  const handleMenuOpenChange = useCallback((next: boolean) => {
+    if (next) {
+      const rect = menuReference.current?.getBoundingClientRect();
+      if (rect) {
+        setAnchorBox({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    }
+    setIsMenuOpen(next);
   }, []);
 
   const isOnMenu = useCallback(
@@ -348,7 +377,7 @@ export function DraggableBlockPlugin({
 
     return (
       <div
-        ref={setMenuReference}
+        ref={menuReference}
         data-slot="draggable-block-menu"
         className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute top-0 left-0 -ml-1 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
       >
@@ -361,7 +390,24 @@ export function DraggableBlockPlugin({
         </div>
 
         {/* Drag Handle with Popover */}
-        <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <Popover open={isMenuOpen} onOpenChange={handleMenuOpenChange}>
+          {anchorBox &&
+            createPortal(
+              <PopoverAnchor asChild>
+                <div
+                  aria-hidden
+                  style={{
+                    position: "fixed",
+                    top: anchorBox.top,
+                    left: anchorBox.left,
+                    width: anchorBox.width,
+                    height: anchorBox.height,
+                    pointerEvents: "none",
+                  }}
+                />
+              </PopoverAnchor>,
+              document.body,
+            )}
           <PopoverTrigger asChild>
             <div
               className={cn(
@@ -374,9 +420,9 @@ export function DraggableBlockPlugin({
           </PopoverTrigger>
           <PopoverContent
             align="start"
-            side="right"
+            side="left"
             sideOffset={5}
-            container={menuElement}
+            collisionPadding={8}
             className="w-64 p-0"
           >
             <Command>
@@ -406,10 +452,10 @@ export function DraggableBlockPlugin({
                       </CommandItem>
                     </PopoverTrigger>
                     <PopoverContent
-                      side="right"
+                      side="left"
                       align="start"
                       sideOffset={0}
-                      container={menuElement}
+                      collisionPadding={8}
                       className="w-48 p-0"
                     >
                       <Command>
@@ -475,8 +521,8 @@ export function DraggableBlockPlugin({
     handleDuplicate,
     handleTurnInto,
     handleAddBlockBelow,
-    setMenuReference,
-    menuElement,
+    handleMenuOpenChange,
+    anchorBox,
     isMenuOpen,
     isTurnIntoOpen,
     size,

@@ -51,16 +51,21 @@ function Harness({ onReady }: { onReady: (editor: LexicalEditor) => void }) {
       <RichTextPlugin
         contentEditable={
           // No stylesheet loads here, so the layout the pointer needs has to
-          // come from the harness: without a size, nothing is hoverable.
-          <div
-            data-testid="anchor"
-            ref={setAnchor}
-            style={{ width: 600, padding: 24, position: "relative" }}
-          >
-            <ContentEditable
-              aria-label="Draggable editor"
-              style={{ minHeight: 200, outline: "none" }}
-            />
+          // come from the harness: without a size, nothing is hoverable. The
+          // outer box is fixed and inset so the page never scrolls — the
+          // positions these tests assert on are viewport-relative — and so the
+          // menu has margin to open into on either side.
+          <div style={{ position: "fixed", top: 150, left: 120 }}>
+            <div
+              data-testid="anchor"
+              ref={setAnchor}
+              style={{ width: 260, padding: 12, position: "relative" }}
+            >
+              <ContentEditable
+                aria-label="Draggable editor"
+                style={{ minHeight: 200, outline: "none" }}
+              />
+            </div>
           </div>
         }
         placeholder={null}
@@ -97,17 +102,26 @@ test("applies Turn into to the block the menu was opened on", async () => {
   await waitFor(() => expect(editor).not.toBeNull());
   const live = editor as unknown as LexicalEditor;
 
+  // Enough blocks that the last one is still clear of the open menu, which
+  // covers the ones directly beneath the handle.
+  const texts = [
+    "First block",
+    "Second block",
+    "Third block",
+    ...Array.from({ length: 8 }, (_, index) => `Filler ${index + 1}`),
+  ];
+
   live.update(() => {
     const root = $getRoot();
     root.clear();
-    for (const text of ["First block", "Second block", "Third block"]) {
+    for (const text of texts) {
       const paragraph = $createParagraphNode();
       paragraph.append($createTextNode(text));
       root.append(paragraph);
     }
   });
 
-  await waitFor(() => expect(paragraphs()).toHaveLength(3));
+  await waitFor(() => expect(paragraphs()).toHaveLength(texts.length));
 
   // Hover the first block so the handle belongs to it.
   await userEvent.hover(paragraphs()[0]!);
@@ -126,7 +140,7 @@ test("applies Turn into to the block the menu was opened on", async () => {
   );
 
   // Reaching for the submenu takes the pointer over the blocks below.
-  await userEvent.hover(paragraphs()[2]!);
+  await userEvent.hover(paragraphs().at(-1)!);
 
   const turnInto = await waitFor(() => {
     const item = [
@@ -157,9 +171,87 @@ test("applies Turn into to the block the menu was opened on", async () => {
   });
 
   // The other blocks are untouched, in their original order.
-  expect(blockTexts(live)).toStrictEqual([
-    "First block",
-    "Second block",
-    "Third block",
-  ]);
+  expect(blockTexts(live)).toStrictEqual(texts);
+});
+
+/**
+ * Reaching for the menu takes the pointer off the editor, and @lexical/react
+ * answers a `mouseleave` on the scroller by dropping the handle and hiding it —
+ * with no `isOnMenu` guard. A menu anchored to the handle therefore lost its
+ * anchor mid-reach: the rect collapsed to 0,0 and the menu jumped to the corner
+ * of the screen. It has to stay where it was opened.
+ */
+test("keeps the menu in place once the pointer leaves the editor", async () => {
+  let editor: LexicalEditor | null = null;
+  render(<Harness onReady={(next) => (editor = next)} />);
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    const paragraph = $createParagraphNode();
+    paragraph.append($createTextNode("First block"));
+    root.append(paragraph);
+  });
+
+  await waitFor(() => expect(paragraphs()).toHaveLength(1));
+  await userEvent.hover(paragraphs()[0]!);
+
+  const trigger = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[data-slot="draggable-block-menu"] [data-slot="popover-trigger"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  // Where the handle was when the menu opened — the menu belongs beside it.
+  const handle = trigger.getBoundingClientRect();
+  // Far enough down that the corner this used to jump to is unmistakable.
+  // Far enough down that the corner this used to jump to is unmistakable.
+  expect(handle.top).toBeGreaterThan(120);
+
+  await userEvent.click(trigger);
+
+  const content = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[data-slot="popover-content"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  // Somewhere outside the editor, the way the pointer travels to a menu item.
+  const outside = document.createElement("div");
+  Object.assign(outside.style, {
+    position: "fixed",
+    right: "0px",
+    top: "0px",
+    width: "120px",
+    height: "120px",
+  });
+  document.body.append(outside);
+  await userEvent.hover(outside);
+
+  // Opening the submenu re-renders the menu, which is when the position is
+  // recomputed — against an anchor that is no longer there.
+  const turnInto = await waitFor(() => {
+    const item = [
+      ...document.querySelectorAll<HTMLElement>("[cmdk-item]"),
+    ].find((node) => node.textContent?.includes("Turn into"));
+    expect(item).toBeDefined();
+    return item!;
+  });
+  await userEvent.hover(turnInto);
+  await waitFor(() =>
+    expect(
+      document.querySelectorAll('[data-slot="popover-content"]'),
+    ).toHaveLength(2),
+  );
+
+  const after = content.getBoundingClientRect();
+
+  expect(after.width).toBeGreaterThan(0);
+  expect(Math.abs(after.top - handle.top)).toBeLessThan(40);
 });
