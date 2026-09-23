@@ -44,6 +44,41 @@ import { $createCheckBlockNode } from "../nodes/check-block-node";
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
 
+/**
+ * The block the drag handle belongs to for a hovered node, or null when there
+ * is no block to drag.
+ *
+ * Null is a real answer, not a defensive one: the pointer resting on the
+ * editor's own padding resolves to the ROOT node, and a root has no top-level
+ * element by definition. Asking it for one used to throw
+ * "root nodes are not top level elements" out of a mousemove listener, which
+ * surfaced as a runtime error overlay the moment a page with the editor was
+ * opened. `getTopLevelElement` answers the same question without the throw.
+ */
+export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
+  const topLevel = node.getTopLevelElement();
+
+  if (!topLevel) {
+    return null;
+  }
+
+  if (!$isListNode(topLevel)) {
+    return topLevel;
+  }
+
+  // Inside a list it is the item that gets dragged, not the whole list.
+  let current: LexicalNode | null = node;
+
+  while (current && current !== topLevel) {
+    if ($isListItemNode(current)) {
+      return current;
+    }
+    current = current.getParent();
+  }
+
+  return topLevel;
+}
+
 export function DraggableBlockPlugin({
   anchorElem,
   size = "middle",
@@ -101,35 +136,14 @@ export function DraggableBlockPlugin({
 
       editor.read(() => {
         const node = $getNearestNodeFromDOMNode(target);
-        if (node) {
-          // If the node is inside a list, we want the ListItemNode, not the whole List
-          let block = node;
-          const topLevel = node.getTopLevelElementOrThrow();
+        if (!node) return;
 
-          if ($isListNode(topLevel)) {
-            // Traverse up to find ListItemNode
-            let current: LexicalNode | null = node;
-            while (current && current !== topLevel) {
-              if ($isListItemNode(current)) {
-                block = current;
-                break;
-              }
-              current = current.getParent();
-            }
-            // If we didn't find ListItem (e.g. hovering the List itself), fallback to topLevel
-            if (current === topLevel) {
-              block = topLevel;
-            }
-          } else {
-            block = topLevel;
-          }
+        const block = $draggableBlockForNode(node);
 
-          const key = block.getKey();
-
-          // Only update if it's a valid block key to prevent flickering or losing state
-          if (key) {
-            currentNodeKeyReference.current = key;
-          }
+        // Keep the last block rather than clearing it: the pointer crossing the
+        // padding between two blocks should not drop the handle.
+        if (block) {
+          currentNodeKeyReference.current = block.getKey();
         }
       });
     };
