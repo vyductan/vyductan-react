@@ -134,4 +134,70 @@ describe("Select", () => {
     expect(input).toHaveValue("");
     expect(screen.getByText("xxx")).toBeInTheDocument();
   });
+
+  describe("accessible name", () => {
+    const options = [{ label: "Option 1", value: "1" }];
+
+    test("falls back to the placeholder when nothing else names it", () => {
+      render(<Select placeholder="No folder" options={options} />);
+
+      expect(
+        screen.getByRole("combobox", { name: "No folder" }),
+      ).toBeInTheDocument();
+    });
+
+    test("lets a caller's aria-label name the select", () => {
+      render(
+        <Select
+          aria-label="Destination folder"
+          placeholder="No folder"
+          options={options}
+        />,
+      );
+
+      expect(
+        screen.getByRole("combobox", { name: "Destination folder" }),
+      ).toBeInTheDocument();
+    });
+
+    /**
+     * The placeholder is empty-state text ("No folder"), not the field's name.
+     * Applying it as aria-label unconditionally outranks aria-labelledby in
+     * accessible-name computation, so a visible label could never name the
+     * control — the field announced itself as its own empty value.
+     */
+    test("lets aria-labelledby name the select", () => {
+      render(
+        <>
+          <span id="folder-label">Folder</span>
+          <Select
+            aria-labelledby="folder-label"
+            placeholder="No folder"
+            options={options}
+          />
+        </>,
+      );
+
+      expect(
+        screen.getByRole("combobox", { name: "Folder" }),
+      ).toBeInTheDocument();
+    });
+
+    test("lets aria-labelledby name a multiple select", () => {
+      render(
+        <>
+          <span id="tags-label">Tags</span>
+          <Select
+            mode="multiple"
+            aria-labelledby="tags-label"
+            placeholder="No tags"
+            options={options}
+          />
+        </>,
+      );
+
+      expect(screen.getByLabelText("Tags")).toBeInTheDocument();
+    });
+  });
+
 });

@@ -146,6 +146,8 @@ const Select = <
     id,
     options = [],
     placeholder,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
 
     allowClear,
     disabled,
@@ -175,6 +177,19 @@ const Select = <
   } = properties;
 
   void showSearch;
+
+  /**
+   * The placeholder names the trigger only as a last resort.
+   *
+   * It is empty-state text ("No folder"), not the field's name, so it must not
+   * displace a name the caller gave. aria-labelledby already outranks aria-label
+   * per the accname spec, but aria-label is applied here explicitly rather than
+   * left to land in the rest-spread: that only worked because the spread happens
+   * to come after the default, and reordering it would silently re-anonymise
+   * every named select.
+   */
+  const triggerAriaLabel =
+    ariaLabel ?? (ariaLabelledBy === undefined ? placeholder : undefined);
 
   // Resolve size from the ambient SizeContext when not set explicitly, so a
   // <SizeContextProvider>/ConfigProvider drives the trigger like Input does.
@@ -832,7 +847,8 @@ const Select = <
               id={id}
               role="combobox"
               aria-expanded={internalOpen}
-              aria-label={placeholder}
+              aria-label={triggerAriaLabel}
+              aria-labelledby={ariaLabelledBy}
               className={cn(
                 "group min-h-control relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md text-left",
                 controlPaddingBySize[mergedSize ?? "middle"],
@@ -918,7 +934,8 @@ const Select = <
             <div>
               <div
                 id={id}
-                aria-label={placeholder}
+                aria-label={triggerAriaLabel}
+                aria-labelledby={ariaLabelledBy}
                 className={cn(
                   "group min-h-control relative flex w-full items-center rounded-md",
                   inputVariants({ variant, status, disabled }),
@@ -1030,7 +1047,8 @@ const Select = <
       >
         <SelectTrigger
           id={id}
-          aria-label={placeholder}
+          aria-label={triggerAriaLabel}
+          aria-labelledby={ariaLabelledBy}
           loading={loading}
           disabled={disabled}
           className={cn(
