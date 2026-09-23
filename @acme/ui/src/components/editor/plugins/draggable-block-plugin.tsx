@@ -94,6 +94,16 @@ export function DraggableBlockPlugin({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTurnIntoOpen, setIsTurnIntoOpen] = useState(false);
+  /**
+   * Mirrors the two above for the mousemove listener, which is bound once and
+   * would otherwise close over their first values. Synced in an effect rather
+   * than during render, and read only from a pointer event, which is always
+   * later than the commit that opened the menu.
+   */
+  const isMenuShowingReference = useRef(false);
+  useEffect(() => {
+    isMenuShowingReference.current = isMenuOpen || isTurnIntoOpen;
+  }, [isMenuOpen, isTurnIntoOpen]);
   const [menuElement, setMenuElement] = useState<HTMLElement | null>(null);
   const turnIntoAnchorReference = useRef<HTMLDivElement>(null);
 
@@ -131,6 +141,13 @@ export function DraggableBlockPlugin({
     if (!anchorElem) return;
 
     const handleMouseMove = (event: MouseEvent) => {
+      // Reaching for a menu item drags the pointer across the blocks in
+      // between, and each crossing used to retarget the handle — so "Turn into"
+      // landed on whatever the pointer last passed over rather than the block
+      // the menu was opened on. While the menu is showing, the block it was
+      // opened on is the answer, whatever the pointer is over now.
+      if (isMenuShowingReference.current) return;
+
       const target = event.target as Node | null;
       if (!target) return;
 
