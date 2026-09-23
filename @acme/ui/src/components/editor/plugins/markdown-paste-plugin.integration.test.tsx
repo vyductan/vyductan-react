@@ -18,7 +18,9 @@ import {
 } from "lexical";
 import { afterEach, expect, test, vi } from "vitest";
 
+import { Editor } from "../editor";
 import { nodes } from "../nodes/nodes";
+import pastedShellNote from "./__fixtures__/pasted-shell-note.md?raw";
 import { MarkdownPastePlugin } from "./markdown-paste-plugin";
 import { normalizeHtmlOutput } from "./normalize-html-output";
 
@@ -229,9 +231,9 @@ test("pastes where the caret is, not at the end of the document", async () => {
 });
 
 /**
- * A real note pasted from a chat: headings, a rule, a fenced block, bullets and
- * a quote. Building the nodes in a detached container is only half the job —
- * they have to be safe to insert.
+ * The document that actually broke this, kept verbatim as a fixture: headings,
+ * rules, a fenced box-drawing block, bullets with inline code, and a blockquote
+ * whose last line is a bare ">".
  */
 test("pastes a whole markdown document without throwing", async () => {
   let editor: LexicalEditor | null = null;
@@ -265,31 +267,12 @@ test("pastes a whole markdown document without throwing", async () => {
     });
   });
 
-  const pasted = [
-    "Trong lập trình web, **Shell** là bộ khung bao ngoài.",
-    "",
-    "---",
-    "",
-    "### 1. Phân biệt",
-    "",
-    "```",
-    "| KHUNG VO (SHELL)",
-    "|   └── Header",
-    "```",
-    "",
-    "- **Ruột:** form đặt tour (`[oishii_booking]`)",
-    "- **Vỏ:** phần bao quanh",
-    "",
-    "> Bộ khung vỏ trang tối giản",
-    "",
-  ].join("\n");
-
   const preventDefault = vi.fn();
 
   act(() => {
     live.dispatchCommand(PASTE_COMMAND, {
       clipboardData: {
-        getData: (type: string) => (type === "text/plain" ? pasted : ""),
+        getData: (type: string) => (type === "text/plain" ? pastedShellNote : ""),
       },
       preventDefault,
     } as unknown as ClipboardEvent);
@@ -312,4 +295,79 @@ test("pastes a whole markdown document without throwing", async () => {
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks.length).toBeGreaterThan(3);
+});
+
+/**
+ * The same paste through the shipped editor rather than a hand-built composer.
+ * A minimal harness registers this plugin and little else, so it misses
+ * anything that only goes wrong alongside the rest of the editor's plugins and
+ * nodes — which is where this first showed up.
+ */
+test("pastes a whole markdown document into the real editor", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor
+      autoFocus={false}
+      format="html"
+      value="<p>First block</p><p>Last block</p>"
+    >
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  await waitFor(() => {
+    const blocks = live
+      .getEditorState()
+      .read(() => $getRoot().getChildren().length);
+    expect(blocks).toBe(2);
+  });
+
+  act(() => {
+    live.update(() => {
+      $getRoot().getFirstChild()?.selectEnd();
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      // The shipped editor has plugins that read more of the event than the
+      // text: files, items and types all get touched before this one runs.
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain" ? pastedShellNote : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const blocks = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getTextContent()),
+    );
+
+  expect(blocks.at(-1)).toBe("Last block");
+  expect(blocks.length).toBeGreaterThan(5);
 });
