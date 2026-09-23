@@ -10,7 +10,12 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { act, cleanup, render, waitFor } from "@testing-library/react";
-import { $getRoot, PASTE_COMMAND } from "lexical";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  PASTE_COMMAND,
+} from "lexical";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { nodes } from "../nodes/nodes";
@@ -153,4 +158,72 @@ test("pastes nested markdown bullets as a nested list inside the preceding paren
       "Guests who cannot accept any risk of cross-contamination, regardless of the severity of their allergy. ( including for religious reasons)",
     ]);
   });
+});
+
+/**
+ * The caret decides where a paste lands. Converting the markdown through a
+ * scratch node appended to the root moved it: @lexical/markdown's
+ * `$convertFromMarkdownString` ends with `root.selectStart()` on whichever node
+ * it was handed, so the caret jumped to the bottom of the document and the
+ * paste landed there instead of where the person was typing.
+ */
+test("pastes where the caret is, not at the end of the document", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <MarkdownPasteHarness
+      onReady={(nextEditor) => {
+        editor = nextEditor;
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      for (const text of ["First block", "Second block", "Third block"]) {
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(text));
+        root.append(paragraph);
+      }
+      // The caret sits in the first block, far from the end.
+      root.getFirstChild()?.selectEnd();
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        getData: (type: string) =>
+          type === "text/plain" ? "## Pasted heading" : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const blocks = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getTextContent()),
+    );
+
+  // The first pasted block merges into the line the caret is on, the way any
+  // insert at a caret does. What matters is that it happens there.
+  expect(blocks[0]).toContain("Pasted heading");
+  expect(blocks.at(-1)).toBe("Third block");
 });

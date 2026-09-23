@@ -4,11 +4,9 @@ import type { ListNode } from "@lexical/list";
 import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isListItemNode, $isListNode } from "@lexical/list";
-import { $convertFromMarkdownString } from "@lexical/markdown";
+import { $generateNodesFromMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
-  $createParagraphNode,
-  $getRoot,
   $getSelection,
   $insertNodes,
   $isRangeSelection,
@@ -153,19 +151,17 @@ export function MarkdownPastePlugin(): null {
             currentSelection.removeText();
           }
 
-          const temporaryParagraph = $createParagraphNode();
-          const root = $getRoot();
-
-          root.append(temporaryParagraph);
-
-          $convertFromMarkdownString(
+          // Build the nodes off to one side. Converting into a scratch node
+          // appended to the root used to move the caret: markdown's
+          // `$convertFromMarkdownString` finishes with `selectStart()` on the
+          // node it was given, so the caret ended up at the bottom of the
+          // document and the paste landed there rather than where the person
+          // was typing. This is the call that leaves the tree and the selection
+          // alone.
+          const children = $generateNodesFromMarkdownString(
             normalizedText,
             MARKDOWN_TRANSFORMERS,
-            temporaryParagraph,
           );
-
-          const children = temporaryParagraph.getChildren();
-          temporaryParagraph.remove();
 
           collapseMarkdownListWrappers(children);
 
