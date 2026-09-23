@@ -452,7 +452,11 @@ export function DraggableBlockPlugin({
                       </CommandItem>
                     </PopoverTrigger>
                     <PopoverContent
-                      side="left"
+                      // The menu itself opens into the left margin, so the
+                      // submenu unfolds back across it rather than pushing
+                      // further left into the app's sidebar. Notion reads the
+                      // same way round.
+                      side="right"
                       align="start"
                       sideOffset={0}
                       collisionPadding={8}
