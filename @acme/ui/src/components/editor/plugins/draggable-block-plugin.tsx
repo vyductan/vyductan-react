@@ -372,10 +372,17 @@ export function DraggableBlockPlugin({
               <GripVerticalIcon className={isSmall ? "size-3" : "size-4"} />
             </div>
           </PopoverTrigger>
+          {/*
+            Opens into the margin rather than over the text. The handle sits in
+            the left gutter, so a menu opening right lands on the block it is
+            acting on — exactly what you need to see while choosing. Radix flips
+            it back to the right when the margin is too narrow to hold it.
+          */}
           <PopoverContent
             align="start"
-            side="right"
+            side="left"
             sideOffset={5}
+            collisionPadding={8}
             container={menuElement}
             className="w-64 p-0"
           >
@@ -405,10 +412,12 @@ export function DraggableBlockPlugin({
                         <span className="ml-auto">›</span>
                       </CommandItem>
                     </PopoverTrigger>
+                    {/* Same reasoning, and it keeps the submenu off its parent. */}
                     <PopoverContent
-                      side="right"
+                      side="left"
                       align="start"
                       sideOffset={0}
+                      collisionPadding={8}
                       container={menuElement}
                       className="w-48 p-0"
                     >
