@@ -227,3 +227,89 @@ test("pastes where the caret is, not at the end of the document", async () => {
   expect(blocks[0]).toContain("Pasted heading");
   expect(blocks.at(-1)).toBe("Third block");
 });
+
+/**
+ * A real note pasted from a chat: headings, a rule, a fenced block, bullets and
+ * a quote. Building the nodes in a detached container is only half the job —
+ * they have to be safe to insert.
+ */
+test("pastes a whole markdown document without throwing", async () => {
+  let editor: LexicalEditor | null = null;
+  const onError = vi.fn();
+
+  render(
+    <MarkdownPasteHarness
+      onReady={(nextEditor) => {
+        editor = nextEditor;
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+  const removeErrorListener = live.registerUpdateListener(() => {});
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      for (const text of ["First block", "Last block"]) {
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(text));
+        root.append(paragraph);
+      }
+      root.getFirstChild()?.selectEnd();
+    });
+  });
+
+  const pasted = [
+    "Trong lập trình web, **Shell** là bộ khung bao ngoài.",
+    "",
+    "---",
+    "",
+    "### 1. Phân biệt",
+    "",
+    "```",
+    "| KHUNG VO (SHELL)",
+    "|   └── Header",
+    "```",
+    "",
+    "- **Ruột:** form đặt tour (`[oishii_booking]`)",
+    "- **Vỏ:** phần bao quanh",
+    "",
+    "> Bộ khung vỏ trang tối giản",
+    "",
+  ].join("\n");
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        getData: (type: string) => (type === "text/plain" ? pasted : ""),
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  removeErrorListener();
+  expect(onError).not.toHaveBeenCalled();
+
+  const blocks = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getTextContent()),
+    );
+
+  expect(blocks.at(-1)).toBe("Last block");
+  expect(blocks.length).toBeGreaterThan(3);
+});

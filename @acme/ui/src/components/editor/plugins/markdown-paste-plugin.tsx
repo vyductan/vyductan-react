@@ -10,6 +10,7 @@ import {
   $getSelection,
   $insertNodes,
   $isRangeSelection,
+  $setSelection,
   COMMAND_PRIORITY_LOW,
   PASTE_COMMAND,
 } from "lexical";
@@ -151,13 +152,16 @@ export function MarkdownPastePlugin(): null {
             currentSelection.removeText();
           }
 
-          // Build the nodes off to one side. Converting into a scratch node
-          // appended to the root used to move the caret: markdown's
-          // `$convertFromMarkdownString` finishes with `selectStart()` on the
-          // node it was given, so the caret ended up at the bottom of the
-          // document and the paste landed there rather than where the person
-          // was typing. This is the call that leaves the tree and the selection
-          // alone.
+          // Where the caret is, which is where this paste belongs. Importing
+          // markdown moves it: it used to run into a scratch paragraph
+          // appended to the root, and `$convertFromMarkdownString` ends with
+          // `selectStart()` on the node it is handed — so the caret followed
+          // that node to the bottom of the document and the paste landed
+          // there. Generating the nodes instead leaves the document alone but
+          // still parks the caret in the importer's own container, which has
+          // no parent; inserting from there throws. So hold on to the caret
+          // and put it back.
+          const target = currentSelection.clone();
           const children = $generateNodesFromMarkdownString(
             normalizedText,
             MARKDOWN_TRANSFORMERS,
@@ -166,6 +170,7 @@ export function MarkdownPastePlugin(): null {
           collapseMarkdownListWrappers(children);
 
           if (children.length > 0) {
+            $setSelection(target);
             $insertNodes(children);
           }
         });
