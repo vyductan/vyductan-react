@@ -14,9 +14,13 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $isElementNode,
+  $isTextNode,
   PASTE_COMMAND,
 } from "lexical";
 import { afterEach, expect, test, vi } from "vitest";
+
+import { $createCodeNode } from "@lexical/code";
 
 import { Editor } from "../editor";
 import { nodes } from "../nodes/nodes";
@@ -370,4 +374,154 @@ test("pastes a whole markdown document into the real editor", async () => {
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks.length).toBeGreaterThan(5);
+});
+
+/**
+ * A caret in the middle of a line, which is where people actually paste. That
+ * takes a different route into the document — the block has to be split around
+ * the caret — and the split walks up from the nodes being inserted. They come
+ * back from the importer still parented to its internal container, which has no
+ * parent of its own, so the walk threw and the paste was left half applied.
+ */
+test("pastes with the caret in the middle of a line", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      for (const text of ["First block here", "Last block"]) {
+        const paragraph = $createParagraphNode();
+        paragraph.append($createTextNode(text));
+        root.append(paragraph);
+      }
+      const firstBlock = $getRoot().getFirstChild();
+      const firstText = $isElementNode(firstBlock)
+        ? firstBlock.getFirstChild()
+        : null;
+      if ($isTextNode(firstText)) {
+        firstText.select(5, 5);
+      }
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain" ? pastedShellNote : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const blocks = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getTextContent()),
+    );
+
+  expect(blocks[0]).toContain("First");
+  expect(blocks.at(-1)).toBe("Last block");
+  expect(blocks.length).toBeGreaterThan(5);
+});
+
+/**
+ * A caret inside a code block. The markdown goes in as the literal text it is,
+ * which is what a code block is for — no headings, no lists. Worth pinning
+ * down: it is a different route into the document, and it must not throw.
+ */
+test("pastes with the caret inside a code block", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const code = $createCodeNode();
+      code.append($createTextNode("| KHUNG VO (SHELL)"));
+      root.append(code);
+      const tail = $createParagraphNode();
+      tail.append($createTextNode("Last block"));
+      root.append(tail);
+      const codeText = code.getFirstChild();
+      if ($isTextNode(codeText)) {
+        codeText.select(5, 5);
+      }
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain" ? pastedShellNote : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const blocks = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getTextContent()),
+    );
+
+  expect(blocks.at(-1)).toBe("Last block");
+  expect(blocks[0]).toContain("Trong lập trình web");
+  expect(blocks[0]).not.toContain("###");
 });

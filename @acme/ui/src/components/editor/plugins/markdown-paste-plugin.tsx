@@ -10,6 +10,7 @@ import {
   $getSelection,
   $insertNodes,
   $isRangeSelection,
+  $removeFromParent,
   $setSelection,
   COMMAND_PRIORITY_LOW,
   PASTE_COMMAND,
@@ -170,6 +171,17 @@ export function MarkdownPastePlugin(): null {
           collapseMarkdownListWrappers(children);
 
           if (children.length > 0) {
+            // Two things have to hold before inserting, and each has been seen
+            // to fail on its own: the nodes belong to no one, and the caret is
+            // the person's. The importer's container is not in the document and
+            // has no parent, so anything that walks up from a node still inside
+            // it, or from a caret still inside it, throws
+            // "Expected node N to have a parent" and leaves the paste half
+            // applied.
+            for (const child of children) {
+              $removeFromParent(child);
+            }
+
             $setSelection(target);
             $insertNodes(children);
           }
