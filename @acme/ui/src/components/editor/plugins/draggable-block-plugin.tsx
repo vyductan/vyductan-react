@@ -377,13 +377,18 @@ export function DraggableBlockPlugin({
             the left gutter, so a menu opening right lands on the block it is
             acting on — exactly what you need to see while choosing. Radix flips
             it back to the right when the margin is too narrow to hold it.
+
+            Portalled to the body, not into the handle: the editor's scroll
+            container and the card around it both clip their overflow, so a menu
+            opening away from the text was cut off at their edge. `isOnMenu`
+            still recognises it, by its popover-content marker rather than by
+            where it sits in the tree.
           */}
           <PopoverContent
             align="start"
             side="left"
             sideOffset={5}
             collisionPadding={8}
-            container={menuElement}
             className="w-64 p-0"
           >
             <Command>
@@ -418,7 +423,6 @@ export function DraggableBlockPlugin({
                       align="start"
                       sideOffset={0}
                       collisionPadding={8}
-                      container={menuElement}
                       className="w-48 p-0"
                     >
                       <Command>

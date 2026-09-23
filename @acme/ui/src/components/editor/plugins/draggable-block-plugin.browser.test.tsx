@@ -125,6 +125,15 @@ test("applies Turn into to the block the menu was opened on", async () => {
     expect(trigger.getAttribute("data-state")).toBe("open"),
   );
 
+  // Portalled out of the handle, not into it. The editor's scroll container and
+  // the card around it clip their overflow, so a menu living inside that
+  // subtree is cut off the moment it opens away from the text.
+  const panel = document.querySelector('[data-slot="popover-content"]');
+  expect(panel).not.toBeNull();
+  expect(
+    panel!.closest('[data-slot="draggable-block-menu"]'),
+  ).toBeNull();
+
   // Reaching for the submenu takes the pointer over the blocks below.
   await userEvent.hover(paragraphs()[2]!);
 
