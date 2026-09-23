@@ -1139,7 +1139,9 @@ function useFloatingTextFormatToolbar(
         setIsLink(false);
       }
 
-      const topLevelElement = node.getTopLevelElementOrThrow();
+      // Null when the caret is on the root, which $isListNode already answers
+      // correctly — the toolbar then reports a plain paragraph.
+      const topLevelElement = node.getTopLevelElement();
       if ($isListNode(topLevelElement)) {
         setListType(topLevelElement.getListType());
       } else {

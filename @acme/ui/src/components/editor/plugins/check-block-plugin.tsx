@@ -39,7 +39,10 @@ export function CheckBlockPlugin() {
 
         const anchor = selection.anchor;
         const node = anchor.getNode();
-        const block = node.getTopLevelElementOrThrow();
+        // No block under the caret means the root itself — an empty editor.
+        // Nothing here applies, so let the default handling run.
+        const block = node.getTopLevelElement();
+        if (!block) return false;
 
         if ($isCheckBlockNode(block)) {
           // If hitting enter at the start of empty block, Turn into Paragraph
@@ -106,7 +109,8 @@ export function CheckBlockPlugin() {
         if (!$isRangeSelection(selection)) return false;
 
         const node = selection.anchor.getNode();
-        const block = node.getTopLevelElementOrThrow();
+        const block = node.getTopLevelElement();
+        if (!block) return false;
 
         if ($isCheckBlockNode(block)) {
           if (event) event.preventDefault();
@@ -131,7 +135,8 @@ export function CheckBlockPlugin() {
         const anchor = selection.anchor;
         if (selection.isCollapsed() && anchor.offset === 0) {
           const node = anchor.getNode();
-          const block = node.getTopLevelElementOrThrow();
+          const block = node.getTopLevelElement();
+          if (!block) return false;
           if (
             $isCheckBlockNode(block) && // If at start, convert to paragraph
             // If there are other blocks before, standard backspace merges.

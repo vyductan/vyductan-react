@@ -211,22 +211,29 @@ export function BlockCopyPastePlugin(): null {
           currentNode = parent;
         }
 
-        targetBlock ??= anchor.getNode().getTopLevelElementOrThrow();
+        targetBlock ??= anchor.getNode().getTopLevelElement();
+
+        // The caret on the root itself means an empty editor, so
+        // there is no block to copy — leave the event alone.
+        if (!targetBlock) return false;
+
+        // Non-null for the closures below, which cannot narrow a `let`.
+        const block = targetBlock;
 
         event.preventDefault();
         editor.update(() => {
           // Select the block to generate HTML for it
-          if ($isElementNode(targetBlock) || $isTextNode(targetBlock)) {
+          if ($isElementNode(block) || $isTextNode(block)) {
             // We know it is ElementNode or TextNode which have select()
-            (targetBlock as ElementNode).select();
+            (block as ElementNode).select();
           }
 
           const selectionToSerialize = $getSelection();
-          let text = targetBlock.getTextContent();
+          let text = block.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
-          if ($isListItemNode(targetBlock)) {
-            const parent = targetBlock.getParent();
+          if ($isListItemNode(block)) {
+            const parent = block.getParent();
             if ($isListNode(parent)) {
               const tag = parent.getTag();
               html = `<${tag}>${html}</${tag}>`;
@@ -336,20 +343,27 @@ export function BlockCopyPastePlugin(): null {
           currentNode = parent;
         }
 
-        targetBlock ??= anchor.getNode().getTopLevelElementOrThrow();
+        targetBlock ??= anchor.getNode().getTopLevelElement();
+
+        // The caret on the root itself means an empty editor, so
+        // there is no block to cut — leave the event alone.
+        if (!targetBlock) return false;
+
+        // Non-null for the closures below, which cannot narrow a `let`.
+        const block = targetBlock;
 
         event.preventDefault();
         editor.update(() => {
-          if ($isElementNode(targetBlock) || $isTextNode(targetBlock)) {
-            (targetBlock as ElementNode).select();
+          if ($isElementNode(block) || $isTextNode(block)) {
+            (block as ElementNode).select();
           }
 
           const selectionToSerialize = $getSelection();
-          let text = targetBlock.getTextContent();
+          let text = block.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
-          if ($isListItemNode(targetBlock)) {
-            const parent = targetBlock.getParent();
+          if ($isListItemNode(block)) {
+            const parent = block.getParent();
             if ($isListNode(parent)) {
               const tag = parent.getTag();
               html = `<${tag}>${html}</${tag}>`;
@@ -366,7 +380,7 @@ export function BlockCopyPastePlugin(): null {
           }
 
           // Remove the block after copying
-          targetBlock.remove();
+          block.remove();
         });
         return true;
       },
@@ -423,14 +437,21 @@ export function BlockCopyPastePlugin(): null {
             currentNode = parent;
           }
 
-          targetBlock ??= anchor.getNode().getTopLevelElementOrThrow();
+          targetBlock ??= anchor.getNode().getTopLevelElement();
+
+          // The caret on the root itself means an empty editor, so
+          // there is no block to paste into — leave the event alone.
+          if (!targetBlock) return false;
+
+          // Non-null for the closures below, which cannot narrow a `let`.
+          const block = targetBlock;
 
           const parser = new DOMParser();
           const document = parser.parseFromString(html, "text/html");
           const nodes = $generateNodesFromDOM(editor, document);
 
           // Insert after current block
-          let lastNode: LexicalNode = targetBlock;
+          let lastNode: LexicalNode = block;
           for (const node of nodes) {
             lastNode.insertAfter(node);
             lastNode = node;
