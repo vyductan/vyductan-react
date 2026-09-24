@@ -77,8 +77,7 @@ export function Plugins({
   mentionsData,
   resolvePasteLink,
   className,
-  contentClassName,
-  placeholderClassName,
+  classNames,
   autoFocus,
   size = "middle",
 }: {
@@ -89,8 +88,10 @@ export function Plugins({
   mentionsData?: MentionData[];
   resolvePasteLink?: ResolvePasteLink;
   className?: string;
-  contentClassName?: string;
-  placeholderClassName?: string;
+  classNames?: {
+    content?: string;
+    placeholder?: string;
+  };
   autoFocus?: boolean;
   size?: SizeType;
 }) {
@@ -167,10 +168,10 @@ export function Plugins({
           <div className="group relative" ref={onReference}>
             <ContentEditable
               className={cn(
-                contentClassName,
+                classNames?.content,
                 size === "small" ? "text-sm" : "text-base",
               )}
-              placeholderClassName={placeholderClassName}
+              placeholderClassName={classNames?.placeholder}
               // className="py-[3px] px-0.5 text-sm wrap-break-word whitespace-break-spaces"
               placeholder={editable ? placeholder : ""}
               // placeholderClassName="text-gray-400 pointer-events-none absolute top-2.5 sm:top-3.5 left-2 sm:left-4 overflow-hidden leading-6 sm:leading-7 text-ellipsis select-none whitespace-nowrap transition-colors max-w-[calc(100%-3rem)] sm:max-w-[calc(100%-4rem)]"

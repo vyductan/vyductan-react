@@ -60,6 +60,14 @@ export type ComposerProps = {
   history?: string[];
   autoFocus?: boolean;
   className?: string;
+  classNames?: {
+    /**
+     * The editor's scroll container — where height lives. Give the box a
+     * starting height (`min-h-*`) or a different cap (`max-h-*`) here. Padding
+     * belongs to the content, not this.
+     */
+    editor?: string;
+  };
 };
 
 export function Composer({
@@ -75,6 +83,7 @@ export function Composer({
   history,
   autoFocus = false,
   className,
+  classNames,
 }: ComposerProps) {
   const [isEmpty, setIsEmpty] = useState(true);
   const submitReference = useRef<(() => void) | null>(null);
@@ -122,8 +131,8 @@ export function Composer({
               // from sm); a composer sizes to its content. Scrolling stays on
               // that container, so the content class only carries padding — two
               // nested scroll areas would fight each other.
-              className="max-h-64 min-h-0 sm:min-h-0"
-              contentClassName="px-3 py-2.5"
+              className={cn("max-h-64 min-h-0 sm:min-h-0", classNames?.editor)}
+              classNames={{ content: "px-3 py-2.5" }}
               format={format as "markdown"}
               onStatsChange={handleStatsChange}
               placeholder={placeholder}

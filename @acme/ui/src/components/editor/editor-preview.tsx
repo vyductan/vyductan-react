@@ -7,8 +7,10 @@ type EditorPreviewBaseProperties = {
   placeholder?: string;
   variant?: "default" | "simple" | "minimal";
   className?: string;
-  contentClassName?: string;
-  placeholderClassName?: string;
+  classNames?: {
+    content?: string;
+    placeholder?: string;
+  };
   autoFocus?: boolean;
   size?: SizeType;
 };

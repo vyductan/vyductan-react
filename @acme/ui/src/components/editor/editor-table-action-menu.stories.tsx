@@ -157,7 +157,7 @@ export const HandlesStraddleTheGridLineWhenPaddingIsTight: Story = {
   args: {
     value: editorRenderFixtures.table.serialized,
     variant: "simple",
-    contentClassName: "px-3 py-2",
+    classNames: { content: "px-3 py-2" },
     autoFocus: false,
     onChange: fn(),
   },

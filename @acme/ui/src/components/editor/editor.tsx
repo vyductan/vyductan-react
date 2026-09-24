@@ -54,9 +54,18 @@ type EditorPropertiesBase = {
    * link is the consumer's job.
    */
   resolvePasteLink?: ResolvePasteLink;
+  /** The scroll container that wraps the whole editor. */
   className?: string;
-  contentClassName?: string;
-  placeholderClassName?: string;
+  /**
+   * Per-part classes, the same shape the rest of the library uses. `content`
+   * lands on the editable area and `placeholder` on the text shown while it is
+   * empty — and because the placeholder inherits the content's padding, tuning
+   * `content` alone usually keeps the two aligned.
+   */
+  classNames?: {
+    content?: string;
+    placeholder?: string;
+  };
   /**
    * Take the caret on mount. Opt-in, like the DOM attribute of the same name:
    * an editor placed in a form is one field among several, and focusing itself
@@ -122,8 +131,7 @@ export function Editor({
   mentionsData,
   resolvePasteLink,
   className,
-  contentClassName,
-  placeholderClassName,
+  classNames,
   autoFocus = false,
   size = "middle",
   children,
@@ -163,8 +171,7 @@ export function Editor({
             mentionsData={mentionsData}
             resolvePasteLink={resolvePasteLink}
             className={className}
-            contentClassName={contentClassName}
-            placeholderClassName={placeholderClassName}
+            classNames={classNames}
             autoFocus={autoFocus}
             size={size}
           />

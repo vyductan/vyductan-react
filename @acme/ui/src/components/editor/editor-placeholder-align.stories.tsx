@@ -67,12 +67,12 @@ export const PlaceholderSitsWhereTheCaretWill: Story = {
 
 /**
  * The inset is hard-coded to the default padding, so it is a second source of
- * truth for the same number. Any consumer that retunes `contentClassName` — and
- * a compact surface always does — moves the caret without moving the prompt,
- * unless it remembers to hand-patch `placeholderClassName` too.
+ * truth for the same number. Any consumer that retunes `classNames.content` —
+ * and a compact surface always does — moves the caret without moving the
+ * prompt, unless it remembers to hand-patch `classNames.placeholder` too.
  */
 export const PlaceholderFollowsCustomPadding: Story = {
-  args: { variant: "simple", contentClassName: "px-3 py-2" },
+  args: { variant: "simple", classNames: { content: "px-3 py-2" } },
   play: async ({ canvasElement }) => {
     const placeholder = await waitFor(() => {
       const node = canvasElement.querySelector(
@@ -101,7 +101,7 @@ export const PlaceholderFollowsCustomPadding: Story = {
 
 /** The composer's configuration: minimal variant, compact padding, no manual offset. */
 export const PlaceholderAlignsInAMinimalEditor: Story = {
-  args: { variant: "minimal", contentClassName: "px-3 py-2.5" },
+  args: { variant: "minimal", classNames: { content: "px-3 py-2.5" } },
   play: async ({ canvasElement }) => {
     const placeholder = await waitFor(() => {
       const node = canvasElement.querySelector(
