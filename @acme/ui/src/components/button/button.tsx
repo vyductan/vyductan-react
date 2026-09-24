@@ -37,6 +37,17 @@ type ColorVariantPairType = [
 // instead of on every re-render.
 const warnedAccessibleName = new WeakSet<Element>();
 
+/**
+ * The button's opening tag, cut short: enough to find it (class, data-slot,
+ * data-variant) without handing the console the live node. Vitest's browser
+ * mode forwards console args to the terminal, and a DOM node serializes with
+ * its React fiber attached — 4-5MB per warning, ~135MB per storybook run.
+ */
+const describeElement = (element: Element) => {
+  const tag = element.outerHTML.slice(0, element.outerHTML.indexOf(">") + 1);
+  return tag.length > 200 ? `${tag.slice(0, 200)}…` : tag;
+};
+
 const ButtonTypeMap: Partial<Record<ButtonType, ColorVariantPairType>> = {
   default: ["default", "outlined"],
   primary: ["primary", "solid"],
@@ -113,7 +124,7 @@ const Button = ({
       warnedAccessibleName.add(element);
       console.warn(
         "Button: Buttons without visible text must have an accessible name. Provide 'aria-label', 'aria-labelledby', 'title', or sr-only text.",
-        element,
+        describeElement(element),
       );
     }
   });

@@ -30,6 +30,24 @@ test("icon-only button without any name warns once, not per re-render", () => {
   warn.mockRestore();
 });
 
+test("warning names the button in a short string, not the live element", () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+  /* eslint-disable-next-line acme-a11y/button-accessible-name -- nameless on purpose: the warning is what's under test */
+  render(<Button icon={<svg />} className={"x ".repeat(200)} />);
+
+  // Vitest's browser mode forwards console args to the terminal, and a DOM
+  // node serializes with its React fiber attached — megabytes per warning.
+  const [call] = a11yWarnings(warn);
+  expect(call).toBeDefined();
+  for (const argument of call!) {
+    expect(typeof argument).toBe("string");
+    expect(String(argument).length).toBeLessThan(400);
+  }
+  expect(call!.join(" ")).toContain("<button");
+  warn.mockRestore();
+});
+
 test("sr-only text inside the icon counts as an accessible name", () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
