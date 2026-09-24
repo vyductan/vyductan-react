@@ -7,6 +7,12 @@ import type { Rule } from "eslint";
  * children, `aria-label`, `aria-labelledby`, `title`, Button's `srOnly`
  * prop, or sr-only text inside the `icon` node (`<Icon srOnly="..." />`).
  *
+ * A button is icon-only when it has an `icon`/`loading` prop, or when every
+ * child is an icon element: `<svg>`, `<Icon>`, a `*Icon` component, or one
+ * imported from an icon module (`<Button><Minus /></Button>`). Any other
+ * child — text, an expression, a non-icon component — may render a name, so
+ * it is left alone rather than risk a false positive.
+ *
  * Elements with a spread attribute are skipped: the spread may carry a
  * label the rule can't see (the runtime warning still covers those).
  */
@@ -52,6 +58,15 @@ const NAME_ATTRIBUTES = new Set([
   "srOnly",
 ]);
 
+/** Modules whose exports are icon components. */
+const ICON_MODULE =
+  /^(?:lucide-react|@acme\/ui\/icons|@radix-ui\/react-icons|react-icons(?:\/.*)?|@tabler\/icons-react|@heroicons\/react(?:\/.*)?)$/;
+
+interface ImportDeclarationNode {
+  source: { value: unknown };
+  specifiers: { type: string; local: { name: string } }[];
+}
+
 const attributeName = (attribute: JsxAttribute | JsxSpreadAttribute) =>
   attribute.type === "JSXAttribute" && attribute.name.type === "JSXIdentifier"
     ? attribute.name.name
@@ -95,7 +110,49 @@ export const buttonAccessibleNameRule: Rule.RuleModule = {
     schema: [],
   },
   create(context) {
+    // Local names bound to icon components (`import { Minus } from
+    // "lucide-react"`) and to icon namespaces (`import * as Icons from ...`).
+    const iconImports = new Set<string>();
+    const iconNamespaces = new Set<string>();
+
+    const isIconElement = (child: JsxNode): boolean => {
+      if (child.type !== "JSXElement" || !child.openingElement) return false;
+      const name = child.openingElement.name;
+      if (name.type === "JSXIdentifier" && typeof name.name === "string") {
+        return (
+          name.name === "svg" ||
+          name.name === "Icon" ||
+          name.name.endsWith("Icon") ||
+          iconImports.has(name.name)
+        );
+      }
+      if (name.type === "JSXMemberExpression") {
+        const object = (name as unknown as { object: JsxNode }).object;
+        return (
+          object.type === "JSXIdentifier" &&
+          typeof object.name === "string" &&
+          (iconNamespaces.has(object.name) || /Icons?$/.test(object.name))
+        );
+      }
+      return false;
+    };
+
     return {
+      ImportDeclaration(estreeNode: Rule.Node) {
+        const node = estreeNode as unknown as ImportDeclarationNode;
+        if (
+          typeof node.source.value !== "string" ||
+          !ICON_MODULE.test(node.source.value)
+        ) {
+          return;
+        }
+        for (const specifier of node.specifiers) {
+          (specifier.type === "ImportNamespaceSpecifier"
+            ? iconNamespaces
+            : iconImports
+          ).add(specifier.local.name);
+        }
+      },
       JSXOpeningElement(estreeNode: Rule.Node) {
         const node = estreeNode as unknown as JsxOpeningElement & {
           parent?: JsxNode;
@@ -124,26 +181,29 @@ export const buttonAccessibleNameRule: Rule.RuleModule = {
             .filter((name): name is string => name !== undefined),
         );
 
-        // Only icon-only / loading-only buttons are in scope.
-        if (!names.has("icon") && !names.has("loading")) return;
-
         if ([...NAME_ATTRIBUTES].some((name) => names.has(name))) return;
 
-        // Children (non-whitespace) give the button visible text.
-        if (!node.selfClosing) {
-          const children = (node.parent?.children ?? []) as JsxNode[];
-          if (children.some((child) => containsTextOrSrOnly(child))) return;
-          if (
-            children.some(
+        const children = node.selfClosing
+          ? []
+          : ((node.parent?.children ?? []) as JsxNode[]).filter(
               (child) =>
                 child.type !== "JSXText" ||
                 (typeof child.value === "string" && child.value.trim() !== ""),
-            )
-          ) {
-            // Non-text children (elements/expressions) — assume they render
-            // something nameable rather than false-positive.
-            return;
-          }
+            );
+
+        // Visible text, or sr-only text, anywhere in the children names it.
+        if (children.some((child) => containsTextOrSrOnly(child))) return;
+
+        const iconOnlyChildren =
+          children.length > 0 &&
+          children.every((child) => isIconElement(child));
+        // Other children (expressions, non-icon components) may render a
+        // name — assume they do rather than false-positive.
+        if (children.length > 0 && !iconOnlyChildren) return;
+
+        // Only icon-only / loading-only buttons are in scope.
+        if (!iconOnlyChildren && !names.has("icon") && !names.has("loading")) {
+          return;
         }
 
         // sr-only text (or literal text) inside the icon counts as a name.
