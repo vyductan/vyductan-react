@@ -353,8 +353,12 @@ export const HandlesStayWithTheTableOnScroll: Story = {
   args: {
     value: editorRenderFixtures.table.serialized,
     variant: "simple",
-    // Short enough that the fixture overflows and the container can scroll.
-    className: "max-h-[180px] min-h-0 sm:min-h-0",
+    // Short enough that the fixture overflows and the container can scroll —
+    // whatever its columns do. 180px only overflowed while every column was
+    // fixed at 96px and the fixture's text wrapped into tall rows; sized by
+    // content, the table is shorter than that. Two rows of cells alone are
+    // taller than this.
+    className: "max-h-[100px] min-h-0 sm:min-h-0",
     autoFocus: false,
     onChange: fn(),
   },
@@ -419,7 +423,8 @@ export const HandlesDoNotLagAScroll: Story = {
   args: {
     value: editorRenderFixtures.table.serialized,
     variant: "simple",
-    className: "max-h-[180px] min-h-0 sm:min-h-0",
+    // See HandlesStayWithTheTableOnScroll for why it is this short.
+    className: "max-h-[100px] min-h-0 sm:min-h-0",
     autoFocus: false,
     onChange: fn(),
   },

@@ -132,10 +132,14 @@ export const richTextSemanticContract = {
     url: "RichTextSemanticContract__tokenOperator",
     variable: "RichTextSemanticContract__tokenVariable",
   },
+  // No width on the cell: until someone drags a column, what it holds decides
+  // how wide it is (see the table rules in themes/editor-theme.css). A fixed
+  // `w-24` gave every column 96px regardless, and a list of providers wrapped
+  // one word per line beside a nearly empty first column.
   table:
-    "RichTextSemanticContract__table w-fit overflow-scroll border-collapse",
+    "RichTextSemanticContract__table w-fit max-w-full overflow-scroll border-collapse",
   tableCell:
-    "RichTextSemanticContract__tableCell w-24 relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right",
+    "RichTextSemanticContract__tableCell relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right",
   tableCellHeader:
     "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right",
   hr: 'border-none my-2 mx-0 after:content-[""] after:block after:h-px after:bg-border',

@@ -34,11 +34,30 @@
     border-spacing: 0;
     overflow-y: auto;
     overflow-x: auto;
-    table-layout: fixed;
+    /* Content decides the columns until the table has widths of its own. */
+    table-layout: auto;
     width: 100%;
     margin: 4px 0;
     border-radius: 3px;
     border: 1px solid var(--border);
+  }
+
+  /*
+   * Lexical only renders a <colgroup> once a table has column widths, which is
+   * once someone has dragged a column; the published renderer does the same.
+   * From then on the widths are theirs, so the layout is fixed to them.
+   * Resizing starts from the measured layout, so the first drag picks up the
+   * widths the content produced rather than jumping.
+   */
+  .RichTextSemanticContract__table:has(> colgroup) {
+    table-layout: fixed;
+  }
+
+  /* Before then, a floor so an empty, freshly inserted table still has room to
+     type into — the 96px every column used to be fixed at. */
+  .RichTextSemanticContract__table:not(:has(> colgroup))
+    .RichTextSemanticContract__tableCell {
+    min-width: 6rem;
   }
 
   .RichTextSemanticContract__tableCell {
