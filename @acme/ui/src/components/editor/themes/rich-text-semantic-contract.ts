@@ -60,8 +60,15 @@ export const richTextSemanticContract = {
   // surfaces pick the pill up from a single place — and utilities outrank the
   // stylesheet's `@layer components`, which could not have turned the underline
   // off from there.
+  //
+  // The underline is the text's own color at 40%, 1px thick, and full
+  // strength on hover: faint enough that a linked address — or a code chip
+  // inside a link — is marked rather than struck through with a black rule,
+  // which is how Notion draws it. A fraction of `currentColor` is still no
+  // color of the link's own.
   link: cn(
     "text-inherit underline underline-offset-4",
+    "decoration-1 decoration-current/40 hover:decoration-current",
     "[&[rel~=mention]]:no-underline [&[rel~=mention]]:rounded-sm",
     "[&[rel~=mention]]:bg-muted [&[rel~=mention]]:px-1 [&[rel~=mention]]:py-0.5",
   ),
