@@ -31,6 +31,15 @@ import {
 } from "../../command";
 import { Popover, PopoverContent, PopoverTrigger } from "../../popover";
 import { CopyButton } from "../editor-ui/code-button";
+import { richTextSemanticContract } from "../themes/rich-text-semantic-contract";
+
+/**
+ * The class the theme actually gives a code block. This used to look for
+ * `code.EditorTheme__code`, the playground's name, which this theme renamed —
+ * so the hover matched nothing and the menu never appeared. Reading it off the
+ * contract keeps the two from drifting apart again.
+ */
+const CODE_BLOCK_SELECTOR = `code.${String(richTextSemanticContract.code)}`;
 
 const LANGUAGE_OPTIONS = Object.entries(
   CODE_LANGUAGE_FRIENDLY_NAME_MAP as Record<string, string>,
@@ -235,7 +244,7 @@ function getMouseInfo(event: MouseEvent | undefined): {
   const target = event.target;
 
   if (target && target instanceof HTMLElement) {
-    const codeDOMNode = target.closest<HTMLElement>("code.EditorTheme__code");
+    const codeDOMNode = target.closest<HTMLElement>(CODE_BLOCK_SELECTOR);
     const isOutside = !(
       codeDOMNode ??
       target.closest<HTMLElement>("div.code-action-menu-container") ??
