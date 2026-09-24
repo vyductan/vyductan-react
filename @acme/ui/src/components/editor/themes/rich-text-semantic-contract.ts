@@ -38,8 +38,10 @@ export const richTextSemanticContract = {
     h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px]",
   },
   paragraph: cn("leading-[24px]"),
-  quote:
-    "border-l-[3px] border-border pl-3.5 pr-0 my-1 italic text-muted-foreground",
+  // A quote is someone's words, not an aside: it reads in the same voice as
+  // the text around it, with the rule down its left the only thing marking it.
+  // Greying and italicising it made pasted quotes look like disclaimers.
+  quote: "border-l-[3px] border-current pl-3.5 pr-0 my-1",
   // No color and no decoration color: the link takes both from whatever page it
   // lands on. Published content has to look native in its host, and the host is
   // the only thing that knows its own link color.
@@ -82,9 +84,14 @@ export const richTextSemanticContract = {
   },
   text: {
     bold: "font-semibold",
-    // The muted fill is enough to mark inline code; leaving the color alone lets
-    // it stay legible on any background.
-    code: "bg-muted px-1 py-0.5 rounded text-[85%] font-mono",
+    // The muted fill alone left `<html>` too close to the prose around it to
+    // pick out at a glance. The color comes from the stylesheet, next to the
+    // syntax palette and for the same reason: a host has no token for "this is
+    // code" to lend.
+    code: cn(
+      "bg-muted px-1 py-0.5 rounded text-[85%] font-mono",
+      "RichTextSemanticContract__inlineCode",
+    ),
     italic: "italic",
     strikethrough: "line-through",
     subscript: "sub",

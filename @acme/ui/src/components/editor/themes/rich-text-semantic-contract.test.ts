@@ -158,6 +158,24 @@ describe("richTextSemanticContract", () => {
     expect(editorThemeCss).not.toContain(".inline-editor-image");
   });
 
+  test("marks inline code in its own color, defined for both modes", () => {
+    expect(richTextSemanticContract.text?.code).toContain(
+      "RichTextSemanticContract__inlineCode",
+    );
+    expect(editorThemeCss).toContain(".RichTextSemanticContract__inlineCode");
+    expect(editorThemeCss).toContain(
+      ":is(.dark *).RichTextSemanticContract__inlineCode",
+    );
+  });
+
+  test("leaves a quote reading in the same voice as the text around it", () => {
+    // The rule down its left is the mark. Greyed and italic, a pasted quote
+    // read as a disclaimer rather than as someone's words.
+    expect(richTextSemanticContract.quote).not.toContain("italic");
+    expect(richTextSemanticContract.quote).not.toContain("text-muted");
+    expect(richTextSemanticContract.quote).toContain("border-l");
+  });
+
   test("expresses color through theme tokens rather than literals", () => {
     // Published content has to follow the host's palette. A literal here pins it
     // to whichever theme the author happened to be looking at.

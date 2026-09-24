@@ -130,6 +130,12 @@ export const DarkModeFollowsTheme: Story = {
     };
     probe.remove();
 
+    const foregroundProbe = document.createElement("div");
+    foregroundProbe.className = "text-foreground";
+    dark.append(foregroundProbe);
+    const foreground = globalThis.getComputedStyle(foregroundProbe).color;
+    foregroundProbe.remove();
+
     const code = dark.querySelector<HTMLElement>("pre code");
     const quote = dark.querySelector<HTMLElement>("blockquote");
     const tableHeader = dark.querySelector<HTMLElement>("table th");
@@ -137,12 +143,13 @@ export const DarkModeFollowsTheme: Story = {
     expect(globalThis.getComputedStyle(code!).backgroundColor).toBe(
       expected.muted,
     );
-    expect(globalThis.getComputedStyle(quote!).color).toBe(
-      expected.mutedForeground,
-    );
-    expect(globalThis.getComputedStyle(quote!).borderLeftColor).toBe(
-      expected.border,
-    );
+    // A quote reads in the same voice as the text around it, so it takes the
+    // foreground rather than the muted one, and its rule is drawn in that same
+    // color rather than in the border token.
+    const quoteStyle = globalThis.getComputedStyle(quote!);
+    expect(quoteStyle.color).toBe(foreground);
+    expect(quoteStyle.borderLeftColor).toBe(quoteStyle.color);
+    expect(quoteStyle.color).not.toBe(expected.mutedForeground);
     expect(globalThis.getComputedStyle(tableHeader!).backgroundColor).toBe(
       expected.muted,
     );

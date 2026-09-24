@@ -57,6 +57,19 @@
   }
 
   /*
+   * Inline code, in the red Notion marks it with. Same reasoning as the syntax
+   * palette below: a host's tokens describe surfaces and text, not "this is
+   * code", so there is nothing to inherit.
+   */
+  .RichTextSemanticContract__inlineCode {
+    color: #d44c47;
+  }
+
+  :is(.dark *).RichTextSemanticContract__inlineCode {
+    color: #ff7369;
+  }
+
+  /*
    * Syntax colors are the one place a host cannot help: no CMS ships a
    * highlighting palette, so both themes are defined here. Light values are
    * Prism's defaults; dark values are lifted a step to hold contrast against a
