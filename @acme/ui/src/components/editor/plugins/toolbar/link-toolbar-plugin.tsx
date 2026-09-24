@@ -2,6 +2,7 @@ import type { BaseSelection } from "lexical";
 import { useCallback, useEffect, useState } from "react";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import {
+  $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_NORMAL,
   KEY_MODIFIER_COMMAND,
@@ -43,6 +44,14 @@ export function LinkToolbarPlugin() {
         const { code, ctrlKey, metaKey } = event;
 
         if (code === "KeyK" && (ctrlKey || metaKey)) {
+          // Like Notion: ⌘K links the selected text (or unlinks the link under
+          // the caret). With nothing selected, leave the key to the page so it
+          // can open its command palette.
+          const selection = $getSelection();
+          const hasTextSelected =
+            $isRangeSelection(selection) && !selection.isCollapsed();
+          if (!hasTextSelected && !isLink) return false;
+
           event.preventDefault();
           let url: string | null;
           if (isLink) {
