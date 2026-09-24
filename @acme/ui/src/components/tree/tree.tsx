@@ -422,6 +422,7 @@ function TreeNode({
               variant="text"
               size="small"
               className="hover:bg-accent h-6 w-6 shrink-0 p-0"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
               onClick={handleToggle}
             >
               <ChevronRight

@@ -27,7 +27,12 @@ export function ClearEditorActionPlugin() {
       <TooltipRoot disableHoverableContent>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size="small" variant="text" className="p-2">
+            <Button
+              size="small"
+              variant="text"
+              className="p-2"
+              aria-label="Clear editor"
+            >
               <Trash2Icon className="h-4 w-4" />
             </Button>
           </DialogTrigger>

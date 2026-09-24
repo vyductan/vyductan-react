@@ -468,6 +468,7 @@ function FloatingLinkEditor({
             type="button"
             variant="ghost"
             size="icon"
+            aria-label="Cancel"
             onClick={() => {
               setIsLinkEditMode(false);
               setIsLink(false);
@@ -501,6 +502,7 @@ function FloatingLinkEditor({
           <Button
             type="button"
             size="icon"
+            aria-label="Save link"
             onClick={handleLinkSubmission}
             className="h-8 w-8 shrink-0"
           >
