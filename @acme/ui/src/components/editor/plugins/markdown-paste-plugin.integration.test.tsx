@@ -374,6 +374,18 @@ test("pastes a whole markdown document into the real editor", async () => {
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks.length).toBeGreaterThan(5);
+
+  // The box-drawing block in the fixture is fenced, and arrives as a code
+  // block rather than a run of paragraphs.
+  const types = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getType()),
+    );
+
+  expect(types).toContain("code");
 });
 
 /**
@@ -524,4 +536,72 @@ test("pastes with the caret inside a code block", async () => {
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks[0]).toContain("Trong lập trình web");
   expect(blocks[0]).not.toContain("###");
+});
+
+/**
+ * A fenced block is the one piece of markdown that spans lines, and pasting a
+ * note from a chat is the common way one arrives. Typing ``` mid-sentence
+ * turning into a code block is a different question — that is the shortcut
+ * plugin, and it stays off.
+ */
+test("pastes a fenced block as a code block", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const paragraph = $createParagraphNode();
+      paragraph.append($createTextNode("Before"));
+      root.append(paragraph);
+      paragraph.selectEnd();
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain"
+            ? ["Intro line", "", "```", "const x = 1;", "```", ""].join("\n")
+            : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const types = live
+    .getEditorState()
+    .read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => child.getType()),
+    );
+
+  expect(types).toContain("code");
 });
