@@ -44,6 +44,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: "unit",
+          sequence: { groupOrder: 1 },
           environment: "jsdom",
           setupFiles: ["./vitest-setup.unit.ts"],
           include: ["src/**/*.{test,spec}.{ts,tsx}"],
@@ -68,6 +69,15 @@ export default defineConfig({
         plugins: [tailwindcss()],
         test: {
           name: "browser",
+          // Run before storybook, never alongside it. Every `userEvent` call is
+          // a Playwright action driven from vitest's main process — a dozen or
+          // more CDP round trips, each waiting on that one event loop — and
+          // storybook's Vite server saturates it for most of its run. Under
+          // that load a single hover took 13s while the page itself stayed
+          // responsive (two rAFs in ~10ms), so the draggable-block test blew
+          // its 15s budget before reaching the menu. Tests that only read the
+          // DOM were unaffected; only real input queues behind storybook.
+          sequence: { groupOrder: 0 },
           include: ["src/**/*.browser.test.{ts,tsx}"],
           setupFiles: ["./vitest-setup.touch.ts"],
           browser: {
@@ -87,6 +97,8 @@ export default defineConfig({
         plugins: [tailwindcss()],
         test: {
           name: "touch",
+          // Real input too — see the `browser` project.
+          sequence: { groupOrder: 0 },
           include: ["src/**/*.touch.test.{ts,tsx}"],
           setupFiles: ["./vitest-setup.touch.ts"],
           browser: {
@@ -113,6 +125,7 @@ export default defineConfig({
         ],
         test: {
           name: "storybook",
+          sequence: { groupOrder: 1 },
           // globals: true,
           // No include - Storybook 8.5.0+ uses stories field from Storybook config
           browser: {
