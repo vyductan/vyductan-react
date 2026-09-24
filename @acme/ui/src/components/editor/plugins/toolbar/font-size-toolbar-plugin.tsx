@@ -59,6 +59,7 @@ export function FontSizeToolbarPlugin() {
           variant="outlined"
           shape="icon"
           className="h-8 w-8"
+          aria-label="Decrease font size"
           onClick={() => updateFontSize(fontSize - 1)}
           disabled={fontSize <= MIN_FONT_SIZE}
         >
@@ -69,6 +70,7 @@ export function FontSizeToolbarPlugin() {
           onChange={(e) =>
             updateFontSize(Number.parseInt(e.target.value) || DEFAULT_FONT_SIZE)
           }
+          aria-label="Font size"
           className="h-8 w-12 text-center"
           min={MIN_FONT_SIZE}
           max={MAX_FONT_SIZE}
@@ -77,6 +79,7 @@ export function FontSizeToolbarPlugin() {
           variant="outlined"
           shape="icon"
           className="h-8 w-8"
+          aria-label="Increase font size"
           onClick={() => updateFontSize(fontSize + 1)}
           disabled={fontSize >= MAX_FONT_SIZE}
         >
