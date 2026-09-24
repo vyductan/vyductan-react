@@ -29,15 +29,23 @@ export type RichTextSemanticContract = Pick<
 >;
 
 export const richTextSemanticContract = {
+  // Block spacing, after Notion. Every block used to sit flush against the
+  // next: two paragraphs read as one with a line break in it, and a heading was
+  // as close to the text before it as to its own, so it marked no break.
+  //
+  // A heading gets room above, scaled with its size, and stays close to what
+  // it introduces; vertical margins collapse, so the larger of two neighbours'
+  // margins is the gap. `first:mt-0` keeps a note that opens with a heading
+  // from starting lower on the page.
   heading: {
-    h1: "scroll-m-20 text-3xl font-bold tracking-tight leading-[44px]",
-    h2: "scroll-m-20 text-2xl font-semibold tracking-tight leading-[36px]",
-    h3: "scroll-m-20 text-xl font-semibold tracking-tight leading-[32px]",
-    h4: "scroll-m-20 text-lg font-semibold tracking-tight leading-[28px]",
-    h5: "scroll-m-20 text-base font-semibold tracking-tight leading-[24px]",
-    h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px]",
+    h1: "scroll-m-20 text-3xl font-bold tracking-tight leading-[44px] mt-8 mb-1 first:mt-0",
+    h2: "scroll-m-20 text-2xl font-semibold tracking-tight leading-[36px] mt-6 mb-1 first:mt-0",
+    h3: "scroll-m-20 text-xl font-semibold tracking-tight leading-[32px] mt-4 mb-1 first:mt-0",
+    h4: "scroll-m-20 text-lg font-semibold tracking-tight leading-[28px] mt-3 mb-1 first:mt-0",
+    h5: "scroll-m-20 text-base font-semibold tracking-tight leading-[24px] mt-3 mb-1 first:mt-0",
+    h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px] mt-3 mb-1 first:mt-0",
   },
-  paragraph: cn("leading-[24px]"),
+  paragraph: cn("leading-[24px] my-1.5"),
   // A quote is someone's words, not an aside: it reads in the same voice as
   // the text around it, with the rule down its left the only thing marking it.
   // Greying and italicising it made pasted quotes look like disclaimers.
@@ -132,6 +140,8 @@ export const richTextSemanticContract = {
     url: "RichTextSemanticContract__tokenOperator",
     variable: "RichTextSemanticContract__tokenVariable",
   },
+  // A cell's paragraphs take no block spacing: it is for running text, and in a
+  // cell it only makes every row taller.
   // No width on the cell: until someone drags a column, what it holds decides
   // how wide it is (see the table rules in themes/editor-theme.css). A fixed
   // `w-24` gave every column 96px regardless, and a list of providers wrapped
@@ -139,9 +149,9 @@ export const richTextSemanticContract = {
   table:
     "RichTextSemanticContract__table w-fit max-w-full overflow-scroll border-collapse",
   tableCell:
-    "RichTextSemanticContract__tableCell relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right",
+    "RichTextSemanticContract__tableCell relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right [&>p]:my-0",
   tableCellHeader:
-    "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right",
+    "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right [&>p]:my-0",
   hr: 'border-none my-2 mx-0 after:content-[""] after:block after:h-px after:bg-border',
   checkBlock:
     'flex items-start gap-2 my-1 *:data-[lexical-text="true"]:flex-1 *:data-[lexical-text="true"]:min-w-0',
