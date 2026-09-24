@@ -45,3 +45,39 @@ describe("hasMarkdownPasteSyntax", () => {
     ).toBe(true);
   });
 });
+
+describe("dropEmptyBlockquoteLines", () => {
+  const dropEmptyBlockquoteLines = (
+    markdownPastePlugin as Record<string, unknown>
+  ).dropEmptyBlockquoteLines as ((text: string) => string) | undefined;
+
+  test("is exported", () => {
+    expect(dropEmptyBlockquoteLines).toBeTypeOf("function");
+  });
+
+  /**
+   * Markdown from a chat often closes a quote with a bare ">", meaning an empty
+   * line inside it. Lexical's quote transformer wants "> " with the space, so
+   * the lone marker fell through as text and the quote ended with a stray ">".
+   */
+  test("drops a line that is only a blockquote marker", () => {
+    expect(dropEmptyBlockquoteLines?.(["> Quoted words", ">", ""].join("\n")))
+      .toBe(["> Quoted words", ""].join("\n"));
+  });
+
+  test("drops it with trailing spaces too", () => {
+    expect(dropEmptyBlockquoteLines?.("> Quoted\n>   \n")).toBe(
+      "> Quoted\n",
+    );
+  });
+
+  test("leaves a quote line that has words on it", () => {
+    const text = "> Quoted\n> still quoted\n";
+    expect(dropEmptyBlockquoteLines?.(text)).toBe(text);
+  });
+
+  test("leaves a bare > inside a fenced block alone", () => {
+    const text = ["```", "> not a quote", ">", "```", ""].join("\n");
+    expect(dropEmptyBlockquoteLines?.(text)).toBe(text);
+  });
+});

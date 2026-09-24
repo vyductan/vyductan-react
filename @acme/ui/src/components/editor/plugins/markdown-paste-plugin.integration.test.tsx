@@ -386,6 +386,12 @@ test("pastes a whole markdown document into the real editor", async () => {
     );
 
   expect(types).toContain("code");
+
+  // The fixture closes its quote with a bare ">", which means an empty line
+  // inside the quote, not a character to show.
+  expect(types).toContain("quote");
+  expect(blocks.some((block) => block.trim() === ">")).toBe(false);
+  expect(blocks.some((block) => block.trimEnd().endsWith(">"))).toBe(false);
 });
 
 /**

@@ -64,6 +64,33 @@ export function normalizeMarkdownPasteForLists(text: string): string {
     .join("\n");
 }
 
+/**
+ * Drops lines that are nothing but a blockquote marker.
+ *
+ * Markdown from a chat often closes a quote with a bare ">", meaning an empty
+ * line inside it. Lexical's quote transformer matches "> " with the space, so
+ * the lone marker fell through as ordinary text and the quote ended with a
+ * stray ">" on its own line. A Lexical quote is one block, so an empty
+ * continuation has nothing to carry anyway.
+ *
+ * Inside a fenced block a ">" is just a character, so fences are left alone.
+ */
+export function dropEmptyBlockquoteLines(text: string): string {
+  let insideFence = false;
+
+  return text
+    .split("\n")
+    .filter((line) => {
+      if (/^\s*```/.test(line)) {
+        insideFence = !insideFence;
+        return true;
+      }
+
+      return insideFence || !/^\s*>\s*$/.test(line);
+    })
+    .join("\n");
+}
+
 function collapseMarkdownListWrappers(nodes: LexicalNode[]) {
   for (const node of nodes) {
     collapseMarkdownListWrappersInNode(node);
@@ -149,7 +176,9 @@ export function MarkdownPastePlugin(): null {
           return false;
         }
 
-        const normalizedText = normalizeMarkdownPasteForLists(text);
+        const normalizedText = dropEmptyBlockquoteLines(
+          normalizeMarkdownPasteForLists(text),
+        );
 
         if (!hasMarkdownPasteSyntax(normalizedText)) {
           // Not markdown, let default paste handler deal with it
