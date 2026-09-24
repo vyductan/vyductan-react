@@ -57,6 +57,33 @@ linkWorkspacePackages: true
 overrides:
   date-fns: ^4.4.0
 
+  # Security overrides. Everything below is a transitive dependency that its
+  # parent pins to an exact vulnerable version, so `pnpm update` cannot reach
+  # the patched release and there is no newer parent to upgrade to. Drop an
+  # entry once its parent ships a fix.
+
+  # @excalidraw/excalidraw@0.18.1 (latest) pins `nanoid: 3.3.3` exactly, and its
+  # @excalidraw/mermaid-to-excalidraw@2.2.2 pins `nanoid: 4.0.2` exactly.
+  # GHSA-mwcw-c2x4-8c55, GHSA-2v37-7h3g-55p8, GHSA-28wg-ghj8-5hjv.
+  nanoid@>=4.0.0 <5.1.16: ">=5.1.16 <6"
+  nanoid@<3.3.18: ">=3.3.18 <4"
+
+  # chevrotain@11.0.3 pins `lodash-es: 4.17.21` exactly. chevrotain 13 dropped
+  # lodash-es entirely, but mermaid-to-excalidraw pins @mermaid-js/parser ^0.6.3
+  # which caps chevrotain at 11. GHSA-xxjr-mmjv-4gpg, GHSA-f23m-r3pf-42rh,
+  # GHSA-r5fr-rjxr-66jc.
+  lodash-es@<4.18.0: ">=4.18.0 <5"
+
+  # drizzle-kit still depends on the deprecated @esbuild-kit/esm-loader, which
+  # pins esbuild ~0.18. Build-time only. GHSA-67mh-4wv8-2f99.
+  esbuild@<0.25.0: ">=0.25.0"
+
+  # valibot is not a direct dependency anywhere and is unused in source; it is
+  # auto-installed as a peer of adapters we do not call. Peer resolution settles
+  # on 1.2.0 even though @valibot/to-json-schema asks for ^1.4.0.
+  # GHSA-5qjj-4xww-7phc.
+  valibot@<1.4.2: ">=1.4.2 <2"
+
 allowBuilds:
   "@swc/core": true
   "@tailwindcss/oxide": true
