@@ -46,6 +46,34 @@ describe("hasMarkdownPasteSyntax", () => {
   });
 });
 
+describe("hasMarkdownPasteSyntax on tables", () => {
+  const hasMarkdownPasteSyntax = (
+    markdownPastePlugin as Record<string, unknown>
+  ).hasMarkdownPasteSyntax as ((text: string) => boolean) | undefined;
+
+  /**
+   * A table on its own has none of the line starts the other checks look for,
+   * so a paste holding only a table was taken for plain text and came in as a
+   * run of lines full of pipes. Its delimiter row is what gives it away.
+   */
+  test.each([
+    ["piped", "| Tiêu chí | Chi tiết |\n| --- | --- |\n| a | b |"],
+    ["aligned", "| Left | Right |\n|:---|---:|\n| a | b |"],
+    ["unpiped edges", "Tiêu chí | Chi tiết\n--- | ---\na | b"],
+    ["single column", "| Only |\n| --- |\n| a |"],
+  ])("recognizes a %s table", (_name, text) => {
+    expect(hasMarkdownPasteSyntax?.(text)).toBe(true);
+  });
+
+  test.each([
+    ["a sentence with a pipe", "Pick one | or the other"],
+    ["a range with a dash", "Open 9 - 5 | Mon to Fri"],
+    ["a rule on its own", "Above\n---\nBelow"],
+  ])("leaves %s alone", (_name, text) => {
+    expect(hasMarkdownPasteSyntax?.(text)).toBe(false);
+  });
+});
+
 describe("dropEmptyBlockquoteLines", () => {
   const dropEmptyBlockquoteLines = (
     markdownPastePlugin as Record<string, unknown>
@@ -61,14 +89,13 @@ describe("dropEmptyBlockquoteLines", () => {
    * the lone marker fell through as text and the quote ended with a stray ">".
    */
   test("drops a line that is only a blockquote marker", () => {
-    expect(dropEmptyBlockquoteLines?.(["> Quoted words", ">", ""].join("\n")))
-      .toBe(["> Quoted words", ""].join("\n"));
+    expect(
+      dropEmptyBlockquoteLines?.(["> Quoted words", ">", ""].join("\n")),
+    ).toBe(["> Quoted words", ""].join("\n"));
   });
 
   test("drops it with trailing spaces too", () => {
-    expect(dropEmptyBlockquoteLines?.("> Quoted\n>   \n")).toBe(
-      "> Quoted\n",
-    );
+    expect(dropEmptyBlockquoteLines?.("> Quoted\n>   \n")).toBe("> Quoted\n");
   });
 
   test("leaves a quote line that has words on it", () => {

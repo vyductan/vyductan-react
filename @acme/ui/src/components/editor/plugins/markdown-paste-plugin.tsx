@@ -21,8 +21,21 @@ import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transfo
 const MARKDOWN_PASTE_SYNTAX_REGEXP =
   /^#{1,6}\s|^\s*\*\s|^\s*-\s|^\s*\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m;
 
+/**
+ * A table's delimiter row: nothing but pipes, dashes, colons and spaces, with
+ * at least one pipe and one dash — `| --- | :---: |`, or `--- | ---` without the
+ * outer pipes. A table has none of the line starts the pattern above looks
+ * for, so without this a paste holding only a table was taken for plain text.
+ * Requiring both characters, and nothing else on the line, keeps a sentence
+ * with a pipe in it and a bare `---` rule out.
+ */
+const MARKDOWN_TABLE_DELIMITER_REGEXP = /^(?=[^\n]*\|)(?=[^\n]*-)[\t |:-]+$/m;
+
 export function hasMarkdownPasteSyntax(text: string): boolean {
-  return MARKDOWN_PASTE_SYNTAX_REGEXP.test(text);
+  return (
+    MARKDOWN_PASTE_SYNTAX_REGEXP.test(text) ||
+    MARKDOWN_TABLE_DELIMITER_REGEXP.test(text)
+  );
 }
 
 export function normalizeMarkdownPasteForLists(text: string): string {

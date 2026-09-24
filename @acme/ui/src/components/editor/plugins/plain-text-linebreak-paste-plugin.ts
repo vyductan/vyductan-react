@@ -7,6 +7,11 @@ import {
   PASTE_COMMAND,
 } from "lexical";
 
+import {
+  hasMarkdownPasteSyntax,
+  normalizeMarkdownPasteForLists,
+} from "./markdown-paste-plugin";
+
 const HTML_LINEBREAK_STRUCTURE_SELECTOR =
   "br, p, div, li, ul, ol, blockquote, pre, h1, h2, h3, h4, h5, h6, table, thead, tbody, tfoot, tr, td, th";
 
@@ -67,12 +72,11 @@ export function PlainTextLinebreakPastePlugin(): null {
           return false;
         }
 
-        const hasMarkdownSyntax =
-          /^#{1,6}\s|^\*\s|^-\s|^\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m.test(
-            text,
-          );
-
-        if (hasMarkdownSyntax) {
+        // Markdown is the markdown plugin's to handle. This asks the same
+        // question it does rather than keeping a copy of the check: the copy
+        // had drifted, and missed tables entirely, so a pasted table was
+        // claimed here as plain text before the markdown plugin saw it.
+        if (hasMarkdownPasteSyntax(normalizeMarkdownPasteForLists(text))) {
           return false;
         }
 

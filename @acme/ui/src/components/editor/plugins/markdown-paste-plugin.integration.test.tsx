@@ -2,6 +2,7 @@ import "@testing-library/jest-dom/vitest";
 
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
+import { $createCodeNode } from "@lexical/code";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -19,8 +20,6 @@ import {
   PASTE_COMMAND,
 } from "lexical";
 import { afterEach, expect, test, vi } from "vitest";
-
-import { $createCodeNode } from "@lexical/code";
 
 import { Editor } from "../editor";
 import { nodes } from "../nodes/nodes";
@@ -220,13 +219,11 @@ test("pastes where the caret is, not at the end of the document", async () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
-  const blocks = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getTextContent()),
-    );
+  const blocks = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getTextContent()),
+  );
 
   // The first pasted block merges into the line the caret is on, the way any
   // insert at a caret does. What matters is that it happens there.
@@ -276,7 +273,8 @@ test("pastes a whole markdown document without throwing", async () => {
   act(() => {
     live.dispatchCommand(PASTE_COMMAND, {
       clipboardData: {
-        getData: (type: string) => (type === "text/plain" ? pastedShellNote : ""),
+        getData: (type: string) =>
+          type === "text/plain" ? pastedShellNote : "",
       },
       preventDefault,
     } as unknown as ClipboardEvent);
@@ -289,13 +287,11 @@ test("pastes a whole markdown document without throwing", async () => {
   removeErrorListener();
   expect(onError).not.toHaveBeenCalled();
 
-  const blocks = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getTextContent()),
-    );
+  const blocks = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getTextContent()),
+  );
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks.length).toBeGreaterThan(3);
@@ -364,26 +360,22 @@ test("pastes a whole markdown document into the real editor", async () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
-  const blocks = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getTextContent()),
-    );
+  const blocks = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getTextContent()),
+  );
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks.length).toBeGreaterThan(5);
 
   // The box-drawing block in the fixture is fenced, and arrives as a code
   // block rather than a run of paragraphs.
-  const types = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getType()),
-    );
+  const types = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getType()),
+  );
 
   expect(types).toContain("code");
 
@@ -458,13 +450,11 @@ test("pastes with the caret in the middle of a line", async () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
-  const blocks = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getTextContent()),
-    );
+  const blocks = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getTextContent()),
+  );
 
   expect(blocks[0]).toContain("First");
   expect(blocks.at(-1)).toBe("Last block");
@@ -531,13 +521,11 @@ test("pastes with the caret inside a code block", async () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
-  const blocks = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getTextContent()),
-    );
+  const blocks = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getTextContent()),
+  );
 
   expect(blocks.at(-1)).toBe("Last block");
   expect(blocks[0]).toContain("Trong lập trình web");
@@ -601,13 +589,83 @@ test("pastes a fenced block as a code block", async () => {
     expect(preventDefault).toHaveBeenCalled();
   });
 
-  const types = live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((child) => child.getType()),
-    );
+  const types = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getType()),
+  );
 
   expect(types).toContain("code");
+});
+
+/**
+ * A table and nothing else, copied from a chat as plain text. Both paste
+ * handlers used to take it for plain text — the one that runs first most of
+ * all, since it kept its own copy of the check — and it came in as lines of
+ * pipes.
+ */
+test("pastes a table on its own as a table", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const paragraph = $createParagraphNode();
+      root.append(paragraph);
+      paragraph.select();
+    });
+  });
+
+  const preventDefault = vi.fn();
+
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain"
+            ? [
+                "| Tiêu chí | Chi tiết |",
+                "| --- | --- |",
+                "| **Dịch vụ hỗ trợ** | Gmail, Outlook, iCloud Mail |",
+              ].join("\n")
+            : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  const types = live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) => child.getType()),
+  );
+
+  expect(types).toContain("table");
+  expect(
+    live.getEditorState().read(() => $getRoot().getTextContent()),
+  ).not.toContain("| ---");
 });
