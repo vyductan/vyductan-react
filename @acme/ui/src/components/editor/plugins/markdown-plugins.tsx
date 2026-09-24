@@ -9,7 +9,7 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
-import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 // Plugin to initialize editor with markdown content
 function InitialMarkdownPlugin({ markdown }: { markdown: string }) {
@@ -22,7 +22,7 @@ function InitialMarkdownPlugin({ markdown }: { markdown: string }) {
     // Only initialize if markdown is provided and not empty
     if (markdown) {
       editor.update(() => {
-        $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS);
+        $convertFromMarkdownString(markdown, MARKDOWN_DOCUMENT_TRANSFORMERS);
       });
     }
 
@@ -51,7 +51,9 @@ export function MarkdownPlugins({
         ignoreSelectionChange={true}
         onChange={(editorState) => {
           editorState.read(() => {
-            const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+            const markdown = $convertToMarkdownString(
+              MARKDOWN_DOCUMENT_TRANSFORMERS,
+            );
             onChange?.(markdown, editorState);
           });
         }}

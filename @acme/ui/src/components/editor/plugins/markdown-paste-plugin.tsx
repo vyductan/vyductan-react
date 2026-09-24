@@ -4,10 +4,7 @@ import type { ListNode } from "@lexical/list";
 import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isListItemNode, $isListNode } from "@lexical/list";
-import {
-  $generateNodesFromMarkdownString,
-  MULTILINE_ELEMENT_TRANSFORMERS,
-} from "@lexical/markdown";
+import { $generateNodesFromMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
@@ -19,19 +16,7 @@ import {
   PASTE_COMMAND,
 } from "lexical";
 
-import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
-
-/**
- * The shared list leaves the multiline transformers out on purpose: they drive
- * the typing shortcuts too, and a ``` typed mid-sentence turning into a code
- * block was not wanted. A paste is not typing — the fence is already whole, and
- * the text it wraps is the reason someone is pasting it — so it is honoured
- * here without changing what typing does.
- */
-const PASTE_TRANSFORMERS = [
-  ...MARKDOWN_TRANSFORMERS,
-  ...MULTILINE_ELEMENT_TRANSFORMERS,
-];
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 const MARKDOWN_PASTE_SYNTAX_REGEXP =
   /^#{1,6}\s|^\s*\*\s|^\s*-\s|^\s*\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m;
@@ -209,7 +194,7 @@ export function MarkdownPastePlugin(): null {
           const target = currentSelection.clone();
           const children = $generateNodesFromMarkdownString(
             normalizedText,
-            PASTE_TRANSFORMERS,
+            MARKDOWN_DOCUMENT_TRANSFORMERS,
           );
 
           collapseMarkdownListWrappers(children);

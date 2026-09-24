@@ -13,7 +13,7 @@ import { $getRoot, createEditor } from "lexical";
 
 import type { LexicalEditorContent } from "../types";
 import { nodes } from "../nodes/nodes";
-import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 /**
  * Convert LexicalEditorContent to markdown string
@@ -43,7 +43,7 @@ export function lexicalContentToMarkdown(
 
     // Read the editor state and convert to markdown
     editorState.read(() => {
-      markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+      markdown = $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS);
     });
 
     return markdown;
@@ -97,7 +97,7 @@ export function tryMarkdownToLexicalContent(
       () => {
         const root = $getRoot();
         root.clear();
-        $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS);
+        $convertFromMarkdownString(markdown, MARKDOWN_DOCUMENT_TRANSFORMERS);
       },
       { discrete: true },
     );
@@ -131,7 +131,7 @@ export function getMarkdownFromEditor(editor: LexicalEditor): string {
   try {
     let markdown = "";
     editor.getEditorState().read(() => {
-      markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+      markdown = $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS);
     });
     return markdown;
   } catch (error) {

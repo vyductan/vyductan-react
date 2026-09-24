@@ -8,7 +8,7 @@ import {
 } from "@lexical/list";
 import {
   ELEMENT_TRANSFORMERS,
-  // MULTILINE_ELEMENT_TRANSFORMERS - TẮT để tránh tự động convert markdown syntax
+  MULTILINE_ELEMENT_TRANSFORMERS,
   TEXT_FORMAT_TRANSFORMERS,
   TEXT_MATCH_TRANSFORMERS,
 } from "@lexical/markdown";
@@ -122,8 +122,24 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
     trigger: " ",
     type: "text-match",
   },
-  // MULTILINE_ELEMENT_TRANSFORMERS - TẮT để tránh tự động convert markdown syntax
-  // ...MULTILINE_ELEMENT_TRANSFORMERS,
+  // No multiline transformers here: this list also drives the typing
+  // shortcuts, and ``` typed mid-sentence must not become a code block.
+  // Whole-document conversion adds them — see MARKDOWN_DOCUMENT_TRANSFORMERS.
   ...TEXT_FORMAT_TRANSFORMERS,
   ...TEXT_MATCH_TRANSFORMERS,
+];
+
+/**
+ * For converting a whole document to or from markdown: export, import, the
+ * markdown toggle, paste.
+ *
+ * `MARKDOWN_TRANSFORMERS` leaves the multiline transformers out, and it has to:
+ * it also drives the typing shortcuts, and a ``` typed mid-sentence turning
+ * into a code block was not wanted. But converting a document is not typing.
+ * Without these a code block exported as escaped backticks and came back as a
+ * run of paragraphs.
+ */
+export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
+  ...MARKDOWN_TRANSFORMERS,
+  ...MULTILINE_ELEMENT_TRANSFORMERS,
 ];

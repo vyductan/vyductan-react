@@ -22,7 +22,7 @@ import {
   TooltipTrigger,
 } from "@acme/ui/components/tooltip";
 
-import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
 
 /**
  * Export to PDF using browser print functionality
@@ -33,7 +33,7 @@ function exportToPDF(editor: LexicalEditor, fileName: string) {
 
   editorState.read(() => {
     const _root = $getRoot();
-    const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+    const markdown = $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS);
 
     // Convert markdown to HTML for better PDF rendering
     // Simple markdown to HTML conversion
@@ -109,7 +109,7 @@ function exportToWord(editor: LexicalEditor, fileName: string) {
 
   editorState.read(() => {
     const _root = $getRoot();
-    const markdown = $convertToMarkdownString(MARKDOWN_TRANSFORMERS);
+    const markdown = $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS);
 
     // Convert markdown to HTML
     htmlContent = markdown

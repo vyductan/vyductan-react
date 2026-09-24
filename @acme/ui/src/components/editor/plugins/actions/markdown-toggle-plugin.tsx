@@ -10,7 +10,7 @@ import { FileTextIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
 
-import { MARKDOWN_TRANSFORMERS } from "../../transformers/markdown-transformers";
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../../transformers/markdown-transformers";
 
 export function MarkdownTogglePlugin({
   shouldPreserveNewLinesInMarkdown,
@@ -26,13 +26,13 @@ export function MarkdownTogglePlugin({
       if ($isCodeNode(firstChild) && firstChild.getLanguage() === "markdown") {
         $convertFromMarkdownString(
           firstChild.getTextContent(),
-          MARKDOWN_TRANSFORMERS,
+          MARKDOWN_DOCUMENT_TRANSFORMERS,
           undefined, // node
           shouldPreserveNewLinesInMarkdown,
         );
       } else {
         const markdown = $convertToMarkdownString(
-          MARKDOWN_TRANSFORMERS,
+          MARKDOWN_DOCUMENT_TRANSFORMERS,
           undefined, //node
           shouldPreserveNewLinesInMarkdown,
         );

@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 
+import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 import {
   EMPTY_LEXICAL_EDITOR_CONTENT,
+  lexicalContentToMarkdown,
   markdownToLexicalContent,
   tryMarkdownToLexicalContent,
 } from "./lexical-converter";
@@ -61,5 +63,45 @@ describe("markdownToLexicalContent", () => {
         },
       }),
     ).toEqual(EMPTY_LEXICAL_EDITOR_CONTENT);
+  });
+});
+
+/**
+ * A code block has to survive the trip to markdown and back. The shared
+ * transformer list leaves the multiline ones out so that typing ``` does not
+ * turn a sentence into a code block — but converting a document is not typing,
+ * and without them a code block exported as bare lines and came back as
+ * paragraphs.
+ */
+describe("code blocks", () => {
+  const markdown = ["Before", "", "```js", "const x = 1;", "```", ""].join(
+    "\n",
+  );
+
+  test("import as a code block", () => {
+    const content = markdownToLexicalContent(markdown);
+    const types = content.root.children.map((child) => child.type);
+
+    expect(types).toContain("code");
+  });
+
+  test("export with their fence and language", () => {
+    const exported = lexicalContentToMarkdown(
+      markdownToLexicalContent(markdown),
+    );
+
+    expect(exported).toContain("```js");
+    expect(exported).toContain("const x = 1;");
+    expect(exported.match(/```/g)).toHaveLength(2);
+  });
+
+  test("stay out of the list that drives typing shortcuts", () => {
+    // Typing ``` mid-sentence must not turn the line into a code block; only
+    // whole-document conversion gets the multiline transformers.
+    expect(
+      MARKDOWN_TRANSFORMERS.some(
+        (transformer) => transformer.type === "multiline-element",
+      ),
+    ).toBe(false);
   });
 });
