@@ -139,3 +139,27 @@ test("an image on the last line gets a new empty line to put the caret in", asyn
     2,
   );
 });
+
+test("the caret never shows beside the image on the way down", async () => {
+  const { image } = await renderWithImage("text");
+  const imageLine = image.closest("p")!;
+
+  // Where the caret is at mouseup: after the browser placed it on mousedown,
+  // before `click`. The old path moved it only on `click`, so between the two
+  // it sat beside the image and was painted there for a frame.
+  const seen: boolean[] = [];
+  const record = () => {
+    const anchor = globalThis.getSelection()?.anchorNode ?? null;
+    seen.push(anchor !== null && imageLine.contains(anchor));
+  };
+  document.addEventListener("mouseup", record, true);
+  try {
+    await clickRightOf(image);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  } finally {
+    document.removeEventListener("mouseup", record, true);
+  }
+
+  expect(seen.length).toBeGreaterThan(0);
+  expect(seen.some(Boolean)).toBe(false);
+});

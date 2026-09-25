@@ -36,13 +36,17 @@ function $isImageOnlyLine(block: ElementNode): boolean {
  * right of an image-only line moves the caret to the start of the next block,
  * whatever that block holds, and adds an empty paragraph when the image is the
  * last thing in the document.
+ *
+ * Handled on mousedown, with the default prevented: on `click` the browser had
+ * already put its caret beside the image, and it was painted there for a frame
+ * before the move.
  */
 export function ImageLineClickPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    const onClick = (event: MouseEvent) => {
-      if (!editor.isEditable()) return;
+    const onMouseDown = (event: MouseEvent) => {
+      if (event.button !== 0 || !editor.isEditable()) return;
       const target = event.target;
       if (!(target instanceof Element) || target.closest("img")) return;
 
@@ -71,6 +75,7 @@ export function ImageLineClickPlugin(): null {
         );
         if (clientX <= rightEdge) return;
 
+        event.preventDefault();
         const next = block.getNextSibling();
         if ($isElementNode(next)) {
           next.selectStart();
@@ -80,11 +85,15 @@ export function ImageLineClickPlugin(): null {
           paragraph.select();
         }
       });
+      // preventDefault also stops the browser focusing the editor.
+      if (event.defaultPrevented) {
+        editor.getRootElement()?.focus({ preventScroll: true });
+      }
     };
 
     return editor.registerRootListener((root, previous) => {
-      previous?.removeEventListener("click", onClick);
-      root?.addEventListener("click", onClick);
+      previous?.removeEventListener("mousedown", onMouseDown);
+      root?.addEventListener("mousedown", onMouseDown);
     });
   }, [editor]);
 
