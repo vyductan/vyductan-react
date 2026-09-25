@@ -38,6 +38,7 @@ const CARD_WIDTH = 320;
 const GAP = 6;
 
 const PAGE_LINK_SELECTOR = 'a[rel~="mention"]';
+const MODIFIER_KEYS = new Set(["Meta", "Control", "Alt", "Shift", "CapsLock"]);
 
 type Open = { url: string; rect: DOMRect; preview: PageLinkPreview | null };
 
@@ -134,8 +135,11 @@ export function PageLinkHoverCardPlugin({
       scheduleClose();
     };
 
-    // Typing or scrolling means the reader has moved on.
-    const dismiss = () => {
+    // Typing means the reader has moved on. A modifier on its own does not:
+    // holding ⌘ is how a link is opened, and the card should still be there
+    // while the reader decides.
+    const dismiss = (event: KeyboardEvent) => {
+      if (MODIFIER_KEYS.has(event.key)) return;
       clearTimers();
       hovered.current = null;
       setOpen(null);
@@ -189,14 +193,13 @@ export function PageLinkHoverCardPlugin({
           {preview.breadcrumb}
         </p>
       )}
-      <p
-        data-slot="page-link-preview-title"
-        className="flex items-start gap-1.5 font-semibold"
-      >
-        <span className="shrink-0" aria-hidden>
+      <p data-slot="page-link-preview-title" className="font-semibold">
+        {/* Inline, like the pill itself: a wrapped title continues under the
+            icon instead of hanging in a column beside it. */}
+        <span className="mr-1.5" aria-hidden>
           {preview.icon ?? DEFAULT_PAGE_ICON}
         </span>
-        <span>{preview.title}</span>
+        {preview.title}
       </p>
       {richContent ? (
         // Scaled down to card size: the page's own heading sizes and block

@@ -241,3 +241,44 @@ test("content the renderer refuses falls back to the plain excerpt", async () =>
 
   expect(card()?.textContent).toContain("Meet at the station at nine.");
 });
+
+test("holding a modifier key keeps the card open", async () => {
+  const { editor, pill } = await renderWithPill(async () => PREVIEW);
+
+  // The key has to land in the editor, where the card listens for typing.
+  // A real click on the editor's blank middle (the pill sits at the start of
+  // the line) — editor.focus() never moved focus in this harness.
+  void editor;
+  await userEvent.click(
+    document.querySelector<HTMLElement>('[contenteditable="true"]')!,
+  );
+  await waitFor(() =>
+    expect(document.activeElement?.getAttribute("contenteditable")).toBe(
+      "true",
+    ),
+  );
+  await userEvent.hover(pill);
+  await waitFor(() => expect(card()).not.toBeNull());
+
+  await userEvent.keyboard("{Meta>}");
+  await new Promise((resolve) => setTimeout(resolve, 300));
+  expect(card()).not.toBeNull();
+  await userEvent.keyboard("{/Meta}");
+
+  await userEvent.keyboard("x");
+  await waitFor(() => expect(card()).toBeNull());
+});
+
+test("a wrapped title flows under the icon rather than beside it", async () => {
+  const { pill } = await renderWithPill(async () => PREVIEW);
+
+  await userEvent.hover(pill);
+  await waitFor(() => expect(card()).not.toBeNull());
+
+  const titleRow = card()?.querySelector<HTMLElement>(
+    '[data-slot="page-link-preview-title"]',
+  );
+  // A flex row puts the title in its own column, so line two starts under the
+  // title's first letter; inline flow starts it under the icon.
+  expect(getComputedStyle(titleRow!).display).toBe("block");
+});
