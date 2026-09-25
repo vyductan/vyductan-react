@@ -112,3 +112,48 @@ test("bulleted levels go • → ◦ → ▪ and then start over", async () => {
     ]),
   );
 });
+
+/** Left edge of an element's text, not of its box. */
+const textLeft = (element: Element) => {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return range.getBoundingClientRect().left;
+};
+
+test("a checklist's box sits in the label column, its text where list text starts", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  (editor as unknown as LexicalEditor).update(
+    () => {
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("number").append(
+            $createListItemNode().append($createTextNode("numbered")),
+          ),
+          $createListNode("check").append(
+            $createListItemNode(false).append($createTextNode("to do")),
+          ),
+        );
+    },
+    { discrete: true },
+  );
+  await waitFor(() =>
+    expect(
+      document.querySelectorAll('[contenteditable="true"] li'),
+    ).toHaveLength(2),
+  );
+
+  const [numbered, check] = document.querySelectorAll<HTMLLIElement>(
+    '[contenteditable="true"] li',
+  );
+  expect(Math.abs(textLeft(check!) - textLeft(numbered!))).toBeLessThan(1);
+  // The box starts left of the text, inside the column the "1." sits in.
+  const box = check!.getBoundingClientRect().left;
+  expect(box).toBeLessThan(textLeft(numbered!) - 16);
+});

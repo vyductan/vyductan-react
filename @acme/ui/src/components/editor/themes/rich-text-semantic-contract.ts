@@ -73,7 +73,11 @@ export const richTextSemanticContract = {
     "[&[rel~=mention]]:bg-muted [&[rel~=mention]]:px-1 [&[rel~=mention]]:py-0.5",
   ),
   list: {
-    checklist: "relative list-none! p-0",
+    // A top-level checklist drops the `ml-6` every list gets: that margin is
+    // the label column, and the box draws inside the item's own padding —
+    // so with it the box sat where list TEXT starts and the text a column
+    // further in. Nested checklists keep it; it is their indent.
+    checklist: "relative list-none! p-0 [:not(li)>&]:ml-0!",
     listitem: "mx-0",
     listitemChecked:
       'relative mx-0 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
