@@ -40,9 +40,17 @@ export function renderNode(
 ): ReactNode {
   switch (node.type) {
     case "paragraph": {
+      // An empty paragraph is a blank line the author left. The editor keeps
+      // it a line tall because Lexical writes a <br> into it; an empty <p>
+      // collapses to nothing, and the published copy lost every gap.
+      const isEmpty = node.children.length === 0;
       return (
         <p key={key} className={richTextSemanticContract.paragraph}>
-          {renderInlineChildren(node.children, `${key}-child`)}
+          {isEmpty ? (
+            <br />
+          ) : (
+            renderInlineChildren(node.children, `${key}-child`)
+          )}
         </p>
       );
     }
