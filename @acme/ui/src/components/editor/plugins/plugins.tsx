@@ -246,9 +246,8 @@ export function Plugins({
       {!isSimple && <TikTokPlugin />}
 
       <CodeHighlightPlugin />
-      {!isSimple && editable && (
-        <CodeActionMenuPlugin anchorElem={floatingAnchorElement} />
-      )}
+      {/* Mounted read-only too: copying code is most wanted when viewing. */}
+      {!isSimple && <CodeActionMenuPlugin anchorElem={floatingAnchorElement} />}
 
       {/* MarkdownShortcutPlugin enabled for checklist support (- [ ]) */}
       <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />

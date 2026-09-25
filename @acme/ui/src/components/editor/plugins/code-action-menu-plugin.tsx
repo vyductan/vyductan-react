@@ -58,6 +58,9 @@ function CodeActionMenuContainer({
   anchorElem: HTMLElement;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
+  // Read-only content still gets Copy; changing the language is an edit.
+  const [isEditable, setIsEditable] = useState(() => editor.isEditable());
+  useEffect(() => editor.registerEditableListener(setIsEditable), [editor]);
 
   const [lang, setLang] = useState("");
   const [isShown, setShown] = useState<boolean>(false);
@@ -97,7 +100,10 @@ function CodeActionMenuContainer({
       let codeNode: CodeNode | null = null;
       let _lang = "";
 
-      editor.update(() => {
+      // A read, not an update: hovering must not add history entries or run
+      // transforms. editor.read (not editorState.read) because mapping a DOM
+      // node back to its Lexical node needs the active editor.
+      editor.read(() => {
         const maybeCodeNode = $getNearestNodeFromDOMNode(codeDOMNode);
 
         if ($isCodeNode(maybeCodeNode)) {
@@ -178,53 +184,62 @@ function CodeActionMenuContainer({
           className="code-action-menu-container user-select-none text-foreground/50 absolute flex h-9 flex-row items-center space-x-1 text-xs"
           style={{ ...position }}
         >
-          <Popover open={isSelectOpen} onOpenChange={setIsSelectOpen}>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="hover:bg-muted/50 flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors"
-                title="Select language"
-              >
-                {codeFriendlyName ?? "Plain Text"}
-                <ChevronDown className="h-3 w-3 opacity-50" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0" align="end">
-              <Command>
-                <CommandInput placeholder="Search for a language..." />
-                <CommandList>
-                  <CommandEmpty>No language found.</CommandEmpty>
-                  <CommandGroup>
-                    {LANGUAGE_OPTIONS.map((option) => (
-                      <CommandItem
-                        key={option.value}
-                        value={option.label}
-                        onSelect={() => {
-                          editor.update(() => {
-                            const codeDOMNode = getCodeDOMNode();
-                            if (!codeDOMNode) return;
-                            const maybeCodeNode =
-                              $getNearestNodeFromDOMNode(codeDOMNode);
-                            if ($isCodeNode(maybeCodeNode)) {
-                              maybeCodeNode.setLanguage(option.value);
-                            }
-                          });
-                          setIsSelectOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={`mr-2 h-4 w-4 ${
-                            lang === option.value ? "opacity-100" : "opacity-0"
-                          }`}
-                        />
-                        {option.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          {!isEditable && (
+            <span className="px-1.5 py-0.5">
+              {codeFriendlyName ?? "Plain Text"}
+            </span>
+          )}
+          {isEditable && (
+            <Popover open={isSelectOpen} onOpenChange={setIsSelectOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="hover:bg-muted/50 flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors"
+                  title="Select language"
+                >
+                  {codeFriendlyName ?? "Plain Text"}
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[200px] p-0" align="end">
+                <Command>
+                  <CommandInput placeholder="Search for a language..." />
+                  <CommandList>
+                    <CommandEmpty>No language found.</CommandEmpty>
+                    <CommandGroup>
+                      {LANGUAGE_OPTIONS.map((option) => (
+                        <CommandItem
+                          key={option.value}
+                          value={option.label}
+                          onSelect={() => {
+                            editor.update(() => {
+                              const codeDOMNode = getCodeDOMNode();
+                              if (!codeDOMNode) return;
+                              const maybeCodeNode =
+                                $getNearestNodeFromDOMNode(codeDOMNode);
+                              if ($isCodeNode(maybeCodeNode)) {
+                                maybeCodeNode.setLanguage(option.value);
+                              }
+                            });
+                            setIsSelectOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={`mr-2 h-4 w-4 ${
+                              lang === option.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            }`}
+                          />
+                          {option.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          )}
           <CopyButton editor={editor} getCodeDOMNode={getCodeDOMNode} />
         </div>
       ) : null}
@@ -243,7 +258,10 @@ function getMouseInfo(event: MouseEvent | undefined): {
 
   const target = event.target;
 
-  if (target && target instanceof HTMLElement) {
+  // Any element, not only HTMLElement: the copy button's icon is an SVG, and
+  // reaching for the button put the pointer on it — which read as "outside"
+  // and hid the menu before Copy could be clicked.
+  if (target instanceof Element) {
     const codeDOMNode = target.closest<HTMLElement>(CODE_BLOCK_SELECTOR);
     const isOutside = !(
       codeDOMNode ??

@@ -1,7 +1,6 @@
 import type { LexicalNode, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { $createCodeNode } from "@lexical/code";
 import { $generateNodesFromDOM } from "@lexical/html";
 import {
@@ -11,7 +10,6 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { DraggableBlockPlugin_EXPERIMENTAL } from "@lexical/react/LexicalDraggableBlockPlugin";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
 import {
@@ -25,6 +23,7 @@ import {
   COPY_COMMAND,
 } from "lexical";
 import { GripVerticalIcon, PlusIcon } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import {
   Command,
@@ -43,6 +42,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import { $createCheckBlockNode } from "../nodes/check-block-node";
+import { DraggableBlockPlugin_EXPERIMENTAL } from "./default/lexical-draggable-block-plugin";
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
 
