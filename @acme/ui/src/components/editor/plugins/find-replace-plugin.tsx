@@ -82,15 +82,24 @@ function $findMatches(query: string): Match[] {
   return found;
 }
 
-/** The nearest ancestor that scrolls, so the bar never slides under what sits above it. */
-function scrollParentOf(element: HTMLElement): HTMLElement | null {
+/**
+ * The ancestors that clip the editor: anything whose overflow is not
+ * visible. The part of the note on screen is inside all of them.
+ *
+ * Not just the nearest one. An editor can sit in a box that is overflow:
+ * auto but never overflows — it scrolls away with the page like everything
+ * else — while the element that really scrolls is further up, below a
+ * header. Taking only the nearest let the bar ride up into that header.
+ */
+function clippingAncestorsOf(element: HTMLElement): HTMLElement[] {
+  const found: HTMLElement[] = [];
   let current = element.parentElement;
   while (current) {
-    const { overflowY } = getComputedStyle(current);
-    if (/(auto|scroll|overlay)/.test(overflowY)) return current;
+    const { overflowX, overflowY } = getComputedStyle(current);
+    if (overflowY !== "visible" || overflowX !== "visible") found.push(current);
     current = current.parentElement;
   }
-  return null;
+  return found;
 }
 
 /**
@@ -242,19 +251,19 @@ export function FindReplacePlugin({
     });
   }, [editor, isOpen, refresh]);
 
-  // Pin to the editor's top right, below whatever scrolls it.
+  // Pin to the editor's top right, inside the part of it on screen.
   useLayoutEffect(() => {
     if (!isOpen) return;
     const root = editor.getRootElement();
     if (!root) return;
-    const scroller = scrollParentOf(root);
+    const clippers = clippingAncestorsOf(root);
 
     const place = () => {
       const box = root.getBoundingClientRect();
       const floor = Math.max(
         box.top,
-        scroller ? scroller.getBoundingClientRect().top : 0,
         0,
+        ...clippers.map((clipper) => clipper.getBoundingClientRect().top),
       );
       const probeX = Math.min(
         Math.max(box.right - 16, 0),

@@ -362,3 +362,66 @@ test.each([
     expect(barBox.top).toBeLessThan(headerBox.bottom + 24);
   },
 );
+
+/**
+ * The app's own layout: a header above a scrolling <main>, and the editor
+ * inside a box of its own that is overflow: auto but never overflows. The
+ * nearest "scroll container" was that inner box, which scrolls away with the
+ * page, so the bar was clamped to nothing and rode up into the header.
+ */
+test("stays inside the area that actually scrolls, below a header beside it", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <div style={{ display: "flex", flexDirection: "column", height: 600 }}>
+      <header data-testid="app-header" style={{ height: 64, flexShrink: 0 }} />
+      <main data-testid="main" style={{ flex: 1, overflowY: "auto" }}>
+        <div style={{ width: 380, marginLeft: 16, overflow: "auto" }}>
+          <Editor autoFocus={false}>
+            <EditorRefPlugin onReady={(next) => (editor = next)} />
+          </Editor>
+        </div>
+      </main>
+    </div>,
+  );
+
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    for (let line = 0; line < 80; line++) {
+      root.append(
+        $createParagraphNode().append($createTextNode(`Line ${line} cơ bản`)),
+      );
+    }
+  });
+
+  const contentEditable = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node?.textContent).toContain("Line 79");
+    return node!;
+  });
+
+  await userEvent.click(contentEditable);
+  document.querySelector<HTMLElement>('[data-testid="main"]')!.scrollTop = 900;
+  await new Promise((resolve) => setTimeout(resolve, 50));
+
+  await userEvent.keyboard("{Control>}f{/Control}");
+  const bar = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>('[data-slot="find-bar"]');
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  const mainTop = document
+    .querySelector<HTMLElement>('[data-testid="main"]')!
+    .getBoundingClientRect().top;
+
+  expect(contentEditable.getBoundingClientRect().top).toBeLessThan(mainTop);
+  expect(bar.getBoundingClientRect().top).toBeGreaterThanOrEqual(mainTop);
+  expect(bar.getBoundingClientRect().top).toBeLessThan(mainTop + 24);
+});
