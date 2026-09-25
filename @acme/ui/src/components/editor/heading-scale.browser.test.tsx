@@ -44,9 +44,13 @@ async function measure(size: SizeType) {
       $getRoot()
         .clear()
         .append(
+          // Text between the headings: each is measured after text, where it
+          // gets its full room above (straight under a heading it gets less).
           paragraph("Before"),
           $createHeadingNode("h1").append($createTextNode("One")),
+          paragraph("After one"),
           $createHeadingNode("h2").append($createTextNode("Two")),
+          paragraph("After two"),
           $createHeadingNode("h3").append($createTextNode("Three")),
           paragraph("Body"),
         );
@@ -58,7 +62,7 @@ async function measure(size: SizeType) {
     const nodes = [
       ...document.querySelectorAll<HTMLElement>('[contenteditable="true"] > *'),
     ];
-    expect(nodes).toHaveLength(5);
+    expect(nodes).toHaveLength(7);
     return nodes;
   });
 
@@ -76,9 +80,9 @@ async function measure(size: SizeType) {
 
   return {
     h1: of(blocks[1]!),
-    h2: of(blocks[2]!),
-    h3: of(blocks[3]!),
-    paragraph: of(blocks[4]!),
+    h2: of(blocks[3]!),
+    h3: of(blocks[5]!),
+    paragraph: of(blocks[6]!),
   };
 }
 
@@ -110,4 +114,48 @@ describe("heading and paragraph sizes", () => {
       paragraph: { font: 14, line: 21, above: 5.25, below: 5.25 },
     });
   });
+});
+
+/**
+ * The room above a heading separates a new section from the text before it.
+ * Straight under another heading there is nothing to separate — "Nối AI chat
+ * với hệ thống của bạn" over "Hiện tại" sat about 37px apart — so a heading
+ * that follows a heading keeps only a little room above it.
+ */
+test("keeps a heading close to the heading right above it", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false} size="large">
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  (editor as unknown as LexicalEditor).update(
+    () => {
+      $getRoot()
+        .clear()
+        .append(
+          $createHeadingNode("h1").append($createTextNode("Title")),
+          $createHeadingNode("h2").append($createTextNode("Section")),
+          $createParagraphNode().append($createTextNode("Body")),
+          $createHeadingNode("h2").append($createTextNode("Next section")),
+        );
+    },
+    { discrete: true },
+  );
+
+  const blocks = await waitFor(() => {
+    const nodes = [
+      ...document.querySelectorAll<HTMLElement>('[contenteditable="true"] > *'),
+    ];
+    expect(nodes).toHaveLength(4);
+    return nodes;
+  });
+  const gap = (above: HTMLElement, below: HTMLElement) =>
+    below.getBoundingClientRect().top - above.getBoundingClientRect().bottom;
+
+  // Heading straight under a heading: close.
+  expect(gap(blocks[0]!, blocks[1]!)).toBeLessThanOrEqual(12);
+  // A heading after text still gets its full room.
+  expect(gap(blocks[2]!, blocks[3]!)).toBe(24);
 });

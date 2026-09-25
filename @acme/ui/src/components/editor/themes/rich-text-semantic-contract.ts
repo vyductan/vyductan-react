@@ -52,13 +52,17 @@ export const richTextSemanticContract = {
   // own line and margins are over its own size, since `em` there is the
   // heading's font. Fixed in pixels, a 30px heading sat over 14px text in a
   // small field at more than twice its size.
+  //
+  // The room above a heading separates a new section from the text before
+  // it; straight under another heading there is nothing to separate, so a
+  // heading that follows one keeps only half an em above it.
   heading: {
-    h1: "scroll-m-20 text-[1.875em] font-bold tracking-tight leading-[calc(44/30)] mt-[calc(32em/30)] mb-[calc(4em/30)] first:mt-0",
-    h2: "scroll-m-20 text-[1.5em] font-semibold tracking-tight leading-[1.5] mt-[1em] mb-[calc(4em/24)] first:mt-0",
-    h3: "scroll-m-20 text-[1.25em] font-semibold tracking-tight leading-[1.6] mt-[0.8em] mb-[0.2em] first:mt-0",
-    h4: "scroll-m-20 text-[1.125em] font-semibold tracking-tight leading-[calc(28/18)] mt-[calc(12em/18)] mb-[calc(4em/18)] first:mt-0",
-    h5: "scroll-m-20 text-[1em] font-semibold tracking-tight leading-[1.5] mt-[0.75em] mb-[0.25em] first:mt-0",
-    h6: "scroll-m-20 text-[0.875em] font-semibold tracking-tight leading-[calc(20/14)] mt-[calc(12em/14)] mb-[calc(4em/14)] first:mt-0",
+    h1: "scroll-m-20 text-[1.875em] font-bold tracking-tight leading-[calc(44/30)] mt-[calc(32em/30)] mb-[calc(4em/30)] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
+    h2: "scroll-m-20 text-[1.5em] font-semibold tracking-tight leading-[1.5] mt-[1em] mb-[calc(4em/24)] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
+    h3: "scroll-m-20 text-[1.25em] font-semibold tracking-tight leading-[1.6] mt-[0.8em] mb-[0.2em] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
+    h4: "scroll-m-20 text-[1.125em] font-semibold tracking-tight leading-[calc(28/18)] mt-[calc(12em/18)] mb-[calc(4em/18)] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
+    h5: "scroll-m-20 text-[1em] font-semibold tracking-tight leading-[1.5] mt-[0.75em] mb-[0.25em] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
+    h6: "scroll-m-20 text-[0.875em] font-semibold tracking-tight leading-[calc(20/14)] mt-[calc(12em/14)] mb-[calc(4em/14)] [:is(h1,h2,h3,h4,h5,h6)+&]:mt-[0.5em] first:mt-0",
   },
   paragraph: cn("leading-[1.5] my-[0.375em]"),
   // A quote is someone's words, not an aside: it reads in the same voice as
