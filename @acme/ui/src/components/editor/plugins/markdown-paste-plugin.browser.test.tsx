@@ -1,8 +1,8 @@
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
+import { $createListItemNode, $createListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { render, waitFor } from "@testing-library/react";
-import { $createListItemNode, $createListNode } from "@lexical/list";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
@@ -164,4 +164,61 @@ test("pastes a markdown document from inside a list item", async () => {
 
   expect(failures).toStrictEqual([]);
   expect(blockTexts(live).at(-1)).toBe("Last block");
+});
+
+/**
+ * A pasted nested list used to be folded into the item above it. Lexical
+ * takes an item holding a list for a wrapper and hides its marker, so the
+ * parent's "1." disappeared.
+ */
+test("keeps the parent item's number when pasting a nested list", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    const paragraph = $createParagraphNode();
+    root.append(paragraph);
+    paragraph.select();
+  });
+
+  const contentEditable = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  const clipboardData = new DataTransfer();
+  clipboardData.setData(
+    "text/plain",
+    ["1. 11", "    1. a", "    2. b", "2. 22"].join("\n"),
+  );
+  contentEditable.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+
+  const parent = await waitFor(() => {
+    const item = [...contentEditable.querySelectorAll("li")].find(
+      (node) => node.textContent?.trim() === "11",
+    );
+    expect(item).toBeDefined();
+    return item!;
+  });
+
+  expect(getComputedStyle(parent).listStyleType).toBe("decimal");
 });

@@ -1,9 +1,6 @@
 "use client";
 
-import type { ListNode } from "@lexical/list";
-import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
-import { $isListItemNode, $isListNode } from "@lexical/list";
 import { $generateNodesFromMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -62,6 +59,50 @@ export function normalizeMarkdownPasteForLists(text: string): string {
     .join("\n");
 }
 
+const LIST_LINE = /^\s*(?:\d+[.)]|[-*+]|[a-z][.)]|[ivx]+[.)])\s/i;
+const LETTERED_ITEM = /^(\s+)(?:[a-z]|[ivx]+)[.)]\s+(.*)$/i;
+
+/**
+ * Renumbers indented lettered items — "a.", "b.", or "i.", "ii." a level
+ * deeper — as numbered markdown items.
+ *
+ * Nested numbered lists are shown with letters, here, in Notion and in most
+ * documents, so that is how they arrive when copied as text. Markdown only
+ * knows digits, so an indented "a." was read as more text in the item above
+ * and the nested list folded into one long item. The digits only have to
+ * count: the list shows its own letters again once it is a list.
+ *
+ * Only an indented marker directly under a list line qualifies, so a line
+ * that merely starts with a letter and a full stop is left as it is.
+ */
+export function normalizeLetteredListItems(text: string): string {
+  const counters = new Map<number, number>();
+  let previousWasList = false;
+
+  return text
+    .split("\n")
+    .map((line) => {
+      if (line.trim() === "") return line;
+
+      const indent = line.length - line.trimStart().length;
+      for (const depth of counters.keys()) {
+        if (depth > indent) counters.delete(depth);
+      }
+
+      const lettered = LETTERED_ITEM.exec(line);
+      if (lettered && previousWasList) {
+        const count = (counters.get(indent) ?? 0) + 1;
+        counters.set(indent, count);
+        return `${lettered[1]}${count}. ${lettered[2]}`;
+      }
+
+      if (!LETTERED_ITEM.test(line)) counters.delete(indent);
+      previousWasList = LIST_LINE.test(line);
+      return line;
+    })
+    .join("\n");
+}
+
 /**
  * Drops lines that are nothing but a blockquote marker.
  *
@@ -87,63 +128,6 @@ export function dropEmptyBlockquoteLines(text: string): string {
       return insideFence || !/^\s*>\s*$/.test(line);
     })
     .join("\n");
-}
-
-function collapseMarkdownListWrappers(nodes: LexicalNode[]) {
-  for (const node of nodes) {
-    collapseMarkdownListWrappersInNode(node);
-  }
-}
-
-function collapseMarkdownListWrappersInNode(node: LexicalNode) {
-  if ($isListNode(node)) {
-    collapseMarkdownListWrappersInList(node);
-    return;
-  }
-
-  if ($isListItemNode(node)) {
-    for (const child of node.getChildren()) {
-      collapseMarkdownListWrappersInNode(child);
-    }
-  }
-}
-
-function collapseMarkdownListWrappersInList(listNode: ListNode) {
-  let current = listNode.getFirstChild();
-
-  while (current !== null) {
-    const next = current.getNextSibling();
-
-    if ($isListItemNode(current)) {
-      const previous = current.getPreviousSibling();
-      const onlyChild =
-        current.getChildrenSize() === 1 ? current.getFirstChild() : null;
-
-      if ($isListItemNode(previous) && $isListNode(onlyChild)) {
-        const previousLastChild = previous.getLastChild();
-
-        if (
-          $isListNode(previousLastChild) &&
-          previousLastChild.getListType() === onlyChild.getListType()
-        ) {
-          previousLastChild.append(...onlyChild.getChildren());
-          current.remove();
-          collapseMarkdownListWrappersInList(previousLastChild);
-          current = next;
-          continue;
-        }
-
-        previous.append(onlyChild);
-        current.remove();
-        collapseMarkdownListWrappersInList(onlyChild);
-        current = next;
-        continue;
-      }
-    }
-
-    collapseMarkdownListWrappersInNode(current);
-    current = next;
-  }
 }
 
 /**
@@ -175,7 +159,7 @@ export function MarkdownPastePlugin(): null {
         }
 
         const normalizedText = dropEmptyBlockquoteLines(
-          normalizeMarkdownPasteForLists(text),
+          normalizeLetteredListItems(normalizeMarkdownPasteForLists(text)),
         );
 
         if (!hasMarkdownPasteSyntax(normalizedText)) {
@@ -210,7 +194,10 @@ export function MarkdownPastePlugin(): null {
             MARKDOWN_DOCUMENT_TRANSFORMERS,
           );
 
-          collapseMarkdownListWrappers(children);
+          // The importer builds nested lists the way Lexical keeps them: in a
+          // list item of their own, after the item they belong under. They
+          // used to be folded into that item here, which Lexical then took
+          // for a wrapper — and hid its marker, so "1." vanished.
 
           if (children.length > 0) {
             // Two things have to hold before inserting, and each has been seen

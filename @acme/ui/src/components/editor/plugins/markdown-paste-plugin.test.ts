@@ -108,3 +108,52 @@ describe("dropEmptyBlockquoteLines", () => {
     expect(dropEmptyBlockquoteLines?.(text)).toBe(text);
   });
 });
+
+describe("normalizeLetteredListItems", () => {
+  const normalizeLetteredListItems = (
+    markdownPastePlugin as Record<string, unknown>
+  ).normalizeLetteredListItems as ((text: string) => string) | undefined;
+
+  test("is exported", () => {
+    expect(normalizeLetteredListItems).toBeTypeOf("function");
+  });
+
+  /**
+   * Nested numbered items are shown as "a.", "b.", "c." — here, in Notion, in
+   * most documents — so that is how they arrive when copied as text. Markdown
+   * numbers them with digits only, so an indented "a." under a list line was
+   * read as more text in the item above.
+   */
+  test("turns indented letter markers under a list into numbered items", () => {
+    const pasted = ["1. 11", "    a. a", "    b. b", "    c. c", "2. 22"].join(
+      "\n",
+    );
+    expect(normalizeLetteredListItems?.(pasted)).toBe(
+      ["1. 11", "    1. a", "    2. b", "    3. c", "2. 22"].join("\n"),
+    );
+  });
+
+  test("does the same for roman numerals a level deeper", () => {
+    const pasted = [
+      "1. one",
+      "    a. two",
+      "        i. three",
+      "        ii. four",
+    ].join("\n");
+    expect(normalizeLetteredListItems?.(pasted)).toBe(
+      ["1. one", "    1. two", "        1. three", "        2. four"].join(
+        "\n",
+      ),
+    );
+  });
+
+  test("leaves a letter that does not follow a list line alone", () => {
+    const text = "Dear team,\n    A. Lincoln said so.";
+    expect(normalizeLetteredListItems?.(text)).toBe(text);
+  });
+
+  test("leaves an unindented letter alone", () => {
+    const text = "1. first\na. not nested";
+    expect(normalizeLetteredListItems?.(text)).toBe(text);
+  });
+});

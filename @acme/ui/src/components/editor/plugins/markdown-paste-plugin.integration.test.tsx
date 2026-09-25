@@ -669,3 +669,98 @@ test("pastes a table on its own as a table", async () => {
     live.getEditorState().read(() => $getRoot().getTextContent()),
   ).not.toContain("| ---");
 });
+
+/**
+ * A nested numbered list pasted as text, the way it is shown: "a.", "b.".
+ * The lettered lines were folded into the first item as more text, so the
+ * list had one long item where there should have been a nested list.
+ */
+test("pastes a lettered nested list as a nested numbered list", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin
+        onReady={(nextEditor) => {
+          editor = nextEditor;
+        }}
+      />
+    </Editor>,
+  );
+
+  await waitFor(() => {
+    expect(editor).not.toBeNull();
+  });
+  const live = editor as unknown as LexicalEditor;
+
+  act(() => {
+    live.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const paragraph = $createParagraphNode();
+      root.append(paragraph);
+      paragraph.select();
+    });
+  });
+
+  const preventDefault = vi.fn();
+  act(() => {
+    live.dispatchCommand(PASTE_COMMAND, {
+      clipboardData: {
+        files: [],
+        items: [],
+        types: ["text/plain"],
+        getData: (type: string) =>
+          type === "text/plain"
+            ? ["1. 11", "    a. a", "    b. b", "    c. c", "2. 22"].join("\n")
+            : "",
+      },
+      preventDefault,
+    } as unknown as ClipboardEvent);
+  });
+
+  await waitFor(() => {
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  type Shape = {
+    type: string;
+    listType?: string;
+    text?: string;
+    children?: Shape[];
+  };
+  const strip = (node: Shape): unknown => ({
+    type: node.type,
+    ...(node.listType ? { listType: node.listType } : {}),
+    ...(node.text ? { text: node.text } : {}),
+    ...(node.children?.length ? { children: node.children.map(strip) } : {}),
+  });
+  const tree = (live.getEditorState().toJSON().root.children as Shape[]).map(
+    strip,
+  );
+
+  const item = (text: string) => ({
+    type: "listitem",
+    children: [{ type: "text", text }],
+  });
+  expect(tree).toStrictEqual([
+    {
+      type: "list",
+      listType: "number",
+      children: [
+        item("11"),
+        {
+          type: "listitem",
+          children: [
+            {
+              type: "list",
+              listType: "number",
+              children: [item("a"), item("b"), item("c")],
+            },
+          ],
+        },
+        item("22"),
+      ],
+    },
+  ]);
+});
