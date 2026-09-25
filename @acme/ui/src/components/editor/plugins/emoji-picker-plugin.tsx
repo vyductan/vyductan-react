@@ -1,4 +1,4 @@
-import type { TextNode } from "lexical";
+import type { LexicalEditor, TextNode } from "lexical";
 import { useCallback, useMemo, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@acme/ui/components/command";
 
 import emojiList from "../utils/emoji-list";
+import { $textBeforeCaretOnLine } from "../utils/text-before-caret";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 class EmojiOption extends MenuOption {
@@ -55,9 +56,30 @@ export function EmojiPickerPlugin() {
     [emojis],
   );
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(":", {
-    minLength: 0,
+  const checkForColonMatch = useBasicTypeaheadTriggerMatch(":", {
+    minLength: 2,
   });
+
+  /*
+   * As in Notion and Slack: a colon at the start of a line, or after a space
+   * or "(", with at least two letters of a name after it. The basic matcher
+   * looks only at the caret's text node, so a colon typed after bold text —
+   * "lãnh đạo:" — began a node of its own, looked like a line start, and
+   * opened the menu on ordinary punctuation. And with no minimum, a colon
+   * alone opened it.
+   */
+  const checkForTriggerMatch = useCallback(
+    (text: string, editor: LexicalEditor) => {
+      const match = checkForColonMatch(text, editor);
+      if (match === null) return null;
+      const beforeCaret = $textBeforeCaretOnLine();
+      if (beforeCaret === null) return null;
+      const colonAt = beforeCaret.length - match.replaceableString.length;
+      const previous = beforeCaret[colonAt - 1];
+      return previous === undefined || /[\s(]/.test(previous) ? match : null;
+    },
+    [checkForColonMatch],
+  );
 
   const options: Array<EmojiOption> = useMemo(() => {
     return emojiOptions
