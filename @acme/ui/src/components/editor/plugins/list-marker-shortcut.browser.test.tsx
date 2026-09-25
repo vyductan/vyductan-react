@@ -168,3 +168,66 @@ test("gives an unmarked numbered line its number back", async () => {
   await waitFor(() => expect(marker("b")).toBe("lower-alpha:2"));
   expect(itemReading("b")?.textContent).toBe("b");
 });
+
+/**
+ * Where the previous test leaves off: "• a" sits between "11" and a nested
+ * "a. b  b. c". Backspace, then "a. " — the letter it would show — makes it
+ * numbered again, and it joins the numbered run after it: a. a  b. b  c. c.
+ * The letter was not taken for a marker, and a new item started a run of its
+ * own, so the list after it counted from "a." again.
+ */
+test("typing 'a. ' brings a line back into the numbered run beside it", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.update(
+    () => {
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("number").append(
+            item("11"),
+            $createListItemNode().append(
+              $createListNode("bullet").append(item("a")),
+            ),
+            $createListItemNode().append(
+              $createListNode("number").append(item("b"), item("c")),
+            ),
+            item("22"),
+          ),
+        );
+    },
+    { discrete: true },
+  );
+  await waitFor(() => expect(marker("a")).toMatch(/^disc:/));
+
+  await caretIn(live, "a", 0);
+  await userEvent.keyboard("{Backspace}");
+  await waitFor(() => expect(marker("a")).toBe(""));
+  await userEvent.keyboard("a. ");
+
+  await waitFor(() => expect(marker("a")).toBe("lower-alpha:1"));
+  expect(itemReading("a")?.textContent).toBe("a");
+  expect(marker("b")).toBe("lower-alpha:2");
+  expect(marker("c")).toBe("lower-alpha:3");
+  expect(marker("22")).toBe("decimal:2");
+  // One nested run, not two side by side.
+  expect(
+    document.querySelectorAll('[contenteditable="true"] ol ol').length,
+  ).toBe(1);
+});
+
+test("takes a roman numeral for a numbered marker too", async () => {
+  const editor = await renderNested("bullet");
+  await caretIn(editor, "22", 0);
+
+  await userEvent.keyboard("i. ");
+
+  await waitFor(() => expect(marker("22")).toBe("decimal:1"));
+  expect(itemReading("22")?.textContent).toBe("22");
+});
