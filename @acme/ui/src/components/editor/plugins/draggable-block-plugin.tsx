@@ -4,12 +4,7 @@ import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { $createCodeNode } from "@lexical/code";
 import { $generateNodesFromDOM } from "@lexical/html";
-import {
-  $isListItemNode,
-  $isListNode,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-} from "@lexical/list";
+import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import {
@@ -54,6 +49,11 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import { $createCheckBlockNode } from "../nodes/check-block-node";
+import {
+  $lineOf,
+  $selectedBlocks,
+  $turnSelectedBlocksIntoList,
+} from "../utils/block-selection";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { DraggableBlockPlugin_EXPERIMENTAL } from "./default/lexical-draggable-block-plugin";
 
@@ -347,9 +347,14 @@ export function DraggableBlockPlugin({
         // This is critical because clicking the menu might have stolen focus
         editor.focus();
 
-        if ($isElementNode(node)) {
-          node.select();
-        } else if ($isTextNode(node)) {
+        // Opened on a line of a block selection, the choice is for every
+        // selected line, as in Notion — so the selection is kept. Otherwise
+        // it is for the line the menu was opened on.
+        const line = $lineOf(node);
+        const inBlockSelection = $selectedBlocks().some(
+          (selected) => line !== null && selected.is(line),
+        );
+        if (!inBlockSelection && ($isElementNode(node) || $isTextNode(node))) {
           node.select();
         }
 
@@ -379,12 +384,14 @@ export function DraggableBlockPlugin({
             );
             break;
           }
+          // Lexical's list commands turned a whole list, or nothing inside a
+          // nested one; these turn just the lines chosen.
           case "bullet": {
-            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0);
+            $turnSelectedBlocksIntoList("bullet");
             break;
           }
           case "number": {
-            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0);
+            $turnSelectedBlocksIntoList("number");
             break;
           }
           case "quote": {

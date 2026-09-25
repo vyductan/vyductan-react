@@ -11,12 +11,7 @@ import type { Dispatch, JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { $createCodeNode, $isCodeHighlightNode } from "@lexical/code";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
-import {
-  $isListNode,
-  INSERT_CHECK_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-} from "@lexical/list";
+import { $isListNode, INSERT_CHECK_LIST_COMMAND } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
 import { $patchStyleText } from "@lexical/selection";
@@ -75,6 +70,7 @@ import { Dropdown } from "@acme/ui/components/dropdown";
 import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
 import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
+import { $turnSelectedBlocksIntoList } from "../utils/block-selection";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
@@ -1062,14 +1058,15 @@ function useFloatingTextFormatToolbar(
         return;
       }
 
-      const commandMap: Record<ListType, typeof INSERT_UNORDERED_LIST_COMMAND> =
-        {
-          bullet: INSERT_UNORDERED_LIST_COMMAND,
-          number: INSERT_ORDERED_LIST_COMMAND,
-          check: INSERT_CHECK_LIST_COMMAND,
-        };
-
-      editor.dispatchCommand(commandMap[type], void 0);
+      if (type === "check") {
+        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
+      } else {
+        // Lexical's list commands turned a whole list, or nothing of a
+        // nested one; this turns just the selected lines.
+        editor.update(() => {
+          $turnSelectedBlocksIntoList(type);
+        });
+      }
       setListType(type);
     },
     [editor],
