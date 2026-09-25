@@ -53,15 +53,18 @@ function Harness({
   createRecord,
   updateRecord,
   onLinkedIdsChange,
+  createId,
 }: {
   records: LinkedRecord[] | undefined;
   onReady: (editor: LexicalEditor) => void;
   createRecord: (draft: {
+    id: string;
     title: string;
     completed: boolean;
-  }) => Promise<string>;
+  }) => Promise<unknown>;
   updateRecord: (id: string, patch: object) => void;
   onLinkedIdsChange: (ids: string[]) => void;
+  createId: () => string;
 }) {
   return (
     <Editor autoFocus={false}>
@@ -73,6 +76,7 @@ function Harness({
         createRecord={createRecord}
         updateRecord={updateRecord}
         debounceMs={50}
+        createId={createId}
       />
     </Editor>
   );
@@ -81,14 +85,24 @@ function Harness({
 async function setup(
   build: () => void,
   records: LinkedRecord[] | undefined = undefined,
+  createRecord = vi.fn(
+    async (_draft: { id: string; title: string; completed: boolean }) =>
+      undefined as unknown,
+  ),
 ) {
   let editor: LexicalEditor | null = null;
   let next = 0;
-  const createRecord = vi.fn(async () => `task-${++next}`);
+  const createId = vi.fn(() => `task-${++next}`);
   const updateRecord = vi.fn();
   const onLinkedIdsChange = vi.fn();
   const onReady = (value: LexicalEditor) => (editor = value);
-  const props = { onReady, createRecord, updateRecord, onLinkedIdsChange };
+  const props = {
+    onReady,
+    createRecord,
+    updateRecord,
+    onLinkedIdsChange,
+    createId,
+  };
   const view = render(<Harness records={records} {...props} />);
   await waitFor(() => expect(editor).not.toBeNull());
   const live = editor as unknown as LexicalEditor;
@@ -109,6 +123,7 @@ async function setup(
   return {
     editor: live,
     createRecord,
+    createId,
     updateRecord,
     onLinkedIdsChange,
     rerender,
@@ -159,6 +174,7 @@ test("a to-do becomes a task once the caret leaves it, and keeps its id", async 
 
   await waitFor(() =>
     expect(createRecord).toHaveBeenCalledWith({
+      id: "task-1",
       title: "Buy milk",
       completed: false,
     }),
@@ -245,4 +261,58 @@ test("a copied linked line is filed as a task of its own", async () => {
   await waitFor(() =>
     expect(snapshot(editor).map((entry) => entry.id)).toEqual(["t1", "task-1"]),
   );
+});
+
+test("the line carries its task's id before the task is filed", async () => {
+  // Filing never answers — the page is left while it is in flight. The id
+  // must already be in the document, or the next save drops it and the next
+  // open files the line a second time.
+  const { editor } = await setup(
+    () => {
+      $getRoot()
+        .clear()
+        .append(heading(), todo(["Buy milk", null]));
+    },
+    undefined,
+    vi.fn(() => new Promise<unknown>(() => undefined)),
+  );
+  await userEvent.keyboard("{Enter}");
+
+  await waitFor(() =>
+    expect(snapshot(editor)).toEqual([
+      { text: "Buy milk", checked: false, id: "task-1" },
+    ]),
+  );
+});
+
+test("a failed filing is retried under the same id", async () => {
+  let calls = 0;
+  const createRecord = vi.fn(
+    async (_draft: { id: string; title: string; completed: boolean }) => {
+      calls += 1;
+      if (calls === 1) throw new Error("offline");
+      return undefined as unknown;
+    },
+  );
+  const { editor, createId } = await setup(
+    () => {
+      $getRoot()
+        .clear()
+        .append(heading(), todo(["Buy milk", null]));
+    },
+    undefined,
+    createRecord,
+  );
+  await userEvent.keyboard("{Enter}");
+  await waitFor(() => expect(createRecord).toHaveBeenCalledTimes(1));
+
+  // Any later edit is a push, and the push retries.
+  await userEvent.keyboard("x");
+  await waitFor(() => expect(createRecord).toHaveBeenCalledTimes(2));
+  expect(createRecord.mock.calls.map(([draft]) => draft)).toEqual([
+    { id: "task-1", title: "Buy milk", completed: false },
+    { id: "task-1", title: "Buy milk", completed: false },
+  ]);
+  expect(createId).toHaveBeenCalledTimes(1);
+  expect(snapshot(editor)[0]?.id).toBe("task-1");
 });

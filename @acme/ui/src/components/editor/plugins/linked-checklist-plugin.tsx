@@ -39,17 +39,25 @@ export interface LinkedChecklistPluginProps {
   records: readonly LinkedRecord[] | undefined;
   /** The ids the section links to, whenever that set changes. */
   onLinkedIdsChange: (ids: string[]) => void;
-  /** File a record for a new item; resolves to its id. */
+  /**
+   * File a record for a new item under the id given, which the item already
+   * carries. Must be idempotent — a failed call is retried with the same id,
+   * and one that timed out may have landed (e.g. insert … on conflict do
+   * nothing).
+   */
   createRecord: (draft: {
+    id: string;
     title: string;
     completed: boolean;
-  }) => Promise<string>;
+  }) => Promise<unknown>;
   updateRecord: (
     id: string,
     patch: { title?: string; completed?: boolean },
   ) => void;
   /** Quiet time after an edit before it is sent. */
   debounceMs?: number;
+  /** Id for a new record; a random UUID unless given. */
+  createId?: () => string;
 }
 
 /** A checklist item: a check-block, or an item of a `check` list. */
@@ -141,7 +149,10 @@ export function LinkedChecklistPlugin(props: LinkedChecklistPluginProps): null {
   });
 
   const synced = useRef(new Map<string, SyncedRecord>());
-  const pending = useRef(new Set<NodeKey>());
+  // Ids whose record is being filed, and ones whose filing failed and waits
+  // for the next push to be retried.
+  const filing = useRef(new Set<string>());
+  const unfiled = useRef(new Map<string, SyncedRecord>());
   const reportedIds = useRef<string | null>(null);
 
   const applyRecords = useCallback(
@@ -154,6 +165,7 @@ export function LinkedChecklistPlugin(props: LinkedChecklistPluginProps): null {
             records,
             synced.current,
             $activeItemKey(isFocused(editor)),
+            new Set([...filing.current, ...unfiled.current.keys()]),
           );
           synced.current = plan.synced;
           for (const key of plan.unlink) {
@@ -177,6 +189,21 @@ export function LinkedChecklistPlugin(props: LinkedChecklistPluginProps): null {
 
   // Local → records.
   useEffect(() => {
+    const file = (id: string, draft: SyncedRecord) => {
+      filing.current.add(id);
+      latest.current
+        .createRecord({ id, ...draft })
+        .then(() => {
+          unfiled.current.delete(id);
+          synced.current.set(id, draft);
+          // A tick made while it was being filed had nothing to compare
+          // against; now it has.
+          schedule();
+        })
+        .catch(() => unfiled.current.set(id, draft))
+        .finally(() => filing.current.delete(id));
+    };
+
     const push = () => {
       const { isSectionHeading, onLinkedIdsChange } = latest.current;
       const { items, duplicates, activeKey } = editor
@@ -225,29 +252,31 @@ export function LinkedChecklistPlugin(props: LinkedChecklistPluginProps): null {
         return;
       }
 
-      const plan = planPush(items, synced.current, activeKey, pending.current);
-      for (const item of plan.create) {
-        pending.current.add(item.key);
-        latest.current
-          .createRecord({ title: item.title, completed: item.checked })
-          .then((id) => {
-            synced.current.set(id, {
-              title: item.title,
-              completed: item.checked,
-            });
-            // Merged into the edit before it: undo takes the line back, not
-            // just its link — a bare unlink would file it again at once.
-            editor.update(
-              () => {
-                const node = $getNodeByKey(item.key);
-                if (node) $setState(node, linkedItemState, id);
-              },
-              { tag: HISTORY_MERGE_TAG },
-            );
-          })
-          // Left unlinked; the next edit tries again.
-          .catch(() => undefined)
-          .finally(() => pending.current.delete(item.key));
+      const plan = planPush(items, synced.current, activeKey);
+      if (plan.create.length > 0) {
+        const { createId = () => crypto.randomUUID() } = latest.current;
+        const drafts = plan.create.map((item) => ({
+          key: item.key,
+          id: createId(),
+          draft: { title: item.title, completed: item.checked },
+        }));
+        // Linked first, filed second: see planPush. Merged into the edit
+        // before it, so undo takes the line back together with its link.
+        editor.update(
+          () => {
+            for (const { key, id } of drafts) {
+              const node = $getNodeByKey(key);
+              if (node) $setState(node, linkedItemState, id);
+            }
+          },
+          { tag: HISTORY_MERGE_TAG },
+        );
+        for (const { id, draft } of drafts) file(id, draft);
+      }
+      // Earlier failures, for lines still in the section.
+      const present = new Set(ids);
+      for (const [id, draft] of unfiled.current) {
+        if (present.has(id) && !filing.current.has(id)) file(id, draft);
       }
       for (const { id, patch } of plan.update) {
         const agreed = synced.current.get(id);

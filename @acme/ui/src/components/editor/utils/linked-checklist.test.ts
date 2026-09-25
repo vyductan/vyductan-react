@@ -16,17 +16,12 @@ const agreed = (entries: [string, SyncedRecord][]): Map<string, SyncedRecord> =>
 describe("planPush", () => {
   test("files an item once the caret has left it", () => {
     const items = [item("a", "Buy milk"), item("b", "Call m")];
-    const plan = planPush(items, new Map(), "b", new Set());
+    const plan = planPush(items, new Map(), "b");
     expect(plan.create.map((entry) => entry.title)).toEqual(["Buy milk"]);
   });
 
-  test("never files an empty item, or one already being filed", () => {
-    const plan = planPush(
-      [item("a", ""), item("b", "Buy milk")],
-      new Map(),
-      null,
-      new Set(["b"]),
-    );
+  test("never files an empty item", () => {
+    const plan = planPush([item("a", "")], new Map(), null);
     expect(plan.create).toEqual([]);
   });
 
@@ -34,27 +29,22 @@ describe("planPush", () => {
     const synced = agreed([["t1", { title: "Buy milk", completed: false }]]);
     const edited = [item("a", "Buy oat milk", "t1", true)];
 
-    expect(planPush(edited, synced, "a", new Set()).update).toEqual([
+    expect(planPush(edited, synced, "a").update).toEqual([
       { id: "t1", patch: { completed: true } },
     ]);
-    expect(planPush(edited, synced, null, new Set()).update).toEqual([
+    expect(planPush(edited, synced, null).update).toEqual([
       { id: "t1", patch: { completed: true, title: "Buy oat milk" } },
     ]);
   });
 
   test("an emptied item keeps its task's title", () => {
     const synced = agreed([["t1", { title: "Buy milk", completed: false }]]);
-    const plan = planPush([item("a", "", "t1")], synced, null, new Set());
+    const plan = planPush([item("a", "", "t1")], synced, null);
     expect(plan.update).toEqual([]);
   });
 
   test("sends nothing for a linked item not loaded yet", () => {
-    const plan = planPush(
-      [item("a", "Buy milk", "t1", true)],
-      new Map(),
-      null,
-      new Set(),
-    );
+    const plan = planPush([item("a", "Buy milk", "t1", true)], new Map(), null);
     expect(plan).toEqual({ create: [], update: [] });
   });
 });
@@ -97,6 +87,17 @@ describe("planPull", () => {
       "a",
     );
     expect(plan.set).toEqual([{ key: "a", checked: true }]);
+  });
+
+  test("a task still being filed is not mistaken for a deleted one", () => {
+    const plan = planPull(
+      [item("a", "Buy milk", "t1")],
+      [{ id: "t1", title: "", completed: false, deleted: true }],
+      new Map(),
+      null,
+      new Set(["t1"]),
+    );
+    expect(plan.unlink).toEqual([]);
   });
 
   test("a deleted task unlinks its item", () => {

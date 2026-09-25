@@ -50,24 +50,27 @@ export interface PushPlan {
  * title is not sent, until the caret leaves — otherwise every pause mid-word
  * would file a task named after half a word. A tick is sent at once, caret or
  * not. A linked item emptied of text keeps its record's title.
+ *
+ * A new item is linked BEFORE its record exists: the caller gives it an id
+ * first and files the record under that id. The id is in the document from
+ * then on, so a record whose id never got saved — filed, then the page left
+ * before the next save — cannot happen, and neither can the second record
+ * that item would have been filed as on the next open.
  */
 export function planPush(
   items: readonly ChecklistItemSnapshot[],
   synced: ReadonlyMap<string, SyncedRecord>,
   activeKey: NodeKey | null,
-  pending: ReadonlySet<NodeKey>,
 ): PushPlan {
   const plan: PushPlan = { create: [], update: [] };
   for (const item of items) {
     const editing = item.key === activeKey;
     if (item.linkedId === null) {
-      if (item.title !== "" && !editing && !pending.has(item.key)) {
-        plan.create.push(item);
-      }
+      if (item.title !== "" && !editing) plan.create.push(item);
       continue;
     }
-    // Not loaded yet: nothing to compare against, and pushing blind would
-    // overwrite whatever changed on the other side meanwhile.
+    // Not loaded yet (or still being filed): nothing to compare against, and
+    // pushing blind would overwrite whatever changed on the other side.
     const agreed = synced.get(item.linkedId);
     if (!agreed) continue;
     const patch: { title?: string; completed?: boolean } = {};
@@ -97,20 +100,24 @@ export interface PullPlan {
  * agreement (or there is no agreement yet — a freshly opened document defers
  * to the records). A field only the document changed is left for `planPush`.
  * When both changed, the record wins, except for the title of the item being
- * written, which is not rewritten under the caret.
+ * written, which is not rewritten under the caret. Records in `filing` are
+ * skipped until their insert has landed.
  */
 export function planPull(
   items: readonly ChecklistItemSnapshot[],
   records: readonly LinkedRecord[],
   synced: ReadonlyMap<string, SyncedRecord>,
   activeKey: NodeKey | null,
+  filing: ReadonlySet<string> = new Set(),
 ): PullPlan {
   const plan: PullPlan = { unlink: [], set: [], synced: new Map(synced) };
   const byId = new Map(records.map((record) => [record.id, record]));
   for (const item of items) {
     if (item.linkedId === null) continue;
     const record = byId.get(item.linkedId);
-    if (!record) continue;
+    // A record still being filed reads as missing to a fetch that raced its
+    // insert; taking that as a deletion would unlink it and file it twice.
+    if (!record || filing.has(record.id)) continue;
     if (record.deleted) {
       plan.unlink.push(item.key);
       plan.synced.delete(record.id);
