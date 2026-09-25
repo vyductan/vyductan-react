@@ -78,6 +78,11 @@ export default defineConfig({
           // its 15s budget before reaching the menu. Tests that only read the
           // DOM were unaffected; only real input queues behind storybook.
           sequence: { groupOrder: 0 },
+          // One file at a time. Files otherwise run side by side as iframes of
+          // one page, and a real key press goes to whichever iframe holds focus:
+          // a sibling test clicking or focusing its own editor took the ⌘K
+          // meant for link-shortcut, which then saw the key never arrive.
+          fileParallelism: false,
           include: ["src/**/*.browser.test.{ts,tsx}"],
           setupFiles: ["./vitest-setup.touch.ts"],
           browser: {
