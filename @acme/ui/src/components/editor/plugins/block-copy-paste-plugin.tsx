@@ -5,7 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type { ElementNode, LexicalNode } from "lexical";
+import type {
+  ElementNode,
+  LexicalNode,
+  PointType,
+  RangeSelection,
+} from "lexical";
 import { useEffect } from "react";
 import {
   $getClipboardDataFromSelection,
@@ -18,6 +23,7 @@ import {
   $getSelection,
   $isElementNode,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   $isTextNode,
   COMMAND_PRIORITY_LOW,
   COPY_COMMAND,
@@ -135,6 +141,160 @@ export function getMultiParagraphCopyPlainText(
     .join("\n\n");
 }
 
+/**
+ * The block a point sits in: the innermost list item, or else the top-level
+ * block. A nested item is its own block — "a." inside "1." — because that is
+ * the line the person is looking at.
+ */
+function $blockOf(point: PointType): LexicalNode | null {
+  let node: LexicalNode | null = point.getNode();
+  while (node) {
+    if ($isListItemNode(node)) return node;
+    const parent: LexicalNode | null = node.getParent();
+    if (parent === null || $isRootOrShadowRoot(parent)) return node;
+    node = parent;
+  }
+  return null;
+}
+
+/** Whether a point is at the very start of its block, before any of its text. */
+function $isAtBlockStart(point: PointType, block: LexicalNode): boolean {
+  if (point.offset !== 0) return false;
+  const node = point.getNode();
+  if (node.is(block)) return true;
+  const first = $isElementNode(block) ? block.getFirstDescendant() : null;
+  return first !== null && (node.is(first) || node.isParentOf(first));
+}
+
+/**
+ * The selection as the person meant it, and whether it lies inside one block.
+ *
+ * Highlighting a whole line — a triple-click, or a drag to its end — carries
+ * the selection to offset 0 of the next line. Nothing of that line is
+ * selected, but Lexical copies it as a second, empty block, so pasting brings
+ * the first block's list or heading along. Such an end is pulled back to the
+ * end of the line before it.
+ */
+function $selectionForCopy(selection: RangeSelection): {
+  selection: RangeSelection;
+  withinOneBlock: boolean;
+} {
+  const copy = selection.clone();
+  const backward = copy.isBackward();
+  const start = backward ? copy.focus : copy.anchor;
+  const end = backward ? copy.anchor : copy.focus;
+
+  const startBlock = $blockOf(start);
+  let endBlock = $blockOf(end);
+
+  if (
+    startBlock &&
+    endBlock &&
+    !startBlock.is(endBlock) &&
+    $isAtBlockStart(end, endBlock)
+  ) {
+    const previous =
+      endBlock.getPreviousSibling() ??
+      endBlock.getParent()?.getPreviousSibling() ??
+      null;
+    const last =
+      startBlock.is(previous) || !previous
+        ? $isElementNode(startBlock)
+          ? startBlock.getLastDescendant()
+          : startBlock
+        : $isElementNode(previous)
+          ? previous.getLastDescendant()
+          : previous;
+    if ($isTextNode(last)) {
+      end.set(last.getKey(), last.getTextContentSize(), "text");
+      endBlock = $blockOf(end);
+    }
+  }
+
+  return {
+    selection: copy,
+    withinOneBlock:
+      startBlock !== null && endBlock !== null && startBlock.is(endBlock),
+  };
+}
+
+/** Inline node types — what is left once the blocks around a copy are gone. */
+const INLINE_TYPES = new Set([
+  "text",
+  "linebreak",
+  "tab",
+  "link",
+  "autolink",
+  "code-highlight",
+  "hashtag",
+  "mention",
+  "emoji",
+  "keyword",
+  "image",
+  "equation",
+]);
+
+/**
+ * Lexical's clipboard JSON with the blocks around it taken away, leaving the
+ * inline content: what a copy from inside one block should carry. Pasted, it
+ * joins the line it lands on instead of replacing that line's block.
+ */
+export function unwrapToInlineClipboardJson(json: string): string {
+  let parsed: { nodes?: unknown[] } & Record<string, unknown>;
+  try {
+    parsed = JSON.parse(json) as typeof parsed;
+  } catch {
+    return json;
+  }
+
+  let nodes = parsed.nodes ?? [];
+  for (;;) {
+    const [only] = nodes as Array<{ type?: string; children?: unknown[] }>;
+    if (
+      nodes.length !== 1 ||
+      !only ||
+      INLINE_TYPES.has(only.type ?? "") ||
+      !Array.isArray(only.children)
+    ) {
+      break;
+    }
+    nodes = only.children;
+  }
+
+  return JSON.stringify({ ...parsed, nodes });
+}
+
+const BLOCK_TAGS = new Set([
+  "OL",
+  "UL",
+  "LI",
+  "P",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "BLOCKQUOTE",
+  "PRE",
+  "DIV",
+]);
+
+/** The same for the HTML copy: the markup inside the block wrappers. */
+export function unwrapToInlineHtml(html: string): string {
+  if (!html) return html;
+  const document = new DOMParser().parseFromString(html, "text/html");
+  let container: Element = document.body;
+  while (
+    container.children.length === 1 &&
+    container.childNodes.length === 1 &&
+    BLOCK_TAGS.has(container.children[0]!.tagName)
+  ) {
+    container = container.children[0]!;
+  }
+  return container === document.body ? html : container.innerHTML;
+}
+
 export function BlockCopyPastePlugin(): null {
   const [editor] = useLexicalComposerContext();
 
@@ -164,8 +324,22 @@ export function BlockCopyPastePlugin(): null {
               return;
             }
 
-            const clipboardData =
-              $getClipboardDataFromSelection(currentSelection);
+            const { selection: meant, withinOneBlock } =
+              $selectionForCopy(currentSelection);
+            const clipboardData = $getClipboardDataFromSelection(meant);
+
+            // Words copied from inside one block carry no block of their
+            // own, as in Notion: pasted, they join the line they land on.
+            if (withinOneBlock) {
+              const lexical = clipboardData["application/x-lexical-editor"];
+              if (lexical) {
+                clipboardData["application/x-lexical-editor"] =
+                  unwrapToInlineClipboardJson(lexical);
+              }
+              clipboardData["text/html"] = unwrapToInlineHtml(
+                clipboardData["text/html"] ?? "",
+              );
+            }
             clipboardData["text/html"] =
               getSingleParagraphSoftLineBreakCopyHtml(
                 clipboardData["text/plain"],
@@ -296,8 +470,22 @@ export function BlockCopyPastePlugin(): null {
               return;
             }
 
-            const clipboardData =
-              $getClipboardDataFromSelection(currentSelection);
+            const { selection: meant, withinOneBlock } =
+              $selectionForCopy(currentSelection);
+            const clipboardData = $getClipboardDataFromSelection(meant);
+
+            // Words copied from inside one block carry no block of their
+            // own, as in Notion: pasted, they join the line they land on.
+            if (withinOneBlock) {
+              const lexical = clipboardData["application/x-lexical-editor"];
+              if (lexical) {
+                clipboardData["application/x-lexical-editor"] =
+                  unwrapToInlineClipboardJson(lexical);
+              }
+              clipboardData["text/html"] = unwrapToInlineHtml(
+                clipboardData["text/html"] ?? "",
+              );
+            }
             clipboardData["text/html"] =
               getSingleParagraphSoftLineBreakCopyHtml(
                 clipboardData["text/plain"],
