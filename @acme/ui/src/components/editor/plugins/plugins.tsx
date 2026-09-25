@@ -16,7 +16,7 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
-import type { MentionData } from "../plugins/mentions-plugin";
+import type { MentionData, SearchPageLinks } from "../plugins/mentions-plugin";
 import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
@@ -75,6 +75,7 @@ export function Plugins({
   editable = true,
   variant = "default",
   mentionsData,
+  searchPageLinks,
   resolvePasteLink,
   className,
   classNames,
@@ -86,6 +87,7 @@ export function Plugins({
   editable?: boolean;
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
+  searchPageLinks?: SearchPageLinks;
   resolvePasteLink?: ResolvePasteLink;
   className?: string;
   classNames?: {
@@ -204,7 +206,10 @@ export function Plugins({
       <HistoryPlugin />
       <BlockTypeNormalizationPlugin />
 
-      <MentionsPlugin mentionsData={mentionsData} />
+      <MentionsPlugin
+        mentionsData={mentionsData}
+        searchPageLinks={editable ? searchPageLinks : undefined}
+      />
       {!isSimple && <PageBreakPlugin />}
       {!isSimple && editable && (
         <DraggableBlockPlugin anchorElem={floatingAnchorElement} size={size} />

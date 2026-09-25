@@ -7,7 +7,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
 import type { SizeType } from "../config-provider/size-context";
 import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
-import type { MentionData } from "./plugins/mentions-plugin";
+import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
 import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
@@ -46,6 +46,13 @@ type EditorPropertiesBase = {
   }) => void;
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
+  /**
+   * Find pages for the "@" menu's "Link to page" section. Picking one inserts
+   * the same pill "Paste as → Mention" does. Leaving it out keeps "@" to
+   * people only; like `resolvePasteLink`, knowing the host's pages is the
+   * consumer's job.
+   */
+  searchPageLinks?: SearchPageLinks;
   /**
    * Identify a pasted URL, so the editor can offer to insert it as a readable
    * mention instead of a bare URL. Returning null declines the offer, and
@@ -129,6 +136,7 @@ export function Editor({
   format = "json",
   variant = "default",
   mentionsData,
+  searchPageLinks,
   resolvePasteLink,
   className,
   classNames,
@@ -169,6 +177,7 @@ export function Editor({
             onImageUpload={onImageUpload}
             variant={variant}
             mentionsData={mentionsData}
+            searchPageLinks={searchPageLinks}
             resolvePasteLink={resolvePasteLink}
             className={className}
             classNames={classNames}

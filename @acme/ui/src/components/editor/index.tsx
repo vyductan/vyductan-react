@@ -6,6 +6,10 @@ export type {
   ResolvedPasteLink,
   ResolvePasteLink,
 } from "./plugins/paste-as-plugin";
+export type {
+  PageLinkOption,
+  SearchPageLinks,
+} from "./plugins/mentions-plugin";
 export * from "./utils/blocktype-normalization";
 export * from "./utils/lexical-converter";
 export { EditorErrorBoundary } from "./components/editor-error-boundary";

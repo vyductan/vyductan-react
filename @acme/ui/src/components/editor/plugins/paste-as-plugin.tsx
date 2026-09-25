@@ -25,11 +25,10 @@
 import type { LinkNode } from "@lexical/link";
 import type { JSX } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { $createLinkNode, $isLinkNode } from "@lexical/link";
+import { $isLinkNode } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
-  $createTextNode,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
@@ -46,6 +45,7 @@ import { createPortal } from "react-dom";
 
 import { cn } from "@acme/ui/lib/utils";
 
+import { $createPageLinkNode, pageLinkLabel } from "../utils/page-link";
 import { setFloatingElemPositionForLinkEditor } from "../utils/set-floating-elem-position-for-link-editor";
 
 /** What the host knows about a pasted URL. */
@@ -64,9 +64,6 @@ export type ResolvedPasteLink = {
 export type ResolvePasteLink = (
   url: string,
 ) => Promise<ResolvedPasteLink | null> | ResolvedPasteLink | null;
-
-/** Used when the host resolves a link but offers no icon of its own. */
-const DEFAULT_ICON = "📄";
 
 /** Named rather than indexed, so no two call sites can disagree on the order. */
 const PASTE_AS_OPTIONS = ["mention", "url"] as const;
@@ -110,12 +107,9 @@ type Offer = {
   rect: DOMRect | null;
 };
 
-/**
- * The text a mention reads as. One function, because the popover promises this
- * string and the document has to receive exactly it.
- */
+/** The text a mention reads as — the popover promises exactly this string. */
 function mentionLabel(resolved: ResolvedPasteLink): string {
-  return `${resolved.icon ?? DEFAULT_ICON} ${resolved.title}`;
+  return pageLinkLabel(resolved);
 }
 
 /**
@@ -178,10 +172,11 @@ function $applyMention(offer: Offer): boolean {
     return false;
   }
 
-  const mention = $createLinkNode(offer.resolved.url ?? offer.url, {
-    rel: "mention",
+  const mention = $createPageLinkNode({
+    url: offer.resolved.url ?? offer.url,
+    title: offer.resolved.title,
+    icon: offer.resolved.icon,
   });
-  mention.append($createTextNode(mentionLabel(offer.resolved)));
 
   const existingLink = $findMatchingParent(
     node,
