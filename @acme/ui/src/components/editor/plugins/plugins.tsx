@@ -46,6 +46,7 @@ import { FindReplacePlugin } from "../plugins/find-replace-plugin";
 import { FloatingLinkEditorPlugin } from "../plugins/floating-link-editor-plugin";
 import { FloatingTextFormatToolbarPlugin } from "../plugins/floating-text-format-toolbar-plugin";
 import { FormatShortcutsPlugin } from "../plugins/format-shortcuts-plugin";
+import { ImageLineClickPlugin } from "../plugins/image-line-click-plugin";
 import { ImagesPlugin } from "../plugins/images-plugin";
 import { KeyboardShortcutsHelpPlugin } from "../plugins/keyboard-shortcuts-help-plugin";
 import { KeywordsPlugin } from "../plugins/keywords-plugin";
@@ -213,6 +214,7 @@ export function Plugins({
       <BlockTypeNormalizationPlugin />
       <ResetFormatOnEnterPlugin />
       <FormatShortcutsPlugin />
+      <ImageLineClickPlugin />
 
       <MentionsPlugin
         mentionsData={mentionsData}
