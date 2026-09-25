@@ -1,5 +1,6 @@
 import type { LinkNode } from "@lexical/link";
-import { $createLinkNode } from "@lexical/link";
+import type { LexicalNode } from "lexical";
+import { $createLinkNode, $isLinkNode } from "@lexical/link";
 import { $createTextNode } from "lexical";
 
 /** Used when the host names a page but offers no icon of its own. */
@@ -39,4 +40,13 @@ export function $createPageLinkNode(target: PageLinkTarget): LinkNode {
   const link = $createLinkNode(target.url, { rel: "mention" });
   link.append($createTextNode(pageLinkLabel(target)));
   return link;
+}
+
+/**
+ * Whether a node is a page-link pill rather than an ordinary link. A plain
+ * boolean, not a type guard: a guard would narrow the non-pill branch to "not
+ * a LinkNode", which is false — ordinary links take that branch.
+ */
+export function $isPageLinkNode(node: LexicalNode | null | undefined): boolean {
+  return $isLinkNode(node) && node.getRel() === "mention";
 }

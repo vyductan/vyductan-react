@@ -37,6 +37,7 @@ import { Input } from "@acme/ui/components/input";
 
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { getSelectedNode } from "../utils/get-selected-node";
+import { $isPageLinkNode } from "../utils/page-link";
 import { setFloatingElemPositionForLinkEditor as setFloatingElementPositionForLinkEditor } from "../utils/set-floating-elem-position-for-link-editor";
 import { sanitizeUrl } from "../utils/url";
 
@@ -593,7 +594,13 @@ function useFloatingLinkEditorToolbar(
           focusNode,
           $isAutoLinkNode,
         );
-        if ((focusLinkNode ?? focusAutoLinkNode) == undefined) {
+        // A page-link pill is edited as a unit (delete it, pick another page),
+        // never by its URL — its hover card is the affordance there, and an
+        // editable "/notes/…" path on top of it reads as a broken link.
+        if (
+          (focusLinkNode ?? focusAutoLinkNode) == undefined ||
+          $isPageLinkNode(focusLinkNode)
+        ) {
           setIsLink(false);
           return;
         }

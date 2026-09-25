@@ -10,6 +10,10 @@ export type {
   PageLinkOption,
   SearchPageLinks,
 } from "./plugins/mentions-plugin";
+export type {
+  PageLinkPreview,
+  ResolvePageLinkPreview,
+} from "./plugins/page-link-hover-card-plugin";
 export * from "./utils/blocktype-normalization";
 export * from "./utils/lexical-converter";
 export { EditorErrorBoundary } from "./components/editor-error-boundary";

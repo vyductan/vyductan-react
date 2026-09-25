@@ -17,6 +17,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import type { MentionData, SearchPageLinks } from "../plugins/mentions-plugin";
+import type { ResolvePageLinkPreview } from "../plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
@@ -53,6 +54,7 @@ import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugi
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
+import { PageLinkHoverCardPlugin } from "../plugins/page-link-hover-card-plugin";
 import { PasteAsPlugin } from "../plugins/paste-as-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
@@ -76,6 +78,7 @@ export function Plugins({
   variant = "default",
   mentionsData,
   searchPageLinks,
+  resolvePageLinkPreview,
   resolvePasteLink,
   className,
   classNames,
@@ -88,6 +91,7 @@ export function Plugins({
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
   searchPageLinks?: SearchPageLinks;
+  resolvePageLinkPreview?: ResolvePageLinkPreview;
   resolvePasteLink?: ResolvePasteLink;
   className?: string;
   classNames?: {
@@ -210,6 +214,11 @@ export function Plugins({
         mentionsData={mentionsData}
         searchPageLinks={editable ? searchPageLinks : undefined}
       />
+      {resolvePageLinkPreview && (
+        <PageLinkHoverCardPlugin
+          resolvePageLinkPreview={resolvePageLinkPreview}
+        />
+      )}
       {!isSimple && <PageBreakPlugin />}
       {!isSimple && editable && (
         <DraggableBlockPlugin anchorElem={floatingAnchorElement} size={size} />

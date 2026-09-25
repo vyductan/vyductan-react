@@ -8,6 +8,7 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import type { SizeType } from "../config-provider/size-context";
 import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
 import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
+import type { ResolvePageLinkPreview } from "./plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
@@ -53,6 +54,12 @@ type EditorPropertiesBase = {
    * consumer's job.
    */
   searchPageLinks?: SearchPageLinks;
+  /**
+   * Describe the page behind a page-link pill, for the card shown while the
+   * pointer rests on it. Returning null shows nothing; leaving it out turns
+   * the card off.
+   */
+  resolvePageLinkPreview?: ResolvePageLinkPreview;
   /**
    * Identify a pasted URL, so the editor can offer to insert it as a readable
    * mention instead of a bare URL. Returning null declines the offer, and
@@ -137,6 +144,7 @@ export function Editor({
   variant = "default",
   mentionsData,
   searchPageLinks,
+  resolvePageLinkPreview,
   resolvePasteLink,
   className,
   classNames,
@@ -178,6 +186,7 @@ export function Editor({
             variant={variant}
             mentionsData={mentionsData}
             searchPageLinks={searchPageLinks}
+            resolvePageLinkPreview={resolvePageLinkPreview}
             resolvePasteLink={resolvePasteLink}
             className={className}
             classNames={classNames}
