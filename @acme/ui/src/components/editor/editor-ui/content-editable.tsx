@@ -70,13 +70,24 @@ const PLACEHOLDER_BOX =
 // The focused empty line's prompt (BlockPlaceholderPlugin sets the attribute).
 // A zero-height float: it takes no room, so the caret stays at the line's
 // start and the prompt sits under it rather than pushing it right.
+//
+// A checklist item's ::before is its checkbox, so there the prompt is ::after,
+// taken out of flow: after the item's <br> it would start a line of its own,
+// but absolutely placed it keeps the line's start as its static left edge and
+// only needs pulling up to the top.
 const BLOCK_PLACEHOLDER = cn(
-  "[&_[data-placeholder]]:before:content-[attr(data-placeholder)]",
-  "[&_[data-placeholder]]:before:text-muted-foreground",
-  "[&_[data-placeholder]]:before:pointer-events-none",
-  "[&_[data-placeholder]]:before:float-left",
-  "[&_[data-placeholder]]:before:h-0",
-  "[&_[data-placeholder]]:before:select-none",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:content-[attr(data-placeholder)]",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:text-muted-foreground",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:pointer-events-none",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:float-left",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:h-0",
+  "[&_[data-placeholder]:not([role=checkbox])]:before:select-none",
+  "[&_[data-placeholder][role=checkbox]]:after:content-[attr(data-placeholder)]",
+  "[&_[data-placeholder][role=checkbox]]:after:text-muted-foreground",
+  "[&_[data-placeholder][role=checkbox]]:after:pointer-events-none",
+  "[&_[data-placeholder][role=checkbox]]:after:absolute",
+  "[&_[data-placeholder][role=checkbox]]:after:top-0",
+  "[&_[data-placeholder][role=checkbox]]:after:select-none",
 );
 
 export function ContentEditable({

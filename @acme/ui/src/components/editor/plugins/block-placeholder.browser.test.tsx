@@ -199,3 +199,35 @@ test("an unmarked list line reads as a paragraph", async () => {
     ]),
   );
 });
+
+test("an empty checklist item shows “To-do” and keeps its checkbox", async () => {
+  const editor = await renderEditor(() => {
+    $getRoot()
+      .clear()
+      .append(
+        $createListNode("check").append(
+          $createListItemNode(false).append($createTextNode("buy milk")),
+          $createListItemNode(false),
+        ),
+      );
+  });
+  caretInto(editor, () => {
+    $getRoot()
+      .getFirstChildOrThrow<ElementNode>()
+      .getLastChildOrThrow<ElementNode>()
+      .selectStart();
+  });
+
+  const [filled, empty] = document.querySelectorAll<HTMLLIElement>(
+    '[contenteditable="true"] li',
+  );
+  await waitFor(() =>
+    expect(getComputedStyle(empty!, "::after").content).toBe('"To-do"'),
+  );
+  // The box is still drawn, and the prompt takes no line of its own.
+  expect(getComputedStyle(empty!, "::before").content).toBe('""');
+  expect(empty!.getBoundingClientRect().height).toBeCloseTo(
+    filled!.getBoundingClientRect().height,
+    0,
+  );
+});

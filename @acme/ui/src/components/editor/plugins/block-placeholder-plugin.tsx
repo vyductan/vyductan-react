@@ -17,7 +17,7 @@ import {
 
 import { $isUnmarkedItem } from "../utils/list-marker";
 
-/** Read by the editable's `[data-placeholder]::before` rule. */
+/** Read by the editable's `[data-placeholder]` pseudo-element rules. */
 export const BLOCK_PLACEHOLDER_ATTRIBUTE = "data-placeholder";
 
 /**
@@ -27,10 +27,11 @@ export const BLOCK_PLACEHOLDER_ATTRIBUTE = "data-placeholder";
 function $placeholderFor(node: LexicalNode, paragraph: string): string | null {
   if ($isListItemNode(node)) {
     if ($isUnmarkedItem(node)) return paragraph;
-    // A checklist item draws its checkbox with ::before, the pseudo-element
-    // the prompt would take; it stays blank rather than lose the box.
     const list = node.getParent();
-    return $isListNode(list) && list.getListType() === "check" ? null : "List";
+    if (!$isListNode(list) || list.getListType() !== "check") return "List";
+    // A checklist item's box is its ::before, so its prompt is drawn with
+    // ::after — which a ticked item spends on the tick. Ticked stays blank.
+    return node.getChecked() ? null : "To-do";
   }
   if ($isHeadingNode(node)) return `Heading ${node.getTag().slice(1)}`;
   if ($isQuoteNode(node)) return "Empty quote";

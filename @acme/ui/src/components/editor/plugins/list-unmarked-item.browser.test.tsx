@@ -7,12 +7,13 @@ import {
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
-import { $createTextNode, $getRoot, $isTextNode } from "lexical";
+import { $createTextNode, $getRoot, $isTextNode, $setState } from "lexical";
 import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 import { EditorRender } from "../editor-render";
+import { unmarkedState } from "../utils/list-marker";
 
 // Runs in the `browser` project: Backspace has to be a real key press so it
 // goes through Lexical's own delete handling first.
@@ -219,3 +220,67 @@ test.each(["number", "bullet"] as const)(
     );
   },
 );
+
+test("Enter on an unmarked line starts another one, aligned with it", async () => {
+  const editor = await renderList();
+  await caretIn(editor, "bb", 0);
+  await userEvent.keyboard("{Backspace}");
+  await waitFor(() => expect(markers()[1]?.marker).toBe(""));
+  await caretIn(editor, "bb", 2);
+  await userEvent.keyboard("{Enter}dd");
+  await waitFor(() => expect(items()).toHaveLength(4));
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const [first, bb, dd] = items();
+  expect(markers()[2]).toEqual({ text: "dd", marker: "" });
+  expect(Math.abs(textLeft(dd!) - textLeft(bb!))).toBeLessThan(1.5);
+  expect(Math.abs(textLeft(dd!) - markerStart(first!))).toBeLessThan(1.5);
+});
+
+test("unmarked lines with no labelled item above still line up", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const unmarkedItem = (text: string) => {
+    const node = item(text);
+    $setState(node, unmarkedState, true);
+    return node;
+  };
+  // Third level numbers i./ii./iii.: the hidden numerals differ in width.
+  (editor as unknown as LexicalEditor).update(
+    () => {
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("number").append(
+            item("top"),
+            $createListItemNode().append(
+              $createListNode("number").append(
+                item("mid"),
+                $createListItemNode().append(
+                  $createListNode("number").append(
+                    unmarkedItem("one"),
+                    unmarkedItem("two"),
+                    unmarkedItem("three"),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+    },
+    { discrete: true },
+  );
+  await waitFor(() => expect(items()).toHaveLength(7));
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  const lefts = items()
+    .filter((li) => ["one", "two", "three"].includes(li.textContent ?? ""))
+    .map((li) => textLeft(li));
+  expect(lefts).toHaveLength(3);
+  expect(Math.max(...lefts) - Math.min(...lefts)).toBeLessThan(1);
+});
