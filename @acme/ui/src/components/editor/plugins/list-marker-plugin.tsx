@@ -1,0 +1,103 @@
+"use client";
+
+import { useEffect } from "react";
+import { $isListItemNode, $isListNode } from "@lexical/list";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $dfs, $findMatchingParent, mergeRegister } from "@lexical/utils";
+import {
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $setState,
+  COMMAND_PRIORITY_LOW,
+  KEY_BACKSPACE_COMMAND,
+} from "lexical";
+
+import {
+  $displayedListValues,
+  $isNestedListHolder,
+  $isUnmarkedItem,
+  unmarkedState,
+} from "../utils/list-marker";
+
+/**
+ * Notion-style Backspace at the start of a list item: the marker goes, the
+ * line stays in the list at the same depth as a continuation of the item
+ * above. Backspace again on that line falls through to Lexical, which takes it
+ * out of the list. Checklists keep Lexical's behaviour — their marker is the
+ * checkbox.
+ *
+ * Lexical renders every item with a marker and numbers them by position, so
+ * after each update the DOM is corrected: unmarked items lose their marker and
+ * the numbers of the rest skip them.
+ */
+export function ListMarkerPlugin(): null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(
+    () =>
+      mergeRegister(
+        editor.registerCommand(
+          KEY_BACKSPACE_COMMAND,
+          (event) => {
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+              return false;
+            }
+            const { anchor } = selection;
+            if (anchor.offset !== 0) return false;
+            const anchorNode = anchor.getNode();
+            const item = $isListItemNode(anchorNode)
+              ? anchorNode
+              : $findMatchingParent(anchorNode, $isListItemNode);
+            if (!$isListItemNode(item) || $isNestedListHolder(item))
+              return false;
+            if ($isUnmarkedItem(item)) return false;
+            const list = item.getParent();
+            if (!$isListNode(list) || list.getListType() === "check") {
+              return false;
+            }
+            // Only at the very start of the item's text.
+            const first = item.getFirstDescendant();
+            const atStart =
+              anchorNode.is(item) || (first !== null && anchorNode.is(first));
+            if (!atStart) return false;
+
+            event?.preventDefault();
+            $setState(item, unmarkedState, true);
+            return true;
+          },
+          COMMAND_PRIORITY_LOW,
+        ),
+        editor.registerUpdateListener(({ editorState }) => {
+          editorState.read(() => {
+            for (const { node } of $dfs($getRoot())) {
+              if (!$isListNode(node)) continue;
+              const values = $displayedListValues(node);
+              const numbered = node.getListType() === "number";
+              for (const child of node.getChildren()) {
+                if (!$isListItemNode(child) || $isNestedListHolder(child)) {
+                  continue;
+                }
+                const element = editor.getElementByKey(child.getKey());
+                if (!(element instanceof HTMLLIElement)) continue;
+                const unmarked = $isUnmarkedItem(child);
+                element.style.listStyleType = unmarked ? "none" : "";
+                const value = values.get(child.getKey());
+                if (
+                  numbered &&
+                  value !== undefined &&
+                  element.value !== value
+                ) {
+                  element.value = value;
+                }
+              }
+            }
+          });
+        }),
+      ),
+    [editor],
+  );
+
+  return null;
+}

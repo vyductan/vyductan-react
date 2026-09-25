@@ -202,6 +202,12 @@ function renderListNode(
           node.listType === "check" && richTextSemanticContract.list.checklist,
         );
   const items = coalesceNestedListItems(node.children);
+  // Unmarked items (continuation lines) take no number, as in the editor;
+  // the serialized `value` counts them, so the numbers are recomputed.
+  let nextValue = node.start;
+  const values = items.map((item) =>
+    item.$?.unmarked === true ? undefined : nextValue++,
+  );
 
   return (
     <Tag
@@ -210,7 +216,7 @@ function renderListNode(
       start={node.tag === "ol" ? node.start : undefined}
     >
       {items.map((child, index) =>
-        renderListItemNode(child, `${key}-${index}`, depth),
+        renderListItemNode(child, `${key}-${index}`, depth, values[index]),
       )}
     </Tag>
   );
@@ -220,7 +226,9 @@ function renderListItemNode(
   node: EditorRenderListItemNode,
   key: string,
   depth: number,
+  displayedValue?: number,
 ): ReactNode {
+  const isUnmarked = node.$?.unmarked === true;
   const isChecklistItem = typeof node.checked === "boolean";
   const checkboxLabel = isChecklistItem ? getListItemLabel(node) : undefined;
   const className = cn(
@@ -233,7 +241,12 @@ function renderListItemNode(
   );
 
   return (
-    <li key={key} className={className} value={node.value}>
+    <li
+      key={key}
+      className={className}
+      value={isUnmarked ? undefined : (displayedValue ?? node.value)}
+      style={isUnmarked ? { listStyleType: "none" } : undefined}
+    >
       {isChecklistItem ? (
         <input
           aria-label={checkboxLabel || undefined}

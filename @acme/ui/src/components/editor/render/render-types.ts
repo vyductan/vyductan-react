@@ -97,6 +97,8 @@ export type EditorRenderListItemNode = Omit<
   >;
   type: "listitem";
   value: number;
+  /** NodeState; `unmarked` is a continuation line without a marker. */
+  $?: { unmarked?: boolean };
 };
 
 export type EditorRenderCheckBlockNode = Omit<
