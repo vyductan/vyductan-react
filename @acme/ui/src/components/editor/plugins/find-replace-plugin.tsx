@@ -93,6 +93,16 @@ function scrollParentOf(element: HTMLElement): HTMLElement | null {
   return null;
 }
 
+/**
+ * The DOM text a Lexical text node renders into. Formatted text is wrapped —
+ * inline code as <code><span>, bold as <strong> — so it is not always the
+ * element's first child; those matches were counted and never painted.
+ */
+function firstTextNode(element: HTMLElement): Text | null {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+  return walker.nextNode() as Text | null;
+}
+
 type HighlightRegistry = Map<string, unknown>;
 type HighlightConstructor = new (...ranges: Range[]) => unknown;
 
@@ -231,8 +241,8 @@ export function FindReplacePlugin({
     const length = queryReference.current.length;
     const ranges = matches.map((match) => {
       const element = editor.getElementByKey(match.key);
-      const text = element?.firstChild;
-      if (!text || text.nodeType !== Node.TEXT_NODE) return null;
+      const text = element ? firstTextNode(element) : null;
+      if (!text) return null;
       const range = document.createRange();
       const end = Math.min(
         match.offset + length,

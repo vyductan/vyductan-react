@@ -185,3 +185,67 @@ test("replaces one match, then all of the rest, in place", async () => {
     ),
   );
 });
+
+/**
+ * Formatted text is wrapped in more elements — inline code in <code><span>,
+ * bold in <strong> — so the text is not the element's first child. Those
+ * matches were counted but never painted.
+ */
+test("highlights a match inside formatted text too", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <div style={{ width: 380, marginLeft: 16 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>,
+  );
+
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    root.append(
+      $createParagraphNode().append(
+        $createTextNode("plain email, "),
+        $createTextNode("code email").toggleFormat("code"),
+        $createTextNode(" and "),
+        $createTextNode("bold email").toggleFormat("bold"),
+      ),
+    );
+  });
+
+  const contentEditable = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node?.textContent).toContain("bold email");
+    return node!;
+  });
+
+  await userEvent.click(contentEditable);
+  await userEvent.keyboard("{Control>}f{/Control}");
+  const input = await waitFor(() => {
+    const node = document.querySelector<HTMLInputElement>(
+      'input[aria-label="Find in note"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  await userEvent.fill(input, "email");
+  await waitFor(() => expect(counter()).toBe("1 of 3"));
+
+  const highlights = (
+    globalThis.CSS as unknown as { highlights: Map<string, Set<Range>> }
+  ).highlights;
+  await waitFor(() => expect(highlights.get("editor-find")?.size).toBe(3));
+
+  const painted = [...highlights.get("editor-find")!].map((range) =>
+    range.toString(),
+  );
+  expect(painted).toStrictEqual(["email", "email", "email"]);
+});
