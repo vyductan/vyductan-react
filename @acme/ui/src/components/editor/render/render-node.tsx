@@ -7,6 +7,7 @@ import type {
   EditorRenderCheckBlockNode,
   EditorRenderCodeHighlightNode,
   EditorRenderContent,
+  EditorRenderImageNode,
   EditorRenderInlineNode,
   EditorRenderLinkNode,
   EditorRenderListItemNode,
@@ -148,10 +149,46 @@ export function renderNode(
     case "code-highlight": {
       return renderCodeHighlightNode(node, key);
     }
+    case "image": {
+      return renderImageNode(node, key);
+    }
     default: {
       return null;
     }
   }
+}
+
+/**
+ * Sources an image may come from: an inline image pasted into the note, the
+ * web, or this site. Anything else — `javascript:`, a `data:` URI that is not
+ * an image — is not drawn.
+ */
+const SAFE_IMAGE_SOURCE =
+  /^(?:data:image\/(?:png|jpe?g|gif|webp|avif);base64,|https?:\/\/|\/(?!\/))/i;
+
+function renderImageNode(node: EditorRenderImageNode, key: string): ReactNode {
+  if (!SAFE_IMAGE_SOURCE.test(node.src)) return null;
+
+  // 0 is how the editor serializes "the image's own size".
+  const width = node.width || undefined;
+  const height = node.height || undefined;
+
+  return (
+    <img
+      key={key}
+      src={node.src}
+      alt={node.altText ?? ""}
+      width={width}
+      height={height}
+      loading="lazy"
+      className="inline-block h-auto max-w-full align-bottom"
+      style={
+        node.maxWidth
+          ? { maxWidth: `min(100%, ${node.maxWidth}px)` }
+          : undefined
+      }
+    />
+  );
 }
 
 function renderInlineChildren(

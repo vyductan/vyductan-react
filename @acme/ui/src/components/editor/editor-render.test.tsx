@@ -502,14 +502,18 @@ describe("EditorRender", () => {
     expect(rendered.container.firstChild).toBeNull();
   });
 
-  test("returns null for unsupported markdown and html source inputs", () => {
+  // Images used to be refused, which took the whole document with them; a
+  // published note with a picture came out blank. They render now.
+  test("renders an image from markdown and html sources", () => {
     const markdownImage = render(
       <EditorRender
         format="markdown"
-        value={editorRenderSourceFixtures.unsupportedImage.markdown}
+        value={editorRenderSourceFixtures.image.markdown}
       />,
     );
-    expect(markdownImage.container.firstChild).toBeNull();
+    expect(
+      markdownImage.container.querySelector("img")?.getAttribute("src"),
+    ).toBe("https://example.com/image.png");
 
     cleanup();
 
@@ -534,10 +538,12 @@ describe("EditorRender", () => {
       const htmlImage = render(
         <EditorRender
           format="html"
-          value={editorRenderSourceFixtures.unsupportedImage.html}
+          value={editorRenderSourceFixtures.image.html}
         />,
       );
-      expect(htmlImage.container.firstChild).toBeNull();
+      expect(
+        htmlImage.container.querySelector("img")?.getAttribute("alt"),
+      ).toBe("A diagram");
     } finally {
       Object.assign(globalThis, {
         DOMParser: originalDomParser,
@@ -580,5 +586,111 @@ describe("EditorRender", () => {
       expect(rendered.container.firstChild).toBeNull();
       cleanup();
     }
+  });
+});
+
+describe("EditorRender with nodes beyond plain text", () => {
+  const base = { direction: "ltr", format: "", indent: 0, version: 1 };
+  const text = (value: string) => ({
+    type: "text",
+    text: value,
+    format: 0,
+    detail: 0,
+    mode: "normal",
+    style: "",
+    version: 1,
+  });
+  const paragraph = (...children: unknown[]) => ({
+    ...base,
+    type: "paragraph",
+    children,
+    textFormat: 0,
+    textStyle: "",
+  });
+  const image = (src: string, altText = "diagram") => ({
+    type: "image",
+    version: 1,
+    src,
+    altText,
+    width: 0,
+    height: 0,
+    maxWidth: 500,
+    showCaption: false,
+  });
+  const document_ = (...children: unknown[]) =>
+    JSON.stringify({ root: { ...base, type: "root", children } });
+
+  /**
+   * One image used to make the whole document "invalid", and the renderer
+   * drew nothing at all — a published note with a picture in it was blank
+   * below its title.
+   */
+  test("draws an image and the text around it", () => {
+    const { container } = render(
+      <EditorRender
+        value={document_(
+          paragraph(text("Before")),
+          paragraph(image("data:image/png;base64,iVBORw0KGgo=")),
+          paragraph(text("After")),
+        )}
+      />,
+    );
+
+    const img = container.querySelector("img");
+    expect(img?.getAttribute("src")).toBe("data:image/png;base64,iVBORw0KGgo=");
+    expect(img?.getAttribute("alt")).toBe("diagram");
+    expect(container.textContent).toContain("Before");
+    expect(container.textContent).toContain("After");
+  });
+
+  test("draws an image from a web address", () => {
+    const { container } = render(
+      <EditorRender
+        value={document_(paragraph(image("https://x.test/a.png")))}
+      />,
+    );
+
+    expect(container.querySelector("img")?.getAttribute("src")).toBe(
+      "https://x.test/a.png",
+    );
+  });
+
+  test("refuses an image source that is not an image", () => {
+    const { container } = render(
+      <EditorRender
+        value={document_(
+          paragraph(image("javascript:alert(1)")),
+          paragraph(text("Still here")),
+        )}
+      />,
+    );
+
+    expect(container.querySelector("img")).toBeNull();
+    expect(container.textContent).toContain("Still here");
+  });
+
+  /**
+   * A node this renderer does not draw — an equation, an embed — is left out,
+   * and the rest of the document still renders. Refusing the whole document
+   * for one of them turned any note using one into a blank page.
+   */
+  test("leaves out a node it does not know and renders the rest", () => {
+    const { container } = render(
+      <EditorRender
+        value={document_(
+          paragraph(text("Kept")),
+          { type: "youtube", version: 1, videoID: "abc" },
+          paragraph(text("Also kept"), {
+            type: "equation",
+            equation: "x",
+            inline: true,
+            version: 1,
+          }),
+        )}
+      />,
+    );
+
+    expect(container.textContent).toContain("Kept");
+    expect(container.textContent).toContain("Also kept");
   });
 });

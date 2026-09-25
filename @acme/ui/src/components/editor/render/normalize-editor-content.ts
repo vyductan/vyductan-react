@@ -23,6 +23,7 @@ const supportedNodeTypes = new Set([
   "table",
   "tablerow",
   "tablecell",
+  "image",
 ]);
 
 const supportedListTypes = new Set(["bullet", "number", "check"]);
@@ -32,16 +33,80 @@ const supportedListTags = new Set(["ol", "ul"]);
 export function normalizeEditorContent(
   value: unknown,
 ): EditorRenderContent | null {
+  let parsed: unknown = value;
   if (typeof value === "string") {
     try {
-      const parsed = JSON.parse(value) as unknown;
-      return isEditorRenderContent(parsed) ? parsed : null;
+      parsed = JSON.parse(value) as unknown;
     } catch {
       return null;
     }
   }
 
-  return isEditorRenderContent(value) ? value : null;
+  const pruned = withoutUnsupportedNodes(parsed);
+  if (!isEditorRenderContent(pruned)) return null;
+
+  // Nothing left that this renderer draws: say so, rather than an empty box.
+  const hadBlocks = hasRootBlocks(parsed);
+  return hadBlocks && pruned.root.children.length === 0 ? null : pruned;
+}
+
+function hasRootBlocks(value: unknown): boolean {
+  return (
+    isRecord(value) &&
+    isRecord(value.root) &&
+    Array.isArray(value.root.children) &&
+    value.root.children.length > 0
+  );
+}
+
+/**
+ * Drops the nodes this renderer does not draw — an equation, an embed, a poll
+ * — before the document is checked.
+ *
+ * The check is all-or-nothing, and it has to be for anything malformed. But a
+ * well-formed node of a kind it simply does not know is not a broken document:
+ * refusing the whole thing for one of them rendered nothing at all, and a
+ * published note with a single embed in it came out blank below its title.
+ * Only nodes that name a type are dropped; one without a type is malformed,
+ * and still fails the check. A dropped node takes its descendants with it —
+ * their text is not salvaged into the document out of context.
+ */
+function withoutUnsupportedNodes(value: unknown): unknown {
+  // Copy only what changes: a document with nothing to drop comes back as the
+  // very same object, as it always has.
+  if (Array.isArray(value)) {
+    let changed = false;
+    const kept: unknown[] = [];
+    for (const item of value) {
+      if (
+        isRecord(item) &&
+        typeof item.type === "string" &&
+        !supportedNodeTypes.has(item.type)
+      ) {
+        changed = true;
+        continue;
+      }
+      const next = withoutUnsupportedNodes(item);
+      if (next !== item) changed = true;
+      kept.push(next);
+    }
+    return changed ? kept : value;
+  }
+
+  if (!isRecord(value)) return value;
+
+  let changed = false;
+  const next: Record<string, unknown> = { ...value };
+  for (const key of ["root", "children"] as const) {
+    if (key in value) {
+      const entry = withoutUnsupportedNodes(value[key]);
+      if (entry !== value[key]) {
+        next[key] = entry;
+        changed = true;
+      }
+    }
+  }
+  return changed ? next : value;
 }
 
 function isEditorRenderContent(value: unknown): value is EditorRenderContent {
@@ -76,6 +141,9 @@ function isNode(node: unknown, allowInline = true): node is EditorRenderNode {
     }
     case "linebreak": {
       return isLineBreakNode(node);
+    }
+    case "image": {
+      return allowInline && isImageNode(node);
     }
     case "horizontalrule": {
       return isHorizontalRuleNode(node);
@@ -379,7 +447,17 @@ function isInlineNode(node: unknown): node is EditorRenderInlineNode {
       node.type === "linebreak" ||
       node.type === "link" ||
       node.type === "autolink" ||
-      node.type === "code-highlight")
+      node.type === "code-highlight" ||
+      node.type === "image")
+  );
+}
+
+function isImageNode(node: unknown): boolean {
+  return (
+    isRecord(node) &&
+    node.type === "image" &&
+    typeof node.src === "string" &&
+    (node.altText === undefined || typeof node.altText === "string")
   );
 }
 

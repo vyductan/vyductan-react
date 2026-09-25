@@ -467,9 +467,9 @@ export const editorRenderSourceFixtures = {
     markdown: "Paragraph before\n\n---\n\nParagraph after",
     html: "<p>Paragraph before</p><hr><p>Paragraph after</p>",
   },
-  unsupportedImage: {
-    markdown: "![Unsupported image](https://example.com/image.png)",
-    html: '<img src="https://example.com/image.png" alt="Unsupported image" />',
+  image: {
+    markdown: "![A diagram](https://example.com/image.png)",
+    html: '<img src="https://example.com/image.png" alt="A diagram" />',
   },
 } as const;
 

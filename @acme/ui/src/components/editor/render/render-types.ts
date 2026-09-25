@@ -16,11 +16,23 @@ export type EditorRenderLineBreakNode = {
   version: number;
 };
 
+export type EditorRenderImageNode = {
+  type: "image";
+  src: string;
+  altText?: string;
+  /** 0, or absent, means the image's own size. */
+  width?: number;
+  height?: number;
+  maxWidth?: number;
+  version: number;
+};
+
 export type EditorRenderInlineNode =
   | EditorRenderTextNode
   | EditorRenderLineBreakNode
   | EditorRenderLinkNode
-  | EditorRenderCodeHighlightNode;
+  | EditorRenderCodeHighlightNode
+  | EditorRenderImageNode;
 
 export type EditorRenderBlockNode =
   | EditorRenderParagraphNode
