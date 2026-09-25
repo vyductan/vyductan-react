@@ -3,7 +3,7 @@ import * as React from "react";
 import { $createListItemNode, $createListNode, ListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
-import { $createTextNode, $getRoot } from "lexical";
+import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
 import { Editor } from "../editor";
@@ -49,14 +49,14 @@ function $nestedList(type: "number" | "bullet", depth: number): ListNode {
 }
 
 /** Each list's marker class, outermost first. */
-function markerClasses(container: ParentNode, tag: "ol" | "ul") {
-  return [...container.querySelectorAll(tag)].map(
-    (list) =>
-      // The per-depth class is the one with "!": it overrides the list's
-      // base `list-decimal` / `list-disc`.
-      [...list.classList].find(
-        (name) => name.startsWith("list-") && name.endsWith("!"),
-      ) ?? "",
+/**
+ * The marker each list draws, outermost first. Read from computed style
+ * rather than class names: the levels come from descendant rules in the
+ * theme, which count lists of the same kind above, not from a class per depth.
+ */
+function markerStyles(container: ParentNode, tag: "ol" | "ul") {
+  return [...container.querySelectorAll<HTMLElement>(tag)].map(
+    (list) => getComputedStyle(list).listStyleType,
   );
 }
 
@@ -78,11 +78,11 @@ test("numbered levels go 1. → a. → i. and then start over, like Notion", asy
   });
 
   await waitFor(() =>
-    expect(markerClasses(document, "ol")).toEqual([
-      "list-decimal!",
-      "list-[lower-alpha]!",
-      "list-[lower-roman]!",
-      "list-decimal!",
+    expect(markerStyles(document, "ol")).toEqual([
+      "decimal",
+      "lower-alpha",
+      "lower-roman",
+      "decimal",
     ]),
   );
 
@@ -90,11 +90,11 @@ test("numbered levels go 1. → a. → i. and then start over, like Notion", asy
   const json = JSON.stringify(editor.getEditorState().toJSON());
   cleanup();
   const { container } = render(<EditorRender value={json} />);
-  expect(markerClasses(container, "ol")).toEqual([
-    "list-decimal!",
-    "list-[lower-alpha]!",
-    "list-[lower-roman]!",
-    "list-decimal!",
+  expect(markerStyles(container, "ol")).toEqual([
+    "decimal",
+    "lower-alpha",
+    "lower-roman",
+    "decimal",
   ]);
 });
 
@@ -104,11 +104,11 @@ test("bulleted levels go • → ◦ → ▪ and then start over", async () => {
   });
 
   await waitFor(() =>
-    expect(markerClasses(document, "ul")).toEqual([
-      "list-disc!",
-      "list-[circle]!",
-      "list-[square]!",
-      "list-disc!",
+    expect(markerStyles(document, "ul")).toEqual([
+      "disc",
+      "circle",
+      "square",
+      "disc",
     ]),
   );
 });
@@ -120,7 +120,7 @@ const textLeft = (element: Element) => {
   return range.getBoundingClientRect().left;
 };
 
-test("a checklist's box sits in the label column, its text where list text starts", async () => {
+test("a checklist's box is drawn like Notion's: inset, centred on the line, grey", async () => {
   let editor: LexicalEditor | null = null;
   render(
     <Editor autoFocus={false}>
@@ -133,9 +133,7 @@ test("a checklist's box sits in the label column, its text where list text start
       $getRoot()
         .clear()
         .append(
-          $createListNode("number").append(
-            $createListItemNode().append($createTextNode("numbered")),
-          ),
+          $createParagraphNode().append($createTextNode("Todo")),
           $createListNode("check").append(
             $createListItemNode(false).append($createTextNode("to do")),
           ),
@@ -146,14 +144,41 @@ test("a checklist's box sits in the label column, its text where list text start
   await waitFor(() =>
     expect(
       document.querySelectorAll('[contenteditable="true"] li'),
-    ).toHaveLength(2),
+    ).toHaveLength(1),
   );
 
-  const [numbered, check] = document.querySelectorAll<HTMLLIElement>(
+  const paragraph = document.querySelector<HTMLElement>(
+    '[contenteditable="true"] p',
+  )!;
+  const check = document.querySelector<HTMLLIElement>(
     '[contenteditable="true"] li',
+  )!;
+  const itemRect = check.getBoundingClientRect();
+  const boxStyle = getComputedStyle(check, "::before");
+  const box = {
+    left: itemRect.left + Number.parseFloat(boxStyle.left),
+    top: itemRect.top + Number.parseFloat(boxStyle.top),
+    width: Number.parseFloat(boxStyle.width),
+    height: Number.parseFloat(boxStyle.height),
+  };
+  const range = document.createRange();
+  range.selectNodeContents(check);
+  const line = range.getClientRects()[0]!;
+
+  // A few pixels in from the text above, not flush with it.
+  const inset = box.left - textLeft(paragraph);
+  expect(inset).toBeGreaterThanOrEqual(2);
+  expect(inset).toBeLessThanOrEqual(5);
+  // Centred on the first line of the item's text.
+  expect(
+    Math.abs(box.top + box.height / 2 - (line.top + line.height / 2)),
+  ).toBeLessThan(1.5);
+  // Room between the box and the text.
+  expect(textLeft(check) - (box.left + box.width)).toBeGreaterThanOrEqual(8);
+  // Grey like the text, not the accent colour: an unticked box is not a
+  // call to action.
+  const [r, g, b] = (boxStyle.borderTopColor.match(/[\d.]+/g) ?? []).map(
+    Number,
   );
-  expect(Math.abs(textLeft(check!) - textLeft(numbered!))).toBeLessThan(1);
-  // The box starts left of the text, inside the column the "1." sits in.
-  const box = check!.getBoundingClientRect().left;
-  expect(box).toBeLessThan(textLeft(numbered!) - 16);
+  expect(Math.max(r!, g!, b!) - Math.min(r!, g!, b!)).toBeLessThan(20);
 });

@@ -285,7 +285,11 @@ function renderListItemNode(
   const checkboxLabel = isChecklistItem ? getListItemLabel(node) : undefined;
   const className = cn(
     richTextSemanticContract.list.listitem,
-    depth > 0 && richTextSemanticContract.list.nested.listitem,
+    // Only an item that holds nothing but a nested list is a holder, whose
+    // marker is hidden — as Lexical decides it in the editor. Every item
+    // below the top level used to get it, so nested lists on a published
+    // page showed no markers at all.
+    isNestedListHolder(node) && richTextSemanticContract.list.nested.listitem,
     isChecklistItem &&
       (node.checked
         ? richTextSemanticContract.list.listitemChecked
@@ -372,7 +376,10 @@ function renderListItemChildren(
     renderedChildren.push(
       <p
         key={`${key}-paragraph-${renderedChildren.length}`}
-        className={richTextSemanticContract.paragraph}
+        // A list line, not a paragraph of running text: the list spaces its
+        // items, and paragraph spacing here made every item taller than in
+        // the editor, which draws no <p> inside an item at all.
+        className={cn(richTextSemanticContract.paragraph, "my-0")}
       >
         {renderInlineChildren(
           inlineBuffer,
@@ -409,6 +416,13 @@ function renderListItemChildren(
 
   flushInlineBuffer();
   return renderedChildren;
+}
+
+function isNestedListHolder(node: EditorRenderListItemNode): boolean {
+  return (
+    node.children.length > 0 &&
+    node.children.every((child) => child.type === "list")
+  );
 }
 
 function coalesceNestedListItems(

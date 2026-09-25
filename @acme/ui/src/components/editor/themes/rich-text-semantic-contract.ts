@@ -2,6 +2,14 @@ import type { EditorThemeClasses } from "lexical";
 
 import { cn } from "@acme/ui/lib/utils";
 
+/** Shared by ticked and unticked to-dos: the item and its box. */
+const CHECK_ITEM = cn(
+  "relative mx-0 list-none pr-6 pl-[30px] outline-none",
+  'before:absolute before:block before:content-[""]',
+  "before:top-[calc((1lh_-_1rem)/2)] before:left-[3px] before:size-4",
+  "before:rounded-[3px] before:border-[1.5px] before:border-solid",
+);
+
 export const richTextSemanticContractKeys = [
   "heading",
   "paragraph",
@@ -79,27 +87,44 @@ export const richTextSemanticContract = {
     // further in. Nested checklists keep it; it is their indent.
     checklist: "relative list-none! p-0 [:not(li)>&]:ml-0!",
     listitem: "mx-0",
-    listitemChecked:
-      'relative mx-0 px-6 list-none outline-none line-through before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:block before:bg-cover before:absolute before:border before:border-primary before:rounded before:bg-primary before:bg-no-repeat after:content-[""] after:border-white after:border-solid after:absolute after:block after:top-[6px] after:w-[3px] after:left-[7px] after:right-[7px] after:h-[6px] after:rotate-45 after:border-r-2 after:border-b-2 after:border-l-0 after:border-t-0',
-    listitemUnchecked:
-      'relative mx-0 px-6 list-none outline-none before:content-[""] before:w-4 before:h-4 before:top-0.5 before:left-0 before:block before:bg-cover before:absolute before:border before:border-primary before:rounded',
+    // Notion's to-do box: 16px, inset 3px from the text column, centred on
+    // the first line (`1lh` is the item's own line height, so it holds at any
+    // text size), grey until ticked, then filled with the accent and a white
+    // tick. The text starts 30px in, clear of the box.
+    listitemChecked: cn(
+      CHECK_ITEM,
+      "line-through",
+      "before:border-primary before:bg-primary",
+      'after:absolute after:block after:content-[""]',
+      "after:top-[calc((1lh_-_1rem)/2_+_4px)] after:left-[9.5px]",
+      "after:h-[6px] after:w-[3px] after:rotate-45",
+      "after:border-solid after:border-white",
+      "after:border-t-0 after:border-r-2 after:border-b-2 after:border-l-0",
+    ),
+    listitemUnchecked: cn(CHECK_ITEM, "before:border-foreground/70"),
     nested: {
       listitem: "list-none before:hidden after:hidden",
     },
-    ol: "my-1 ml-6 list-decimal [&>li]:mt-1",
-    // Notion's levels: 1. → a. → i., then round again. Lexical and the
-    // published renderer both take depth modulo this length.
-    olDepth: [
-      "list-outside list-decimal!",
-      "list-outside list-[lower-alpha]!",
-      "list-outside list-[lower-roman]!",
-    ],
-    ul: "my-1 ml-6 list-disc [&>li]:mt-1",
-    ulDepth: [
-      "list-outside list-disc!",
-      "list-outside list-[circle]!",
-      "list-outside list-[square]!",
-    ],
+    // A list's marker counts only lists of its own kind above it, not its
+    // depth. A bullet under a numbered line is the first level of bullets —
+    // a filled dot, as in Notion — and a number under a bullet starts at
+    // "1.". A number under a number still goes on 1. → a. → i., so every
+    // item has an address of its own ("1.a"), which Notion's "1." twice does
+    // not give. Descendant selectors do the counting, in the editor and on a
+    // published page alike, and each deeper one outranks the one above.
+    //
+    // A checklist is a <ul> too, so a bullet under one counts it as a level.
+    ol: cn(
+      "my-1 ml-6 list-decimal [&>li]:mt-1",
+      "[ol_&]:list-[lower-alpha] [ol_ol_&]:list-[lower-roman] [ol_ol_ol_&]:list-decimal",
+    ),
+    // The marker comes from the rules above, so depth sets only the position.
+    olDepth: ["list-outside"],
+    ul: cn(
+      "my-1 ml-6 list-disc [&>li]:mt-1",
+      "[ul_&]:list-[circle] [ul_ul_&]:list-[square] [ul_ul_ul_&]:list-disc",
+    ),
+    ulDepth: ["list-outside"],
   },
   text: {
     bold: "font-semibold",
