@@ -161,3 +161,83 @@ test("a caret inside a page link does not open the URL editor", async () => {
   );
   expect(printed).toBe(false);
 });
+
+const richContent = JSON.stringify({
+  root: {
+    type: "root",
+    version: 1,
+    format: "",
+    indent: 0,
+    direction: null,
+    children: [
+      {
+        type: "paragraph",
+        version: 1,
+        format: "",
+        indent: 0,
+        direction: null,
+        children: [
+          {
+            type: "text",
+            version: 1,
+            text: "Meet at ",
+            format: 0,
+            detail: 0,
+            mode: "normal",
+            style: "",
+          },
+          {
+            type: "text",
+            version: 1,
+            text: "nine",
+            format: 1,
+            detail: 0,
+            mode: "normal",
+            style: "",
+          },
+        ],
+      },
+    ],
+  },
+});
+
+test("the icon sits in the title row", async () => {
+  const { pill } = await renderWithPill(async () => PREVIEW);
+
+  await userEvent.hover(pill);
+  await waitFor(() => expect(card()).not.toBeNull());
+
+  const titleRow = card()?.querySelector(
+    '[data-slot="page-link-preview-title"]',
+  );
+  expect(titleRow?.textContent).toContain("🗺️");
+  expect(titleRow?.textContent).toContain("Tour information");
+});
+
+test("rich content keeps its formatting", async () => {
+  const { pill } = await renderWithPill(async () => ({
+    ...PREVIEW,
+    excerpt: undefined,
+    content: richContent,
+  }));
+
+  await userEvent.hover(pill);
+  await waitFor(() => expect(card()).not.toBeNull());
+
+  expect(card()?.querySelector("strong")?.textContent).toBe("nine");
+  expect(card()?.textContent).toContain("Meet at nine");
+});
+
+test("content the renderer refuses falls back to the plain excerpt", async () => {
+  const { pill } = await renderWithPill(async () => ({
+    ...PREVIEW,
+    content: JSON.stringify({
+      root: { type: "root", children: [{ type: "mention", text: "x" }] },
+    }),
+  }));
+
+  await userEvent.hover(pill);
+  await waitFor(() => expect(card()).not.toBeNull());
+
+  expect(card()?.textContent).toContain("Meet at the station at nine.");
+});

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { createPortal } from "react-dom";
 
+import { normalizeEditorContent } from "../render/normalize-editor-content";
+import { renderRootNodes } from "../render/render-node";
 import { DEFAULT_PAGE_ICON } from "../utils/page-link";
 
 /** What the host shows for a linked page. */
@@ -13,6 +15,13 @@ export type PageLinkPreview = {
   icon?: string;
   /** Where the page lives, e.g. "Work / Trips". */
   breadcrumb?: string;
+  /**
+   * The opening of the page as serialized Lexical JSON, rendered with its
+   * formatting. Keep it to the first few text blocks: the static renderer
+   * refuses a whole document over one node type it does not support, and the
+   * card then falls back to `excerpt`.
+   */
+  content?: string;
   /** The opening of the page's text, already plain. */
   excerpt?: string;
 };
@@ -158,6 +167,9 @@ export function PageLinkHoverCardPlugin({
   if (!open?.preview) return null;
 
   const { rect, preview } = open;
+  const richContent = preview.content
+    ? normalizeEditorContent(preview.content)
+    : null;
   const left = Math.max(
     8,
     Math.min(rect.left, globalThis.innerWidth - CARD_WIDTH - 8),
@@ -172,19 +184,33 @@ export function PageLinkHoverCardPlugin({
       style={{ top: rect.bottom + GAP, left, width: CARD_WIDTH }}
       className="bg-popover text-popover-foreground fixed z-50 space-y-1 rounded-lg border p-4 shadow-lg"
     >
-      <div className="mb-2 text-3xl leading-none" aria-hidden>
-        {preview.icon ?? DEFAULT_PAGE_ICON}
-      </div>
       {preview.breadcrumb && (
         <p className="text-muted-foreground truncate text-xs">
           {preview.breadcrumb}
         </p>
       )}
-      <p className="font-semibold">{preview.title}</p>
-      {preview.excerpt && (
-        <p className="text-muted-foreground line-clamp-4 pt-1 text-sm">
-          {preview.excerpt}
-        </p>
+      <p
+        data-slot="page-link-preview-title"
+        className="flex items-start gap-1.5 font-semibold"
+      >
+        <span className="shrink-0" aria-hidden>
+          {preview.icon ?? DEFAULT_PAGE_ICON}
+        </span>
+        <span>{preview.title}</span>
+      </p>
+      {richContent ? (
+        // Scaled down to card size: the page's own heading sizes and block
+        // spacing would let one heading fill the card. The fade marks the cut
+        // where a line clamp cannot reach, since the content spans blocks.
+        <div className="text-muted-foreground max-h-28 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)] pt-1 text-sm [&_*]:!my-0.5 [&_*]:!text-sm [&_h1,&_h2,&_h3,&_h4]:font-semibold">
+          {renderRootNodes(richContent.root.children)}
+        </div>
+      ) : (
+        preview.excerpt && (
+          <p className="text-muted-foreground line-clamp-4 pt-1 text-sm">
+            {preview.excerpt}
+          </p>
+        )
       )}
     </div>,
     document.body,
