@@ -79,6 +79,18 @@ import { FixedToolbarPlugin } from "./fixed-toolbar-plugin";
 
 // ...
 
+/**
+ * Text size by control size, as Input sizes its text: 14px at small and at
+ * the default middle — small only makes a control smaller, not its text —
+ * and 16px at large. Surfaces that are documents rather than fields (a note,
+ * a journal page) ask for large.
+ */
+const EDITOR_TEXT_BY_SIZE = {
+  small: "text-sm",
+  middle: "text-sm",
+  large: "text-base",
+} as const;
+
 export function Plugins({
   placeholder = "Write, press ‘space’ for AI, ‘/’ for commands…",
   onImageUpload,
@@ -181,10 +193,7 @@ export function Plugins({
         contentEditable={
           <div className="group relative" ref={onReference}>
             <ContentEditable
-              className={cn(
-                classNames?.content,
-                size === "small" ? "text-sm" : "text-base",
-              )}
+              className={cn(classNames?.content, EDITOR_TEXT_BY_SIZE[size])}
               placeholderClassName={classNames?.placeholder}
               // className="py-[3px] px-0.5 text-sm wrap-break-word whitespace-break-spaces"
               placeholder={editable ? placeholder : ""}
