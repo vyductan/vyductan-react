@@ -1,4 +1,5 @@
 import type { LexicalNode, NodeKey } from "lexical";
+import type { LucideIcon } from "lucide-react";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { $createCodeNode } from "@lexical/code";
@@ -21,7 +22,19 @@ import {
   $isTextNode,
   COPY_COMMAND,
 } from "lexical";
-import { GripVerticalIcon, PlusIcon } from "lucide-react";
+import {
+  CodeIcon,
+  GripVerticalIcon,
+  Heading1Icon,
+  Heading2Icon,
+  Heading3Icon,
+  ListIcon,
+  ListOrderedIcon,
+  ListTodoIcon,
+  PlusIcon,
+  QuoteIcon,
+  TextIcon,
+} from "lucide-react";
 import { createPortal } from "react-dom";
 
 import {
@@ -80,6 +93,27 @@ export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
 
   return topLevel;
 }
+
+/**
+ * What "Turn into" offers, each with the icon and name the slash menu gives
+ * it — so a type reads the same wherever it is chosen, and is picked out at a
+ * glance rather than read. Notion's order.
+ */
+const TURN_INTO_CHOICES: ReadonlyArray<{
+  type: string;
+  label: string;
+  Icon: LucideIcon;
+}> = [
+  { type: "paragraph", label: "Text", Icon: TextIcon },
+  { type: "h1", label: "Heading 1", Icon: Heading1Icon },
+  { type: "h2", label: "Heading 2", Icon: Heading2Icon },
+  { type: "h3", label: "Heading 3", Icon: Heading3Icon },
+  { type: "bullet", label: "Bulleted list", Icon: ListIcon },
+  { type: "number", label: "Numbered list", Icon: ListOrderedIcon },
+  { type: "check", label: "To-do list", Icon: ListTodoIcon },
+  { type: "code", label: "Code", Icon: CodeIcon },
+  { type: "quote", label: "Quote", Icon: QuoteIcon },
+];
 
 export function DraggableBlockPlugin({
   anchorElem,
@@ -475,45 +509,15 @@ export function DraggableBlockPlugin({
                       <Command>
                         <CommandList>
                           <CommandGroup>
-                            <CommandItem onSelect={() => handleTurnInto("h1")}>
-                              Heading 1
-                            </CommandItem>
-                            <CommandItem onSelect={() => handleTurnInto("h2")}>
-                              Heading 2
-                            </CommandItem>
-                            <CommandItem onSelect={() => handleTurnInto("h3")}>
-                              Heading 3
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("bullet")}
-                            >
-                              Bullet list
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("number")}
-                            >
-                              Numbered list
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("quote")}
-                            >
-                              Quote
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("code")}
-                            >
-                              Code
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("paragraph")}
-                            >
-                              Paragraph
-                            </CommandItem>
-                            <CommandItem
-                              onSelect={() => handleTurnInto("check")}
-                            >
-                              Check list
-                            </CommandItem>
+                            {TURN_INTO_CHOICES.map(({ type, label, Icon }) => (
+                              <CommandItem
+                                key={type}
+                                onSelect={() => handleTurnInto(type)}
+                              >
+                                <Icon className="size-4" />
+                                {label}
+                              </CommandItem>
+                            ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
