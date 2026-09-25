@@ -22,14 +22,25 @@ function textBoxOf(element: HTMLElement) {
   return range.getBoundingClientRect();
 }
 
-/** Where the caret lands in an empty field: the editable's content-box origin. */
+/**
+ * Where the caret lands in an empty field. Horizontally that is the editable's
+ * padding edge; vertically it is the first block's line, which the theme
+ * pushes down by the block's margin — so the vertical reference is the centre
+ * of that line, not the padding edge.
+ */
 function caretOriginOf(editable: HTMLElement) {
   const box = editable.getBoundingClientRect();
   const style = globalThis.getComputedStyle(editable);
+  const line = (editable.firstElementChild ?? editable).getBoundingClientRect();
   return {
     left: box.left + Number.parseFloat(style.paddingLeft),
-    top: box.top + Number.parseFloat(style.paddingTop),
+    centreY: line.top + line.height / 2,
   };
+}
+
+/** A Range's font box and its line box share a vertical centre. */
+function centreYOf(box: DOMRect) {
+  return box.top + box.height / 2;
 }
 
 /**
@@ -57,11 +68,7 @@ export const PlaceholderSitsWhereTheCaretWill: Story = {
     const placeholderBox = textBoxOf(placeholder);
 
     expect(Math.abs(placeholderBox.left - caret.left)).toBeLessThan(2);
-    // Looser on the vertical: a Range reports the text's font box while the
-    // content-box origin is the line box, so the two differ by the half-leading
-    // (~3px at this size) even when they render on the same line. The horizontal
-    // assertion is the one that catches the drift.
-    expect(Math.abs(placeholderBox.top - caret.top)).toBeLessThan(5);
+    expect(Math.abs(centreYOf(placeholderBox) - caret.centreY)).toBeLessThan(1);
   },
 };
 
@@ -91,11 +98,7 @@ export const PlaceholderFollowsCustomPadding: Story = {
     const placeholderBox = textBoxOf(placeholder);
 
     expect(Math.abs(placeholderBox.left - caret.left)).toBeLessThan(2);
-    // Looser on the vertical: a Range reports the text's font box while the
-    // content-box origin is the line box, so the two differ by the half-leading
-    // (~3px at this size) even when they render on the same line. The horizontal
-    // assertion is the one that catches the drift.
-    expect(Math.abs(placeholderBox.top - caret.top)).toBeLessThan(5);
+    expect(Math.abs(centreYOf(placeholderBox) - caret.centreY)).toBeLessThan(1);
   },
 };
 
@@ -120,6 +123,41 @@ export const PlaceholderAlignsInAMinimalEditor: Story = {
     const placeholderBox = textBoxOf(placeholder);
 
     expect(Math.abs(placeholderBox.left - caret.left)).toBeLessThan(2);
-    expect(Math.abs(placeholderBox.top - caret.top)).toBeLessThan(5);
+    expect(Math.abs(centreYOf(placeholderBox) - caret.centreY)).toBeLessThan(1);
+  },
+};
+
+/**
+ * The caret does not sit at the editable's padding edge: it sits in the first
+ * paragraph, which the theme gives a vertical margin (`my-1.5`). The stories
+ * above measure against the padding edge with a 5px tolerance, which that 6px
+ * margin slipped under — the prompt rendered a line-margin above the caret.
+ *
+ * Compare vertical centres instead: a Range's font box and the paragraph's
+ * line box share a centre when they are on the same line, so no half-leading
+ * slack is needed and the tolerance can be tight.
+ */
+export const PlaceholderSharesTheFirstParagraphsLine: Story = {
+  args: {},
+  play: async ({ canvasElement }) => {
+    const placeholder = await waitFor(() => {
+      const node = canvasElement.querySelector(
+        '[data-slot="editor-placeholder"]',
+      );
+      if (!node) throw new Error("placeholder never rendered");
+      return node as HTMLElement;
+    });
+
+    const paragraph = canvasElement.querySelector<HTMLElement>(
+      '[contenteditable="true"] > p',
+    );
+    if (!paragraph) throw new Error("empty paragraph never rendered");
+
+    const text = textBoxOf(placeholder);
+    const line = paragraph.getBoundingClientRect();
+
+    expect(
+      Math.abs(text.top + text.height / 2 - (line.top + line.height / 2)),
+    ).toBeLessThan(1);
   },
 };

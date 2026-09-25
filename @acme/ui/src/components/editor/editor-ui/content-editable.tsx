@@ -43,29 +43,29 @@ function getPlaceholderForBlockType(
 }
 
 /**
- * Maps block type to placeholder styling className
- * Reuses classes from editorTheme to avoid duplication
+ * The theme classes of the block the caret is in, for the placeholder's text.
+ *
+ * They go on an inner element, not on the positioned box: the caret sits inside
+ * the first block, and that block's theme gives it a vertical margin (a
+ * paragraph is `my-1.5`). Without the same block around the prompt, the prompt
+ * rendered one margin above the caret.
  */
-function getPlaceholderClassName(blockType: string): string {
-  // Inset to the box, then padded like the editable itself, rather than offset
-  // by a hard-coded copy of that padding: the prompt has to start exactly where
-  // the caret will, and a second literal of the same number drifts the moment a
-  // consumer retunes contentClassName.
-  const baseClasses =
-    "text-muted-foreground pointer-events-none absolute inset-0 select-none";
-
-  // Get theme classes for the block type
-  let themeClasses = "";
+function getPlaceholderBlockClassName(blockType: string): string {
   if (editorTheme.heading && blockType in editorTheme.heading) {
-    themeClasses =
-      editorTheme.heading[blockType as keyof typeof editorTheme.heading] ?? "";
-  } else if (blockType === "quote" && editorTheme.quote) {
-    themeClasses = editorTheme.quote;
+    return (
+      editorTheme.heading[blockType as keyof typeof editorTheme.heading] ?? ""
+    );
   }
-
-  // Combine base classes with theme classes
-  return cn(baseClasses, themeClasses);
+  if (blockType === "quote" && editorTheme.quote) return editorTheme.quote;
+  return editorTheme.paragraph ?? "";
 }
+
+// Inset to the box, then padded like the editable itself, rather than offset
+// by a hard-coded copy of that padding: the prompt has to start exactly where
+// the caret will, and a second literal of the same number drifts the moment a
+// consumer retunes contentClassName.
+const PLACEHOLDER_BOX =
+  "text-muted-foreground pointer-events-none absolute inset-0 select-none";
 
 export function ContentEditable({
   placeholder = "Start typing...",
@@ -113,7 +113,7 @@ export function ContentEditable({
         <div
           data-slot="editor-placeholder"
           className={cn(
-            getPlaceholderClassName(blockType),
+            PLACEHOLDER_BOX,
             CONTENT_PADDING,
             // The same class the editable gets, so a retuned padding or text
             // size moves both together.
@@ -121,7 +121,9 @@ export function ContentEditable({
             placeholderClassName,
           )}
         >
-          {dynamicPlaceholder}
+          <div className={getPlaceholderBlockClassName(blockType)}>
+            {dynamicPlaceholder}
+          </div>
         </div>
       )}
       <LexicalContentEditable
