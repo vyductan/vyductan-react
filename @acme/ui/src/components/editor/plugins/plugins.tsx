@@ -22,6 +22,7 @@ import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
+import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
@@ -219,6 +220,9 @@ export function Plugins({
       <ImageLineClickPlugin />
       <HistoryFlashPlugin />
       <ListMarkerPlugin />
+      {editable && placeholder && (
+        <BlockPlaceholderPlugin placeholder={placeholder} />
+      )}
 
       <MentionsPlugin
         mentionsData={mentionsData}

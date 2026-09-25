@@ -67,6 +67,18 @@ function getPlaceholderBlockClassName(blockType: string): string {
 const PLACEHOLDER_BOX =
   "text-muted-foreground pointer-events-none absolute inset-0 select-none";
 
+// The focused empty line's prompt (BlockPlaceholderPlugin sets the attribute).
+// A zero-height float: it takes no room, so the caret stays at the line's
+// start and the prompt sits under it rather than pushing it right.
+const BLOCK_PLACEHOLDER = cn(
+  "[&_[data-placeholder]]:before:content-[attr(data-placeholder)]",
+  "[&_[data-placeholder]]:before:text-muted-foreground",
+  "[&_[data-placeholder]]:before:pointer-events-none",
+  "[&_[data-placeholder]]:before:float-left",
+  "[&_[data-placeholder]]:before:h-0",
+  "[&_[data-placeholder]]:before:select-none",
+);
+
 export function ContentEditable({
   placeholder = "Start typing...",
   className,
@@ -133,6 +145,7 @@ export function ContentEditable({
         className={cn(
           CONTENT_PADDING,
           "wrap-break-word whitespace-break-spaces focus:outline-none",
+          BLOCK_PLACEHOLDER,
           className,
         )}
         aria-placeholder={dynamicPlaceholder}

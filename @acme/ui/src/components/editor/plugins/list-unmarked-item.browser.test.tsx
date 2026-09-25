@@ -202,10 +202,7 @@ function markerStart(item: HTMLLIElement): number {
   return outside - (inside - outside);
 }
 
-test.each([
-  ["number", "decimal"],
-  ["bullet", "disc"],
-] as const)(
+test.each(["number", "bullet"] as const)(
   "an unmarked %s item's text starts where the markers start",
   async (type) => {
     const editor = await renderList(type);
