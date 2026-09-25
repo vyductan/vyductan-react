@@ -22,7 +22,6 @@ import {
   useBasicTypeaheadTriggerMatch,
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import { $setBlocksType } from "@lexical/selection";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
   $createParagraphNode,
@@ -80,6 +79,7 @@ import { InsertPollDialog } from "../plugins/poll-plugin";
 import { InsertTableDialog } from "../plugins/table-plugin";
 import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
 import { InsertVideoDialog } from "../plugins/video-plugin";
+import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { $textBeforeCaretOnLine } from "../utils/text-before-caret";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
@@ -176,7 +176,9 @@ function getBaseOptions(
           editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createParagraphNode());
+              $setBlocksTypeLiftingChildren(selection, () =>
+                $createParagraphNode(),
+              );
             }
           }),
       }),
@@ -191,7 +193,9 @@ function getBaseOptions(
           editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode(`h${n}`));
+              $setBlocksTypeLiftingChildren(selection, () =>
+                $createHeadingNode(`h${n}`),
+              );
             }
           }),
       }),
@@ -235,7 +239,9 @@ function getBaseOptions(
           editor.update(() => {
             const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createQuoteNode());
+              $setBlocksTypeLiftingChildren(selection, () =>
+                $createQuoteNode(),
+              );
             }
           }),
       }),
@@ -251,7 +257,9 @@ function getBaseOptions(
 
             if ($isRangeSelection(selection)) {
               if (selection.isCollapsed()) {
-                $setBlocksType(selection, () => $createCodeNode());
+                $setBlocksTypeLiftingChildren(selection, () =>
+                  $createCodeNode(),
+                );
               } else {
                 const textContent = selection.getTextContent();
                 const codeNode = $createCodeNode();

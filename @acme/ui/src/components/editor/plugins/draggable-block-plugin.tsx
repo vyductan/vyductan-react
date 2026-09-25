@@ -11,7 +11,6 @@ import {
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import { $setBlocksType } from "@lexical/selection";
 import {
   $createParagraphNode,
   $getNearestNodeFromDOMNode,
@@ -42,6 +41,7 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import { $createCheckBlockNode } from "../nodes/check-block-node";
+import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { DraggableBlockPlugin_EXPERIMENTAL } from "./default/lexical-draggable-block-plugin";
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
@@ -328,15 +328,21 @@ export function DraggableBlockPlugin({
 
         switch (type) {
           case "h1": {
-            $setBlocksType(selection, () => $createHeadingNode("h1"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h1"),
+            );
             break;
           }
           case "h2": {
-            $setBlocksType(selection, () => $createHeadingNode("h2"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h2"),
+            );
             break;
           }
           case "h3": {
-            $setBlocksType(selection, () => $createHeadingNode("h3"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h3"),
+            );
             break;
           }
           case "bullet": {
@@ -348,19 +354,23 @@ export function DraggableBlockPlugin({
             break;
           }
           case "quote": {
-            $setBlocksType(selection, () => $createQuoteNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createQuoteNode());
             break;
           }
           case "code": {
-            $setBlocksType(selection, () => $createCodeNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createCodeNode());
             break;
           }
           case "paragraph": {
-            $setBlocksType(selection, () => $createParagraphNode());
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createParagraphNode(),
+            );
             break;
           }
           case "check": {
-            $setBlocksType(selection, () => $createCheckBlockNode());
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createCheckBlockNode(),
+            );
             break;
           }
         }

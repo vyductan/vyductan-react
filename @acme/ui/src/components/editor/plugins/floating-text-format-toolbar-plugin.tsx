@@ -19,7 +19,7 @@ import {
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import { $patchStyleText, $setBlocksType } from "@lexical/selection";
+import { $patchStyleText } from "@lexical/selection";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
   $createParagraphNode,
@@ -77,6 +77,7 @@ import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
+import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { setFloatingElemPosition as setFloatingElementPosition } from "../utils/set-floating-elem-position";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
 import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
@@ -380,27 +381,35 @@ function TextFormatFloatingToolbar({
 
         switch (type) {
           case "paragraph": {
-            $setBlocksType(selection, () => $createParagraphNode());
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createParagraphNode(),
+            );
             break;
           }
           case "h1": {
-            $setBlocksType(selection, () => $createHeadingNode("h1"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h1"),
+            );
             break;
           }
           case "h2": {
-            $setBlocksType(selection, () => $createHeadingNode("h2"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h2"),
+            );
             break;
           }
           case "h3": {
-            $setBlocksType(selection, () => $createHeadingNode("h3"));
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createHeadingNode("h3"),
+            );
             break;
           }
           case "quote": {
-            $setBlocksType(selection, () => $createQuoteNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createQuoteNode());
             break;
           }
           case "code": {
-            $setBlocksType(selection, () => $createCodeNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createCodeNode());
             break;
           }
           default: {
@@ -1044,7 +1053,9 @@ function useFloatingTextFormatToolbar(
         editor.update(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createParagraphNode());
+            $setBlocksTypeLiftingChildren(selection, () =>
+              $createParagraphNode(),
+            );
           }
         });
         setListType("paragraph");

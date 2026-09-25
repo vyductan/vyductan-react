@@ -9,7 +9,6 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
 } from "@lexical/list";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
-import { $setBlocksType } from "@lexical/selection";
 import {
   $createParagraphNode,
   $getSelection,
@@ -28,6 +27,7 @@ import { cn } from "@acme/ui/lib/utils";
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
 import { $resolveBlockType } from "../../utils/resolve-block-type";
+import { $setBlocksTypeLiftingChildren } from "../../utils/set-blocks-type-lifting-children";
 import { blockTypeToBlockName } from "./block-format-data";
 
 export function BlockFormatDropDown() {
@@ -48,7 +48,7 @@ export function BlockFormatDropDown() {
     activeEditor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createParagraphNode());
+        $setBlocksTypeLiftingChildren(selection, () => $createParagraphNode());
       }
     });
   };
@@ -86,7 +86,7 @@ export function BlockFormatDropDown() {
         activeEditor.update(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () =>
+            $setBlocksTypeLiftingChildren(selection, () =>
               $createHeadingNode(value as HeadingTagType),
             );
           }
@@ -121,7 +121,7 @@ export function BlockFormatDropDown() {
         activeEditor.update(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createQuoteNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createQuoteNode());
           }
         });
         break;
@@ -130,7 +130,7 @@ export function BlockFormatDropDown() {
         activeEditor.update(() => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createCodeNode());
+            $setBlocksTypeLiftingChildren(selection, () => $createCodeNode());
           }
         });
         break;
