@@ -45,15 +45,22 @@ export const richTextSemanticContract = {
   // it introduces; vertical margins collapse, so the larger of two neighbours'
   // margins is the gap. `first:mt-0` keeps a note that opens with a heading
   // from starting lower on the page.
+  // Sizes are relative to the editor's text, so a heading keeps its
+  // proportion whatever size the text is: a note at 16px, a form field at
+  // 14px. Each ratio is the old pixel value over 16px — at 16px they come out
+  // exactly as before (h1 30px on a 44px line, 32px above) — and a heading's
+  // own line and margins are over its own size, since `em` there is the
+  // heading's font. Fixed in pixels, a 30px heading sat over 14px text in a
+  // small field at more than twice its size.
   heading: {
-    h1: "scroll-m-20 text-3xl font-bold tracking-tight leading-[44px] mt-8 mb-1 first:mt-0",
-    h2: "scroll-m-20 text-2xl font-semibold tracking-tight leading-[36px] mt-6 mb-1 first:mt-0",
-    h3: "scroll-m-20 text-xl font-semibold tracking-tight leading-[32px] mt-4 mb-1 first:mt-0",
-    h4: "scroll-m-20 text-lg font-semibold tracking-tight leading-[28px] mt-3 mb-1 first:mt-0",
-    h5: "scroll-m-20 text-base font-semibold tracking-tight leading-[24px] mt-3 mb-1 first:mt-0",
-    h6: "scroll-m-20 text-sm font-semibold tracking-tight leading-[20px] mt-3 mb-1 first:mt-0",
+    h1: "scroll-m-20 text-[1.875em] font-bold tracking-tight leading-[calc(44/30)] mt-[calc(32em/30)] mb-[calc(4em/30)] first:mt-0",
+    h2: "scroll-m-20 text-[1.5em] font-semibold tracking-tight leading-[1.5] mt-[1em] mb-[calc(4em/24)] first:mt-0",
+    h3: "scroll-m-20 text-[1.25em] font-semibold tracking-tight leading-[1.6] mt-[0.8em] mb-[0.2em] first:mt-0",
+    h4: "scroll-m-20 text-[1.125em] font-semibold tracking-tight leading-[calc(28/18)] mt-[calc(12em/18)] mb-[calc(4em/18)] first:mt-0",
+    h5: "scroll-m-20 text-[1em] font-semibold tracking-tight leading-[1.5] mt-[0.75em] mb-[0.25em] first:mt-0",
+    h6: "scroll-m-20 text-[0.875em] font-semibold tracking-tight leading-[calc(20/14)] mt-[calc(12em/14)] mb-[calc(4em/14)] first:mt-0",
   },
-  paragraph: cn("leading-[24px] my-1.5"),
+  paragraph: cn("leading-[1.5] my-[0.375em]"),
   // A quote is someone's words, not an aside: it reads in the same voice as
   // the text around it, with the rule down its left the only thing marking it.
   // Greying and italicising it made pasted quotes look like disclaimers.
