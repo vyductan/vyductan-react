@@ -182,3 +182,43 @@ test("the published view hides the marker and numbers the same way", async () =>
     { text: "cc", marker: "2" },
   ]);
 });
+
+/** Left edge of an element's text, not of its box. */
+const textLeft = (element: Element) => {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return range.getBoundingClientRect().left;
+};
+
+/**
+ * Where `item`'s marker starts, measured rather than computed: switching the
+ * marker inside pushes the text right by exactly the marker's width.
+ */
+function markerStart(item: HTMLLIElement): number {
+  const outside = textLeft(item);
+  item.style.listStylePosition = "inside";
+  const inside = textLeft(item);
+  item.style.listStylePosition = "";
+  return outside - (inside - outside);
+}
+
+test.each([
+  ["number", "decimal"],
+  ["bullet", "disc"],
+] as const)(
+  "an unmarked %s item's text starts where the markers start",
+  async (type) => {
+    const editor = await renderList(type);
+    await caretIn(editor, "bb", 0);
+    await userEvent.keyboard("{Backspace}");
+    await waitFor(() => expect(markers()[1]?.marker).toBe(""));
+
+    // Measured once, outside waitFor: markerStart mutates a style, and
+    // waitFor re-runs its callback on every DOM mutation — it looped forever.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const [first, unmarked] = items();
+    expect(Math.abs(textLeft(unmarked!) - markerStart(first!))).toBeLessThan(
+      1.5,
+    );
+  },
+);

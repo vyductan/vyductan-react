@@ -20,6 +20,34 @@ import {
   unmarkedState,
 } from "../utils/list-marker";
 
+/** Left edge of an element's text, not of its box. */
+function textLeft(element: HTMLElement): number {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  return range.getBoundingClientRect().left;
+}
+
+/**
+ * Hide an item's marker and pull its text left to where markers start, as
+ * Notion lines a continuation up with the labels rather than the text.
+ *
+ * Measured, not assumed: Chrome draws an outside marker (a glyph for numbers,
+ * a shape for bullets) against the text, and turning it inside pushes the text
+ * right by exactly that width — so the width is read from the item's own
+ * marker, whatever its font, level or number.
+ */
+function alignUnmarked(element: HTMLLIElement) {
+  element.style.marginInlineStart = "";
+  element.style.listStyleType = "";
+  const outside = textLeft(element);
+  element.style.listStylePosition = "inside";
+  const inside = textLeft(element);
+  element.style.listStylePosition = "";
+  element.style.listStyleType = "none";
+  const markerWidth = inside - outside;
+  if (markerWidth > 0) element.style.marginInlineStart = `${-markerWidth}px`;
+}
+
 /**
  * Notion-style Backspace at the start of a list item: the marker goes, the
  * line stays in the list at the same depth as a continuation of the item
@@ -82,7 +110,11 @@ export function ListMarkerPlugin(): null {
                 const element = editor.getElementByKey(child.getKey());
                 if (!(element instanceof HTMLLIElement)) continue;
                 const unmarked = $isUnmarkedItem(child);
-                element.style.listStyleType = unmarked ? "none" : "";
+                if (unmarked) alignUnmarked(element);
+                else {
+                  element.style.listStyleType = "";
+                  element.style.marginInlineStart = "";
+                }
                 const value = values.get(child.getKey());
                 if (
                   numbered &&

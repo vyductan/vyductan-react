@@ -216,7 +216,13 @@ function renderListNode(
       start={node.tag === "ol" ? node.start : undefined}
     >
       {items.map((child, index) =>
-        renderListItemNode(child, `${key}-${index}`, depth, values[index]),
+        renderListItemNode(
+          child,
+          `${key}-${index}`,
+          depth,
+          values[index],
+          node.tag === "ul",
+        ),
       )}
     </Tag>
   );
@@ -227,6 +233,7 @@ function renderListItemNode(
   key: string,
   depth: number,
   displayedValue?: number,
+  depthIsBullet = false,
 ): ReactNode {
   const isUnmarked = node.$?.unmarked === true;
   const isChecklistItem = typeof node.checked === "boolean";
@@ -245,7 +252,17 @@ function renderListItemNode(
       key={key}
       className={className}
       value={isUnmarked ? undefined : (displayedValue ?? node.value)}
-      style={isUnmarked ? { listStyleType: "none" } : undefined}
+      // The editor measures the marker it pulls back over; a static render
+      // cannot, so it uses the widths Chrome draws at body size: "1. " is
+      // ~1.15em, a disc and its gap ~1.375em.
+      style={
+        isUnmarked
+          ? {
+              listStyleType: "none",
+              marginInlineStart: depthIsBullet ? "-1.375em" : "-1.15em",
+            }
+          : undefined
+      }
     >
       {isChecklistItem ? (
         <input
