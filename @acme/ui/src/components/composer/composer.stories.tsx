@@ -565,3 +565,121 @@ export const SendRidesTheLastLine: Story = {
     expect(sendBox.top).toBeLessThan(editorBox.bottom);
   },
 };
+
+/**
+ * A stand-in for the browser recognizer, so dictation can be driven
+ * deterministically: no microphone, no network, results on demand.
+ */
+class FakeRecognition extends EventTarget {
+  static latest: FakeRecognition | null = null;
+  lang = "";
+  continuous = false;
+  interimResults = false;
+  onresult: ((event: unknown) => void) | null = null;
+  onerror: ((event: unknown) => void) | null = null;
+  onend: (() => void) | null = null;
+
+  start() {
+    FakeRecognition.latest = this;
+  }
+
+  stop() {
+    this.onend?.();
+  }
+
+  abort() {
+    this.onend?.();
+  }
+
+  /** Deliver one phrase, interim or final, the way Chromium reports it. */
+  say(transcript: string, isFinal: boolean) {
+    const result = { isFinal, length: 1, item: () => ({ transcript }) };
+    this.onresult?.({
+      resultIndex: 0,
+      results: { length: 1, item: () => result },
+    });
+  }
+}
+
+function installFakeRecognition() {
+  // Both names: current Chromium ships the unprefixed one too, and it wins.
+  const speechWindow = window as unknown as Record<string, unknown>;
+  const saved = [
+    speechWindow.SpeechRecognition,
+    speechWindow.webkitSpeechRecognition,
+  ];
+  speechWindow.SpeechRecognition = FakeRecognition;
+  speechWindow.webkitSpeechRecognition = FakeRecognition;
+  return () => {
+    [speechWindow.SpeechRecognition, speechWindow.webkitSpeechRecognition] =
+      saved;
+    FakeRecognition.latest = null;
+  };
+}
+
+/**
+ * Dictation types at the caret and keeps the draft around it: interim text is
+ * only shown, final text is inserted with a separating space, and sending
+ * closes the mic so the next message does not fill itself.
+ */
+export const DictationAppendsToTheDraft: Story = {
+  args: { onSubmit: fn(), dictation: { lang: "en-US" } },
+  beforeEach: installFakeRecognition,
+  play: async ({ args, canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editable = await focusComposer(canvasElement);
+    await userEvent.keyboard("Check");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Start dictation" }),
+    );
+    const recognition = FakeRecognition.latest;
+    await expect(recognition?.lang).toBe("en-US");
+
+    recognition?.say("it ou", false);
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector('[data-slot="composer-dictation-interim"]'),
+      ).toHaveTextContent("it ou");
+    });
+    // Still revising, so not in the draft yet.
+    await expect(editable).toHaveTextContent(/^Check$/);
+
+    recognition?.say("it out", true);
+    await waitFor(() => {
+      expect(editable).toHaveTextContent("Check it out");
+    });
+
+    await userEvent.click(canvas.getByRole("button", { name: "Send message" }));
+    await waitFor(() => {
+      expect(args.onSubmit).toHaveBeenCalledWith("Check it out");
+    });
+    await expect(
+      canvas.getByRole("button", { name: "Start dictation" }),
+    ).toHaveAttribute("aria-pressed", "false");
+  },
+};
+
+/** No recognizer, no button — Firefox has none. */
+export const NoMicWithoutARecognizer: Story = {
+  args: { onSubmit: fn(), dictation: true },
+  beforeEach: () => {
+    const speechWindow = window as unknown as Record<string, unknown>;
+    const saved = [
+      speechWindow.SpeechRecognition,
+      speechWindow.webkitSpeechRecognition,
+    ];
+    speechWindow.SpeechRecognition = undefined;
+    speechWindow.webkitSpeechRecognition = undefined;
+    return () => {
+      [speechWindow.SpeechRecognition, speechWindow.webkitSpeechRecognition] =
+        saved;
+    };
+  },
+  play: async ({ canvasElement }) => {
+    await focusComposer(canvasElement);
+    await expect(
+      within(canvasElement).queryByRole("button", { name: /dictation/ }),
+    ).toBeNull();
+  },
+};

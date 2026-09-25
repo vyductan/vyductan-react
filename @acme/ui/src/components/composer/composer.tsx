@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useRef, useState } from "react";
-import { CornerDownLeftIcon, SquareIcon } from "lucide-react";
+import { CornerDownLeftIcon, MicIcon, SquareIcon } from "lucide-react";
 
 import {
   InputGroup,
@@ -12,8 +12,17 @@ import {
 import { cn } from "@acme/ui/lib/utils";
 
 import type { ComposerFormat } from "./composer-submit-plugin";
+import type { DictationErrorCode } from "./use-dictation";
 import { Editor } from "../editor";
 import { ComposerSubmitPlugin } from "./composer-submit-plugin";
+import { useDictation } from "./use-dictation";
+
+export type ComposerDictation = {
+  /** BCP 47 tag the recognizer listens for, e.g. `en-US`. */
+  lang?: string;
+  /** A take that could not start or broke off — permission refused, say. */
+  onError?: (code: DictationErrorCode) => void;
+};
 
 export type ComposerProps = {
   /**
@@ -56,6 +65,12 @@ export type ComposerProps = {
    */
   bindSetValue?: (setValue: (text: string) => void) => void;
   onStop?: () => void;
+  /**
+   * Adds a mic button beside send that types what is said at the caret. Uses
+   * the browser's speech recognizer, so the button only appears where one
+   * exists (Chromium, Safari); `true` listens in the document's language.
+   */
+  dictation?: boolean | ComposerDictation;
   /** Earlier messages, newest first — Arrow Up walks back through them. */
   history?: string[];
   autoFocus?: boolean;
@@ -80,6 +95,7 @@ export function Composer({
   allowEmptySubmit = false,
   bindSetValue,
   onStop,
+  dictation,
   history,
   autoFocus = false,
   className,
@@ -87,10 +103,37 @@ export function Composer({
 }: ComposerProps) {
   const [isEmpty, setIsEmpty] = useState(true);
   const submitReference = useRef<(() => void) | null>(null);
+  const insertTextReference = useRef<((text: string) => void) | null>(null);
 
   const bindSubmit = useCallback((submit: () => void) => {
     submitReference.current = submit;
   }, []);
+
+  const bindInsertText = useCallback((insertText: (text: string) => void) => {
+    insertTextReference.current = insertText;
+  }, []);
+
+  const insertTranscript = useCallback((text: string) => {
+    insertTextReference.current?.(text);
+  }, []);
+  const dictationOptions = typeof dictation === "object" ? dictation : {};
+  const speech = useDictation({
+    lang: dictationOptions.lang,
+    onError: dictationOptions.onError,
+    onFinal: insertTranscript,
+  });
+  const showMic = Boolean(dictation) && speech.supported;
+
+  // Sending ends the take: a mic left open would start filling the next
+  // message with whatever is said while reading the reply.
+  const { listening, stop: stopDictation } = speech;
+  const handleSubmit = useCallback(
+    (value: string) => {
+      if (listening) stopDictation();
+      onSubmit(value);
+    },
+    [listening, onSubmit, stopDictation],
+  );
 
   // Emptiness comes from the word-count plugin, which `Editor` renders eagerly.
   // Deriving it from the value would tie the button's enabled state to the
@@ -140,17 +183,39 @@ export function Composer({
             >
               <ComposerSubmitPlugin
                 allowEmpty={allowEmptySubmit}
+                bindInsertText={bindInsertText}
                 bindSetValue={bindSetValue}
                 bindSubmit={bindSubmit}
                 history={history}
                 disabled={busy}
                 format={format}
-                onSubmit={onSubmit}
+                onSubmit={handleSubmit}
               />
             </Editor>
           </div>
 
-          <div className="shrink-0 pr-2 pb-2">
+          <div className="flex shrink-0 items-center gap-0.5 pr-2 pb-2">
+            {showMic && (
+              <InputGroupButton
+                aria-label={
+                  speech.listening ? "Stop dictation" : "Start dictation"
+                }
+                aria-pressed={speech.listening}
+                // Keep the caret where it is: the transcript goes there.
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  if (speech.listening) speech.stop();
+                  else speech.start();
+                }}
+                size="icon-sm"
+                variant="ghost"
+                className={cn(
+                  speech.listening && "text-destructive animate-pulse",
+                )}
+              >
+                <MicIcon />
+              </InputGroupButton>
+            )}
             <InputGroupButton
               aria-label={busy ? "Stop generating" : "Send message"}
               disabled={busy ? !onStop : isEmpty && !allowEmptySubmit}
@@ -173,6 +238,18 @@ export function Composer({
             </InputGroupButton>
           </div>
         </div>
+
+        {/* What the recognizer has heard but not settled on yet. Shown, not
+            typed: it is still being revised. */}
+        {speech.listening && speech.interim && (
+          <p
+            aria-live="polite"
+            data-slot="composer-dictation-interim"
+            className="text-muted-foreground truncate px-3 pb-2 text-sm italic"
+          >
+            {speech.interim}
+          </p>
+        )}
       </InputGroup>
 
       {actions && (

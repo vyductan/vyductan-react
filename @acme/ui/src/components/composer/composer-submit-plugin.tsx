@@ -6,6 +6,8 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $getSelection,
+  $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
@@ -66,6 +68,12 @@ type ComposerSubmitPluginProperties = {
    * `value` as an initial state only, so there is no prop that could do this.
    */
   bindSetValue?: (setValue: (text: string) => void) => void;
+  /**
+   * Hands out an inserter that adds text at the caret without touching the
+   * rest of the draft — what dictation needs, where `bindSetValue` would
+   * throw away whatever was typed before the mic was switched on.
+   */
+  bindInsertText?: (insertText: (text: string) => void) => void;
   disabled?: boolean;
   /**
    * Let an empty text box be sent. Set it when the message carries something
@@ -93,6 +101,7 @@ export function ComposerSubmitPlugin({
   onSubmit,
   bindSubmit,
   bindSetValue,
+  bindInsertText,
   disabled = false,
   allowEmpty = false,
   history = [],
@@ -111,6 +120,32 @@ export function ComposerSubmitPlugin({
         if (text) paragraph.append($createTextNode(text));
         root.append(paragraph);
         paragraph.selectEnd();
+      });
+    },
+    [editor],
+  );
+
+  const insertText = useCallback(
+    (text: string) => {
+      editor.update(() => {
+        let selection = $getSelection();
+        // Focus may have left the editor for the mic button; without a range
+        // selection there is no caret, so the text goes on the end.
+        if (!$isRangeSelection(selection)) {
+          $getRoot().selectEnd();
+          selection = $getSelection();
+        }
+        if (!$isRangeSelection(selection)) return;
+
+        // Phrases arrive without their separating space. Add one unless the
+        // caret already sits after whitespace or at the start of a line.
+        const anchor = selection.anchor;
+        const before =
+          anchor.type === "text"
+            ? anchor.getNode().getTextContent().slice(0, anchor.offset)
+            : "";
+        const needsSpace = before !== "" && !/\s$/.test(before);
+        selection.insertText(needsSpace ? ` ${text}` : text);
       });
     },
     [editor],
@@ -158,6 +193,10 @@ export function ComposerSubmitPlugin({
   useEffect(() => {
     bindSetValue?.(replaceContent);
   }, [bindSetValue, replaceContent]);
+
+  useEffect(() => {
+    bindInsertText?.(insertText);
+  }, [bindInsertText, insertText]);
 
   useEffect(() => {
     if (history.length === 0) return;
