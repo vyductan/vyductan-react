@@ -1,5 +1,4 @@
 import type { LexicalNode, NodeKey } from "lexical";
-import type { LucideIcon } from "lucide-react";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { $createCodeNode } from "@lexical/code";
@@ -17,19 +16,7 @@ import {
   $isTextNode,
   COPY_COMMAND,
 } from "lexical";
-import {
-  CodeIcon,
-  GripVerticalIcon,
-  Heading1Icon,
-  Heading2Icon,
-  Heading3Icon,
-  ListIcon,
-  ListOrderedIcon,
-  ListTodoIcon,
-  PlusIcon,
-  QuoteIcon,
-  TextIcon,
-} from "lucide-react";
+import { GripVerticalIcon, PlusIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import {
@@ -54,6 +41,7 @@ import {
   $selectedBlocks,
   $turnSelectedBlocksIntoList,
 } from "../utils/block-selection";
+import { BLOCK_TYPE_ICONS } from "../utils/block-type-icons";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { DraggableBlockPlugin_EXPERIMENTAL } from "./default/lexical-draggable-block-plugin";
 
@@ -100,19 +88,18 @@ export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
  * glance rather than read. Notion's order.
  */
 const TURN_INTO_CHOICES: ReadonlyArray<{
-  type: string;
+  type: keyof typeof BLOCK_TYPE_ICONS;
   label: string;
-  Icon: LucideIcon;
 }> = [
-  { type: "paragraph", label: "Text", Icon: TextIcon },
-  { type: "h1", label: "Heading 1", Icon: Heading1Icon },
-  { type: "h2", label: "Heading 2", Icon: Heading2Icon },
-  { type: "h3", label: "Heading 3", Icon: Heading3Icon },
-  { type: "bullet", label: "Bulleted list", Icon: ListIcon },
-  { type: "number", label: "Numbered list", Icon: ListOrderedIcon },
-  { type: "check", label: "To-do list", Icon: ListTodoIcon },
-  { type: "code", label: "Code", Icon: CodeIcon },
-  { type: "quote", label: "Quote", Icon: QuoteIcon },
+  { type: "paragraph", label: "Text" },
+  { type: "h1", label: "Heading 1" },
+  { type: "h2", label: "Heading 2" },
+  { type: "h3", label: "Heading 3" },
+  { type: "bullet", label: "Bulleted list" },
+  { type: "number", label: "Numbered list" },
+  { type: "check", label: "To-do list" },
+  { type: "code", label: "Code" },
+  { type: "quote", label: "Quote" },
 ];
 
 export function DraggableBlockPlugin({
@@ -516,15 +503,18 @@ export function DraggableBlockPlugin({
                       <Command>
                         <CommandList>
                           <CommandGroup>
-                            {TURN_INTO_CHOICES.map(({ type, label, Icon }) => (
-                              <CommandItem
-                                key={type}
-                                onSelect={() => handleTurnInto(type)}
-                              >
-                                <Icon className="size-4" />
-                                {label}
-                              </CommandItem>
-                            ))}
+                            {TURN_INTO_CHOICES.map(({ type, label }) => {
+                              const Icon = BLOCK_TYPE_ICONS[type];
+                              return (
+                                <CommandItem
+                                  key={type}
+                                  onSelect={() => handleTurnInto(type)}
+                                >
+                                  <Icon className="size-4" />
+                                  {label}
+                                </CommandItem>
+                              );
+                            })}
                           </CommandGroup>
                         </CommandList>
                       </Command>

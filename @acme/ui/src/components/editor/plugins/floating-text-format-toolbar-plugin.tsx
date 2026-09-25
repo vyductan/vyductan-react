@@ -27,7 +27,6 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import {
-  AlignLeftIcon,
   ArrowRightLeftIcon,
   ArrowUpDownIcon,
   BoldIcon,
@@ -71,6 +70,7 @@ import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
 import { message } from "../../message";
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { $turnSelectedBlocksIntoList } from "../utils/block-selection";
+import { BLOCK_TYPE_ICONS } from "../utils/block-type-icons";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
@@ -89,6 +89,7 @@ function TextFormatFloatingToolbar({
   isStrikethrough,
   setIsLinkEditMode,
   listLabel,
+  listType,
   onListChange,
   onExplain,
   onAskAI,
@@ -106,6 +107,7 @@ function TextFormatFloatingToolbar({
   isUnderline: boolean;
   setIsLinkEditMode: Dispatch<boolean>;
   listLabel: string;
+  listType: "paragraph" | ListType;
   onListChange: (type: "paragraph" | ListType) => void;
   onExplain: () => void;
   onAskAI: () => void;
@@ -113,6 +115,8 @@ function TextFormatFloatingToolbar({
   onMath: () => void;
   variant: "default" | "simple";
 }): JSX.Element {
+  // The button shows the current type's icon, not one icon for every type.
+  const ListTypeIcon = BLOCK_TYPE_ICONS[listType];
   const popupCharStylesEditorReference = useRef<HTMLDivElement | null>(null);
 
   const insertLink = useCallback(() => {
@@ -824,24 +828,30 @@ function TextFormatFloatingToolbar({
               <Dropdown
                 menu={{
                   items: [
+                    // The icons the block menu's Turn into and the slash menu
+                    // show for the same types.
                     {
                       key: "paragraph",
                       label: "Normal text",
+                      icon: <BLOCK_TYPE_ICONS.paragraph className="h-4 w-4" />,
                       onClick: () => onListChange("paragraph"),
                     },
                     {
                       key: "bullet",
                       label: "Bulleted list",
+                      icon: <BLOCK_TYPE_ICONS.bullet className="h-4 w-4" />,
                       onClick: () => onListChange("bullet"),
                     },
                     {
                       key: "number",
                       label: "Numbered list",
+                      icon: <BLOCK_TYPE_ICONS.number className="h-4 w-4" />,
                       onClick: () => onListChange("number"),
                     },
                     {
                       key: "check",
                       label: "To-do list",
+                      icon: <BLOCK_TYPE_ICONS.check className="h-4 w-4" />,
                       onClick: () => onListChange("check"),
                     },
                   ],
@@ -853,7 +863,7 @@ function TextFormatFloatingToolbar({
                   size="sm"
                   className="h-8 gap-1 px-2 text-xs font-medium sm:h-7"
                 >
-                  <AlignLeftIcon className="h-4 w-4" />
+                  <ListTypeIcon className="h-4 w-4" />
                   <span>{listLabel}</span>
                   <ChevronDownIcon className="h-4 w-4" />
                 </Button>
@@ -1209,6 +1219,7 @@ function useFloatingTextFormatToolbar(
       isCode={isCode}
       setIsLinkEditMode={setIsLinkEditMode}
       listLabel={listLabel}
+      listType={listType}
       onListChange={handleListChange}
       onExplain={handleExplain}
       onAskAI={handleAskAI}
