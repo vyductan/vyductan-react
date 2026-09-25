@@ -46,6 +46,7 @@ import {
 } from "lexical";
 import { createPortal } from "react-dom";
 
+import { $selectedTopLevelBlocks } from "../../utils/block-selection";
 import { flashNodeKeys } from "../../utils/flash-block";
 
 const SPACE = 4;
@@ -346,6 +347,30 @@ function $moveBlock(
   else anchor.insertAfter(dragged);
 }
 
+/**
+ * Move a run of top-level blocks — a block selection — beside `target`'s
+ * top-level block, keeping their order. Dropped on one of themselves, nothing
+ * moves.
+ */
+function $moveBlocks(
+  blocks: LexicalNode[],
+  target: LexicalNode,
+  placement: "before" | "after",
+): boolean {
+  const anchor = target.getTopLevelElement() ?? target;
+  if (blocks.some((block) => block.is(anchor))) return false;
+  if (placement === "before") {
+    for (const block of blocks) anchor.insertBefore(block);
+  } else {
+    let previous: LexicalNode = anchor;
+    for (const block of blocks) {
+      previous.insertAfter(block);
+      previous = block;
+    }
+  }
+  return true;
+}
+
 function useDraggableBlockMenu(
   editor: LexicalEditor,
   anchorElem: HTMLElement,
@@ -434,14 +459,37 @@ function useDraggableBlockMenu(
       if (isFileTransfer) return false;
       const { dataTransfer } = event;
       const target = event.target;
-      const draggedNode = $getNodeByKey(
-        dataTransfer?.getData(DRAG_DATA_FORMAT) ?? "",
-      );
+      // One key, or several comma-separated for a block selection.
+      const draggedNodes = (dataTransfer?.getData(DRAG_DATA_FORMAT) ?? "")
+        .split(",")
+        .map((key) => $getNodeByKey(key))
+        .filter((node): node is LexicalNode => node !== null);
+      const [draggedNode] = draggedNodes;
       if (!draggedNode || !isHTMLElement(target)) return false;
       const targetBlockElem = getBlockElement(anchorElem, editor, event, true);
       if (!targetBlockElem) return false;
       const targetNode = $getNearestNodeFromDOMNode(targetBlockElem);
       if (!targetNode) return false;
+
+      if (draggedNodes.length > 1) {
+        const moved = $moveBlocks(
+          draggedNodes,
+          targetNode,
+          placementFor(
+            targetBlockElem,
+            event.clientY / calculateZoomLevel(target),
+          ),
+        );
+        setDraggableBlockElem(null);
+        if (moved) {
+          const movedKeys = draggedNodes.map((node) => node.getKey());
+          $onUpdate(() => {
+            flashNodeKeys(editor, movedKeys);
+            if (IS_FIREFOX) editor.focus();
+          });
+        }
+        return true;
+      }
       if (targetNode === draggedNode || targetNode.isParentOf(draggedNode)) {
         if (IS_FIREFOX) editor.focus();
         return true;
@@ -517,17 +565,36 @@ function useDraggableBlockMenu(
     );
   }, [editor, isEditable, isOnMenu]);
 
+  /*
+   * The block selection as it was when the handle was pressed. Read on
+   * mousedown, not dragstart: pressing a handle outside the editable can move
+   * the page's selection before the drag begins.
+   */
+  const selectedBlockKeysRef = useRef<string[]>([]);
+  function onMouseDown() {
+    selectedBlockKeysRef.current = editor
+      .getEditorState()
+      .read(() => $selectedTopLevelBlocks().map((node) => node.getKey()));
+  }
+
   function onDragStart(event: ReactDragEvent<HTMLDivElement>) {
     const { dataTransfer } = event;
     if (!draggableBlockElem) return;
     setDragImage(dataTransfer, draggableBlockElem);
-    let nodeKey = "";
+    let nodeKeys = "";
     editor.read(() => {
       const node = $getNearestNodeFromDOMNode(draggableBlockElem);
-      if (node) nodeKey = node.getKey();
+      if (!node) return;
+      nodeKeys = node.getKey();
+      // The handle of a block inside a block selection drags the selection.
+      const selected = selectedBlockKeysRef.current;
+      const block = node.getTopLevelElement() ?? node;
+      if (selected.length > 1 && selected.includes(block.getKey())) {
+        nodeKeys = selected.join(",");
+      }
     });
     isDraggingBlockRef.current = true;
-    dataTransfer.setData(DRAG_DATA_FORMAT, nodeKey);
+    dataTransfer.setData(DRAG_DATA_FORMAT, nodeKeys);
     if (IS_FIREFOX) {
       const rootElement = editor.getRootElement();
       if (
@@ -547,7 +614,12 @@ function useDraggableBlockMenu(
 
   return createPortal(
     <>
-      <div draggable onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <div
+        draggable
+        onMouseDown={onMouseDown}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+      >
         {isEditable && menuComponent}
       </div>
       {targetLineComponent}

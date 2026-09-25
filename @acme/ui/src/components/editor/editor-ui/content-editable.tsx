@@ -90,6 +90,14 @@ const BLOCK_PLACEHOLDER = cn(
   "[&_[data-placeholder][role=checkbox]]:after:select-none",
 );
 
+// Blocks under a multi-block selection (BlockSelectionPlugin), highlighted
+// whole in Notion's blue, with the text highlight inside them turned off.
+const BLOCK_SELECTION = cn(
+  "[&_[data-block-selected]]:rounded-sm",
+  "[&_[data-block-selected]]:bg-[rgb(35_131_226/0.14)]",
+  "[&_[data-block-selected]]:selection:bg-transparent",
+);
+
 export function ContentEditable({
   placeholder = "Start typing...",
   className,
@@ -157,6 +165,7 @@ export function ContentEditable({
           CONTENT_PADDING,
           "wrap-break-word whitespace-break-spaces focus:outline-none",
           BLOCK_PLACEHOLDER,
+          BLOCK_SELECTION,
           className,
         )}
         aria-placeholder={dynamicPlaceholder}

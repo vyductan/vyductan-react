@@ -23,6 +23,7 @@ import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
 import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
+import { BlockSelectionPlugin } from "../plugins/block-selection-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
@@ -225,6 +226,7 @@ export function Plugins({
       {editable && placeholder && (
         <BlockPlaceholderPlugin placeholder={placeholder} />
       )}
+      {editable && <BlockSelectionPlugin />}
 
       <MentionsPlugin
         mentionsData={mentionsData}
