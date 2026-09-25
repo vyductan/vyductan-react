@@ -6,7 +6,9 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import type { SilenceDetectorOptions } from "./silence-detector";
 import { encodeWav } from "./encode-wav";
+import { createSilenceDetector } from "./silence-detector";
 
 // Support is a browser fact: false on the server and through hydration.
 const noSubscribe = () => () => undefined;
@@ -29,6 +31,14 @@ export type UseAudioRecorderOptions = {
   onError?: (code: AudioRecorderErrorCode) => void;
   /** Hard stop, so a forgotten mic cannot fill the upload limit. */
   maxDurationMs?: number;
+  /**
+   * End the take by itself once the speaker goes quiet — hands-free turns.
+   * Measures the room first, then stops after `silenceMs` of quiet following
+   * speech; with no speech at all for `noSpeechMs` the take is discarded and
+   * `onNoSpeech` fires.
+   */
+  autoStop?: Pick<SilenceDetectorOptions, "silenceMs" | "noSpeechMs">;
+  onNoSpeech?: () => void;
 };
 
 /**
@@ -40,6 +50,8 @@ export function useAudioRecorder({
   onRecorded,
   onError,
   maxDurationMs = 60_000,
+  autoStop,
+  onNoSpeech,
 }: UseAudioRecorderOptions) {
   const supported = useSyncExternalStore(
     noSubscribe,
@@ -49,14 +61,16 @@ export function useAudioRecorder({
   const [recording, setRecording] = useState(false);
   const [encoding, setEncoding] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
+  /** Microphone loudness, 0–1, for a live meter. Updated ~10× a second. */
+  const [level, setLevel] = useState(0);
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const discardRef = useRef(false);
 
-  const callbacksRef = useRef({ onRecorded, onError });
+  const callbacksRef = useRef({ onRecorded, onError, onNoSpeech });
   useEffect(() => {
-    callbacksRef.current = { onRecorded, onError };
-  }, [onRecorded, onError]);
+    callbacksRef.current = { onRecorded, onError, onNoSpeech };
+  }, [onRecorded, onError, onNoSpeech]);
 
   const stop = useCallback(() => {
     const recorder = recorderRef.current;
@@ -96,19 +110,50 @@ export function useAudioRecorder({
     const startedAt = Date.now();
     discardRef.current = false;
 
+    // Loudness, read off the same stream the recorder takes. The context is
+    // only for measuring; it plays nothing.
+    const meterContext = new AudioContext();
+    const analyser = meterContext.createAnalyser();
+    analyser.fftSize = 1024;
+    meterContext.createMediaStreamSource(stream).connect(analyser);
+    const samples = new Float32Array(analyser.fftSize);
+    const detector = autoStop ? createSilenceDetector(autoStop) : null;
+
     const tick = setInterval(() => {
-      const elapsed = Date.now() - startedAt;
+      const now = Date.now();
+      const elapsed = now - startedAt;
       setElapsedMs(elapsed);
-      if (elapsed >= maxDurationMs && recorder.state === "recording") {
+
+      analyser.getFloatTimeDomainData(samples);
+      let sum = 0;
+      for (const sample of samples) sum += sample * sample;
+      const rms = Math.sqrt(sum / samples.length);
+      // Speech sits around 0.02–0.2 RMS; scaled so a normal voice fills most
+      // of a meter.
+      setLevel(Math.min(1, rms * 6));
+
+      if (recorder.state !== "recording") return;
+      if (elapsed >= maxDurationMs) {
         recorder.stop();
+        return;
       }
-    }, 200);
+      const decision = detector?.push(rms, now);
+      if (decision === "stop") {
+        recorder.stop();
+      } else if (decision === "no-speech") {
+        discardRef.current = true;
+        recorder.stop();
+        callbacksRef.current.onNoSpeech?.();
+      }
+    }, 100);
 
     recorder.addEventListener("dataavailable", (event) => {
       if (event.data.size > 0) chunks.push(event.data);
     });
     recorder.addEventListener("stop", () => {
       clearInterval(tick);
+      void meterContext.close();
+      setLevel(0);
       // Release the mic at once, or the browser keeps its indicator lit.
       stream.getTracks().forEach((track) => track.stop());
       recorderRef.current = null;
@@ -133,7 +178,10 @@ export function useAudioRecorder({
     recorder.start();
     setElapsedMs(0);
     setRecording(true);
-  }, [maxDurationMs]);
+    // autoStop is read once per take; a new object each render must not
+    // rebuild start() and restart anything.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxDurationMs, autoStop?.silenceMs, autoStop?.noSpeechMs]);
 
   // Leaving the page mid-take: drop it and free the mic.
   useEffect(
@@ -145,5 +193,14 @@ export function useAudioRecorder({
     [],
   );
 
-  return { supported, recording, encoding, elapsedMs, start, stop, cancel };
+  return {
+    supported,
+    recording,
+    encoding,
+    elapsedMs,
+    level,
+    start,
+    stop,
+    cancel,
+  };
 }
