@@ -55,6 +55,7 @@ import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { LayoutPlugin } from "../plugins/layout-plugin";
 import { LinkPlugin } from "../plugins/link-plugin";
 import { ListMarkerPlugin } from "../plugins/list-marker-plugin";
+import { ListMarkerShortcutPlugin } from "../plugins/list-marker-shortcut-plugin";
 import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugin";
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
@@ -220,6 +221,7 @@ export function Plugins({
       <ImageLineClickPlugin />
       <HistoryFlashPlugin />
       <ListMarkerPlugin />
+      <ListMarkerShortcutPlugin />
       {editable && placeholder && (
         <BlockPlaceholderPlugin placeholder={placeholder} />
       )}
