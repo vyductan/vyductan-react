@@ -76,6 +76,19 @@
   }
 
   /*
+   * Find: every match in a soft yellow, the current one stronger, as Notion
+   * marks them. Drawn with the CSS Custom Highlight API, so nothing is
+   * written into the document — see plugins/find-replace-plugin.tsx.
+   */
+  ::highlight(editor-find) {
+    background-color: rgb(255 212 0 / 0.35);
+  }
+
+  ::highlight(editor-find-current) {
+    background-color: rgb(255 150 0 / 0.6);
+  }
+
+  /*
    * Inline code, in the red Notion marks it with. Same reasoning as the syntax
    * palette below: a host's tokens describe surfaces and text, not "this is
    * code", so there is nothing to inherit.
