@@ -242,3 +242,79 @@ test("treats a whole-line selection ending at the next line's start as one block
     expect(first).toStrictEqual(["list", "bullet", WORDS]);
   });
 });
+
+/**
+ * Copying a whole numbered list and pasting it must bring back a numbered
+ * list. A selection that takes the list whole has both ends on the root, and
+ * taking the root for "one block" stripped the list off the copy: the items
+ * came back wrapped in a new list of the default kind, bullets.
+ */
+test("keeps a copied numbered list numbered, nested items and all", async () => {
+  let editor: LexicalEditor | null = null;
+
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  const contentEditable = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  contentEditable.focus();
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    const nested = $createListNode("number").append(
+      $createListItemNode().append($createTextNode("a")),
+      $createListItemNode().append($createTextNode("b")),
+    );
+    root.append(
+      $createListNode("number").append(
+        $createListItemNode().append($createTextNode("11")),
+        $createListItemNode().append(nested),
+        $createListItemNode().append($createTextNode("22")),
+      ),
+      $createParagraphNode(),
+    );
+    // The list, whole, and nothing after it.
+    root.select(0, 1);
+  });
+
+  const clipboard = new DataTransfer();
+  fire(contentEditable, "copy", clipboard);
+
+  // The copy itself must still say "numbered list" at its top.
+  const copied = JSON.parse(
+    clipboard.getData("application/x-lexical-editor"),
+  ) as { nodes: Array<{ type: string; listType?: string }> };
+  expect(copied.nodes.map((node) => [node.type, node.listType])).toStrictEqual([
+    ["list", "number"],
+  ]);
+
+  // Paste into the empty line below the list.
+  live.update(() => {
+    $getRoot().getLastChild()?.selectEnd();
+  });
+  fire(contentEditable, "paste", clipboard);
+
+  await waitFor(() => {
+    const lists = live.getEditorState().read(() =>
+      $getRoot()
+        .getChildren()
+        .filter((node) => $isListNode(node))
+        .map((node) =>
+          (node as ReturnType<typeof $createListNode>).getListType(),
+        ),
+    );
+    expect(lists).not.toContain("bullet");
+    expect(contentEditable.textContent?.match(/22/g)).toHaveLength(2);
+  });
+});

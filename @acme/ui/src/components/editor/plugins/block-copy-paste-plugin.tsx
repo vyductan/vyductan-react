@@ -148,6 +148,10 @@ export function getMultiParagraphCopyPlainText(
  */
 function $blockOf(point: PointType): LexicalNode | null {
   let node: LexicalNode | null = point.getNode();
+  // A point on the root itself — a select-all — is in no block. Taking the
+  // root for one made two such points "the same block", and a whole list was
+  // copied without its list: pasted, the items came back as bullets.
+  if ($isRootOrShadowRoot(node)) return null;
   while (node) {
     if ($isListItemNode(node)) return node;
     const parent: LexicalNode | null = node.getParent();
