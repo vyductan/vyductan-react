@@ -379,7 +379,9 @@ export function MentionsPlugin({
         ).length;
 
         return createPortal(
-          <div className="bg-popover fixed z-10 w-72 rounded-md shadow-md">
+          // z-50 like the "/" menu: at z-10 the list opened behind any Modal
+          // (itself z-50), so "@" looked dead in an editor inside a dialog.
+          <div className="bg-popover fixed z-50 w-72 rounded-md shadow-md">
             <Command
               onKeyDown={(e) => {
                 if (e.key === "ArrowUp") {

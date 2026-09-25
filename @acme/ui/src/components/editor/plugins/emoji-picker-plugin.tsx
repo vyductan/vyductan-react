@@ -113,7 +113,8 @@ export function EmojiPickerPlugin() {
       ) => {
         return anchorElementReference.current && options.length > 0
           ? createPortal(
-              <div className="fixed w-[200px] rounded-md shadow-md">
+              // z-50 like the "/" menu, so it is not hidden behind a Modal.
+              <div className="fixed z-50 w-[200px] rounded-md shadow-md">
                 <CommandRoot
                   onKeyDown={(e) => {
                     if (e.key === "ArrowUp") {
