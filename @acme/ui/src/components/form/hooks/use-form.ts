@@ -122,9 +122,7 @@ const useForm = <
   const setFieldsValue = useCallback(
     (
       values?:
-        | DefaultValues<TFieldValues>
-        | TFieldValues
-        | ResetAction<TFieldValues>,
+        DefaultValues<TFieldValues> | TFieldValues | ResetAction<TFieldValues>,
       keepStateOptions?: KeepStateOptions,
     ) => {
       reset(values, {
@@ -135,22 +133,31 @@ const useForm = <
     [reset],
   );
 
+  // `props` (and usually an inline `defaultValues` literal) is a new object on
+  // every render. Read it through a ref so `resetFields` keeps a stable
+  // identity — otherwise a consumer effect that lists it as a dependency and
+  // calls it re-runs on every render, and reset() re-renders → infinite loop.
+  const hasProps = props !== undefined;
+  const defaultValuesRef = useRef(props?.defaultValues);
+  useEffect(() => {
+    defaultValuesRef.current = props?.defaultValues;
+  });
+
   const resetFields = useCallback(
     (keepStateOptions?: KeepStateOptions) => {
-      if (props) {
-        if (typeof props.defaultValues === "function") {
-          // props
-          //   .defaultValues()
-          //   .then((values: TFieldValues) => {
-          //     return methods.reset(values, keepStateOptions);
-          //   })
-          //   .catch(() => void 0);
-        } else {
-          methods.reset(props.defaultValues, keepStateOptions);
-        }
+      if (!hasProps) return;
+      const defaultValues = defaultValuesRef.current;
+      if (typeof defaultValues === "function") {
+        // defaultValues()
+        //   .then((values: TFieldValues) => {
+        //     return reset(values, keepStateOptions);
+        //   })
+        //   .catch(() => void 0);
+      } else {
+        reset(defaultValues, keepStateOptions);
       }
     },
-    [methods, props],
+    [hasProps, reset],
   );
   const _formControl =
     useRef<FormInstance<TFieldValues, TContext, TTransformedValues>>(null);
@@ -196,7 +203,9 @@ const useForm = <
       // the root formState proxy to 'all' (which would re-render the whole form
       // on every subsequent errors emission). Identity does not matter here —
       // it is read imperatively inside the callback, not as a dependency.
-      const errorFieldsAll = buildErrorFields(methods.control._formState.errors);
+      const errorFieldsAll = buildErrorFields(
+        methods.control._formState.errors,
+      );
       const errorFields = names
         ? errorFieldsAll.filter((e) =>
             names.some((n) => e.name.join(".") === String(n)),

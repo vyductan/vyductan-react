@@ -579,7 +579,7 @@ export function DraggableBlockPlugin({
         <div
           ref={targetLineReference}
           data-slot="draggable-block-target-line"
-          className="bg-primary/50 pointer-events-none absolute top-0 left-0 h-1 w-full transition-opacity duration-200"
+          className="bg-primary/50 pointer-events-none absolute top-0 left-0 h-1 w-full opacity-0 transition-opacity duration-200"
         />
       }
       isOnMenu={isOnMenu}
