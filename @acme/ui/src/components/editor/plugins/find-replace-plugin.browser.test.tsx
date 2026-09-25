@@ -29,6 +29,7 @@ function EditorRefPlugin({
 
 afterEach(() => {
   document.body.replaceChildren();
+  globalThis.scrollTo(0, 0);
   // A modal left behind sets pointer-events: none on the body.
   document.body.removeAttribute("style");
 });
@@ -249,3 +250,115 @@ test("highlights a match inside formatted text too", async () => {
   );
   expect(painted).toStrictEqual(["email", "email", "email"]);
 });
+
+/**
+ * A page that scrolls under a sticky header. The bar was kept below the
+ * nearest scroll container's top, which here is the top of the viewport, so
+ * once the note was scrolled it rode up into the header and out of the
+ * editor. Whatever sits over the spot it would take, it goes below.
+ */
+async function openFindUnderStickyHeader(scrollsInside: boolean) {
+  let editor: LexicalEditor | null = null;
+
+  const header = (
+    <header
+      data-testid="sticky-header"
+      style={{
+        position: "sticky",
+        top: 0,
+        height: 64,
+        background: "white",
+        zIndex: 10,
+      }}
+    />
+  );
+  const body = (
+    <div style={{ width: 380, marginLeft: 16 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>
+  );
+
+  render(
+    scrollsInside ? (
+      <div data-testid="scroller" style={{ height: 600, overflowY: "auto" }}>
+        {header}
+        {body}
+      </div>
+    ) : (
+      <div>
+        {header}
+        {body}
+      </div>
+    ),
+  );
+
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    for (let line = 0; line < 80; line++) {
+      root.append(
+        $createParagraphNode().append($createTextNode(`Line ${line} cơ bản`)),
+      );
+    }
+  });
+
+  const contentEditable = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node?.textContent).toContain("Line 79");
+    return node!;
+  });
+
+  await userEvent.click(contentEditable);
+
+  // Scroll well past the top of the note.
+  if (scrollsInside) {
+    document.querySelector<HTMLElement>('[data-testid="scroller"]')!.scrollTop =
+      900;
+  } else {
+    globalThis.scrollTo(0, 900);
+  }
+  await new Promise((resolve) => setTimeout(resolve, 50));
+
+  await userEvent.keyboard("{Control>}f{/Control}");
+  const bar = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>('[data-slot="find-bar"]');
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  return {
+    bar,
+    header: document.querySelector<HTMLElement>(
+      '[data-testid="sticky-header"]',
+    )!,
+    contentEditable,
+  };
+}
+
+test.each([
+  ["a scroll container", true],
+  ["the page itself", false],
+])(
+  "stays below a sticky header when %s scrolls",
+  async (_name, scrollsInside) => {
+    const { bar, header, contentEditable } =
+      await openFindUnderStickyHeader(scrollsInside);
+
+    const barBox = bar.getBoundingClientRect();
+    const headerBox = header.getBoundingClientRect();
+
+    // The note really has scrolled up under the header.
+    expect(contentEditable.getBoundingClientRect().top).toBeLessThan(
+      headerBox.bottom,
+    );
+    expect(barBox.top).toBeGreaterThanOrEqual(headerBox.bottom);
+    expect(barBox.top).toBeLessThan(headerBox.bottom + 24);
+  },
+);

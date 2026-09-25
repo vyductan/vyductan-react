@@ -103,6 +103,45 @@ function firstTextNode(element: HTMLElement): Text | null {
   return walker.nextNode() as Text | null;
 }
 
+/**
+ * Where the bar can start without sitting under something pinned over the
+ * page — a sticky or fixed header the editor knows nothing about.
+ *
+ * Probes the spot the bar would take. If what is on top there is pinned and
+ * is not the editor or the page behind it, the bar moves below it, and looks
+ * again (a header can sit under a banner).
+ */
+function belowPinnedCover(
+  x: number,
+  y: number,
+  root: HTMLElement,
+  ignore: HTMLElement | null,
+): number {
+  let top = y;
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const hit = document
+      .elementsFromPoint(x, top)
+      .find((element) => !ignore?.contains(element));
+    // The note itself, or a container it sits in: nothing is covering it.
+    if (!hit || root.contains(hit) || hit.contains(root)) break;
+
+    let pinned: Element | null = hit;
+    while (pinned && !pinned.contains(root)) {
+      const { position } = getComputedStyle(pinned);
+      if (position === "fixed" || position === "sticky") break;
+      pinned = pinned.parentElement;
+    }
+    if (!pinned || pinned.contains(root)) break;
+
+    const bottom = pinned.getBoundingClientRect().bottom;
+    if (bottom <= top) break;
+    top = bottom;
+  }
+
+  return top;
+}
+
 type HighlightRegistry = Map<string, unknown>;
 type HighlightConstructor = new (...ranges: Range[]) => unknown;
 
@@ -135,6 +174,7 @@ export function FindReplacePlugin({
   const [position, setPosition] = useState<{ top: number; right: number }>();
 
   const findInputReference = useRef<HTMLInputElement>(null);
+  const barReference = useRef<HTMLDivElement>(null);
   const queryReference = useRef(query);
   useEffect(() => {
     queryReference.current = query;
@@ -211,9 +251,23 @@ export function FindReplacePlugin({
 
     const place = () => {
       const box = root.getBoundingClientRect();
-      const floor = scroller ? scroller.getBoundingClientRect().top : 0;
+      const floor = Math.max(
+        box.top,
+        scroller ? scroller.getBoundingClientRect().top : 0,
+        0,
+      );
+      const probeX = Math.min(
+        Math.max(box.right - 16, 0),
+        globalThis.innerWidth - 1,
+      );
+      const clear = belowPinnedCover(
+        probeX,
+        floor + 1,
+        root,
+        barReference.current,
+      );
       setPosition({
-        top: Math.max(box.top, floor, 0) + EDGE_GAP,
+        top: Math.max(floor, clear) + EDGE_GAP,
         right: Math.max(globalThis.innerWidth - box.right, 0),
       });
     };
@@ -325,6 +379,7 @@ export function FindReplacePlugin({
 
   return createPortal(
     <div
+      ref={barReference}
       data-slot="find-bar"
       role="search"
       style={{ top: position.top, right: position.right }}
