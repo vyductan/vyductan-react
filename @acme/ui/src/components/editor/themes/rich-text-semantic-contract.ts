@@ -83,12 +83,12 @@ export const richTextSemanticContract = {
       listitem: "list-none before:hidden after:hidden",
     },
     ol: "my-1 ml-6 list-decimal [&>li]:mt-1",
+    // Notion's levels: 1. → a. → i., then round again. Lexical and the
+    // published renderer both take depth modulo this length.
     olDepth: [
       "list-outside list-decimal!",
-      "list-outside list-[upper-roman]!",
-      "list-outside list-[lower-roman]!",
-      "list-outside list-[upper-alpha]!",
       "list-outside list-[lower-alpha]!",
+      "list-outside list-[lower-roman]!",
     ],
     ul: "my-1 ml-6 list-disc [&>li]:mt-1",
     ulDepth: [
