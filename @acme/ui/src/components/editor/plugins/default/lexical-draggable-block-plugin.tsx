@@ -15,6 +15,7 @@
  * - `$moveBlock` moves a list item together with its nested children, wraps
  *   an item dropped among non-list blocks in a new list of its own type, and
  *   removes the lists it leaves empty.
+ * - Drops use the target's upper/lower half, and the moved block flashes.
  */
 import type { ListItemNode } from "@lexical/list";
 import type { LexicalEditor, LexicalNode } from "lexical";
@@ -44,6 +45,8 @@ import {
   isHTMLElement,
 } from "lexical";
 import { createPortal } from "react-dom";
+
+import { flashNodeKeys } from "../../utils/flash-block";
 
 const SPACE = 4;
 const TARGET_LINE_HALF_HEIGHT = 2;
@@ -455,11 +458,12 @@ function useDraggableBlockMenu(
         ),
       );
       setDraggableBlockElem(null);
-      if (IS_FIREFOX) {
-        $onUpdate(() => {
-          editor.focus();
-        });
-      }
+      // Highlight what moved once it is in its new place, as Notion does.
+      const movedKey = draggedNode.getKey();
+      $onUpdate(() => {
+        flashNodeKeys(editor, [movedKey]);
+        if (IS_FIREFOX) editor.focus();
+      });
       return true;
     }
 

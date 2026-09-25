@@ -9,7 +9,12 @@ import {
 } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
-import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  UNDO_COMMAND,
+} from "lexical";
 import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -338,4 +343,57 @@ test("a read-only editor still offers copy, and no language picker", async () =>
 
   await waitFor(() => expect(copyButton()).toBeDefined());
   expect(document.querySelector('button[title="Select language"]')).toBeNull();
+});
+
+/** Whether a highlight is running on the block that holds `element`. */
+const isFlashing = (element: Element) =>
+  (element.closest("li, p, h1, h2, h3, code") ?? element)
+    .getAnimations()
+    .some((animation) => animation.id === "editor-block-flash");
+
+test("a dropped block is highlighted, like Notion", async () => {
+  await renderEditor(buildCodeBlock);
+
+  await userEvent.hover(lineOf("After"));
+  await waitFor(() =>
+    expect(Math.abs(centreY(handle()) - centreY(lineOf("After")))).toBeLessThan(
+      12,
+    ),
+  );
+  dragBlockOnto(lineOf("Before"), "upper");
+
+  await waitFor(() => expect(isFlashing(lineOf("After"))).toBe(true));
+  expect(isFlashing(lineOf("Before"))).toBe(false);
+});
+
+test("undo highlights the block it brings back", async () => {
+  const editor = await renderEditor(buildNestedList);
+
+  await userEvent.hover(lineOf("After"));
+  await waitFor(() =>
+    expect(Math.abs(centreY(handle()) - centreY(lineOf("After")))).toBeLessThan(
+      8,
+    ),
+  );
+  dragBlockOnto(lineOf("Khung framework"), "upper");
+  await waitFor(() =>
+    expect(shape(editor)[1]).toEqual([
+      "After",
+      "Khung framework",
+      ["S situation", "B behavior", "Ví dụ example"],
+    ]),
+  );
+  // Let the drop's own highlight finish so only the undo's can be seen.
+  for (const animation of document.getAnimations()) animation.finish();
+
+  editor.dispatchCommand(UNDO_COMMAND, undefined);
+
+  await waitFor(() =>
+    expect(shape(editor)[1]).toEqual([
+      "Khung framework",
+      ["S situation", "B behavior", "Ví dụ example"],
+      "After",
+    ]),
+  );
+  await waitFor(() => expect(isFlashing(lineOf("After"))).toBe(true));
 });
