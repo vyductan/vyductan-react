@@ -58,6 +58,7 @@ import { PageLinkHoverCardPlugin } from "../plugins/page-link-hover-card-plugin"
 import { PasteAsPlugin } from "../plugins/paste-as-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
+import { ResetFormatOnEnterPlugin } from "../plugins/reset-format-on-enter-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
 import { TableColumnResizePlugin } from "../plugins/table-column-resize-plugin";
@@ -209,6 +210,7 @@ export function Plugins({
       {!isSimple && <HashtagPlugin />}
       <HistoryPlugin />
       <BlockTypeNormalizationPlugin />
+      <ResetFormatOnEnterPlugin />
 
       <MentionsPlugin
         mentionsData={mentionsData}
