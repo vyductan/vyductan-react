@@ -80,6 +80,7 @@ import { InsertPollDialog } from "../plugins/poll-plugin";
 import { InsertTableDialog } from "../plugins/table-plugin";
 import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
 import { InsertVideoDialog } from "../plugins/video-plugin";
+import { $textBeforeCaretOnLine } from "../utils/text-before-caret";
 import { LexicalTypeaheadMenuPlugin } from "./default/lexical-typeahead-menu-plugin";
 
 // const LexicalTypeaheadMenuPlugin = dynamic(
@@ -426,9 +427,26 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
   const [queryString, setQueryString] = useState<string | null>(null);
   const [, setIsComponentPickerOpen] = useComponentPickerContext();
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
+  const checkForSlashMatch = useBasicTypeaheadTriggerMatch("/", {
     minLength: 0,
   });
+
+  /*
+   * Only a "/" that starts its line opens the menu. The basic matcher accepts
+   * one after any whitespace, so "abc 123 /" opened it mid-sentence, where a
+   * slash is just a slash. Leading spaces before the "/" are allowed.
+   */
+  const checkForTriggerMatch = useCallback(
+    (text: string, editor: LexicalEditor) => {
+      const match = checkForSlashMatch(text, editor);
+      if (match === null) return null;
+      const beforeCaret = $textBeforeCaretOnLine();
+      return beforeCaret?.trimStart() === match.replaceableString
+        ? match
+        : null;
+    },
+    [checkForSlashMatch],
+  );
 
   const options = useMemo(() => {
     const categorizedOptions = getBaseOptions(editor, showModal);
