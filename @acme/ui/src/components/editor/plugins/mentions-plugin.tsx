@@ -11,8 +11,15 @@
  */
 import type { MenuTextMatch } from "@lexical/react/LexicalTypeaheadMenuPlugin";
 import type { TextNode } from "lexical";
-import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import type { JSX, ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   MenuOption,
@@ -260,6 +267,51 @@ type AtMenuOption =
   | PageLinkTypeaheadOption
   | CreateMentionTypeaheadOption;
 
+/**
+ * The menu opens under the caret. At the bottom of the viewport — a chat
+ * composer, always — that put it off-screen, and Lexical's own flip never
+ * fires there: it only flips when the editor itself has room above the caret,
+ * which a one-line box does not. So: measure after render, and if the menu
+ * would run past the viewport (or the caret sits in the lower half), pin it
+ * above the caret instead.
+ */
+function FlipAboveWhenClipped({
+  anchor,
+  deps,
+  className,
+  children,
+}: {
+  anchor: HTMLElement;
+  deps: unknown;
+  className?: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const menu = ref.current;
+    if (!menu) return;
+    menu.style.top = "";
+    const anchorRect = anchor.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    // Past the viewport, or merely in its lower half: a box down there is a
+    // chat composer, and a menu dropped over the row under it (model picker,
+    // hints) reads as broken even when it technically fits.
+    const clipped = menuRect.bottom > window.innerHeight - 8;
+    const lowerHalf = anchorRect.top > window.innerHeight / 2;
+    if (!clipped && !lowerHalf) return;
+    // Lexical puts the anchor 3px under a box as tall as the caret line.
+    const caretTop = anchorRect.top - anchorRect.height - 3;
+    menu.style.top = `${Math.max(8, caretTop - menuRect.height - 4)}px`;
+  }, [anchor, deps]);
+
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  );
+}
+
 export function MentionsPlugin({
   mentionsData = [],
   searchPageLinks,
@@ -437,7 +489,12 @@ export function MentionsPlugin({
         return createPortal(
           // z-50 like the "/" menu: at z-10 the list opened behind any Modal
           // (itself z-50), so "@" looked dead in an editor inside a dialog.
-          <div className="bg-popover fixed z-50 w-72 rounded-md shadow-md">
+          <FlipAboveWhenClipped
+            anchor={anchorElementReference.current}
+            // Re-measure when the list changes height.
+            deps={options.length}
+            className="bg-popover fixed z-50 w-72 rounded-md shadow-md"
+          >
             <Command
               onKeyDown={(e) => {
                 if (e.key === "ArrowUp") {
@@ -485,7 +542,7 @@ export function MentionsPlugin({
                 )}
               </CommandList>
             </Command>
-          </div>,
+          </FlipAboveWhenClipped>,
           anchorElementReference.current,
         );
       }}
