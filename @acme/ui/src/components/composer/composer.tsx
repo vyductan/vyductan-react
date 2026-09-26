@@ -11,6 +11,7 @@ import {
 } from "@acme/ui/components/input-group";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { MentionData } from "../editor";
 import type { ComposerFormat } from "./composer-submit-plugin";
 import type { DictationErrorCode } from "./use-dictation";
 import { Editor } from "../editor";
@@ -71,6 +72,16 @@ export type ComposerProps = {
    * exists (Chromium, Safari); `true` listens in the document's language.
    */
   dictation?: boolean | ComposerDictation;
+  /**
+   * "@" opens a menu of these people; picking one inserts "@Name". With
+   * `createLabel`, a single word nobody matches gets a last "create" option
+   * that inserts it too — the composer creates nothing, the host reads the
+   * name out of the submitted text.
+   */
+  mentions?: {
+    people: MentionData[];
+    createLabel?: (name: string) => string;
+  };
   /** Earlier messages, newest first — Arrow Up walks back through them. */
   history?: string[];
   autoFocus?: boolean;
@@ -96,6 +107,7 @@ export function Composer({
   bindSetValue,
   onStop,
   dictation,
+  mentions,
   history,
   autoFocus = false,
   className,
@@ -180,6 +192,8 @@ export function Composer({
               onStatsChange={handleStatsChange}
               placeholder={placeholder}
               variant="minimal"
+              mentionsData={mentions?.people}
+              createMentionLabel={mentions?.createLabel}
             >
               <ComposerSubmitPlugin
                 allowEmpty={allowEmptySubmit}

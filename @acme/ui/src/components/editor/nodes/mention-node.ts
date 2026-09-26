@@ -111,8 +111,15 @@ export class MentionNode extends TextNode {
   }
 }
 
-export function $createMentionNode(mentionName: string): MentionNode {
-  const mentionNode = new MentionNode(mentionName);
+/**
+ * `text` is what the node shows and exports (defaults to the name) — e.g.
+ * "@Thuận", so a chat message exported to markdown still reads as a mention.
+ */
+export function $createMentionNode(
+  mentionName: string,
+  text?: string,
+): MentionNode {
+  const mentionNode = new MentionNode(mentionName, text);
   mentionNode.setMode("segmented").toggleDirectionless();
   return $applyNodeReplacement(mentionNode);
 }

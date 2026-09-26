@@ -7,6 +7,7 @@ export type {
   ResolvePasteLink,
 } from "./plugins/paste-as-plugin";
 export type {
+  MentionData,
   PageLinkOption,
   SearchPageLinks,
 } from "./plugins/mentions-plugin";

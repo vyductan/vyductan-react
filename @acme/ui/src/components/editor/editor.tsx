@@ -54,6 +54,8 @@ type EditorPropertiesBase = {
    * consumer's job.
    */
   searchPageLinks?: SearchPageLinks;
+  /** Offer "create" for an unknown @name, labelled by this. See MentionsPlugin. */
+  createMentionLabel?: (name: string) => string;
   /**
    * Describe the page behind a page-link pill, for the card shown while the
    * pointer rests on it. Returning null shows nothing; leaving it out turns
@@ -144,6 +146,7 @@ export function Editor({
   variant = "default",
   mentionsData,
   searchPageLinks,
+  createMentionLabel,
   resolvePageLinkPreview,
   resolvePasteLink,
   className,
@@ -186,6 +189,7 @@ export function Editor({
             variant={variant}
             mentionsData={mentionsData}
             searchPageLinks={searchPageLinks}
+            createMentionLabel={createMentionLabel}
             resolvePageLinkPreview={resolvePageLinkPreview}
             resolvePasteLink={resolvePasteLink}
             className={className}

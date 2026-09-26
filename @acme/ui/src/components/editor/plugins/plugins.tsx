@@ -98,6 +98,7 @@ export function Plugins({
   variant = "default",
   mentionsData,
   searchPageLinks,
+  createMentionLabel,
   resolvePageLinkPreview,
   resolvePasteLink,
   className,
@@ -111,6 +112,8 @@ export function Plugins({
   variant?: "default" | "simple" | "minimal";
   mentionsData?: MentionData[];
   searchPageLinks?: SearchPageLinks;
+  /** Offer "create" for an unknown @name, labelled by this. See MentionsPlugin. */
+  createMentionLabel?: (name: string) => string;
   resolvePageLinkPreview?: ResolvePageLinkPreview;
   resolvePasteLink?: ResolvePasteLink;
   className?: string;
@@ -240,6 +243,7 @@ export function Plugins({
       <MentionsPlugin
         mentionsData={mentionsData}
         searchPageLinks={editable ? searchPageLinks : undefined}
+        createMentionLabel={editable ? createMentionLabel : undefined}
       />
       {resolvePageLinkPreview && (
         <PageLinkHoverCardPlugin

@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react-hooks/set-state-in-effect -- usePageLinkSearch */
 
 "use client";
 
@@ -18,7 +18,8 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import { CircleUserRoundIcon } from "lucide-react";
+import { COMMAND_PRIORITY_CRITICAL } from "lexical";
+import { CircleUserRoundIcon, PlusIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import {
@@ -119,40 +120,40 @@ export type SearchPageLinks = (
   query: string,
 ) => Promise<PageLinkOption[]> | PageLinkOption[];
 
-const mentionsCache = new Map();
+/**
+ * Case- and diacritic-insensitive: "thuan" finds "Thuận". đ is its own letter,
+ * not d plus a mark, so NFD leaves it and it is mapped by hand.
+ */
+export function foldMentionName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replaceAll(/[\u0300-\u036F]/g, "")
+    .replaceAll("đ", "d")
+    .replaceAll("Đ", "D")
+    .toLowerCase()
+    .trim();
+}
 
+/**
+ * People whose name contains the query. A bare "@" (empty query) lists the
+ * first few, so the menu can offer names before anything is typed.
+ *
+ * This used to cache results per query in a module-level Map, which never
+ * saw `mentionsData` change: a host whose people load asynchronously got the
+ * empty answer computed before they arrived, for good. Filtering a short
+ * list is cheaper than keeping that cache honest.
+ */
 function useMentionLookupService(
   mentionString: string | null,
   mentionsData: MentionData[] = [],
 ) {
-  const [results, setResults] = useState<Array<MentionData>>([]);
-
-  useEffect(() => {
-    const cachedResults = mentionsCache.get(mentionString);
-
-    if (mentionString == undefined) {
-      setResults((previous) => (previous.length === 0 ? previous : []));
-      return;
-    }
-
-    if (cachedResults === null) {
-      return;
-    } else if (cachedResults !== undefined) {
-      setResults(cachedResults);
-      return;
-    }
-
-    mentionsCache.set(mentionString, null);
-    setTimeout(() => {
-      const results = mentionsData.filter((mention) =>
-        mention.name.toLowerCase().includes(mentionString.toLowerCase()),
-      );
-      mentionsCache.set(mentionString, results);
-      setResults(results);
-    }, 100);
+  return useMemo(() => {
+    if (mentionString === null) return [];
+    const query = foldMentionName(mentionString);
+    return mentionsData.filter((mention) =>
+      foldMentionName(mention.name).includes(query),
+    );
   }, [mentionString, mentionsData]);
-
-  return results;
 }
 
 /**
@@ -243,14 +244,36 @@ class PageLinkTypeaheadOption extends MenuOption {
   }
 }
 
-type AtMenuOption = MentionTypeaheadOption | PageLinkTypeaheadOption;
+/** "Create …" for a name the host does not know yet — inserts it as a mention. */
+class CreateMentionTypeaheadOption extends MenuOption {
+  readonly kind = "create";
+  name: string;
+
+  constructor(name: string) {
+    super(`create:${name}`);
+    this.name = name;
+  }
+}
+
+type AtMenuOption =
+  | MentionTypeaheadOption
+  | PageLinkTypeaheadOption
+  | CreateMentionTypeaheadOption;
 
 export function MentionsPlugin({
   mentionsData = [],
   searchPageLinks,
+  createMentionLabel,
 }: {
   mentionsData?: MentionData[];
   searchPageLinks?: SearchPageLinks;
+  /**
+   * Offer a last option that inserts the typed text as a new mention, labelled
+   * by this function (e.g. `(name) => \`Create "\${name}"\``). Omitted, only
+   * known people and pages are offered. Nothing is created by the plugin — it
+   * inserts the mention; the host decides what a new name means.
+   */
+  createMentionLabel?: (name: string) => string;
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
@@ -262,6 +285,20 @@ export function MentionsPlugin({
   const checkForSlashTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
     minLength: 0,
   });
+
+  // Only for a single word that no known name already equals. Multi-word
+  // text is the one case left out on purpose: in a chat box the menu stays
+  // open while "@Thuận cho mượn 1m" is typed, and Enter picks the highlighted
+  // option — a create option there would swallow the message as a name.
+  const createOption = useMemo(() => {
+    const name = queryString?.trim() ?? "";
+    if (!createMentionLabel || name === "" || /\s/.test(name)) return null;
+    const folded = foldMentionName(name);
+    if (mentionsData.some((m) => foldMentionName(m.name) === folded)) {
+      return null;
+    }
+    return new CreateMentionTypeaheadOption(name);
+  }, [createMentionLabel, queryString, mentionsData]);
 
   // One flat list, people first, because the typeahead tracks a single
   // highlighted index; the menu below splits it back into sections.
@@ -285,8 +322,9 @@ export function MentionsPlugin({
           ),
       ),
       ...pages.map((page) => new PageLinkTypeaheadOption(page)),
+      ...(createOption ? [createOption] : []),
     ],
-    [people, pages],
+    [people, pages, createOption],
   );
 
   const onSelectOption = useCallback(
@@ -299,7 +337,10 @@ export function MentionsPlugin({
         const node =
           selectedOption.kind === "page"
             ? $createPageLinkNode(selectedOption.page)
-            : $createMentionNode(selectedOption.name);
+            : $createMentionNode(
+                selectedOption.name,
+                `@${selectedOption.name}`,
+              );
         if (nodeToReplace) {
           nodeToReplace.replace(node);
         }
@@ -310,9 +351,9 @@ export function MentionsPlugin({
     [editor],
   );
 
-  // A bare "@" opens the menu only when there are pages to offer: people are
-  // matched on what is typed, so an empty query would list nobody useful.
-  const minMatchLength = searchPageLinks ? 0 : 1;
+  // A bare "@" opens the menu when there is something to list before a letter
+  // is typed: pages, or the host's people.
+  const minMatchLength = searchPageLinks || mentionsData.length > 0 ? 0 : 1;
 
   const checkForMentionMatch = useCallback(
     (text: string) => {
@@ -327,6 +368,10 @@ export function MentionsPlugin({
 
   return (
     <LexicalTypeaheadMenuPlugin<AtMenuOption>
+      // Above the composer's Enter-to-send and Arrow-Up history (both HIGH):
+      // at the default LOW, Enter sent the message instead of picking the
+      // highlighted name. The menu only claims keys while it is open.
+      commandPriority={COMMAND_PRIORITY_CRITICAL}
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
       triggerFn={checkForMentionMatch}
@@ -356,6 +401,13 @@ export function MentionsPlugin({
                 {option.picture}
                 {option.name}
               </>
+            ) : option.kind === "create" ? (
+              <>
+                <PlusIcon className="size-4" />
+                <span className="truncate">
+                  {createMentionLabel?.(option.name) ?? option.name}
+                </span>
+              </>
             ) : (
               <>
                 <span className="w-4 shrink-0 text-center" aria-hidden>
@@ -377,6 +429,10 @@ export function MentionsPlugin({
         const peopleCount = options.filter(
           (option) => option.kind === "person",
         ).length;
+        const pageCount = options.filter(
+          (option) => option.kind === "page",
+        ).length;
+        const createIndex = peopleCount + pageCount;
 
         return createPortal(
           // z-50 like the "/" menu: at z-10 the list opened behind any Modal
@@ -409,12 +465,21 @@ export function MentionsPlugin({
                       .map((option, index) => renderItem(option, index))}
                   </CommandGroup>
                 )}
-                {options.length > peopleCount && (
+                {pageCount > 0 && (
                   <CommandGroup heading="Link to page">
                     {options
-                      .slice(peopleCount)
+                      .slice(peopleCount, createIndex)
                       .map((option, index) =>
                         renderItem(option, peopleCount + index),
+                      )}
+                  </CommandGroup>
+                )}
+                {options.length > createIndex && (
+                  <CommandGroup>
+                    {options
+                      .slice(createIndex)
+                      .map((option, index) =>
+                        renderItem(option, createIndex + index),
                       )}
                   </CommandGroup>
                 )}
