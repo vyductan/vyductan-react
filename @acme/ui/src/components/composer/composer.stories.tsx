@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
-import { ImageIcon, PaperclipIcon, XIcon } from "lucide-react";
+import { ImageIcon, PaperclipIcon, PlusIcon, XIcon } from "lucide-react";
 import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 
 import { InputGroupButton } from "@acme/ui/components/input-group";
@@ -68,6 +68,32 @@ export const Busy: Story = {
     busy: true,
     onStop: fn(),
     onSubmit: fn(),
+  },
+};
+
+/**
+ * `size="small"` with an attach button in the `leading` slot — how a phone
+ * chat uses it: the "+" sits inside the border on the send button's line, and
+ * the padding around the text is tighter.
+ */
+export const SmallWithLeading: Story = {
+  args: {
+    size: "small",
+    placeholder: "Nhập việc cá nhân…",
+    onSubmit: fn(),
+    leading: (
+      <InputGroupButton aria-label="Add image" size="icon-xs" variant="ghost">
+        <PlusIcon />
+      </InputGroupButton>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const leading = canvasElement.querySelector(
+      '[data-slot="composer-leading"]',
+    );
+    await expect(leading).not.toBeNull();
+    // Inside the box, not in the actions row under it.
+    await expect(leading?.closest('[data-slot="input-group"]')).not.toBeNull();
   },
 };
 

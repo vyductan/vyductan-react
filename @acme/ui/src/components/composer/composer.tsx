@@ -44,6 +44,18 @@ export type ComposerProps = {
    */
   attachments?: ReactNode;
   /**
+   * A control inside the box, left of the text — an "add attachment" button,
+   * say. Sits on the last line with the send button, so the box stays one
+   * row tall for a one-line message.
+   */
+  leading?: ReactNode;
+  /**
+   * `small` tightens the padding between the border and the text, and the
+   * buttons with it — for a composer in a narrow card or on a phone. The text
+   * size is the editor's own and does not change.
+   */
+  size?: "small" | "middle";
+  /**
    * Controls that belong to the message but not to its text: file pickers, model
    * selectors, mode switches. Rendered in a row **below** the box, so the border
    * contains only the message itself.
@@ -102,6 +114,8 @@ export function Composer({
   onSubmit,
   busy = false,
   attachments,
+  leading,
+  size = "middle",
   actions,
   allowEmptySubmit = false,
   bindSetValue,
@@ -135,6 +149,8 @@ export function Composer({
     onFinal: insertTranscript,
   });
   const showMic = Boolean(dictation) && speech.supported;
+  const isSmall = size === "small";
+  const buttonSize = isSmall ? "icon-xs" : "icon-sm";
 
   // Sending ends the take: a mic left open would start filling the next
   // message with whatever is said while reading the reply.
@@ -172,6 +188,17 @@ export function Composer({
          * block-end addon would do.
          */}
         <div className="flex items-end">
+          {leading && (
+            <div
+              data-slot="composer-leading"
+              className={cn(
+                "flex shrink-0 items-center",
+                isSmall ? "pb-1.5 pl-1.5" : "pb-2 pl-2",
+              )}
+            >
+              {leading}
+            </div>
+          )}
           {/*
             Editor forwards className to an inner scroll container, so a flex-1
             handed to it lands a level below this row and the typing area
@@ -187,7 +214,16 @@ export function Composer({
               // that container, so the content class only carries padding — two
               // nested scroll areas would fight each other.
               className={cn("max-h-64 min-h-0 sm:min-h-0", classNames?.editor)}
-              classNames={{ content: "px-3 py-2.5" }}
+              classNames={{
+                content: cn(
+                  isSmall ? "px-2.5 py-1.5" : "px-3 py-2.5",
+                  // The leading control already holds the left edge.
+                  leading && (isSmall ? "pl-1.5" : "pl-2"),
+                ),
+                // One line: a long hint wrapped under a one-line box and was
+                // cut in half at its bottom edge.
+                placeholder: "[&>div]:truncate",
+              }}
               format={format as "markdown"}
               onStatsChange={handleStatsChange}
               placeholder={placeholder}
@@ -208,7 +244,12 @@ export function Composer({
             </Editor>
           </div>
 
-          <div className="flex shrink-0 items-center gap-0.5 pr-2 pb-2">
+          <div
+            className={cn(
+              "flex shrink-0 items-center gap-0.5",
+              isSmall ? "pr-1.5 pb-1.5" : "pr-2 pb-2",
+            )}
+          >
             {showMic && (
               <InputGroupButton
                 aria-label={
@@ -221,7 +262,7 @@ export function Composer({
                   if (speech.listening) speech.stop();
                   else speech.start();
                 }}
-                size="icon-sm"
+                size={buttonSize}
                 variant="ghost"
                 className={cn(
                   speech.listening && "text-destructive animate-pulse",
@@ -241,7 +282,7 @@ export function Composer({
 
                 submitReference.current?.();
               }}
-              size="icon-sm"
+              size={buttonSize}
               variant="ghost"
             >
               {busy ? (
