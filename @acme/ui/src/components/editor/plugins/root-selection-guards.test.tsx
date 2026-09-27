@@ -32,6 +32,13 @@ for (const name of ["DragEvent", "ClipboardEvent"]) {
   }
 }
 
+// Nor execCommand. A copy/cut event that is not a real ClipboardEvent sends
+// Lexical down its fallback, `document.execCommand("copy")`, and without this
+// the test passes while an unhandled rejection fails the run.
+if (typeof document.execCommand !== "function") {
+  Object.assign(document, { execCommand: () => false });
+}
+
 function EditorRefPlugin({
   onReady,
 }: {
