@@ -193,7 +193,9 @@ export function Composer({
               data-slot="composer-leading"
               className={cn(
                 "flex shrink-0 items-center",
-                isSmall ? "pb-1.5 pl-1.5" : "pb-2 pl-2",
+                // Same last-line centring as the send button, see below.
+                "pb-[4.5px]",
+                isSmall ? "pl-1.5" : "pl-2",
               )}
             >
               {leading}
@@ -217,12 +219,17 @@ export function Composer({
               classNames={{
                 content: cn(
                   isSmall ? "px-2.5 py-1.5" : "px-3 py-2.5",
+                  // The editor spaces blocks like a document (0.375em above
+                  // and below). Inside a box that pushed a one-line message
+                  // up off the buttons' line; keep the spacing between blocks,
+                  // drop it at the edges.
+                  "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
                   // The leading control already holds the left edge.
                   leading && (isSmall ? "pl-1.5" : "pl-2"),
                 ),
                 // One line: a long hint wrapped under a one-line box and was
                 // cut in half at its bottom edge.
-                placeholder: "[&>div]:truncate",
+                placeholder: "[&>div]:my-0 [&>div]:truncate",
               }}
               format={format as "markdown"}
               onStatsChange={handleStatsChange}
@@ -247,7 +254,10 @@ export function Composer({
           <div
             className={cn(
               "flex shrink-0 items-center gap-0.5",
-              isSmall ? "pr-1.5 pb-1.5" : "pr-2 pb-2",
+              // Centred on the last line of text: its middle sits the content
+              // padding plus half a 21px line above the bottom (16.5px small,
+              // 20.5px middle), minus half the 24px / 32px button.
+              isSmall ? "pr-1.5 pb-[4.5px]" : "pr-2 pb-[4.5px]",
             )}
           >
             {showMic && (
