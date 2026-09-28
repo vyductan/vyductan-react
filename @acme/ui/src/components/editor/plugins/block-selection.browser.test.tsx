@@ -11,7 +11,7 @@ import {
   $isElementNode,
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 
@@ -236,5 +236,83 @@ test("the handle of a block outside the selection drags only that block", async 
       "TODO",
       "to do",
     ]),
+  );
+});
+
+/*
+ * The format toolbar opens on a block selection and can sit over the block
+ * next to it — that is what the drag test above had to route around. These
+ * two hold the reader's side of it: the neighbour stays grabbable.
+ *
+ * 1280px wide is the layout that puts the toolbar on top of Middle here (a
+ * 640px toolbar in a 720px editor), the same collision CI's fonts produced.
+ */
+const toolbar = () =>
+  [...document.querySelectorAll<HTMLElement>("div.z-50")].find((element) =>
+    element.querySelector('[aria-label="Toggle bold"]'),
+  )!;
+
+test("a block next to a selection can be grabbed by its handle", async () => {
+  await page.viewport(1280, 800);
+  const editor = await renderEditor(build);
+  await selectBlocks(editor, 2, 3);
+  await waitFor(() => expect(selectedTexts()).toEqual(["TODO", "to do"]));
+  await waitFor(() => expect(toolbar().style.opacity).toBe("1"));
+
+  // Real pointer input into the left gutter, level with Middle — where a
+  // reader reaches for a handle. Playwright refuses if anything covers it.
+  const editable = document.querySelector<HTMLElement>(
+    '[contenteditable="true"]',
+  )!;
+  const box = editable.getBoundingClientRect();
+  const line = lineOf("Middle").getBoundingClientRect();
+  const textStart =
+    box.left + Number.parseFloat(getComputedStyle(editable).paddingLeft);
+  await userEvent.hover(editable, {
+    position: {
+      x: textStart - box.left - 20,
+      y: line.top - box.top + line.height / 2,
+    },
+  });
+
+  await waitFor(() => {
+    const grab = grip().getBoundingClientRect();
+    expect(
+      Math.abs(grab.top + grab.height / 2 - (line.top + line.height / 2)),
+    ).toBeLessThan(line.height);
+  });
+  // And the grip itself is what the pointer would press, not the toolbar.
+  const grab = grip().getBoundingClientRect();
+  const hit = document.elementFromPoint(
+    grab.left + grab.width / 2,
+    grab.top + grab.height / 2,
+  );
+  expect(handle().contains(hit)).toBe(true);
+});
+
+test("the toolbar lets a block drag pass through it", async () => {
+  await page.viewport(1280, 800);
+  const editor = await renderEditor(build);
+  await selectBlocks(editor, 2, 3);
+  await waitFor(() => expect(toolbar().style.opacity).toBe("1"));
+  expect(getComputedStyle(toolbar()).pointerEvents).toBe("auto");
+
+  // A drop onto a block the toolbar covers would land on the toolbar, which
+  // is outside the editable, and be lost — so while any drag is in flight it
+  // must not take the pointer, and must take it back once the drag ends.
+  await userEvent.hover(lineOf("to do"));
+  await waitFor(() => expect(handle()).toBeTruthy());
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    dataTransfer: new DataTransfer(),
+  };
+  grip().dispatchEvent(new DragEvent("dragstart", init));
+  await waitFor(() =>
+    expect(getComputedStyle(toolbar()).pointerEvents).toBe("none"),
+  );
+  grip().dispatchEvent(new DragEvent("dragend", init));
+  await waitFor(() =>
+    expect(getComputedStyle(toolbar()).pointerEvents).toBe("auto"),
   );
 });

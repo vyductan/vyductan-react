@@ -154,6 +154,33 @@ function TextFormatFloatingToolbar({
     }
   }
 
+  /*
+   * The same "let the pointer through" for a BLOCK drag. The mousemove check
+   * above only sees a text drag: a handle drag is native drag-and-drop, which
+   * fires dragover instead of mousemove, so the toolbar kept taking the
+   * pointer — and a drop onto a block under it landed on the toolbar, outside
+   * the editable, and was lost. Any drag in flight passes through; the end of
+   * it (dragend, or a drop) takes the pointer back.
+   */
+  useEffect(() => {
+    const setPointer = (value: "none" | "auto") => () => {
+      const popup = popupCharStylesEditorReference.current;
+      if (popup && popup.style.pointerEvents !== value) {
+        popup.style.pointerEvents = value;
+      }
+    };
+    const onDragStart = setPointer("none");
+    const onDragEnd = setPointer("auto");
+    document.addEventListener("dragstart", onDragStart, true);
+    document.addEventListener("dragend", onDragEnd, true);
+    document.addEventListener("drop", onDragEnd, true);
+    return () => {
+      document.removeEventListener("dragstart", onDragStart, true);
+      document.removeEventListener("dragend", onDragEnd, true);
+      document.removeEventListener("drop", onDragEnd, true);
+    };
+  }, []);
+
   useEffect(() => {
     if (popupCharStylesEditorReference.current) {
       document.addEventListener("mousemove", mouseMoveListener);
@@ -184,6 +211,24 @@ function TextFormatFloatingToolbar({
       rootElement?.contains(nativeSelection.anchorNode)
     ) {
       const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
+
+      /*
+       * Stay out of the handle gutter. The toolbar is pushed left when it
+       * would overflow the scroller's right edge, and at ~640px in a ~720px
+       * editor that pushed it into the left padding where each block's drag
+       * handle lives — so on a block selection it covered the handle of the
+       * block beside the selection and nobody could grab it. Capping the
+       * width at "text start to scroller's right edge" makes it wrap instead
+       * of sliding over the gutter. Set before positioning, which measures it.
+       */
+      const scroller = anchorElem.parentElement;
+      if (scroller) {
+        const textStart =
+          rootElement.getBoundingClientRect().left +
+          Number.parseFloat(getComputedStyle(rootElement).paddingLeft || "0");
+        const room = scroller.getBoundingClientRect().right - textStart;
+        if (room > 0) popupCharStylesEditorElement.style.maxWidth = `${room}px`;
+      }
 
       setFloatingElementPosition(
         rangeRect,
