@@ -113,6 +113,36 @@ function build() {
     );
 }
 
+const FILLERS = [
+  "Filler 1",
+  "Filler 2",
+  "Filler 3",
+  "Filler 4",
+  "Filler 5",
+  "Filler 6",
+];
+
+/**
+ * `build` with six paragraphs between Middle and the TODO heading.
+ *
+ * A block selection opens the formatting toolbar (it carries "Turn into"),
+ * placed just above the selection when the editor's scroller has room and
+ * flipped just below it when not — up to ~114px tall once it wraps. A block
+ * right next to the selection is under it on one side or the other, and
+ * which side depends on font metrics and viewport: in `build`, Middle sat
+ * under it on CI (Linux fonts) and on a wide viewport here, but not on a Mac
+ * at vitest's default 414px. The real hover then timed out on "toolbar
+ * intercepts pointer events", every CI run, never locally. The fillers put
+ * the dragged block out of the toolbar's reach whichever way it goes.
+ */
+function buildWithGap() {
+  build();
+  const heading = $getRoot().getChildAtIndex<ElementNode>(2)!;
+  for (const text of FILLERS) {
+    heading.insertBefore($createParagraphNode().append($createTextNode(text)));
+  }
+}
+
 /** Select from the start of block `from` to the end of block `to`. */
 async function selectBlocks(editor: LexicalEditor, from: number, to: number) {
   await userEvent.click(lineOf("Intro"));
@@ -189,8 +219,8 @@ test("dragging the handle of a selected block moves the whole selection", async 
 });
 
 test("the handle of a block outside the selection drags only that block", async () => {
-  const editor = await renderEditor(build);
-  await selectBlocks(editor, 2, 3);
+  const editor = await renderEditor(buildWithGap);
+  await selectBlocks(editor, 8, 9);
   await waitFor(() => expect(selectedTexts()).toEqual(["TODO", "to do"]));
 
   await userEvent.hover(lineOf("Middle"));
@@ -199,6 +229,12 @@ test("the handle of a block outside the selection drags only that block", async 
   dragBlockOnto(lineOf("Intro"), "upper");
 
   await waitFor(() =>
-    expect(topLevelTexts(editor)).toEqual(["Middle", "Intro", "TODO", "to do"]),
+    expect(topLevelTexts(editor)).toEqual([
+      "Middle",
+      "Intro",
+      ...FILLERS,
+      "TODO",
+      "to do",
+    ]),
   );
 });
