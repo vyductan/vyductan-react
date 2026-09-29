@@ -26,6 +26,18 @@ import {
 
 type SidebarItem = ItemType<MenuItemType>;
 
+/**
+ * A click the browser turns into "open elsewhere" rather than "go here".
+ * Not `defaultPrevented`: Next's <Link> prevents every plain click itself (to
+ * route client-side) and runs before us, so that would block every drill.
+ */
+const isNewContextClick = (event: MouseEvent) =>
+  event.button !== 0 ||
+  event.metaKey ||
+  event.ctrlKey ||
+  event.shiftKey ||
+  event.altKey;
+
 type SidebarProperties = {
   className?: string;
   classNames?: {
@@ -253,8 +265,14 @@ const Sidebar = (properties: SidebarProperties) => {
               tooltip={typeof label === "string" ? label : key}
               className={classNames?.menuButton}
               // Slot merges this onto the rendered child, so a submenu whose
-              // itemRender returns a <Link> both navigates and drills in.
-              onClick={() => setOpenKeys([...openKeys, key])}
+              // itemRender returns a <Link> both navigates and drills in —
+              // but only on a plain click. Cmd/Ctrl/Shift/Alt-click and
+              // non-primary buttons hand the link to the browser (new tab,
+              // window, download); this tab and its level stay where they are.
+              onClick={(event) => {
+                if (isNewContextClick(event)) return;
+                setOpenKeys([...openKeys, key]);
+              }}
             >
               {content}
             </SidebarMenuButton>

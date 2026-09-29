@@ -3,7 +3,7 @@ import React from "react";
 import "@testing-library/jest-dom/vitest";
 
 import type { MenuProps } from "../menu";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test } from "vitest";
 
@@ -182,6 +182,44 @@ describe("Sidebar drilldown", () => {
 
     expect(seen.at(0)).toEqual([]);
     expect(seen.at(-1)).toEqual(["/finance"]);
+  });
+
+  test.each([
+    ["metaKey", { metaKey: true }],
+    ["ctrlKey", { ctrlKey: true }],
+    ["shiftKey", { shiftKey: true }],
+    ["altKey", { altKey: true }],
+  ])(
+    "a %s-click on a submenu link leaves the level alone (the browser opens a tab)",
+    (_name, modifiers) => {
+      const seen: string[][] = [];
+      renderSidebar({
+        mode: "drilldown",
+        onOpenChange: (next) => seen.push(next),
+        itemRender: (item, _classNames, node) => (
+          <a href={String(item.key)}>{node}</a>
+        ),
+      });
+
+      fireEvent.click(screen.getByRole("link", { name: /Finance/ }), modifiers);
+
+      expect(seen).toEqual([]);
+      expect(screen.getByText("Dashboard")).toBeInTheDocument();
+      expect(screen.queryByText("Budgets")).not.toBeInTheDocument();
+    },
+  );
+
+  test("a plain click on a submenu link still drills in", () => {
+    renderSidebar({
+      mode: "drilldown",
+      itemRender: (item, _classNames, node) => (
+        <a href={String(item.key)}>{node}</a>
+      ),
+    });
+
+    fireEvent.click(screen.getByRole("link", { name: /Finance/ }));
+
+    expect(screen.getByText("Budgets")).toBeInTheDocument();
   });
 
   test("openKeys is controllable and reports changes", async () => {

@@ -46,6 +46,13 @@ type EditorPropertiesBase = {
     readingTimeMinutes: number;
   }) => void;
   variant?: "default" | "simple" | "minimal";
+  /**
+   * The bold/italic/link bar that floats over a text selection. On by default;
+   * a chat box turns it off — markdown shortcuts and Cmd+B still work, and in
+   * a one-line box the bar opened inside the editor's own scroll container,
+   * which clipped it.
+   */
+  formatToolbar?: boolean;
   mentionsData?: MentionData[];
   /**
    * Find pages for the "@" menu's "Link to page" section. Picking one inserts
@@ -144,6 +151,7 @@ export function Editor({
   onStatsChange,
   format = "json",
   variant = "default",
+  formatToolbar = true,
   mentionsData,
   searchPageLinks,
   createMentionLabel,
@@ -187,6 +195,7 @@ export function Editor({
             editable={editable}
             onImageUpload={onImageUpload}
             variant={variant}
+            formatToolbar={formatToolbar}
             mentionsData={mentionsData}
             searchPageLinks={searchPageLinks}
             createMentionLabel={createMentionLabel}

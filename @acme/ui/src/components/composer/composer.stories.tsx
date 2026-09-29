@@ -709,3 +709,52 @@ export const NoMicWithoutARecognizer: Story = {
     ).toBeNull();
   },
 };
+
+/**
+ * Selects everything typed so far with a real DOM range — the selection a drag
+ * or a long-press leaves — and lets Lexical pick it up from `selectionchange`.
+ */
+async function typeAndSelect(canvasElement: HTMLElement, text: string) {
+  const editable = await focusComposer(canvasElement);
+  await userEvent.keyboard(text);
+  await waitFor(() => {
+    expect(editable).toHaveTextContent(text);
+  });
+
+  const range = document.createRange();
+  range.selectNodeContents(editable);
+  const selection = globalThis.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+
+  return editable;
+}
+
+/** `formatToolbar` opts a composer back into the bar over a selection. */
+export const FormatToolbarOnSelection: Story = {
+  args: { onSubmit: fn(), formatToolbar: true },
+  play: async ({ canvasElement }) => {
+    await typeAndSelect(canvasElement, "hello world");
+
+    await waitFor(() => {
+      expect(
+        document.querySelector('[aria-label="Toggle bold"]'),
+      ).not.toBeNull();
+    });
+  },
+};
+
+/**
+ * The default, like a chat box: selecting text brings up no bar. It
+ * used to open inside the box's own scroll container and was cut off there.
+ */
+export const NoFormatToolbarByDefault: Story = {
+  args: { onSubmit: fn() },
+  play: async ({ canvasElement }) => {
+    await typeAndSelect(canvasElement, "hello world");
+
+    // Same wait the story above passes on, so "absent" is not just "not yet".
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(document.querySelector('[aria-label="Toggle bold"]')).toBeNull();
+  },
+};

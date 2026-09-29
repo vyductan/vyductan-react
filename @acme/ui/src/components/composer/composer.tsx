@@ -96,6 +96,13 @@ export type ComposerProps = {
   };
   /** Earlier messages, newest first — Arrow Up walks back through them. */
   history?: string[];
+  /**
+   * The formatting bar that floats over selected text. Off by default, as in
+   * Claude's chat box — markdown shortcuts and Cmd+B still format. The bar
+   * lives inside the box's scroll container, so at one or two lines tall it
+   * was cut off. (The Editor itself keeps it on by default.)
+   */
+  formatToolbar?: boolean;
   autoFocus?: boolean;
   className?: string;
   classNames?: {
@@ -123,6 +130,7 @@ export function Composer({
   dictation,
   mentions,
   history,
+  formatToolbar = false,
   autoFocus = false,
   className,
   classNames,
@@ -235,6 +243,7 @@ export function Composer({
               onStatsChange={handleStatsChange}
               placeholder={placeholder}
               variant="minimal"
+              formatToolbar={formatToolbar}
               mentionsData={mentions?.people}
               createMentionLabel={mentions?.createLabel}
             >

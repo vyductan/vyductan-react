@@ -96,6 +96,7 @@ export function Plugins({
   onImageUpload,
   editable = true,
   variant = "default",
+  formatToolbar = true,
   mentionsData,
   searchPageLinks,
   createMentionLabel,
@@ -110,6 +111,8 @@ export function Plugins({
   onImageUpload?: (file: File) => Promise<string>;
   editable?: boolean;
   variant?: "default" | "simple" | "minimal";
+  /** See Editor's `formatToolbar`. */
+  formatToolbar?: boolean;
   mentionsData?: MentionData[];
   searchPageLinks?: SearchPageLinks;
   /** Offer "create" for an unknown @name, labelled by this. See MentionsPlugin. */
@@ -305,7 +308,7 @@ export function Plugins({
       {editable && (
         <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />
       )}
-      {editable && variant !== "simple" && (
+      {editable && formatToolbar && variant !== "simple" && (
         <FloatingTextFormatToolbarPlugin
           anchorElem={floatingAnchorElement}
           variant={isSimple ? "simple" : "default"}
