@@ -16,6 +16,7 @@ import { Plugins } from "./plugins/plugins";
 import { WordCountPlugin } from "./plugins/word-count-plugin";
 import { editorTheme } from "./themes/editor-theme";
 import { toEditorState } from "./to-editor-state";
+import { ariaHeadingHtmlImportMap } from "./utils/aria-heading-import";
 import { inlineStyleHtmlImportMap } from "./utils/html-inline-style-import";
 
 const editorConfig: InitialConfigType = {
@@ -23,7 +24,9 @@ const editorConfig: InitialConfigType = {
   theme: editorTheme,
   nodes,
   // Without this, opening saved HTML drops every inline color it contained.
-  html: { import: inlineStyleHtmlImportMap },
+  html: {
+    import: { ...inlineStyleHtmlImportMap, ...ariaHeadingHtmlImportMap },
+  },
   onError: (error: Error) => {
     console.error(error);
   },

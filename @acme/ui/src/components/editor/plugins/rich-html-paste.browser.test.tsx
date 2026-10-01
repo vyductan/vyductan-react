@@ -142,3 +142,37 @@ test("still reads markdown when the HTML beside it is only colored source", asyn
     expect(root.querySelectorAll("ul > li")).toHaveLength(2);
   });
 });
+
+/**
+ * Copied from Google's AI overview. Its section titles are not `<h3>` but
+ * `<div role="heading" aria-level="3">` — the ARIA spelling of the same
+ * thing — and the importer only knew the tags, so they landed as plain text.
+ */
+test("pastes an ARIA heading as a heading of its level", async () => {
+  const html =
+    '<meta charset="utf-8"><div><strong>Site map (sơ đồ trang web)</strong> là một tệp tin.</div>' +
+    '<div class="otQkpb" aria-level="3" role="heading" style="font-size: 20px; font-weight: 600;">Các loại Site map phổ biến<!--TgQPHd|||[]--></div>' +
+    "<ul><li><strong>XML Sitemap:</strong> Định dạng chuyên dụng.</li></ul>" +
+    '<div role="heading" aria-level="2">Vai trò của Site map</div>' +
+    "<ul><li><strong>Hỗ trợ SEO:</strong> Giúp các bộ máy tìm kiếm.</li></ul>";
+  const text = [
+    "Site map (sơ đồ trang web) là một tệp tin.",
+    "Các loại Site map phổ biến",
+    "XML Sitemap: Định dạng chuyên dụng.",
+    "Vai trò của Site map",
+    "Hỗ trợ SEO: Giúp các bộ máy tìm kiếm.",
+  ].join("\n");
+
+  const root = await pasteIntoEmptyEditor({
+    "text/html": html,
+    "text/plain": text,
+  });
+
+  await waitFor(() => {
+    expect(root.querySelector("h3")?.textContent).toBe(
+      "Các loại Site map phổ biến",
+    );
+  });
+  expect(root.querySelector("h2")?.textContent).toBe("Vai trò của Site map");
+  expect(root.querySelectorAll("ul > li")).toHaveLength(2);
+});
