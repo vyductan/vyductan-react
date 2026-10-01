@@ -35,6 +35,47 @@ export function hasMarkdownPasteSyntax(text: string): boolean {
   );
 }
 
+/**
+ * Elements that carry formatting a plain-text copy loses. Google Docs wraps
+ * every copy in a `<b id="docs-internal-guid-…" style="font-weight:normal">`,
+ * which is not bold, so that one does not count.
+ */
+const HTML_FORMATTING_SELECTOR = [
+  "strong",
+  "b:not([id^='docs-internal-guid'])",
+  "em",
+  "i",
+  "u",
+  "s",
+  "code",
+  "pre",
+  "ul",
+  "ol",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "blockquote",
+  "table",
+  "a[href]",
+  "img",
+].join(", ");
+
+/**
+ * Whether the HTML on the clipboard says more than its plain text. A rendered
+ * page — a chat reply, a web article, another editor — puts its bold, code and
+ * lists in the HTML and writes the plain text without them; reading that text
+ * as markdown throws all of it away. Code editors put markdown *source* there
+ * as colored spans, which carry nothing, so their paste is still markdown.
+ */
+export function htmlCarriesFormatting(html: string): boolean {
+  if (!html) return false;
+  const document = new DOMParser().parseFromString(html, "text/html");
+  return document.body.querySelector(HTML_FORMATTING_SELECTOR) !== null;
+}
+
 export function normalizeMarkdownPasteForLists(text: string): string {
   return text
     .replaceAll(/\r\n?/g, "\n")
@@ -155,6 +196,12 @@ export function MarkdownPastePlugin(): null {
         // Get plain text from clipboard
         const text = clipboardData.getData("text/plain");
         if (!text || text.trim().length === 0) {
+          return false;
+        }
+
+        // The HTML is the better copy whenever it holds formatting: leave it
+        // to the HTML import.
+        if (htmlCarriesFormatting(clipboardData.getData("text/html"))) {
           return false;
         }
 
