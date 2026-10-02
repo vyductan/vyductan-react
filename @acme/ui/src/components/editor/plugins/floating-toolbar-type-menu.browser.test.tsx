@@ -68,7 +68,7 @@ test("shows each type's icon in the toolbar's type menu, and the current one on 
   const typeButton = await waitFor(() => {
     const node = [
       ...document.querySelectorAll<HTMLButtonElement>("button"),
-    ].find((button) => button.textContent?.trim() === "Normal text");
+    ].find((button) => button.textContent?.trim() === "Text");
     expect(node).toBeDefined();
     return node!;
   });
@@ -78,7 +78,7 @@ test("shows each type's icon in the toolbar's type menu, and the current one on 
     const items = [
       ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
     ].filter((node) =>
-      ["Normal text", "Bulleted list", "Numbered list", "To-do list"].includes(
+      ["Text", "Bulleted list", "Numbered list", "To-do list"].includes(
         node.textContent?.trim() ?? "",
       ),
     );
@@ -94,10 +94,12 @@ test("shows each type's icon in the toolbar's type menu, and the current one on 
   await userEvent.click(
     choices.find((item) => item.textContent?.trim() === "Bulleted list")!,
   );
+  // Found by its name: in an editor this narrow the bar folds the type's
+  // label away once it reads "Bulleted list", and keeps only the icon.
   await waitFor(() => {
-    const button = [
-      ...document.querySelectorAll<HTMLButtonElement>("button"),
-    ].find((node) => node.textContent?.trim() === "Bulleted list");
+    const button = document.querySelector<HTMLButtonElement>(
+      'button[aria-label="Turn into"]',
+    );
     expect([...(button?.querySelector("svg")?.classList ?? [])]).toContain(
       "lucide-list",
     );

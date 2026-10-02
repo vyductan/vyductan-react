@@ -5,15 +5,30 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type { ListType } from "@lexical/list";
-import type { LexicalEditor } from "lexical";
-import type { Dispatch, JSX } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { $createCodeNode, $isCodeHighlightNode } from "@lexical/code";
+import type { LexicalEditor, TextFormatType } from "lexical";
+import type { ComponentProps, Dispatch, JSX, ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  $createCodeNode,
+  $isCodeHighlightNode,
+  $isCodeNode,
+} from "@lexical/code";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { $isListNode, INSERT_CHECK_LIST_COMMAND } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  $isQuoteNode,
+} from "@lexical/rich-text";
 import { $patchStyleText } from "@lexical/selection";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
@@ -27,36 +42,29 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import {
-  ArrowRightLeftIcon,
   ArrowUpDownIcon,
   BoldIcon,
-  BookOpenIcon,
-  CheckSquareIcon,
+  CheckIcon,
   ChevronDownIcon,
   CircleHelpIcon,
   CircleIcon,
   ClipboardCopyIcon,
   CodeIcon,
-  FileIcon,
-  FileOutputIcon,
-  Heading1Icon,
-  Heading2Icon,
-  Heading3Icon,
+  EraserIcon,
   ItalicIcon,
   LinkIcon,
   ListIcon,
-  ListOrderedIcon,
   ListTreeIcon,
   MessageSquarePlusIcon,
   MoreHorizontalIcon,
   PaletteIcon,
-  QuoteIcon,
+  SigmaIcon,
   SparklesIcon,
   SquareIcon,
   StrikethroughIcon,
+  SubscriptIcon,
   SuperscriptIcon,
   TrashIcon,
-  TypeIcon,
   UnderlineIcon,
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -65,6 +73,12 @@ import type { ItemType } from "@acme/ui/components/menu";
 import { Button } from "@acme/ui/components/button";
 import { Separator } from "@acme/ui/components/divider";
 import { Dropdown } from "@acme/ui/components/dropdown";
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from "@acme/ui/components/tooltip";
+import { cn } from "@acme/ui/lib/utils";
 
 import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
 import { message } from "../../message";
@@ -73,10 +87,108 @@ import { $turnSelectedBlocksIntoList } from "../utils/block-selection";
 import { BLOCK_TYPE_ICONS } from "../utils/block-type-icons";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
+import {
+  getFormatToolbarBounds,
+  positionFormatToolbar,
+} from "../utils/position-format-toolbar";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
-import { setFloatingElemPosition as setFloatingElementPosition } from "../utils/set-floating-elem-position";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
 import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
+
+type BlockType = keyof typeof BLOCK_TYPE_ICONS;
+
+/**
+ * The bar's type menu — Notion's "Text ▾" — with the names and icons the block
+ * menu's Turn into and the slash menu give each type.
+ */
+const BLOCK_TYPE_CHOICES: ReadonlyArray<{ type: BlockType; label: string }> = [
+  { type: "paragraph", label: "Text" },
+  { type: "h1", label: "Heading 1" },
+  { type: "h2", label: "Heading 2" },
+  { type: "h3", label: "Heading 3" },
+  { type: "bullet", label: "Bulleted list" },
+  { type: "number", label: "Numbered list" },
+  { type: "check", label: "To-do list" },
+  { type: "code", label: "Code" },
+  { type: "quote", label: "Quote" },
+];
+
+const BLOCK_TYPE_LABELS = Object.fromEntries(
+  BLOCK_TYPE_CHOICES.map(({ type, label }) => [type, label]),
+) as Record<BlockType, string>;
+
+const IS_MAC =
+  globalThis.navigator !== undefined &&
+  /mac|iphone|ipad/i.test(globalThis.navigator.platform);
+const MOD = IS_MAC ? "⌘" : "Ctrl+";
+
+/**
+ * How much the bar has folded to fit its editor: 0 is the full bar, 1 drops
+ * the type's name (its icon stays), 2 also moves underline, strikethrough and
+ * inline code into "More". It never wraps — a second row is what made the old
+ * bar heavy, and what slid it over the blocks beside a selection.
+ */
+type FoldLevel = 0 | 1 | 2;
+
+/** The marks that move into "More" at fold level 2. */
+const FOLDING_MARKS: ReadonlyArray<{
+  format: TextFormatType;
+  label: string;
+  shortcut?: string;
+  Icon: typeof BoldIcon;
+}> = [
+  {
+    format: "underline",
+    label: "Underline",
+    shortcut: `${MOD}U`,
+    Icon: UnderlineIcon,
+  },
+  { format: "strikethrough", label: "Strikethrough", Icon: StrikethroughIcon },
+  { format: "code", label: "Inline code", Icon: CodeIcon },
+];
+
+/** A tooltip of a name and, when it has one, a shortcut — Notion's. */
+function Hint({
+  title,
+  shortcut,
+  children,
+  ...triggerProps
+}: Omit<ComponentProps<typeof TooltipTrigger>, "title"> & {
+  title: string;
+  shortcut?: string;
+  children: ReactNode;
+}) {
+  return (
+    <TooltipRoot>
+      {/* A Dropdown's trigger props come in here and go on to the button. */}
+      <TooltipTrigger asChild {...triggerProps}>
+        {children}
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="flex items-center gap-1.5 px-2 py-1"
+      >
+        <span>{title}</span>
+        {shortcut && <span className="opacity-60">{shortcut}</span>}
+      </TooltipContent>
+    </TooltipRoot>
+  );
+}
+
+/** Every control on the bar is 28px tall; the icon buttons are 28px square. */
+const BUTTON_CLASS =
+  "h-7 min-w-7 shrink-0 touch-manipulation rounded-md px-0 text-foreground active:bg-accent";
+
+function ToolbarButton({ className, ...props }: ComponentProps<typeof Button>) {
+  return (
+    <Button
+      variant="text"
+      size="small"
+      className={cn(BUTTON_CLASS, "w-7", className)}
+      {...props}
+    />
+  );
+}
 
 function TextFormatFloatingToolbar({
   editor,
@@ -88,14 +200,14 @@ function TextFormatFloatingToolbar({
   isCode,
   isStrikethrough,
   setIsLinkEditMode,
-  listLabel,
-  listType,
-  onListChange,
+  blockType,
+  onBlockTypeChange,
   onExplain,
   onAskAI,
   onComment,
   onMath,
   variant,
+  isTouchSelection,
 }: {
   editor: LexicalEditor;
   anchorElem: HTMLElement;
@@ -106,18 +218,28 @@ function TextFormatFloatingToolbar({
   isStrikethrough: boolean;
   isUnderline: boolean;
   setIsLinkEditMode: Dispatch<boolean>;
-  listLabel: string;
-  listType: "paragraph" | ListType;
-  onListChange: (type: "paragraph" | ListType) => void;
+  blockType: BlockType;
+  onBlockTypeChange: (type: BlockType) => void;
   onExplain: () => void;
   onAskAI: () => void;
   onComment: () => void;
   onMath: () => void;
   variant: "default" | "simple";
+  isTouchSelection: () => boolean;
 }): JSX.Element {
   // The button shows the current type's icon, not one icon for every type.
-  const ListTypeIcon = BLOCK_TYPE_ICONS[listType];
+  const BlockTypeIcon = BLOCK_TYPE_ICONS[blockType];
   const popupCharStylesEditorReference = useRef<HTMLDivElement | null>(null);
+  const typeLabelReference = useRef<HTMLSpanElement | null>(null);
+
+  const [foldLevel, setFoldLevel] = useState<FoldLevel>(0);
+  const foldLevelReference = useRef<FoldLevel>(0);
+  /** The bar's widths unfolded, measured whenever it is shown at level 0. */
+  const widthsReference = useRef<{
+    full: number;
+    label: number;
+    marks: number;
+  }>({ full: 0, label: 0, marks: 0 });
 
   const insertLink = useCallback(() => {
     if (isLink) {
@@ -204,45 +326,76 @@ function TextFormatFloatingToolbar({
     }
 
     const rootElement = editor.getRootElement();
+    const scroller = anchorElem.parentElement;
     if (
       selection !== null &&
       nativeSelection !== null &&
       !nativeSelection.isCollapsed &&
-      rootElement?.contains(nativeSelection.anchorNode)
+      rootElement?.contains(nativeSelection.anchorNode) &&
+      scroller
     ) {
       const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
 
       /*
-       * Stay out of the handle gutter. The toolbar is pushed left when it
-       * would overflow the scroller's right edge, and at ~640px in a ~720px
-       * editor that pushed it into the left padding where each block's drag
-       * handle lives — so on a block selection it covered the handle of the
-       * block beside the selection and nobody could grab it. Capping the
-       * width at "text start to scroller's right edge" makes it wrap instead
-       * of sliding over the gutter. Set before positioning, which measures it.
+       * Stay out of the handle gutter. Pushed left to fit the scroller, a wide
+       * bar used to slide into the left padding where each block's drag
+       * handle lives, and covered the handle of the block beside a selection.
+       * The bar now keeps between the text's start and the scroller's right
+       * edge (and the viewport), and folds to fit rather than wrapping.
        */
-      const scroller = anchorElem.parentElement;
-      if (scroller) {
-        const textStart =
-          rootElement.getBoundingClientRect().left +
-          Number.parseFloat(getComputedStyle(rootElement).paddingLeft || "0");
-        const room = scroller.getBoundingClientRect().right - textStart;
-        if (room > 0) popupCharStylesEditorElement.style.maxWidth = `${room}px`;
+      const textStart =
+        rootElement.getBoundingClientRect().left +
+        Number.parseFloat(getComputedStyle(rootElement).paddingLeft || "0");
+      const bounds = getFormatToolbarBounds(scroller, textStart);
+      const room = bounds.right - bounds.left;
+      if (room > 0) popupCharStylesEditorElement.style.maxWidth = `${room}px`;
+
+      if (foldLevelReference.current === 0) {
+        const marks = [
+          ...popupCharStylesEditorElement.querySelectorAll<HTMLElement>(
+            "[data-folding-mark]",
+          ),
+        ].reduce((sum, element) => sum + element.offsetWidth + 2, 0);
+        widthsReference.current = {
+          full: popupCharStylesEditorElement.scrollWidth,
+          // The name plus the gap before it.
+          label: (typeLabelReference.current?.offsetWidth ?? 0) + 4,
+          marks,
+        };
+      }
+      const { full, label, marks } = widthsReference.current;
+      let next: FoldLevel = 2;
+      if (full <= room) next = 0;
+      else if (full - label <= room) next = 1;
+      if (next === 2 && marks === 0) next = 1;
+      if (next !== foldLevelReference.current) {
+        foldLevelReference.current = next;
+        setFoldLevel(next);
       }
 
-      setFloatingElementPosition(
-        rangeRect,
-        popupCharStylesEditorElement,
-        anchorElem,
+      positionFormatToolbar({
+        selectionRect: rangeRect,
+        toolbar: popupCharStylesEditorElement,
+        anchor: anchorElem,
+        scroller,
+        minLeft: textStart,
+        preferBelow: isTouchSelection(),
         isLink,
-      );
+      });
     } else {
       // Hide toolbar when no selection
       popupCharStylesEditorElement.style.opacity = "0";
       popupCharStylesEditorElement.style.transform =
         "translate(-10000px, -10000px)";
     }
-  }, [editor, anchorElem, isLink]);
+  }, [editor, anchorElem, isLink, isTouchSelection]);
+
+  // A fold changes the bar's width, so it is placed again.
+  useLayoutEffect(() => {
+    editor.getEditorState().read(() => {
+      $updateTextFormatFloatingToolbar();
+    });
+  }, [editor, foldLevel, $updateTextFormatFloatingToolbar]);
 
   useEffect(() => {
     const scrollerElement = anchorElem.parentElement;
@@ -389,6 +542,20 @@ function TextFormatFloatingToolbar({
     [editor, backgroundColors],
   );
 
+  /** Drops every mark and inline color/highlight from the selected text. */
+  const handleClearFormatting = useCallback(() => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection) || selection.isCollapsed()) return;
+      // extract() splits the edge nodes, so only the selected text changes.
+      for (const node of selection.extract()) {
+        if (!$isTextNode(node)) continue;
+        if (node.getFormat() !== 0) node.setFormat(0);
+        if (node.getStyle() !== "") node.setStyle("");
+      }
+    });
+  }, [editor]);
+
   const handleListFormatChange = useCallback(
     (style: "default" | "disc" | "circle" | "square") => {
       editor.update(() => {
@@ -416,56 +583,6 @@ function TextFormatFloatingToolbar({
     [editor],
   );
 
-  const applyBlockType = useCallback(
-    (type: "paragraph" | "h1" | "h2" | "h3" | "quote" | "code") => {
-      editor.update(() => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) {
-          return;
-        }
-
-        switch (type) {
-          case "paragraph": {
-            $setBlocksTypeLiftingChildren(selection, () =>
-              $createParagraphNode(),
-            );
-            break;
-          }
-          case "h1": {
-            $setBlocksTypeLiftingChildren(selection, () =>
-              $createHeadingNode("h1"),
-            );
-            break;
-          }
-          case "h2": {
-            $setBlocksTypeLiftingChildren(selection, () =>
-              $createHeadingNode("h2"),
-            );
-            break;
-          }
-          case "h3": {
-            $setBlocksTypeLiftingChildren(selection, () =>
-              $createHeadingNode("h3"),
-            );
-            break;
-          }
-          case "quote": {
-            $setBlocksTypeLiftingChildren(selection, () => $createQuoteNode());
-            break;
-          }
-          case "code": {
-            $setBlocksTypeLiftingChildren(selection, () => $createCodeNode());
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      });
-    },
-    [editor],
-  );
-
   const handleToggleList = useCallback(() => {
     editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, void 0);
   }, [editor]);
@@ -476,18 +593,6 @@ function TextFormatFloatingToolbar({
       inline: false,
     });
   }, [editor]);
-
-  const handlePageAction = useCallback(() => {
-    message.info("Tính năng tạo Page đang được phát triển.");
-  }, []);
-
-  const handlePageInAction = useCallback(() => {
-    message.info("“Page in” chưa khả dụng trong phiên bản hiện tại.");
-  }, []);
-
-  const handleCalloutAction = useCallback(() => {
-    message.info("Callout đang được phát triển.");
-  }, []);
 
   const handleCopyLinkToBlock = useCallback(() => {
     const baseUrl = globalThis.location.href.split("#")[0];
@@ -533,113 +638,63 @@ function TextFormatFloatingToolbar({
     message.success("Đã xóa khối đã chọn.");
   }, [editor]);
 
+  /** Notion's "Text ▾": every type the selection can be turned into. */
+  const typeMenu = useMemo(
+    () => ({
+      className: "min-w-[220px]",
+      items: [
+        ...BLOCK_TYPE_CHOICES.map(({ type, label }) => {
+          const Icon = BLOCK_TYPE_ICONS[type];
+          return {
+            key: type,
+            label,
+            icon: <Icon className="h-4 w-4" />,
+            extra:
+              type === blockType ? (
+                <CheckIcon className="h-4 w-4" />
+              ) : undefined,
+            onClick: () => onBlockTypeChange(type),
+          };
+        }),
+        { type: "divider" as const, key: "type-divider" },
+        {
+          key: "toggle",
+          label: "Toggle list",
+          icon: <ListTreeIcon className="h-4 w-4" />,
+          onClick: handleToggleList,
+        },
+        {
+          key: "equation",
+          label: "Block equation",
+          icon: <SigmaIcon className="h-4 w-4" />,
+          onClick: handleInsertEquationBlock,
+        },
+      ] as ItemType[],
+    }),
+    [blockType, handleInsertEquationBlock, handleToggleList, onBlockTypeChange],
+  );
+
   const moreMenu = useMemo(() => {
-    const turnIntoItems: Array<{
-      type: "item";
-      key: string;
-      label: string;
-      icon: React.ReactElement;
-      onClick: () => void;
-    }> = [
-      {
-        type: "item",
-        key: "turn-text",
-        label: "Text",
-        icon: <TypeIcon className="h-4 w-4" />,
-        onClick: () => applyBlockType("paragraph"),
-      },
-      {
-        type: "item",
-        key: "turn-heading1",
-        label: "Heading 1",
-        icon: <Heading1Icon className="h-4 w-4" />,
-        onClick: () => applyBlockType("h1"),
-      },
-      {
-        type: "item",
-        key: "turn-heading2",
-        label: "Heading 2",
-        icon: <Heading2Icon className="h-4 w-4" />,
-        onClick: () => applyBlockType("h2"),
-      },
-      {
-        type: "item",
-        key: "turn-heading3",
-        label: "Heading 3",
-        icon: <Heading3Icon className="h-4 w-4" />,
-        onClick: () => applyBlockType("h3"),
-      },
-      {
-        type: "item",
-        key: "turn-page",
-        label: "Page",
-        icon: <FileIcon className="h-4 w-4" />,
-        onClick: handlePageAction,
-      },
-      {
-        type: "item",
-        key: "turn-page-in",
-        label: "Page in",
-        icon: <FileOutputIcon className="h-4 w-4" />,
-        onClick: handlePageInAction,
-      },
-      {
-        type: "item",
-        key: "turn-bulleted",
-        label: "Bulleted list",
-        icon: <ListIcon className="h-4 w-4" />,
-        onClick: () => onListChange("bullet"),
-      },
-      {
-        type: "item",
-        key: "turn-numbered",
-        label: "Numbered list",
-        icon: <ListOrderedIcon className="h-4 w-4" />,
-        onClick: () => onListChange("number"),
-      },
-      {
-        type: "item",
-        key: "turn-todo",
-        label: "To-do list",
-        icon: <CheckSquareIcon className="h-4 w-4" />,
-        onClick: () => onListChange("check"),
-      },
-      {
-        type: "item",
-        key: "turn-toggle",
-        label: "Toggle list",
-        icon: <ListTreeIcon className="h-4 w-4" />,
-        onClick: handleToggleList,
-      },
-      {
-        type: "item",
-        key: "turn-code",
-        label: "Code",
-        icon: <CodeIcon className="h-4 w-4" />,
-        onClick: () => applyBlockType("code"),
-      },
-      {
-        type: "item",
-        key: "turn-quote",
-        label: "Quote",
-        icon: <QuoteIcon className="h-4 w-4" />,
-        onClick: () => applyBlockType("quote"),
-      },
-      {
-        type: "item",
-        key: "turn-callout",
-        label: "Callout",
-        icon: <BookOpenIcon className="h-4 w-4" />,
-        onClick: handleCalloutAction,
-      },
-      {
-        type: "item",
-        key: "turn-equation",
-        label: "Block equation",
-        icon: <SuperscriptIcon className="h-4 w-4" />,
-        onClick: handleInsertEquationBlock,
-      },
-    ];
+    const markState: Partial<Record<TextFormatType, boolean>> = {
+      underline: isUnderline,
+      strikethrough: isStrikethrough,
+      code: isCode,
+    };
+    const foldedMarkItems: ItemType[] =
+      foldLevel === 2
+        ? FOLDING_MARKS.map(({ format, label, shortcut, Icon }) => ({
+            type: "item" as const,
+            key: `mark-${format}`,
+            label,
+            icon: <Icon className="h-4 w-4" />,
+            extra: markState[format] ? (
+              <CheckIcon className="h-4 w-4" />
+            ) : (
+              shortcut
+            ),
+            onClick: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, format),
+          }))
+        : [];
 
     const textColorItems = textColors.map((color) => ({
       type: "item",
@@ -703,7 +758,99 @@ function TextFormatFloatingToolbar({
         ),
     }));
 
-    const actionItems = [
+    const formatItems: ItemType[] = [
+      ...foldedMarkItems,
+      {
+        type: "item" as const,
+        key: "superscript",
+        label: "Superscript",
+        icon: <SuperscriptIcon className="h-4 w-4" />,
+        onClick: () =>
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript"),
+      },
+      {
+        type: "item" as const,
+        key: "subscript",
+        label: "Subscript",
+        icon: <SubscriptIcon className="h-4 w-4" />,
+        onClick: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript"),
+      },
+      variant !== "simple" && {
+        type: "item" as const,
+        key: "inline-math",
+        label: "Inline math",
+        icon: <SigmaIcon className="h-4 w-4" />,
+        onClick: onMath,
+      },
+      variant !== "simple" && {
+        type: "submenu" as const,
+        key: "color",
+        label: "Color",
+        icon: <PaletteIcon className="h-4 w-4" />,
+        children: [
+          {
+            type: "group" as const,
+            key: "text-color-group",
+            label: "Text color",
+            children: textColorItems as ItemType[],
+          },
+          {
+            type: "group" as const,
+            key: "bg-color-group",
+            label: "Background color",
+            children: backgroundColorItems as ItemType[],
+          },
+        ],
+      },
+      {
+        type: "item" as const,
+        key: "clear-formatting",
+        label: "Clear formatting",
+        icon: <EraserIcon className="h-4 w-4" />,
+        onClick: handleClearFormatting,
+      },
+    ].filter(Boolean) as ItemType[];
+
+    const assistItems =
+      variant === "simple"
+        ? []
+        : ([
+            { type: "divider" as const, key: "assist-divider" },
+            {
+              type: "item" as const,
+              key: "explain",
+              label: "Explain",
+              icon: <CircleHelpIcon className="h-4 w-4" />,
+              onClick: onExplain,
+            },
+            {
+              type: "item" as const,
+              key: "ask-ai",
+              label: "Ask AI",
+              icon: <SparklesIcon className="h-4 w-4" />,
+              extra: "⌘+J",
+              onClick: onAskAI,
+            },
+            {
+              type: "item" as const,
+              key: "comment",
+              label: "Comment",
+              icon: <MessageSquarePlusIcon className="h-4 w-4" />,
+              extra: "⌘+M",
+              onClick: onComment,
+            },
+            { type: "divider" as const, key: "list-divider" },
+            {
+              type: "submenu" as const,
+              key: "list-format",
+              label: "List format",
+              icon: <ListIcon className="h-4 w-4" />,
+              children: listFormatItems as ItemType[],
+            },
+          ] as ItemType[]);
+
+    const blockItems = [
+      { type: "divider" as const, key: "actions-divider" },
       {
         type: "item" as const,
         key: "copy-link",
@@ -737,94 +884,69 @@ function TextFormatFloatingToolbar({
         extra: "Del",
         onClick: handleDeleteSelection,
       },
-      { type: "divider" as const, key: "actions-divider" },
-      {
-        type: "item" as const,
-        key: "comment",
-        label: "Comment",
-        icon: <MessageSquarePlusIcon className="h-4 w-4" />,
-        extra: "⌘+M",
-        onClick: onComment,
-      },
-      {
-        type: "item" as const,
-        key: "ask-ai",
-        label: "Ask AI",
-        icon: <SparklesIcon className="h-4 w-4" />,
-        extra: "⌘+J",
-        onClick: onAskAI,
-      },
-    ];
-
-    const items = [
-      {
-        type: "submenu" as const,
-        key: "turn-into",
-        label: "Turn into",
-        icon: <ArrowRightLeftIcon className="h-4 w-4" />,
-        children: turnIntoItems as ItemType[],
-      },
-      variant !== "simple" && {
-        type: "submenu" as const,
-        key: "color",
-        label: "Color",
-        icon: <PaletteIcon className="h-4 w-4" />,
-        children: [
-          {
-            type: "group" as const,
-            key: "text-color-group",
-            label: "Text color",
-            children: textColorItems as ItemType[],
-          },
-          {
-            type: "group" as const,
-            key: "bg-color-group",
-            label: "Background color",
-            children: backgroundColorItems as ItemType[],
-          },
-        ],
-      },
-      variant !== "simple" && {
-        type: "submenu" as const,
-        key: "list-format",
-        label: "List format",
-        icon: <ListIcon className="h-4 w-4" />,
-        children: listFormatItems as ItemType[],
-      },
-      variant !== "simple" && { type: "divider" as const, key: "turn-divider" },
-      ...actionItems,
-    ].filter(Boolean) as ItemType[];
+    ] as ItemType[];
 
     return {
-      className: "min-w-[260px]",
-      items,
+      className: "min-w-[240px]",
+      items: [...formatItems, ...assistItems, ...blockItems],
     };
   }, [
-    applyBlockType,
     backgroundColors,
+    editor,
+    foldLevel,
     handleBackgroundColorChange,
-    handleCalloutAction,
+    handleClearFormatting,
     handleCopyLinkToBlock,
     handleDeleteSelection,
     handleDuplicateSelection,
-    handleInsertEquationBlock,
     handleListFormatChange,
     handleMoveToBlock,
-    handlePageAction,
-    handlePageInAction,
     handleTextColorChange,
-    handleToggleList,
+    isCode,
+    isStrikethrough,
+    isUnderline,
     onAskAI,
     onComment,
-    onListChange,
+    onExplain,
+    onMath,
     textColors,
     variant,
   ]);
 
+  const markButton = (
+    format: TextFormatType,
+    label: string,
+    Icon: typeof BoldIcon,
+    shortcut?: string,
+    folding = false,
+  ) => (
+    <Hint key={format} title={label} shortcut={shortcut}>
+      <ToggleGroupItem
+        value={format}
+        aria-label={`Toggle ${format}`}
+        data-folding-mark={folding ? "" : undefined}
+        onClick={() => {
+          editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+        }}
+        className={cn(BUTTON_CLASS, "w-7 p-0")}
+      >
+        <Icon className="h-4 w-4" />
+      </ToggleGroupItem>
+    </Hint>
+  );
+
+  const separator = (
+    <Separator orientation="vertical" className="mx-0.5 h-4 shrink-0" />
+  );
+
   return (
     <div
       ref={popupCharStylesEditorReference}
-      className="border-border bg-popover/95 text-popover-foreground sm:bg-popover/95 absolute top-0 left-0 z-50 flex max-w-[calc(100vw-2rem)] flex-wrap items-center gap-0.5 rounded-lg border px-1 py-1.5 shadow-lg backdrop-blur-sm transition-opacity duration-200 will-change-transform sm:max-w-none sm:gap-0.5 sm:px-1 sm:py-1.5"
+      data-slot="format-toolbar"
+      data-fold={foldLevel}
+      role="toolbar"
+      aria-label="Text formatting"
+      className="border-border bg-popover text-popover-foreground absolute top-0 left-0 z-50 flex flex-nowrap items-center gap-0.5 overflow-hidden rounded-lg border p-1 shadow-lg transition-opacity duration-200 will-change-transform"
       style={{
         opacity: 0,
         transform: "translate(-10000px, -10000px)",
@@ -832,94 +954,32 @@ function TextFormatFloatingToolbar({
     >
       {editor.isEditable() && (
         <>
-          <div className="flex items-center gap-1 pr-2">
-            {variant !== "simple" && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 text-xs font-medium sm:h-7"
-                  onClick={onExplain}
-                >
-                  <CircleHelpIcon className="h-4 w-4" />
-                  <span>Explain</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 text-xs font-medium sm:h-7"
-                  onClick={onAskAI}
-                >
-                  <SparklesIcon className="h-4 w-4" />
-                  <span>Ask AI</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 text-xs font-medium sm:h-7"
-                  onClick={onComment}
-                >
-                  <MessageSquarePlusIcon className="h-4 w-4" />
-                  <span>Comment</span>
-                </Button>
-              </>
-            )}
-          </div>
-
           {variant !== "simple" && (
             <>
-              <Separator orientation="vertical" className="mx-0.5 h-5" />
-
-              <Dropdown
-                menu={{
-                  items: [
-                    // The icons the block menu's Turn into and the slash menu
-                    // show for the same types.
-                    {
-                      key: "paragraph",
-                      label: "Normal text",
-                      icon: <BLOCK_TYPE_ICONS.paragraph className="h-4 w-4" />,
-                      onClick: () => onListChange("paragraph"),
-                    },
-                    {
-                      key: "bullet",
-                      label: "Bulleted list",
-                      icon: <BLOCK_TYPE_ICONS.bullet className="h-4 w-4" />,
-                      onClick: () => onListChange("bullet"),
-                    },
-                    {
-                      key: "number",
-                      label: "Numbered list",
-                      icon: <BLOCK_TYPE_ICONS.number className="h-4 w-4" />,
-                      onClick: () => onListChange("number"),
-                    },
-                    {
-                      key: "check",
-                      label: "To-do list",
-                      icon: <BLOCK_TYPE_ICONS.check className="h-4 w-4" />,
-                      onClick: () => onListChange("check"),
-                    },
-                  ],
-                }}
-                placement="bottomLeft"
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 gap-1 px-2 text-xs font-medium sm:h-7"
-                >
-                  <ListTypeIcon className="h-4 w-4" />
-                  <span>{listLabel}</span>
-                  <ChevronDownIcon className="h-4 w-4" />
-                </Button>
+              <Dropdown asChild menu={typeMenu} placement="bottomLeft">
+                <Hint title="Turn into">
+                  <ToolbarButton
+                    aria-label="Turn into"
+                    className="w-auto gap-1 px-1.5 text-sm font-normal"
+                  >
+                    <BlockTypeIcon className="h-4 w-4" />
+                    {foldLevel === 0 && (
+                      <span ref={typeLabelReference}>
+                        {BLOCK_TYPE_LABELS[blockType]}
+                      </span>
+                    )}
+                    <ChevronDownIcon className="h-3 w-3 opacity-60" />
+                  </ToolbarButton>
+                </Hint>
               </Dropdown>
+              {separator}
             </>
           )}
 
-          <Separator orientation="vertical" className="mx-0.5 h-5" />
-
           <ToggleGroup
             type="multiple"
+            spacing={0.5}
+            className="shrink-0"
             value={
               [
                 isBold ? "bold" : null,
@@ -931,134 +991,32 @@ function TextFormatFloatingToolbar({
               ].filter(Boolean) as string[]
             }
           >
-            <ToggleGroupItem
-              value="bold"
-              aria-label="Toggle bold"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
-              }}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <BoldIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="italic"
-              aria-label="Toggle italic"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
-              }}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <ItalicIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="underline"
-              aria-label="Toggle underline"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
-              }}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <UnderlineIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="strikethrough"
-              aria-label="Toggle strikethrough"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
-              }}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <StrikethroughIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
-            <Separator orientation="vertical" className="mx-0.5 h-5" />
-            <ToggleGroupItem
-              value="code"
-              aria-label="Toggle code"
-              onClick={() => {
-                editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code");
-              }}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <CodeIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="link"
-              aria-label="Toggle link"
-              onClick={insertLink}
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-            >
-              <LinkIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </ToggleGroupItem>
+            {markButton("bold", "Bold", BoldIcon, `${MOD}B`)}
+            {markButton("italic", "Italic", ItalicIcon, `${MOD}I`)}
+            {foldLevel < 2 &&
+              FOLDING_MARKS.map(({ format, label, shortcut, Icon }) =>
+                markButton(format, label, Icon, shortcut, true),
+              )}
+            <Hint title="Link" shortcut={`${MOD}K`}>
+              <ToggleGroupItem
+                value="link"
+                aria-label="Toggle link"
+                onClick={insertLink}
+                className={cn(BUTTON_CLASS, "w-7 p-0")}
+              >
+                <LinkIcon className="h-4 w-4" />
+              </ToggleGroupItem>
+            </Hint>
           </ToggleGroup>
 
-          {variant !== "simple" && (
-            <>
-              <Separator orientation="vertical" className="mx-0.5 h-5" />
+          {separator}
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-                title="Inline Math"
-                onClick={onMath}
-              >
-                <SuperscriptIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-              </Button>
-
-              <Separator orientation="vertical" className="mx-0.5 h-5" />
-
-              <Dropdown
-                menu={{
-                  items: textColors.map((color) => ({
-                    key: color.value,
-                    label: (
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-4 w-4 rounded border border-gray-300"
-                          style={{ backgroundColor: color.hex }}
-                        />
-                        <span>{color.label}</span>
-                      </div>
-                    ),
-                    onClick: () => {
-                      handleTextColorChange(color.value);
-                    },
-                  })),
-                }}
-                placement="bottomLeft"
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-                  title="Text color"
-                >
-                  <div className="flex h-4 w-4 items-center justify-center sm:h-3.5 sm:w-3.5">
-                    <span className="text-xs font-bold">A</span>
-                  </div>
-                </Button>
-              </Dropdown>
-            </>
-          )}
-
-          <Separator orientation="vertical" className="mx-0.5 h-5 sm:h-5" />
-
-          <Dropdown menu={moreMenu} placement="bottomLeft">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="active:bg-accent h-8 w-8 touch-manipulation p-0 sm:h-7 sm:w-7"
-              title="More options"
-            >
-              <MoreHorizontalIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
-            </Button>
+          <Dropdown asChild menu={moreMenu} placement="bottomRight">
+            <Hint title="More">
+              <ToolbarButton aria-label="More options">
+                <MoreHorizontalIcon className="h-4 w-4" />
+              </ToolbarButton>
+            </Hint>
           </Dropdown>
         </>
       )}
@@ -1079,50 +1037,63 @@ function useFloatingTextFormatToolbar(
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
-  const [listType, setListType] = useState<"paragraph" | ListType>("paragraph");
+  const [blockType, setBlockType] = useState<BlockType>("paragraph");
 
-  const listLabel = useMemo(() => {
-    switch (listType) {
-      case "bullet": {
-        return "Bulleted list";
-      }
-      case "number": {
-        return "Numbered list";
-      }
-      case "check": {
-        return "To-do list";
-      }
-      default: {
-        return "Normal text";
-      }
-    }
-  }, [listType]);
+  /**
+   * Whether the selection was made by touch, from the last pointer that went
+   * down. Before any, a device whose main pointer is a finger counts as touch.
+   */
+  const lastPointerTypeReference = useRef<string | null>(null);
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      lastPointerTypeReference.current = event.pointerType;
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, []);
+  const isTouchSelection = useCallback(() => {
+    const last = lastPointerTypeReference.current;
+    if (last) return last === "touch";
+    return globalThis.matchMedia?.("(pointer: coarse)").matches ?? false;
+  }, []);
 
-  const handleListChange = useCallback(
-    (type: "paragraph" | ListType) => {
-      if (type === "paragraph") {
-        editor.update(() => {
-          const selection = $getSelection();
-          if ($isRangeSelection(selection)) {
-            $setBlocksTypeLiftingChildren(selection, () =>
-              $createParagraphNode(),
-            );
-          }
-        });
-        setListType("paragraph");
-        return;
-      }
-
+  const handleBlockTypeChange = useCallback(
+    (type: BlockType) => {
       if (type === "check") {
         editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
-      } else {
+      } else if (type === "bullet" || type === "number") {
         // Lexical's list commands turned a whole list, or nothing of a
         // nested one; this turns just the selected lines.
         editor.update(() => {
           $turnSelectedBlocksIntoList(type);
         });
+      } else {
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return;
+          $setBlocksTypeLiftingChildren(selection, () => {
+            switch (type) {
+              case "h1":
+              case "h2":
+              case "h3": {
+                return $createHeadingNode(type);
+              }
+              case "quote": {
+                return $createQuoteNode();
+              }
+              case "code": {
+                return $createCodeNode();
+              }
+              default: {
+                return $createParagraphNode();
+              }
+            }
+          });
+        });
       }
-      setListType(type);
+      setBlockType(type);
     },
     [editor],
   );
@@ -1202,13 +1173,20 @@ function useFloatingTextFormatToolbar(
         setIsLink(false);
       }
 
-      // Null when the caret is on the root, which $isListNode already answers
-      // correctly — the toolbar then reports a plain paragraph.
+      // Null when the caret is on the root — the toolbar then reports a plain
+      // paragraph. Headings below h3 read as h3, the smallest offered.
       const topLevelElement = node.getTopLevelElement();
       if ($isListNode(topLevelElement)) {
-        setListType(topLevelElement.getListType());
+        setBlockType(topLevelElement.getListType());
+      } else if ($isHeadingNode(topLevelElement)) {
+        const tag = topLevelElement.getTag();
+        setBlockType(tag === "h1" || tag === "h2" ? tag : "h3");
+      } else if ($isQuoteNode(topLevelElement)) {
+        setBlockType("quote");
+      } else if ($isCodeNode(topLevelElement)) {
+        setBlockType("code");
       } else {
-        setListType("paragraph");
+        setBlockType("paragraph");
       }
 
       if (
@@ -1263,14 +1241,14 @@ function useFloatingTextFormatToolbar(
       isUnderline={isUnderline}
       isCode={isCode}
       setIsLinkEditMode={setIsLinkEditMode}
-      listLabel={listLabel}
-      listType={listType}
-      onListChange={handleListChange}
+      blockType={blockType}
+      onBlockTypeChange={handleBlockTypeChange}
       onExplain={handleExplain}
       onAskAI={handleAskAI}
       onComment={handleComment}
       onMath={handleMath}
       variant={variant}
+      isTouchSelection={isTouchSelection}
     />,
     anchorElement,
   );
