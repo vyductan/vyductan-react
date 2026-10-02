@@ -28,6 +28,11 @@ import {
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
 import { CALLOUT, DETAILS } from "./markdown-nfm-blocks-transformer";
+import {
+  NFM_RAW_BLOCK,
+  NFM_RAW_INLINE,
+  withTabIndentedLists,
+} from "./markdown-nfm-raw-transformer";
 
 export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   TABLE,
@@ -60,7 +65,7 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   },
   // ELEMENT_TRANSFORMERS bao gồm transformers cho lists (unordered và ordered)
   // Cần có để Lexical có thể convert list nodes thành markdown đúng format
-  ...ELEMENT_TRANSFORMERS,
+  ...ELEMENT_TRANSFORMERS.map(withTabIndentedLists),
   // Transformer custom: Convert current list item to checklist when typing "[] "
   {
     dependencies: [CheckBlockNode, ListNode, ListItemNode],
@@ -144,5 +149,7 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
+  NFM_RAW_BLOCK,
+  NFM_RAW_INLINE,
   ...MULTILINE_ELEMENT_TRANSFORMERS,
 ];

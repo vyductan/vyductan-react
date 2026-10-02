@@ -166,6 +166,10 @@ describe("hasMarkdownPasteSyntax on Notion toggles and callouts", () => {
   test.each([
     ["toggle", "<details><summary>T</summary>\n\tBody\n</details>"],
     ["callout", '<callout icon="💡">\n\tTip\n</callout>'],
+    ["child page", '<page url="https://www.notion.so/a">Child</page>'],
+    ["unreadable block", '<unknown url="u" alt="ai_block"/>'],
+    ["Notion table", "<table>\n\t<tr>\n\t\t<td>a</td>\n\t</tr>\n</table>"],
+    ["mention", 'Ask <mention-user url="user://1">Tân</mention-user>'],
   ])("takes a %s for markdown", (_name, text) => {
     expect(hasMarkdownPasteSyntax?.(text)).toBe(true);
   });
@@ -173,6 +177,8 @@ describe("hasMarkdownPasteSyntax on Notion toggles and callouts", () => {
   test.each([
     ["a sentence mentioning the tag", "Use <details> for a toggle."],
     ["an opening tag never closed", "<callout>\nnot finished"],
+    ["a sentence mentioning <page>", "Put a <page> tag here."],
+    ["a bare mention tag", "the <mention-user> element"],
   ])("leaves %s as text", (_name, text) => {
     expect(hasMarkdownPasteSyntax?.(text)).toBe(false);
   });

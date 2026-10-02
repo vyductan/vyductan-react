@@ -61,7 +61,7 @@ const escapeAttribute = (value: string) => value.replaceAll('"', "&quot;");
 const unescapeAttribute = (value: string) => value.replaceAll("&quot;", '"');
 
 /** The line closing the tag opened at `start`, counting nested same tags. */
-function findClosingLine(lines: string[], start: number, tag: string) {
+export function findClosingLine(lines: string[], start: number, tag: string) {
   const opens = new RegExp(String.raw`^\s*<${tag}(\s|>)`);
   const closes = new RegExp(String.raw`^\s*</${tag}>\s*$`);
   let depth = 1;

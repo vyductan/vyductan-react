@@ -171,6 +171,124 @@
     color: #d44c47;
   }
 
+  /*
+   * Notion-flavored Markdown kept byte for byte (nodes/nfm-raw-node.tsx):
+   * read-only chips. A block chip names what it stands for; an inline chip
+   * shows its text — a mention with an @, a span in its color.
+   */
+  .NfmRaw {
+    user-select: none;
+    cursor: default;
+  }
+
+  .NfmRaw[data-selected] {
+    outline: 2px solid var(--editor-color-primary, #4766cb);
+    outline-offset: 1px;
+  }
+
+  .NfmRaw--block {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 4px 0;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted-foreground);
+    font-size: 0.9em;
+  }
+
+  .NfmRaw--block[data-tag="page"],
+  .NfmRaw--block[data-tag="database"] {
+    color: var(--foreground);
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    border-color: transparent;
+    padding-left: 2px;
+  }
+
+  /* Notion's blank line: room, not a box. */
+  .NfmRaw--block[data-tag="empty-block"] {
+    min-height: 1.5em;
+    border-color: transparent;
+  }
+
+  .NfmRaw--inline {
+    border-radius: 3px;
+  }
+
+  .NfmRaw--inline[data-tag^="mention-"] {
+    color: var(--muted-foreground);
+    font-weight: 500;
+  }
+
+  .NfmRaw--inline[data-underline="true"] {
+    text-decoration: underline;
+  }
+
+  .NfmRaw--inline[data-color="gray"] {
+    color: #787774;
+  }
+  .NfmRaw--inline[data-color="gray_bg"] {
+    background-color: color-mix(in oklab, #787774 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="brown"] {
+    color: #9f6b53;
+  }
+  .NfmRaw--inline[data-color="brown_bg"] {
+    background-color: color-mix(in oklab, #9f6b53 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="orange"] {
+    color: #d9730d;
+  }
+  .NfmRaw--inline[data-color="orange_bg"] {
+    background-color: color-mix(in oklab, #d9730d 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="yellow"] {
+    color: #cb912f;
+  }
+  .NfmRaw--inline[data-color="yellow_bg"] {
+    background-color: color-mix(in oklab, #cb912f 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="green"] {
+    color: #448361;
+  }
+  .NfmRaw--inline[data-color="green_bg"] {
+    background-color: color-mix(in oklab, #448361 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="blue"] {
+    color: #337ea9;
+  }
+  .NfmRaw--inline[data-color="blue_bg"] {
+    background-color: color-mix(in oklab, #337ea9 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="purple"] {
+    color: #9065b0;
+  }
+  .NfmRaw--inline[data-color="purple_bg"] {
+    background-color: color-mix(in oklab, #9065b0 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="pink"] {
+    color: #c14c8a;
+  }
+  .NfmRaw--inline[data-color="pink_bg"] {
+    background-color: color-mix(in oklab, #c14c8a 18%, transparent);
+  }
+
+  .NfmRaw--inline[data-color="red"] {
+    color: #d44c47;
+  }
+  .NfmRaw--inline[data-color="red_bg"] {
+    background-color: color-mix(in oklab, #d44c47 18%, transparent);
+  }
+
   .RichTextSemanticContract__tableCell {
     border: 1px solid var(--border);
     padding: 8px 12px;

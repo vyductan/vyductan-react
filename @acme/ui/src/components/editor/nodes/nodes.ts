@@ -29,6 +29,7 @@ import { KeywordNode } from "../nodes/keyword-node";
 import { LayoutContainerNode } from "../nodes/layout-container-node";
 import { LayoutItemNode } from "../nodes/layout-item-node";
 import { MentionNode } from "../nodes/mention-node";
+import { NfmRawBlockNode, NfmRawInlineNode } from "../nodes/nfm-raw-node";
 import { PageBreakNode } from "../nodes/page-break-node";
 import { PollNode } from "../nodes/poll-node";
 import { TOCNode } from "../nodes/toc-node";
@@ -68,6 +69,8 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     CollapsibleContentNode,
     CollapsibleTitleNode,
     CalloutNode,
+    NfmRawBlockNode,
+    NfmRawInlineNode,
     TOCNode,
     AutoLinkNode,
     FigmaNode,

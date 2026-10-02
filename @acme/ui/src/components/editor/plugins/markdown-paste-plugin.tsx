@@ -29,18 +29,31 @@ const MARKDOWN_PASTE_SYNTAX_REGEXP =
 const MARKDOWN_TABLE_DELIMITER_REGEXP = /^(?=[^\n]*\|)(?=[^\n]*-)[\t |:-]+$/m;
 
 /**
- * A Notion-flavored Markdown toggle or callout (see
- * transformers/markdown-nfm-blocks-transformer.ts), as Notion's markdown API
- * writes them. Only with its closing tag on a later line, so prose that
- * merely mentions `<details>` stays prose.
+ * Notion-flavored Markdown as Notion's markdown API writes it (see
+ * transformers/markdown-nfm-blocks-transformer.ts and
+ * markdown-nfm-raw-transformer.ts). Each needs its whole form — a closing
+ * tag, or a self-closing line — so prose that merely mentions `<details>`
+ * or `<page>` stays prose.
  */
-const NFM_BLOCK_REGEXP = /^<(details|callout)[\s>][\s\S]*^\s*<\/\1>\s*$/m;
+// Blocks whose body runs over lines: closing tag on a later line of its own.
+const NFM_BLOCK_REGEXP =
+  /^<(details|callout|table|columns|synced_block)[\s>][\s\S]*^\s*<\/\1>\s*$/m;
+// One-line blocks: the whole line, opening to closing tag.
+const NFM_LINE_BLOCK_REGEXP =
+  /^<(page|database|audio|video|file|pdf)\s[^>\n]*>[^\n]*<\/\1>\s*$/m;
+const NFM_SELF_CLOSING_REGEXP =
+  /^<(unknown|empty-block|table_of_contents|synced_block_reference)\b[^>\n]*\/>\s*$/m;
+// Mentions, with their url or date: `<mention-user url="…">Name</mention-user>`.
+const NFM_MENTION_REGEXP = /<(mention-[\w-]+)\s[^>\n]*(?:\/>|>[^<\n]*<\/\1>)/;
 
 export function hasMarkdownPasteSyntax(text: string): boolean {
   return (
     MARKDOWN_PASTE_SYNTAX_REGEXP.test(text) ||
     MARKDOWN_TABLE_DELIMITER_REGEXP.test(text) ||
-    NFM_BLOCK_REGEXP.test(text)
+    NFM_BLOCK_REGEXP.test(text) ||
+    NFM_LINE_BLOCK_REGEXP.test(text) ||
+    NFM_SELF_CLOSING_REGEXP.test(text) ||
+    NFM_MENTION_REGEXP.test(text)
   );
 }
 
