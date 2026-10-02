@@ -1,5 +1,6 @@
 import type { ElementNode, LexicalEditor } from "lexical";
 import * as React from "react";
+import { $createListItemNode, $createListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createTableNodeWithDimensions } from "@lexical/table";
 import { render, waitFor } from "@testing-library/react";
@@ -137,6 +138,103 @@ test("ArrowLeft inside inline code, away from its edge, moves as usual", async (
   await waitFor(() =>
     expect(runsOf(live)).toStrictEqual([{ text: "2x0 reconcile", code: true }]),
   );
+});
+
+/**
+ * Code with text right after it, as `stripe_secret_key_7000`✅. The first
+ * ArrowRight only changed the selection's format, leaving the caret in the
+ * code node; the browser's selectionchange then gave it the code's format
+ * back, so every press "left" the code again and the caret never got past.
+ */
+test("ArrowRight at the end of inline code steps into the text after it", async () => {
+  const live = await editorWith(
+    [
+      { text: "key_7000", code: true },
+      { text: "✅", code: false },
+    ],
+    0,
+    "end",
+  );
+
+  await userEvent.keyboard("{ArrowRight}x");
+
+  await waitFor(() =>
+    expect(runsOf(live)).toStrictEqual([
+      { text: "key_7000", code: true },
+      { text: "x✅", code: false },
+    ]),
+  );
+});
+
+test("a second ArrowRight after inline code moves on past the next character", async () => {
+  const live = await editorWith(
+    [
+      { text: "key_7000", code: true },
+      { text: "✅ done", code: false },
+    ],
+    0,
+    "end",
+  );
+
+  await userEvent.keyboard("{ArrowRight}{ArrowRight}x");
+
+  await waitFor(() =>
+    expect(runsOf(live)).toStrictEqual([
+      { text: "key_7000", code: true },
+      { text: "✅x done", code: false },
+    ]),
+  );
+});
+
+/** As reported: a list item, the caret put after the code by a click. */
+test("in a list item, after a click at the end of inline code, ArrowRight twice moves past what follows", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.update(
+    () => {
+      const code = $createTextNode("stripe_secret_key_7000").toggleFormat(
+        "code",
+      );
+      const item = $createListItemNode().append(code, $createTextNode("✅"));
+      $getRoot().clear().append($createListNode("bullet").append(item));
+    },
+    { discrete: true },
+  );
+  const code = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"] code',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  const rect = code.getBoundingClientRect();
+  await userEvent.click(code, {
+    position: { x: rect.width - 1, y: rect.height / 2 },
+  });
+
+  await userEvent.keyboard("{ArrowRight}");
+  // A selectionchange that is not from the editor's own DOM update, later
+  // than 200ms after the press, as VS Code's webview delivers: Lexical then
+  // takes the format back from the code node the caret is still in.
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  document.dispatchEvent(new Event("selectionchange"));
+  await new Promise((resolve) => setTimeout(resolve, 50));
+
+  await userEvent.keyboard("{ArrowRight}x");
+
+  await waitFor(() => {
+    const item = document.querySelector("li");
+    expect(item?.textContent).toBe("stripe_secret_key_7000✅x");
+    expect(item?.querySelector("code")?.textContent).toBe(
+      "stripe_secret_key_7000",
+    );
+  });
 });
 
 /** The case it was reported in: inline code at the start of a table cell. */

@@ -8,6 +8,7 @@ import {
   COMMAND_PRIORITY_CRITICAL,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
+  SELECTION_CHANGE_COMMAND,
 } from "lexical";
 
 /**
@@ -26,17 +27,18 @@ export function InlineCodeExitPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    const exit = (edge: "start" | "end") => (event: KeyboardEvent | null) => {
-      if (event?.shiftKey || event?.altKey || event?.metaKey || event?.ctrlKey)
-        return false;
+    // Where the caret left the code. The selection's format alone does not
+    // hold it: a selectionchange the editor did not cause, later than 200ms
+    // after the press (VS Code's webview sends them), makes Lexical take the
+    // format back from the code node the caret is still in. Every press then
+    // "left" the code again and the caret never got past it.
+    let exited: { key: string; offset: number } | null = null;
+
+    /** The caret, collapsed in inline code at its `edge`. */
+    const $caretAtCodeEdge = (edge: "start" | "end") => {
       const selection = $getSelection();
-      if (
-        !$isRangeSelection(selection) ||
-        !selection.isCollapsed() ||
-        !selection.hasFormat("code")
-      ) {
-        return false;
-      }
+      if (!$isRangeSelection(selection) || !selection.isCollapsed())
+        return null;
       const { anchor } = selection;
       const node = anchor.getNode();
       if (
@@ -44,14 +46,29 @@ export function InlineCodeExitPlugin(): null {
         !$isTextNode(node) ||
         !node.hasFormat("code")
       )
-        return false;
+        return null;
       const atEdge =
         edge === "start"
           ? anchor.offset === 0
           : anchor.offset === node.getTextContentSize();
-      if (!atEdge) return false;
+      return atEdge ? selection : null;
+    };
+    const isExitPoint = (point: { key: string; offset: number }) =>
+      exited?.key === point.key && exited.offset === point.offset;
+
+    const exit = (edge: "start" | "end") => (event: KeyboardEvent | null) => {
+      if (event?.shiftKey || event?.altKey || event?.metaKey || event?.ctrlKey)
+        return false;
+      const selection = $caretAtCodeEdge(edge);
+      if (!selection) return false;
+      // Already out: this press moves on as usual.
+      if (isExitPoint(selection.anchor) || !selection.hasFormat("code")) {
+        exited = null;
+        return false;
+      }
 
       selection.toggleFormat("code");
+      exited = { key: selection.anchor.key, offset: selection.anchor.offset };
       event?.preventDefault();
       return true;
     };
@@ -65,6 +82,24 @@ export function InlineCodeExitPlugin(): null {
       editor.registerCommand(
         KEY_ARROW_RIGHT_COMMAND,
         exit("end"),
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
+          if (!exited) return false;
+          const selection = $getSelection();
+          if (
+            !$isRangeSelection(selection) ||
+            !selection.isCollapsed() ||
+            !isExitPoint(selection.anchor)
+          ) {
+            exited = null;
+          } else if (selection.hasFormat("code")) {
+            selection.toggleFormat("code");
+          }
+          return false;
+        },
         COMMAND_PRIORITY_CRITICAL,
       ),
     );
