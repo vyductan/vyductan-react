@@ -1,3 +1,4 @@
+import type { RangeSelection } from "lexical";
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -24,6 +25,34 @@ export function splitPlainTextIntoParagraphs(text: string): string[][] {
   return paragraphs.filter((paragraph) =>
     paragraph.some((line) => line.length > 0),
   );
+}
+
+/**
+ * Inserts plain text as it is: blank lines between paragraphs, single line
+ * breaks within one. Nothing in it is read as markdown.
+ */
+export function $insertPlainText(selection: RangeSelection, text: string) {
+  if (!selection.isCollapsed()) {
+    selection.removeText();
+  }
+
+  for (const [paragraphIndex, lines] of splitPlainTextIntoParagraphs(
+    text,
+  ).entries()) {
+    if (paragraphIndex > 0) {
+      selection.insertParagraph();
+    }
+
+    for (const [lineIndex, line] of lines.entries()) {
+      if (lineIndex > 0) {
+        selection.insertLineBreak();
+      }
+
+      if (line.length > 0) {
+        selection.insertText(line);
+      }
+    }
+  }
 }
 
 export function shouldPreferPlainTextLinebreakPaste(
@@ -80,8 +109,7 @@ export function PlainTextLinebreakPastePlugin(): null {
           return false;
         }
 
-        const paragraphs = splitPlainTextIntoParagraphs(text);
-        if (paragraphs.length === 0) {
+        if (splitPlainTextIntoParagraphs(text).length === 0) {
           return false;
         }
 
@@ -89,28 +117,8 @@ export function PlainTextLinebreakPastePlugin(): null {
 
         editor.update(() => {
           const currentSelection = $getSelection();
-          if (!$isRangeSelection(currentSelection)) {
-            return;
-          }
-
-          if (!currentSelection.isCollapsed()) {
-            currentSelection.removeText();
-          }
-
-          for (const [paragraphIndex, lines] of paragraphs.entries()) {
-            if (paragraphIndex > 0) {
-              currentSelection.insertParagraph();
-            }
-
-            for (const [lineIndex, line] of lines.entries()) {
-              if (lineIndex > 0) {
-                currentSelection.insertLineBreak();
-              }
-
-              if (line.length > 0) {
-                currentSelection.insertText(line);
-              }
-            }
+          if ($isRangeSelection(currentSelection)) {
+            $insertPlainText(currentSelection, text);
           }
         });
 

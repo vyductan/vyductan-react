@@ -10,6 +10,7 @@ import type { ImageResolverFn as ImageResolverFunction } from "./context/image-r
 import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "./plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
+import type { ReadClipboardText } from "./plugins/paste-cleanup-plugin";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
@@ -80,6 +81,12 @@ type EditorPropertiesBase = {
    * link is the consumer's job.
    */
   resolvePasteLink?: ResolvePasteLink;
+  /**
+   * Read the clipboard's plain text, for Cmd+Shift+V (paste without
+   * formatting). The browser's clipboard by default; a host whose page
+   * cannot read it — VS Code's webview — reads it itself.
+   */
+  readClipboardText?: ReadClipboardText;
   /** The scroll container that wraps the whole editor. */
   className?: string;
   /**
@@ -160,6 +167,7 @@ export function Editor({
   createMentionLabel,
   resolvePageLinkPreview,
   resolvePasteLink,
+  readClipboardText,
   className,
   classNames,
   autoFocus = false,
@@ -204,6 +212,7 @@ export function Editor({
             createMentionLabel={createMentionLabel}
             resolvePageLinkPreview={resolvePageLinkPreview}
             resolvePasteLink={resolvePasteLink}
+            readClipboardText={readClipboardText}
             className={className}
             classNames={classNames}
             autoFocus={autoFocus}

@@ -19,6 +19,7 @@ import type { SizeType } from "../../config-provider/size-context";
 import type { MentionData, SearchPageLinks } from "../plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "../plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
+import type { ReadClipboardText } from "../plugins/paste-cleanup-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
@@ -67,6 +68,7 @@ import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
 import { PageLinkHoverCardPlugin } from "../plugins/page-link-hover-card-plugin";
 import { PasteAsPlugin } from "../plugins/paste-as-plugin";
+import { PasteCleanupPlugin } from "../plugins/paste-cleanup-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
 import { ResetFormatOnEnterPlugin } from "../plugins/reset-format-on-enter-plugin";
@@ -106,6 +108,7 @@ export function Plugins({
   createMentionLabel,
   resolvePageLinkPreview,
   resolvePasteLink,
+  readClipboardText,
   className,
   classNames,
   autoFocus,
@@ -123,6 +126,8 @@ export function Plugins({
   createMentionLabel?: (name: string) => string;
   resolvePageLinkPreview?: ResolvePageLinkPreview;
   resolvePasteLink?: ResolvePasteLink;
+  /** See Editor's `readClipboardText`. */
+  readClipboardText?: ReadClipboardText;
   className?: string;
   classNames?: {
     content?: string;
@@ -299,6 +304,7 @@ export function Plugins({
           anchorElem={floatingAnchorElement ?? undefined}
         />
       )}
+      {editable && <PasteCleanupPlugin readClipboardText={readClipboardText} />}
       {editable && <MarkdownPastePlugin />}
       {editable && <PlainTextLinebreakPastePlugin />}
       {editable && resolvePasteLink && (
