@@ -1,6 +1,6 @@
 import type { TableCellNode } from "@lexical/table";
 import type { LexicalNode } from "lexical";
-import type { DragEventHandler, JSX } from "react";
+import type { JSX, PointerEvent as ReactPointerEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
@@ -34,6 +34,31 @@ import { Dropdown } from "@acme/ui/components/dropdown";
 import { Switch } from "@acme/ui/components/switch";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
+
+/** Where the pointer is during a handle drag: all a drag needs of an event. */
+type DragPoint = Pick<PointerEvent, "clientX" | "clientY">;
+
+/** Travel before a press on a handle becomes a drag rather than a click. */
+const DRAG_THRESHOLD_PX = 4;
+
+/**
+ * The index a dragged row or column ends at, dropped before or after the one
+ * at `target`. Taking it out first shifts everything after it up by one.
+ * (The old arithmetic was off by one going up or left: a row could not be
+ * moved to the top, nor a column to the left of its neighbour's left edge.)
+ */
+function finalIndex(origin: number, target: number, insertAfter: boolean) {
+  const index = insertAfter ? target + 1 : target;
+  return origin < index ? index - 1 : index;
+}
+
+/** A header row (all <th>) stays first: nothing is dropped above it. */
+function isHeaderRow(row: HTMLTableRowElement) {
+  return (
+    row.cells.length > 0 &&
+    [...row.cells].every((cell) => cell.tagName === "TH")
+  );
+}
 
 /*
  * Handle sizing lives in the className of each button, measured off Notion's
@@ -243,7 +268,7 @@ function TableCellActionMenuInner({
   };
 
   const handleRowDragOver = useCallback(
-    (event: DragEvent) => {
+    (event: DragPoint) => {
       const currentDragState = dragStateReference.current;
       if (
         !focusedTable ||
@@ -252,8 +277,6 @@ function TableCellActionMenuInner({
       ) {
         return;
       }
-
-      event.preventDefault();
 
       const tableRect = focusedTable.getBoundingClientRect();
       const rows = [...focusedTable.rows];
@@ -268,13 +291,13 @@ function TableCellActionMenuInner({
       }
 
       const targetIndex = rows.indexOf(targetRow);
-      if (targetIndex <= 0) {
+      const rect = targetRow.getBoundingClientRect();
+      const insertAfter = event.clientY >= rect.top + rect.height / 2;
+      // Nothing goes above a header row.
+      if (targetIndex === 0 && !insertAfter && isHeaderRow(targetRow)) {
         setDropIndicator(null);
         return;
       }
-
-      const rect = targetRow.getBoundingClientRect();
-      const insertAfter = event.clientY >= rect.top + rect.height / 2;
       const indicatorIndex = insertAfter ? targetIndex + 1 : targetIndex;
 
       setDropIndicator({
@@ -290,7 +313,7 @@ function TableCellActionMenuInner({
   );
 
   const handleRowDrop = useCallback(
-    (event: DragEvent) => {
+    (event: DragPoint) => {
       const currentDragState = dragStateReference.current;
       if (
         !focusedCell ||
@@ -301,8 +324,6 @@ function TableCellActionMenuInner({
         clearDragState();
         return;
       }
-
-      event.preventDefault();
 
       const rows = [...focusedTable.rows];
       const targetRow = rows.find((row) => {
@@ -316,19 +337,18 @@ function TableCellActionMenuInner({
       }
 
       const targetIndex = rows.indexOf(targetRow);
-      if (targetIndex <= 0) {
-        clearDragState();
-        return;
-      }
-
       const targetRect = targetRow.getBoundingClientRect();
       const insertAfter =
         event.clientY >= targetRect.top + targetRect.height / 2;
-      const destinationIndex = insertAfter ? targetIndex : targetIndex - 1;
+      const destinationIndex = finalIndex(
+        currentDragState.originIndex,
+        targetIndex,
+        insertAfter,
+      );
 
       if (
         destinationIndex === currentDragState.originIndex ||
-        destinationIndex < 1
+        (destinationIndex === 0 && rows[0] && isHeaderRow(rows[0]))
       ) {
         clearDragState();
         return;
@@ -343,17 +363,13 @@ function TableCellActionMenuInner({
         const tableNode = $getTableNodeFromLexicalNodeOrThrow(node);
         const rows = tableNode.getChildren().filter($isTableRowNode);
         const originRow = rows[currentDragState.originIndex];
-        const destinationRow = rows[destinationIndex];
+        if (!originRow) return;
 
-        if (!originRow || !destinationRow || originRow === destinationRow) {
-          return;
-        }
-
-        if (currentDragState.originIndex < destinationIndex) {
-          destinationRow.insertAfter(originRow);
-        } else {
-          destinationRow.insertBefore(originRow);
-        }
+        // Where it lands among the other rows.
+        const others = rows.filter((row) => row !== originRow);
+        const before = others[destinationIndex];
+        if (before) before.insertBefore(originRow);
+        else others.at(-1)?.insertAfter(originRow);
       });
 
       clearDragState();
@@ -412,7 +428,7 @@ function TableCellActionMenuInner({
   };
 
   const handleColumnDragOver = useCallback(
-    (event: DragEvent) => {
+    (event: DragPoint) => {
       const currentDragState = dragStateReference.current;
       if (
         !focusedTable ||
@@ -421,8 +437,6 @@ function TableCellActionMenuInner({
       ) {
         return;
       }
-
-      event.preventDefault();
 
       const tableRect = focusedTable.getBoundingClientRect();
       const firstRow = focusedTable.rows.item(0);
@@ -460,7 +474,7 @@ function TableCellActionMenuInner({
   );
 
   const handleColumnDrop = useCallback(
-    (event: DragEvent) => {
+    (event: DragPoint) => {
       const currentDragState = dragStateReference.current;
       if (
         !focusedCell ||
@@ -471,8 +485,6 @@ function TableCellActionMenuInner({
         clearDragState();
         return;
       }
-
-      event.preventDefault();
 
       const firstRow = focusedTable.rows.item(0);
       if (!firstRow) {
@@ -495,9 +507,11 @@ function TableCellActionMenuInner({
       const targetRect = targetCell.getBoundingClientRect();
       const insertAfter =
         event.clientX >= targetRect.left + targetRect.width / 2;
-      const destinationIndex = insertAfter
-        ? targetIndex
-        : Math.max(targetIndex - 1, 0);
+      const destinationIndex = finalIndex(
+        currentDragState.originIndex,
+        targetIndex,
+        insertAfter,
+      );
 
       if (destinationIndex === currentDragState.originIndex) {
         clearDragState();
@@ -848,16 +862,6 @@ function TableCellActionMenuInner({
       setFocusedCellFromElement(event.target as HTMLElement | null);
     };
 
-    const handleDocumentDragOver = (event: DragEvent) => {
-      handleRowDragOver(event);
-      handleColumnDragOver(event);
-    };
-
-    const handleDocumentDrop = (event: DragEvent) => {
-      handleRowDrop(event);
-      handleColumnDrop(event);
-    };
-
     syncFocusedCellFromSelection();
 
     return mergeRegister(
@@ -877,16 +881,10 @@ function TableCellActionMenuInner({
         document.addEventListener("mousemove", handleMouseMove, {
           passive: true,
         });
-        document.addEventListener("dragover", handleDocumentDragOver);
-        document.addEventListener("drop", handleDocumentDrop);
-        document.addEventListener("dragend", clearDragState);
 
         return () => {
           document.removeEventListener("mouseup", handleMouseUp);
           document.removeEventListener("mousemove", handleMouseMove);
-          document.removeEventListener("dragover", handleDocumentDragOver);
-          document.removeEventListener("drop", handleDocumentDrop);
-          document.removeEventListener("dragend", clearDragState);
         };
       })(),
     );
@@ -899,26 +897,73 @@ function TableCellActionMenuInner({
     handleRowDrop,
   ]);
 
-  const handleRowButtonDragOver: DragEventHandler<HTMLButtonElement> = (
-    event,
+  /*
+   * Dragging a handle, with pointer events rather than HTML drag and drop:
+   * inside VS Code's webview a native drag's dragover and drop never reach
+   * the page, so the grip's ghost followed the pointer and nothing moved.
+   * Past a few px of travel a press becomes a drag; the click that ends a
+   * drag must not open the menu, which a plain click does.
+   */
+  // The handlers of the render the press happened in: the table and the
+  // cell a drag acts on do not change while it lasts.
+  const dragHandlers = {
+    row: {
+      start: handleRowDragStart,
+      over: handleRowDragOver,
+      drop: handleRowDrop,
+    },
+    column: {
+      start: handleColumnDragStart,
+      over: handleColumnDragOver,
+      drop: handleColumnDrop,
+    },
+  };
+  const suppressClickReference = useRef(false);
+
+  const startHandleDrag = (
+    axis: "row" | "column",
+    event: ReactPointerEvent<HTMLButtonElement>,
   ) => {
-    handleRowDragOver(event.nativeEvent);
+    if (event.button !== 0) return;
+    // No text selection and no focus jump while the pointer is down.
+    event.preventDefault();
+    const origin = { x: event.clientX, y: event.clientY };
+    let dragging = false;
+    const handlers = () => dragHandlers[axis];
+
+    const onMove = (move: PointerEvent) => {
+      if (!dragging) {
+        const travel = Math.hypot(
+          move.clientX - origin.x,
+          move.clientY - origin.y,
+        );
+        if (travel < DRAG_THRESHOLD_PX) return;
+        dragging = true;
+        handlers().start();
+      }
+      handlers().over(move);
+    };
+    const finish = (end: PointerEvent, drop: boolean) => {
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onCancel);
+      if (!dragging) return;
+      suppressClickReference.current = true;
+      if (drop) handlers().drop(end);
+      else clearDragState();
+    };
+    const onUp = (up: PointerEvent) => finish(up, true);
+    const onCancel = (cancel: PointerEvent) => finish(cancel, false);
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    document.addEventListener("pointercancel", onCancel);
   };
 
-  const handleRowButtonDrop: DragEventHandler<HTMLButtonElement> = (event) => {
-    handleRowDrop(event.nativeEvent);
-  };
-
-  const handleColumnButtonDragOver: DragEventHandler<HTMLButtonElement> = (
-    event,
-  ) => {
-    handleColumnDragOver(event.nativeEvent);
-  };
-
-  const handleColumnButtonDrop: DragEventHandler<HTMLButtonElement> = (
-    event,
-  ) => {
-    handleColumnDrop(event.nativeEvent);
+  /** True once for the click that ends a drag, which must not open the menu. */
+  const isDragEndClick = () => {
+    const suppressed = suppressClickReference.current;
+    suppressClickReference.current = false;
+    return suppressed;
   };
 
   const rowMenu = {
@@ -1162,7 +1207,6 @@ function TableCellActionMenuInner({
           aria-haspopup="menu"
           aria-expanded={openMenu === "row"}
           data-state={openMenu === "row" ? "open" : "closed"}
-          draggable
           className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
           onMouseEnter={() => setActiveAxis("row")}
           onMouseLeave={() => {
@@ -1171,13 +1215,11 @@ function TableCellActionMenuInner({
             }
           }}
           onClick={() => {
+            if (isDragEndClick()) return;
             setActiveAxis("row");
             setOpenMenu((current) => (current === "row" ? null : "row"));
           }}
-          onDragStart={handleRowDragStart}
-          onDragOver={handleRowButtonDragOver}
-          onDrop={handleRowButtonDrop}
-          onDragEnd={clearDragState}
+          onPointerDown={(event) => startHandleDrag("row", event)}
           data-table-row-index={rowIndex}
         >
           {/* A bar at rest, the grip once the pointer is on it. Notion's own
@@ -1230,7 +1272,6 @@ function TableCellActionMenuInner({
           aria-haspopup="menu"
           aria-expanded={openMenu === "column"}
           data-state={openMenu === "column" ? "open" : "closed"}
-          draggable
           className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
           onMouseEnter={() => setActiveAxis("column")}
           onMouseLeave={() => {
@@ -1239,13 +1280,11 @@ function TableCellActionMenuInner({
             }
           }}
           onClick={() => {
+            if (isDragEndClick()) return;
             setActiveAxis("column");
             setOpenMenu((current) => (current === "column" ? null : "column"));
           }}
-          onDragStart={handleColumnDragStart}
-          onDragOver={handleColumnButtonDragOver}
-          onDrop={handleColumnButtonDrop}
-          onDragEnd={clearDragState}
+          onPointerDown={(event) => startHandleDrag("column", event)}
           data-table-column-index={columnIndex}
         >
           {/* A bar at rest, the grip once the pointer is on it. Notion's own

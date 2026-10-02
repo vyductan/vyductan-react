@@ -321,21 +321,18 @@ function getColoredCellOrThrow(
   cellIndex: number,
 ): BackgroundColorCell {
   const tableNode = content.root.children[0] as
-    | FixtureNodeWithChildren
-    | undefined;
+    FixtureNodeWithChildren | undefined;
   invariant(
     tableNode !== undefined,
     "Expected fixture root to contain a table node",
   );
 
   const rowNode = tableNode.children[rowIndex] as
-    | FixtureNodeWithChildren
-    | undefined;
+    FixtureNodeWithChildren | undefined;
   invariant(rowNode !== undefined, "Expected fixture row node to exist");
 
   const cellNode = rowNode.children[cellIndex] as
-    | BackgroundColorCell
-    | undefined;
+    BackgroundColorCell | undefined;
   invariant(
     cellNode !== undefined,
     "Expected fixture cell node to contain backgroundColor",
@@ -923,18 +920,6 @@ test("hides the action handles when selection moves outside the table", async ()
   });
 });
 
-function createMockDataTransfer() {
-  return {
-    types: [] as string[],
-    files: [] as File[],
-    setData: (_format: string, _data: string) => null,
-    getData: () => "",
-    clearData: (_format?: string) => null,
-    effectAllowed: "move",
-    dropEffect: "move",
-  };
-}
-
 function mockThreeRowTableGeometry(table: HTMLTableElement) {
   Object.defineProperty(table, "getBoundingClientRect", {
     configurable: true,
@@ -1069,14 +1054,25 @@ test("reorders rows when dragging the row handle below the next row", async () =
   fireEvent.mouseUp(sourceCell as HTMLTableCellElement);
 
   const rowHandle = await screen.findByRole("button", { name: /row actions/i });
-  const dataTransfer = createMockDataTransfer();
-
-  fireEvent.dragStart(rowHandle, { dataTransfer });
-  fireEvent.dragOver(rowHandle, {
-    dataTransfer,
-    clientX: 80,
-    clientY: 120,
-  });
+  // A drag is pointer events: down on the handle, moves past the threshold.
+  fireEvent(
+    rowHandle,
+    new MouseEvent("pointerdown", {
+      bubbles: true,
+      button: 0,
+      clientX: 0,
+      clientY: 0,
+    }),
+  );
+  for (const [clientX, clientY] of [
+    [80 / 2, 120 / 2],
+    [80, 120],
+  ]) {
+    fireEvent(
+      document,
+      new MouseEvent("pointermove", { bubbles: true, clientX, clientY }),
+    );
+  }
 
   await waitFor(() => {
     expect(
@@ -1084,12 +1080,10 @@ test("reorders rows when dragging the row handle below the next row", async () =
     ).not.toBeNull();
   });
 
-  fireEvent.drop(rowHandle, {
-    dataTransfer,
-    clientX: 80,
-    clientY: 120,
-  });
-  fireEvent.dragEnd(rowHandle, { dataTransfer });
+  fireEvent(
+    document,
+    new MouseEvent("pointerup", { bubbles: true, clientX: 80, clientY: 120 }),
+  );
 
   await waitFor(() => {
     const firstBodyRow = table.rows.item(1);
@@ -1127,14 +1121,25 @@ test("reorders columns when dragging the column handle to the right", async () =
   const columnHandle = await screen.findByRole("button", {
     name: /column actions/i,
   });
-  const dataTransfer = createMockDataTransfer();
-
-  fireEvent.dragStart(columnHandle, { dataTransfer });
-  fireEvent.dragOver(columnHandle, {
-    dataTransfer,
-    clientX: 180,
-    clientY: 30,
-  });
+  // A drag is pointer events: down on the handle, moves past the threshold.
+  fireEvent(
+    columnHandle,
+    new MouseEvent("pointerdown", {
+      bubbles: true,
+      button: 0,
+      clientX: 0,
+      clientY: 0,
+    }),
+  );
+  for (const [clientX, clientY] of [
+    [180 / 2, 30 / 2],
+    [180, 30],
+  ]) {
+    fireEvent(
+      document,
+      new MouseEvent("pointermove", { bubbles: true, clientX, clientY }),
+    );
+  }
 
   await waitFor(() => {
     expect(
@@ -1142,12 +1147,10 @@ test("reorders columns when dragging the column handle to the right", async () =
     ).not.toBeNull();
   });
 
-  fireEvent.drop(columnHandle, {
-    dataTransfer,
-    clientX: 180,
-    clientY: 30,
-  });
-  fireEvent.dragEnd(columnHandle, { dataTransfer });
+  fireEvent(
+    document,
+    new MouseEvent("pointerup", { bubbles: true, clientX: 180, clientY: 30 }),
+  );
 
   await waitFor(() => {
     const headerRow = table.rows.item(0);
