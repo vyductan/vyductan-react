@@ -536,6 +536,22 @@
     opacity: 0.35;
   }
 
+  /* The caret on the side of inline code's edge the browser does not draw
+     (plugins/inline-code-exit-plugin.tsx). */
+  .EditorTheme__drawnCaret {
+    position: fixed;
+    z-index: 1;
+    width: 1px;
+    pointer-events: none;
+    animation: EditorTheme__drawnCaretBlink 1.06s steps(1) infinite;
+  }
+
+  @keyframes EditorTheme__drawnCaretBlink {
+    50% {
+      opacity: 0;
+    }
+  }
+
   @media (max-width: 640px) {
     .RichTextSemanticContract__code {
       font-size: 13px;

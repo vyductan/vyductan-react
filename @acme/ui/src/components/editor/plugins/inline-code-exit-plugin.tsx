@@ -1,37 +1,42 @@
-import type { RangeSelection, TextNode } from "lexical";
+import type { LexicalEditor, RangeSelection, TextNode } from "lexical";
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { mergeRegister } from "@lexical/utils";
 import {
-  $addUpdateTag,
   $getSelection,
   $isRangeSelection,
   $isTextNode,
+  BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  getDOMSelection,
   getDOMTextNode,
   KEY_ARROW_LEFT_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
   SELECTION_CHANGE_COMMAND,
-  SKIP_DOM_SELECTION_TAG,
 } from "lexical";
 
 /**
- * Like Notion: with the caret at the edge of inline code, the first arrow
- * press toward the outside leaves the code without moving the caret, so what
- * is typed next is plain text beside it. The next press moves on as usual.
+ * Like Notion, the caret at an edge of inline code has two places: inside
+ * the code and outside it. An arrow press toward the other side moves it
+ * there without moving through the text, so what is typed next goes in or
+ * out of the code. The next press moves on as usual.
+ *
+ * - At the end of code, ArrowRight leaves it (and ArrowLeft goes back in).
+ * - At the start of code, ArrowLeft leaves it (and ArrowRight goes back in).
+ * - Coming back one character with ArrowLeft stops on the side the caret
+ *   came from: before the code's first character, still in the code; or
+ *   right after the code, outside it.
  *
  * Without it the caret moved a character past the edge — and at the start
  * of a table cell, where there is nothing to the left, the table took the
  * key and jumped to the previous cell: there was no way to type before code
  * that opened a cell.
  *
- * Out of the code, the caret is also drawn outside its box when there is
- * text after it: in the DOM it goes to the start of that text. The model
- * cannot follow — Lexical moves a caret at the start of a text node to the
- * end of the one before — so there it stays at the code's end, with the
- * selection's format plain. The same holds when ArrowLeft comes back from
- * that text: the caret stops before it, outside the code.
+ * In the model both places are one point: Lexical moves a caret at the
+ * start of a text node to the end of the one before. The side is the
+ * selection's format, code or not. The browser cannot draw it either: it
+ * puts the caret at the code's text edge whichever side the DOM selection
+ * is on — the padding between them is no content to it. So on the side it
+ * does not draw, the native caret is hidden and the editor draws its own.
  *
  * Critical priority: ahead of the table's own arrow handling.
  */
@@ -39,152 +44,166 @@ export function InlineCodeExitPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    // Where the caret left the code. The selection's format alone does not
-    // hold it: a selectionchange the editor did not cause, later than 200ms
-    // after the press (VS Code's webview sends them), makes Lexical take the
-    // format back from the code node the caret is still in. Every press then
-    // "left" the code again and the caret never got past it.
-    let exited: { key: string; offset: number } | null = null;
+    // The side chosen, at the point it was chosen for. The selection's
+    // format alone does not hold it: a selectionchange the editor did not
+    // cause, later than 200ms after the press (VS Code's webview sends
+    // them), makes Lexical take the format back from the node the caret is
+    // in. Every press then "left" the code again and the caret never got
+    // past it.
+    let side: { key: string; offset: number; inCode: boolean } | null = null;
+    const caret = createDrawnCaret(editor);
 
-    /** The caret, collapsed in inline code at its `edge`. */
-    const $caretAtCodeEdge = (edge: "start" | "end") => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection) || !selection.isCollapsed())
-        return null;
-      const { anchor } = selection;
-      const node = anchor.getNode();
-      if (
-        anchor.type !== "text" ||
-        !$isTextNode(node) ||
-        !node.hasFormat("code")
-      )
-        return null;
-      const atEdge =
-        edge === "start"
-          ? anchor.offset === 0
-          : anchor.offset === node.getTextContentSize();
-      return atEdge ? { selection, node } : null;
-    };
-    const isExitPoint = (point: { key: string; offset: number }) =>
-      exited?.key === point.key && exited.offset === point.offset;
+    const isSidePoint = (selection: RangeSelection) =>
+      side !== null &&
+      selection.isCollapsed() &&
+      selection.anchor.key === side.key &&
+      selection.anchor.offset === side.offset;
 
-    /** The DOM text of the plain text right after `code`, if any. */
-    const $domTextAfter = (code: TextNode) => {
-      const next = code.getNextSibling();
-      if (!$isTextNode(next) || !next.isSimpleText() || next.hasFormat("code"))
-        return null;
-      const element = editor.getElementByKey(next.getKey());
-      return element ? getDOMTextNode(element) : null;
-    };
-
-    /** Out of the code, leaving the DOM caret where it is drawn. */
-    const $leave = (selection: RangeSelection) => {
-      if (selection.hasFormat("code")) selection.toggleFormat("code");
-      $addUpdateTag(SKIP_DOM_SELECTION_TAG);
-      exited = { key: selection.anchor.key, offset: selection.anchor.offset };
-    };
-
-    const exit = (edge: "start" | "end") => (event: KeyboardEvent | null) => {
-      if (event?.shiftKey || event?.altKey || event?.metaKey || event?.ctrlKey)
-        return false;
-      const caret = $caretAtCodeEdge(edge);
-      if (!caret) return false;
-      const { selection, node } = caret;
-      // Already out: this press moves on as usual.
-      if (isExitPoint(selection.anchor) || !selection.hasFormat("code")) {
-        exited = null;
-        return false;
-      }
-
-      event?.preventDefault();
-      const afterDOM = edge === "end" ? $domTextAfter(node) : null;
-      if (afterDOM) {
-        $leave(selection);
-        getDOMSelection(editor._window)?.collapse(afterDOM, 0);
-      } else {
-        // Nothing beside it to draw the caret in.
+    const $choose = (selection: RangeSelection, inCode: boolean) => {
+      if (selection.hasFormat("code") !== inCode)
         selection.toggleFormat("code");
-        exited = { key: selection.anchor.key, offset: selection.anchor.offset };
-      }
-      return true;
+      const { key, offset } = selection.anchor;
+      side = { key, offset, inCode };
     };
 
-    /**
-     * ArrowLeft one character after inline code, from the text after it:
-     * the browser would draw the caret at the code's end, inside its box.
-     */
-    const backBesideCode = (event: KeyboardEvent | null) => {
-      if (event?.shiftKey || event?.altKey || event?.metaKey || event?.ctrlKey)
+    const press = (direction: "left" | "right") => (event: KeyboardEvent) => {
+      if (event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)
         return false;
       const selection = $getSelection();
       if (!$isRangeSelection(selection) || !selection.isCollapsed())
         return false;
-      const { anchor } = selection;
-      const node = anchor.getNode();
-      if (anchor.type !== "text" || !$isTextNode(node) || anchor.offset === 0)
-        return false;
-      const code = node.getPreviousSibling();
-      if (
-        !$isTextNode(code) ||
-        !code.isSimpleText() ||
-        !code.hasFormat("code") ||
-        !isOneCharacter(node.getTextContent().slice(0, anchor.offset))
-      )
-        return false;
-      const afterDOM = $domTextAfter(code);
-      if (!afterDOM) return false;
 
-      event?.preventDefault();
-      const end = code.getTextContentSize();
-      const back = code.select(end, end);
-      $leave(back);
-      getDOMSelection(editor._window)?.collapse(afterDOM, 0);
-      return true;
+      const edge = $codeEdgeAt(selection);
+      if (edge) {
+        // The press toward the side the caret is not on yet: the code's
+        // outside is past its edge.
+        const outward = edge.edge === "end" ? "right" : "left";
+        const inCode = selection.hasFormat("code");
+        if (inCode === (direction === outward)) {
+          event.preventDefault();
+          $choose(selection, !inCode);
+          return true;
+        }
+        side = null;
+        return false;
+      }
+
+      if (direction === "left") {
+        const back = $oneCharacterAfterBoundary(selection);
+        if (back) {
+          event.preventDefault();
+          const end = back.before.getTextContentSize();
+          $choose(back.before.select(end, end), back.after.hasFormat("code"));
+          return true;
+        }
+      }
+      return false;
     };
 
-    const exitStart = exit("start");
+    const $redraw = () => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection) || !isSidePoint(selection)) {
+        side = null;
+        caret.hide();
+        return;
+      }
+      const edge = $codeEdgeAt(selection);
+      // The browser draws the caret in the node the model point is in.
+      if (!edge || side!.inCode === edge.at.hasFormat("code")) caret.hide();
+      else caret.show(edge, side!.inCode);
+    };
 
     return mergeRegister(
       editor.registerCommand(
         KEY_ARROW_LEFT_COMMAND,
-        (event) => exitStart(event) || backBesideCode(event),
+        press("left"),
         COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand(
         KEY_ARROW_RIGHT_COMMAND,
-        exit("end"),
+        press("right"),
         COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          const caret = $caretAtCodeEdge("end");
-          if (!caret) {
-            exited = null;
-            return false;
-          }
-          const { selection, node } = caret;
-          // Drawn at the start of the text after the code: arrowed back to
-          // from that text, or put there on the way out.
-          const afterDOM = $domTextAfter(node);
-          const domSelection = getDOMSelection(editor._window);
-          const drawnAfter =
-            afterDOM !== null &&
-            domSelection?.anchorNode === afterDOM &&
-            domSelection.anchorOffset === 0;
-          if (drawnAfter || isExitPoint(selection.anchor)) {
-            $leave(selection);
-          } else {
-            exited = null;
-          }
+          const selection = $getSelection();
+          if (!side || !$isRangeSelection(selection)) return false;
+          if (!isSidePoint(selection)) side = null;
+          else if (selection.hasFormat("code") !== side.inCode)
+            selection.toggleFormat("code");
           return false;
         },
         COMMAND_PRIORITY_CRITICAL,
       ),
+      editor.registerCommand(
+        BLUR_COMMAND,
+        () => {
+          caret.hide();
+          return false;
+        },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read($redraw);
+      }),
+      caret.dispose,
     );
   }, [editor]);
 
   return null;
+}
+
+/**
+ * A caret at an edge of inline code: the code, which edge, and the node the
+ * model point is in — the code itself, or the text right before its start.
+ */
+type CodeEdge = { code: TextNode; edge: "start" | "end"; at: TextNode };
+
+const isCode = (node: TextNode) =>
+  node.isSimpleText() && node.hasFormat("code");
+const isPlain = (node: TextNode) =>
+  node.isSimpleText() && !node.hasFormat("code");
+
+function $codeEdgeAt(selection: RangeSelection): CodeEdge | null {
+  const { anchor } = selection;
+  const node = anchor.getNode();
+  if (anchor.type !== "text" || !$isTextNode(node)) return null;
+  const size = node.getTextContentSize();
+  if (isCode(node)) {
+    if (anchor.offset === size) return { code: node, edge: "end", at: node };
+    if (anchor.offset === 0) return { code: node, edge: "start", at: node };
+    return null;
+  }
+  // Text, then code: the text's end is the code's start.
+  const next = node.getNextSibling();
+  if (
+    isPlain(node) &&
+    anchor.offset === size &&
+    $isTextNode(next) &&
+    isCode(next)
+  ) {
+    return { code: next, edge: "start", at: node };
+  }
+  return null;
+}
+
+/**
+ * The caret one character into a text node, from its boundary with the
+ * text before it, one of the two code and the other not.
+ */
+function $oneCharacterAfterBoundary(selection: RangeSelection) {
+  const { anchor } = selection;
+  const after = anchor.getNode();
+  if (anchor.type !== "text" || !$isTextNode(after)) return null;
+  const before = after.getPreviousSibling();
+  if (!$isTextNode(before)) return null;
+  const pair =
+    (isCode(before) && isPlain(after)) || (isPlain(before) && isCode(after));
+  if (!pair) return null;
+  if (!isOneCharacter(after.getTextContent().slice(0, anchor.offset)))
+    return null;
+  return { before, after };
 }
 
 const segmenter = new Intl.Segmenter();
@@ -192,3 +211,80 @@ const isOneCharacter = (text: string) => {
   const [first, second] = segmenter.segment(text);
   return first !== undefined && second === undefined;
 };
+
+/**
+ * The editor's own caret, drawn where the browser would not: a blinking bar
+ * over the page, with the native caret hidden meanwhile.
+ */
+function createDrawnCaret(editor: LexicalEditor) {
+  let bar: HTMLElement | null = null;
+  let place: (() => void) | null = null;
+
+  const hide = () => {
+    bar?.remove();
+    bar = null;
+    place = null;
+    const root = editor.getRootElement();
+    if (root) root.style.caretColor = "";
+  };
+
+  const show = (edge: CodeEdge, inCode: boolean) => {
+    const root = editor.getRootElement();
+    const codeElement = editor.getElementByKey(edge.code.getKey());
+    const text = codeElement ? getDOMTextNode(codeElement) : null;
+    if (!root || !codeElement || !text?.textContent) {
+      hide();
+      return;
+    }
+    const doc = root.ownerDocument;
+    const element = (bar ??= doc.createElement("div"));
+    element.className = "EditorTheme__drawnCaret";
+    element.dataset.editorCaret = "";
+    if (!element.isConnected) doc.body.append(element);
+    root.style.caretColor = "transparent";
+
+    place = () => {
+      const length = text.textContent?.length ?? 0;
+      if (length === 0) return;
+      const atStart = edge.edge === "start";
+      // The code's edge character: the line the caret is on, its height.
+      const range = doc.createRange();
+      range.setStart(text, atStart ? 0 : length - 1);
+      range.setEnd(text, atStart ? 1 : length);
+      const glyphs = range.getClientRects();
+      const boxes = codeElement.getClientRects();
+      const glyph = atStart ? glyphs[0] : glyphs[glyphs.length - 1];
+      const box = atStart ? boxes[0] : boxes[boxes.length - 1];
+      if (!glyph || !box) return;
+      const inside = atStart ? glyph.left : glyph.right;
+      const outside = atStart ? box.left : box.right;
+      element.style.left = `${inCode ? inside : outside}px`;
+      element.style.top = `${glyph.top}px`;
+      element.style.height = `${glyph.height}px`;
+      element.style.backgroundColor = getComputedStyle(
+        inCode
+          ? (text.parentElement ?? codeElement)
+          : (codeElement.parentElement ?? root),
+      ).color;
+      // Restart the blink: a caret shows the moment it moves.
+      element.style.animation = "none";
+      void element.offsetWidth;
+      element.style.animation = "";
+    };
+    place();
+  };
+
+  const onMove = () => place?.();
+  window.addEventListener("scroll", onMove, true);
+  window.addEventListener("resize", onMove);
+
+  return {
+    show,
+    hide,
+    dispose: () => {
+      hide();
+      window.removeEventListener("scroll", onMove, true);
+      window.removeEventListener("resize", onMove);
+    },
+  };
+}

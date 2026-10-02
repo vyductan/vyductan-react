@@ -216,9 +216,54 @@ async function codeThenCheck() {
   return { live, code };
 }
 
-/** The caret as drawn: in the DOM, not in the editor's model. */
-const caretIsInCode = () =>
-  window.getSelection()?.anchorNode?.parentElement?.closest("code") != null;
+/**
+ * Chrome draws a caret at the boundary of inline code at the code's text
+ * edge, whichever side of it the DOM selection is on: the two positions
+ * count as one, the padding between them is no content. So where the caret
+ * belongs on the other side, the editor hides it and draws its own.
+ */
+const drawnCaret = () =>
+  document.querySelector<HTMLElement>("[data-editor-caret]");
+const nativeCaretHidden = () =>
+  getComputedStyle(
+    document.querySelector<HTMLElement>('[contenteditable="true"]')!,
+  ).caretColor === "rgba(0, 0, 0, 0)";
+const rectOf = (element: Element) => element.getBoundingClientRect();
+/** The editor's caret, past the code's box (its padding). */
+const drawnAfter = (code: Element) => {
+  const caret = drawnCaret();
+  expect(caret).not.toBeNull();
+  expect(nativeCaretHidden()).toBe(true);
+  expect(caret!.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+    rectOf(code).right - 0.5,
+  );
+};
+/** The editor's caret, inside the code's box, before its text. */
+const drawnInsideStart = (code: Element) => {
+  const caret = drawnCaret();
+  expect(caret).not.toBeNull();
+  expect(nativeCaretHidden()).toBe(true);
+  const left = caret!.getBoundingClientRect().left;
+  const box = rectOf(code);
+  const text = document.createRange();
+  text.setStart(code.querySelector("span")?.firstChild ?? code.firstChild!, 0);
+  text.setEnd(code.querySelector("span")?.firstChild ?? code.firstChild!, 1);
+  expect(left).toBeGreaterThan(box.left + 0.5);
+  expect(left).toBeLessThanOrEqual(text.getBoundingClientRect().left + 0.5);
+};
+const nativeCaretShown = () => {
+  expect(drawnCaret()).toBeNull();
+  expect(nativeCaretHidden()).toBe(false);
+};
+
+/** A selectionchange the editor did not cause, as VS Code's webview sends. */
+async function straySelectionChange() {
+  // Later than 200ms after the press: Lexical then takes the format back
+  // from the node the caret is in.
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  document.dispatchEvent(new Event("selectionchange"));
+  await new Promise((resolve) => setTimeout(resolve, 50));
+}
 
 const itemText = () => document.querySelector("li")?.textContent;
 const itemCode = () => document.querySelector("li code")?.textContent;
@@ -235,18 +280,16 @@ test("in a list item, after a click at the end of inline code, ArrowRight shows 
   await userEvent.click(code, {
     position: { x: rect.width - 1, y: rect.height / 2 },
   });
-  expect(caretIsInCode()).toBe(true);
+  nativeCaretShown();
 
   await userEvent.keyboard("{ArrowRight}");
-  await waitFor(() => expect(caretIsInCode()).toBe(false));
-  // A selectionchange that is not from the editor's own DOM update, later
-  // than 200ms after the press, as VS Code's webview delivers: Lexical then
-  // takes the format back from the code node the caret is still in.
-  await new Promise((resolve) => setTimeout(resolve, 250));
-  document.dispatchEvent(new Event("selectionchange"));
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await waitFor(() => drawnAfter(code));
+  await straySelectionChange();
+  drawnAfter(code);
 
-  await userEvent.keyboard("{ArrowRight}x");
+  await userEvent.keyboard("{ArrowRight}");
+  await waitFor(() => nativeCaretShown());
+  await userEvent.keyboard("x");
 
   await waitFor(() => {
     expect(itemText()).toBe("stripe_secret_key_7000✅x");
@@ -267,11 +310,13 @@ test("ArrowRight at the end of inline code, then typing, types between it and wh
     expect(itemText()).toBe("stripe_secret_key_7000x✅");
     expect(itemCode()).toBe("stripe_secret_key_7000");
   });
+  // Typed: the caret is past the x, drawn by the browser again.
+  nativeCaretShown();
 });
 
 /** From the other side: ArrowLeft past ✅ stops before it, not in the code. */
 test("ArrowLeft onto the end of inline code from the text after it stays outside the code", async () => {
-  const { live } = await codeThenCheck();
+  const { live, code } = await codeThenCheck();
   const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
   root.focus();
   live.update(
@@ -286,10 +331,8 @@ test("ArrowLeft onto the end of inline code from the text after it stays outside
   );
 
   await userEvent.keyboard("{ArrowLeft}");
-  await waitFor(() => expect(caretIsInCode()).toBe(false));
-  await new Promise((resolve) => setTimeout(resolve, 250));
-  document.dispatchEvent(new Event("selectionchange"));
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await waitFor(() => drawnAfter(code));
+  await straySelectionChange();
 
   await userEvent.keyboard("x");
 
@@ -297,6 +340,95 @@ test("ArrowLeft onto the end of inline code from the text after it stays outside
     expect(itemText()).toBe("stripe_secret_key_7000x✅");
     expect(itemCode()).toBe("stripe_secret_key_7000");
   });
+});
+
+/** As reported: `direct_web.*`: `fn_stripe_secret`, the caret after its f. */
+async function textThenCode() {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  root.focus();
+  live.update(
+    () => {
+      const fn = $createTextNode("fn_stripe_secret").toggleFormat("code");
+      const item = $createListItemNode().append(
+        $createTextNode("direct_web.*").toggleFormat("code"),
+        $createTextNode(": "),
+        fn,
+        $createTextNode(", f"),
+      );
+      $getRoot().clear().append($createListNode("bullet").append(item));
+      fn.select(1, 1);
+      $takeFormatOf(fn);
+    },
+    { discrete: true },
+  );
+  const code = await waitFor(() => {
+    const node = document.querySelectorAll<HTMLElement>("li code")[1];
+    expect(node).toBeDefined();
+    return node!;
+  });
+  return { live, code };
+}
+
+const fnCode = () => document.querySelectorAll("li code")[1]?.textContent;
+
+/**
+ * ArrowLeft after the first character of inline code stops before it, still
+ * in the code — the browser went on to the end of the text before it, out of
+ * the code. A second press leaves the code.
+ */
+test("ArrowLeft after the first character of inline code stops before it, in the code", async () => {
+  const { code } = await textThenCode();
+
+  await userEvent.keyboard("{ArrowLeft}");
+  await waitFor(() => drawnInsideStart(code));
+  await straySelectionChange();
+  drawnInsideStart(code);
+
+  await userEvent.keyboard("x");
+
+  await waitFor(() => {
+    expect(fnCode()).toBe("xfn_stripe_secret");
+    expect(itemText()).toBe("direct_web.*: xfn_stripe_secret, f");
+  });
+});
+
+test("a second ArrowLeft at the start of inline code leaves it", async () => {
+  await textThenCode();
+
+  await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+  await waitFor(() => nativeCaretShown());
+  await userEvent.keyboard("x");
+
+  await waitFor(() => {
+    expect(fnCode()).toBe("fn_stripe_secret");
+    expect(itemText()).toBe("direct_web.*: xfn_stripe_secret, f");
+  });
+});
+
+test("ArrowRight from the text before inline code goes into it first", async () => {
+  const { code } = await textThenCode();
+  await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+  await waitFor(() => nativeCaretShown());
+
+  await userEvent.keyboard("{ArrowRight}");
+  await waitFor(() => drawnInsideStart(code));
+  await userEvent.keyboard("x");
+
+  await waitFor(() => expect(fnCode()).toBe("xfn_stripe_secret"));
 });
 
 /** The case it was reported in: inline code at the start of a table cell. */
