@@ -23,6 +23,14 @@ import { TABLE_COLUMN_RESIZE_DRAG_COMMAND } from "./table-column-resize-plugin";
 // How many px outside the table boundary we still consider "hovering the table"
 const HOVER_MARGIN_PX = 36;
 
+/**
+ * The add-row bar's height. It sits in the room left below a table for it
+ * (editor-theme.runtime.css): it used to hang 24px into the line below,
+ * covering its start, and hovering that line raised it — the line could not
+ * be clicked into. Below the table, the hover band is that room and no more.
+ */
+const ROW_BAR_HEIGHT_PX = 20;
+
 type ButtonState = {
   /** Which button to show */
   kind: "column" | "row";
@@ -78,8 +86,13 @@ function resolveButtonState(
 
   const nearRightEdge =
     Math.abs(distributionToRight) <= HOVER_MARGIN_PX && verticallyInside;
+  const roomBelow =
+    Number.parseFloat(getComputedStyle(table).marginBottom) || 0;
   const nearBottomEdge =
-    Math.abs(distributionToBottom) <= HOVER_MARGIN_PX && horizontallyInside;
+    horizontallyInside &&
+    (distributionToBottom >= 0
+      ? distributionToBottom <= HOVER_MARGIN_PX
+      : -distributionToBottom <= roomBelow);
 
   // The bands keep their old precedence — right beats bottom — and the
   // last-column rule only fills the gap they leave: deep inside the last
@@ -336,11 +349,11 @@ function TableHoverActionsInner({
               height: buttonState.stripeHeight,
             }
           : {
-              top: buttonState.y - anchorRect.top,
+              top: buttonState.y + 2 - anchorRect.top,
               left:
                 buttonState.x - buttonState.stripeWidth / 2 - anchorRect.left,
               width: buttonState.stripeWidth,
-              height: 24,
+              height: ROW_BAR_HEIGHT_PX,
             }),
         display: "flex",
         alignItems: "center",

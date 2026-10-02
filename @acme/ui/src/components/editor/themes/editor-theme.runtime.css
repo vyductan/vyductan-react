@@ -9,6 +9,15 @@
  */
 
 @layer components {
+  /*
+   * Room below a table for its add-row bar (plugins/table-hover-actions-
+   * plugin.tsx, ROW_BAR_HEIGHT_PX + 2px each side), so the bar never covers
+   * the line after. Editor-only: published content keeps its own spacing.
+   */
+  [data-lexical-editor="true"] .RichTextSemanticContract__table {
+    margin-bottom: 24px;
+  }
+
   .Collapsible__container {
     background-color: transparent;
     border: none;
