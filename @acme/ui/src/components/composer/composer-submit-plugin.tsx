@@ -45,6 +45,35 @@ function readValue(editor: LexicalEditor, format: ComposerFormat): string {
   return normalizeHtmlOutput(html);
 }
 
+/**
+ * Empties the box down to one plain paragraph holding the caret, optionally
+ * with `text` in it. Call inside `editor.update`.
+ *
+ * `select()` reuses the live selection, so whatever format and style it carried
+ * — bold switched on with Cmd+B, say — rides into the next message. Lexical
+ * only re-derives them from the caret on a DOM selectionchange, and skips even
+ * that while the root is empty; a send from the button (the phone path) never
+ * triggers one at all. So both are reset by hand.
+ */
+function $resetContent(text = "") {
+  const root = $getRoot();
+  root.clear();
+
+  // clear() on its own leaves a root with no children, so the selection stays
+  // anchored on the root — a state every plugin that walks from the selection
+  // to its top-level element throws on, and one no caret can sit in. Hand back
+  // an empty paragraph instead.
+  const paragraph = $createParagraphNode();
+  if (text) paragraph.append($createTextNode(text));
+  root.append(paragraph);
+
+  const selection = paragraph.selectEnd();
+  if ($isRangeSelection(selection)) {
+    selection.format = 0;
+    selection.style = "";
+  }
+}
+
 function readPlainText(editor: LexicalEditor): string {
   let text = "";
   editor.getEditorState().read(() => {
@@ -114,12 +143,7 @@ export function ComposerSubmitPlugin({
   const replaceContent = useCallback(
     (text: string) => {
       editor.update(() => {
-        const root = $getRoot();
-        root.clear();
-        const paragraph = $createParagraphNode();
-        if (text) paragraph.append($createTextNode(text));
-        root.append(paragraph);
-        paragraph.selectEnd();
+        $resetContent(text);
       });
     },
     [editor],
@@ -172,16 +196,7 @@ export function ComposerSubmitPlugin({
     historyIndex.current = -1;
 
     editor.update(() => {
-      const root = $getRoot();
-      root.clear();
-
-      // clear() on its own leaves a root with no children, so the selection
-      // stays anchored on the root — a state every plugin that walks from the
-      // selection to its top-level element throws on, and one no caret can sit
-      // in. Hand back an empty paragraph instead.
-      const paragraph = $createParagraphNode();
-      root.append(paragraph);
-      paragraph.select();
+      $resetContent();
     });
     editor.focus();
   }, [allowEmpty, disabled, editor, format, onSubmit]);
