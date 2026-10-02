@@ -43,6 +43,7 @@ import {
   Heading2Icon,
   Heading3Icon,
   ImageIcon,
+  LightbulbIcon,
   ListChecksIcon,
   ListCollapseIcon,
   ListIcon,
@@ -67,6 +68,7 @@ import {
 
 import { useComponentPickerContext } from "../context/component-picker-context";
 import { useEditorModal } from "../editor-hooks/use-modal";
+import { $insertCallout } from "../nodes/callout-node";
 import { INSERT_COLLAPSIBLE_COMMAND } from "../plugins/collapsible-plugin";
 import { EmbedConfigs } from "../plugins/embeds/auto-embed-plugin";
 import { InsertEquationDialog } from "../plugins/equations-plugin";
@@ -296,6 +298,14 @@ function getBaseOptions(
         keywords: ["collapse", "collapsible", "toggle"],
         onSelect: () =>
           editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, void 0),
+      }),
+    },
+    {
+      category: "basic",
+      option: new ComponentPickerOption("Callout", {
+        icon: <LightbulbIcon className="size-4" />,
+        keywords: ["callout", "note", "tip", "info", "warning", "aside"],
+        onSelect: () => editor.update(() => $insertCallout()),
       }),
     },
     {

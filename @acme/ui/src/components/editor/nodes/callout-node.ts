@@ -9,7 +9,12 @@ import type {
   SerializedElementNode,
   Spread,
 } from "lexical";
-import { $applyNodeReplacement, ElementNode } from "lexical";
+import { $insertNodeToNearestRoot } from "@lexical/utils";
+import {
+  $applyNodeReplacement,
+  $createParagraphNode,
+  ElementNode,
+} from "lexical";
 
 /**
  * A Notion callout: blocks in a tinted box behind an icon.
@@ -144,4 +149,18 @@ export function $isCalloutNode(
   node: LexicalNode | null | undefined,
 ): node is CalloutNode {
   return node instanceof CalloutNode;
+}
+
+/** What "/callout" puts in, as Notion does: 💡 on a gray tint. */
+export const DEFAULT_CALLOUT = { icon: "💡", color: "gray_bg" } as const;
+
+/** Insert an empty default callout at the selection, caret inside it. */
+export function $insertCallout(): void {
+  const paragraph = $createParagraphNode();
+  $insertNodeToNearestRoot(
+    $createCalloutNode(DEFAULT_CALLOUT.icon, DEFAULT_CALLOUT.color).append(
+      paragraph,
+    ),
+  );
+  paragraph.select();
 }
