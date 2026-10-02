@@ -25,6 +25,7 @@ import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
 import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
 import { BlockSelectionPlugin } from "../plugins/block-selection-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
+import { CalloutPickerPlugin } from "../plugins/callout-picker-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
 import { CodeHighlightPlugin } from "../plugins/code-highlight-plugin";
@@ -304,6 +305,7 @@ export function Plugins({
         />
       )}
       {editable && <EmojiPickerPlugin />}
+      {editable && <CalloutPickerPlugin />}
 
       {editable && (
         <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />

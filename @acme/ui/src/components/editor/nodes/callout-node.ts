@@ -151,6 +151,24 @@ export function $isCalloutNode(
   return node instanceof CalloutNode;
 }
 
+/**
+ * The backgrounds the callout picker offers: Notion's, by the names its
+ * markdown uses. "" is the default tint. Their colors live in
+ * themes/editor-theme.css.
+ */
+export const CALLOUT_COLORS = [
+  { color: "", label: "Default" },
+  { color: "gray_bg", label: "Gray" },
+  { color: "brown_bg", label: "Brown" },
+  { color: "orange_bg", label: "Orange" },
+  { color: "yellow_bg", label: "Yellow" },
+  { color: "green_bg", label: "Green" },
+  { color: "blue_bg", label: "Blue" },
+  { color: "purple_bg", label: "Purple" },
+  { color: "pink_bg", label: "Pink" },
+  { color: "red_bg", label: "Red" },
+] as const;
+
 /** What "/callout" puts in, as Notion does: 💡 on a gray tint. */
 export const DEFAULT_CALLOUT = { icon: "💡", color: "gray_bg" } as const;
 
