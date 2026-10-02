@@ -186,8 +186,8 @@ test("a second ArrowRight after inline code moves on past the next character", a
   );
 });
 
-/** As reported: a list item, the caret put after the code by a click. */
-test("in a list item, after a click at the end of inline code, ArrowRight twice moves past what follows", async () => {
+/** As reported: a list item of `stripe_secret_key_7000`✅. */
+async function codeThenCheck() {
   let editor: LexicalEditor | null = null;
   render(
     <Editor autoFocus={false}>
@@ -213,12 +213,32 @@ test("in a list item, after a click at the end of inline code, ArrowRight twice 
     expect(node).not.toBeNull();
     return node!;
   });
+  return { live, code };
+}
+
+/** The caret as drawn: in the DOM, not in the editor's model. */
+const caretIsInCode = () =>
+  window.getSelection()?.anchorNode?.parentElement?.closest("code") != null;
+
+const itemText = () => document.querySelector("li")?.textContent;
+const itemCode = () => document.querySelector("li code")?.textContent;
+
+/**
+ * Like Notion, the first press shows the caret outside the code's box, past
+ * its padding — in the model it cannot be anywhere but the code's end, since
+ * Lexical moves a caret at the start of a text node to the end of the one
+ * before.
+ */
+test("in a list item, after a click at the end of inline code, ArrowRight shows the caret outside it, and again moves past what follows", async () => {
+  const { code } = await codeThenCheck();
   const rect = code.getBoundingClientRect();
   await userEvent.click(code, {
     position: { x: rect.width - 1, y: rect.height / 2 },
   });
+  expect(caretIsInCode()).toBe(true);
 
   await userEvent.keyboard("{ArrowRight}");
+  await waitFor(() => expect(caretIsInCode()).toBe(false));
   // A selectionchange that is not from the editor's own DOM update, later
   // than 200ms after the press, as VS Code's webview delivers: Lexical then
   // takes the format back from the code node the caret is still in.
@@ -229,11 +249,53 @@ test("in a list item, after a click at the end of inline code, ArrowRight twice 
   await userEvent.keyboard("{ArrowRight}x");
 
   await waitFor(() => {
-    const item = document.querySelector("li");
-    expect(item?.textContent).toBe("stripe_secret_key_7000✅x");
-    expect(item?.querySelector("code")?.textContent).toBe(
-      "stripe_secret_key_7000",
-    );
+    expect(itemText()).toBe("stripe_secret_key_7000✅x");
+    expect(itemCode()).toBe("stripe_secret_key_7000");
+  });
+});
+
+test("ArrowRight at the end of inline code, then typing, types between it and what follows", async () => {
+  const { code } = await codeThenCheck();
+  const rect = code.getBoundingClientRect();
+  await userEvent.click(code, {
+    position: { x: rect.width - 1, y: rect.height / 2 },
+  });
+
+  await userEvent.keyboard("{ArrowRight}x");
+
+  await waitFor(() => {
+    expect(itemText()).toBe("stripe_secret_key_7000x✅");
+    expect(itemCode()).toBe("stripe_secret_key_7000");
+  });
+});
+
+/** From the other side: ArrowLeft past ✅ stops before it, not in the code. */
+test("ArrowLeft onto the end of inline code from the text after it stays outside the code", async () => {
+  const { live } = await codeThenCheck();
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  root.focus();
+  live.update(
+    () => {
+      const check = $getRoot()
+        .getFirstChildOrThrow<ElementNode>()
+        .getFirstChildOrThrow<ElementNode>()
+        .getLastChildOrThrow();
+      if ($isTextNode(check)) check.select(1, 1);
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("{ArrowLeft}");
+  await waitFor(() => expect(caretIsInCode()).toBe(false));
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  document.dispatchEvent(new Event("selectionchange"));
+  await new Promise((resolve) => setTimeout(resolve, 50));
+
+  await userEvent.keyboard("x");
+
+  await waitFor(() => {
+    expect(itemText()).toBe("stripe_secret_key_7000x✅");
+    expect(itemCode()).toBe("stripe_secret_key_7000");
   });
 });
 
