@@ -19,6 +19,7 @@ import {
   $isElementNode,
   $isParagraphNode,
   $isRangeSelection,
+  $isRootNode,
   $isTextNode,
   $setState,
   COPY_COMMAND,
@@ -68,10 +69,19 @@ const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
  * element by definition. Asking it for one used to throw
  * "root nodes are not top level elements" out of a mousemove listener, which
  * surfaced as a runtime error overlay the moment a page with the editor was
- * opened. `getTopLevelElement` answers the same question without the throw.
+ * opened.
+ *
+ * The block is the root's own child, not `getTopLevelElement()`: that stops at
+ * a shadow root, and a table cell, a callout and a toggle's body are shadow
+ * roots. The handle stands beside the root's children (getBlockElement), so
+ * inside a table it acted on the paragraph in a cell — "+" put its new line,
+ * and the "/", into the cell.
  */
 export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
-  const topLevel = node.getTopLevelElement();
+  let topLevel: LexicalNode | null = node;
+  while (topLevel && !$isRootNode(topLevel.getParent())) {
+    topLevel = topLevel.getParent();
+  }
 
   if (!topLevel) {
     return null;

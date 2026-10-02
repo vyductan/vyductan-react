@@ -8,6 +8,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { $createTableNodeWithDimensions } from "@lexical/table";
 import {
   act,
   cleanup,
@@ -23,6 +24,7 @@ import {
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
+import { $createCalloutNode } from "../nodes/callout-node";
 import { nodes } from "../nodes/nodes";
 import {
   $draggableBlockForNode,
@@ -194,5 +196,50 @@ test("resolves the block a hovered node belongs to, and nothing for the root", a
 
     // Hovering the list itself has no item to pick, so the list stands.
     expect(blockKeyFor(keys.list)).toBe(keys.list);
+  });
+});
+
+/**
+ * The handle stands beside the blocks at the top of the page (see
+ * getBlockElement), so the block it acts on must be that one too. A table
+ * cell and a callout are shadow roots, where getTopLevelElement stops: the
+ * handle beside a table acted on the paragraph inside a cell, and "+" put
+ * its new line — and the "/" — into the cell.
+ */
+test("a node inside a table or a callout belongs to the table or the callout", async () => {
+  const { editor } = await mountHarness();
+  const keys = { table: "", cellText: "", callout: "", calloutText: "" };
+
+  act(() => {
+    editor.update(
+      () => {
+        const root = $getRoot();
+        root.clear();
+
+        const table = $createTableNodeWithDimensions(2, 2, false);
+        const cellText = $createTextNode("In a cell");
+        table.getFirstDescendant()?.getParent()?.append(cellText);
+
+        const calloutText = $createTextNode("In a callout");
+        const callout = $createCalloutNode("💡").append(
+          $createParagraphNode().append(calloutText),
+        );
+
+        root.append(table, callout);
+        keys.table = table.getKey();
+        keys.cellText = cellText.getKey();
+        keys.callout = callout.getKey();
+        keys.calloutText = calloutText.getKey();
+      },
+      { discrete: true },
+    );
+  });
+
+  editor.getEditorState().read(() => {
+    const blockKeyFor = (key: string) =>
+      $draggableBlockForNode($getNodeByKey(key)!)?.getKey() ?? null;
+
+    expect(blockKeyFor(keys.cellText)).toBe(keys.table);
+    expect(blockKeyFor(keys.calloutText)).toBe(keys.callout);
   });
 });
