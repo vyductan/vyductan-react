@@ -40,9 +40,11 @@ describe("Notion-only blocks", () => {
     ["an empty block", "<empty-block/>"],
     ["a table of contents", '<table_of_contents color="gray"/>'],
     ["a video", '<video src="https://example.com/v.mp4">Caption</video>'],
+    // A plain one becomes an editable table (markdown-nfm-table.test.ts);
+    // one with colors has nowhere to keep them, so it stays raw.
     [
-      "a Notion table",
-      '<table header-row="true">\n\t<tr>\n\t\t<td>a</td>\n\t\t<td>b</td>\n\t</tr>\n</table>',
+      "a Notion table with colors",
+      '<table header-row="true">\n\t<tr color="blue_bg">\n\t\t<td>a</td>\n\t\t<td>b</td>\n\t</tr>\n</table>',
     ],
     [
       "columns",

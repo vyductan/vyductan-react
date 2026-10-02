@@ -116,3 +116,30 @@ test("a chip is selected by a click and removed with Backspace", async () => {
   );
   expect(contentEditable.querySelector(".NfmRaw--inline")).not.toBeNull();
 });
+
+/**
+ * A plain Notion table — rows and cells, no colors — is not a chip: it comes
+ * in as a real table, header row and all.
+ */
+test("a pasted plain Notion table is a real table, not a chip", async () => {
+  const { contentEditable } = await pasteIntoEmptyEditor({
+    "text/plain":
+      '<table header-row="true">\n\t<tr>\n\t\t<td>Name</td>\n\t\t<td>Role</td>\n\t</tr>\n\t<tr>\n\t\t<td>Tân</td>\n\t\t<td>Owner</td>\n\t</tr>\n</table>',
+  });
+
+  const table = await waitFor(() => {
+    const node = contentEditable.querySelector("table");
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(contentEditable.querySelector(".NfmRaw--block")).toBeNull();
+  expect(
+    [...table.querySelectorAll("tr")].map((row) =>
+      [...row.querySelectorAll("th, td")].map((cell) => cell.textContent),
+    ),
+  ).toStrictEqual([
+    ["Name", "Role"],
+    ["Tân", "Owner"],
+  ]);
+  expect(table.querySelector("tr")?.querySelector("th")).not.toBeNull();
+});

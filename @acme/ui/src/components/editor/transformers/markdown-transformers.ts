@@ -28,6 +28,7 @@ import {
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
 import { CALLOUT, DETAILS } from "./markdown-nfm-blocks-transformer";
+import { NFM_TABLE } from "./markdown-nfm-table-transformer";
 import {
   NFM_RAW_BLOCK,
   NFM_RAW_INLINE,
@@ -149,6 +150,8 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
+  // Before NFM_RAW_BLOCK, which keeps the <table>s this declines.
+  NFM_TABLE,
   NFM_RAW_BLOCK,
   NFM_RAW_INLINE,
   ...MULTILINE_ELEMENT_TRANSFORMERS,

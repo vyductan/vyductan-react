@@ -16,9 +16,13 @@ import {
   TableNode,
   TableRowNode,
 } from "@lexical/table";
-import { $isParagraphNode, $isTextNode } from "lexical";
+import { $getState, $isParagraphNode, $isTextNode } from "lexical";
 
 import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
+import {
+  $exportNfmTable,
+  nfmTableState,
+} from "./markdown-nfm-table-transformer";
 
 // Very primitive table setup
 const TABLE_ROW_REG_EXP = /^(?:\|)(.+)(?:\|)\s?$/;
@@ -29,6 +33,12 @@ export const TABLE: ElementTransformer = {
   export: (node: LexicalNode) => {
     if (!$isTableNode(node)) {
       return null;
+    }
+
+    // Read from Notion's <table> markup: written back in it.
+    const nfmAttributes = $getState(node, nfmTableState);
+    if (nfmAttributes !== null) {
+      return $exportNfmTable(node, nfmAttributes);
     }
 
     const output: string[] = [];
@@ -173,7 +183,7 @@ const UNESCAPED_PIPE = /(?<!\\)\|/g;
 const CELL_BULLET_EXPORT = /^(\s*)[-*+] (?!\[[ x]\] )/i;
 const CELL_BULLET_IMPORT = /^(\s*)• ?/;
 
-const $exportTableCell = (cell: TableCellNode): string =>
+export const $exportTableCell = (cell: TableCellNode): string =>
   $convertToMarkdownString(MARKDOWN_TRANSFORMERS, cell)
     .split("\n")
     .filter((line) => line.trim() !== "")
@@ -185,7 +195,7 @@ const $exportTableCell = (cell: TableCellNode): string =>
     )
     .join("<br>");
 
-const $createTableCell = (textContent: string): TableCellNode => {
+export const $createTableCell = (textContent: string): TableCellNode => {
   const markdown = textContent
     .trim()
     .replaceAll(String.raw`\|`, "|")
