@@ -37,12 +37,13 @@ import {
   NFM_BLOCK_COLOR_IMPORT,
   NFM_SPAN,
 } from "./markdown-nfm-colors-transformer";
-import { NFM_TABLE } from "./markdown-nfm-table-transformer";
 import {
   NFM_RAW_BLOCK,
   NFM_RAW_INLINE,
   withTabIndentedLists,
 } from "./markdown-nfm-raw-transformer";
+import { NFM_TABLE } from "./markdown-nfm-table-transformer";
+import { registerMarkdownTransformers } from "./markdown-transformer-registry";
 
 export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   TABLE,
@@ -171,3 +172,10 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   NFM_RAW_INLINE,
   ...MULTILINE_ELEMENT_TRANSFORMERS,
 ];
+
+// Hand the lists to the transformers that convert their own contents with
+// them; see markdown-transformer-registry for why they are not imported.
+registerMarkdownTransformers({
+  cell: MARKDOWN_TRANSFORMERS,
+  document: MARKDOWN_DOCUMENT_TRANSFORMERS,
+});

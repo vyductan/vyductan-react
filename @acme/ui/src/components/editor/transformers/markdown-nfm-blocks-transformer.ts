@@ -35,7 +35,7 @@ import {
   $isLayoutItemNode,
   LayoutItemNode,
 } from "../nodes/layout-item-node";
-import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "./markdown-transformers";
+import { getMarkdownDocumentTransformers } from "./markdown-transformer-registry";
 
 /*
  * Toggles and callouts in Notion-flavored Markdown, the format Notion's
@@ -96,10 +96,10 @@ const indent = (markdown: string) =>
     .join("\n");
 
 const $importBlocks = (markdown: string, into: ElementNode) =>
-  $convertFromMarkdownString(markdown, MARKDOWN_DOCUMENT_TRANSFORMERS, into);
+  $convertFromMarkdownString(markdown, getMarkdownDocumentTransformers(), into);
 
 const $exportBlocks = (node: ElementNode) =>
-  $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS, node);
+  $convertToMarkdownString(getMarkdownDocumentTransformers(), node);
 
 export const DETAILS: MultilineElementTransformer = {
   dependencies: [

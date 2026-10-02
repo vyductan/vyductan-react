@@ -18,11 +18,11 @@ import {
 } from "@lexical/table";
 import { $getState, $isParagraphNode, $isTextNode } from "lexical";
 
-import { MARKDOWN_TRANSFORMERS } from "../transformers/markdown-transformers";
 import {
   $exportNfmTable,
   nfmTableState,
 } from "./markdown-nfm-table-transformer";
+import { getMarkdownTransformers } from "./markdown-transformer-registry";
 
 // Very primitive table setup
 const TABLE_ROW_REG_EXP = /^(?:\|)(.+)(?:\|)\s?$/;
@@ -184,7 +184,7 @@ const CELL_BULLET_EXPORT = /^(\s*)[-*+] (?!\[[ x]\] )/i;
 const CELL_BULLET_IMPORT = /^(\s*)• ?/;
 
 export const $exportTableCell = (cell: TableCellNode): string =>
-  $convertToMarkdownString(MARKDOWN_TRANSFORMERS, cell)
+  $convertToMarkdownString(getMarkdownTransformers(), cell)
     .split("\n")
     .filter((line) => line.trim() !== "")
     .map((line) =>
@@ -203,7 +203,7 @@ export const $createTableCell = (textContent: string): TableCellNode => {
     .map((line) => line.trimEnd().replace(CELL_BULLET_IMPORT, "$1- "))
     .join("\n");
   const cell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
-  $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS, cell);
+  $convertFromMarkdownString(markdown, getMarkdownTransformers(), cell);
   return cell;
 };
 
