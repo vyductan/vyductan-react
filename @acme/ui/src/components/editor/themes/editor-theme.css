@@ -511,13 +511,19 @@
 
   /* The row or column being dragged: a copy following the pointer, the
      original faded where it is (plugins/table-cell-action-menu-plugin.tsx). */
+  /* Near-opaque, with a primary outline: on a dark page a shadow alone
+     barely shows, and the copy read as a faint smudge. */
   .EditorTheme__tableDragPreview {
     position: absolute;
     z-index: 44;
     pointer-events: none;
-    opacity: 0.85;
+    opacity: 0.96;
+    border-radius: 4px;
     background-color: var(--background);
-    box-shadow: 0 6px 16px rgb(0 0 0 / 0.18);
+    outline: 2px solid color-mix(in oklab, var(--primary) 70%, transparent);
+    box-shadow:
+      0 8px 24px rgb(0 0 0 / 0.35),
+      0 2px 6px rgb(0 0 0 / 0.2);
   }
 
   .EditorTheme__tableDragPreview > table {
