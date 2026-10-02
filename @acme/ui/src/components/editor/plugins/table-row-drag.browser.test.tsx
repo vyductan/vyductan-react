@@ -257,3 +257,82 @@ test("dragging a column's handle left, onto a column's right half, lands after i
 
   await waitFor(() => expect(rowTexts()).toStrictEqual(["C1C3C2"]));
 });
+
+const pointer = (type: string, clientX: number, clientY: number) =>
+  new PointerEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    clientX,
+    clientY,
+    button: 0,
+    buttons: type === "pointerup" ? 0 : 1,
+    pointerId: 1,
+    pointerType: "mouse",
+    isPrimary: true,
+  });
+
+const preview = () =>
+  document.querySelector<HTMLElement>("[data-table-drag-preview]");
+
+/**
+ * Like Notion, the row being dragged follows the pointer — a translucent copy
+ * of it — while the row itself fades where it was. Only the drop line showed,
+ * so nothing seemed to move until the drop.
+ */
+test("while dragging a row, a copy of it follows the pointer", async () => {
+  const handle = await tableWithRows();
+  const start = handle.getBoundingClientRect();
+  const from = { x: start.left + 5, y: start.top + 5 };
+  const r3 = cellOf("R3").getBoundingClientRect();
+
+  handle.dispatchEvent(pointer("pointerdown", from.x, from.y));
+  await frame();
+  document.dispatchEvent(pointer("pointermove", from.x, from.y + 10));
+  await frame();
+  const firstTop = preview()?.getBoundingClientRect().top;
+  document.dispatchEvent(pointer("pointermove", from.x, r3.top + 5));
+  await frame();
+
+  const copy = preview();
+  expect(copy).not.toBeNull();
+  expect(copy!.textContent).toBe("R1");
+  // It moved with the pointer, down by what the pointer did.
+  expect(copy!.getBoundingClientRect().top - firstTop!).toBeCloseTo(
+    r3.top + 5 - (from.y + 10),
+    0,
+  );
+  // The row itself stays, faded.
+  expect(Number(getComputedStyle(cellOf("R1")).opacity)).toBeLessThan(1);
+
+  document.dispatchEvent(pointer("pointerup", from.x, r3.top + 5));
+  await frame();
+  expect(preview()).toBeNull();
+  expect(Number(getComputedStyle(cellOf("R1")).opacity)).toBe(1);
+});
+
+test("while dragging a column, a copy of it follows the pointer", async () => {
+  await tableWithColumns();
+  await userEvent.click(cellOf("C1"));
+  const handle = await columnHandle();
+  const start = handle.getBoundingClientRect();
+  const from = { x: start.left + 5, y: start.top + 5 };
+  const c3 = cellOf("C3").getBoundingClientRect();
+
+  handle.dispatchEvent(pointer("pointerdown", from.x, from.y));
+  await frame();
+  document.dispatchEvent(pointer("pointermove", from.x + 10, from.y));
+  await frame();
+  const firstLeft = preview()?.getBoundingClientRect().left;
+  document.dispatchEvent(pointer("pointermove", c3.left + 5, from.y));
+  await frame();
+
+  expect(preview()?.textContent).toBe("C1");
+  expect(preview()!.getBoundingClientRect().left - firstLeft!).toBeCloseTo(
+    c3.left + 5 - (from.x + 10),
+    0,
+  );
+
+  document.dispatchEvent(pointer("pointerup", c3.left + 5, from.y));
+  await frame();
+  expect(preview()).toBeNull();
+});

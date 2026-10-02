@@ -60,6 +60,74 @@ function isHeaderRow(row: HTMLTableRowElement) {
   );
 }
 
+/** The cells of the row or column a handle drags. */
+function draggedCells(
+  table: HTMLTableElement,
+  axis: "row" | "column",
+  index: number,
+): HTMLTableCellElement[] {
+  return axis === "row"
+    ? [...(table.rows[index]?.cells ?? [])]
+    : [...table.rows].flatMap((row) => {
+        const cell = row.cells[index];
+        return cell ? [cell] : [];
+      });
+}
+
+/**
+ * A translucent copy of the dragged row or column, laid over it, to follow
+ * the pointer along its axis — as Notion shows what is being moved. It lives
+ * beside the other table overlays, outside the editable root, so the editor
+ * never sees it. The cells keep their measured sizes: a copy re-laid out on
+ * its own would come out a different width.
+ */
+function createDragPreview(
+  table: HTMLTableElement,
+  axis: "row" | "column",
+  index: number,
+  anchor: HTMLElement,
+): HTMLElement | null {
+  const cells = draggedCells(table, axis, index);
+  const first = cells[0];
+  if (!first) return null;
+
+  const anchorRect = anchor.getBoundingClientRect();
+  const firstRect = first.getBoundingClientRect();
+  const copy = document.createElement("table");
+  copy.className = table.className;
+  const body = document.createElement("tbody");
+  copy.append(body);
+
+  if (axis === "row") {
+    const row = document.createElement("tr");
+    for (const cell of cells) {
+      const clone = cell.cloneNode(true) as HTMLTableCellElement;
+      clone.style.width = `${cell.getBoundingClientRect().width}px`;
+      row.append(clone);
+    }
+    body.append(row);
+  } else {
+    for (const cell of cells) {
+      const row = document.createElement("tr");
+      const clone = cell.cloneNode(true) as HTMLTableCellElement;
+      clone.style.width = `${firstRect.width}px`;
+      clone.style.height = `${cell.getBoundingClientRect().height}px`;
+      row.append(clone);
+      body.append(row);
+    }
+  }
+
+  const preview = document.createElement("div");
+  preview.className = "EditorTheme__tableDragPreview";
+  preview.dataset.tableDragPreview = axis;
+  preview.setAttribute("aria-hidden", "true");
+  preview.style.top = `${firstRect.top - anchorRect.top}px`;
+  preview.style.left = `${firstRect.left - anchorRect.left}px`;
+  preview.append(copy);
+  anchor.append(preview);
+  return preview;
+}
+
 /*
  * Handle sizing lives in the className of each button, measured off Notion's
  * own `notion-simple-table-selector`: an 18x6 bar with a 4px radius, centred on
@@ -930,6 +998,12 @@ function TableCellActionMenuInner({
     const origin = { x: event.clientX, y: event.clientY };
     let dragging = false;
     const handlers = () => dragHandlers[axis];
+    const index =
+      axis === "row"
+        ? focusedCellState?.rowIndex
+        : focusedCellState?.columnIndex;
+    let preview: HTMLElement | null = null;
+    let faded: HTMLTableCellElement[] = [];
 
     const onMove = (move: PointerEvent) => {
       if (!dragging) {
@@ -940,6 +1014,17 @@ function TableCellActionMenuInner({
         if (travel < DRAG_THRESHOLD_PX) return;
         dragging = true;
         handlers().start();
+        if (focusedTable && index !== undefined) {
+          preview = createDragPreview(focusedTable, axis, index, anchorElem);
+          faded = draggedCells(focusedTable, axis, index);
+          for (const cell of faded) cell.dataset.tableDragOrigin = "";
+        }
+      }
+      if (preview) {
+        preview.style.transform =
+          axis === "row"
+            ? `translateY(${move.clientY - origin.y}px)`
+            : `translateX(${move.clientX - origin.x}px)`;
       }
       handlers().over(move);
     };
@@ -947,6 +1032,8 @@ function TableCellActionMenuInner({
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
       document.removeEventListener("pointercancel", onCancel);
+      preview?.remove();
+      for (const cell of faded) delete cell.dataset.tableDragOrigin;
       if (!dragging) return;
       suppressClickReference.current = true;
       if (drop) handlers().drop(end);

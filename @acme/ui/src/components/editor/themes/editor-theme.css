@@ -509,6 +509,27 @@
     box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 15%, transparent);
   }
 
+  /* The row or column being dragged: a copy following the pointer, the
+     original faded where it is (plugins/table-cell-action-menu-plugin.tsx). */
+  .EditorTheme__tableDragPreview {
+    position: absolute;
+    z-index: 44;
+    pointer-events: none;
+    opacity: 0.85;
+    background-color: var(--background);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 0.18);
+  }
+
+  .EditorTheme__tableDragPreview > table {
+    margin: 0;
+    width: auto;
+    table-layout: fixed;
+  }
+
+  [data-table-drag-origin] {
+    opacity: 0.35;
+  }
+
   @media (max-width: 640px) {
     .RichTextSemanticContract__code {
       font-size: 13px;
