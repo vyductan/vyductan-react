@@ -28,6 +28,11 @@ import {
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
 import { CALLOUT, DETAILS } from "./markdown-nfm-blocks-transformer";
+import {
+  NFM_BLOCK_COLOR_EXPORT,
+  NFM_BLOCK_COLOR_IMPORT,
+  NFM_SPAN,
+} from "./markdown-nfm-colors-transformer";
 import { NFM_TABLE } from "./markdown-nfm-table-transformer";
 import {
   NFM_RAW_BLOCK,
@@ -147,12 +152,17 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
  * run of paragraphs.
  */
 export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
+  // First: a colored block is written by it, before HEADING/QUOTE/paragraph.
+  NFM_BLOCK_COLOR_EXPORT,
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
   // Before NFM_RAW_BLOCK, which keeps the <table>s this declines.
   NFM_TABLE,
   NFM_RAW_BLOCK,
+  // Before NFM_RAW_INLINE, which keeps the spans these decline.
+  NFM_SPAN,
+  NFM_BLOCK_COLOR_IMPORT,
   NFM_RAW_INLINE,
   ...MULTILINE_ELEMENT_TRANSFORMERS,
 ];

@@ -5,15 +5,22 @@ import { $createCodeNode } from "@lexical/code";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  $isQuoteNode,
+} from "@lexical/rich-text";
 import {
   $createParagraphNode,
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
   $getSelection,
   $isElementNode,
+  $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
+  $setState,
   COPY_COMMAND,
 } from "lexical";
 import { GripVerticalIcon, PlusIcon } from "lucide-react";
@@ -36,6 +43,11 @@ import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
 import { $createCheckBlockNode } from "../nodes/check-block-node";
+import {
+  blockColorState,
+  cssForNotionColor,
+  NOTION_COLOR_NAMES,
+} from "../transformers/markdown-nfm-colors-transformer";
 import {
   $lineOf,
   $selectedBlocks,
@@ -83,6 +95,28 @@ export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
 }
 
 /**
+ * The block colors "Color" offers, as Notion names them (see
+ * transformers/markdown-nfm-colors-transformer.ts): text colors, then
+ * backgrounds. Only paragraphs, headings and quotes take one — the blocks
+ * whose color Notion-flavored Markdown can carry back.
+ */
+const BLOCK_COLORS: { color: string | null; label: string }[] = [
+  { color: null, label: "Default" },
+  ...NOTION_COLOR_NAMES.map((name) => ({
+    color: name,
+    label: name[0]!.toUpperCase() + name.slice(1),
+  })),
+  ...NOTION_COLOR_NAMES.map((name) => ({
+    color: `${name}_bg`,
+    label: `${name[0]!.toUpperCase() + name.slice(1)} background`,
+  })),
+];
+
+function $isColorable(node: LexicalNode | null): node is LexicalNode {
+  return $isParagraphNode(node) || $isHeadingNode(node) || $isQuoteNode(node);
+}
+
+/**
  * What "Turn into" offers, each with the icon and name the slash menu gives
  * it — so a type reads the same wherever it is chosen, and is picked out at a
  * glance rather than read. Notion's order.
@@ -117,6 +151,9 @@ export function DraggableBlockPlugin({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTurnIntoOpen, setIsTurnIntoOpen] = useState(false);
+  const [isColorOpen, setIsColorOpen] = useState(false);
+  // The block the menu is open on can take a color (see BLOCK_COLORS).
+  const [canColor, setCanColor] = useState(false);
   /**
    * Mirrors the two above for the mousemove listener, which is bound once and
    * would otherwise close over their first values. Synced in an effect rather
@@ -125,8 +162,9 @@ export function DraggableBlockPlugin({
    */
   const isMenuShowingReference = useRef(false);
   useEffect(() => {
-    isMenuShowingReference.current = isMenuOpen || isTurnIntoOpen;
-  }, [isMenuOpen, isTurnIntoOpen]);
+    isMenuShowingReference.current =
+      isMenuOpen || isTurnIntoOpen || isColorOpen;
+  }, [isMenuOpen, isTurnIntoOpen, isColorOpen]);
   const turnIntoAnchorReference = useRef<HTMLDivElement>(null);
 
   /**
@@ -147,25 +185,34 @@ export function DraggableBlockPlugin({
     height: number;
   } | null>(null);
 
-  const handleMenuOpenChange = useCallback((next: boolean) => {
-    if (next) {
-      const rect = menuReference.current?.getBoundingClientRect();
-      if (rect) {
-        setAnchorBox({
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height,
-        });
+  const handleMenuOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        const rect = menuReference.current?.getBoundingClientRect();
+        if (rect) {
+          setAnchorBox({
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+          });
+        }
+        const key = currentNodeKeyReference.current;
+        setCanColor(
+          key !== null && editor.read(() => $isColorable($getNodeByKey(key))),
+        );
+      } else {
+        setIsColorOpen(false);
       }
-    }
-    setIsMenuOpen(next);
-  }, []);
+      setIsMenuOpen(next);
+    },
+    [editor],
+  );
 
   const isOnMenu = useCallback(
     (element: HTMLElement): boolean => {
       // 1. Check state ref (primary source of truth)
-      if (isMenuOpen || isTurnIntoOpen) return true;
+      if (isMenuOpen || isTurnIntoOpen || isColorOpen) return true;
 
       // 2. Fallback: Check if the trigger inside the menu indicates it's open
       if (
@@ -183,7 +230,7 @@ export function DraggableBlockPlugin({
         !!element.closest('[data-slot="popover-content"]')
       );
     },
-    [isMenuOpen, isTurnIntoOpen],
+    [isMenuOpen, isTurnIntoOpen, isColorOpen],
   );
 
   // Update currentNodeKey when hovering blocks
@@ -311,6 +358,20 @@ export function DraggableBlockPlugin({
     });
     setIsMenuOpen(false);
   }, [editor]);
+
+  const handleColor = useCallback(
+    (color: string | null) => {
+      const key = currentNodeKeyReference.current;
+      if (!key) return;
+      editor.update(() => {
+        const node = $getNodeByKey(key);
+        if ($isColorable(node)) $setState(node, blockColorState, color);
+      });
+      setIsColorOpen(false);
+      setIsMenuOpen(false);
+    },
+    [editor],
+  );
 
   const handleTurnInto = useCallback(
     (type: string) => {
@@ -479,6 +540,7 @@ export function DraggableBlockPlugin({
                       <CommandItem
                         ref={turnIntoAnchorReference}
                         onMouseEnter={() => {
+                          setIsColorOpen(false);
                           setIsTurnIntoOpen(true);
                         }}
                         onSelect={() => {
@@ -520,6 +582,64 @@ export function DraggableBlockPlugin({
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  {canColor && (
+                    <Popover open={isColorOpen} onOpenChange={setIsColorOpen}>
+                      <PopoverTrigger asChild>
+                        <CommandItem
+                          onMouseEnter={() => {
+                            setIsTurnIntoOpen(false);
+                            setIsColorOpen(true);
+                          }}
+                          onSelect={() => setIsColorOpen(true)}
+                        >
+                          <span>Color</span>
+                          <span className="ml-auto">›</span>
+                        </CommandItem>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="right"
+                        align="start"
+                        sideOffset={0}
+                        collisionPadding={8}
+                        className="w-52 p-0"
+                      >
+                        <Command>
+                          <CommandList className="max-h-80">
+                            <CommandGroup>
+                              {BLOCK_COLORS.map(({ color, label }) => {
+                                const css = color
+                                  ? cssForNotionColor(color)
+                                  : undefined;
+                                return (
+                                  <CommandItem
+                                    key={label}
+                                    onSelect={() => handleColor(color)}
+                                  >
+                                    <span
+                                      aria-hidden
+                                      className="border-border inline-flex size-5 items-center justify-center rounded border text-xs font-medium"
+                                      style={
+                                        css
+                                          ? {
+                                              [css.property === "color"
+                                                ? "color"
+                                                : "backgroundColor"]: css.value,
+                                            }
+                                          : undefined
+                                      }
+                                    >
+                                      A
+                                    </span>
+                                    {label}
+                                  </CommandItem>
+                                );
+                              })}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  )}
                   <CommandItem onSelect={handleDelete}>
                     <span className="text-red-500">Delete</span>
                   </CommandItem>
@@ -535,11 +655,14 @@ export function DraggableBlockPlugin({
     handleDelete,
     handleDuplicate,
     handleTurnInto,
+    handleColor,
     handleAddBlockBelow,
     handleMenuOpenChange,
     anchorBox,
     isMenuOpen,
     isTurnIntoOpen,
+    isColorOpen,
+    canColor,
     size,
   ]);
 

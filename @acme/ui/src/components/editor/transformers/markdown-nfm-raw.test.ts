@@ -88,8 +88,10 @@ describe("Notion-only inline markup", () => {
       '<mention-page url="https://www.notion.so/p">Plan</mention-page>',
     ],
     ["a date mention", '<mention-date start="2026-10-02"/>'],
-    ["a colored span", '<span color="red">hot</span>'],
-    ["an underlined span", '<span underline="true">under</span>'],
+    // A plain colored or underlined span is editable text now
+    // (markdown-nfm-colors.test.ts); one with markdown inside stays raw.
+    ["a colored span with markdown inside", '<span color="red">**hot**</span>'],
+    ["a span in a color Notion lacks", '<span color="teal">odd</span>'],
   ] as const) {
     test(`keeps ${name} as a raw inline chip in its line`, () => {
       const markdown = `Ask ${markup} today`;

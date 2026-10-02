@@ -289,6 +289,79 @@
     background-color: color-mix(in oklab, #d44c47 18%, transparent);
   }
 
+  /*
+   * Block colors (plugins/block-color-plugin.tsx): Notion's, by name, the
+   * values markdown-nfm-colors-transformer.ts reads a color into. A
+   * background gets a little room so the tint does not sit flush on the text.
+   */
+  [data-block-color$="_bg"] {
+    border-radius: 3px;
+    padding-inline: 2px;
+  }
+
+  [data-block-color="gray"] {
+    color: #6b7280;
+  }
+  [data-block-color="gray_bg"] {
+    background-color: rgba(107, 114, 128, 0.25);
+  }
+
+  [data-block-color="brown"] {
+    color: #b45309;
+  }
+  [data-block-color="brown_bg"] {
+    background-color: rgba(180, 83, 9, 0.25);
+  }
+
+  [data-block-color="orange"] {
+    color: #ea580c;
+  }
+  [data-block-color="orange_bg"] {
+    background-color: rgba(234, 88, 12, 0.25);
+  }
+
+  [data-block-color="yellow"] {
+    color: #ca8a04;
+  }
+  [data-block-color="yellow_bg"] {
+    background-color: rgba(202, 138, 4, 0.25);
+  }
+
+  [data-block-color="green"] {
+    color: #16a34a;
+  }
+  [data-block-color="green_bg"] {
+    background-color: rgba(22, 163, 74, 0.25);
+  }
+
+  [data-block-color="blue"] {
+    color: #2563eb;
+  }
+  [data-block-color="blue_bg"] {
+    background-color: rgba(37, 99, 235, 0.25);
+  }
+
+  [data-block-color="purple"] {
+    color: #9333ea;
+  }
+  [data-block-color="purple_bg"] {
+    background-color: rgba(147, 51, 234, 0.25);
+  }
+
+  [data-block-color="pink"] {
+    color: #db2777;
+  }
+  [data-block-color="pink_bg"] {
+    background-color: rgba(219, 39, 119, 0.25);
+  }
+
+  [data-block-color="red"] {
+    color: #dc2626;
+  }
+  [data-block-color="red_bg"] {
+    background-color: rgba(220, 38, 38, 0.25);
+  }
+
   .RichTextSemanticContract__tableCell {
     border: 1px solid var(--border);
     padding: 8px 12px;
