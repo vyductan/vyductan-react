@@ -1136,6 +1136,10 @@ function TableCellActionMenuInner({
           zIndex: 50,
         }}
       >
+        {/* The menu's trigger is this stand-in over the handle, not the handle:
+            a dropdown trigger opens on pointerdown and cancels it, and a
+            cancelled pointerdown never becomes a drag. The handle opens the
+            menu on click, as Notion's does, and is free to be dragged. */}
         <Dropdown
           open={openMenu === "row"}
           onOpenChange={(open) => {
@@ -1145,41 +1149,49 @@ function TableCellActionMenuInner({
           menu={rowMenu}
           placement="bottomLeft"
         >
-          <Button
-            type="button"
-            variant="ghost"
-            aria-label="Row actions"
-            draggable
-            className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
-            onMouseEnter={() => setActiveAxis("row")}
-            onMouseLeave={() => {
-              if (openMenu !== "row" && !dragState) {
-                setActiveAxis(null);
-              }
-            }}
-            onClick={() => {
-              setActiveAxis("row");
-              setOpenMenu((current) => (current === "row" ? null : "row"));
-            }}
-            onDragStart={handleRowDragStart}
-            onDragOver={handleRowButtonDragOver}
-            onDrop={handleRowButtonDrop}
-            onDragEnd={clearDragState}
-            data-table-row-index={rowIndex}
-          >
-            {/* A bar at rest, the grip once the pointer is on it. Notion's own
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+          />
+        </Dropdown>
+        <Button
+          type="button"
+          variant="ghost"
+          aria-label="Row actions"
+          // What the dropdown trigger used to say about its menu.
+          aria-haspopup="menu"
+          aria-expanded={openMenu === "row"}
+          data-state={openMenu === "row" ? "open" : "closed"}
+          draggable
+          className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
+          onMouseEnter={() => setActiveAxis("row")}
+          onMouseLeave={() => {
+            if (openMenu !== "row" && !dragState) {
+              setActiveAxis(null);
+            }
+          }}
+          onClick={() => {
+            setActiveAxis("row");
+            setOpenMenu((current) => (current === "row" ? null : "row"));
+          }}
+          onDragStart={handleRowDragStart}
+          onDragOver={handleRowButtonDragOver}
+          onDrop={handleRowButtonDrop}
+          onDragEnd={clearDragState}
+          data-table-row-index={rowIndex}
+        >
+          {/* A bar at rest, the grip once the pointer is on it. Notion's own
                 bar measures 18x6 at r4; ours is deliberately half as thick
                 because our cells are narrower (96px vs Notion's 150px), so the
                 same bar reads heavier against them. MAX_HANDLE_BAR_THICKNESS in
                 editor-table-action-menu.stories.tsx pins this. */}
-            <span
-              aria-hidden="true"
-              data-slot="table-handle-bar"
-              className="bg-muted-foreground/70 h-[18px] w-[3px] shrink-0 rounded-full group-hover/handle:hidden"
-            />
-            <GripVertical className="hidden size-3.5 group-hover/handle:block" />
-          </Button>
-        </Dropdown>
+          <span
+            aria-hidden="true"
+            data-slot="table-handle-bar"
+            className="bg-muted-foreground/70 h-[18px] w-[3px] shrink-0 rounded-full group-hover/handle:hidden"
+          />
+          <GripVertical className="hidden size-3.5 group-hover/handle:block" />
+        </Button>
       </div>
       <div
         style={{
@@ -1192,6 +1204,10 @@ function TableCellActionMenuInner({
           zIndex: 50,
         }}
       >
+        {/* The menu's trigger is this stand-in over the handle, not the handle:
+            a dropdown trigger opens on pointerdown and cancels it, and a
+            cancelled pointerdown never becomes a drag. The handle opens the
+            menu on click, as Notion's does, and is free to be dragged. */}
         <Dropdown
           open={openMenu === "column"}
           onOpenChange={(open) => {
@@ -1201,43 +1217,49 @@ function TableCellActionMenuInner({
           menu={columnMenu}
           placement="bottomLeft"
         >
-          <Button
-            type="button"
-            variant="ghost"
-            aria-label="Column actions"
-            draggable
-            className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
-            onMouseEnter={() => setActiveAxis("column")}
-            onMouseLeave={() => {
-              if (openMenu !== "column" && !dragState) {
-                setActiveAxis(null);
-              }
-            }}
-            onClick={() => {
-              setActiveAxis("column");
-              setOpenMenu((current) =>
-                current === "column" ? null : "column",
-              );
-            }}
-            onDragStart={handleColumnDragStart}
-            onDragOver={handleColumnButtonDragOver}
-            onDrop={handleColumnButtonDrop}
-            onDragEnd={clearDragState}
-            data-table-column-index={columnIndex}
-          >
-            {/* A bar at rest, the grip once the pointer is on it. Notion's own
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+          />
+        </Dropdown>
+        <Button
+          type="button"
+          variant="ghost"
+          aria-label="Column actions"
+          // What the dropdown trigger used to say about its menu.
+          aria-haspopup="menu"
+          aria-expanded={openMenu === "column"}
+          data-state={openMenu === "column" ? "open" : "closed"}
+          draggable
+          className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
+          onMouseEnter={() => setActiveAxis("column")}
+          onMouseLeave={() => {
+            if (openMenu !== "column" && !dragState) {
+              setActiveAxis(null);
+            }
+          }}
+          onClick={() => {
+            setActiveAxis("column");
+            setOpenMenu((current) => (current === "column" ? null : "column"));
+          }}
+          onDragStart={handleColumnDragStart}
+          onDragOver={handleColumnButtonDragOver}
+          onDrop={handleColumnButtonDrop}
+          onDragEnd={clearDragState}
+          data-table-column-index={columnIndex}
+        >
+          {/* A bar at rest, the grip once the pointer is on it. Notion's own
                 bar measures 18x6 at r4; ours is deliberately half as thick
                 because our cells are narrower (96px vs Notion's 150px), so the
                 same bar reads heavier against them. MAX_HANDLE_BAR_THICKNESS in
                 editor-table-action-menu.stories.tsx pins this. */}
-            <span
-              aria-hidden="true"
-              data-slot="table-handle-bar"
-              className="bg-muted-foreground/70 h-[3px] w-[18px] shrink-0 rounded-full group-hover/handle:hidden"
-            />
-            <GripHorizontal className="hidden size-3.5 group-hover/handle:block" />
-          </Button>
-        </Dropdown>
+          <span
+            aria-hidden="true"
+            data-slot="table-handle-bar"
+            className="bg-muted-foreground/70 h-[3px] w-[18px] shrink-0 rounded-full group-hover/handle:hidden"
+          />
+          <GripHorizontal className="hidden size-3.5 group-hover/handle:block" />
+        </Button>
       </div>
     </>,
     anchorElem,
