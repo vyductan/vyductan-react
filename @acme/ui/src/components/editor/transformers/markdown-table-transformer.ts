@@ -43,12 +43,7 @@ export const TABLE: ElementTransformer = {
       for (const cell of row.getChildren()) {
         // It's TableCellNode so it's just to make flow happy
         if ($isTableCellNode(cell)) {
-          rowOutput.push(
-            $convertToMarkdownString(MARKDOWN_TRANSFORMERS, cell).replaceAll(
-              "\n",
-              String.raw`\n`,
-            ),
-          );
+          rowOutput.push($exportTableCell(cell));
           if (cell.__headerState === TableCellHeaderStates.ROW) {
             isHeaderRow = true;
           }
@@ -166,10 +161,39 @@ function getTableColumnsSize(table: TableNode) {
   return $isTableRowNode(row) ? row.getChildrenSize() : 0;
 }
 
+/*
+ * GFM has no block content in table cells. The common reading — GitHub, VS
+ * Code, AI-written tables — is `<br>` for a line break, and `• a<br>• b` for
+ * a list. Cells are written that way and read back the same. The literal
+ * `\n` Lexical's playground used is still read, for content saved with it.
+ */
+const CELL_LINE_BREAK = /<br\s*\/?>|\\n/gi;
+const UNESCAPED_PIPE = /(?<!\\)\|/g;
+// `- [ ] x` is a check item, not a bullet: keep its `-`.
+const CELL_BULLET_EXPORT = /^(\s*)[-*+] (?!\[[ x]\] )/i;
+const CELL_BULLET_IMPORT = /^(\s*)• ?/;
+
+const $exportTableCell = (cell: TableCellNode): string =>
+  $convertToMarkdownString(MARKDOWN_TRANSFORMERS, cell)
+    .split("\n")
+    .filter((line) => line.trim() !== "")
+    .map((line) =>
+      line
+        .trimEnd()
+        .replace(CELL_BULLET_EXPORT, "$1• ")
+        .replaceAll(UNESCAPED_PIPE, String.raw`\|`),
+    )
+    .join("<br>");
+
 const $createTableCell = (textContent: string): TableCellNode => {
-  textContent = textContent.replaceAll(String.raw`\n`, "\n");
+  const markdown = textContent
+    .trim()
+    .replaceAll(String.raw`\|`, "|")
+    .split(CELL_LINE_BREAK)
+    .map((line) => line.trimEnd().replace(CELL_BULLET_IMPORT, "$1- "))
+    .join("\n");
   const cell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
-  $convertFromMarkdownString(textContent, MARKDOWN_TRANSFORMERS, cell);
+  $convertFromMarkdownString(markdown, MARKDOWN_TRANSFORMERS, cell);
   return cell;
 };
 
@@ -178,5 +202,5 @@ const mapToTableCells = (textContent: string): Array<TableCellNode> | null => {
   if (!match?.[1]) {
     return null;
   }
-  return match[1].split("|").map((text) => $createTableCell(text));
+  return match[1].split(UNESCAPED_PIPE).map((text) => $createTableCell(text));
 };
