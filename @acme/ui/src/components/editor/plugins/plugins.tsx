@@ -26,6 +26,7 @@ import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
 import { BlockSelectionPlugin } from "../plugins/block-selection-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
 import { BlockColorPlugin } from "../plugins/block-color-plugin";
+import { SelectLineFirstPlugin } from "../plugins/select-line-first-plugin";
 import { CalloutPickerPlugin } from "../plugins/callout-picker-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
@@ -308,6 +309,7 @@ export function Plugins({
       {editable && <EmojiPickerPlugin />}
       {editable && <CalloutPickerPlugin />}
       <BlockColorPlugin />
+      <SelectLineFirstPlugin />
 
       {editable && (
         <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />
