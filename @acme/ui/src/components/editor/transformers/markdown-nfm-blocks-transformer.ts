@@ -25,6 +25,16 @@ import {
   $isCollapsibleTitleNode,
   CollapsibleTitleNode,
 } from "../nodes/collapsible-title-node";
+import {
+  $createLayoutContainerNode,
+  $isLayoutContainerNode,
+  LayoutContainerNode,
+} from "../nodes/layout-container-node";
+import {
+  $createLayoutItemNode,
+  $isLayoutItemNode,
+  LayoutItemNode,
+} from "../nodes/layout-item-node";
 import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "./markdown-transformers";
 
 /*
@@ -172,6 +182,78 @@ export const CALLOUT: MultilineElementTransformer = {
     return [true, end];
   },
   regExpStart: CALLOUT_START,
+  replace: () => false,
+  type: "multiline-element",
+};
+
+/*
+ * Columns, read into the editor's column layout:
+ *
+ *   <columns>
+ *   	<column>
+ *   		blocks, two tabs deep
+ *   	</column>
+ *   </columns>
+ *
+ * Notion's markup has no widths, so columns read in equal (the editor's own
+ * widths are not written). Only bare tags: a <column> with attributes is
+ * left to NFM_RAW_BLOCK and kept as a chip.
+ */
+const COLUMN_OPEN = "\t<column>";
+const COLUMN_CLOSE = "\t</column>";
+
+/** Each column's lines, two tabs taken off; null for anything else. */
+function readColumns(lines: string[]): string[][] | null {
+  const result: string[][] = [];
+  let column: string[] | undefined;
+  for (const line of lines) {
+    if (!column) {
+      if (line === COLUMN_OPEN) column = [];
+      else if (line.trim() !== "") return null;
+    } else if (line === COLUMN_CLOSE) {
+      result.push(column);
+      column = undefined;
+    } else if (line === "" || line.startsWith("\t\t")) {
+      column.push(line.slice(2));
+    } else {
+      return null;
+    }
+  }
+  return column || result.length === 0 ? null : result;
+}
+
+export const NFM_COLUMNS: MultilineElementTransformer = {
+  dependencies: [LayoutContainerNode, LayoutItemNode],
+  export: (node) => {
+    if (!$isLayoutContainerNode(node)) return null;
+    const columns = node.getChildren().filter($isLayoutItemNode);
+    return [
+      "<columns>",
+      ...columns.flatMap((column) => {
+        const body = indent(indent($exportBlocks(column)));
+        return [COLUMN_OPEN, ...(body ? [body] : []), COLUMN_CLOSE];
+      }),
+      "</columns>",
+    ].join("\n");
+  },
+  handleImportAfterStartMatch: ({ lines, rootNode, startLineIndex }) => {
+    const end = findClosingLine(lines, startLineIndex, "columns");
+    if (end === -1) return null;
+    const columns = readColumns(lines.slice(startLineIndex + 1, end));
+    if (!columns) return null;
+
+    const layout = $createLayoutContainerNode(
+      columns.map(() => "1fr").join(" "),
+    );
+    for (const column of columns) {
+      const item = $createLayoutItemNode();
+      $importBlocks(column.join("\n"), item);
+      layout.append(item);
+    }
+    rootNode.append(layout);
+    return [true, end];
+  },
+  regExpStart: /^<columns>$/,
   replace: () => false,
   type: "multiline-element",
 };

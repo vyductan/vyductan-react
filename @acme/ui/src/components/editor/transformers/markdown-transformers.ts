@@ -27,7 +27,11 @@ import {
   IMAGE_ELEMENT,
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
-import { CALLOUT, DETAILS } from "./markdown-nfm-blocks-transformer";
+import {
+  CALLOUT,
+  DETAILS,
+  NFM_COLUMNS,
+} from "./markdown-nfm-blocks-transformer";
 import {
   NFM_BLOCK_COLOR_EXPORT,
   NFM_BLOCK_COLOR_IMPORT,
@@ -157,8 +161,9 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
-  // Before NFM_RAW_BLOCK, which keeps the <table>s this declines.
+  // Before NFM_RAW_BLOCK, which keeps the <table>s and <columns> these decline.
   NFM_TABLE,
+  NFM_COLUMNS,
   NFM_RAW_BLOCK,
   // Before NFM_RAW_INLINE, which keeps the spans these decline.
   NFM_SPAN,

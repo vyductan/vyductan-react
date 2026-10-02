@@ -46,9 +46,10 @@ describe("Notion-only blocks", () => {
       "a Notion table with colors",
       '<table header-row="true">\n\t<tr color="blue_bg">\n\t\t<td>a</td>\n\t\t<td>b</td>\n\t</tr>\n</table>',
     ],
+    // Bare columns read into the editor's layout (markdown-nfm-columns.test.ts).
     [
-      "columns",
-      "<columns>\n\t<column>\n\t\tLeft\n\t</column>\n\t<column>\n\t\tRight\n\t</column>\n</columns>",
+      "columns with attributes",
+      '<columns>\n\t<column width="0.4">\n\t\tLeft\n\t</column>\n\t<column>\n\t\tRight\n\t</column>\n</columns>',
     ],
     [
       "a synced block",

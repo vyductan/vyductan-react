@@ -143,3 +143,24 @@ test("a pasted plain Notion table is a real table, not a chip", async () => {
   ]);
   expect(table.querySelector("tr")?.querySelector("th")).not.toBeNull();
 });
+
+/** Notion columns come in as the editor's own column layout. */
+test("pasted Notion columns are a column layout, not a chip", async () => {
+  const { contentEditable } = await pasteIntoEmptyEditor({
+    "text/plain":
+      "<columns>\n\t<column>\n\t\tLeft\n\t</column>\n\t<column>\n\t\tRight\n\t</column>\n</columns>",
+  });
+
+  const layout = await waitFor(() => {
+    const node = contentEditable.querySelector<HTMLElement>(
+      '[style*="grid-template-columns"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(contentEditable.querySelector(".NfmRaw--block")).toBeNull();
+  expect(
+    [...layout.children].map((column) => column.textContent),
+  ).toStrictEqual(["Left", "Right"]);
+  expect(getComputedStyle(layout).display).toBe("grid");
+});
