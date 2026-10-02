@@ -52,7 +52,8 @@ export type ComposerProps = {
   /**
    * `small` tightens the padding between the border and the text, and the
    * buttons with it — for a composer in a narrow card or on a phone. The text
-   * size is the editor's own and does not change.
+   * size is the editor's own and does not change — except on a touch device,
+   * where the box types at 16px at every size so iOS does not zoom on focus.
    */
   size?: "small" | "middle";
   /**
@@ -234,6 +235,12 @@ export function Composer({
                   "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
                   // The leading control already holds the left edge.
                   leading && (isSmall ? "pl-1.5" : "pl-2"),
+                  // iOS Safari zooms the page in when a focused field's text
+                  // is under 16px, and the editor draws 14px. On touch the
+                  // box types at 16px instead — the fix Input's own text
+                  // takes — rather than locking the viewport's zoom, which
+                  // would take pinch-zoom away from everyone.
+                  "any-pointer-coarse:text-base",
                 ),
                 // One line: a long hint wrapped under a one-line box and was
                 // cut in half at its bottom edge.
