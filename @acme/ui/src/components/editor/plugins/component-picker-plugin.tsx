@@ -76,7 +76,7 @@ import { InsertImageDialog } from "../plugins/images-plugin";
 import { InsertLayoutDialog } from "../plugins/layout-plugin";
 import { INSERT_PAGE_BREAK } from "../plugins/page-break-plugin";
 import { InsertPollDialog } from "../plugins/poll-plugin";
-import { InsertTableDialog } from "../plugins/table-plugin";
+import { insertDefaultTable } from "../plugins/table-plugin";
 import { INSERT_TOC_COMMAND } from "../plugins/toc-plugin";
 import { InsertVideoDialog } from "../plugins/video-plugin";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
@@ -284,10 +284,9 @@ function getBaseOptions(
       option: new ComponentPickerOption("Table", {
         icon: <TableIcon className="size-4" />,
         keywords: ["table", "grid", "spreadsheet", "rows", "columns"],
-        onSelect: () =>
-          showModal("Insert Table", (onClose) => (
-            <InsertTableDialog activeEditor={editor} onClose={onClose} />
-          )),
+        // Another size is typed after the slash: "/2x5".
+        keyboardShortcut: "3x3",
+        onSelect: () => insertDefaultTable(editor),
       }),
     },
     {

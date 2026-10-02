@@ -1,6 +1,5 @@
 "use client";
 
-/* eslint-disable react-hooks/set-state-in-effect */
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -24,11 +23,6 @@ import {
   TableNode,
 } from "@lexical/table";
 import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
-
-import { Button } from "@acme/ui/components/button";
-import { Input } from "@acme/ui/components/input";
-import { Label } from "@acme/ui/components/label";
-import { DialogFooter } from "@acme/ui/components/modal";
 
 import { invariant } from "../shared/invariant";
 
@@ -92,69 +86,15 @@ export function TableContext({ children }: { children: JSX.Element }) {
   );
 }
 
-export function InsertTableDialog({
-  activeEditor,
-  onClose,
-}: {
-  activeEditor: LexicalEditor;
-  onClose: () => void;
-}): JSX.Element {
-  const [rows, setRows] = useState("5");
-  const [columns, setColumns] = useState("5");
-  const [isDisabled, setIsDisabled] = useState(true);
+/**
+ * Inserting a table asks nothing, like Notion: a 3×3 table goes in with the
+ * caret in its first cell, and rows and columns are added later from the
+ * table's "+" handles. Another size is typed into the slash menu: "/2x5".
+ */
+export const DEFAULT_TABLE_SIZE = { columns: "3", rows: "3" } as const;
 
-  useEffect(() => {
-    const row = Number(rows);
-    const column = Number(columns);
-    if (row && row > 0 && row <= 500 && column && column > 0 && column <= 50) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
-    }
-  }, [rows, columns]);
-
-  const onClick = () => {
-    activeEditor.dispatchCommand(INSERT_TABLE_COMMAND, {
-      columns,
-      rows,
-    });
-
-    onClose();
-  };
-
-  return (
-    <>
-      <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="rows">Number of rows</Label>
-          <Input
-            id="rows"
-            placeholder={"# of rows (1-500)"}
-            onChange={(e) => setRows(e.target.value)}
-            value={rows}
-            data-test-id="table-modal-rows"
-            type="number"
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="columns">Number of columns</Label>
-          <Input
-            id="columns"
-            placeholder={"# of columns (1-50)"}
-            onChange={(e) => setColumns(e.target.value)}
-            value={columns}
-            data-test-id="table-modal-columns"
-            type="number"
-          />
-        </div>
-      </div>
-      <DialogFooter data-test-id="table-model-confirm-insert">
-        <Button disabled={isDisabled} onClick={onClick}>
-          Confirm
-        </Button>
-      </DialogFooter>
-    </>
-  );
+export function insertDefaultTable(editor: LexicalEditor): void {
+  editor.dispatchCommand(INSERT_TABLE_COMMAND, DEFAULT_TABLE_SIZE);
 }
 
 export function TablePlugin({
