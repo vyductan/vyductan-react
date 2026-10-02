@@ -27,6 +27,7 @@ import {
   IMAGE_ELEMENT,
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
+import { CALLOUT, DETAILS } from "./markdown-nfm-blocks-transformer";
 
 export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   TABLE,
@@ -141,5 +142,7 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
  */
 export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   ...MARKDOWN_TRANSFORMERS,
+  DETAILS,
+  CALLOUT,
   ...MULTILINE_ELEMENT_TRANSFORMERS,
 ];

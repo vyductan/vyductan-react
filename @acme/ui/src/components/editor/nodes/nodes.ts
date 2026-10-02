@@ -10,6 +10,7 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ParagraphNode, TextNode } from "lexical";
 
 import { AutocompleteNode } from "../nodes/autocomplete-node";
+import { CalloutNode } from "../nodes/callout-node";
 import { CheckBlockNode } from "../nodes/check-block-node";
 import { CollapsibleContainerNode } from "../nodes/collapsible-container-node";
 import { CollapsibleContentNode } from "../nodes/collapsible-content-node";
@@ -66,6 +67,7 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     CollapsibleContainerNode,
     CollapsibleContentNode,
     CollapsibleTitleNode,
+    CalloutNode,
     TOCNode,
     AutoLinkNode,
     FigmaNode,

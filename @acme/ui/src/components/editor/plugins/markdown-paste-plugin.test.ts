@@ -157,3 +157,23 @@ describe("normalizeLetteredListItems", () => {
     expect(normalizeLetteredListItems?.(text)).toBe(text);
   });
 });
+
+describe("hasMarkdownPasteSyntax on Notion toggles and callouts", () => {
+  const hasMarkdownPasteSyntax = (
+    markdownPastePlugin as Record<string, unknown>
+  ).hasMarkdownPasteSyntax as ((text: string) => boolean) | undefined;
+
+  test.each([
+    ["toggle", "<details><summary>T</summary>\n\tBody\n</details>"],
+    ["callout", '<callout icon="💡">\n\tTip\n</callout>'],
+  ])("takes a %s for markdown", (_name, text) => {
+    expect(hasMarkdownPasteSyntax?.(text)).toBe(true);
+  });
+
+  test.each([
+    ["a sentence mentioning the tag", "Use <details> for a toggle."],
+    ["an opening tag never closed", "<callout>\nnot finished"],
+  ])("leaves %s as text", (_name, text) => {
+    expect(hasMarkdownPasteSyntax?.(text)).toBe(false);
+  });
+});

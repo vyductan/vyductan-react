@@ -60,6 +60,102 @@
     min-width: 6rem;
   }
 
+  /*
+   * Callout (nodes/callout-node.ts): Notion's tinted box. The icon comes from
+   * data-icon, so it is not a node the caret can land in; data-color takes
+   * Notion's color names, "<name>_bg" tinting the box and "<name>" the text.
+   */
+  .Callout {
+    position: relative;
+    margin: 4px 0;
+    padding: 12px 16px 12px 2.75rem;
+    border-radius: 4px;
+    background-color: var(--muted);
+  }
+
+  .Callout[data-icon=""] {
+    padding-left: 16px;
+  }
+
+  .Callout::before {
+    content: attr(data-icon);
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    line-height: inherit;
+  }
+
+  .Callout > :first-child {
+    margin-top: 0;
+  }
+
+  .Callout > :last-child {
+    margin-bottom: 0;
+  }
+
+  .Callout[data-color="gray_bg"] {
+    background-color: color-mix(in oklab, #787774 16%, transparent);
+  }
+  .Callout[data-color="gray"] {
+    color: #787774;
+  }
+
+  .Callout[data-color="brown_bg"] {
+    background-color: color-mix(in oklab, #9f6b53 16%, transparent);
+  }
+  .Callout[data-color="brown"] {
+    color: #9f6b53;
+  }
+
+  .Callout[data-color="orange_bg"] {
+    background-color: color-mix(in oklab, #d9730d 16%, transparent);
+  }
+  .Callout[data-color="orange"] {
+    color: #d9730d;
+  }
+
+  .Callout[data-color="yellow_bg"] {
+    background-color: color-mix(in oklab, #cb912f 16%, transparent);
+  }
+  .Callout[data-color="yellow"] {
+    color: #cb912f;
+  }
+
+  .Callout[data-color="green_bg"] {
+    background-color: color-mix(in oklab, #448361 16%, transparent);
+  }
+  .Callout[data-color="green"] {
+    color: #448361;
+  }
+
+  .Callout[data-color="blue_bg"] {
+    background-color: color-mix(in oklab, #337ea9 16%, transparent);
+  }
+  .Callout[data-color="blue"] {
+    color: #337ea9;
+  }
+
+  .Callout[data-color="purple_bg"] {
+    background-color: color-mix(in oklab, #9065b0 16%, transparent);
+  }
+  .Callout[data-color="purple"] {
+    color: #9065b0;
+  }
+
+  .Callout[data-color="pink_bg"] {
+    background-color: color-mix(in oklab, #c14c8a 16%, transparent);
+  }
+  .Callout[data-color="pink"] {
+    color: #c14c8a;
+  }
+
+  .Callout[data-color="red_bg"] {
+    background-color: color-mix(in oklab, #d44c47 16%, transparent);
+  }
+  .Callout[data-color="red"] {
+    color: #d44c47;
+  }
+
   .RichTextSemanticContract__tableCell {
     border: 1px solid var(--border);
     padding: 8px 12px;

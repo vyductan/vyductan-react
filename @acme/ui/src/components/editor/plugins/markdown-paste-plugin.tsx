@@ -28,10 +28,19 @@ const MARKDOWN_PASTE_SYNTAX_REGEXP =
  */
 const MARKDOWN_TABLE_DELIMITER_REGEXP = /^(?=[^\n]*\|)(?=[^\n]*-)[\t |:-]+$/m;
 
+/**
+ * A Notion-flavored Markdown toggle or callout (see
+ * transformers/markdown-nfm-blocks-transformer.ts), as Notion's markdown API
+ * writes them. Only with its closing tag on a later line, so prose that
+ * merely mentions `<details>` stays prose.
+ */
+const NFM_BLOCK_REGEXP = /^<(details|callout)[\s>][\s\S]*^\s*<\/\1>\s*$/m;
+
 export function hasMarkdownPasteSyntax(text: string): boolean {
   return (
     MARKDOWN_PASTE_SYNTAX_REGEXP.test(text) ||
-    MARKDOWN_TABLE_DELIMITER_REGEXP.test(text)
+    MARKDOWN_TABLE_DELIMITER_REGEXP.test(text) ||
+    NFM_BLOCK_REGEXP.test(text)
   );
 }
 
