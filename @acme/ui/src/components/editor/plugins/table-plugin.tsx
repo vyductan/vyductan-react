@@ -19,10 +19,18 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $createTableNodeWithDimensions,
+  $isTableNode,
   INSERT_TABLE_COMMAND,
   TableNode,
 } from "@lexical/table";
-import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from "lexical";
+import { $findMatchingParent } from "@lexical/utils";
+import {
+  $getSelection,
+  $insertNodes,
+  $isRangeSelection,
+  COMMAND_PRIORITY_EDITOR,
+  createCommand,
+} from "lexical";
 
 import { invariant } from "../shared/invariant";
 
@@ -93,8 +101,40 @@ export function TableContext({ children }: { children: JSX.Element }) {
  */
 export const DEFAULT_TABLE_SIZE = { columns: "3", rows: "3" } as const;
 
+// A header row, as GFM requires once the table is saved as markdown. No header
+// column: markdown cannot hold one, so a save would quietly drop it.
+const DEFAULT_TABLE_HEADERS = { rows: true, columns: false } as const;
+
 export function insertDefaultTable(editor: LexicalEditor): void {
-  editor.dispatchCommand(INSERT_TABLE_COMMAND, DEFAULT_TABLE_SIZE);
+  editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+    ...DEFAULT_TABLE_SIZE,
+    includeHeaders: DEFAULT_TABLE_HEADERS,
+  });
+
+  // Spread it across the width it has, in equal columns, as Notion does. With
+  // no widths an empty table is sized by its empty content: three narrow
+  // columns. A table someone pastes keeps sizing by what it holds.
+  editor.update(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return;
+    const table = $findMatchingParent(selection.anchor.getNode(), $isTableNode);
+    const parent = table?.getParent();
+    if (!$isTableNode(table) || !parent) return;
+
+    const container = editor.getElementByKey(parent.getKey());
+    if (!container) return;
+    const style = getComputedStyle(container);
+    const available =
+      container.clientWidth -
+      Number.parseFloat(style.paddingLeft) -
+      Number.parseFloat(style.paddingRight);
+    const columns = table.getColumnCount();
+    // The collapsed borders take a pixel or two beyond the columns.
+    const width = Math.floor((available - 2) / columns);
+    if (columns === 0 || width <= 0) return;
+
+    table.setColWidths(Array.from({ length: columns }, () => width));
+  });
 }
 
 export function TablePlugin({

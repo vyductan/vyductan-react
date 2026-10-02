@@ -69,6 +69,35 @@ async function expectThreeByThreeWithCaretInFirstCell() {
     rows.map((row) => row.querySelectorAll("td, th").length),
   ).toStrictEqual([3, 3, 3]);
 
+  // A header row, as GFM requires when the table is saved as markdown; no
+  // header column, which markdown cannot hold and a save would drop.
+  expect(rows.map((row) => row.querySelector("td, th")?.tagName)).toStrictEqual(
+    ["TH", "TD", "TD"],
+  );
+  expect([...rows[0]!.children].map((cell) => cell.tagName)).toStrictEqual([
+    "TH",
+    "TH",
+    "TH",
+  ]);
+
+  // Spread across the width it has, in equal columns, as Notion does —
+  // not three narrow columns sized by their (empty) content.
+  const container = table.closest<HTMLElement>('[contenteditable="true"]')!;
+  const style = getComputedStyle(container);
+  const available =
+    container.clientWidth -
+    Number.parseFloat(style.paddingLeft) -
+    Number.parseFloat(style.paddingRight);
+  await waitFor(() => {
+    const width = table.getBoundingClientRect().width;
+    expect(width).toBeGreaterThan(available * 0.95);
+    expect(width).toBeLessThanOrEqual(available + 1);
+  });
+  const widths = [...rows[0]!.children].map((cell) =>
+    Math.round(cell.getBoundingClientRect().width),
+  );
+  expect(Math.max(...widths) - Math.min(...widths)).toBeLessThanOrEqual(1);
+
   await userEvent.keyboard("hi");
   await waitFor(() =>
     expect(rows[0]?.querySelector("td, th")?.textContent).toBe("hi"),
