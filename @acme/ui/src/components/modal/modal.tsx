@@ -4,8 +4,8 @@ import * as React from "react";
 
 import type { ButtonProps } from "@acme/ui/components/button";
 import { Button } from "@acme/ui/components/button";
-import { cn } from "@acme/ui/lib/utils";
 import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { Breakpoint } from "../_util/responsive-observer";
 import { ScrollArea } from "../scroll-area";
@@ -19,6 +19,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./_components";
+
+const DEFAULT_WIDTH = 520;
+const RESPONSIVE_WIDTH_ORDER: Breakpoint[] = [
+  "xs",
+  "sm",
+  "md",
+  "lg",
+  "xl",
+  "xxl",
+];
 
 type ModalProperties = React.ComponentProps<typeof Dialog> & {
   /** Width of the modal dialog */
@@ -80,7 +90,7 @@ const Modal = ({
   // An explicit `width` still wins over a caller class: the prop is the more
   // specific instruction of the two.
   const callerCapsWidth = /(^|\s)max-w-/.test(className ?? "");
-  const resolvedWidth = width ?? (callerCapsWidth ? undefined : 520);
+  const resolvedWidth = width ?? (callerCapsWidth ? undefined : DEFAULT_WIDTH);
 
   const [numberWidth, responsiveWidth] = React.useMemo<
     [
@@ -94,17 +104,24 @@ const Modal = ({
     return [resolvedWidth, undefined];
   }, [resolvedWidth]);
 
+  // Breakpoints cascade up like Tailwind's mobile-first variants: a breakpoint
+  // the caller skips takes the nearest smaller one, so `{ md: 760, lg: 1000 }`
+  // is 520 at sm, 760 at md, 1000 at lg and up. Every sm..xxl variable
+  // ends up defined, which the per-breakpoint `max-w-*` classes below rely on —
+  // an undefined var would drop that breakpoint's cap altogether. `xs` (phones)
+  // stays unset unless given, leaving DialogContent's full-bleed gutter alone.
   const responsiveWidthVariables = React.useMemo(() => {
     const variables: Record<string, string> = {};
-    if (responsiveWidth) {
-      for (const breakpoint of Object.keys(responsiveWidth)) {
-        const breakpointWidth = responsiveWidth[breakpoint as Breakpoint];
-        if (breakpointWidth !== undefined) {
-          variables[`--modal-${breakpoint}-width`] =
-            typeof breakpointWidth === "number"
-              ? `${breakpointWidth}px`
-              : breakpointWidth;
-        }
+    if (!responsiveWidth) return variables;
+    let current: string | number | undefined;
+    for (const breakpoint of RESPONSIVE_WIDTH_ORDER) {
+      current =
+        responsiveWidth[breakpoint] ??
+        current ??
+        (breakpoint === "sm" ? DEFAULT_WIDTH : undefined);
+      if (current !== undefined) {
+        variables[`--modal-${breakpoint}-width`] =
+          typeof current === "number" ? `${current}px` : current;
       }
     }
     return variables;
@@ -245,6 +262,21 @@ const Modal = ({
         className={cn(
           "px-0 text-sm select-text",
           numberWidth && ["w-(--modal-width)", "sm:max-w-(--modal-width)"],
+          // Responsive form: fill the row and cap per breakpoint. The `sm:`
+          // cap replaces DialogContent's `sm:max-w-lg` via tailwind-merge.
+          // Tailwind's screens (sm 640, lg 1024, xl 1280, 2xl 1536) stand in
+          // for AntD's (576, 992, 1200, 1600) so the dialog switches widths
+          // on the same lines as every other utility in the app.
+          responsiveWidth && [
+            "w-full",
+            responsiveWidth.xs !== undefined &&
+              "max-w-[min(var(--modal-xs-width),calc(100%-2rem))]",
+            "sm:max-w-(--modal-sm-width)",
+            "md:max-w-(--modal-md-width)",
+            "lg:max-w-(--modal-lg-width)",
+            "xl:max-w-(--modal-xl-width)",
+            "2xl:max-w-(--modal-xxl-width)",
+          ],
           // DialogContent's own `max-w-[calc(100%-2rem)]` phone gutter is a
           // base utility, so a caller's base `max-w-*` replaces it outright.
           // Re-state it under `max-sm:` — a different variant group, so it

@@ -92,6 +92,56 @@ describe("Modal", () => {
     expect(content).toHaveClass("sm:max-w-[500px]");
   });
 
+  // Regression: the object form only set `--modal-<bp>-width` variables and no
+  // class read them, so `{ md: 760, lg: 1000 }` rendered the 512px
+  // `sm:max-w-lg` default at every width.
+  test("a responsive width caps the dialog per breakpoint", () => {
+    render(
+      <Modal open title="Responsive" width={{ md: 760, lg: 1000 }}>
+        Body
+      </Modal>,
+    );
+
+    const content = screen.getByRole("dialog");
+
+    expect(content).toHaveClass(
+      "w-full",
+      "sm:max-w-(--modal-sm-width)",
+      "md:max-w-(--modal-md-width)",
+      "lg:max-w-(--modal-lg-width)",
+      "xl:max-w-(--modal-xl-width)",
+      "2xl:max-w-(--modal-xxl-width)",
+    );
+    expect(content).not.toHaveClass("sm:max-w-lg");
+    expect(content).not.toHaveClass("w-(--modal-width)");
+    // Skipped breakpoints take the nearest smaller one; below the smallest
+    // given, sm falls back to the 520px default. xs stays unset (phone gutter).
+    expect(content.style.getPropertyValue("--modal-xs-width")).toBe("");
+    expect(content.style.getPropertyValue("--modal-sm-width")).toBe("520px");
+    expect(content.style.getPropertyValue("--modal-md-width")).toBe("760px");
+    expect(content.style.getPropertyValue("--modal-lg-width")).toBe("1000px");
+    expect(content.style.getPropertyValue("--modal-xl-width")).toBe("1000px");
+    expect(content.style.getPropertyValue("--modal-xxl-width")).toBe("1000px");
+  });
+
+  test("a responsive xs width caps phones and seeds the larger breakpoints", () => {
+    render(
+      <Modal open title="Responsive" width={{ xs: "90vw", lg: 900 }}>
+        Body
+      </Modal>,
+    );
+
+    const content = screen.getByRole("dialog");
+
+    expect(content).toHaveClass(
+      "max-w-[min(var(--modal-xs-width),calc(100%-2rem))]",
+    );
+    expect(content.style.getPropertyValue("--modal-xs-width")).toBe("90vw");
+    expect(content.style.getPropertyValue("--modal-sm-width")).toBe("90vw");
+    expect(content.style.getPropertyValue("--modal-md-width")).toBe("90vw");
+    expect(content.style.getPropertyValue("--modal-lg-width")).toBe("900px");
+  });
+
   test("wraps fragment descriptions with DialogDescription", () => {
     render(
       <Modal
