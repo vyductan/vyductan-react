@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useRef, useState } from "react";
-import { CornerDownLeftIcon, MicIcon, SquareIcon } from "lucide-react";
+import { MicIcon, SendHorizontalIcon, SquareIcon } from "lucide-react";
 
 import {
   InputGroup,
@@ -314,7 +314,7 @@ export function Composer({
               {busy ? (
                 <SquareIcon className="size-3 fill-current" />
               ) : (
-                <CornerDownLeftIcon />
+                <SendHorizontalIcon />
               )}
             </InputGroupButton>
           </div>
