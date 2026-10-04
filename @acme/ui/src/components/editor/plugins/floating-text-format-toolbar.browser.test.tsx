@@ -100,80 +100,121 @@ async function selectLine(
   return { bar, root, line, range };
 }
 
-const buttonsOf = (bar: HTMLElement) => [
-  ...bar.querySelectorAll<HTMLButtonElement>("button"),
+/** The grid's buttons, in the order Notion's selection menu lays them out. */
+const GRID = [
+  "Text color",
+  "Toggle bold",
+  "Toggle italic",
+  "Toggle underline",
+  "Clear formatting",
+  "Toggle link",
+  "Toggle strikethrough",
+  "Toggle code",
+  "More options",
 ];
 
-/**
- * The bar over a selection was a heavy, wide strip — Explain, Ask AI and
- * Comment as labelled buttons, a type menu, math, color — ~640px, so it
- * wrapped in most editors. Like Notion's it is now one slim row of 28px
- * buttons, opened just above the selection.
- */
-test("opens as one slim row of 28px buttons just above the selection", async () => {
-  await page.viewport(1280, 800);
-  const { bar, range } = await selectLine(
-    { top: 300, left: 40, width: 720 },
-    { linesBefore: 3 },
+const gridButtons = (bar: HTMLElement) =>
+  GRID.map((label) =>
+    bar.querySelector<HTMLElement>(`[aria-label="${label}"]`),
   );
 
-  const box = bar.getBoundingClientRect();
-  expect(box.height).toBeLessThanOrEqual(38);
-  for (const button of buttonsOf(bar)) {
-    expect(button.getBoundingClientRect().height).toBe(28);
-  }
-  expect(box.bottom).toBeLessThanOrEqual(range.getBoundingClientRect().top);
-  expect(bar.dataset.placement).toBe("top");
+/**
+ * Laid out as Notion's selection menu is now: a panel with the block's type
+ * on the first row, then the marks in a grid of two rows — color, bold,
+ * italic, underline, clear formatting; link, strikethrough, code, more. It
+ * replaced a one-row bar that hid color and clear formatting behind "More"
+ * and folded marks away in a narrow editor.
+ */
+test("opens as a panel: the block type, then two rows of marks", async () => {
+  await page.viewport(1280, 800);
+  const { bar, range } = await selectLine(
+    { top: 200, left: 40, width: 720 },
+    { linesBefore: 8 },
+  );
 
-  // The most-used marks stay on the bar, the rest sit behind "More".
-  for (const label of [
-    "Toggle bold",
-    "Toggle italic",
-    "Toggle underline",
-    "Toggle strikethrough",
-    "Toggle code",
-    "Toggle link",
-  ]) {
-    expect(bar.querySelector(`[aria-label="${label}"]`)).not.toBeNull();
+  expect(bar.dataset.placement).toBe("top");
+  expect(bar.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+    range.getBoundingClientRect().top,
+  );
+
+  const type = bar.querySelector<HTMLElement>('[aria-label="Turn into"]')!;
+  expect(type.textContent).toContain("Text");
+
+  const buttons = gridButtons(bar);
+  expect(buttons.every((button) => button !== null)).toBe(true);
+  const tops = buttons.map((button) =>
+    Math.round(button!.getBoundingClientRect().top),
+  );
+  const [firstRow, secondRow] = [tops.slice(0, 5), tops.slice(5)];
+  expect(new Set(firstRow).size).toBe(1);
+  expect(new Set(secondRow).size).toBe(1);
+  expect(secondRow[0]).toBeGreaterThan(firstRow[0]!);
+  expect(type.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+    firstRow[0]! + 0.5,
+  );
+  for (const button of buttons) {
+    expect(button!.getBoundingClientRect().height).toBe(28);
   }
+
+  // The type row spans the panel, as Notion's does.
+  expect(type.getBoundingClientRect().width).toBeGreaterThan(
+    bar.getBoundingClientRect().width * 0.8,
+  );
   expect(bar.textContent).not.toContain("Ask AI");
   expect(bar.textContent).not.toContain("Explain");
 });
 
 /**
- * In a narrow editor the old bar wrapped onto two or three rows. It now keeps
- * to one row inside the editor (its handle gutter included — see the
- * block-selection tests) and folds what does not fit into its "More" menu.
+ * A narrow editor no longer costs any marks: the panel is narrow already, so
+ * nothing folds into "More", and it still keeps clear of the handle gutter.
  */
-test("keeps to one row in a narrow editor and folds the rest into More", async () => {
+test("keeps every mark in a narrow editor, clear of the handle gutter", async () => {
   const { bar, root } = await selectLine({ top: 300, left: 8, width: 230 });
 
-  await waitFor(() =>
-    expect(bar.querySelector('[aria-label="Toggle underline"]')).toBeNull(),
-  );
+  expect(gridButtons(bar).every((button) => button !== null)).toBe(true);
   const box = bar.getBoundingClientRect();
-  expect(box.height).toBeLessThanOrEqual(38);
-  const scroller = (bar.parentElement!.parentElement ??
-    bar.parentElement!) as HTMLElement;
-  expect(box.right).toBeLessThanOrEqual(
-    scroller.getBoundingClientRect().right + 0.5,
-  );
   const textStart =
     root.getBoundingClientRect().left +
     Number.parseFloat(getComputedStyle(root).paddingLeft);
   expect(box.left).toBeGreaterThanOrEqual(textStart - 6);
   expect(box.right).toBeLessThanOrEqual(window.innerWidth);
+});
+
+/** Color and clear formatting are on the panel now, not in "More". */
+test("colors and clears from the panel, and More no longer repeats them", async () => {
+  const { bar, line } = await selectLine({ top: 300, left: 8, width: 380 });
+
+  await userEvent.click(bar.querySelector('[aria-label="Text color"]')!);
+  await waitFor(() => {
+    const text = document.body.textContent ?? "";
+    expect(text).toContain("Text color");
+    expect(text).toContain("Background color");
+  });
+  const red = [
+    ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+  ].find((item) => item.textContent?.trim() === "Red")!;
+  await userEvent.click(red);
+  await waitFor(() =>
+    expect(line.querySelector<HTMLElement>("span")?.style.color).not.toBe(""),
+  );
+
+  await userEvent.click(bar.querySelector('[aria-label="Clear formatting"]')!);
+  await waitFor(() =>
+    expect(line.querySelector<HTMLElement>("span")?.style.color ?? "").toBe(""),
+  );
 
   await userEvent.click(bar.querySelector('[aria-label="More options"]')!);
-  await waitFor(() => {
-    const labels = [
+  const labels = await waitFor(() => {
+    const items = [
       ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
     ].map((item) => item.textContent?.trim() ?? "");
-    expect(labels.some((label) => label.startsWith("Underline"))).toBe(true);
-    expect(labels.some((label) => label.startsWith("Strikethrough"))).toBe(
-      true,
-    );
+    expect(items.some((label) => label.startsWith("Superscript"))).toBe(true);
+    return items;
   });
+  expect(labels.some((label) => label.startsWith("Clear formatting"))).toBe(
+    false,
+  );
+  expect(labels.some((label) => label === "Color")).toBe(false);
 });
 
 test("flips below the selection when there is no room above", async () => {

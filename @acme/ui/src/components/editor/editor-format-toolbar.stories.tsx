@@ -20,13 +20,18 @@ Select these words to see the format toolbar.`;
 
 /** Selects the last paragraph's words, the way a drag across them would. */
 async function selectLastLine(canvasElement: HTMLElement) {
-  const line = await waitFor(() => {
-    const node = canvasElement.querySelector<HTMLElement>(
-      '[contenteditable="true"] p:last-of-type',
-    );
-    expect(node?.textContent).toContain("Select these words");
-    return node!;
-  });
+  const line = await waitFor(
+    () => {
+      const node = canvasElement.querySelector<HTMLElement>(
+        '[contenteditable="true"] p:last-of-type',
+      );
+      expect(node?.textContent).toContain("Select these words");
+      return node!;
+      // The first story of the file mounts cold; under the full suite the
+      // markdown import alone has taken longer than the default second.
+    },
+    { timeout: 5000 },
+  );
   canvasElement.querySelector<HTMLElement>('[contenteditable="true"]')!.focus();
   const range = document.createRange();
   range.selectNodeContents(line);
@@ -44,10 +49,10 @@ async function selectLastLine(canvasElement: HTMLElement) {
 }
 
 /**
- * Notion's bar: the block type ("Text ▾"), the marks used most — bold, italic,
- * underline, strikethrough, inline code, link — and "More" for the rest
- * (super/subscript, inline math, color, clear formatting, Ask AI, Comment,
- * block actions). One slim row of 28px controls.
+ * Notion's selection menu: the block type ("Text ›") across the top, then a
+ * grid of two rows — color, bold, italic, underline, clear formatting; link,
+ * strikethrough, inline code, "More" for the rest (super/subscript, inline
+ * math, Ask AI, Comment, block actions). Every control is 28px.
  */
 export const Compact: Story = {
   args: { format: "markdown", value: DOCUMENT },
@@ -62,7 +67,6 @@ export const Compact: Story = {
 
     // Waited for: the first paint of a cold story can still be laying out.
     await waitFor(() => {
-      expect(bar.getBoundingClientRect().height).toBeLessThanOrEqual(38);
       for (const button of toolbar.getAllByRole("button")) {
         expect(button.getBoundingClientRect().height).toBe(28);
       }
@@ -71,12 +75,14 @@ export const Compact: Story = {
       toolbar.getByRole("button", { name: "Turn into" }),
     ).toHaveTextContent("Text");
     for (const name of [
+      "Text color",
       "Toggle bold",
       "Toggle italic",
       "Toggle underline",
+      "Clear formatting",
+      "Toggle link",
       "Toggle strikethrough",
       "Toggle code",
-      "Toggle link",
       "More options",
     ]) {
       expect(toolbar.getByRole("button", { name })).toBeInTheDocument();
@@ -104,7 +110,7 @@ export const TooltipsShowShortcuts: Story = {
   },
 };
 
-/** Colors and the rarer actions live in "More". */
+/** The rarer actions live in "More"; color and clear formatting do not. */
 export const MoreHoldsTheRest: Story = {
   ...Compact,
   play: async ({ canvasElement }) => {
@@ -114,14 +120,7 @@ export const MoreHoldsTheRest: Story = {
       within(bar).getByRole("button", { name: "More options" }),
     );
     const body = within(document.body);
-    for (const name of [
-      "Superscript",
-      "Subscript",
-      "Color",
-      "Clear formatting",
-      "Ask AI",
-      "Comment",
-    ]) {
+    for (const name of ["Superscript", "Subscript", "Ask AI", "Comment"]) {
       await waitFor(() =>
         expect(
           body
@@ -130,13 +129,17 @@ export const MoreHoldsTheRest: Story = {
         ).toBe(true),
       );
     }
+    const labels = body
+      .getAllByRole("menuitem")
+      .map((item) => item.textContent?.trim() ?? "");
+    expect(labels).not.toContain("Color");
+    expect(labels.some((label) => label.startsWith("Clear formatting"))).toBe(
+      false,
+    );
   },
 };
 
-/**
- * In a narrow editor the bar keeps to one row: the type's label goes, then
- * underline, strikethrough and inline code move into "More".
- */
+/** The panel is narrow already, so a narrow editor costs it no controls. */
 export const Narrow: Story = {
   args: { format: "markdown", value: DOCUMENT },
   render: (arguments_) => (
@@ -147,10 +150,12 @@ export const Narrow: Story = {
   play: async ({ canvasElement }) => {
     const bar = await selectLastLine(canvasElement);
 
-    await waitFor(() => expect(bar.dataset.fold).toBe("2"));
-    expect(bar.getBoundingClientRect().height).toBeLessThanOrEqual(38);
-    expect(
-      within(bar).queryByRole("button", { name: "Toggle underline" }),
-    ).toBeNull();
+    for (const name of [
+      "Toggle underline",
+      "Toggle strikethrough",
+      "Toggle code",
+    ]) {
+      expect(within(bar).getByRole("button", { name })).toBeInTheDocument();
+    }
   },
 };

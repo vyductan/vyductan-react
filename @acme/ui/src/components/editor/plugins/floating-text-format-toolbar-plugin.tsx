@@ -7,14 +7,7 @@
  */
 import type { LexicalEditor, TextFormatType } from "lexical";
 import type { ComponentProps, Dispatch, JSX, ReactNode } from "react";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   $createCodeNode,
   $isCodeHighlightNode,
@@ -43,21 +36,21 @@ import {
 } from "lexical";
 import {
   ArrowUpDownIcon,
+  BaselineIcon,
   BoldIcon,
   CheckIcon,
-  ChevronDownIcon,
+  ChevronRightIcon,
   CircleHelpIcon,
   CircleIcon,
   ClipboardCopyIcon,
   CodeIcon,
-  EraserIcon,
   ItalicIcon,
   LinkIcon,
   ListIcon,
   ListTreeIcon,
   MessageSquarePlusIcon,
   MoreHorizontalIcon,
-  PaletteIcon,
+  RemoveFormattingIcon,
   SigmaIcon,
   SparklesIcon,
   SquareIcon,
@@ -87,10 +80,7 @@ import { $turnSelectedBlocksIntoList } from "../utils/block-selection";
 import { BLOCK_TYPE_ICONS } from "../utils/block-type-icons";
 import { getDOMRangeRect } from "../utils/get-dom-range-rect";
 import { getSelectedNode } from "../utils/get-selected-node";
-import {
-  getFormatToolbarBounds,
-  positionFormatToolbar,
-} from "../utils/position-format-toolbar";
+import { positionFormatToolbar } from "../utils/position-format-toolbar";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
 import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
@@ -123,26 +113,15 @@ const IS_MAC =
 const MOD = IS_MAC ? "⌘" : "Ctrl+";
 
 /**
- * How much the bar has folded to fit its editor: 0 is the full bar, 1 drops
- * the type's name (its icon stays), 2 also moves underline, strikethrough and
- * inline code into "More". It never wraps — a second row is what made the old
- * bar heavy, and what slid it over the blocks beside a selection.
+ * The panel's second row after link: the marks Notion keeps there. Bold,
+ * italic and underline are on the first row, after color.
  */
-type FoldLevel = 0 | 1 | 2;
-
-/** The marks that move into "More" at fold level 2. */
-const FOLDING_MARKS: ReadonlyArray<{
+const SECOND_ROW_MARKS: ReadonlyArray<{
   format: TextFormatType;
   label: string;
   shortcut?: string;
   Icon: typeof BoldIcon;
 }> = [
-  {
-    format: "underline",
-    label: "Underline",
-    shortcut: `${MOD}U`,
-    Icon: UnderlineIcon,
-  },
   { format: "strikethrough", label: "Strikethrough", Icon: StrikethroughIcon },
   { format: "code", label: "Inline code", Icon: CodeIcon },
 ];
@@ -230,16 +209,6 @@ function TextFormatFloatingToolbar({
   // The button shows the current type's icon, not one icon for every type.
   const BlockTypeIcon = BLOCK_TYPE_ICONS[blockType];
   const popupCharStylesEditorReference = useRef<HTMLDivElement | null>(null);
-  const typeLabelReference = useRef<HTMLSpanElement | null>(null);
-
-  const [foldLevel, setFoldLevel] = useState<FoldLevel>(0);
-  const foldLevelReference = useRef<FoldLevel>(0);
-  /** The bar's widths unfolded, measured whenever it is shown at level 0. */
-  const widthsReference = useRef<{
-    full: number;
-    label: number;
-    marks: number;
-  }>({ full: 0, label: 0, marks: 0 });
 
   const insertLink = useCallback(() => {
     if (isLink) {
@@ -336,42 +305,11 @@ function TextFormatFloatingToolbar({
     ) {
       const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
 
-      /*
-       * Stay out of the handle gutter. Pushed left to fit the scroller, a wide
-       * bar used to slide into the left padding where each block's drag
-       * handle lives, and covered the handle of the block beside a selection.
-       * The bar now keeps between the text's start and the scroller's right
-       * edge (and the viewport), and folds to fit rather than wrapping.
-       */
+      // Stay out of the handle gutter: the panel keeps between the text's
+      // start and the scroller's right edge (see positionFormatToolbar).
       const textStart =
         rootElement.getBoundingClientRect().left +
         Number.parseFloat(getComputedStyle(rootElement).paddingLeft || "0");
-      const bounds = getFormatToolbarBounds(scroller, textStart);
-      const room = bounds.right - bounds.left;
-      if (room > 0) popupCharStylesEditorElement.style.maxWidth = `${room}px`;
-
-      if (foldLevelReference.current === 0) {
-        const marks = [
-          ...popupCharStylesEditorElement.querySelectorAll<HTMLElement>(
-            "[data-folding-mark]",
-          ),
-        ].reduce((sum, element) => sum + element.offsetWidth + 2, 0);
-        widthsReference.current = {
-          full: popupCharStylesEditorElement.scrollWidth,
-          // The name plus the gap before it.
-          label: (typeLabelReference.current?.offsetWidth ?? 0) + 4,
-          marks,
-        };
-      }
-      const { full, label, marks } = widthsReference.current;
-      let next: FoldLevel = 2;
-      if (full <= room) next = 0;
-      else if (full - label <= room) next = 1;
-      if (next === 2 && marks === 0) next = 1;
-      if (next !== foldLevelReference.current) {
-        foldLevelReference.current = next;
-        setFoldLevel(next);
-      }
 
       positionFormatToolbar({
         selectionRect: rangeRect,
@@ -389,13 +327,6 @@ function TextFormatFloatingToolbar({
         "translate(-10000px, -10000px)";
     }
   }, [editor, anchorElem, isLink, isTouchSelection]);
-
-  // A fold changes the bar's width, so it is placed again.
-  useLayoutEffect(() => {
-    editor.getEditorState().read(() => {
-      $updateTextFormatFloatingToolbar();
-    });
-  }, [editor, foldLevel, $updateTextFormatFloatingToolbar]);
 
   useEffect(() => {
     const scrollerElement = anchorElem.parentElement;
@@ -675,53 +606,6 @@ function TextFormatFloatingToolbar({
   );
 
   const moreMenu = useMemo(() => {
-    const markState: Partial<Record<TextFormatType, boolean>> = {
-      underline: isUnderline,
-      strikethrough: isStrikethrough,
-      code: isCode,
-    };
-    const foldedMarkItems: ItemType[] =
-      foldLevel === 2
-        ? FOLDING_MARKS.map(({ format, label, shortcut, Icon }) => ({
-            type: "item" as const,
-            key: `mark-${format}`,
-            label,
-            icon: <Icon className="h-4 w-4" />,
-            extra: markState[format] ? (
-              <CheckIcon className="h-4 w-4" />
-            ) : (
-              shortcut
-            ),
-            onClick: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, format),
-          }))
-        : [];
-
-    const textColorItems = textColors.map((color) => ({
-      type: "item",
-      key: `menu-text-${color.value}`,
-      label: color.label,
-      icon: (
-        <div
-          className="h-4 w-4 rounded border border-gray-300"
-          style={{ backgroundColor: color.hex }}
-        />
-      ),
-      onClick: () => handleTextColorChange(color.value),
-    }));
-
-    const backgroundColorItems = backgroundColors.map((color) => ({
-      type: "item",
-      key: `menu-bg-${color.value}`,
-      label: color.label,
-      icon: (
-        <div
-          className="h-4 w-4 rounded border border-gray-300"
-          style={{ backgroundColor: color.hex }}
-        />
-      ),
-      onClick: () => handleBackgroundColorChange(color.value),
-    }));
-
     const listFormatItems = [
       {
         key: "list-format-default",
@@ -759,7 +643,6 @@ function TextFormatFloatingToolbar({
     }));
 
     const formatItems: ItemType[] = [
-      ...foldedMarkItems,
       {
         type: "item" as const,
         key: "superscript",
@@ -781,33 +664,6 @@ function TextFormatFloatingToolbar({
         label: "Inline math",
         icon: <SigmaIcon className="h-4 w-4" />,
         onClick: onMath,
-      },
-      variant !== "simple" && {
-        type: "submenu" as const,
-        key: "color",
-        label: "Color",
-        icon: <PaletteIcon className="h-4 w-4" />,
-        children: [
-          {
-            type: "group" as const,
-            key: "text-color-group",
-            label: "Text color",
-            children: textColorItems as ItemType[],
-          },
-          {
-            type: "group" as const,
-            key: "bg-color-group",
-            label: "Background color",
-            children: backgroundColorItems as ItemType[],
-          },
-        ],
-      },
-      {
-        type: "item" as const,
-        key: "clear-formatting",
-        label: "Clear formatting",
-        icon: <EraserIcon className="h-4 w-4" />,
-        onClick: handleClearFormatting,
       },
     ].filter(Boolean) as ItemType[];
 
@@ -891,26 +747,69 @@ function TextFormatFloatingToolbar({
       items: [...formatItems, ...assistItems, ...blockItems],
     };
   }, [
-    backgroundColors,
     editor,
-    foldLevel,
-    handleBackgroundColorChange,
-    handleClearFormatting,
     handleCopyLinkToBlock,
     handleDeleteSelection,
     handleDuplicateSelection,
     handleListFormatChange,
     handleMoveToBlock,
-    handleTextColorChange,
-    isCode,
-    isStrikethrough,
-    isUnderline,
     onAskAI,
     onComment,
     onExplain,
     onMath,
-    textColors,
     variant,
+  ]);
+
+  /** Notion's "A": the text colors, then the backgrounds. */
+  const colorMenu = useMemo(() => {
+    const textColorItems = textColors.map((color) => ({
+      type: "item",
+      key: `menu-text-${color.value}`,
+      label: color.label,
+      icon: (
+        <div
+          className="h-4 w-4 rounded border border-gray-300"
+          style={{ backgroundColor: color.hex }}
+        />
+      ),
+      onClick: () => handleTextColorChange(color.value),
+    }));
+
+    const backgroundColorItems = backgroundColors.map((color) => ({
+      type: "item",
+      key: `menu-bg-${color.value}`,
+      label: color.label,
+      icon: (
+        <div
+          className="h-4 w-4 rounded border border-gray-300"
+          style={{ backgroundColor: color.hex }}
+        />
+      ),
+      onClick: () => handleBackgroundColorChange(color.value),
+    }));
+
+    return {
+      className: "min-w-[200px]",
+      items: [
+        {
+          type: "group" as const,
+          key: "text-color-group",
+          label: "Text color",
+          children: textColorItems as ItemType[],
+        },
+        {
+          type: "group" as const,
+          key: "bg-color-group",
+          label: "Background color",
+          children: backgroundColorItems as ItemType[],
+        },
+      ] as ItemType[],
+    };
+  }, [
+    backgroundColors,
+    handleBackgroundColorChange,
+    handleTextColorChange,
+    textColors,
   ]);
 
   const markButton = (
@@ -918,13 +817,11 @@ function TextFormatFloatingToolbar({
     label: string,
     Icon: typeof BoldIcon,
     shortcut?: string,
-    folding = false,
   ) => (
     <Hint key={format} title={label} shortcut={shortcut}>
       <ToggleGroupItem
         value={format}
         aria-label={`Toggle ${format}`}
-        data-folding-mark={folding ? "" : undefined}
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
         }}
@@ -935,18 +832,19 @@ function TextFormatFloatingToolbar({
     </Hint>
   );
 
-  const separator = (
-    <Separator orientation="vertical" className="mx-0.5 h-4 shrink-0" />
-  );
-
+  /*
+   * Laid out as Notion's selection menu: the block's type across the top,
+   * then a grid of two rows — color, bold, italic, underline, clear
+   * formatting; link, strikethrough, code, more. Narrow enough that it never
+   * has to fold marks away to fit an editor.
+   */
   return (
     <div
       ref={popupCharStylesEditorReference}
       data-slot="format-toolbar"
-      data-fold={foldLevel}
       role="toolbar"
       aria-label="Text formatting"
-      className="border-border bg-popover text-popover-foreground absolute top-0 left-0 z-50 flex flex-nowrap items-center gap-0.5 overflow-hidden rounded-lg border p-1 shadow-lg transition-opacity duration-200 will-change-transform"
+      className="border-border bg-popover text-popover-foreground absolute top-0 left-0 z-50 flex w-max flex-col gap-1 rounded-xl border p-1.5 shadow-lg transition-opacity duration-200 will-change-transform"
       style={{
         opacity: 0,
         transform: "translate(-10000px, -10000px)",
@@ -956,30 +854,26 @@ function TextFormatFloatingToolbar({
         <>
           {variant !== "simple" && (
             <>
-              <Dropdown asChild menu={typeMenu} placement="bottomLeft">
-                <Hint title="Turn into">
-                  <ToolbarButton
-                    aria-label="Turn into"
-                    className="w-auto gap-1 px-1.5 text-sm font-normal"
-                  >
-                    <BlockTypeIcon className="h-4 w-4" />
-                    {foldLevel === 0 && (
-                      <span ref={typeLabelReference}>
-                        {BLOCK_TYPE_LABELS[blockType]}
-                      </span>
-                    )}
-                    <ChevronDownIcon className="h-3 w-3 opacity-60" />
-                  </ToolbarButton>
-                </Hint>
+              <Dropdown asChild menu={typeMenu} placement="rightTop">
+                <ToolbarButton
+                  aria-label="Turn into"
+                  className="w-full justify-start gap-2 px-2 text-sm font-normal"
+                >
+                  <BlockTypeIcon className="h-4 w-4" />
+                  <span className="flex-1 text-left">
+                    {BLOCK_TYPE_LABELS[blockType]}
+                  </span>
+                  <ChevronRightIcon className="h-3.5 w-3.5 opacity-60" />
+                </ToolbarButton>
               </Dropdown>
-              {separator}
+              <Separator className="my-0" />
             </>
           )}
 
           <ToggleGroup
             type="multiple"
             spacing={0.5}
-            className="shrink-0"
+            className="grid grid-cols-5 gap-0.5"
             value={
               [
                 isBold ? "bold" : null,
@@ -991,12 +885,26 @@ function TextFormatFloatingToolbar({
               ].filter(Boolean) as string[]
             }
           >
+            {variant !== "simple" && (
+              <Dropdown asChild menu={colorMenu} placement="bottomLeft">
+                <Hint title="Color">
+                  <ToolbarButton aria-label="Text color">
+                    <BaselineIcon className="h-4 w-4" />
+                  </ToolbarButton>
+                </Hint>
+              </Dropdown>
+            )}
             {markButton("bold", "Bold", BoldIcon, `${MOD}B`)}
             {markButton("italic", "Italic", ItalicIcon, `${MOD}I`)}
-            {foldLevel < 2 &&
-              FOLDING_MARKS.map(({ format, label, shortcut, Icon }) =>
-                markButton(format, label, Icon, shortcut, true),
-              )}
+            {markButton("underline", "Underline", UnderlineIcon, `${MOD}U`)}
+            <Hint title="Clear formatting">
+              <ToolbarButton
+                aria-label="Clear formatting"
+                onClick={handleClearFormatting}
+              >
+                <RemoveFormattingIcon className="h-4 w-4" />
+              </ToolbarButton>
+            </Hint>
             <Hint title="Link" shortcut={`${MOD}K`}>
               <ToggleGroupItem
                 value="link"
@@ -1007,17 +915,17 @@ function TextFormatFloatingToolbar({
                 <LinkIcon className="h-4 w-4" />
               </ToggleGroupItem>
             </Hint>
+            {SECOND_ROW_MARKS.map(({ format, label, shortcut, Icon }) =>
+              markButton(format, label, Icon, shortcut),
+            )}
+            <Dropdown asChild menu={moreMenu} placement="bottomRight">
+              <Hint title="More">
+                <ToolbarButton aria-label="More options">
+                  <MoreHorizontalIcon className="h-4 w-4" />
+                </ToolbarButton>
+              </Hint>
+            </Dropdown>
           </ToggleGroup>
-
-          {separator}
-
-          <Dropdown asChild menu={moreMenu} placement="bottomRight">
-            <Hint title="More">
-              <ToolbarButton aria-label="More options">
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </ToolbarButton>
-            </Hint>
-          </Dropdown>
         </>
       )}
     </div>
