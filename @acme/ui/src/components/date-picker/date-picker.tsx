@@ -135,6 +135,12 @@ type DatePickerProperties = DatePickerBaseProperties & {
   open?: boolean;
   /** Callback when the panel open state changes. */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Callback when the "Ok" button is clicked (only rendered with `showTime`),
+   * with the selected value — AntD `onOk`. Fires before the panel closes, so a
+   * caller can tell a confirmation from any other close (Escape, click-away).
+   */
+  onOk?: (date: Dayjs | null | undefined) => void;
 
   picker?: PickerMode;
 
@@ -161,6 +167,7 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
     cellRender,
     open: openProperty,
     onOpenChange,
+    onOk,
     minDate,
     maxDate,
 
@@ -984,7 +991,10 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
                 <Button
                   size="small"
                   type="primary"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    onOk?.(value);
+                    setOpen(false);
+                  }}
                 >
                   Ok
                 </Button>

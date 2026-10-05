@@ -50,6 +50,8 @@ interface DatePickerProps<DateValueType extends Dayjs = Dayjs> {
     date: DateValueType | null | undefined,
     dateString: string,
   ) => void;
+  // "Ok" clicked (showTime only), before the panel closes
+  onOk?: (date: DateValueType | null | undefined) => void;
 
   // Display
   format?: string;
