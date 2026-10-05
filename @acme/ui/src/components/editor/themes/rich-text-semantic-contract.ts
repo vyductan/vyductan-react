@@ -199,7 +199,8 @@ export const richTextSemanticContract = {
     "RichTextSemanticContract__tableCell relative border px-4 py-2 text-left [[align=center]]:text-center [[align=right]]:text-right [&>p]:my-0",
   tableCellHeader:
     "RichTextSemanticContract__tableCellHeader bg-muted border px-4 py-2 text-left font-bold [[align=center]]:text-center [[align=right]]:text-right [&>p]:my-0",
-  hr: 'border-none my-2 mx-0 after:content-[""] after:block after:h-px after:bg-border',
+  // A real border: Chrome makes no ::after for an <hr>, a void element.
+  hr: "my-2 mx-0 h-0 border-0 border-t border-border",
   checkBlock:
     'flex items-start gap-2 my-1 *:data-[lexical-text="true"]:flex-1 *:data-[lexical-text="true"]:min-w-0',
   checkBlockIcon: "mt-0.5 size-4 shrink-0 rounded border border-primary",

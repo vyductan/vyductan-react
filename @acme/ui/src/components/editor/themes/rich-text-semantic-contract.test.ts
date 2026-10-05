@@ -110,7 +110,7 @@ describe("richTextSemanticContract", () => {
       tableCellHeader: expect.stringContaining(
         "RichTextSemanticContract__tableCellHeader",
       ),
-      hr: expect.stringContaining("after:bg-border"),
+      hr: expect.stringContaining("border-t"),
       checkBlock: expect.any(String),
       checkBlockIcon: expect.any(String),
       checkBlockChecked: expect.any(String),
