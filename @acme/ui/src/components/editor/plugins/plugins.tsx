@@ -36,6 +36,7 @@ import { CodeHighlightPlugin } from "../plugins/code-highlight-plugin";
 import { CollapsiblePlugin } from "../plugins/collapsible-plugin";
 import { ComponentPickerMenuPlugin } from "../plugins/component-picker-plugin";
 import { ContextMenuPlugin } from "../plugins/context-menu-plugin";
+import { CopyHtmlCleanupPlugin } from "../plugins/copy-html-cleanup-plugin";
 import { DragDropPastePlugin } from "../plugins/drag-drop-paste-plugin";
 import { DraggableBlockPlugin } from "../plugins/draggable-block-plugin";
 import { AutoEmbedPlugin } from "../plugins/embeds/auto-embed-plugin";
@@ -304,6 +305,7 @@ export function Plugins({
           anchorElem={floatingAnchorElement ?? undefined}
         />
       )}
+      <CopyHtmlCleanupPlugin />
       {editable && <PasteCleanupPlugin readClipboardText={readClipboardText} />}
       {editable && <MarkdownPastePlugin />}
       {editable && <PlainTextLinebreakPastePlugin />}
