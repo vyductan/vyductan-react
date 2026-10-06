@@ -96,7 +96,10 @@ export const CodeBlock = memo(
         </div>
         <div
           {...properties}
-          className="sb-unstyled no-scrollbar w-full overflow-x-auto px-4 py-6 text-[0.9rem] [--shiki-font-family:var(--font-mono)]"
+          // Shiki's <pre> took Typography's 1.7em top and bottom inside a chat
+          // bubble, on top of this box's own 1.5rem: a band of empty space
+          // above and below the code. The box pads, the <pre> does not.
+          className="sb-unstyled no-scrollbar w-full overflow-x-auto px-3 pb-3 text-[0.9rem] [--shiki-font-family:var(--font-mono)] [&_pre]:m-0 [&_pre]:rounded-md [&_pre]:p-3"
           // Shiki returns a full <pre class="shiki"><code>...</code></pre> block
           dangerouslySetInnerHTML={{ __html: html }}
         />
