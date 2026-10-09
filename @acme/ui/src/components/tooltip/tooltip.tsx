@@ -36,6 +36,10 @@ type TooltipProps = AbstractTooltipProps &
     title?: React.ReactNode;
     placement?: TooltipPlacement;
     hidden?: boolean;
+    /**
+     * Show the arrow (default `true`). Use `false` to drop it.
+     */
+    arrow?: boolean;
     classNames?: {
       title?: string;
       arrow?: string;
@@ -61,6 +65,7 @@ const Tooltip = (props: TooltipProps) => {
     title,
     placement,
     hidden,
+    arrow,
     classNames,
     styles,
     align: domAlign,
@@ -106,6 +111,7 @@ const Tooltip = (props: TooltipProps) => {
             alignOffset={alignOffset}
             sideOffset={sideOffset}
             hidden={hidden}
+            arrow={arrow}
             // keep tooltip open when trigger is clicked
             onPointerDownOutside={(event) => {
               if (event.target === triggerRef.current) event.preventDefault();

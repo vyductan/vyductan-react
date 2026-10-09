@@ -91,4 +91,17 @@ describe("Tooltip styles", () => {
       backgroundColor: "rgb(10, 11, 12)",
     });
   });
+
+  test("renders no arrow when arrow is false", () => {
+    render(
+      <Tooltip open title="Arrowless tooltip" arrow={false}>
+        <button type="button">Open tooltip</button>
+      </Tooltip>,
+    );
+
+    const content = document.querySelector('[data-slot="tooltip-content"]');
+
+    expect(content).toHaveTextContent("Arrowless tooltip");
+    expect(content?.querySelector('[data-slot="tooltip-arrow"]')).toBeNull();
+  });
 });

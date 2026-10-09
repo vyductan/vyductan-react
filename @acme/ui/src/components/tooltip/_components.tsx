@@ -6,10 +6,16 @@ function TooltipContent({
   className,
   sideOffset = 4,
   children,
+  arrow = true,
   classNames,
   styles,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content> & {
+  /**
+   * Render the arrow. Pass `false` to drop it — a `hidden` class can't, since
+   * Radix sets an inline `display: block` on the arrow's svg.
+   */
+  arrow?: boolean;
   classNames?: {
     arrow?: string;
   };
@@ -30,15 +36,17 @@ function TooltipContent({
         {...props}
       >
         {children}
-        <TooltipPrimitive.Arrow
-          data-slot="tooltip-arrow"
-          className={cn(
-            "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px]",
-            "fill-foreground bg-foreground",
-            classNames?.arrow,
-          )}
-          style={styles?.arrow}
-        />
+        {arrow && (
+          <TooltipPrimitive.Arrow
+            data-slot="tooltip-arrow"
+            className={cn(
+              "bg-primary fill-primary z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px]",
+              "fill-foreground bg-foreground",
+              classNames?.arrow,
+            )}
+            style={styles?.arrow}
+          />
+        )}
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
