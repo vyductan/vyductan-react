@@ -1,6 +1,7 @@
 import type { ElementNode } from "lexical";
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode } from "@lexical/table";
 import { $findMatchingParent } from "@lexical/utils";
 import {
   $getSelection,
@@ -12,7 +13,7 @@ import {
 
 /**
  * Cmd+A as Notion does it: the first press selects the line (block) the caret
- * is in, the next one the whole page.
+ * is in — in a table, the cell — the next one the whole page.
  *
  * "Already selected" is the trigger for the second step, so a line whose text
  * is all selected — by the first press or by hand — goes straight to the
@@ -29,7 +30,9 @@ export function SelectLineFirstPlugin(): null {
           const selection = $getSelection();
           if (!$isRangeSelection(selection)) return false;
 
+          // In a table cell, the cell: its lines are one block, as in Notion.
           const blockOf = (node: Parameters<typeof $findMatchingParent>[0]) =>
+            $findMatchingParent(node, $isTableCellNode) ??
             $findMatchingParent(
               node,
               (candidate): candidate is ElementNode =>
@@ -39,8 +42,12 @@ export function SelectLineFirstPlugin(): null {
           if (!block || block !== blockOf(selection.focus.getNode()))
             return false;
 
-          const text = block.getTextContent();
-          if (text === "" || selection.getTextContent() === text) return false;
+          // A cell's lines join with line breaks a selection's text counts
+          // differently, so those do not tell the two apart.
+          const lines = (value: string) => value.replaceAll(/\n+/g, "\n");
+          const text = lines(block.getTextContent());
+          if (text === "" || lines(selection.getTextContent()) === text)
+            return false;
 
           block.select(0, block.getChildrenSize());
           return true;
