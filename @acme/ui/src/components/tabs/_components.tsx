@@ -57,9 +57,15 @@ function TabsList({ className, type, ...properties }: TabsListProperties) {
       className={cn(
         // type === "solid" && "h-9 w-fit justify-center",
         tabsType === "card" &&
-          "before:bg-border justify-start gap-0.5 rounded-none bg-transparent p-0 group-data-[orientation=horizontal]/tabs:h-auto before:absolute before:inset-x-0 before:bottom-0 before:h-px *:data-[slot=tabs-trigger]:flex-none",
+          "justify-start gap-0.5 rounded-none bg-transparent p-0 shadow-[inset_0_-1px_0_var(--border)] group-data-[orientation=horizontal]/tabs:h-auto *:data-[slot=tabs-trigger]:flex-none",
         tabsType === "line" &&
-          "h-auto justify-start rounded-none border-b bg-transparent p-0 *:data-[slot=tabs-trigger]:flex-none",
+          "h-auto justify-start rounded-none bg-transparent p-0 shadow-[inset_0_-1px_0_var(--border)] *:data-[slot=tabs-trigger]:flex-none",
+        // Too many tabs for the width: scroll the bar itself. Without this the
+        // bar overflows and focusing a clipped trigger scrolls the page instead.
+        // The bottom rule is an inset shadow, not border-b, because overflow
+        // clips at the padding box and would hide an indicator drawn over a border.
+        (tabsType === "line" || tabsType === "card") &&
+          "no-scrollbar overflow-x-auto overflow-y-hidden",
         // antd
         "relative w-full",
         className,
@@ -99,8 +105,12 @@ function TabsTrigger({
           "mx-3 h-[calc(100%+2px)] first:ml-0",
           "text-muted-foreground rounded-none bg-transparent font-semibold shadow-none transition-none",
           "hover:text-primary-hover",
-          "data-[state=active]:text-primary after:bg-primary group-data-[orientation=horizontal]/tabs:after:-bottom-px data-[state=active]:shadow-none",
+          "data-[state=active]:text-primary after:bg-primary group-data-[orientation=horizontal]/tabs:after:bottom-0 data-[state=active]:shadow-none",
         ],
+        // The list scrolls (overflow clips), so draw the focus ring and
+        // outline inside the trigger or their top and bottom get cut off.
+        (type === "line" || type === "card") &&
+          "focus-visible:ring-inset focus-visible:-outline-offset-1",
         className,
       )}
       {...properties}
