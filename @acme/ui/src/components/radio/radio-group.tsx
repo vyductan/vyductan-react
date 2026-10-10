@@ -16,13 +16,26 @@ import { Radio } from "./radio";
 type RadioOptionType<T extends FormValueType = FormValueType> =
   CheckboxOptionType<T>;
 
-type RadioGroupProperties<T extends FormValueType = FormValueType> =
+type OwnRadioGroupProperties<T extends FormValueType = FormValueType> =
   AbstractCheckboxGroupProperties<T> &
     Pick<RadioProperties, "optionType" | "buttonStyle" | "variant"> & {
       defaultValue?: T;
       value?: T;
       onChange?: (e: RadioChangeEvent<T>) => void;
     };
+// Root attributes (aria-*, name, required, orientation…) are spread onto the
+// Radix root below, so the type must accept them too. Without this, a root-only
+// prop like `aria-label` made the public XOR pick the Radix branch, and then
+// `options` / `variant` failed with misleading "not assignable" errors.
+type RadioGroupProperties<T extends FormValueType = FormValueType> =
+  OwnRadioGroupProperties<T> &
+    Omit<
+      React.ComponentProps<typeof RadioGroupPrimitive.Root>,
+      | keyof OwnRadioGroupProperties<T>
+      | "children"
+      | "asChild"
+      | "onValueChange"
+    >;
 export const RadioGroup = <T extends FormValueType = FormValueType>({
   value,
   defaultValue,
