@@ -373,8 +373,8 @@ function TableHoverActionsInner({
         style={{ pointerEvents: "all" }}
         className={
           isColumn
-            ? "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 relative z-10 flex h-[calc(100%-8px)] w-4 cursor-pointer items-center justify-center overflow-hidden rounded-r border shadow-sm transition-all hover:shadow-md"
-            : "border-border bg-background text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 relative z-10 flex h-4 w-[calc(100%-8px)] cursor-pointer items-center justify-center overflow-hidden rounded-b border shadow-sm transition-all hover:shadow-md"
+            ? "relative z-10 flex h-[calc(100%-8px)] w-4 cursor-pointer items-center justify-center overflow-hidden rounded-r border border-border bg-background text-muted-foreground shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md"
+            : "relative z-10 flex h-4 w-[calc(100%-8px)] cursor-pointer items-center justify-center overflow-hidden rounded-b border border-border bg-background text-muted-foreground shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md"
         }
       >
         <PlusIcon className="size-3 shrink-0" />

@@ -66,7 +66,7 @@ const DisabledDateTimeDemo = () => (
       format="YYYY-MM-DD HH:mm:ss"
       className="w-[420px]"
     />
-    <p className="text-muted-foreground text-sm">
+    <p className="text-sm text-muted-foreground">
       disabledTime only works when showTime is enabled.
     </p>
   </Space>

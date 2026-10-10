@@ -104,7 +104,7 @@ export const PublishedParity: Story = {
  */
 export const DarkModeFollowsTheme: Story = {
   render: () => (
-    <div className="dark bg-background text-foreground p-4">
+    <div className="dark bg-background p-4 text-foreground">
       <EditorRender format="json" value={kitchenSinkValue} />
     </div>
   ),

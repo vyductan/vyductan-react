@@ -38,5 +38,4 @@ export interface FlattenOptionData<TOption> {
 }
 
 export type RenderNode =
-  | React.ReactNode
-  | ((properties?: Record<string, never>) => React.ReactNode);
+  React.ReactNode | ((properties?: Record<string, never>) => React.ReactNode);

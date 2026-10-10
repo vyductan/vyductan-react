@@ -44,8 +44,7 @@ type MultipleDatePickerProps = InputVariants &
     maxTagCount?: number;
     /** Node (or fn of the omitted dates) rendered for the collapsed tags. */
     maxTagPlaceholder?:
-      | React.ReactNode
-      | ((omittedValues: Dayjs[]) => React.ReactNode);
+      React.ReactNode | ((omittedValues: Dayjs[]) => React.ReactNode);
 
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
@@ -76,10 +75,8 @@ const MultipleDatePicker = (properties: MultipleDatePickerProps) => {
     onOpenChange,
   } = properties;
 
-  const {
-    format: formatConfig,
-    captionLayout: captionLayoutConfig,
-  } = useComponentConfig("datePicker");
+  const { format: formatConfig, captionLayout: captionLayoutConfig } =
+    useComponentConfig("datePicker");
   const format = formatProperty ?? formatConfig ?? "YYYY-MM-DD";
 
   const [value, setValue] = useMergedState<Dayjs[]>(defaultValue ?? [], {
@@ -116,8 +113,8 @@ const MultipleDatePicker = (properties: MultipleDatePickerProps) => {
     [value],
   );
 
-  const [month, setMonth] = React.useState<Date | undefined>(
-    () => sorted[0]?.toDate(),
+  const [month, setMonth] = React.useState<Date | undefined>(() =>
+    sorted[0]?.toDate(),
   );
 
   const shownTags = maxTagCount == null ? sorted : sorted.slice(0, maxTagCount);
@@ -176,13 +173,13 @@ const MultipleDatePicker = (properties: MultipleDatePickerProps) => {
       >
         <div
           className={cn(
-            "group min-h-control relative flex w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-8 pl-2",
+            "group relative flex min-h-control w-full cursor-pointer items-center gap-1 rounded-md py-1 pr-8 pl-2",
             inputVariants({ variant, status, disabled }),
             controlRadiusBySize[size ?? "middle"],
           )}
         >
           {sorted.length === 0 ? (
-            <span className="text-muted-foreground truncate pl-1">
+            <span className="truncate pl-1 text-muted-foreground">
               {placeholder}
             </span>
           ) : (

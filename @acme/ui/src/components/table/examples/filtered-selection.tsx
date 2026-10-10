@@ -62,7 +62,7 @@ const App: React.FC = () => {
         dataSource={filtered}
         rowSelection={rowSelection}
       />
-      <div className="text-muted-foreground text-sm">
+      <div className="text-sm text-muted-foreground">
         Selected ids: {JSON.stringify(selectedRowKeys)}
       </div>
     </div>

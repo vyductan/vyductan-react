@@ -31,7 +31,7 @@ export default function ResultExamples() {
         <h1 className="mb-4 text-4xl font-bold tracking-tight">
           Result Examples
         </h1>
-        <p className="text-muted-foreground max-w-2xl text-lg">
+        <p className="max-w-2xl text-lg text-muted-foreground">
           Interactive examples of result components with different states and
           configurations.
         </p>

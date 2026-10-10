@@ -104,8 +104,7 @@ export interface TreeNodeProps<TreeDataType extends BasicDataNode = DataNode> {
   children?: React.ReactNode;
 }
 export type IconType =
-  | React.ReactNode
-  | ((properties: TreeNodeProps) => React.ReactNode);
+  React.ReactNode | ((properties: TreeNodeProps) => React.ReactNode);
 
 /** For fieldNames, we provides a abstract interface */
 export interface BasicDataNode {
@@ -421,7 +420,7 @@ function TreeNode({
             <Button
               variant="text"
               size="small"
-              className="hover:bg-accent h-6 w-6 shrink-0 p-0"
+              className="h-6 w-6 shrink-0 p-0 hover:bg-accent"
               aria-label={isExpanded ? "Collapse" : "Expand"}
               onClick={handleToggle}
             >

@@ -138,8 +138,8 @@ function SelectionControl({
           aria-label={ariaLabel}
           disabled={disabled}
           className={cn(
-            "border-input bg-background text-primary inline-flex size-4 shrink-0 items-center justify-center rounded-full border align-middle transition-colors outline-none",
-            "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50",
+            "inline-flex size-4 shrink-0 items-center justify-center rounded-full border border-input bg-background align-middle text-primary transition-colors outline-none",
+            "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
             checked
               ? "border-primary bg-primary text-primary-foreground"
               : undefined,
@@ -1159,7 +1159,7 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                   : "[&_tbody_tr:last-child>td:first-child]:rounded-bl-[calc(var(--radius)_-_3px)] [&_tbody_tr:last-child>td:last-child]:rounded-br-[calc(var(--radius)_-_3px)]"),
             ],
             (!bordered || bordered === "around") && [
-              "[&_th]:before:bg-accent [&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
+              "[&_th]:before:absolute [&_th]:before:top-1/2 [&_th]:before:right-0 [&_th]:before:h-[1.6em] [&_th]:before:w-px [&_th]:before:-translate-y-1/2 [&_th]:before:bg-accent [&_th]:before:content-[''] [&_th:last-child]:before:bg-transparent",
             ],
             // bordered === "around" && [
             // "[&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-md",
@@ -1482,7 +1482,7 @@ function OwnTable<TRecord extends AnyObject, TKey extends Key = Key>(
                     >
                       <TableCell
                         colSpan={allLeafColumns.length}
-                        className={cn("text-muted-foreground h-48 text-center")}
+                        className={cn("h-48 text-center text-muted-foreground")}
                       >
                         {!loading &&
                           (tableLocale.emptyText == null ? (

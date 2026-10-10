@@ -35,7 +35,7 @@ const SizedForm = ({
 
   return (
     <Form name={formName} form={form} className="flex flex-col gap-5">
-      <div className="text-muted-foreground text-sm font-medium">
+      <div className="text-sm font-medium text-muted-foreground">
         size=&quot;{size}&quot;
       </div>
       <Field name="name" control={form.control}>

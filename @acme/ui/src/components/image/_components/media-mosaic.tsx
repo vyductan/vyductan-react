@@ -93,7 +93,7 @@ export function MediaMosaic({
       )}
     >
       {visible.length === 0 ? (
-        <div className="text-muted-foreground bg-muted col-span-full row-span-full flex h-full items-center justify-center">
+        <div className="col-span-full row-span-full flex h-full items-center justify-center bg-muted text-muted-foreground">
           {empty}
         </div>
       ) : (
@@ -126,7 +126,7 @@ export function MediaMosaic({
                     type="button"
                     aria-label={label}
                     onClick={() => onItemClick?.(index)}
-                    className="focus-visible:ring-ring group block h-full w-full cursor-pointer focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+                    className="group block h-full w-full cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset"
                   >
                     {item.type === "video" ? (
                       <video

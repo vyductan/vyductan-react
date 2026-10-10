@@ -129,9 +129,7 @@ export const Loading: Story = {
 
     await step("clicking does not open the calendar", async () => {
       await userEvent.click(input);
-      await expect(
-        document.querySelector('[data-slot="calendar"]'),
-      ).toBeNull();
+      await expect(document.querySelector('[data-slot="calendar"]')).toBeNull();
     });
   },
 };
@@ -263,32 +261,33 @@ export const WithTime: Story = {
       ).not.toBeNull();
     });
 
-    await step("picking a day keeps the panel open and preserves time", async () => {
-      const day = document.querySelector<HTMLButtonElement>(
-        '[data-day="6/15/2024"]',
-      );
-      if (!day) throw new Error("Expected day button for 6/15/2024");
-      await userEvent.click(day);
-      // Move the mouse off the day so the input shows the committed value
-      // instead of the hover preview.
-      await userEvent.unhover(day);
+    await step(
+      "picking a day keeps the panel open and preserves time",
+      async () => {
+        const day = document.querySelector<HTMLButtonElement>(
+          '[data-day="6/15/2024"]',
+        );
+        if (!day) throw new Error("Expected day button for 6/15/2024");
+        await userEvent.click(day);
+        // Move the mouse off the day so the input shows the committed value
+        // instead of the hover preview.
+        await userEvent.unhover(day);
 
-      // Panel must stay open (regression: previously closed immediately).
-      await expect(
-        document.querySelector('[data-slot="picker-time"]'),
-      ).not.toBeNull();
-      // Default showTime shows seconds (AntD parity): HH:mm:ss.
-      await expect(input).toHaveValue("2024-06-15 09:30:00");
-    });
+        // Panel must stay open (regression: previously closed immediately).
+        await expect(
+          document.querySelector('[data-slot="picker-time"]'),
+        ).not.toBeNull();
+        // Default showTime shows seconds (AntD parity): HH:mm:ss.
+        await expect(input).toHaveValue("2024-06-15 09:30:00");
+      },
+    );
 
     await step("Ok closes the panel", async () => {
       await userEvent.click(
         within(document.body).getByRole("button", { name: "Ok" }),
       );
       await waitFor(() =>
-        expect(
-          document.querySelector('[data-slot="picker-time"]'),
-        ).toBeNull(),
+        expect(document.querySelector('[data-slot="picker-time"]')).toBeNull(),
       );
     });
   },
@@ -380,21 +379,24 @@ export const WithTime12Hours: Story = {
 
     await userEvent.click(input);
 
-    await step("panel adds an AM/PM column, PM selected for 14:30", async () => {
-      const panel = document.querySelector('[data-slot="picker-time"]');
-      if (!panel) throw new Error("Expected time panel");
-      const cols = panel.querySelectorAll("ul");
-      // hour, minute, second, meridiem
-      await expect(cols).toHaveLength(4);
-      const meridiem = [...cols[3]!.querySelectorAll("li")].map(
-        (li) => li.textContent,
-      );
-      await expect(meridiem).toEqual(["AM", "PM"]);
-      const selectedMeridiem = [...cols[3]!.querySelectorAll("li")].find((li) =>
-        li.className.includes("bg-primary-200"),
-      );
-      await expect(selectedMeridiem?.textContent).toBe("PM");
-    });
+    await step(
+      "panel adds an AM/PM column, PM selected for 14:30",
+      async () => {
+        const panel = document.querySelector('[data-slot="picker-time"]');
+        if (!panel) throw new Error("Expected time panel");
+        const cols = panel.querySelectorAll("ul");
+        // hour, minute, second, meridiem
+        await expect(cols).toHaveLength(4);
+        const meridiem = [...cols[3]!.querySelectorAll("li")].map(
+          (li) => li.textContent,
+        );
+        await expect(meridiem).toEqual(["AM", "PM"]);
+        const selectedMeridiem = [...cols[3]!.querySelectorAll("li")].find(
+          (li) => li.className.includes("bg-primary-200"),
+        );
+        await expect(selectedMeridiem?.textContent).toBe("PM");
+      },
+    );
   },
 };
 
@@ -428,15 +430,18 @@ export const ControlledOpen: Story = {
     const canvas = within(canvasElement);
     const input = canvas.getByPlaceholderText("Controlled open");
 
-    await step("clicking the input fires onOpenChange and opens (controlled)", async () => {
-      await userEvent.click(input);
-      // Panel is controlled: it only opens because the handler set state from
-      // the onOpenChange(true) callback.
-      await expect(args.onOpenChange).toHaveBeenCalledWith(true);
-      await expect(
-        document.querySelector('[data-slot="calendar"]'),
-      ).not.toBeNull();
-    });
+    await step(
+      "clicking the input fires onOpenChange and opens (controlled)",
+      async () => {
+        await userEvent.click(input);
+        // Panel is controlled: it only opens because the handler set state from
+        // the onOpenChange(true) callback.
+        await expect(args.onOpenChange).toHaveBeenCalledWith(true);
+        await expect(
+          document.querySelector('[data-slot="calendar"]'),
+        ).not.toBeNull();
+      },
+    );
 
     await step("closing fires onOpenChange(false)", async () => {
       await userEvent.keyboard("{Escape}");

@@ -96,9 +96,7 @@ export function useAgenda(options: UseAgendaOptions = {}): UseAgendaResult {
   const shift = React.useCallback(
     (direction: 1 | -1) => {
       setDate(
-        view === "day"
-          ? addDays(date, direction)
-          : addWeeks(date, direction),
+        view === "day" ? addDays(date, direction) : addWeeks(date, direction),
       );
     },
     [date, setDate, view],

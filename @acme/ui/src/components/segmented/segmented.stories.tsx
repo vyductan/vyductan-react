@@ -20,7 +20,7 @@ type SegmentedStoryArguments = ComponentProps<typeof Segmented>;
 
 function renderInBackground(arguments_: SegmentedStoryArguments): JSX.Element {
   return (
-    <div className="bg-background rounded-xl p-6">
+    <div className="rounded-xl bg-background p-6">
       <Segmented {...arguments_} />
     </div>
   );
@@ -28,7 +28,7 @@ function renderInBackground(arguments_: SegmentedStoryArguments): JSX.Element {
 
 function renderBlock(arguments_: SegmentedStoryArguments): JSX.Element {
   return (
-    <div className="bg-background w-96 rounded-xl p-6">
+    <div className="w-96 rounded-xl bg-background p-6">
       <Segmented {...arguments_} />
     </div>
   );

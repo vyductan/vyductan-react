@@ -8,7 +8,7 @@ const brokenSource = "/this-image-does-not-exist.png";
 const App: React.FC = () => (
   <div className="flex flex-wrap gap-6">
     <div className="flex flex-col gap-2">
-      <span className="text-muted-foreground text-sm">Default fallback</span>
+      <span className="text-sm text-muted-foreground">Default fallback</span>
       <Image
         src={brokenSource}
         alt="Unavailable photo"
@@ -19,7 +19,7 @@ const App: React.FC = () => (
     </div>
 
     <div className="flex flex-col gap-2">
-      <span className="text-muted-foreground text-sm">Custom fallback</span>
+      <span className="text-sm text-muted-foreground">Custom fallback</span>
       <Image
         src={brokenSource}
         fallback="https://picsum.photos/seed/acme-image-fallback/600/400"

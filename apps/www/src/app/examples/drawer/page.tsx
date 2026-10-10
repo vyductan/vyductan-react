@@ -32,7 +32,7 @@ export default function DrawerExamples() {
         <h1 className="mb-4 text-4xl font-bold tracking-tight">
           Drawer Examples
         </h1>
-        <p className="text-muted-foreground max-w-2xl text-lg">
+        <p className="max-w-2xl text-lg text-muted-foreground">
           Interactive examples of the drawer component with different states and
           configurations.
         </p>

@@ -2,12 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table-spin-support",
   "title": "Table Spin Support",
-  "dependencies": [
-    "class-variance-authority"
-  ],
-  "registryDependencies": [
-    "table-shared-core"
-  ],
+  "dependencies": ["class-variance-authority"],
+  "registryDependencies": ["table-shared-core"],
   "files": [
     {
       "path": "components/spin/index.ts",

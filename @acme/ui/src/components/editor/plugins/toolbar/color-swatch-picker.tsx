@@ -42,7 +42,7 @@ export function ColorSwatchPicker({
           <button
             type="button"
             className={cn(
-              "hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1 text-left text-sm",
+              "flex w-full items-center gap-2 rounded-sm px-2 py-1 text-left text-sm hover:bg-accent",
               !value && "bg-accent",
             )}
             onClick={() => onSelect(undefined)}
@@ -58,8 +58,8 @@ export function ColorSwatchPicker({
                 aria-label={swatch.name}
                 title={swatch.name}
                 className={cn(
-                  "border-border flex size-7 items-center justify-center rounded-sm border text-sm font-semibold transition-transform hover:scale-110",
-                  value === swatch.value && "ring-primary ring-2",
+                  "flex size-7 items-center justify-center rounded-sm border border-border text-sm font-semibold transition-transform hover:scale-110",
+                  value === swatch.value && "ring-2 ring-primary",
                 )}
                 onClick={() => onSelect(swatch.value)}
               >

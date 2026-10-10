@@ -340,11 +340,11 @@ export const CustomContent: Story = {
     <Button
       onClick={() =>
         message.custom(() => (
-          <div className="bg-background flex items-center gap-3 rounded-lg border p-4 shadow-lg">
+          <div className="flex items-center gap-3 rounded-lg border bg-background p-4 shadow-lg">
             <div className="size-10 rounded-full bg-linear-to-r from-purple-500 to-pink-500" />
             <div>
               <div className="font-semibold">Custom Toast</div>
-              <div className="text-muted-foreground text-sm">
+              <div className="text-sm text-muted-foreground">
                 This is a completely custom message with custom styling
               </div>
             </div>

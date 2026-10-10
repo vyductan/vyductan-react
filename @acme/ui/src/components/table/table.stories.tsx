@@ -43,7 +43,7 @@ const columns: ColumnsType<DataType> = [
         {tags.map((tag) => (
           <span
             key={tag}
-            className="bg-accent text-accent-foreground mr-1 rounded px-1 py-0.5 text-xs"
+            className="mr-1 rounded bg-accent px-1 py-0.5 text-xs text-accent-foreground"
           >
             {tag.toUpperCase()}
           </span>

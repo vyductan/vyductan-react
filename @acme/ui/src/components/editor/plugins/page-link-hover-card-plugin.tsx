@@ -186,10 +186,10 @@ export function PageLinkHoverCardPlugin({
       onPointerEnter={cancelClose}
       onPointerLeave={scheduleClose}
       style={{ top: rect.bottom + GAP, left, width: CARD_WIDTH }}
-      className="bg-popover text-popover-foreground fixed z-50 space-y-1 rounded-lg border p-4 shadow-lg"
+      className="fixed z-50 space-y-1 rounded-lg border bg-popover p-4 text-popover-foreground shadow-lg"
     >
       {preview.breadcrumb && (
-        <p className="text-muted-foreground truncate text-xs">
+        <p className="truncate text-xs text-muted-foreground">
           {preview.breadcrumb}
         </p>
       )}
@@ -205,12 +205,12 @@ export function PageLinkHoverCardPlugin({
         // Scaled down to card size: the page's own heading sizes and block
         // spacing would let one heading fill the card. The fade marks the cut
         // where a line clamp cannot reach, since the content spans blocks.
-        <div className="text-muted-foreground max-h-28 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)] pt-1 text-sm [&_*]:!my-0.5 [&_*]:!text-sm [&_h1,&_h2,&_h3,&_h4]:font-semibold">
+        <div className="max-h-28 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)] pt-1 text-sm text-muted-foreground [&_*]:!my-0.5 [&_*]:!text-sm [&_h1,&_h2,&_h3,&_h4]:font-semibold">
           {renderRootNodes(richContent.root.children)}
         </div>
       ) : (
         preview.excerpt && (
-          <p className="text-muted-foreground line-clamp-4 pt-1 text-sm">
+          <p className="line-clamp-4 pt-1 text-sm text-muted-foreground">
             {preview.excerpt}
           </p>
         )

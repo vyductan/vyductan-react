@@ -32,7 +32,7 @@ const App: React.FC = () => {
       >
         Check all
       </Checkbox>
-      <div className="bg-border h-px w-full" />
+      <div className="h-px w-full bg-border" />
       <Checkbox.Group
         options={groupOptions}
         value={checkedList}

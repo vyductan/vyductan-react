@@ -21,7 +21,7 @@ const Box = ({
   className?: string;
 }) => (
   <div
-    className={`bg-primary/20 border-primary/50 rounded border p-4 text-center ${className}`}
+    className={`rounded border border-primary/50 bg-primary/20 p-4 text-center ${className}`}
   >
     {children}
   </div>

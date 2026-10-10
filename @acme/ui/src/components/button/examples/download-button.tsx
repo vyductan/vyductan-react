@@ -22,11 +22,11 @@ function App(): React.JSX.Element {
   const [mode, setMode] = useState<DownloadMode>("success");
 
   return (
-    <div className="bg-muted/40 grid w-[min(100%,28rem)] gap-3 rounded-2xl border p-4 shadow-sm">
-      <div className="bg-background flex items-center justify-between gap-4 rounded-xl px-4 py-3">
+    <div className="grid w-[min(100%,28rem)] gap-3 rounded-2xl border bg-muted/40 p-4 shadow-sm">
+      <div className="flex items-center justify-between gap-4 rounded-xl bg-background px-4 py-3">
         <div>
           <p className="font-medium">Monthly report</p>
-          <p className="text-muted-foreground text-sm">CSV export · 2.4 MB</p>
+          <p className="text-sm text-muted-foreground">CSV export · 2.4 MB</p>
         </div>
         <AsyncActionButton
           action={() => downloadReport(mode)}
@@ -56,7 +56,7 @@ function App(): React.JSX.Element {
           Fail
         </Button>
       </div>
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Switch to Fail before clicking Download to preview the inline error
         tooltip at the button.
       </p>

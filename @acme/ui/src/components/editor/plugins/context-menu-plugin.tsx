@@ -250,7 +250,7 @@ export function ContextMenuPlugin(): JSX.Element {
   return (
     <NodeContextMenuPlugin
       items={items}
-      className="border-border bg-popover text-popover-foreground z-50 flex min-w-[220px] flex-col rounded-lg border py-1 shadow-lg outline-none"
+      className="z-50 flex min-w-[220px] flex-col rounded-lg border border-border bg-popover py-1 text-popover-foreground shadow-lg outline-none"
       itemClassName="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-left text-sm text-popover-foreground transition-colors hover:bg-accent focus:bg-accent focus:outline-none"
     />
   );

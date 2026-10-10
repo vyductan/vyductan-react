@@ -34,7 +34,12 @@ const App: React.FC = () => {
           { label: "Blue", value: "blue", color: "blue" },
           { label: "Purple", value: "purple", color: "purple" },
           { label: "Pink", value: "pink", color: "pink" },
-          { label: "Disabled", value: "disabled", color: "teal", disabled: true },
+          {
+            label: "Disabled",
+            value: "disabled",
+            color: "teal",
+            disabled: true,
+          },
         ]}
       />
     </div>

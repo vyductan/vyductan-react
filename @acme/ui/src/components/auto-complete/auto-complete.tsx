@@ -320,9 +320,9 @@ const AutoComplete = <
           "group",
           "w-full justify-between font-normal",
           // own
-          "hover:border-primary bg-transparent text-start text-sm whitespace-normal hover:bg-transparent",
+          "bg-transparent text-start text-sm whitespace-normal hover:border-primary hover:bg-transparent",
           "focus:border-primary-500 focus:ring-primary-500/20 focus-visible:border-primary-500 focus-visible:ring-primary-500/20",
-          open && "border-primary-500 ring-primary-500/20 ring-[3px]",
+          open && "border-primary-500 ring-[3px] ring-primary-500/20",
           !value && "text-muted-foreground hover:text-muted-foreground",
           selectedTagColor,
           selectedHoverTagColor,

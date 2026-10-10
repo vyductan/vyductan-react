@@ -76,7 +76,7 @@ export const ColorPickerOKLCHPanel: React.FC<
       {/* Color Display */}
       <div className="flex items-center space-x-3">
         <div
-          className="border-border h-8 w-8 rounded border"
+          className="h-8 w-8 rounded border border-border"
           style={{ backgroundColor: hexValue }}
         />
         <div className="flex-1">
@@ -146,7 +146,7 @@ export const ColorPickerOKLCHPanel: React.FC<
             {presets.map((preset: string, index: number) => (
               <button
                 key={index}
-                className="border-border h-6 w-6 rounded border transition-transform hover:scale-110"
+                className="h-6 w-6 rounded border border-border transition-transform hover:scale-110"
                 style={{ backgroundColor: preset }}
                 onClick={() => handlePresetClick(preset)}
                 title={preset}

@@ -91,7 +91,16 @@ describe("Drawer resizable", () => {
       "[data-slot='drawer-content']",
     )!;
     panel.getBoundingClientRect = () =>
-      ({ width, height: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0 }) as DOMRect;
+      ({
+        width,
+        height: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+      }) as DOMRect;
     return panel;
   }
 
@@ -126,9 +135,9 @@ describe("Drawer resizable", () => {
       </Drawer>,
     );
 
-    expect(screen.getByRole("separator", { name: "Resize drawer" })).toHaveAttribute(
-      "data-vaul-no-drag",
-    );
+    expect(
+      screen.getByRole("separator", { name: "Resize drawer" }),
+    ).toHaveAttribute("data-vaul-no-drag");
   });
 
   test("dragging left grows a right-placed drawer and reports the size", () => {
@@ -177,9 +186,12 @@ describe("Drawer resizable", () => {
     );
     stubPanelWidth(448);
 
-    fireEvent.keyDown(screen.getByRole("separator", { name: "Resize drawer" }), {
-      key: "ArrowLeft",
-    });
+    fireEvent.keyDown(
+      screen.getByRole("separator", { name: "Resize drawer" }),
+      {
+        key: "ArrowLeft",
+      },
+    );
 
     expect(onResize).toHaveBeenLastCalledWith(464);
   });
@@ -231,13 +243,25 @@ describe("Drawer resize persistence", () => {
       "[data-slot='drawer-content']",
     )!;
     panel.getBoundingClientRect = () =>
-      ({ width: 448, height: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0 }) as DOMRect;
+      ({
+        width: 448,
+        height: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+      }) as DOMRect;
     const view = document.defaultView!;
     fireEvent.pointerDown(
       screen.getByRole("separator", { name: "Resize drawer" }),
       { clientX: 0, clientY: 0 },
     );
-    fireEvent(view, new MouseEvent("pointermove", { clientX: -100, clientY: 0 }));
+    fireEvent(
+      view,
+      new MouseEvent("pointermove", { clientX: -100, clientY: 0 }),
+    );
     fireEvent(view, new MouseEvent("pointerup", {}));
     expect(panel.style.getPropertyValue("--drawer-size")).toBe("548px");
 
@@ -246,9 +270,7 @@ describe("Drawer resize persistence", () => {
 
     const reopened = await screen.findByText("Body");
     expect(
-      reopened
-        .closest("[data-slot='drawer-content']")!
-        .getAttribute("style"),
+      reopened.closest("[data-slot='drawer-content']")!.getAttribute("style"),
     ).toContain("548px");
   });
 });

@@ -486,7 +486,7 @@ function TableColumnResizeInner({
           <span
             aria-hidden="true"
             data-table-column-resize-mark
-            className="bg-primary/60 h-full w-0.5"
+            className="h-full w-0.5 bg-primary/60"
           />
         )}
       </div>
@@ -494,7 +494,7 @@ function TableColumnResizeInner({
         <div
           aria-hidden="true"
           data-table-column-resize-ruler
-          className="bg-primary pointer-events-none absolute z-[47] w-px"
+          className="pointer-events-none absolute z-[47] w-px bg-primary"
           style={{
             left: ruler.x - anchorRect.left,
             top: ruler.top - anchorRect.top,

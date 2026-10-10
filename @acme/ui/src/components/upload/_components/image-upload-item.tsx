@@ -25,7 +25,7 @@ export const ImageUploadItem = ({
   return (
     <Card
       className={cn(
-        "hover:bg-accent relative cursor-pointer",
+        "relative cursor-pointer hover:bg-accent",
         selected && "bg-primary-50",
       )}
       classNames={{
@@ -54,7 +54,7 @@ export const ImageUploadItem = ({
 
       {/* Upload progress */}
       {status === "uploading" && (
-        <div className="bg-primary/50 absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-primary/50">
           <Progress
             type="circle"
             percent={percent}
@@ -64,7 +64,7 @@ export const ImageUploadItem = ({
         </div>
       )}
       <div className="mt-auto w-full truncate text-center text-xs">{name}</div>
-      <div className="text-muted-foreground text-xs uppercase">
+      <div className="text-xs text-muted-foreground uppercase">
         {name.split(".").at(-1)}
       </div>
     </Card>

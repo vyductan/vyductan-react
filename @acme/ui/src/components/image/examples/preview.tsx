@@ -5,7 +5,7 @@ import { Image } from "@acme/ui/components/image";
 const App: React.FC = () => (
   <div className="flex flex-wrap items-start gap-6">
     <div className="flex flex-col gap-2">
-      <span className="text-muted-foreground text-sm">Default</span>
+      <span className="text-sm text-muted-foreground">Default</span>
       <Image
         src="https://picsum.photos/seed/acme-image-preview-1/600/400"
         alt="Sand dunes"
@@ -16,7 +16,7 @@ const App: React.FC = () => (
     </div>
 
     <div className="flex flex-col gap-2">
-      <span className="text-muted-foreground text-sm">With a cover label</span>
+      <span className="text-sm text-muted-foreground">With a cover label</span>
       <Image
         src="https://picsum.photos/seed/acme-image-preview-2/600/400"
         alt="Snowy ridge"
@@ -28,7 +28,7 @@ const App: React.FC = () => (
     </div>
 
     <div className="flex flex-col gap-2">
-      <span className="text-muted-foreground text-sm">preview={"{false}"}</span>
+      <span className="text-sm text-muted-foreground">preview={"{false}"}</span>
       <Image
         src="https://picsum.photos/seed/acme-image-preview-3/600/400"
         alt="Coastal cliffs"

@@ -78,12 +78,7 @@ type ButtonTypeConfig =
   | "reset"
   | "button";
 type ButtonVariantConfig =
-  | "solid"
-  | "outlined"
-  | "dashed"
-  | "filled"
-  | "link"
-  | "text";
+  "solid" | "outlined" | "dashed" | "filled" | "link" | "text";
 type ButtonColorConfig =
   | "default"
   | "primary"
@@ -110,10 +105,7 @@ type ButtonColorConfig =
   | "rose";
 type ButtonSizeConfig = "small" | "middle" | "large";
 type DatePickerCaptionLayout =
-  | "label"
-  | "dropdown"
-  | "dropdown-months"
-  | "dropdown-years";
+  "label" | "dropdown" | "dropdown-months" | "dropdown-years";
 type FormLayoutConfig = "horizontal" | "vertical";
 type FormLabelAlignConfig = "left" | "right";
 type TagVariantConfig = "filled" | "solid" | "outlined";

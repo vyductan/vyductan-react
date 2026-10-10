@@ -56,7 +56,7 @@ const FloatingLabelTextarea = ({
         disabled={disabled}
         aria-invalid={isError || properties["aria-invalid"]}
         className={cn(
-          "peer text-foreground w-full rounded-md border bg-transparent px-3 py-3 text-sm outline-none transition-colors",
+          "peer w-full rounded-md border bg-transparent px-3 py-3 text-sm text-foreground transition-colors outline-none",
           size === "sm" ? "min-h-20" : "min-h-24",
           floatingBorderClass,
           className,
@@ -67,7 +67,7 @@ const FloatingLabelTextarea = ({
         htmlFor={inputId}
         className={cn(
           floatingLabelBaseClass,
-          "peer-focus:text-primary-500 peer-aria-[invalid=true]:text-error peer-disabled:opacity-50",
+          "peer-focus:text-primary-500 peer-disabled:opacity-50 peer-aria-[invalid=true]:text-error",
           // resting: aligned to the first line (top), acts like the placeholder
           "top-3.5",
           // floated (focused OR filled): sit on the top border, shrink

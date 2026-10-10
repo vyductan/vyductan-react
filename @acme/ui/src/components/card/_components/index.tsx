@@ -30,7 +30,7 @@ const CardRoot = ({
     <ShadcnCardRoot
       data-size={size}
       className={cn(
-        "group/card bg-card text-card-foreground gap-0 overflow-hidden rounded-xl py-0 text-sm *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        "group/card gap-0 overflow-hidden rounded-xl bg-card py-0 text-sm text-card-foreground *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         size === "small" && "gap-0 py-0",
         bordered ? "" : "border-none shadow-none",
         className,
@@ -123,7 +123,7 @@ const CardFooter = ({
   return (
     <ShadcnCardFooter
       className={cn(
-        "bg-muted/50 rounded-b-xl border-t p-4 group-data-[size=small]/card:p-3 [.border-t]:pt-4",
+        "rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=small]/card:p-3 [.border-t]:pt-4",
         size === "small" && "p-3 [.border-t]:pt-3",
         className,
       )}

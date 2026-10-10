@@ -104,17 +104,17 @@ export const Interactive: Story = {
       <div className="space-y-4">
         <div className="text-sm">
           <div className="font-semibold">Current OKLCH Values:</div>
-          <div className="text-muted-foreground font-mono">
+          <div className="font-mono text-muted-foreground">
             L: {Math.round(color.l * 100)}%
           </div>
-          <div className="text-muted-foreground font-mono">
+          <div className="font-mono text-muted-foreground">
             C: {color.c.toFixed(3)}
           </div>
-          <div className="text-muted-foreground font-mono">
+          <div className="font-mono text-muted-foreground">
             H: {Math.round(color.h)}°
           </div>
           {arguments_.showAlpha && (
-            <div className="text-muted-foreground font-mono">
+            <div className="font-mono text-muted-foreground">
               Alpha: {Math.round((color.alpha ?? 1) * 100)}%
             </div>
           )}

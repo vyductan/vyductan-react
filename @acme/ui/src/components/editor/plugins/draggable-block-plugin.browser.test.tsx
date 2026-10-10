@@ -135,9 +135,7 @@ test("applies Turn into to the block the menu was opened on", async () => {
   });
 
   await userEvent.click(trigger);
-  await waitFor(() =>
-    expect(trigger.getAttribute("data-state")).toBe("open"),
-  );
+  await waitFor(() => expect(trigger.getAttribute("data-state")).toBe("open"));
 
   // Reaching for the submenu takes the pointer over the blocks below.
   await userEvent.hover(paragraphs().at(-1)!);

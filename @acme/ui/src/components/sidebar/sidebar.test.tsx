@@ -2,11 +2,11 @@ import React from "react";
 
 import "@testing-library/jest-dom/vitest";
 
-import type { MenuProps } from "../menu";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, test } from "vitest";
 
+import type { MenuProps } from "../menu";
 import { SidebarMenuButton, SidebarProvider } from "./index";
 import { Sidebar } from "./sidebar";
 
@@ -78,7 +78,9 @@ const items: MenuProps["items"] = [
   },
 ];
 
-const renderSidebar = (properties: Partial<React.ComponentProps<typeof Sidebar>>) =>
+const renderSidebar = (
+  properties: Partial<React.ComponentProps<typeof Sidebar>>,
+) =>
   render(
     <SidebarProvider>
       <Sidebar items={items} {...properties} />

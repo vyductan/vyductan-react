@@ -13,10 +13,11 @@ import dayjs from "dayjs";
 
 import { cn } from "@acme/ui/lib/utils";
 
-import type { MultipleDatePickerProps } from "./date-picker-multiple";
 import type { ShadcnCalendarProps } from "../calendar/_components";
 import type { InputRef as InputReference } from "../input";
 import type { InputSizeVariants, InputVariants } from "../input/variants";
+import type { TimeSelectOptions } from "../time-picker/_components/time-select";
+import type { MultipleDatePickerProps } from "./date-picker-multiple";
 import type { DisabledDate } from "./types";
 import { Icon } from "../../icons";
 import { Button } from "../button";
@@ -27,7 +28,6 @@ import { CustomCalendarDayButton } from "../calendar/_components";
 import { useComponentConfig } from "../config-provider/context";
 import { Input } from "../input/input";
 import { Popover } from "../popover";
-import type { TimeSelectOptions } from "../time-picker/_components/time-select";
 import { TimeSelect } from "../time-picker/_components/time-select";
 import { MultipleDatePicker } from "./date-picker-multiple";
 import { MonthSelect } from "./month-select";
@@ -43,13 +43,7 @@ import { YearSelect } from "./year-select";
 //     : string;
 
 export type PanelMode =
-  | "time"
-  | "date"
-  | "week"
-  | "month"
-  | "quarter"
-  | "year"
-  | "decade";
+  "time" | "date" | "week" | "month" | "quarter" | "year" | "decade";
 export type PickerMode = Exclude<PanelMode, "datetime" | "decade">;
 
 type DisabledTimeConfig = {
@@ -300,9 +294,7 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
     // use12Hours switches the display to 12h tokens with a meridiem.
     const datePart = formatConfig ?? datePickerFormat ?? "YYYY-MM-DD";
     const twelve = typeof showTime === "object" && showTime.use12Hours;
-    fallbackFormat = twelve
-      ? `${datePart} hh:mm:ss A`
-      : `${datePart} HH:mm:ss`;
+    fallbackFormat = twelve ? `${datePart} hh:mm:ss A` : `${datePart} HH:mm:ss`;
   }
 
   const format = formatProperty ?? fallbackFormat;

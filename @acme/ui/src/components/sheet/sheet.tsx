@@ -94,7 +94,7 @@ const Sheet = (properties: SheetProperties) => {
         {footer && (
           <div
             className={cn(
-              "bg-muted/10 flex flex-col-reverse border-t p-4 sm:flex-row sm:justify-end sm:space-x-2",
+              "flex flex-col-reverse border-t bg-muted/10 p-4 sm:flex-row sm:justify-end sm:space-x-2",
               classNames?.footer,
             )}
           >

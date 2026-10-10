@@ -32,7 +32,7 @@ export default function KitchenSinkDemo() {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Editor — the full toolbar is available; try the text color and
           highlight pickers.
         </p>
@@ -55,7 +55,7 @@ export default function KitchenSinkDemo() {
         </TabsList>
 
         <TabsContent value="published">
-          <p className="text-muted-foreground mb-2 text-sm">
+          <p className="mb-2 text-sm text-muted-foreground">
             <code>EditorRender</code> — the serialized-document renderer used
             for published pages. Unsupported nodes (images, equations, polls)
             are dropped here by design.
@@ -66,7 +66,7 @@ export default function KitchenSinkDemo() {
         </TabsContent>
 
         <TabsContent value="read-only">
-          <p className="text-muted-foreground mb-2 text-sm">
+          <p className="mb-2 text-sm text-muted-foreground">
             <code>EditorPreview</code> — Lexical with editing disabled, so it
             renders everything the editor can, including nodes the published
             view drops.

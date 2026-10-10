@@ -224,7 +224,7 @@ const Sidebar = (properties: SidebarProperties) => {
           <li
             key={index}
             role="separator"
-            className={cn("bg-sidebar-border my-1 h-px", item.className)}
+            className={cn("my-1 h-px bg-sidebar-border", item.className)}
           />
         );
       }

@@ -64,7 +64,7 @@ const App: React.FC = () => (
     <div className="grid gap-3">
       <div className="grid gap-1">
         <h3 className="text-sm font-medium">Choose your audience</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Select the teams that should receive this update.
         </p>
       </div>
@@ -79,7 +79,7 @@ const App: React.FC = () => (
     <div className="grid gap-3">
       <div className="grid gap-1">
         <h3 className="text-sm font-medium">Status (Simple Card)</h3>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Filter by current status.
         </p>
       </div>

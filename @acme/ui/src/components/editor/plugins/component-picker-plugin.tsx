@@ -725,7 +725,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
             ? createPortal(
                 <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
                   {/* Menu */}
-                  <div className="border-border bg-popover text-popover-foreground overflow-hidden rounded-lg border shadow-lg">
+                  <div className="overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
                     <CommandRoot
                       onKeyDown={(e) => {
                         if (e.key === "ArrowUp") {
@@ -764,13 +764,13 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
-                                  <span className="text-muted-foreground shrink-0">
+                                  <span className="shrink-0 text-muted-foreground">
                                     {option.icon}
                                   </span>
                                   <span className="flex-1">{option.title}</span>
                                 </div>
                                 {option.keyboardShortcut && (
-                                  <span className="text-muted-foreground text-xs">
+                                  <span className="text-xs text-muted-foreground">
                                     {option.keyboardShortcut}
                                   </span>
                                 )}
@@ -797,7 +797,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
 
                               return (
                                 <CommandGroup key={category}>
-                                  <div className="text-muted-foreground px-3 py-1.5 text-xs font-medium">
+                                  <div className="px-3 py-1.5 text-xs font-medium text-muted-foreground">
                                     {CATEGORY_LABELS[category]}
                                   </div>
                                   {categoryOptions.map((item, itemIndex) => {
@@ -817,7 +817,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                         }`}
                                       >
                                         <div className="flex items-center gap-3">
-                                          <span className="text-muted-foreground shrink-0">
+                                          <span className="shrink-0 text-muted-foreground">
                                             {item.option.icon}
                                           </span>
                                           <span className="flex-1">
@@ -825,7 +825,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                                           </span>
                                         </div>
                                         {item.option.keyboardShortcut && (
-                                          <span className="text-muted-foreground text-xs">
+                                          <span className="text-xs text-muted-foreground">
                                             {item.option.keyboardShortcut}
                                           </span>
                                         )}
@@ -840,9 +840,9 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
                       </CommandList>
 
                       {/* Footer */}
-                      <div className="border-border text-muted-foreground flex items-center justify-between border-t px-3 py-2 text-xs">
+                      <div className="flex items-center justify-between border-t border-border px-3 py-2 text-xs text-muted-foreground">
                         <span>Type '' on the page</span>
-                        <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 font-mono">
+                        <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-muted-foreground">
                           esc
                         </span>
                       </div>

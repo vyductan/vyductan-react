@@ -39,11 +39,7 @@ type DisabledRangeTime = (
  * fields; `start` / `end` narrow it to one and are merged after `input`.
  */
 type DateRangePickerSemanticName =
-  | "root"
-  | "input"
-  | "start"
-  | "end"
-  | "suffix";
+  "root" | "input" | "start" | "end" | "suffix";
 
 /**
  * Calendar-panel options the range picker does not implement are omitted rather
@@ -487,7 +483,9 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
           // fall back to that side's default (or now) when it has no value yet.
           const sideValue = activeInput === "end" ? value?.[1] : value?.[0];
           const sideDefault =
-            activeInput === "end" ? defaultOpenTuple?.[1] : defaultOpenTuple?.[0];
+            activeInput === "end"
+              ? defaultOpenTuple?.[1]
+              : defaultOpenTuple?.[0];
           const selectedDate = showTimeEnabled
             ? applyTime(rawDate, sideValue ?? sideDefault ?? now)
             : rawDate;
@@ -681,7 +679,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
             inputVariants({ variant, disabled, status }),
             inputSizeVariants({ size }),
             "inline-flex items-center gap-2",
-            activeInput && "border-primary ring-primary/20 ring-2",
+            activeInput && "border-primary ring-2 ring-primary/20",
             className,
             classNames?.root,
           )}
@@ -769,8 +767,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               }}
               onBlur={(e) => {
                 const relatedTarget = e.relatedTarget as
-                  | HTMLElement
-                  | undefined;
+                  HTMLElement | undefined;
                 const calendarContainer = document.querySelector(
                   '[data-slot="calendar"]',
                 );
@@ -804,12 +801,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               }}
             />
             {activeInput === "start" && (
-              <div className="bg-primary absolute right-0 bottom-0 left-0 h-0.5" />
+              <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-primary" />
             )}
           </div>
           <Icon
             icon="icon-[mingcute--arrow-right-line]"
-            className="text-muted-foreground size-4 shrink-0"
+            className="size-4 shrink-0 text-muted-foreground"
           />
           <div className="relative flex-1">
             <Input
@@ -900,8 +897,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               }}
               onBlur={(e) => {
                 const relatedTarget = e.relatedTarget as
-                  | HTMLElement
-                  | undefined;
+                  HTMLElement | undefined;
                 const calendarContainer = document.querySelector(
                   '[data-slot="calendar"]',
                 );
@@ -934,7 +930,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
               }}
             />
             {activeInput === "end" && (
-              <div className="bg-primary absolute right-0 bottom-0 left-0 h-0.5" />
+              <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-primary" />
             )}
           </div>
           {allowClear && isHovering && (value?.[0] || value?.[1]) ? (

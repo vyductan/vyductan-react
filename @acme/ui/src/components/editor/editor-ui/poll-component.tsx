@@ -79,12 +79,12 @@ function PollOptionComponent({
           checked={checked}
         />
       </div>
-      <div className="border-primary relative flex flex-[10px] cursor-pointer overflow-hidden rounded-md border">
+      <div className="relative flex flex-[10px] cursor-pointer overflow-hidden rounded-md border border-primary">
         <div
-          className="transition-width bg-accent absolute top-0 left-0 z-0 h-full duration-1000 ease-in-out"
+          className="transition-width absolute top-0 left-0 z-0 h-full bg-accent duration-1000 ease-in-out"
           style={{ width: `${votes === 0 ? 0 : (votes / totalVotes) * 100}%` }}
         />
-        <span className="text-primary absolute top-1.5 right-4 text-xs">
+        <span className="absolute top-1.5 right-4 text-xs text-primary">
           {votes > 0 && (votes === 1 ? "1 vote" : `${votes} votes`)}
         </span>
         <Input
@@ -110,7 +110,7 @@ function PollOptionComponent({
       </div>
       <button
         disabled={options.length < 3}
-        className={`hover:bg-accent relative z-0 ml-1.5 flex h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent bg-position-[6px_6px] bg-no-repeat opacity-30 before:absolute before:top-1.5 before:left-[13px] before:block before:h-[15px] before:w-0.5 before:-rotate-45 before:bg-gray-400 before:content-[''] after:absolute after:top-1.5 after:left-[13px] after:block after:h-[15px] after:w-0.5 after:rotate-45 after:bg-gray-400 after:content-[''] hover:opacity-100 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:opacity-30`}
+        className={`relative z-0 ml-1.5 flex h-7 w-7 cursor-pointer rounded-md border-0 bg-transparent bg-position-[6px_6px] bg-no-repeat opacity-30 before:absolute before:top-1.5 before:left-[13px] before:block before:h-[15px] before:w-0.5 before:-rotate-45 before:bg-gray-400 before:content-[''] after:absolute after:top-1.5 after:left-[13px] after:block after:h-[15px] after:w-0.5 after:rotate-45 after:bg-gray-400 after:content-[''] hover:bg-accent hover:opacity-100 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:opacity-30`}
         aria-label="Remove"
         onClick={() => {
           withPollNode((node) => {
@@ -217,8 +217,8 @@ export default function PollComponent({
 
   return (
     <div
-      className={`bg-background border-border max-w-[600px] min-w-[400px] cursor-pointer rounded-lg border select-none ${
-        isFocused ? "outline-primary outline" : ""
+      className={`max-w-[600px] min-w-[400px] cursor-pointer rounded-lg border border-border bg-background select-none ${
+        isFocused ? "outline outline-primary" : ""
       }`}
       ref={reference}
     >

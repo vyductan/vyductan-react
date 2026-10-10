@@ -13,9 +13,7 @@ import { Button } from "./button";
 // the console on every re-render.
 
 const a11yWarnings = (warn: MockInstance) =>
-  warn.mock.calls.filter((call) =>
-    String(call[0]).includes("accessible name"),
-  );
+  warn.mock.calls.filter((call) => String(call[0]).includes("accessible name"));
 
 test("icon-only button without any name warns once, not per re-render", () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
@@ -34,7 +32,7 @@ test("warning names the button in a short string, not the live element", () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 
   /* eslint-disable-next-line acme-a11y/button-accessible-name -- nameless on purpose: the warning is what's under test */
-  render(<Button icon={<svg />} className={"x ".repeat(200)} />);
+  render(<Button icon={<svg />} className={"x".repeat(200)} />);
 
   // Vitest's browser mode forwards console args to the terminal, and a DOM
   // node serializes with its React fiber attached — megabytes per warning.

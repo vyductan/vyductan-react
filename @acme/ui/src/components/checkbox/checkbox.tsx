@@ -186,7 +186,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
           hasDescriptionContent ? "items-start" : "items-center",
           direction === "rtl" ? "flex-row-reverse" : "flex-row",
           variant === "card" && [
-            "hover:bg-accent/50 items-start gap-2 rounded-md border",
+            "items-start gap-2 rounded-md border hover:bg-accent/50",
             inputSizeVariants({ size }),
             "h-auto",
             size === "small"
@@ -279,7 +279,7 @@ function Checkbox<TValue extends CheckboxValueType = CheckboxValueType>(
               {rendersDescriptionContent ? (
                 <p
                   id={generatedDescriptionId}
-                  className="text-muted-foreground text-xs font-normal"
+                  className="text-xs font-normal text-muted-foreground"
                 >
                   {description}
                 </p>

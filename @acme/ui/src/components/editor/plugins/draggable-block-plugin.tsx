@@ -492,7 +492,7 @@ export function DraggableBlockPlugin({
       >
         {/* Plus Button */}
         <div
-          className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded p-1 transition-colors"
+          className="cursor-pointer rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           onClick={handleAddBlockBelow}
         >
           <PlusIcon className={isSmall ? "size-3" : "size-4"} />
@@ -520,7 +520,7 @@ export function DraggableBlockPlugin({
           <PopoverTrigger asChild>
             <div
               className={cn(
-                "group/drag text-muted-foreground hover:bg-accent hover:text-accent-foreground active:bg-muted flex cursor-grab items-center justify-center rounded transition-all duration-200 active:scale-95 active:cursor-grabbing",
+                "group/drag flex cursor-grab items-center justify-center rounded text-muted-foreground transition-all duration-200 hover:bg-accent hover:text-accent-foreground active:scale-95 active:cursor-grabbing active:bg-muted",
                 isSmall ? "h-4 w-3.5" : "h-6 w-5",
               )}
             >
@@ -627,7 +627,7 @@ export function DraggableBlockPlugin({
                                   >
                                     <span
                                       aria-hidden
-                                      className="border-border inline-flex size-5 items-center justify-center rounded border text-xs font-medium"
+                                      className="inline-flex size-5 items-center justify-center rounded border border-border text-xs font-medium"
                                       style={
                                         css
                                           ? {
@@ -723,7 +723,7 @@ export function DraggableBlockPlugin({
         <div
           ref={targetLineReference}
           data-slot="draggable-block-target-line"
-          className="bg-primary/50 pointer-events-none absolute top-0 left-0 h-1 w-full opacity-0 transition-opacity duration-200"
+          className="pointer-events-none absolute top-0 left-0 h-1 w-full bg-primary/50 opacity-0 transition-opacity duration-200"
         />
       }
       isOnMenu={isOnMenu}

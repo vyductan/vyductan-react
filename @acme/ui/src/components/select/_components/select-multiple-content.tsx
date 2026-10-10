@@ -127,7 +127,7 @@ export const SelectMultipleContent = <
         />
       )}
       {!isTags && selectedValues.length === 0 && (
-        <span className="text-muted-foreground text-sm">{placeholder}</span>
+        <span className="text-sm text-muted-foreground">{placeholder}</span>
       )}
     </div>
   );

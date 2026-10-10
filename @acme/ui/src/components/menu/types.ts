@@ -62,11 +62,7 @@ export interface MenuItemGroupType<
 }
 
 export type ItemType<T extends MenuItemType = MenuItemType> =
-  | T
-  | SubMenuType<T>
-  | MenuItemGroupType<T>
-  | MenuDividerType
-  | null;
+  T | SubMenuType<T> | MenuItemGroupType<T> | MenuDividerType | null;
 
 export interface RenderIconInfo {
   isSelected?: boolean;
@@ -75,8 +71,7 @@ export interface RenderIconInfo {
   disabled?: boolean;
 }
 export type RenderIconType =
-  | React.ReactNode
-  | ((properties: RenderIconInfo) => React.ReactNode);
+  React.ReactNode | ((properties: RenderIconInfo) => React.ReactNode);
 export interface MenuInfo {
   key: string;
   keyPath: string[];

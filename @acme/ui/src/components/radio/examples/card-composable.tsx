@@ -7,26 +7,26 @@ import { RadioGroup, RadioGroupItem } from "../index";
 const App: React.FC = () => {
   return (
     <RadioGroup defaultValue="auto-start" className="w-full max-w-sm">
-      <Label className="hover:bg-accent/50 has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50 dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950 flex items-start gap-2 rounded-lg border p-3">
+      <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50 dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950">
         <RadioGroupItem
           value="auto-start"
           className="data-[state=checked]:border-primary-600 dark:data-[state=checked]:border-primary-700"
         />
         <div className="grid gap-1.5 font-normal">
           <p className="text-sm leading-none font-medium">Auto Start</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Starting with your OS.
           </p>
         </div>
       </Label>
-      <Label className="hover:bg-accent/50 has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50 dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950 flex items-start gap-2 rounded-lg border p-3">
+      <Label className="flex items-start gap-2 rounded-lg border p-3 hover:bg-accent/50 has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50 dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950">
         <RadioGroupItem
           value="manual-start"
           className="data-[state=checked]:border-primary-600 dark:data-[state=checked]:border-primary-700"
         />
         <div className="grid gap-1.5 font-normal">
           <p className="text-sm leading-none font-medium">Manual Start</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Start the app yourself when needed.
           </p>
         </div>

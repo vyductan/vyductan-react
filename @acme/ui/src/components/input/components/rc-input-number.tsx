@@ -744,7 +744,7 @@ const InternalInputNumber = <T extends ValueType = ValueType>({
         onChange={onInternalInput}
         disabled={disabled}
         readOnly={readOnly}
-        className={cn(readOnly && "bg-muted cursor-default", classNames?.input)}
+        className={cn(readOnly && "cursor-default bg-muted", classNames?.input)}
       />
     </div>
   );

@@ -70,10 +70,10 @@ export const ColorPicker: React.FC<ColorPickerProperties> = ({
           style={{
             backgroundColor: displayValue,
           }}
-          className="w-control-sm h-control-sm rounded-sm"
+          className="h-control-sm w-control-sm rounded-sm"
         >
           {showText && (
-            <span className="text-foreground/70 text-xs">{displayText}</span>
+            <span className="text-xs text-foreground/70">{displayText}</span>
           )}
         </div>
       </Button>

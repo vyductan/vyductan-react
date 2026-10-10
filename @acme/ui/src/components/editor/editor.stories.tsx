@@ -139,7 +139,7 @@ export const Variants: Story = {
         >
           <header>
             <h3 className="font-mono text-sm font-semibold">{title}</h3>
-            <p className="text-muted-foreground text-sm">{blurb}</p>
+            <p className="text-sm text-muted-foreground">{blurb}</p>
           </header>
 
           <div className="rounded-md border">

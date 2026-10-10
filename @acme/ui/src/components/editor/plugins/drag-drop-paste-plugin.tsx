@@ -299,12 +299,12 @@ export function DragDropPastePlugin({
     <>
       <div
         ref={targetBlockReference}
-        className="bg-primary/10 pointer-events-none absolute top-0 left-0 rounded transition-opacity duration-200"
+        className="pointer-events-none absolute top-0 left-0 rounded bg-primary/10 transition-opacity duration-200"
         style={{ opacity: 0, zIndex: 90 }}
       />
       <div
         ref={targetLineReference}
-        className="bg-primary pointer-events-none absolute top-0 left-0 h-1 rounded transition-opacity duration-200"
+        className="pointer-events-none absolute top-0 left-0 h-1 rounded bg-primary transition-opacity duration-200"
         style={{ opacity: 0, zIndex: 100 }}
       />
     </>

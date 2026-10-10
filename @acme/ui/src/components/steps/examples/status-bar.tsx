@@ -28,9 +28,9 @@ const operationItems = [
     className: "w-32",
     icon: <Icon icon="icon-[lucide--handshake]" className="size-4" />,
     content: (
-      <div className="bg-muted relative mt-2 flex w-max flex-col items-center gap-2 rounded-lg border p-3 text-center shadow-sm">
-        <div className="bg-muted absolute -top-1.5 left-1/2 z-20 size-3 -translate-x-1/2 rotate-45 rounded-tl-[2px] border-t border-l" />
-        <span className="text-muted-foreground relative z-10 text-xs leading-relaxed">
+      <div className="relative mt-2 flex w-max flex-col items-center gap-2 rounded-lg border bg-muted p-3 text-center shadow-sm">
+        <div className="absolute -top-1.5 left-1/2 z-20 size-3 -translate-x-1/2 rotate-45 rounded-tl-[2px] border-t border-l bg-muted" />
+        <span className="relative z-10 text-xs leading-relaxed text-muted-foreground">
           Guide accepted.
           <br />
           Next step: generate reminder.
@@ -139,8 +139,8 @@ function StatusBarExample() {
         items={items}
         iconRender={(oriNode, { index }) => (current < index ? null : oriNode)}
       />
-      <section className="bg-background rounded-xl border p-6 shadow-sm">
-        <h3 className="text-muted-foreground mb-6 text-xs font-semibold tracking-[0.16em] uppercase">
+      <section className="rounded-xl border bg-background p-6 shadow-sm">
+        <h3 className="mb-6 text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
           OPERATION STATUS
         </h3>
         <div className="overflow-x-auto pb-2">

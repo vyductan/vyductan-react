@@ -37,7 +37,9 @@ export const LongContentFades: Story = {
   ),
   play: async () => {
     const body = within(document.body);
-    await waitFor(() => expect(body.queryByTestId("first-line")).not.toBeNull());
+    await waitFor(() =>
+      expect(body.queryByTestId("first-line")).not.toBeNull(),
+    );
 
     const vp = document.querySelector<HTMLElement>(
       "[data-radix-scroll-area-viewport]",
@@ -92,10 +94,10 @@ export const OrderSummary: Story = {
         </div>
         <div
           data-testid="total-row"
-          className="bg-muted -mx-1 flex justify-between rounded-md px-3 py-2"
+          className="-mx-1 flex justify-between rounded-md bg-muted px-3 py-2"
         >
           <span className="font-semibold">Total Amount</span>
-          <span className="text-primary font-semibold">$696.30</span>
+          <span className="font-semibold text-primary">$696.30</span>
         </div>
       </div>
     </Modal>
@@ -116,9 +118,9 @@ export const OrderSummary: Story = {
     );
     const overlays = wrapper.querySelectorAll(":scope > [aria-hidden]");
     expect(overlays.length).toBe(2);
-    expect(
-      wrapper.lastElementChild === overlays[overlays.length - 1],
-    ).toBe(true);
+    expect(wrapper.lastElementChild === overlays[overlays.length - 1]).toBe(
+      true,
+    );
   },
 };
 

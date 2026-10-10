@@ -14,12 +14,13 @@ const ConditionSwitch = (properties: SwitchProperties) => {
   // InternalSwitch already renders the correct sizing natively, so both prop
   // styles route to it. Normalize the radix-style API (onCheckedChange, size="sm")
   // onto InternalSwitch's API (onChange, size="small").
-  const { onCheckedChange, size, ...restProperties } = properties as
-    & Omit<OwnSwitchProperties, "size">
-    & {
-      onCheckedChange?: (checked: boolean) => void;
-      size?: "sm" | "small" | "default" | "large";
-    };
+  const { onCheckedChange, size, ...restProperties } = properties as Omit<
+    OwnSwitchProperties,
+    "size"
+  > & {
+    onCheckedChange?: (checked: boolean) => void;
+    size?: "sm" | "small" | "default" | "large";
+  };
 
   return (
     <InternalSwitch

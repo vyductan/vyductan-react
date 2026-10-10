@@ -177,7 +177,7 @@ export const OKLCHSlider: React.FC<OKLCHSliderProperties> = ({
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">{config.label}</label>
-        <span className="text-muted-foreground text-xs">
+        <span className="text-xs text-muted-foreground">
           {config.format(config.value)}
         </span>
       </div>

@@ -26,9 +26,7 @@ test("resize grip is hidden, and out of the a11y tree, without a fine pointer", 
 
   expect(grip).not.toBeNull();
   expect(getComputedStyle(grip!).display).toBe("none");
-  expect(
-    screen.queryByRole("separator", { name: "Resize drawer" }),
-  ).toBeNull();
+  expect(screen.queryByRole("separator", { name: "Resize drawer" })).toBeNull();
 });
 
 test("the drawer itself still renders — only the grip is gated", () => {

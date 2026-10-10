@@ -29,7 +29,7 @@ const floatingLabelBaseClass = cn(
 /** utilities that put the label onto the top border, shrunk. */
 const FLOATED = "top-0 -translate-y-1/2 text-xs";
 
-const RequiredMark = () => <span className="text-destructive ml-1">*</span>;
+const RequiredMark = () => <span className="ml-1 text-destructive">*</span>;
 
 export type { FloatingLabelStatus, FloatingLabelSize };
 export {

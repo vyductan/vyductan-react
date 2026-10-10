@@ -47,4 +47,3 @@ Khi vào khâu thanh toán, plugin dùng file `checkout-page.php` để **thay t
 Khi nói **"Minimal standalone checkout shell"**, ta có thể hiểu đơn giản là:
 
 > **"Bộ khung vỏ trang tối giản, độc lập dành riêng cho trang thanh toán"** (giúp bọc lấy form đặt tour mà không bị dính các menu/footer rườm rà của theme).
->

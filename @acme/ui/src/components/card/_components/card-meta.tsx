@@ -24,7 +24,7 @@ const CardMeta: React.FC<CardMetaProps> = (properties) => {
   const titleDom: React.ReactNode = title ? (
     <div
       data-slot="card-meta-title"
-      className="text-foreground text-base font-semibold"
+      className="text-base font-semibold text-foreground"
     >
       {title}
     </div>
@@ -33,7 +33,7 @@ const CardMeta: React.FC<CardMetaProps> = (properties) => {
   const descriptionDom: React.ReactNode = description ? (
     <div
       data-slot="card-meta-description"
-      className="text-muted-foreground mt-1 text-sm"
+      className="mt-1 text-sm text-muted-foreground"
     >
       {description}
     </div>

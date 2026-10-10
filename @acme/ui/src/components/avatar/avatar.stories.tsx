@@ -91,21 +91,21 @@ export const Sizes: Story = {
 export const AvatarGroup: Story = {
   render: () => (
     <div className="flex -space-x-4">
-      <Avatar className="border-background border-2">
+      <Avatar className="border-2 border-background">
         <AvatarImage src="https://github.com/shadcn.png" alt="User 1" />
         <AvatarFallback>U1</AvatarFallback>
       </Avatar>
-      <Avatar className="border-background border-2">
+      <Avatar className="border-2 border-background">
         <AvatarImage src="https://github.com/vercel.png" alt="User 2" />
         <AvatarFallback>U2</AvatarFallback>
       </Avatar>
-      <Avatar className="border-background border-2">
+      <Avatar className="border-2 border-background">
         <AvatarFallback>U3</AvatarFallback>
       </Avatar>
-      <Avatar className="border-background border-2">
+      <Avatar className="border-2 border-background">
         <AvatarFallback>U4</AvatarFallback>
       </Avatar>
-      <Avatar className="border-background border-2">
+      <Avatar className="border-2 border-background">
         <AvatarFallback className="text-xs">+5</AvatarFallback>
       </Avatar>
     </div>
@@ -120,19 +120,19 @@ export const WithBadge: Story = {
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-        <span className="border-background absolute right-0 bottom-0 size-3 rounded-full border-2 bg-green-500" />
+        <span className="absolute right-0 bottom-0 size-3 rounded-full border-2 border-background bg-green-500" />
       </div>
       <div className="relative">
         <Avatar>
           <AvatarFallback>JD</AvatarFallback>
         </Avatar>
-        <span className="border-background absolute right-0 bottom-0 size-3 rounded-full border-2 bg-red-500" />
+        <span className="absolute right-0 bottom-0 size-3 rounded-full border-2 border-background bg-red-500" />
       </div>
       <div className="relative">
         <Avatar>
           <AvatarFallback>AB</AvatarFallback>
         </Avatar>
-        <span className="border-background absolute right-0 bottom-0 size-3 rounded-full border-2 bg-yellow-500" />
+        <span className="absolute right-0 bottom-0 size-3 rounded-full border-2 border-background bg-yellow-500" />
       </div>
     </div>
   ),

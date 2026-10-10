@@ -23,7 +23,7 @@
   }
 
   a:not([data-slot]) {
-    @apply text-link hover:text-link-hover active:text-link-active cursor-pointer;
+    @apply cursor-pointer text-link hover:text-link-hover active:text-link-active;
   }
 }
 

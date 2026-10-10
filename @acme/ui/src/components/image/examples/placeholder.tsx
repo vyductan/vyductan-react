@@ -17,7 +17,7 @@ const App: React.FC = () => {
 
       <div className="flex flex-wrap gap-6">
         <div className="flex flex-col gap-2">
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             Default (Skeleton)
           </span>
           <Image
@@ -31,7 +31,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="text-muted-foreground text-sm">
+          <span className="text-sm text-muted-foreground">
             Custom placeholder
           </span>
           <Image
@@ -42,7 +42,7 @@ const App: React.FC = () => {
             height={160}
             className="rounded-lg"
             placeholder={
-              <div className="bg-muted text-muted-foreground flex size-full animate-pulse items-center justify-center text-xs">
+              <div className="flex size-full animate-pulse items-center justify-center bg-muted text-xs text-muted-foreground">
                 Loading…
               </div>
             }

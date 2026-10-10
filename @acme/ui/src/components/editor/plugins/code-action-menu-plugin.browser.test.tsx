@@ -3,9 +3,9 @@ import * as React from "react";
 import { $createCodeNode } from "@lexical/code";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { render, waitFor } from "@testing-library/react";
-import { userEvent } from "vitest/browser";
 import { $createTextNode, $getRoot } from "lexical";
 import { afterEach, expect, test } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 
@@ -67,9 +67,7 @@ test("shows the code block's actions on hover", async () => {
     expect(menu).not.toBeNull();
     // Notion shows the language and a way to copy; so does this.
     expect(menu?.textContent).toContain("JavaScript");
-    expect(
-      menu?.querySelector('[title="Select language"]'),
-    ).not.toBeNull();
+    expect(menu?.querySelector('[title="Select language"]')).not.toBeNull();
     expect(menu?.querySelectorAll("button").length).toBeGreaterThan(1);
   });
 });

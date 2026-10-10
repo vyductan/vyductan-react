@@ -127,7 +127,7 @@ export default function ExamplesLayout({ children }: { children: ReactNode }) {
           </SidebarContent>
         </Sidebar>
         <SidebarInset className="flex-1">
-          <div className="bg-background min-h-screen">
+          <div className="min-h-screen bg-background">
             <div className="container mx-auto pl-6">{children}</div>
           </div>
         </SidebarInset>

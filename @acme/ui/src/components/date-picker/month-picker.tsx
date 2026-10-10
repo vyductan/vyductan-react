@@ -81,7 +81,7 @@ const MonthPicker = ({
                     "hover:bg-background-hover rounded-md px-4 py-0.5",
                     index === new Date().getMonth() && "bg-background",
                     value === index &&
-                      "bg-primary-600 hover:bg-primary-600 text-white",
+                      "bg-primary-600 text-white hover:bg-primary-600",
                   )}
                 >
                   {monthString}

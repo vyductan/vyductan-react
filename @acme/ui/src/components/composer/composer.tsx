@@ -291,7 +291,7 @@ export function Composer({
                 size={buttonSize}
                 variant="ghost"
                 className={cn(
-                  speech.listening && "text-destructive animate-pulse",
+                  speech.listening && "animate-pulse text-destructive",
                 )}
               >
                 <MicIcon />
@@ -326,7 +326,7 @@ export function Composer({
           <p
             aria-live="polite"
             data-slot="composer-dictation-interim"
-            className="text-muted-foreground truncate px-3 pb-2 text-sm italic"
+            className="truncate px-3 pb-2 text-sm text-muted-foreground italic"
           >
             {speech.interim}
           </p>
@@ -334,7 +334,7 @@ export function Composer({
       </InputGroup>
 
       {actions && (
-        <div className="text-muted-foreground flex items-center gap-1 px-1 text-sm">
+        <div className="flex items-center gap-1 px-1 text-sm text-muted-foreground">
           {actions}
         </div>
       )}

@@ -60,17 +60,29 @@ const App: React.FC = () => {
       options={[
         {
           value: "all",
-          label: <LabelWithCount label="All" count={counts?.all} loading={loading} />,
+          label: (
+            <LabelWithCount label="All" count={counts?.all} loading={loading} />
+          ),
         },
         {
           value: "active",
           label: (
-            <LabelWithCount label="Active" count={counts?.active} loading={loading} />
+            <LabelWithCount
+              label="Active"
+              count={counts?.active}
+              loading={loading}
+            />
           ),
         },
         {
           value: "done",
-          label: <LabelWithCount label="Done" count={counts?.done} loading={loading} />,
+          label: (
+            <LabelWithCount
+              label="Done"
+              count={counts?.done}
+              loading={loading}
+            />
+          ),
         },
       ]}
     />

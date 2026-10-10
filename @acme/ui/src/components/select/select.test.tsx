@@ -199,5 +199,4 @@ describe("Select", () => {
       expect(screen.getByLabelText("Tags")).toBeInTheDocument();
     });
   });
-
 });

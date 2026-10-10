@@ -226,7 +226,7 @@ export default function ExcalidrawComponent({
       {elements.length > 0 && (
         <button
           ref={buttonReference}
-          className={`m-0 border-0 bg-transparent p-0 ${isSelected ? "user-select-none ring-primary ring-2 ring-offset-2" : ""}`}
+          className={`m-0 border-0 bg-transparent p-0 ${isSelected ? "user-select-none ring-2 ring-primary ring-offset-2" : ""}`}
         >
           <ExcalidrawImage
             ref={imageContainerReference}

@@ -1,7 +1,7 @@
 import { Slot } from "radix-ui";
 
-import { cn } from "../../lib/utils";
 import type { Label as ShadLabel } from "../../shadcn/label";
+import { cn } from "../../lib/utils";
 
 // Base classes mirror ../../shadcn/label but with select-none -> select-text so
 // double-click selects the label text. Keep in sync if the shadcn CLI updates

@@ -657,9 +657,7 @@ describe("DatePicker showTime hover", () => {
   test("previews and dims a hovered time", async () => {
     const user = userEvent.setup();
 
-    render(
-      <DatePicker showTime defaultValue={dayjs("2026-05-05 09:30:00")} />,
-    );
+    render(<DatePicker showTime defaultValue={dayjs("2026-05-05 09:30:00")} />);
 
     const input = screen.getByRole("textbox");
     await user.click(input);

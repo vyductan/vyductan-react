@@ -86,12 +86,12 @@ export const WithExtraContent: Story = {
     type: "line",
     tabBarExtraContent: {
       left: (
-        <span className="text-muted-foreground mr-4 font-medium">
+        <span className="mr-4 font-medium text-muted-foreground">
           Left Extra
         </span>
       ),
       right: (
-        <button className="text-primary text-sm hover:underline">Action</button>
+        <button className="text-sm text-primary hover:underline">Action</button>
       ),
     },
   },

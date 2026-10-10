@@ -25,7 +25,7 @@ const CustomOptionRenderDemo = () => (
         label: (option) => (
           <span className="inline-flex flex-col text-left align-top">
             <span className="font-medium">{String(option.label)}</span>
-            <span className="text-muted-foreground text-xs">
+            <span className="text-xs text-muted-foreground">
               {String(option.description)}
             </span>
           </span>

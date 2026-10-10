@@ -12,7 +12,7 @@ export const StatisticTitle = ({
 }: React.ComponentProps<"div">) => {
   return (
     <div
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-sm text-muted-foreground", className)}
       {...properties}
     />
   );

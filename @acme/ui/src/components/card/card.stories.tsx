@@ -100,7 +100,7 @@ export const WithFooter: Story = {
           <Bell className="size-5" />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium">New messages</p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Check your inbox for updates
             </p>
           </div>
@@ -126,7 +126,7 @@ export const BorderedSections: Story = {
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm font-medium">Profile visibility</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Choose what other people can see on your public profile.
           </p>
         </div>
@@ -191,7 +191,7 @@ export const WithImage: Story = {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-30 aspect-video bg-black/35" />
       <CardHeader>
         <CardAction>
-          <span className="bg-secondary text-secondary-foreground inline-flex h-5 w-fit shrink-0 items-center justify-center overflow-hidden rounded-4xl px-2 py-0.5 text-xs font-medium">
+          <span className="inline-flex h-5 w-fit shrink-0 items-center justify-center overflow-hidden rounded-4xl bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
             Featured
           </span>
         </CardAction>
@@ -272,12 +272,12 @@ export const Interactive: Story = {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           Settings
-          <Settings className="text-muted-foreground size-5" />
+          <Settings className="size-5 text-muted-foreground" />
         </CardTitle>
         <CardDescription>Manage your account settings</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Click to view and update your preferences
         </p>
       </CardContent>
@@ -328,7 +328,7 @@ export const MinimalContent: Story = {
   render: () => (
     <Card className="w-[350px]">
       <CardContent>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           A simple card with just content, no header or footer.
         </p>
       </CardContent>

@@ -392,7 +392,7 @@ export function FindReplacePlugin({
       data-slot="find-bar"
       role="search"
       style={{ top: position.top, right: position.right }}
-      className="bg-popover text-popover-foreground fixed z-50 w-[22rem] max-w-[calc(100vw-1rem)] rounded-xl border shadow-lg"
+      className="fixed z-50 w-[22rem] max-w-[calc(100vw-1rem)] rounded-xl border bg-popover text-popover-foreground shadow-lg"
     >
       <div className="flex items-center gap-1 py-1.5 pr-1.5 pl-3">
         <input
@@ -425,7 +425,7 @@ export function FindReplacePlugin({
         />
         <span
           data-slot="find-count"
-          className="text-muted-foreground shrink-0 px-1 text-xs tabular-nums"
+          className="shrink-0 px-1 text-xs text-muted-foreground tabular-nums"
         >
           {query
             ? `${matches.length > 0 ? current + 1 : 0} of ${matches.length}`

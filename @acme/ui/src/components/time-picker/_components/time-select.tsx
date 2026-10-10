@@ -66,8 +66,7 @@ export const TimeSelect = ({
 }: TimeSelectProperties) => {
   const hourType = format.split(":")[0];
   // 12-hour helpers: the hour column shows 12/1..11 while values stay 24h.
-  const meridiem: "AM" | "PM" =
-    value && value.hour() >= 12 ? "PM" : "AM";
+  const meridiem: "AM" | "PM" = value && value.hour() >= 12 ? "PM" : "AM";
   const to12 = (h24: number) => (h24 % 12 === 0 ? 12 : h24 % 12);
   const from12 = (displayHour: number, mer: "AM" | "PM") => {
     const base = displayHour % 12; // 12 -> 0
@@ -230,162 +229,100 @@ export const TimeSelect = ({
         style={{
           // 56px per column (+2px for column borders): hour, minute,
           // optionally second, optionally AM/PM.
-          width:
-            56 * (2 + (showSeconds ? 1 : 0) + (use12Hours ? 1 : 0)) + 2,
+          width: 56 * (2 + (showSeconds ? 1 : 0) + (use12Hours ? 1 : 0)) + 2,
         }}
       >
         <div
           className="absolute inset-0 flex py-3"
           onMouseLeave={() => onHoverChange?.()}
         >
-        <ul
-          ref={hourListReference}
-          className="flex w-14 min-h-0 flex-1 scrollbar-none flex-col gap-0.5 overflow-y-auto py-24 [&::-webkit-scrollbar]:hidden"
-          onScroll={(e) => handleInfiniteScroll(e, baseHourOptions.length)}
-        >
-          {/* <ScrollArea className="h-[227px]"> */}
-          {hourOptions.map((hour, index) => {
-            // Tripled options already hold real values; no modulo (which would
-            // corrupt stepped values, e.g. 15 % 4). In 12h mode `actualHour` is
-            // the display hour (12/1..11) and `hour24` its 24h value.
-            const actualHour = hour;
-            const hour24 = use12Hours
-              ? from12(actualHour, meridiem)
-              : actualHour;
-            const hourSelected = use12Hours
-              ? value != null && to12(value.hour()) === actualHour
-              : value?.hour() === actualHour;
-            const hourDisabled = disabledHourList.includes(hour24);
-            const setHour = () =>
-              (value ?? dayjs().hour(0).minute(0).second(0).millisecond(0)).hour(
-                hour24,
-              );
-            return (
-              <li
-                key={index}
-                aria-disabled={hourDisabled || undefined}
-                className={cn(
-                  "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  hourSelected && "bg-primary-200",
-                  hourDisabled && "pointer-events-none opacity-30",
-                  hourDisabled && hideDisabledOptions && "hidden",
-                )}
-                onMouseEnter={() => {
-                  onHoverChange?.(setHour());
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={() => {
-                  onChange?.(setHour());
-                  scrollColumnToBaseIndex(
-                    hourListReference,
-                    baseHourOptions.length,
-                    index % baseHourOptions.length,
-                  );
-                }}
-              >
-                {actualHour.toString().padStart(2, "0")}
-              </li>
-            );
-          })}
-          {/* </ScrollArea> */}
-        </ul>
-        <ul
-          ref={minuteListReference}
-          className="flex w-14 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
-          onScroll={(e) => handleInfiniteScroll(e, baseMinuteOptions.length)}
-        >
-          {minuteOptions.map((minute, index) => {
-            const actualMinute = minute;
-            return (
-              <li
-                key={index}
-                aria-disabled={
-                  disabledMinuteList.includes(actualMinute) || undefined
-                }
-                className={cn(
-                  "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  value?.minute() === actualMinute && "bg-primary-200",
-                  disabledMinuteList.includes(actualMinute) &&
-                    "pointer-events-none opacity-30",
-                  disabledMinuteList.includes(actualMinute) &&
-                    hideDisabledOptions &&
-                    "hidden",
-                )}
-                onMouseEnter={() => {
-                  const newDate = value
-                    ? value.minute(actualMinute)
-                    : dayjs()
-                        .hour(0)
-                        .minute(0)
-                        .second(0)
-                        .millisecond(0)
-                        .minute(actualMinute);
-                  onHoverChange?.(newDate);
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={() => {
-                  const newDate = value
-                    ? value.minute(actualMinute)
-                    : dayjs()
-                        .hour(0)
-                        .minute(0)
-                        .second(0)
-                        .millisecond(0)
-                        .minute(actualMinute);
-                  onChange?.(newDate);
-                  scrollColumnToBaseIndex(
-                    minuteListReference,
-                    baseMinuteOptions.length,
-                    index % baseMinuteOptions.length,
-                  );
-                }}
-              >
-                {actualMinute.toString().padStart(2, "0")}
-              </li>
-            );
-          })}
-        </ul>
-        {showSeconds && (
           <ul
-            ref={secondListReference}
-            className="flex w-14 min-h-0 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
-            onScroll={(e) => handleInfiniteScroll(e, baseSecondOptions.length)}
+            ref={hourListReference}
+            className="flex min-h-0 w-14 flex-1 scrollbar-none flex-col gap-0.5 overflow-y-auto py-24 [&::-webkit-scrollbar]:hidden"
+            onScroll={(e) => handleInfiniteScroll(e, baseHourOptions.length)}
           >
-            {secondOptions.map((second, index) => {
-              const actualSecond = second;
+            {/* <ScrollArea className="h-[227px]"> */}
+            {hourOptions.map((hour, index) => {
+              // Tripled options already hold real values; no modulo (which would
+              // corrupt stepped values, e.g. 15 % 4). In 12h mode `actualHour` is
+              // the display hour (12/1..11) and `hour24` its 24h value.
+              const actualHour = hour;
+              const hour24 = use12Hours
+                ? from12(actualHour, meridiem)
+                : actualHour;
+              const hourSelected = use12Hours
+                ? value != null && to12(value.hour()) === actualHour
+                : value?.hour() === actualHour;
+              const hourDisabled = disabledHourList.includes(hour24);
+              const setHour = () =>
+                (
+                  value ?? dayjs().hour(0).minute(0).second(0).millisecond(0)
+                ).hour(hour24);
+              return (
+                <li
+                  key={index}
+                  aria-disabled={hourDisabled || undefined}
+                  className={cn(
+                    "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    hourSelected && "bg-primary-200",
+                    hourDisabled && "pointer-events-none opacity-30",
+                    hourDisabled && hideDisabledOptions && "hidden",
+                  )}
+                  onMouseEnter={() => {
+                    onHoverChange?.(setHour());
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={() => {
+                    onChange?.(setHour());
+                    scrollColumnToBaseIndex(
+                      hourListReference,
+                      baseHourOptions.length,
+                      index % baseHourOptions.length,
+                    );
+                  }}
+                >
+                  {actualHour.toString().padStart(2, "0")}
+                </li>
+              );
+            })}
+            {/* </ScrollArea> */}
+          </ul>
+          <ul
+            ref={minuteListReference}
+            className="flex w-14 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
+            onScroll={(e) => handleInfiniteScroll(e, baseMinuteOptions.length)}
+          >
+            {minuteOptions.map((minute, index) => {
+              const actualMinute = minute;
               return (
                 <li
                   key={index}
                   aria-disabled={
-                    disabledSecondList.includes(actualSecond) || undefined
+                    disabledMinuteList.includes(actualMinute) || undefined
                   }
                   className={cn(
                     "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
                     "hover:bg-accent hover:text-accent-foreground",
-                    value?.second() === actualSecond && "bg-primary-200",
-                    disabledSecondList.includes(actualSecond) &&
+                    value?.minute() === actualMinute && "bg-primary-200",
+                    disabledMinuteList.includes(actualMinute) &&
                       "pointer-events-none opacity-30",
-                    disabledSecondList.includes(actualSecond) &&
+                    disabledMinuteList.includes(actualMinute) &&
                       hideDisabledOptions &&
                       "hidden",
                   )}
                   onMouseEnter={() => {
                     const newDate = value
-                      ? value.second(actualSecond)
+                      ? value.minute(actualMinute)
                       : dayjs()
                           .hour(0)
                           .minute(0)
                           .second(0)
                           .millisecond(0)
-                          .second(actualSecond);
+                          .minute(actualMinute);
                     onHoverChange?.(newDate);
                   }}
                   onMouseDown={(e) => {
@@ -394,60 +331,123 @@ export const TimeSelect = ({
                   }}
                   onClick={() => {
                     const newDate = value
-                      ? value.second(actualSecond)
+                      ? value.minute(actualMinute)
                       : dayjs()
                           .hour(0)
                           .minute(0)
                           .second(0)
                           .millisecond(0)
-                          .second(actualSecond);
+                          .minute(actualMinute);
                     onChange?.(newDate);
                     scrollColumnToBaseIndex(
-                      secondListReference,
-                      baseSecondOptions.length,
-                      index % baseSecondOptions.length,
+                      minuteListReference,
+                      baseMinuteOptions.length,
+                      index % baseMinuteOptions.length,
                     );
                   }}
                 >
-                  {actualSecond.toString().padStart(2, "0")}
+                  {actualMinute.toString().padStart(2, "0")}
                 </li>
               );
             })}
           </ul>
-        )}
-        {use12Hours && (
-          <ul className="flex w-14 min-h-0 flex-col gap-0.5 border-l">
-            {(["AM", "PM"] as const).map((mer) => (
-              <li
-                key={mer}
-                className={cn(
-                  "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
-                  "hover:bg-accent hover:text-accent-foreground",
-                  meridiem === mer && "bg-primary-200",
-                )}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={() => {
-                  const base =
-                    value ??
-                    dayjs().hour(0).minute(0).second(0).millisecond(0);
-                  const h = base.hour();
-                  const next =
-                    mer === "AM" && h >= 12
-                      ? base.hour(h - 12)
-                      : mer === "PM" && h < 12
-                        ? base.hour(h + 12)
-                        : base;
-                  onChange?.(next);
-                }}
-              >
-                {mer}
-              </li>
-            ))}
-          </ul>
-        )}
+          {showSeconds && (
+            <ul
+              ref={secondListReference}
+              className="flex min-h-0 w-14 scrollbar-none flex-col gap-0.5 overflow-y-auto border-l py-24 [&::-webkit-scrollbar]:hidden"
+              onScroll={(e) =>
+                handleInfiniteScroll(e, baseSecondOptions.length)
+              }
+            >
+              {secondOptions.map((second, index) => {
+                const actualSecond = second;
+                return (
+                  <li
+                    key={index}
+                    aria-disabled={
+                      disabledSecondList.includes(actualSecond) || undefined
+                    }
+                    className={cn(
+                      "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      value?.second() === actualSecond && "bg-primary-200",
+                      disabledSecondList.includes(actualSecond) &&
+                        "pointer-events-none opacity-30",
+                      disabledSecondList.includes(actualSecond) &&
+                        hideDisabledOptions &&
+                        "hidden",
+                    )}
+                    onMouseEnter={() => {
+                      const newDate = value
+                        ? value.second(actualSecond)
+                        : dayjs()
+                            .hour(0)
+                            .minute(0)
+                            .second(0)
+                            .millisecond(0)
+                            .second(actualSecond);
+                      onHoverChange?.(newDate);
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    onClick={() => {
+                      const newDate = value
+                        ? value.second(actualSecond)
+                        : dayjs()
+                            .hour(0)
+                            .minute(0)
+                            .second(0)
+                            .millisecond(0)
+                            .second(actualSecond);
+                      onChange?.(newDate);
+                      scrollColumnToBaseIndex(
+                        secondListReference,
+                        baseSecondOptions.length,
+                        index % baseSecondOptions.length,
+                      );
+                    }}
+                  >
+                    {actualSecond.toString().padStart(2, "0")}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {use12Hours && (
+            <ul className="flex min-h-0 w-14 flex-col gap-0.5 border-l">
+              {(["AM", "PM"] as const).map((mer) => (
+                <li
+                  key={mer}
+                  className={cn(
+                    "mx-1 flex cursor-pointer justify-center rounded-sm py-1 transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    meridiem === mer && "bg-primary-200",
+                  )}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={() => {
+                    const base =
+                      value ??
+                      dayjs().hour(0).minute(0).second(0).millisecond(0);
+                    const h = base.hour();
+                    const next =
+                      mer === "AM" && h >= 12
+                        ? base.hour(h - 12)
+                        : mer === "PM" && h < 12
+                          ? base.hour(h + 12)
+                          : base;
+                    onChange?.(next);
+                  }}
+                >
+                  {mer}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       {showFooter && (

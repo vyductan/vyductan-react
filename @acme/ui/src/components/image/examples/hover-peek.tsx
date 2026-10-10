@@ -11,7 +11,7 @@ const receipts = [
 const App: React.FC = () => (
   <table className="w-full max-w-md text-sm">
     <thead>
-      <tr className="text-muted-foreground border-b text-left">
+      <tr className="border-b text-left text-muted-foreground">
         <th className="w-12 py-2 font-medium">Receipt</th>
         <th className="py-2 font-medium">Expense</th>
         <th className="py-2 text-right font-medium">Amount</th>

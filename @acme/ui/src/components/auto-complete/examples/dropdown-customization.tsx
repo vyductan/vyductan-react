@@ -13,7 +13,7 @@ const DropdownCustomizationDemo = () => (
       placeholder="Select a service"
       options={[...serviceOptions]}
       dropdownFooter={
-        <div className="border-border border-t p-2">
+        <div className="border-t border-border p-2">
           <Button variant="text" className="w-full justify-start px-2">
             Create service
           </Button>

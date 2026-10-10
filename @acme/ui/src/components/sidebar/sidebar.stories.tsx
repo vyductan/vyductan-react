@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, userEvent, within } from "storybook/test";
 import {
   Calendar,
   ChevronUp,
@@ -10,6 +9,7 @@ import {
   Settings,
   User2,
 } from "lucide-react";
+import { expect, userEvent, within } from "storybook/test";
 
 import {
   SidebarContent,
@@ -227,7 +227,7 @@ export const WithHeaderAndFooter: Story = {
     items: items,
     header: (
       <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
-        <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
           <div className="size-4 rounded-full bg-current" />
         </div>
         <div className="grid flex-1 text-left text-sm leading-tight">
@@ -258,7 +258,7 @@ export const ShadcnComposable: Story = {
     <SidebarBase className="w-64 border-r">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <div className="size-4 rounded-full bg-current" />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">

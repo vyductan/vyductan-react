@@ -80,7 +80,7 @@ export function MediaGallery({
                 variant="outlined"
                 size="sm"
                 onClick={() => openAt(0)}
-                className="bg-background/90 hover:bg-background text-sm font-medium shadow-sm transition-transform hover:scale-105"
+                className="bg-background/90 text-sm font-medium shadow-sm transition-transform hover:scale-105 hover:bg-background"
               >
                 <ImageIcon className="size-4" />
                 {viewAllLabel}
@@ -92,11 +92,11 @@ export function MediaGallery({
 
       <div
         className={cn(
-          "bg-muted relative h-72 w-full overflow-hidden rounded-xl sm:h-96 md:hidden",
+          "relative h-72 w-full overflow-hidden rounded-xl bg-muted sm:h-96 md:hidden",
         )}
       >
         {media.length === 0 ? (
-          <div className="text-muted-foreground flex h-full items-center justify-center">
+          <div className="flex h-full items-center justify-center text-muted-foreground">
             {empty}
           </div>
         ) : (
@@ -143,9 +143,9 @@ export function MediaGallery({
 
             {media.length > 1 && (
               <>
-                <CarouselPrevious className="bg-popover/70 hover:bg-popover left-3 border-none" />
-                <CarouselNext className="bg-popover/70 hover:bg-popover right-3 border-none" />
-                <div className="bg-background/60 text-foreground absolute top-3 left-3 rounded px-2 py-1 text-xs font-medium backdrop-blur-sm">
+                <CarouselPrevious className="left-3 border-none bg-popover/70 hover:bg-popover" />
+                <CarouselNext className="right-3 border-none bg-popover/70 hover:bg-popover" />
+                <div className="absolute top-3 left-3 rounded bg-background/60 px-2 py-1 text-xs font-medium text-foreground backdrop-blur-sm">
                   {current + 1} / {media.length}
                 </div>
               </>

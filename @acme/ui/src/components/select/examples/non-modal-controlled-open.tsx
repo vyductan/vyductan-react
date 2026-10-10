@@ -43,14 +43,14 @@ const App: React.FC = () => {
       <button
         ref={keepOpenRef}
         type="button"
-        className="hover:bg-accent hover:text-accent-foreground h-8 cursor-pointer rounded-md border px-3 text-sm"
+        className="h-8 cursor-pointer rounded-md border px-3 text-sm hover:bg-accent hover:text-accent-foreground"
         onClick={() => setValue(undefined)}
       >
         Clear (keeps panel open)
       </button>
       <button
         type="button"
-        className="hover:bg-accent hover:text-accent-foreground h-8 cursor-pointer rounded-md border px-3 text-sm"
+        className="h-8 cursor-pointer rounded-md border px-3 text-sm hover:bg-accent hover:text-accent-foreground"
       >
         Closes normally
       </button>

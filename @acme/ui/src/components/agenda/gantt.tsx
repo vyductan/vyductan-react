@@ -95,13 +95,13 @@ export function Gantt({
   const trackWidth = Math.max(days.length * dayWidth, 0);
 
   return (
-    <div className={cn("bg-background rounded-lg border", className)}>
+    <div className={cn("rounded-lg border bg-background", className)}>
       <div className="overflow-x-auto">
         <div style={{ minWidth: labelWidth + trackWidth }}>
           {/* Axis */}
-          <div className="bg-muted/40 sticky top-0 z-10 flex border-b">
+          <div className="sticky top-0 z-10 flex border-b bg-muted/40">
             <div
-              className="text-muted-foreground shrink-0 border-r px-3 py-2 text-xs font-medium"
+              className="shrink-0 border-r px-3 py-2 text-xs font-medium text-muted-foreground"
               style={{ width: labelWidth }}
             >
               Task
@@ -116,7 +116,7 @@ export function Gantt({
                   )}
                   style={{ minWidth: dayWidth }}
                 >
-                  <span className="text-muted-foreground text-[10px] uppercase">
+                  <span className="text-[10px] text-muted-foreground uppercase">
                     {format(day, "EEEEE")}
                   </span>
                   <span className="text-[11px]">{format(day, "d/M")}</span>
@@ -129,7 +129,7 @@ export function Gantt({
           <div className="relative">
             {now ? (
               <div
-                className="bg-destructive/70 pointer-events-none absolute top-0 bottom-0 z-10 w-px"
+                className="pointer-events-none absolute top-0 bottom-0 z-10 w-px bg-destructive/70"
                 style={{
                   left: `calc(${labelWidth}px + (100% - ${labelWidth}px) * ${toPercent(now) / 100})`,
                 }}
@@ -139,7 +139,7 @@ export function Gantt({
             {items.map((item) => (
               <div
                 key={item.id}
-                className="hover:bg-muted/40 flex border-b transition-colors last:border-b-0"
+                className="flex border-b transition-colors last:border-b-0 hover:bg-muted/40"
                 style={{ height: ROW_HEIGHT }}
               >
                 <div
@@ -176,7 +176,7 @@ export function Gantt({
                         : ` · ${Math.round(item.progress)}%`
                     }`}
                     className={cn(
-                      "bg-primary/30 border-primary absolute top-1.5 bottom-1.5 overflow-hidden rounded-sm border",
+                      "absolute top-1.5 bottom-1.5 overflow-hidden rounded-sm border border-primary bg-primary/30",
                       "hover:brightness-110",
                       !onItemClick && "cursor-default",
                     )}
@@ -195,7 +195,7 @@ export function Gantt({
                   >
                     {item.progress === undefined ? null : (
                       <span
-                        className="bg-primary/70 absolute inset-y-0 left-0"
+                        className="absolute inset-y-0 left-0 bg-primary/70"
                         style={{
                           width: `${clamp(item.progress, 0, 100)}%`,
                           ...(item.color

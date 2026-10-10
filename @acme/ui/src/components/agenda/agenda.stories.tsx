@@ -39,7 +39,13 @@ const EVENTS: AgendaEvent[] = [
     end: day(3, 8),
     color: "var(--color-orange-500)",
   },
-  { id: "6", title: "Release day", start: day(4, 0), end: day(5, 0), allDay: true },
+  {
+    id: "6",
+    title: "Release day",
+    start: day(4, 0),
+    end: day(5, 0),
+    allDay: true,
+  },
 ];
 
 const meta = {
@@ -110,7 +116,7 @@ export const Empty: Story = {
     events: [],
     defaultDate: MONDAY,
     empty: (
-      <div className="text-muted-foreground rounded-lg border p-8 text-center text-sm">
+      <div className="rounded-lg border p-8 text-center text-sm text-muted-foreground">
         Nothing scheduled.
       </div>
     ),

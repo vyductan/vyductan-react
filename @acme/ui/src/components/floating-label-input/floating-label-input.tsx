@@ -67,7 +67,7 @@ const FloatingLabelInput = ({
         disabled={disabled}
         aria-invalid={isError || properties["aria-invalid"]}
         className={cn(
-          "peer text-foreground w-full rounded-md border bg-transparent px-3 text-sm outline-none transition-colors",
+          "peer w-full rounded-md border bg-transparent px-3 text-sm text-foreground transition-colors outline-none",
           floatingControlHeight[size],
           floatingBorderClass,
           className,
@@ -78,7 +78,7 @@ const FloatingLabelInput = ({
         htmlFor={inputId}
         className={cn(
           floatingLabelBaseClass,
-          "peer-focus:text-primary-500 peer-aria-[invalid=true]:text-error peer-disabled:opacity-50",
+          "peer-focus:text-primary-500 peer-disabled:opacity-50 peer-aria-[invalid=true]:text-error",
           // resting: vertically centered, acts like the placeholder
           "top-1/2 -translate-y-1/2",
           // floated (focused OR filled): sit on the top border, shrink

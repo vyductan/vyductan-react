@@ -9,9 +9,7 @@
     "radix-ui",
     "ts-xor"
   ],
-  "registryDependencies": [
-    "table-shared-core"
-  ],
+  "registryDependencies": ["table-shared-core"],
   "files": [
     {
       "path": "components/checkbox/index.tsx",

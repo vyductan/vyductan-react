@@ -24,7 +24,8 @@ import type { AgendaEvent, PositionedEvent } from "./types";
 export function layoutOverlaps(events: AgendaEvent[]): PositionedEvent[] {
   const sorted = [...events].sort(
     (a, b) =>
-      a.start.getTime() - b.start.getTime() || a.end.getTime() - b.end.getTime(),
+      a.start.getTime() - b.start.getTime() ||
+      a.end.getTime() - b.end.getTime(),
   );
 
   const positioned: PositionedEvent[] = [];
@@ -44,7 +45,10 @@ export function layoutOverlaps(events: AgendaEvent[]): PositionedEvent[] {
     const end = Math.max(event.end.getTime(), start);
 
     // Cluster is over only when NO column is still running.
-    if (columnEnds.length > 0 && columnEnds.every((columnEnd) => columnEnd <= start)) {
+    if (
+      columnEnds.length > 0 &&
+      columnEnds.every((columnEnd) => columnEnd <= start)
+    ) {
       closeCluster(columnEnds.length);
       columnEnds = [];
       clusterStart = positioned.length;

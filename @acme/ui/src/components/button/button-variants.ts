@@ -5,8 +5,8 @@ export const buttonVariants = tv({
   base: [
     "inline-flex shrink-0 items-center justify-center gap-2 border text-sm font-medium whitespace-nowrap ring-offset-white transition-all outline-none",
     // "disabled:pointer-events-none disabled:opacity-50",
-    "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-    "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+    "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
     // own
     // "shrink-0", // disable flex box sizing - added by shadcn
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -71,7 +71,7 @@ export const buttonColorVariants = tv({
     variant: {
       solid: ["text-white", "hover:text-white"],
       outlined: [
-        "border-border bg-background hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs",
+        "border border-border bg-background shadow-xs hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
       ],
       dashed: [],
       filled: ["border-transparent", "hover:bg-background-hover"],
@@ -1127,45 +1127,45 @@ export const buttonColorVariants = tv({
       disabled: true,
       variant: "solid",
       className: [
-        "bg-muted/80 border-input text-muted-foreground/50",
-        "hover:bg-muted/80! hover:border-input! hover:text-muted-foreground/50!",
-        "active:bg-muted/80! active:border-input! active:text-muted-foreground/50!",
+        "border-input bg-muted/80 text-muted-foreground/50",
+        "hover:border-input! hover:bg-muted/80! hover:text-muted-foreground/50!",
+        "active:border-input! active:bg-muted/80! active:text-muted-foreground/50!",
       ],
     },
     {
       disabled: true,
       variant: "outlined",
       className: [
-        "border-input text-muted-foreground/50 bg-muted/80",
-        "hover:border-input! hover:text-muted-foreground/50! hover:bg-muted/80!",
-        "active:border-input! active:text-muted-foreground/50! active:bg-muted/80!",
+        "border-input bg-muted/80 text-muted-foreground/50",
+        "hover:border-input! hover:bg-muted/80! hover:text-muted-foreground/50!",
+        "active:border-input! active:bg-muted/80! active:text-muted-foreground/50!",
       ],
     },
     {
       disabled: true,
       variant: "filled",
       className: [
-        "bg-muted/80 text-muted-foreground/50 border-transparent",
-        "hover:bg-muted/80! hover:text-muted-foreground/50! hover:border-transparent!",
-        "active:bg-muted/80! active:text-muted-foreground/50! active:border-transparent!",
+        "border-transparent bg-muted/80 text-muted-foreground/50",
+        "hover:border-transparent! hover:bg-muted/80! hover:text-muted-foreground/50!",
+        "active:border-transparent! active:bg-muted/80! active:text-muted-foreground/50!",
       ],
     },
     {
       disabled: true,
       variant: "text",
       className: [
-        "text-muted-foreground/50 border-transparent bg-transparent",
-        "hover:text-muted-foreground/50! hover:border-transparent! hover:bg-transparent!",
-        "active:text-muted-foreground/50! active:border-transparent! active:bg-transparent!",
+        "border-transparent bg-transparent text-muted-foreground/50",
+        "hover:border-transparent! hover:bg-transparent! hover:text-muted-foreground/50!",
+        "active:border-transparent! active:bg-transparent! active:text-muted-foreground/50!",
       ],
     },
     {
       disabled: true,
       variant: "link",
       className: [
-        "text-muted-foreground/50 border-transparent",
-        "hover:text-muted-foreground/50! hover:border-transparent!",
-        "active:text-muted-foreground/50! active:border-transparent!",
+        "border-transparent text-muted-foreground/50",
+        "hover:border-transparent! hover:text-muted-foreground/50!",
+        "active:border-transparent! active:text-muted-foreground/50!",
       ],
     },
   ],

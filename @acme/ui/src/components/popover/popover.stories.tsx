@@ -5,9 +5,8 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 
 import { Button } from "../button";
 import { Drawer } from "../drawer";
-import { Select } from "../select";
-
 import { ComponentSource } from "../mdx/component-source";
+import { Select } from "../select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../tabs";
 import BasicExample from "./examples/basic";
 import BasicShadcnLikeExample from "./examples/basic-shadcn-like";
@@ -141,16 +140,19 @@ export const SurvivesADrawerOpenedOnTop: Story = {
       );
     });
 
-    await step("clicking inside the drawer leaves the popover standing", async () => {
-      await userEvent.click(
-        body.getByRole("button", { name: /a control inside the drawer/i }),
-      );
+    await step(
+      "clicking inside the drawer leaves the popover standing",
+      async () => {
+        await userEvent.click(
+          body.getByRole("button", { name: /a control inside the drawer/i }),
+        );
 
-      // Presence, not role: the drawer is modal, so radix marks everything
-      // outside it `aria-hidden` — the popover is intentionally out of the
-      // accessibility tree while the drawer is up, but must not be dismissed.
-      expect(popoverNode()).not.toBeNull();
-    });
+        // Presence, not role: the drawer is modal, so radix marks everything
+        // outside it `aria-hidden` — the popover is intentionally out of the
+        // accessibility tree while the drawer is up, but must not be dismissed.
+        expect(popoverNode()).not.toBeNull();
+      },
+    );
 
     await step("and it comes back to life once the drawer closes", async () => {
       await userEvent.click(body.getByRole("button", { name: "Close" }));
@@ -273,9 +275,7 @@ export const EscapePeelsNestedLayersOneAtATime: Story = {
         return node as Element;
       });
       await userEvent.click(selectTrigger);
-      await waitFor(() =>
-        expect(openSlots()).toContain("select-content"),
-      );
+      await waitFor(() => expect(openSlots()).toContain("select-content"));
     });
 
     await step("Escape #1 takes the select only", async () => {

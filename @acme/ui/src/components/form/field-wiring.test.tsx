@@ -1,15 +1,21 @@
 import "@testing-library/jest-dom/vitest";
 
 import type React from "react";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 
 import { Field } from "@acme/ui/components/field";
 
+import { FormItem } from "./_components";
 import { Form } from "./form";
 import { useForm } from "./hooks/use-form";
-import { FormItem } from "./_components";
 
 // Characterization tests for the field VALUE-WIRING semantics shared by
 // Form.Item and Field. They pin the observable contract of the binding:
@@ -41,7 +47,9 @@ function Probe(props: {
     <div>
       <div data-testid="value">{JSON.stringify(props.value ?? null)}</div>
       <div data-testid="checked">{JSON.stringify(props.checked ?? null)}</div>
-      <div data-testid="display">{JSON.stringify(props.displayText ?? null)}</div>
+      <div data-testid="display">
+        {JSON.stringify(props.displayText ?? null)}
+      </div>
       <button type="button" onClick={() => props.onChange?.("typed")}>
         emit-typed
       </button>
@@ -127,7 +135,9 @@ for (const entry of ["form-item", "field"] as const) {
     });
 
     test("valuePropName renames the injected value prop", () => {
-      render(<Harness entry={entry} fieldProps={{ valuePropName: "checked" }} />);
+      render(
+        <Harness entry={entry} fieldProps={{ valuePropName: "checked" }} />,
+      );
       expect(screen.getByTestId("checked")).toHaveTextContent('"initial"');
     });
 
@@ -264,7 +274,7 @@ describe("default value extraction", () => {
     act(() => {
       ((globalThis as any).__onChange as (a: unknown) => void)(arg);
     });
-  const committed = () => ((globalThis as any).__form).getValues().f;
+  const committed = () => (globalThis as any).__form.getValues().f;
 
   test("extracts event.target.value so normalize receives the value", () => {
     let seen: unknown = "UNSET";
@@ -338,8 +348,7 @@ describe("field extra prop", () => {
 
     // DOM order: error precedes extra.
     expect(
-      error.compareDocumentPosition(extra) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
+      error.compareDocumentPosition(extra) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
 });

@@ -9,11 +9,11 @@ import type {
 import { Fragment } from "react";
 
 import type { Screens } from "@acme/ui/types";
-import useBreakpoint from "../grid/hooks/use-breakpoint";
 import { cn } from "@acme/ui/lib/utils";
 
 import type { DescriptionsItem, VerticalCell } from "./types";
 import { responsiveArray } from "../_util/responsive-observer";
+import useBreakpoint from "../grid/hooks/use-breakpoint";
 import { Skeleton } from "../skeleton";
 import { createHorizontalRows, createVerticalRows } from "./utils";
 
@@ -87,8 +87,7 @@ type DescriptionsCompoundProperties = ComponentProps<"div"> & {
 };
 
 type DescriptionsProperties =
-  | DescriptionsTableProperties
-  | DescriptionsCompoundProperties;
+  DescriptionsTableProperties | DescriptionsCompoundProperties;
 
 function Descriptions(properties: DescriptionsProperties): ReactElement {
   if (properties.items === undefined) {
@@ -355,7 +354,7 @@ function DescriptionsLabel({
 }: DescriptionsLabelProperties): ReactElement {
   return (
     <p
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-sm text-muted-foreground", className)}
       {...properties}
     />
   );
@@ -375,7 +374,7 @@ function DescriptionsValue({
   return (
     <div
       className={cn(
-        "text-foreground text-sm",
+        "text-sm text-foreground",
         muted && "text-muted-foreground",
         truncate && "truncate",
         className,
@@ -394,7 +393,7 @@ function DescriptionsAvatar({
   return (
     <div
       className={cn(
-        "bg-muted text-muted-foreground flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
+        "flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground",
         className,
       )}
       {...properties}

@@ -238,7 +238,7 @@ function ColorPreview({
     return (
       <span
         data-testid={`table-action-color-mixed-${axis}`}
-        className="border-border inline-flex size-4 items-center justify-center rounded-full border bg-[linear-gradient(135deg,var(--color-muted)_0%,var(--color-muted)_45%,var(--color-foreground)_45%,var(--color-foreground)_55%,var(--color-muted)_55%,var(--color-muted)_100%)]"
+        className="inline-flex size-4 items-center justify-center rounded-full border border-border bg-[linear-gradient(135deg,var(--color-muted)_0%,var(--color-muted)_45%,var(--color-foreground)_45%,var(--color-foreground)_55%,var(--color-muted)_55%,var(--color-muted)_100%)]"
       />
     );
   }
@@ -246,7 +246,7 @@ function ColorPreview({
   return (
     <span
       data-testid={`table-action-color-preview-${axis}`}
-      className="border-border inline-flex size-4 rounded-full border"
+      className="inline-flex size-4 rounded-full border border-border"
       style={{
         backgroundColor:
           summary.kind === "single" ? summary.value : "transparent",
@@ -1089,7 +1089,7 @@ function TableCellActionMenuInner({
               <Icon className="size-4" icon="icon-[lucide--ban]" />
             ) : (
               <span
-                className="border-border size-4 rounded-full border"
+                className="size-4 rounded-full border border-border"
                 style={{ backgroundColor: preset.value }}
               />
             ),
@@ -1165,7 +1165,7 @@ function TableCellActionMenuInner({
               <Icon className="size-4" icon="icon-[lucide--ban]" />
             ) : (
               <span
-                className="border-border size-4 rounded-full border"
+                className="size-4 rounded-full border border-border"
                 style={{ backgroundColor: preset.value }}
               />
             ),
@@ -1218,7 +1218,7 @@ function TableCellActionMenuInner({
       <div
         aria-hidden="true"
         className={cn(
-          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none absolute z-40 rounded-md border-2",
+          "EditorTheme__tableCellActionMenuHighlight pointer-events-none absolute z-40 rounded-md border-2 border-primary/70 bg-primary/5",
           activeAxis === "row" ? "opacity-100" : "opacity-0",
         )}
         style={{
@@ -1231,7 +1231,7 @@ function TableCellActionMenuInner({
       <div
         aria-hidden="true"
         className={cn(
-          "EditorTheme__tableCellActionMenuHighlight border-primary/70 bg-primary/5 pointer-events-none absolute z-40 rounded-md border-2",
+          "EditorTheme__tableCellActionMenuHighlight pointer-events-none absolute z-40 rounded-md border-2 border-primary/70 bg-primary/5",
           activeAxis === "column" ? "opacity-100" : "opacity-0",
         )}
         style={{
@@ -1294,7 +1294,7 @@ function TableCellActionMenuInner({
           aria-haspopup="menu"
           aria-expanded={openMenu === "row"}
           data-state={openMenu === "row" ? "open" : "closed"}
-          className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
+          className="EditorTheme__tableCellActionMenuHandle group/handle relative flex h-[24px] min-h-0 w-[14px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-muted-foreground transition-colors hover:border-border hover:bg-background hover:shadow-sm"
           onMouseEnter={() => setActiveAxis("row")}
           onMouseLeave={() => {
             if (openMenu !== "row" && !dragState) {
@@ -1317,7 +1317,7 @@ function TableCellActionMenuInner({
           <span
             aria-hidden="true"
             data-slot="table-handle-bar"
-            className="bg-muted-foreground/70 h-[18px] w-[3px] shrink-0 rounded-full group-hover/handle:hidden"
+            className="h-[18px] w-[3px] shrink-0 rounded-full bg-muted-foreground/70 group-hover/handle:hidden"
           />
           <GripVertical className="hidden size-3.5 group-hover/handle:block" />
         </Button>
@@ -1359,7 +1359,7 @@ function TableCellActionMenuInner({
           aria-haspopup="menu"
           aria-expanded={openMenu === "column"}
           data-state={openMenu === "column" ? "open" : "closed"}
-          className="EditorTheme__tableCellActionMenuHandle group/handle text-muted-foreground hover:border-border hover:bg-background relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 transition-colors hover:shadow-sm"
+          className="EditorTheme__tableCellActionMenuHandle group/handle relative flex h-[14px] min-h-0 w-[24px] items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-muted-foreground transition-colors hover:border-border hover:bg-background hover:shadow-sm"
           onMouseEnter={() => setActiveAxis("column")}
           onMouseLeave={() => {
             if (openMenu !== "column" && !dragState) {
@@ -1382,7 +1382,7 @@ function TableCellActionMenuInner({
           <span
             aria-hidden="true"
             data-slot="table-handle-bar"
-            className="bg-muted-foreground/70 h-[3px] w-[18px] shrink-0 rounded-full group-hover/handle:hidden"
+            className="h-[3px] w-[18px] shrink-0 rounded-full bg-muted-foreground/70 group-hover/handle:hidden"
           />
           <GripHorizontal className="hidden size-3.5 group-hover/handle:block" />
         </Button>

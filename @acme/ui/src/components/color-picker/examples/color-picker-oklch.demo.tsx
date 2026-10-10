@@ -35,7 +35,7 @@ export default function ColorPickerOKLCHDemo() {
     <div className="space-y-8 p-8">
       <div>
         <h2 className="mb-4 text-2xl font-bold">OKLCH Color Picker Demo</h2>
-        <p className="text-muted-foreground mb-6">
+        <p className="mb-6 text-muted-foreground">
           OKLCH provides perceptually uniform color selection. Moving sliders
           produces visually consistent changes.
         </p>
@@ -44,12 +44,12 @@ export default function ColorPickerOKLCHDemo() {
       {/* Basic OKLCH Picker */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Basic OKLCH Picker</h3>
-        <div className="border-border rounded-lg border p-4">
+        <div className="rounded-lg border border-border p-4">
           <ColorPickerOKLCHPanel
             oklchValue={oklchValue}
             onChange={setOklchValue}
           />
-          <div className="text-muted-foreground mt-4 text-sm">
+          <div className="mt-4 text-sm text-muted-foreground">
             <div>
               L:{" "}
               <span className="font-mono">
@@ -72,7 +72,7 @@ export default function ColorPickerOKLCHDemo() {
       {/* OKLCH Picker with Alpha */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">OKLCH Picker with Alpha</h3>
-        <div className="border-border rounded-lg border p-4">
+        <div className="rounded-lg border border-border p-4">
           <ColorPickerOKLCHPanel
             oklchValue={oklchValue}
             onChange={setOklchValue}
@@ -84,7 +84,7 @@ export default function ColorPickerOKLCHDemo() {
       {/* OKLCH Picker with Presets */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">OKLCH Picker with Presets</h3>
-        <div className="border-border rounded-lg border p-4">
+        <div className="rounded-lg border border-border p-4">
           <ColorPickerOKLCHPanel
             oklchValue={oklchValue}
             onChange={setOklchValue}
@@ -99,19 +99,19 @@ export default function ColorPickerOKLCHDemo() {
           Comparison: OKLCH vs Hex Picker
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="border-border rounded-lg border p-4">
+          <div className="rounded-lg border border-border p-4">
             <h4 className="mb-2 font-medium">OKLCH (Perceptually Uniform)</h4>
             <ColorPickerOKLCHPanel
               oklchValue={oklchValue}
               onChange={setOklchValue}
             />
           </div>
-          <div className="border-border rounded-lg border p-4">
+          <div className="rounded-lg border border-border p-4">
             <h4 className="mb-2 font-medium">Hex/RGB (Traditional)</h4>
             <ColorPickerPanel hexValue={hexValue} onChange={setHexValue} />
           </div>
         </div>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           The OKLCH picker provides more perceptually uniform color selection,
           where equal steps in the sliders result in equal perceived color
           differences.

@@ -50,7 +50,7 @@ const SkeletonElement = (properties: SkeletonElementProps) => {
       data-slot="skeleton"
       className={cn(
         "h-4 w-full",
-        "bg-accent animate-pulse rounded-md",
+        "animate-pulse rounded-md bg-accent",
         active ? "" : "animate-none",
         sizeCls,
         shapeCls,

@@ -28,7 +28,7 @@ const App: React.FC = () => {
         onOk={() => console.log("Deleted")}
       >
         <p>Are you sure you want to delete this item?</p>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           This action cannot be undone.
         </p>
       </Modal>
@@ -42,7 +42,7 @@ const App: React.FC = () => {
         onOk={handleDelete}
       >
         <p>Click confirm to see the loading state.</p>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           The OK button will show a loading indicator for 2 seconds.
         </p>
       </Modal>

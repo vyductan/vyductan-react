@@ -181,7 +181,7 @@ function CodeActionMenuContainer({
     <>
       {isShown ? (
         <div
-          className="code-action-menu-container user-select-none text-foreground/50 absolute flex h-9 flex-row items-center space-x-1 text-xs"
+          className="code-action-menu-container user-select-none absolute flex h-9 flex-row items-center space-x-1 text-xs text-foreground/50"
           style={{ ...position }}
         >
           {!isEditable && (
@@ -194,7 +194,7 @@ function CodeActionMenuContainer({
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="hover:bg-muted/50 flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors"
+                  className="flex items-center gap-1 rounded px-1.5 py-0.5 transition-colors hover:bg-muted/50"
                   title="Select language"
                 >
                   {codeFriendlyName ?? "Plain Text"}

@@ -9,9 +9,7 @@
     "radix-ui",
     "tailwind-variants"
   ],
-  "registryDependencies": [
-    "table-shared-core"
-  ],
+  "registryDependencies": ["table-shared-core"],
   "files": [
     {
       "path": "components/pagination/index.ts",

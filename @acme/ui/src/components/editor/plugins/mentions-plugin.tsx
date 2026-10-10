@@ -468,7 +468,7 @@ export function MentionsPlugin({
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate">{option.page.title}</span>
                   {option.page.description && (
-                    <span className="text-muted-foreground truncate text-xs">
+                    <span className="truncate text-xs text-muted-foreground">
                       {option.page.description}
                     </span>
                   )}
@@ -493,7 +493,7 @@ export function MentionsPlugin({
             anchor={anchorElementReference.current}
             // Re-measure when the list changes height.
             deps={options.length}
-            className="bg-popover fixed z-50 w-72 rounded-md shadow-md"
+            className="fixed z-50 w-72 rounded-md bg-popover shadow-md"
           >
             <Command
               onKeyDown={(e) => {

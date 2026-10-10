@@ -13,7 +13,6 @@ import {
 } from "@acme/ui/shadcn/field";
 
 import useSize from "../config-provider/hooks/use-size";
-
 import { FormController } from "../form/_components/form-controller";
 import { useFormContext } from "../form/context";
 import { buildFieldChildProps } from "../form/field-binding";
@@ -93,8 +92,7 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
   const required = useRequiredFieldCheck(name, defaultRequired);
   const inputId = name ? `${formId ?? generatedId}-${name}` : generatedId;
   const mergedControl = (control ?? form?.control) as
-    | Control<TFieldValues>
-    | undefined;
+    Control<TFieldValues> | undefined;
 
   // Tighten the label/control/description spacing at the small size; middle and
   // large keep the current gap-2.
@@ -109,7 +107,11 @@ function Field<TFieldValues extends FieldValues = FieldValues>({
         {...properties}
       >
         {label && (
-          <FieldLabel htmlFor={inputId} required={required} labelExtra={labelExtra}>
+          <FieldLabel
+            htmlFor={inputId}
+            required={required}
+            labelExtra={labelExtra}
+          >
             {label}
           </FieldLabel>
         )}
@@ -207,7 +209,7 @@ const FieldError = ({
       <div
         data-slot="field-error"
         className={cn(
-          "text-destructive min-h-6 text-sm font-normal",
+          "min-h-6 text-sm font-normal text-destructive",
           className,
         )}
         {...properties}

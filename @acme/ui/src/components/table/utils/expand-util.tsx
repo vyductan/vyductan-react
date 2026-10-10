@@ -27,7 +27,7 @@ export function renderExpandIcon<RecordType>({
       type="button"
       onClick={onClick}
       className={cn(
-        "text-foreground hover:bg-muted focus-visible:border-ring focus-visible:ring-ring/50 inline-flex size-6 items-center justify-center rounded-sm border border-transparent transition-colors focus-visible:ring-3",
+        "inline-flex size-6 items-center justify-center rounded-sm border border-transparent text-foreground transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
         className,
       )}
       aria-label={expanded ? "Collapse row" : "Expand row"}

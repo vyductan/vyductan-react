@@ -40,7 +40,7 @@ const App: React.FC = () => {
             type="button"
             aria-label={`Open ${item.fileName}`}
             onClick={() => setOpenIndex(index)}
-            className="focus-visible:ring-ring size-24 overflow-hidden rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="size-24 overflow-hidden rounded-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             {item.type === "video" ? (
               <video

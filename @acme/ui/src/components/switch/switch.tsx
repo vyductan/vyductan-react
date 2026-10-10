@@ -49,7 +49,7 @@ export const Switch = (properties: OwnSwitchProps) => {
       data-size={size}
       className={cn(
         "peer group/switch inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input dark:data-[state=unchecked]:bg-input/80",
-        "data-[size=small]:h-4 data-[size=small]:w-7 data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=large]:h-[22px] data-[size=large]:w-11",
+        "data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=large]:h-[22px] data-[size=large]:w-11 data-[size=small]:h-4 data-[size=small]:w-7",
         className,
       )}
       checked={isChecked}
@@ -64,13 +64,13 @@ export const Switch = (properties: OwnSwitchProps) => {
         data-slot="switch-thumb"
         className={cn(
           "pointer-events-none relative block rounded-full bg-background ring-0 transition-transform dark:data-[state=checked]:bg-primary-foreground dark:data-[state=unchecked]:bg-foreground",
-          "group-data-[size=small]/switch:size-3 group-data-[size=default]/switch:size-3.5 group-data-[size=large]/switch:size-[18px]",
-          "data-[state=unchecked]:translate-x-px group-data-[size=small]/switch:data-[state=checked]:translate-x-[13px] group-data-[size=default]/switch:data-[state=checked]:translate-x-[15px] group-data-[size=large]/switch:data-[state=checked]:translate-x-[23px]",
+          "group-data-[size=default]/switch:size-3.5 group-data-[size=large]/switch:size-[18px] group-data-[size=small]/switch:size-3",
+          "group-data-[size=default]/switch:data-[state=checked]:translate-x-[15px] group-data-[size=large]/switch:data-[state=checked]:translate-x-[23px] group-data-[size=small]/switch:data-[state=checked]:translate-x-[13px] data-[state=unchecked]:translate-x-px",
         )}
       >
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center opacity-50">
-            <LoadingIcon className="group-data-[size=small]/switch:size-2 group-data-[size=default]/switch:size-2.5 group-data-[size=large]/switch:size-3" />
+            <LoadingIcon className="group-data-[size=default]/switch:size-2.5 group-data-[size=large]/switch:size-3 group-data-[size=small]/switch:size-2" />
           </div>
         )}
       </SwitchPrimitive.Thumb>

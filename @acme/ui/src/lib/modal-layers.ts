@@ -116,7 +116,8 @@ function snapshotLayersBeforeDismiss(event: Event) {
 
   if (layers.length > 0) {
     for (const consumer of document.querySelectorAll(GUARD_CONSUMERS)) {
-      if (layers.some((layer) => isAfter(consumer, layer))) guarded.add(consumer);
+      if (layers.some((layer) => isAfter(consumer, layer)))
+        guarded.add(consumer);
     }
   }
 
@@ -244,7 +245,9 @@ function takeEscape(event: KeyboardEvent) {
   if (open.length === 0) return;
 
   const topmost = open.reduce((a, b) => (isAfter(a, b) ? b : a));
-  const target = [...escapeTargets].find((entry) => entry.getNode() === topmost);
+  const target = [...escapeTargets].find(
+    (entry) => entry.getNode() === topmost,
+  );
   if (!target) return;
 
   event.preventDefault();

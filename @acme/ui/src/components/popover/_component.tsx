@@ -1,13 +1,12 @@
 import React from "react";
-
 import { Popover as PopoverPrimitive } from "radix-ui";
 
 import type {
   Popover as ShadcnPopover,
   PopoverContent as ShadcnPopoverContent,
 } from "@acme/ui/shadcn/popover";
-import { cn } from "@acme/ui/lib/utils";
 import { hasModalLayerAfter } from "@acme/ui/lib/modal-layers";
+import { cn } from "@acme/ui/lib/utils";
 
 type PopoverRootProps = React.ComponentProps<typeof ShadcnPopover>;
 
@@ -60,7 +59,7 @@ const PopoverContent = ({
           // `select-text`: guarantee the popover text stays selectable/copyable
           // inside modal contexts that otherwise disable selection.
           "pointer-events-auto select-text",
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden max-sm:p-2",
+          "z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 max-sm:p-2",
           className,
         )}
         // prevent close panel if open any modal
@@ -102,7 +101,9 @@ const PopoverContent = ({
           // Pass the originating pointer-down: the layer above resolves this
           // same event and flips its own `data-state` while doing so, so the
           // answer has to come from the pre-dismiss snapshot keyed on it.
-          if (hasModalLayerAfter(contentReference.current, e.detail.originalEvent)) {
+          if (
+            hasModalLayerAfter(contentReference.current, e.detail.originalEvent)
+          ) {
             e.preventDefault();
           }
           onPointerDownOutside?.(e);

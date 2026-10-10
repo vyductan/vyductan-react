@@ -21,7 +21,7 @@ const Option: React.FC<OptionProperties> = ({ value, children, className }) => {
       value={value as string}
       className={cn(
         isActive
-          ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+          ? "bg-primary-100 hover:bg-primary-100 focus:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
           : "",
         className,
       )}

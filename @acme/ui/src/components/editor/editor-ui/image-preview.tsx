@@ -104,7 +104,7 @@ export function ImagePreview({
 
   return createPortal(
     <div
-      className="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm duration-200"
+      className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/90 backdrop-blur-sm duration-200 fade-in"
       onClick={onClose}
       role="dialog"
       aria-modal="true"

@@ -7,11 +7,11 @@ import { ScrollArea, ScrollBar } from "@acme/ui/components/scroll-area";
 export function EditorDebugViewPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   return (
-    <div className="border-border mt-4 border-t">
-      <div className="text-muted-foreground bg-muted px-2 py-1 text-sm font-medium">
+    <div className="mt-4 border-t border-border">
+      <div className="bg-muted px-2 py-1 text-sm font-medium text-muted-foreground">
         Editor Debug View
       </div>
-      <ScrollArea className="bg-foreground text-background h-96 overflow-hidden rounded-b-lg p-2">
+      <ScrollArea className="h-96 overflow-hidden rounded-b-lg bg-foreground p-2 text-background">
         <TreeView
           viewClassName="tree-view-output"
           treeTypeButtonClassName="debug-treetype-button"

@@ -82,7 +82,7 @@ const App: React.FC = () => {
         </Button>
       </div>
 
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Origin: {probe?.url === source ? probe.text : "probing…"}
       </p>
 
@@ -100,7 +100,7 @@ const App: React.FC = () => {
             onLoadedMetadata={noteScheme("direct")}
             className="w-full rounded-lg"
           />
-          <span className="text-muted-foreground text-xs">
+          <span className="text-xs text-muted-foreground">
             src: {schemes.direct ?? "…"} · landed at {format(landing.direct)}
           </span>
         </div>
@@ -117,7 +117,7 @@ const App: React.FC = () => {
             onLoadedMetadata={noteScheme("buffered")}
             className="w-full rounded-lg"
           />
-          <span className="text-muted-foreground text-xs">
+          <span className="text-xs text-muted-foreground">
             src: {schemes.buffered ?? "…"} · landed at{" "}
             {format(landing.buffered)}
           </span>
@@ -128,7 +128,7 @@ const App: React.FC = () => {
         Seek both to {SEEK_TARGET}s
       </Button>
 
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         On an origin without Range support the left video reports{" "}
         <code>0.00s</code> after the seek while the right one lands on{" "}
         {SEEK_TARGET}

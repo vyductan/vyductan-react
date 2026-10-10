@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, userEvent } from "storybook/test";
 import dayjs from "dayjs";
+import { expect, userEvent } from "storybook/test";
 
 import { Calendar } from "./calendar";
-import { Calendar as CalendarXor } from "./index";
 import SizeDemo from "./examples/size";
+import { Calendar as CalendarXor } from "./index";
 
 const meta = {
   title: "Components/Calendar",
@@ -55,7 +55,7 @@ export const Multiple: Story = {
     return (
       <div className="flex flex-wrap items-start gap-10">
         <div data-testid="basic" className="space-y-2">
-          <div className="text-muted-foreground text-sm">Basic</div>
+          <div className="text-sm text-muted-foreground">Basic</div>
           <Calendar
             mode="multiple"
             defaultMonth={dayjs("2024-06-01").toDate()}
@@ -64,7 +64,7 @@ export const Multiple: Story = {
           />
         </div>
         <div data-testid="series" className="space-y-2">
-          <div className="text-muted-foreground text-sm">Series schedule</div>
+          <div className="text-sm text-muted-foreground">Series schedule</div>
           <CalendarXor
             mode="multiple"
             fixedWeeks={false}

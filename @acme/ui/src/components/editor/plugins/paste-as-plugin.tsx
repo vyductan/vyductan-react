@@ -491,10 +491,10 @@ export function PasteAsPlugin({
       */}
       <div
         aria-label="Paste as"
-        className="bg-popover text-popover-foreground min-w-48 rounded-md border p-1 shadow-md"
+        className="min-w-48 rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
         role="listbox"
       >
-        <div className="text-muted-foreground px-2 py-1 text-xs">Paste as</div>
+        <div className="px-2 py-1 text-xs text-muted-foreground">Paste as</div>
         {PASTE_AS_OPTIONS.map((option) => (
           <button
             aria-selected={option === activeOption}

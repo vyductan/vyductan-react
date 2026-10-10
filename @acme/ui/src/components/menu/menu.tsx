@@ -118,7 +118,7 @@ const Menu = ({
               <div
                 role="presentation"
                 title={typeof item.label === "string" ? item.label : ""}
-                className="text-muted-foreground px-4 py-2 text-xs font-medium"
+                className="px-4 py-2 text-xs font-medium text-muted-foreground"
               >
                 {item.label}
               </div>

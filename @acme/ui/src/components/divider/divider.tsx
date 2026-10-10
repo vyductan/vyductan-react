@@ -9,10 +9,7 @@ type DividerProperties = Omit<
   "orientation"
 > & {
   orientation?:
-    | "start"
-    | "end"
-    | "center"
-    | ShadcnSeparatorProperties["orientation"];
+    "start" | "end" | "center" | ShadcnSeparatorProperties["orientation"];
   type?: "horizontal" | "vertical";
   plain?: boolean;
   size?: "small" | "middle" | "large";

@@ -39,7 +39,7 @@ const PickerOption = ({
         "rounded-md p-2 text-center transition-colors",
         disabled
           ? "cursor-not-allowed opacity-50"
-          : "hover:bg-accent hover:text-accent-foreground cursor-pointer",
+          : "cursor-pointer hover:bg-accent hover:text-accent-foreground",
         className,
       )}
       onMouseEnter={() => {

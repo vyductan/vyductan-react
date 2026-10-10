@@ -153,10 +153,10 @@ export function Agenda({
       {events.length === 0 && empty ? (
         empty
       ) : (
-        <div className="bg-background overflow-hidden rounded-lg border">
+        <div className="overflow-hidden rounded-lg border bg-background">
           {/* Day headers — sticky so they survive the body's scroll. */}
           <div
-            className="bg-muted/40 sticky top-0 z-20 grid border-b"
+            className="sticky top-0 z-20 grid border-b bg-muted/40"
             style={{ gridTemplateColumns: gridTemplate }}
           >
             <div className="border-r" />
@@ -168,7 +168,7 @@ export function Agenda({
                   isToday(day) && "bg-primary/5",
                 )}
               >
-                <span className="text-muted-foreground text-xs uppercase">
+                <span className="text-xs text-muted-foreground uppercase">
                   {format(day, "EEE")}
                 </span>
                 <span
@@ -188,7 +188,7 @@ export function Agenda({
               className="grid border-b"
               style={{ gridTemplateColumns: gridTemplate }}
             >
-              <div className="text-muted-foreground border-r px-2 py-1 text-right text-[10px] uppercase">
+              <div className="border-r px-2 py-1 text-right text-[10px] text-muted-foreground uppercase">
                 All day
               </div>
               {days.map((day) => (
@@ -220,7 +220,7 @@ export function Agenda({
                 {hours.map((hour, hourIndex) => (
                   <div
                     key={hour}
-                    className="text-muted-foreground relative text-right text-[10px]"
+                    className="relative text-right text-[10px] text-muted-foreground"
                     style={{ height: hourHeight }}
                   >
                     {/*
@@ -261,37 +261,39 @@ export function Agenda({
                       className="pointer-events-none absolute inset-x-0 z-10 flex items-center"
                       style={{ top: nowOffset.top }}
                     >
-                      <span className="bg-destructive -ml-1 size-2 rounded-full" />
-                      <span className="bg-destructive h-px flex-1" />
+                      <span className="-ml-1 size-2 rounded-full bg-destructive" />
+                      <span className="h-px flex-1 bg-destructive" />
                     </div>
                   ) : null}
 
-                  {columns[dayIndex]?.map(({ event, column, columns: total }) => {
-                    const top =
-                      dayFraction(event.start, dayStartHour, dayEndHour) *
-                      bodyHeight;
-                    const bottom =
-                      dayFraction(event.end, dayStartHour, dayEndHour) *
-                      bodyHeight;
-                    // Events ending exactly at midnight clamp to fraction 0 on
-                    // the *next* day boundary, which would read as height 0.
-                    const end = bottom <= top ? bodyHeight : bottom;
+                  {columns[dayIndex]?.map(
+                    ({ event, column, columns: total }) => {
+                      const top =
+                        dayFraction(event.start, dayStartHour, dayEndHour) *
+                        bodyHeight;
+                      const bottom =
+                        dayFraction(event.end, dayStartHour, dayEndHour) *
+                        bodyHeight;
+                      // Events ending exactly at midnight clamp to fraction 0 on
+                      // the *next* day boundary, which would read as height 0.
+                      const end = bottom <= top ? bodyHeight : bottom;
 
-                    return (
-                      <EventBlock
-                        key={event.id}
-                        event={event}
-                        source={sourceById.get(event.id) ?? event}
-                        onClick={onEventClick}
-                        style={{
-                          top,
-                          height: Math.max(end - top, 18),
-                          left: `calc(${(column / total) * 100}% + 2px)`,
-                          width: `calc(${100 / total}% - 4px)`,
-                        }}
-                      />
-                    );
-                  })}
+                      return (
+                        <EventBlock
+                          key={event.id}
+                          event={event}
+                          source={sourceById.get(event.id) ?? event}
+                          onClick={onEventClick}
+                          style={{
+                            top,
+                            height: Math.max(end - top, 18),
+                            left: `calc(${(column / total) * 100}% + 2px)`,
+                            width: `calc(${100 / total}% - 4px)`,
+                          }}
+                        />
+                      );
+                    },
+                  )}
                 </div>
               ))}
             </div>
@@ -336,14 +338,14 @@ function EventBlock({
       )}`}
       onClick={onClick ? () => onClick(source) : undefined}
       className={cn(
-        "border-primary bg-primary/15 absolute overflow-hidden rounded-sm border-l-2 px-1.5 py-0.5 text-left text-xs",
-        "hover:bg-primary/25 focus-visible:ring-ring transition-colors focus-visible:ring-2 focus-visible:outline-none",
+        "absolute overflow-hidden rounded-sm border-l-2 border-primary bg-primary/15 px-1.5 py-0.5 text-left text-xs",
+        "transition-colors hover:bg-primary/25 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         !onClick && "cursor-default",
       )}
       style={{ ...style, ...accentStyle(event.color) }}
     >
       <span className="block truncate font-medium">{event.title}</span>
-      <span className="text-muted-foreground block truncate text-[10px]">
+      <span className="block truncate text-[10px] text-muted-foreground">
         {continuesBefore ? "↑ " : ""}
         {format(source.start, "HH:mm")}
         {continuesAfter ? " ↓" : ""}
@@ -365,8 +367,8 @@ function EventChip({
       title={event.title}
       onClick={onClick ? () => onClick(event) : undefined}
       className={cn(
-        "border-primary bg-primary/15 truncate rounded-sm border-l-2 px-1.5 py-0.5 text-left text-[11px]",
-        "hover:bg-primary/25 transition-colors",
+        "truncate rounded-sm border-l-2 border-primary bg-primary/15 px-1.5 py-0.5 text-left text-[11px]",
+        "transition-colors hover:bg-primary/25",
         !onClick && "cursor-default",
       )}
       style={accentStyle(event.color)}

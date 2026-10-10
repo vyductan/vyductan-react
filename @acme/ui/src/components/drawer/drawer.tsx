@@ -14,8 +14,8 @@ import type {
   DrawerResizableConfig,
   DrawerSize,
 } from "./types";
-
 import { Icon } from "../../icons";
+import { registerEscapeTarget } from "../../lib/modal-layers";
 import { Button } from "../button";
 import {
   DrawerClose,
@@ -28,7 +28,6 @@ import {
   DrawerTrigger,
   hasOpenDialogAbove,
 } from "./_components";
-import { registerEscapeTarget } from "../../lib/modal-layers";
 import {
   clampDrawerSize,
   isHorizontalPlacement,
@@ -161,7 +160,11 @@ const Drawer = ({
     const onPointerMove = (move: PointerEvent) => {
       const next = clampDrawerSize(
         startSize +
-          resizeDelta(placement, move.clientX - clientX, move.clientY - clientY),
+          resizeDelta(
+            placement,
+            move.clientX - clientX,
+            move.clientY - clientY,
+          ),
         maxSize,
       );
       setDraggedSize(next);
@@ -264,7 +267,7 @@ const Drawer = ({
               // fine pointer at all lose it.
               "not-any-pointer-fine:hidden",
               "focus-visible:outline-hidden",
-              "before:bg-primary/40 before:absolute before:opacity-0 before:transition-opacity before:content-['']",
+              "before:absolute before:bg-primary/40 before:opacity-0 before:transition-opacity before:content-['']",
               "hover:before:opacity-100 focus-visible:before:opacity-100",
               isHorizontal
                 ? "inset-y-0 w-2.5 cursor-col-resize before:inset-y-0 before:w-0.5"

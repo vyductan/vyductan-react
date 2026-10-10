@@ -844,7 +844,7 @@ function TextFormatFloatingToolbar({
       data-slot="format-toolbar"
       role="toolbar"
       aria-label="Text formatting"
-      className="border-border bg-popover text-popover-foreground absolute top-0 left-0 z-50 flex w-max flex-col gap-1 rounded-xl border p-1.5 shadow-lg transition-opacity duration-200 will-change-transform"
+      className="absolute top-0 left-0 z-50 flex w-max flex-col gap-1 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-lg transition-opacity duration-200 will-change-transform"
       style={{
         opacity: 0,
         transform: "translate(-10000px, -10000px)",

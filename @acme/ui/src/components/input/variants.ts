@@ -5,7 +5,7 @@ const inputDisabledVariants = tv({
   variants: {
     disabled: {
       true: [
-        "bg-background-active hover:border-input! cursor-not-allowed opacity-50",
+        "bg-background-active cursor-not-allowed opacity-50 hover:border-input!",
       ],
     },
   },
@@ -19,7 +19,7 @@ const inputVariants = tv({
     // disable shadcn focus-visible classes
     "outline-0",
     // "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex w-full min-w-0 rounded-md border bg-transparent px-3 py-1 shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-    "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
   ],
   variants: {
     disabled: inputDisabledVariants.variants.disabled,
@@ -68,7 +68,7 @@ const inputVariants = tv({
         "aria-expanded:ring-[3px]",
       ],
       filled: [
-        "bg-accent rounded-md border-none shadow-none",
+        "rounded-md border-none bg-accent shadow-none",
         "transition-colors",
       ],
       borderless: ["border-none", "transition-colors"],

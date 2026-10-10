@@ -2,12 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table-shared-core",
   "title": "Table Shared Core",
-  "dependencies": [
-    "clsx",
-    "iconify-icon",
-    "rc-util",
-    "tailwind-merge"
-  ],
+  "dependencies": ["clsx", "iconify-icon", "rc-util", "tailwind-merge"],
   "files": [
     {
       "path": "lib/utils.ts",

@@ -150,7 +150,7 @@ describe("Modal", () => {
         description={
           <>
             Configure per-pax limits for{" "}
-            <span className="text-foreground font-medium">Food</span>.
+            <span className="font-medium text-foreground">Food</span>.
           </>
         }
       >

@@ -7,7 +7,6 @@ import { Modal } from "../modal";
 import { Popover } from "../popover";
 import { Select } from "../select";
 import { Drawer } from "./drawer";
-
 import BasicDemo from "./examples/basic";
 import FormDemo from "./examples/form";
 import ResizableDemo from "./examples/resizable";
@@ -60,7 +59,9 @@ export const EscapeDismisses: Story = {
     const body = within(document.body);
 
     await step("open it", async () => {
-      await userEvent.click(canvas.getByRole("button", { name: /open drawer/i }));
+      await userEvent.click(
+        canvas.getByRole("button", { name: /open drawer/i }),
+      );
       await waitFor(() => expect(body.getByText("Escape me")).toBeVisible());
     });
 
@@ -106,7 +107,9 @@ export const AutoFocusMovesFocusIntoTheDrawer: Story = {
     const body = within(document.body);
 
     await step("open it", async () => {
-      await userEvent.click(canvas.getByRole("button", { name: /open drawer/i }));
+      await userEvent.click(
+        canvas.getByRole("button", { name: /open drawer/i }),
+      );
       await waitFor(() => expect(body.getByText("Focus me")).toBeVisible());
     });
 
@@ -140,7 +143,11 @@ export const EscapeWithASelectInsideStaysOpen: Story = {
       return (
         <>
           <Button onClick={() => setOpen(true)}>Open drawer</Button>
-          <Drawer open={open} title="Nested layers" onClose={() => setOpen(false)}>
+          <Drawer
+            open={open}
+            title="Nested layers"
+            onClose={() => setOpen(false)}
+          >
             <Popover
               trigger="click"
               content={
@@ -167,10 +174,16 @@ export const EscapeWithASelectInsideStaysOpen: Story = {
     const body = within(document.body);
 
     await step("drawer → popover → select, all open", async () => {
-      await userEvent.click(canvas.getByRole("button", { name: /open drawer/i }));
-      await waitFor(() => expect(body.getByText("Nested layers")).toBeVisible());
+      await userEvent.click(
+        canvas.getByRole("button", { name: /open drawer/i }),
+      );
+      await waitFor(() =>
+        expect(body.getByText("Nested layers")).toBeVisible(),
+      );
 
-      await userEvent.click(body.getByRole("button", { name: /open inner popover/i }));
+      await userEvent.click(
+        body.getByRole("button", { name: /open inner popover/i }),
+      );
       const selectTrigger = await waitFor(() => {
         const node = document.querySelector("[data-slot='select-trigger']");
         expect(node).not.toBeNull();
@@ -179,7 +192,9 @@ export const EscapeWithASelectInsideStaysOpen: Story = {
       await userEvent.click(selectTrigger);
       await waitFor(() =>
         expect(
-          document.querySelector("[data-slot='select-content'][data-state='open']"),
+          document.querySelector(
+            "[data-slot='select-content'][data-state='open']",
+          ),
         ).not.toBeNull(),
       );
     });
@@ -189,7 +204,9 @@ export const EscapeWithASelectInsideStaysOpen: Story = {
 
       await waitFor(() =>
         expect(
-          document.querySelector("[data-slot='select-content'][data-state='open']"),
+          document.querySelector(
+            "[data-slot='select-content'][data-state='open']",
+          ),
         ).toBeNull(),
       );
       expect(body.queryByText("Nested layers")).not.toBeNull();

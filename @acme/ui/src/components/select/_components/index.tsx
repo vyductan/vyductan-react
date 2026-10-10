@@ -54,9 +54,9 @@ const SelectTrigger = ({
         "w-full min-w-0 text-left",
         inputVariants({ variant, status, disabled }),
         // inputSizeVariants({ size }),
-        "data-[size=default]:h-control data-[size=sm]:h-control-sm data-[size=lg]:h-control-lg",
+        "data-[size=default]:h-control data-[size=lg]:h-control-lg data-[size=sm]:h-control-sm",
         // Size-aware radius: sharper when small, softer when large.
-        "data-[size=default]:rounded-md data-[size=sm]:rounded-sm data-[size=lg]:rounded-lg",
+        "data-[size=default]:rounded-md data-[size=lg]:rounded-lg data-[size=sm]:rounded-sm",
         // Shared size -> padding source, same as input/autocomplete/datepicker.
         controlPaddingBySize[size ?? "middle"],
         [

@@ -30,8 +30,8 @@ const CheckableTag = ({
       className={cn(
         "cursor-pointer transition-all duration-200",
         checked
-          ? "bg-primary text-primary-foreground border-primary"
-          : "bg-muted text-muted-foreground border-border hover:bg-muted/80",
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-muted text-muted-foreground hover:bg-muted/80",
         className,
       )}
       onClick={handleClick}

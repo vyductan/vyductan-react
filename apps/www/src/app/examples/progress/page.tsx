@@ -34,7 +34,7 @@ export default function DescriptionsExamples() {
         <h1 className="mb-4 text-4xl font-bold tracking-tight">
           Progress Examples
         </h1>
-        <p className="text-muted-foreground max-w-2xl text-lg">
+        <p className="max-w-2xl text-lg text-muted-foreground">
           Interactive examples of progress components with different states and
           configurations.
         </p>

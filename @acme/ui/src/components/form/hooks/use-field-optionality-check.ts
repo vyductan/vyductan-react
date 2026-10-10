@@ -31,7 +31,9 @@ const unwrapContainer = (schema: any): any => {
     if (CONTAINER_WRAPPERS.has(ctorName) || CONTAINER_WRAPPER_TYPES.has(type)) {
       const def = current.def ?? current._def;
       current =
-        typeof current.unwrap === "function" ? current.unwrap() : def?.innerType;
+        typeof current.unwrap === "function"
+          ? current.unwrap()
+          : def?.innerType;
     } else {
       break;
     }

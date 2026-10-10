@@ -1,5 +1,10 @@
 import { createHeadlessEditor } from "@lexical/headless";
-import { $createListItemNode, $createListNode, ListItemNode, ListNode } from "@lexical/list";
+import {
+  $createListItemNode,
+  $createListNode,
+  ListItemNode,
+  ListNode,
+} from "@lexical/list";
 import {
   $createHeadingNode,
   $createQuoteNode,

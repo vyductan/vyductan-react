@@ -24,8 +24,7 @@ export type ProgressSize = "default" | "small";
 export type StringGradients = Record<string, string>;
 type FromToGradients = { from: string; to: string };
 export type ProgressGradient = { direction?: string } & (
-  | StringGradients
-  | FromToGradients
+  StringGradients | FromToGradients
 );
 export interface PercentPositionType {
   align?: "start" | "center" | "end";

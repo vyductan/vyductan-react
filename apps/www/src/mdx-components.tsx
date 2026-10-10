@@ -108,7 +108,7 @@ const components: MDXComponents = {
     <hr className="my-4 md:my-8" {...properties} />
   ),
   table: ({ className, ...properties }: React.ComponentProps<"table">) => (
-    <div className="no-scrollbar my-6 w-full overflow-y-auto rounded-lg border">
+    <div className="my-6 no-scrollbar w-full overflow-y-auto rounded-lg border">
       <table
         className={cn(
           "relative w-full overflow-hidden border-none text-sm [&_tbody_tr:last-child]:border-b-0",
@@ -207,7 +207,7 @@ const components: MDXComponents = {
       return (
         <code
           className={cn(
-            "bg-muted relative rounded-md px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
+            "relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
             className,
           )}
           {...properties}
@@ -220,7 +220,7 @@ const components: MDXComponents = {
     return (
       <code
         className={cn(
-          "bg-muted relative rounded-md px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
+          "relative rounded-md bg-muted px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
           className,
         )}
         {...properties}

@@ -8,11 +8,11 @@ import {
   DrawerHeader as ShadcnDrawerHeader,
 } from "@acme/ui/shadcn/drawer";
 
-import { cn } from "../../lib/utils";
 import {
   hasEscapeClaimantAfter,
   hasOpenDialogAfter,
 } from "../../lib/modal-layers";
+import { cn } from "../../lib/utils";
 
 /**
  * A vaul Drawer is built on its OWN copy of `@radix-ui/react-dialog`, so it has
@@ -92,7 +92,7 @@ function DrawerContent({
           onEscapeKeyDown?.(event);
         }}
         className={cn(
-          "group/drawer-content bg-background fixed z-50 flex h-auto flex-col",
+          "group/drawer-content fixed z-50 flex h-auto flex-col bg-background",
           "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",
           "data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t",
           "data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:border-l",
@@ -123,7 +123,7 @@ function DrawerContent({
         }}
         {...properties}
       >
-        <div className="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
+        <div className="mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full bg-muted group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
         {children}
       </Content>
     </DrawerPortal>
@@ -174,7 +174,7 @@ const DrawerFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-      "bg-muted/10 border-t p-4",
+      "border-t bg-muted/10 p-4",
       className,
     )}
     {...properties}

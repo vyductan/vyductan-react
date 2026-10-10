@@ -27,7 +27,7 @@ const ListItemMeta = ({
           <div className="text-sm leading-snug font-medium">{title}</div>
         )}
         {description && (
-          <div className="text-muted-foreground mt-1 text-sm leading-normal">
+          <div className="mt-1 text-sm leading-normal text-muted-foreground">
             {description}
           </div>
         )}

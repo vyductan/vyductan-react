@@ -65,7 +65,7 @@ export const FollowsLinkToken: Story = {
 
 export const FollowsLinkTokenInDarkMode: Story = {
   render: () => (
-    <div className="dark bg-background text-foreground p-4">
+    <div className="dark bg-background p-4 text-foreground">
       <ProseSample />
     </div>
   ),

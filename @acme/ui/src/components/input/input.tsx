@@ -368,9 +368,9 @@ const Input = (properties: InputProperties) => {
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         className={cn(
-          "text-foreground placeholder:text-placeholder relative inline-block w-full text-sm placeholder-shown:text-ellipsis",
+          "placeholder:text-placeholder relative inline-block w-full text-sm text-foreground placeholder-shown:text-ellipsis",
           !hasAffix && inputSizeVariants({ size: mergedSize }),
-          otherProperties.readOnly && "bg-muted cursor-default",
+          otherProperties.readOnly && "cursor-default bg-muted",
           classNames?.input,
         )}
         style={styles?.input}

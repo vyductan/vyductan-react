@@ -44,7 +44,7 @@ const App: React.FC = () => {
         <Button type="primary" onClick={() => setOpen(true)}>
           Open from outside
         </Button>
-        <span className="text-muted-foreground text-sm">
+        <span className="text-sm text-muted-foreground">
           current index: {current}
         </span>
       </div>

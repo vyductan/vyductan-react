@@ -1,9 +1,9 @@
 "use client";
 
-import { isValidElement, useEffect, useRef } from "react";
 import type * as React from "react";
-import { composeRef } from "@rc-component/util/es/ref";
 import type { PartialDeep } from "type-fest";
+import { isValidElement, useEffect, useRef } from "react";
+import { composeRef } from "@rc-component/util/es/ref";
 
 import type { IconProps } from "@acme/ui/icons";
 import { GenericSlot } from "@acme/ui/components/slot";

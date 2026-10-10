@@ -50,9 +50,10 @@ describe("parseInlineStyle", () => {
   });
 
   test("parses multiple declarations and tolerates loose formatting", () => {
-    expect(
-      parseInlineStyle("  COLOR : #eb5757 ; font-size:20px ;  "),
-    ).toEqual({ color: "#eb5757", fontSize: "20px" });
+    expect(parseInlineStyle("  COLOR : #eb5757 ; font-size:20px ;  ")).toEqual({
+      color: "#eb5757",
+      fontSize: "20px",
+    });
   });
 
   test("drops properties outside the allowlist but keeps their neighbours", () => {

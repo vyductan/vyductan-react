@@ -51,8 +51,7 @@ export interface CommonInputProps {
 type DataAttribute = Record<`data-${string}`, string>;
 
 export type InputValueType =
-  | InputHTMLAttributes<HTMLInputElement>["value"]
-  | bigint;
+  InputHTMLAttributes<HTMLInputElement>["value"] | bigint;
 
 export type BaseInputProps = CommonInputProps & {
   value?: InputValueType | null;

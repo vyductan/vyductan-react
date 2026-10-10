@@ -3,13 +3,7 @@ import type { Dayjs } from "dayjs";
 import type { InputRef as InputReference } from "../input";
 
 export type PanelMode =
-  | "time"
-  | "date"
-  | "week"
-  | "month"
-  | "quarter"
-  | "year"
-  | "decade";
+  "time" | "date" | "week" | "month" | "quarter" | "year" | "decade";
 export type DisabledDate<DateType = Dayjs> = (
   date: DateType,
   info: {

@@ -103,7 +103,7 @@ export function AsyncActionButton({
     <span
       key={status}
       aria-hidden="true"
-      className="animate-in fade-in-0 zoom-in-90 inline-flex items-center justify-center transition-all duration-200 ease-out motion-reduce:animate-none motion-reduce:transition-none"
+      className="inline-flex animate-in items-center justify-center transition-all duration-200 ease-out fade-in-0 zoom-in-90 motion-reduce:animate-none motion-reduce:transition-none"
       data-slot="async-action-icon"
     >
       {icon}

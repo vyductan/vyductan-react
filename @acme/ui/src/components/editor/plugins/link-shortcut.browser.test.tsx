@@ -79,15 +79,18 @@ function select(editor: LexicalEditor, anchor: number, focus: number) {
 }
 
 const hasLink = (editor: LexicalEditor) =>
-  editor
-    .getEditorState()
-    .read(() => $getRoot().getAllTextNodes().some((n) => $isLinkNode(n.getParent())));
+  editor.getEditorState().read(() =>
+    $getRoot()
+      .getAllTextNodes()
+      .some((n) => $isLinkNode(n.getParent())),
+  );
 
 /** Presses ⌘K and reports whether the key reached `window` unclaimed. */
 async function pressModK(): Promise<{ reachedWindow: boolean }> {
   let reachedWindow = false;
   const listener = (event: KeyboardEvent) => {
-    if (event.key.toLowerCase() === "k") reachedWindow = !event.defaultPrevented;
+    if (event.key.toLowerCase() === "k")
+      reachedWindow = !event.defaultPrevented;
   };
   globalThis.addEventListener("keydown", listener);
   try {

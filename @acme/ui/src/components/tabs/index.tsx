@@ -13,8 +13,7 @@ type ShadcnTabsProperties<TKey extends string = string> = React.ComponentProps<
 >;
 
 type ConditionalTabsProps<TKey extends string = string> =
-  | TabsProperties<TKey>
-  | ShadcnTabsProperties<TKey>;
+  TabsProperties<TKey> | ShadcnTabsProperties<TKey>;
 
 function Tabs<TKey extends string = string>(
   props: ConditionalTabsProps<TKey>,

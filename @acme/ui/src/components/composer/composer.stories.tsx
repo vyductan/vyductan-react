@@ -109,7 +109,7 @@ export const WithTranscript: Story = {
           {sent.map((message, index) => (
             <pre
               key={index}
-              className="bg-muted rounded-md p-3 text-sm whitespace-pre-wrap"
+              className="rounded-md bg-muted p-3 text-sm whitespace-pre-wrap"
             >
               {message}
             </pre>
@@ -422,7 +422,7 @@ function AttachmentChip({
   onRemove: () => void;
 }) {
   return (
-    <span className="bg-muted text-foreground relative flex items-center gap-2 rounded-md px-2 py-1 text-xs">
+    <span className="relative flex items-center gap-2 rounded-md bg-muted px-2 py-1 text-xs text-foreground">
       {name}
       <button
         aria-label={`Remove ${name}`}

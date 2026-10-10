@@ -149,7 +149,7 @@ export function CalloutPickerPlugin(): JSX.Element | null {
                 aria-label={`${label} background`}
                 title={label}
                 data-color={color || undefined}
-                className="CalloutSwatch border-border size-6 rounded border"
+                className="CalloutSwatch size-6 rounded border border-border"
                 onClick={() => update({ color })}
               />
             ))}
@@ -159,7 +159,7 @@ export function CalloutPickerPlugin(): JSX.Element | null {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search emoji"
-            className="border-input bg-background h-8 rounded border px-2 text-sm outline-none"
+            className="h-8 rounded border border-input bg-background px-2 text-sm outline-none"
           />
           <div className="grid max-h-56 grid-cols-8 gap-0.5 overflow-y-auto">
             {emojis.map(({ emoji, description }) => (
@@ -168,7 +168,7 @@ export function CalloutPickerPlugin(): JSX.Element | null {
                 type="button"
                 aria-label={description}
                 title={description}
-                className="hover:bg-muted rounded p-1 text-xl leading-none"
+                className="rounded p-1 text-xl leading-none hover:bg-muted"
                 onClick={() => {
                   update({ icon: emoji });
                   close();
@@ -180,7 +180,7 @@ export function CalloutPickerPlugin(): JSX.Element | null {
           </div>
           <button
             type="button"
-            className="text-muted-foreground hover:bg-muted self-start rounded px-2 py-1 text-sm"
+            className="self-start rounded px-2 py-1 text-sm text-muted-foreground hover:bg-muted"
             onClick={() => {
               update({ icon: "" });
               close();

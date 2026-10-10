@@ -59,8 +59,7 @@ const useFormContext = <
   TTransformedValues extends FieldValues | undefined = undefined,
 >() => {
   return useContext(FormContext) as unknown as
-    | FormProviderProps<TFieldValues, TContext, TTransformedValues>
-    | undefined;
+    FormProviderProps<TFieldValues, TContext, TTransformedValues> | undefined;
 };
 
 const VariantContext = React.createContext<Variant | undefined>(undefined);

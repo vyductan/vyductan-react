@@ -96,7 +96,7 @@ export function FontBackgroundToolbarPlugin() {
       >
         <PaintBucketIcon className="h-4 w-4" />
         <div
-          className="border-border h-1 w-5 rounded-sm border"
+          className="h-1 w-5 rounded-sm border border-border"
           style={{ backgroundColor: bgColor || "transparent" }}
         />
       </Button>

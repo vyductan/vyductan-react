@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within } from "storybook/test";
 
-import { FloatingLabelInput } from "./floating-label-input";
-import { FloatingLabelSelect } from "./floating-label-select";
 import BasicExample from "./examples/basic";
 import SelectExample from "./examples/select";
 import ShowcaseExample from "./examples/showcase";
 import SizesExample from "./examples/sizes";
 import TextareaExample from "./examples/textarea";
+import { FloatingLabelInput } from "./floating-label-input";
+import { FloatingLabelSelect } from "./floating-label-select";
 
 const meta = {
   title: "Components/FloatingLabelInput",

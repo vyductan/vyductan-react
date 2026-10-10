@@ -2,12 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "table-empty-support",
   "title": "Table Empty Support",
-  "dependencies": [
-    "ts-xor"
-  ],
-  "registryDependencies": [
-    "table-shared-core"
-  ],
+  "dependencies": ["ts-xor"],
+  "registryDependencies": ["table-shared-core"],
   "files": [
     {
       "path": "components/empty/index.tsx",

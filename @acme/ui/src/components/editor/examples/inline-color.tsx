@@ -94,7 +94,7 @@ export default function InlineColorDemo() {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="space-y-2">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Editor — use the toolbar to change text color, highlight, or size.
         </p>
         <div className="rounded-md border">
@@ -109,7 +109,7 @@ export default function InlineColorDemo() {
       </div>
 
       <div className="space-y-2">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Published view — <code>EditorRender</code> of the same document.
           Colors must match the editor; declarations outside the allowlist
           (positioning, <code>url()</code>, and friends) are dropped.

@@ -441,7 +441,7 @@ function Steps(properties: StepsProps) {
                     <div
                       data-slot="steps-item-subtitle"
                       className={cn(
-                        "text-muted-foreground text-xs",
+                        "text-xs text-muted-foreground",
                         classNames?.itemSubtitle,
                       )}
                       style={styles?.itemSubtitle}

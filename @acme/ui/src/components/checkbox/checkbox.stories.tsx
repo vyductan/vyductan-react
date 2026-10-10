@@ -169,7 +169,7 @@ export const WithDescription: Story = {
         >
           Use different settings for my mobile devices
         </Label>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           You can manage your mobile notifications in the mobile settings page.
         </p>
       </div>

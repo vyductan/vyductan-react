@@ -207,11 +207,11 @@ export default function TOCComponent({
     return (
       <div
         data-lexical-toc-component
-        className={`border-border bg-muted/50 my-4 rounded-lg border p-4 ${
+        className={`my-4 rounded-lg border border-border bg-muted/50 p-4 ${
           isSelected ? "ring-2 ring-blue-500" : ""
         }`}
       >
-        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <ListIcon className="size-4" />
           <span>
             No headings found. Add headings to generate table of contents.
@@ -224,13 +224,13 @@ export default function TOCComponent({
   return (
     <div
       data-lexical-toc-component
-      className={`border-border bg-card my-4 rounded-lg border p-4 ${
+      className={`my-4 rounded-lg border border-border bg-card p-4 ${
         isSelected ? "ring-2 ring-blue-500" : ""
       }`}
     >
-      <div className="border-border mb-3 flex items-center gap-2 border-b pb-2">
-        <ListIcon className="text-muted-foreground size-4" />
-        <h3 className="text-card-foreground text-sm font-semibold">
+      <div className="mb-3 flex items-center gap-2 border-b border-border pb-2">
+        <ListIcon className="size-4 text-muted-foreground" />
+        <h3 className="text-sm font-semibold text-card-foreground">
           Table of Contents
         </h3>
       </div>
@@ -240,7 +240,7 @@ export default function TOCComponent({
             key={`${heading.id}-${index}`}
             href={`#${heading.id}`}
             onClick={(e) => handleHeadingClick(heading.id, e)}
-            className={`text-card-foreground block text-sm hover:text-blue-600 hover:underline ${getIndentClass(heading.level)}`}
+            className={`block text-sm text-card-foreground hover:text-blue-600 hover:underline ${getIndentClass(heading.level)}`}
           >
             {heading.text}
           </a>

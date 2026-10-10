@@ -14,7 +14,7 @@ const richOptions: OptionType<string>[] = [
         <span className="font-semibold">
           The Izakaya-Jul 31, 26-5:00 PM-9 adults ⭐
         </span>
-        <span className="text-muted-foreground text-xs">
+        <span className="text-xs text-muted-foreground">
           Reference: ggg, Chinmay Puranik, Chinmay Puranik
         </span>
       </div>
@@ -27,7 +27,7 @@ const richOptions: OptionType<string>[] = [
         <span className="font-semibold">
           Sushi Bar-Aug 02, 26-7:30 PM-4 adults
         </span>
-        <span className="text-muted-foreground text-xs">
+        <span className="text-xs text-muted-foreground">
           Reference: abc, Jane Doe
         </span>
       </div>

@@ -68,7 +68,7 @@ const FieldLabel = ({
     >
       {children}
       {mergedColon && ":"}
-      {mergedRequired && <span className="text-destructive ml-1">*</span>}
+      {mergedRequired && <span className="ml-1 text-destructive">*</span>}
     </ShadFieldLabel>
   );
 
@@ -78,7 +78,7 @@ const FieldLabel = ({
   const rowNode = labelExtra ? (
     <div className="flex w-full items-center justify-between gap-2">
       {labelNode}
-      <span className="text-muted-foreground text-xs font-normal">
+      <span className="text-xs font-normal text-muted-foreground">
         {labelExtra}
       </span>
     </div>

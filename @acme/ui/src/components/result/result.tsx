@@ -56,8 +56,7 @@ const Result = ({
   let defaultSubTitle: React.ReactNode = "";
 
   const statusConfig = resultConfig?.[status as keyof typeof resultConfig] as
-    | ResultStatusConfig
-    | undefined;
+    ResultStatusConfig | undefined;
 
   switch (status) {
     case "success": {

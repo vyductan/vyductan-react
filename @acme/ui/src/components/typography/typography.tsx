@@ -223,7 +223,7 @@ const Link = ({ className, children, ...properties }: LinkProperties) => {
     <Typography
       asChild
       className={cn(
-        "text-primary font-medium underline underline-offset-4",
+        "font-medium text-primary underline underline-offset-4",
         className,
       )}
       {...properties}

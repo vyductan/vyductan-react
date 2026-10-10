@@ -126,7 +126,7 @@ const Radio = <T extends FormValueType = FormValueType>({
           value={value as string}
           className={cn(
             "aspect-square size-4 shrink-0 rounded-full border border-current text-current shadow-xs outline-none",
-            "focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+            "focus-visible:ring-[3px] focus-visible:ring-ring/50",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
           disabled={disabled}
@@ -164,7 +164,7 @@ const Radio = <T extends FormValueType = FormValueType>({
           buttonStyle === "outline" && !checked && "border-input",
           buttonStyle === "outline" &&
             disabled &&
-            "hover:border-input! bg-muted/80",
+            "bg-muted/80 hover:border-input!",
 
           // Override rounded for group buttons: first has left rounded, last has right rounded
           "rounded-none first:rounded-l-md last:rounded-r-md",
@@ -216,7 +216,7 @@ const Radio = <T extends FormValueType = FormValueType>({
         //   "text-foreground [&>button]:border-foreground cursor-not-allowed opacity-30",
         variant === "card"
           ? [
-              "hover:bg-accent/50 items-start gap-2 rounded-md border",
+              "items-start gap-2 rounded-md border hover:bg-accent/50",
               "h-auto min-h-8 px-3 py-2",
               "has-aria-checked:border-primary-600 has-aria-checked:bg-primary-50",
               "dark:has-aria-checked:border-primary-900 dark:has-aria-checked:bg-primary-950",
@@ -245,7 +245,7 @@ const Radio = <T extends FormValueType = FormValueType>({
         data-slot="radio-group-item"
         value={value as string}
         className={cn(
-          "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+          "aspect-square size-4 shrink-0 rounded-full border border-input text-primary shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40",
           (variant === "card" || hasDescription) && "self-start",
           variant === "card" && [
             "data-[state=checked]:border-primary-600",
@@ -300,7 +300,7 @@ const Radio = <T extends FormValueType = FormValueType>({
         >
           <Icon
             icon="icon-[bi--circle-fill]"
-            className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2"
+            className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 fill-primary"
           />
         </RadioGroupPrimitive.Indicator>
       </RadioGroupPrimitive.Item>
@@ -312,7 +312,7 @@ const Radio = <T extends FormValueType = FormValueType>({
             </div>
             <p
               id={descriptionId}
-              className="text-muted-foreground text-xs font-normal"
+              className="text-xs font-normal text-muted-foreground"
             >
               {description}
             </p>
@@ -329,7 +329,7 @@ const Radio = <T extends FormValueType = FormValueType>({
           </div>
           <p
             id={descriptionId}
-            className="text-muted-foreground text-xs font-normal"
+            className="text-xs font-normal text-muted-foreground"
           >
             {description}
           </p>

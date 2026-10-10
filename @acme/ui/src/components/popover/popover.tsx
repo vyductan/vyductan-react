@@ -3,15 +3,15 @@ import { useMergedState } from "@rc-component/util";
 import { useDebounce } from "ahooks";
 import { Popover as PopoverPrimitive } from "radix-ui";
 
-import { cn } from "@acme/ui/lib/utils";
 import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { AlignType } from "../../types";
 import type { AbstractTooltipProps } from "../tooltip";
 import type { PopoverContentProps, PopoverRootProps } from "./_component";
 import {
-  PopoverAnchor,
   Popover as InternalPopover,
+  PopoverAnchor,
   PopoverContent,
   PopoverDescription,
   PopoverHeader,

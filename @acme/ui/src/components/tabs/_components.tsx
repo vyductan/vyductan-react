@@ -97,20 +97,20 @@ function TabsTrigger({
           "h-auto rounded-none rounded-t-lg px-4 py-2",
           "border-border bg-muted text-muted-foreground",
           "hover:text-primary-hover",
-          "data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:border-b-transparent group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none",
-          "dark:data-[state=active]:border-border dark:data-[state=active]:bg-background dark:data-[state=active]:border-b-transparent",
+          "data-[state=active]:border-b-transparent data-[state=active]:bg-background data-[state=active]:text-primary group-data-[variant=default]/tabs-list:data-[state=active]:shadow-none",
+          "dark:data-[state=active]:border-border dark:data-[state=active]:border-b-transparent dark:data-[state=active]:bg-background",
         ],
         type === "line" && [
           "pt-3 pb-[11px]",
           "mx-3 h-[calc(100%+2px)] first:ml-0",
-          "text-muted-foreground rounded-none bg-transparent font-semibold shadow-none transition-none",
+          "rounded-none bg-transparent font-semibold text-muted-foreground shadow-none transition-none",
           "hover:text-primary-hover",
-          "data-[state=active]:text-primary after:bg-primary group-data-[orientation=horizontal]/tabs:after:bottom-0 data-[state=active]:shadow-none",
+          "after:bg-primary group-data-[orientation=horizontal]/tabs:after:bottom-0 data-[state=active]:text-primary data-[state=active]:shadow-none",
         ],
         // The list scrolls (overflow clips), so draw the focus ring and
         // outline inside the trigger or their top and bottom get cut off.
         (type === "line" || type === "card") &&
-          "focus-visible:ring-inset focus-visible:-outline-offset-1",
+          "focus-visible:-outline-offset-1 focus-visible:ring-inset",
         className,
       )}
       {...properties}

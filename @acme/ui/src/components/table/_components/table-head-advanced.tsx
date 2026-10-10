@@ -92,7 +92,7 @@ export function TableHeadAdvanced<TData, TValue>({
           className={cn(
             tableSorterBoxClass(size),
             "flex w-full items-center justify-between",
-            "hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-md border-none",
+            "cursor-pointer rounded-md border-none hover:bg-accent hover:text-accent-foreground",
           )}
           onClick={column.getToggleSortingHandler()}
         >

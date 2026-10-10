@@ -38,7 +38,7 @@ const ListItem = ({ children, actions, extra }: ListItemProperties) => {
     <Item
       asChild
       className={cn(
-        "border-b-border rounded-b-none border-b",
+        "rounded-b-none border-b border-b-border",
         listVariants({ size }),
       )}
     >

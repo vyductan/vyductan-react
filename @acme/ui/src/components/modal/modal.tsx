@@ -344,11 +344,11 @@ const Modal = ({
           </ScrollArea>
           <div
             aria-hidden
-            className="from-foreground/20 pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-up]/scroll:opacity-100"
+            className="pointer-events-none absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-up]/scroll:opacity-100"
           />
           <div
             aria-hidden
-            className="from-foreground/20 pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-down]/scroll:opacity-100"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-5 bg-gradient-to-t from-foreground/20 to-transparent opacity-0 transition-opacity duration-150 group-data-[scroll-down]/scroll:opacity-100"
           />
         </div>
 

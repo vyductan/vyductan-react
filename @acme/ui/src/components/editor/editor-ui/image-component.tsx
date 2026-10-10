@@ -116,7 +116,7 @@ function LazyImage({
 function BrokenImage(): JSX.Element {
   return (
     <div
-      className="border-border bg-muted flex items-center justify-center rounded-lg border"
+      className="flex items-center justify-center rounded-lg border border-border bg-muted"
       style={{
         height: 200,
         width: 200,
@@ -124,7 +124,7 @@ function BrokenImage(): JSX.Element {
     >
       <div className="flex flex-col items-center gap-2 p-4 text-center">
         <svg
-          className="text-muted-foreground h-12 w-12"
+          className="h-12 w-12 text-muted-foreground"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -136,7 +136,7 @@ function BrokenImage(): JSX.Element {
             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        <span className="text-muted-foreground text-sm">
+        <span className="text-sm text-muted-foreground">
           Image failed to load
         </span>
       </div>
@@ -545,9 +545,9 @@ export default function ImageComponent({
               <div className="relative">
                 {loading && (
                   <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 backdrop-blur-[1px]">
-                    <div className="bg-popover/90 flex flex-col items-center gap-2 rounded-lg p-3 shadow-lg">
+                    <div className="flex flex-col items-center gap-2 rounded-lg bg-popover/90 p-3 shadow-lg">
                       <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
-                      <span className="text-popover-foreground text-xs font-medium">
+                      <span className="text-xs font-medium text-popover-foreground">
                         Uploading...
                       </span>
                     </div>
@@ -563,7 +563,7 @@ export default function ImageComponent({
                       loading ? "opacity-90" : ""
                     } ${
                       isFocused
-                        ? `${$isNodeSelection(selection) ? "draggable cursor-grab active:cursor-grabbing" : ""} focused ring-primary ring-2 ring-offset-2`
+                        ? `${$isNodeSelection(selection) ? "draggable cursor-grab active:cursor-grabbing" : ""} focused ring-2 ring-primary ring-offset-2`
                         : null
                     }`}
                     src={src}
@@ -582,7 +582,7 @@ export default function ImageComponent({
           </div>
 
           {showCaption && (
-            <div className="image-caption-container bg-popover/90 text-popover-foreground absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t p-0">
+            <div className="image-caption-container absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t bg-popover/90 p-0 text-popover-foreground">
               <LexicalNestedComposer initialEditor={caption}>
                 <AutoFocusPlugin />
                 <MentionsPlugin />
@@ -594,7 +594,7 @@ export default function ImageComponent({
                 <RichTextPlugin
                   contentEditable={
                     <ContentEditable
-                      className="ImageNode__contentEditable user-select-text word-break-break-word caret-primary relative block min-h-5 w-[calc(100%-20px)] cursor-text resize-none border-0 p-2.5 text-sm whitespace-pre-wrap outline-none"
+                      className="ImageNode__contentEditable user-select-text word-break-break-word relative block min-h-5 w-[calc(100%-20px)] cursor-text resize-none border-0 p-2.5 text-sm whitespace-pre-wrap caret-primary outline-none"
                       placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground overflow-hidden absolute top-2.5 left-2.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
                       placeholder="Enter a caption..."
                     />

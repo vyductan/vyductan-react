@@ -11,10 +11,10 @@ import type {
   FloatingLabelStatus,
 } from "./floating-label-shared";
 import {
+  FLOATED,
   floatingBorderClass,
   floatingControlHeight,
   floatingLabelBaseClass,
-  FLOATED,
   RequiredMark,
 } from "./floating-label-shared";
 
@@ -91,7 +91,7 @@ const FloatingLabelSelect = ({
           onBlur?.(event);
         }}
         className={cn(
-          "peer text-foreground w-full appearance-none rounded-md border bg-transparent pr-9 pl-3 text-sm outline-none transition-colors",
+          "peer w-full appearance-none rounded-md border bg-transparent pr-9 pl-3 text-sm text-foreground transition-colors outline-none",
           floatingControlHeight[size],
           floatingBorderClass,
           className,
@@ -104,7 +104,7 @@ const FloatingLabelSelect = ({
       </select>
       <ChevronDown
         aria-hidden
-        className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 peer-disabled:opacity-50"
+        className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground peer-disabled:opacity-50"
       />
       <label
         htmlFor={inputId}

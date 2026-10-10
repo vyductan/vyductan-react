@@ -81,7 +81,11 @@ const App: React.FC = () => {
                 ]}
               />
             </Field>
-            <Field name="description" control={form.control} label="Description">
+            <Field
+              name="description"
+              control={form.control}
+              label="Description"
+            >
               <Textarea
                 rows={4}
                 placeholder="Please enter a description"

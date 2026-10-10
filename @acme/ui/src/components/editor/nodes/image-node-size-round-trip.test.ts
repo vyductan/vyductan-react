@@ -1,6 +1,6 @@
 import type { ParagraphNode } from "lexical";
 import { createHeadlessEditor } from "@lexical/headless";
-import { $getRoot, $createParagraphNode } from "lexical";
+import { $createParagraphNode, $getRoot } from "lexical";
 import { describe, expect, test } from "vitest";
 
 import { $createImageNode, ImageNode } from "./image-node";
@@ -32,14 +32,20 @@ const roundTrip = (payload: { width?: number; height?: number }) => {
     () => {
       const paragraph = $createParagraphNode();
       paragraph.append(
-        $createImageNode({ altText: "a screenshot", src: "data:image/png;base64,AAAA", ...payload }),
+        $createImageNode({
+          altText: "a screenshot",
+          src: "data:image/png;base64,AAAA",
+          ...payload,
+        }),
       );
       $getRoot().append(paragraph);
     },
     { discrete: true },
   );
   editor.read(() => {
-    exported = JSON.parse(JSON.stringify(editor.getEditorState().toJSON())) as Record<string, unknown>;
+    exported = JSON.parse(
+      JSON.stringify(editor.getEditorState().toJSON()),
+    ) as Record<string, unknown>;
   });
 
   const reloaded = makeEditor();

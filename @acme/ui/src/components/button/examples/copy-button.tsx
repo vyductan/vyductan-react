@@ -79,12 +79,12 @@ export function CopyButton({
 
 function App(): React.JSX.Element {
   return (
-    <div className="bg-muted/40 grid w-[min(100%,32rem)] gap-3 rounded-2xl border p-4 shadow-sm">
-      <div className="bg-background flex items-center justify-between gap-3 rounded-xl px-4 py-3 font-mono text-sm">
-        <span className="text-muted-foreground truncate">{SNIPPET}</span>
+    <div className="grid w-[min(100%,32rem)] gap-3 rounded-2xl border bg-muted/40 p-4 shadow-sm">
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-background px-4 py-3 font-mono text-sm">
+        <span className="truncate text-muted-foreground">{SNIPPET}</span>
         <CopyButton value={SNIPPET} />
       </div>
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Use a composed button to copy command snippets and confirm the action in
         place.
       </p>

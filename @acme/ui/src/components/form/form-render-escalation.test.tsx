@@ -2,7 +2,6 @@ import "@testing-library/jest-dom/vitest";
 
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-
 import {
   act,
   cleanup,
@@ -193,7 +192,9 @@ describe("no root formState proxy reads", () => {
             // `_formState.x` (raw store) and `useFormState` are the safe forms.
             const pattern = new RegExp(`(?<!_)\\bformState\\.${key}\\b`);
             if (pattern.test(line)) {
-              offenders.push(`${path.basename(file)}:${index + 1} → ${line.trim()}`);
+              offenders.push(
+                `${path.basename(file)}:${index + 1} → ${line.trim()}`,
+              );
             }
           }
         });

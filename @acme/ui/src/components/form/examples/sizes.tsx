@@ -1,6 +1,6 @@
-import type { SizeType } from "@acme/ui/components/config-provider/size-context";
 import { z } from "zod";
 
+import type { SizeType } from "@acme/ui/components/config-provider/size-context";
 import { Button } from "@acme/ui/components/button";
 import { Field } from "@acme/ui/components/field";
 import { Form, requiredNumberSchema, useForm } from "@acme/ui/components/form";
@@ -32,7 +32,7 @@ const SizedForm = ({ size }: { size: SizeType }) => {
       size={size}
       className="flex flex-col gap-4"
     >
-      <div className="text-muted-foreground mb-1 text-sm font-medium">
+      <div className="mb-1 text-sm font-medium text-muted-foreground">
         size=&quot;{size ?? "middle"}&quot;
       </div>
       <Field name="name" control={form.control} label="Name">

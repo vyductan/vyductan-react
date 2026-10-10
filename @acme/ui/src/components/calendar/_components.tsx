@@ -33,7 +33,7 @@ export const CustomCalendarDayButton = ({
       data-range-end={isRangeEnd}
       data-range-middle={isRangeMiddle}
       className={cn(
-        "data-[range-middle=true]:bg-primary/20 data-[range-middle=true]:text-primary data-[range-end=true]:rounded-none data-[range-end=true]:rounded-r-md data-[range-start=true]:rounded-none data-[range-start=true]:rounded-l-md",
+        "data-[range-end=true]:rounded-none data-[range-end=true]:rounded-r-md data-[range-middle=true]:bg-primary/20 data-[range-middle=true]:text-primary data-[range-start=true]:rounded-none data-[range-start=true]:rounded-l-md",
         isDisabled && "cursor-not-allowed disabled:pointer-events-auto",
         className,
       )}
@@ -74,7 +74,7 @@ const CustomCalendar = ({
       // whole cell"). Range mode is left untouched — highlight stays continuous.
       className={cn(
         isMultiple &&
-          "[&_tr]:gap-1 [&_td]:size-(--cell-size) [&_td]:p-0 [&_td>button]:size-full [&_td>button]:min-w-0",
+          "[&_td]:size-(--cell-size) [&_td]:p-0 [&_td>button]:size-full [&_td>button]:min-w-0 [&_tr]:gap-1",
         className,
       )}
       // In multiple mode, modifier styling is applied to the day BUTTON (see

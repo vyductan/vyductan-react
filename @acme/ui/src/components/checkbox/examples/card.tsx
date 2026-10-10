@@ -8,7 +8,7 @@ const App: React.FC = () => {
       <Checkbox defaultChecked variant="card">
         <div className="grid gap-1.5 font-normal">
           <p className="text-sm leading-none font-medium">Auto Start</p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Starting with your OS.
           </p>
         </div>

@@ -18,7 +18,11 @@ globalThis.ResizeObserver ??= class ResizeObserver {
   disconnect() {}
 };
 
-function Harness({ onSubmit }: { onSubmit: (values: { plan: string }) => void }) {
+function Harness({
+  onSubmit,
+}: {
+  onSubmit: (values: { plan: string }) => void;
+}) {
   const form = useForm<{ plan: string }>({ defaultValues: { plan: "" } });
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>

@@ -5,8 +5,8 @@ import React from "react";
 import useControlledState from "@rc-component/util/es/hooks/useControlledState";
 
 import { tagColors } from "@acme/ui/components/tag";
-import { cn } from "@acme/ui/lib/utils";
 import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { AnyObject } from "../_util/type";
 import type { inputSizeVariants, InputVariants } from "../input";
@@ -18,6 +18,7 @@ import type {
   SelectOption,
   SelectValueType,
 } from "./types";
+import { Icon } from "../../icons";
 import useSize from "../config-provider/hooks/use-size";
 import { Empty } from "../empty";
 import {
@@ -28,7 +29,6 @@ import {
 import { PopoverContent, PopoverTrigger } from "../popover";
 import { Popover } from "../popover/_component";
 import { Spin } from "../spin";
-import { Icon } from "../../icons";
 import {
   SelectContent,
   SelectGroup,
@@ -529,7 +529,7 @@ const Select = <
               return (
                 <SelectGroup key={`group-${oIndex}`}>
                   {o.label && (
-                    <SelectLabel className="text-muted-foreground text-[10px] font-semibold tracking-widest uppercase">
+                    <SelectLabel className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
                       {o.label}
                     </SelectLabel>
                   )}
@@ -551,7 +551,7 @@ const Select = <
                         value={item.value as string}
                         className={cn(
                           selectedValues.includes(item.value)
-                            ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+                            ? "bg-primary-100 hover:bg-primary-100 focus:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
                             : "",
                           item.color && tagColors[item.color],
                         )}
@@ -603,7 +603,7 @@ const Select = <
                 value={o.value as string}
                 className={cn(
                   selectedValues.includes(o.value)
-                    ? "bg-primary-100 focus:bg-primary-100 hover:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
+                    ? "bg-primary-100 hover:bg-primary-100 focus:bg-primary-100 [&>span>span[role='img']]:text-primary-600"
                     : "",
                   o.color && tagColors[o.color],
                 )}
@@ -647,7 +647,7 @@ const Select = <
               return (
                 <div key={`tags-group-${optionIndex}`} className="space-y-1">
                   {option.label && (
-                    <div className="text-muted-foreground px-2 py-1 text-[10px] font-semibold tracking-widest uppercase">
+                    <div className="px-2 py-1 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
                       {option.label}
                     </div>
                   )}
@@ -669,7 +669,7 @@ const Select = <
                         key={String(item.value)}
                         type="button"
                         className={cn(
-                          "hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm",
+                          "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground",
                           isActiveTagsOption(item.value) &&
                             "bg-primary-100 text-primary-600",
                           item.color && tagColors[item.color],
@@ -709,7 +709,7 @@ const Select = <
                 key={String(option.value)}
                 type="button"
                 className={cn(
-                  "hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm",
+                  "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground",
                   isActiveTagsOption(option.value) &&
                     "bg-primary-100 text-primary-600",
                   option.color && tagColors[option.color],
@@ -741,7 +741,7 @@ const Select = <
             return (
               <div key={`tags-group-${optionIndex}`} className="space-y-1">
                 {option.label && (
-                  <div className="text-muted-foreground px-2 py-1 text-[10px] font-semibold tracking-widest uppercase">
+                  <div className="px-2 py-1 text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
                     {option.label}
                   </div>
                 )}
@@ -763,7 +763,7 @@ const Select = <
                       key={String(item.value)}
                       type="button"
                       className={cn(
-                        "hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm",
+                        "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground",
                         isActiveTagsOption(item.value) &&
                           "bg-primary-100 text-primary-600",
                         item.color && tagColors[item.color],
@@ -803,7 +803,7 @@ const Select = <
               key={String(option.value)}
               type="button"
               className={cn(
-                "hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm",
+                "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground",
                 isActiveTagsOption(option.value) &&
                   "bg-primary-100 text-primary-600",
                 option.color && tagColors[option.color],
@@ -850,7 +850,7 @@ const Select = <
               aria-label={triggerAriaLabel}
               aria-labelledby={ariaLabelledBy}
               className={cn(
-                "group min-h-control relative flex w-full cursor-pointer items-center justify-between gap-2 rounded-md text-left",
+                "group relative flex min-h-control w-full cursor-pointer items-center justify-between gap-2 rounded-md text-left",
                 controlPaddingBySize[mergedSize ?? "middle"],
                 inputVariants({ variant, status, disabled }),
                 controlRadiusBySize[mergedSize ?? "middle"],
@@ -937,7 +937,7 @@ const Select = <
                 aria-label={triggerAriaLabel}
                 aria-labelledby={ariaLabelledBy}
                 className={cn(
-                  "group min-h-control relative flex w-full items-center rounded-md",
+                  "group relative flex min-h-control w-full items-center rounded-md",
                   inputVariants({ variant, status, disabled }),
                   controlRadiusBySize[mergedSize ?? "middle"],
                   "h-auto py-1 pr-8 pl-[3px]",
@@ -1053,7 +1053,7 @@ const Select = <
           disabled={disabled}
           className={cn(
             "w-full",
-            isMultiple && "min-h-control h-auto items-center py-1 pl-[3px]",
+            isMultiple && "h-auto min-h-control items-center py-1 pl-[3px]",
             tagColors[flatOptions.find((o) => o.value === value)?.color ?? ""],
             className,
           )}

@@ -30,7 +30,7 @@ section .container .detail {
   @apply fixed top-14 right-[5%] w-60 items-center justify-center space-y-5 bg-[#000] p-4 text-sm md:static md:flex md:w-full md:space-y-0 md:space-x-5 md:bg-transparent;
 }
 .nav ul li a {
-  @apply hover:text-primary cursor-pointer text-base font-extrabold;
+  @apply cursor-pointer text-base font-extrabold hover:text-primary;
 }
 .logo {
   @apply fixed top-2 left-[5%];

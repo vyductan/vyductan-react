@@ -7,7 +7,7 @@ const Statistic = ({ title, value, ...properties }: StatisticProperties) => {
     typeof value === "number" ? value.toLocaleString() : value;
   return (
     <div {...properties}>
-      <div className="text-muted-foreground mb-1 text-sm">{title}</div>
+      <div className="mb-1 text-sm text-muted-foreground">{title}</div>
       <div className="text-2xl font-bold">{valueToRender}</div>
     </div>
   );

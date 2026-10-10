@@ -5,7 +5,11 @@ import { clipToDay, dayFraction, layoutOverlaps, occursOn } from "./layout";
 
 const at = (hour: number, minute = 0) => new Date(2026, 0, 5, hour, minute);
 
-const event = (id: string, startHour: number, endHour: number): AgendaEvent => ({
+const event = (
+  id: string,
+  startHour: number,
+  endHour: number,
+): AgendaEvent => ({
   id,
   title: id,
   start: at(startHour),

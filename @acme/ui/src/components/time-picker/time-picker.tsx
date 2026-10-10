@@ -46,7 +46,10 @@ type TimePickerProperties<
     disabledTime?: (now: Dayjs) => {
       disabledHours?: () => number[];
       disabledMinutes?: (selectedHour: number) => number[];
-      disabledSeconds?: (selectedHour: number, selectedMinute: number) => number[];
+      disabledSeconds?: (
+        selectedHour: number,
+        selectedMinute: number,
+      ) => number[];
     };
     /** Hide (instead of greying) options rejected by `disabledTime`. */
     hideDisabledOptions?: boolean;
@@ -88,8 +91,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
   } = properties;
 
   // AntD default: use12Hours with no explicit format falls back to "h:mm:ss A".
-  const format =
-    formatProperty ?? (use12Hours ? "h:mm:ss A" : "HH:mm:ss");
+  const format = formatProperty ?? (use12Hours ? "h:mm:ss A" : "HH:mm:ss");
   const [open, setOpen] = useMergedState(false, {
     value: openProperty,
     onChange: onOpenChange,
@@ -335,7 +337,7 @@ const TimePicker = <TValue extends Dayjs | string | null | undefined = Dayjs>(
             suffix={
               <Icon
                 icon="icon-[lucide--clock]"
-                className="text-muted-foreground h-4 w-4"
+                className="h-4 w-4 text-muted-foreground"
               />
             }
             onKeyUp={(event) => {

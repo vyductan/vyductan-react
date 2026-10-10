@@ -31,8 +31,8 @@ export const InParagraph: Story = {
   },
   render: (args) => (
     <p className="max-w-prose text-sm leading-6">
-      Learn more by visiting{" "}
-      <ExternalLink {...args} />, then come back here to continue.
+      Learn more by visiting <ExternalLink {...args} />, then come back here to
+      continue.
     </p>
   ),
 };

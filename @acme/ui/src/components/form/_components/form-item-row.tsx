@@ -64,7 +64,7 @@ const FormItemRow = ({
         key="form-item-control-input"
         data-slot="form-item-control-input"
         className={cn(
-          "min-h-control flex items-center",
+          "flex min-h-control items-center",
           layout === "vertical" && "*:w-full",
         )}
       >

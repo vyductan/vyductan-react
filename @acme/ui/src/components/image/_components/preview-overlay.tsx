@@ -55,8 +55,7 @@ export type ToolbarRenderInfo = {
 };
 
 export type PreviewMask =
-  | boolean
-  | { enabled?: boolean; blur?: boolean; closable?: boolean };
+  boolean | { enabled?: boolean; blur?: boolean; closable?: boolean };
 
 export type PreviewOverlayProps = {
   open: boolean;

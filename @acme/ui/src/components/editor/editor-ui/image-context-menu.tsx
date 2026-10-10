@@ -111,7 +111,7 @@ export function ImageContextMenu({
   return (
     <div
       ref={menuReference}
-      className="border-border bg-popover text-popover-foreground fixed z-50 min-w-[220px] rounded-lg border shadow-lg"
+      className="fixed z-50 min-w-[220px] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg"
       style={{
         top: `${position.y}px`,
         left: `${position.x}px`,
@@ -132,7 +132,7 @@ export function ImageContextMenu({
             <span className={`${item.icon} size-4 shrink-0`} />
             <span className="flex-1">{item.label}</span>
             {item.shortcut && (
-              <span className="text-muted-foreground text-xs">
+              <span className="text-xs text-muted-foreground">
                 {item.shortcut}
               </span>
             )}

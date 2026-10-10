@@ -5,9 +5,9 @@ import * as React from "react";
 import { cva } from "class-variance-authority";
 import { Tabs as TabsPrimitive } from "radix-ui";
 
-import type { TooltipProps } from "../tooltip";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { TooltipProps } from "../tooltip";
 import { Tooltip } from "../tooltip";
 
 const segmentedVariants = cva(
@@ -173,11 +173,9 @@ const Segmented = React.forwardRef<
           <TabsPrimitive.List
             ref={listRef}
             data-slot="segmented-list"
-            className="-my-1 flex w-full items-center overflow-x-auto py-1 scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="-my-1 flex w-full scrollbar-none items-center overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden"
             style={
-              maskImage
-                ? { maskImage, WebkitMaskImage: maskImage }
-                : undefined
+              maskImage ? { maskImage, WebkitMaskImage: maskImage } : undefined
             }
           >
             {normalizedOptions.map((option) => {

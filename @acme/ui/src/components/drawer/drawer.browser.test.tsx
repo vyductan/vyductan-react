@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { userEvent } from "vitest/browser";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Button } from "../button";
 import { Popover } from "../popover";
@@ -66,7 +66,9 @@ describe("Escape from a real keypress", () => {
     };
     render(<Harness />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Open jobs list" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Open jobs list" }),
+    );
     await waitFor(() => expect(openPopovers()).toHaveLength(1));
     await userEvent.click(screen.getByRole("button", { name: "Assign job" }));
     await waitFor(() => expect(drawerPanel()).not.toBeNull());

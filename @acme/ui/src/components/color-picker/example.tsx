@@ -43,7 +43,7 @@ export const ColorPickerExample: React.FC = () => {
         />
       </div>
 
-      <div className="text-muted-foreground text-sm">
+      <div className="text-sm text-muted-foreground">
         Selected color: {color ?? "None"}
       </div>
     </div>

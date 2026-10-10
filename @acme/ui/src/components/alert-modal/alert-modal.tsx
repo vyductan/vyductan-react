@@ -1,7 +1,7 @@
 import React from "react";
 
-import { cn } from "@acme/ui/lib/utils";
 import { registerEscapeTarget } from "@acme/ui/lib/modal-layers";
+import { cn } from "@acme/ui/lib/utils";
 
 import type { ModalProps as ModalProperties } from "../modal";
 import { Icon } from "../../icons";

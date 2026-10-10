@@ -113,8 +113,7 @@ export class TOCNode extends DecoratorNode<JSX.Element> {
   }
 
   getHeadings():
-    | Array<{ id: string; text: string; level: number }>
-    | undefined {
+    Array<{ id: string; text: string; level: number }> | undefined {
     return this.__headings;
   }
 
