@@ -582,4 +582,97 @@ describe("DateRangePicker showTime", () => {
       ).toBeTruthy();
     });
   });
+
+  test("previews and dims a hovered time in the active input", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RangePicker
+        showTime
+        format="YYYY-MM-DD HH:mm"
+        defaultValue={[dayjs("2026-05-05 09:30"), dayjs("2026-05-20 14:00")]}
+      />,
+    );
+
+    const startInput = screen.getAllByRole("textbox")[0];
+    if (!startInput) throw new Error("Expected range start input");
+    await user.click(startInput);
+
+    const minute = [
+      ...document.querySelectorAll<HTMLElement>(
+        '[data-slot="range-picker-time"] li',
+      ),
+    ].find((element) => element.textContent === "45");
+    if (!minute) throw new Error("Expected minute option 45");
+    fireEvent.mouseEnter(minute);
+
+    // Same day, different time: must still preview + dim (regression: no
+    // hover wiring, and the dim check compared by day).
+    await waitFor(() => {
+      expect(startInput).toHaveValue("2026-05-05 09:45");
+    });
+    expect(startInput).toHaveClass("text-muted-foreground");
+  });
+
+  test("previews a hovered day with the active side's time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <RangePicker
+        showTime
+        format="YYYY-MM-DD HH:mm"
+        defaultValue={[dayjs("2026-05-05 09:30"), dayjs("2026-05-20 14:00")]}
+      />,
+    );
+
+    const startInput = screen.getAllByRole("textbox")[0];
+    if (!startInput) throw new Error("Expected range start input");
+    await user.click(startInput);
+
+    const day = document.querySelector<HTMLButtonElement>(
+      '[data-day="5/12/2026"]',
+    );
+    if (!day) throw new Error("Expected day button for 5/12/2026");
+    await user.hover(day);
+
+    // Regression: the default two-panel layout had no day preview, and the
+    // preview dropped the time to 00:00.
+    await waitFor(() => {
+      expect(startInput).toHaveValue("2026-05-12 09:30");
+    });
+    expect(startInput).toHaveClass("text-muted-foreground");
+
+    const hoveredDay = document.querySelector<HTMLButtonElement>(
+      '[data-day="5/12/2026"]',
+    );
+    if (!hoveredDay) throw new Error("Expected day button for 5/12/2026");
+    fireEvent.mouseLeave(hoveredDay);
+    await waitFor(() => {
+      expect(startInput).toHaveValue("2026-05-05 09:30");
+    });
+  });
+});
+
+describe("DatePicker showTime hover", () => {
+  test("previews and dims a hovered time", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <DatePicker showTime defaultValue={dayjs("2026-05-05 09:30:00")} />,
+    );
+
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+
+    const minute = [
+      ...document.querySelectorAll<HTMLElement>('[data-slot="picker-time"] li'),
+    ].find((element) => element.textContent === "45");
+    if (!minute) throw new Error("Expected minute option 45");
+    fireEvent.mouseEnter(minute);
+
+    await waitFor(() => {
+      expect(input).toHaveValue("2026-05-05 09:45:00");
+    });
+    expect(input).toHaveClass("text-muted-foreground");
+  });
 });

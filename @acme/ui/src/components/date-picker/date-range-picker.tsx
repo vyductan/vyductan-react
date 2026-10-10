@@ -343,6 +343,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
   const activeDefaultOpen =
     activeSide === "end" ? defaultOpenTuple?.[1] : defaultOpenTuple?.[0];
   const fallbackTime = activeDefaultOpen ?? now;
+  // A time-only hover keeps the same day, so dimming must compare to the second.
+  const hoverGranularity = showTimeEnabled ? "second" : "day";
   const timeConfig =
     showTimeEnabled && disabledTime
       ? disabledTime(activeTimeValue ?? dayjs(), activeSide)
@@ -356,6 +358,19 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
         .second(source?.second() ?? 0)
         .millisecond(source?.millisecond() ?? 0),
     [],
+  );
+
+  // Preview a hovered day in the active input. With showTime, carry the active
+  // side's time-of-day (same source onSelect commits with) instead of 00:00.
+  const previewHoveredDay = React.useCallback(
+    (day: Dayjs | undefined) => {
+      setHoverPreview(
+        day && showTimeEnabled
+          ? applyTime(day, activeTimeValue ?? activeDefaultOpen ?? now)
+          : day,
+      );
+    },
+    [activeDefaultOpen, activeTimeValue, applyTime, now, showTimeEnabled],
   );
 
   const handleTimeChange = React.useCallback(
@@ -424,7 +439,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
           disabled={(date: Date) => disabled || !isDateAllowed(dayjs(date))}
           activeInput={activeInput}
           hoverPreview={hoverPreview}
-          onHoverPreviewChange={setHoverPreview}
+          onHoverPreviewChange={previewHoveredDay}
           onStartMonthChange={(month) => {
             setMonth(month);
           }}
@@ -460,6 +475,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
             : undefined
         }
         disabled={(date: Date) => disabled || !isDateAllowed(dayjs(date))}
+        onDayMouseEnter={(date, modifiers) => {
+          if (!modifiers.disabled) previewHoveredDay(dayjs(date));
+        }}
+        onDayMouseLeave={() => {
+          setHoverPreview(undefined);
+        }}
         onSelect={(_selected, triggerDate) => {
           const rawDate = dayjs(triggerDate);
           // Preserve the active side's time-of-day when showTime is enabled;
@@ -542,6 +563,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     disabled,
     hoverPreview,
     isDateAllowed,
+    previewHoveredDay,
     setHoverPreview,
     showTimeEnabled,
     applyTime,
@@ -611,6 +633,11 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                     secondStep={showTimeConfig?.secondStep}
                     use12Hours={use12Hours}
                     onChange={handleTimeChange}
+                    onHoverChange={(hovered) => {
+                      // Preview the hovered time in the active input; clear on
+                      // mouse-leave (undefined).
+                      setHoverPreview(hovered ?? undefined);
+                    }}
                   />
                 </div>
               )}
@@ -683,7 +710,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   open &&
                     hoverPreview &&
                     activeInput === "start" &&
-                    !value?.[0]?.isSame(hoverPreview, "day") &&
+                    !value?.[0]?.isSame(hoverPreview, hoverGranularity) &&
                     "text-muted-foreground",
                   classNames?.input,
                   classNames?.start,
@@ -804,7 +831,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   open &&
                     hoverPreview &&
                     activeInput === "end" &&
-                    !value?.[1]?.isSame(hoverPreview, "day") &&
+                    !value?.[1]?.isSame(hoverPreview, hoverGranularity) &&
                     "text-muted-foreground",
                   classNames?.input,
                   classNames?.end,
