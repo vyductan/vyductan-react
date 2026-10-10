@@ -10,6 +10,7 @@ import type {
   ButtonConfig,
   ConfigConsumerProps,
   DatePickerConfig,
+  EditorConfig,
   FormConfig,
   InputConfig,
   InputNumberConfig,
@@ -32,6 +33,7 @@ export interface ConfigProviderProps {
   locale?: Locale;
   button?: ButtonConfig;
   datePicker?: DatePickerConfig;
+  editor?: EditorConfig;
   form?: FormConfig;
   input?: InputConfig;
   inputNumber?: InputNumberConfig;

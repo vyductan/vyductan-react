@@ -4,18 +4,24 @@ import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
-import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
+import {
+  $getSelection,
+  $isRangeSelection,
+  $setSelection,
+  SKIP_DOM_SELECTION_TAG,
+} from "lexical";
 import { PaintBucketIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
 
+import { useEditorColorPalette } from "../../context/color-palette-context";
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
-import { ColorSwatchPicker } from "./color-swatch-picker";
-import { EDITOR_HIGHLIGHT_COLORS } from "./editor-color-palette";
+import { EditorColorChooser } from "./editor-color-chooser";
 
 export function FontBackgroundToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
+  const palette = useEditorColorPalette();
   const selectionReference = useRef<RangeSelection | null>(null);
 
   // Empty means no highlight at all, which is not the same as a white fill:
@@ -45,10 +51,18 @@ export function FontBackgroundToolbarPlugin() {
             $patchStyleText(selection, styles);
           }
         },
-        skipHistoryStack ? { tag: "historic" } : {},
+        {
+          tag: [
+            ...(skipHistoryStack ? ["historic"] : []),
+            // The free picker keeps the focus while a color is typed or
+            // dragged: putting the editor's selection back in the DOM took
+            // it, and the rest of a hex code was typed over the text.
+            ...(palette === "free" ? [SKIP_DOM_SELECTION_TAG] : []),
+          ],
+        },
       );
     },
-    [activeEditor],
+    [activeEditor, palette],
   );
 
   const onBackgroundColorSelect = useCallback(
@@ -74,19 +88,11 @@ export function FontBackgroundToolbarPlugin() {
   );
 
   return (
-    <ColorSwatchPicker
-      swatches={EDITOR_HIGHLIGHT_COLORS}
-      value={bgColor || undefined}
+    <EditorColorChooser
+      kind="highlight"
+      value={bgColor}
       onSelect={onBackgroundColorSelect}
       onOpenChange={onOpenChange}
-      defaultLabel="No highlight"
-      renderSwatch={(swatch) => (
-        <span
-          aria-hidden="true"
-          className="size-full rounded-sm"
-          style={{ backgroundColor: swatch.value }}
-        />
-      )}
     >
       <Button
         variant="ghost"
@@ -100,6 +106,6 @@ export function FontBackgroundToolbarPlugin() {
           style={{ backgroundColor: bgColor || "transparent" }}
         />
       </Button>
-    </ColorSwatchPicker>
+    </EditorColorChooser>
   );
 }

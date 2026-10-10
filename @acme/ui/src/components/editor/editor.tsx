@@ -1,7 +1,7 @@
 import type { InitialConfigType } from "@lexical/react/LexicalComposer";
 import type { EditorState } from "lexical";
 import type { ReactNode } from "react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useContext } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
@@ -11,6 +11,9 @@ import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "./plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
 import type { ReadClipboardText } from "./plugins/paste-cleanup-plugin";
+import type { EditorColorPalette } from "./plugins/toolbar/editor-color-palette";
+import { ConfigContext } from "../config-provider/context";
+import { EditorColorPaletteContext } from "./context/color-palette-context";
 import { EditorProviders } from "./editor-providers";
 import { nodes } from "./nodes/nodes";
 import { Plugins } from "./plugins/plugins";
@@ -87,6 +90,11 @@ type EditorPropertiesBase = {
    * cannot read it — VS Code's webview — reads it itself.
    */
   readClipboardText?: ReadClipboardText;
+  /**
+   * The colors the toolbars offer: any ("free") or Notion's ("notion"). Left
+   * out, the ConfigProvider's `editor.colorPalette`, else "free".
+   */
+  colorPalette?: EditorColorPalette;
   /** The scroll container that wraps the whole editor. */
   className?: string;
   /**
@@ -168,6 +176,7 @@ export function Editor({
   resolvePageLinkPreview,
   resolvePasteLink,
   readClipboardText,
+  colorPalette,
   className,
   classNames,
   autoFocus = false,
@@ -175,6 +184,7 @@ export function Editor({
   children,
   onChangeEditorState,
 }: EditorProps) {
+  const configuredPalette = useContext(ConfigContext).editor?.colorPalette;
   const isMarkdownMode = format === "markdown";
   const isHtmlMode = format === "html";
 
@@ -200,75 +210,79 @@ export function Editor({
       }}
     >
       <EditorProviders resolveImage={resolveImage}>
-        <div className="relative">
-          <Plugins
-            placeholder={placeholder}
-            editable={editable}
-            onImageUpload={onImageUpload}
-            variant={variant}
-            formatToolbar={formatToolbar}
-            mentionsData={mentionsData}
-            searchPageLinks={searchPageLinks}
-            createMentionLabel={createMentionLabel}
-            resolvePageLinkPreview={resolvePageLinkPreview}
-            resolvePasteLink={resolvePasteLink}
-            readClipboardText={readClipboardText}
-            className={className}
-            classNames={classNames}
-            autoFocus={autoFocus}
-            size={size}
-          />
+        <EditorColorPaletteContext.Provider
+          value={colorPalette ?? configuredPalette ?? "free"}
+        >
+          <div className="relative">
+            <Plugins
+              placeholder={placeholder}
+              editable={editable}
+              onImageUpload={onImageUpload}
+              variant={variant}
+              formatToolbar={formatToolbar}
+              mentionsData={mentionsData}
+              searchPageLinks={searchPageLinks}
+              createMentionLabel={createMentionLabel}
+              resolvePageLinkPreview={resolvePageLinkPreview}
+              resolvePasteLink={resolvePasteLink}
+              readClipboardText={readClipboardText}
+              className={className}
+              classNames={classNames}
+              autoFocus={autoFocus}
+              size={size}
+            />
 
-          {/*
+            {/*
             Gated on `onChange`: serializing walks the entire document, so it
             only happens when a caller actually asked for the string.
           */}
-          {!isMarkdownMode && !isHtmlMode && onChange && (
-            <OnChangePlugin
-              ignoreSelectionChange={true}
-              onChange={(editorState) => {
-                const jsonString = JSON.stringify(editorState.toJSON());
-                onChange(jsonString, editorState);
-              }}
-            />
-          )}
+            {!isMarkdownMode && !isHtmlMode && onChange && (
+              <OnChangePlugin
+                ignoreSelectionChange={true}
+                onChange={(editorState) => {
+                  const jsonString = JSON.stringify(editorState.toJSON());
+                  onChange(jsonString, editorState);
+                }}
+              />
+            )}
 
-          {/*
+            {/*
             Its own listener rather than a branch inside the one above, so it
             reports in every format and never becomes an inert prop in markdown
             or html mode.
           */}
-          {onChangeEditorState && (
-            <OnChangePlugin
-              ignoreSelectionChange={true}
-              onChange={onChangeEditorState}
-            />
-          )}
-
-          {isMarkdownMode && (
-            <Suspense fallback={null}>
-              <MarkdownPlugins
-                value={value}
-                defaultValue={defaultValue}
-                onChange={onChange}
+            {onChangeEditorState && (
+              <OnChangePlugin
+                ignoreSelectionChange={true}
+                onChange={onChangeEditorState}
               />
-            </Suspense>
-          )}
+            )}
 
-          {isHtmlMode && (
-            <Suspense fallback={null}>
-              <HtmlPlugins
-                value={value}
-                defaultValue={defaultValue}
-                onChange={onChange}
-              />
-            </Suspense>
-          )}
+            {isMarkdownMode && (
+              <Suspense fallback={null}>
+                <MarkdownPlugins
+                  value={value}
+                  defaultValue={defaultValue}
+                  onChange={onChange}
+                />
+              </Suspense>
+            )}
 
-          {onStatsChange && <WordCountPlugin onStatsChange={onStatsChange} />}
+            {isHtmlMode && (
+              <Suspense fallback={null}>
+                <HtmlPlugins
+                  value={value}
+                  defaultValue={defaultValue}
+                  onChange={onChange}
+                />
+              </Suspense>
+            )}
 
-          {children}
-        </div>
+            {onStatsChange && <WordCountPlugin onStatsChange={onStatsChange} />}
+
+            {children}
+          </div>
+        </EditorColorPaletteContext.Provider>
       </EditorProviders>
     </LexicalComposer>
   );

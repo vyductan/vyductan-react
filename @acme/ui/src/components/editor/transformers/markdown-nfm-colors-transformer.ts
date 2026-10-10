@@ -13,9 +13,13 @@ import {
   createState,
 } from "lexical";
 
+import type { NotionColor } from "../plugins/toolbar/editor-color-palette";
 import {
   EDITOR_HIGHLIGHT_COLORS,
   EDITOR_TEXT_COLORS,
+  NOTION_COLOR_NAMES,
+  NOTION_TEXT_HEX,
+  notionBackground,
 } from "../plugins/toolbar/editor-color-palette";
 
 /*
@@ -34,38 +38,7 @@ import {
  * before. A span with markdown inside is left to NFM_RAW_INLINE (a chip).
  */
 
-export const NOTION_COLOR_NAMES = [
-  "gray",
-  "brown",
-  "orange",
-  "yellow",
-  "green",
-  "blue",
-  "purple",
-  "pink",
-  "red",
-] as const;
-type NotionColor = (typeof NOTION_COLOR_NAMES)[number];
-
-// What a Notion color reads into: the floating toolbar's text colors (the
-// same nine names), and for a background that hue at 25% alpha — like the
-// fixed toolbar's highlights, readable on a light page and a dark one.
-const TEXT_HEX: Record<NotionColor, string> = {
-  gray: "#6B7280",
-  brown: "#B45309",
-  orange: "#EA580C",
-  yellow: "#CA8A04",
-  green: "#16A34A",
-  blue: "#2563EB",
-  purple: "#9333EA",
-  pink: "#DB2777",
-  red: "#DC2626",
-};
-
-const rgba = (hex: string, alpha: number) => {
-  const value = Number.parseInt(hex.slice(1), 16);
-  return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${alpha})`;
-};
+export { NOTION_COLOR_NAMES };
 
 /** The CSS a Notion color name reads into, or undefined for a name it lacks. */
 export function cssForNotionColor(
@@ -75,11 +48,12 @@ export function cssForNotionColor(
   const hue = (background ? name.slice(0, -3) : name) as NotionColor;
   if (!NOTION_COLOR_NAMES.includes(hue)) return undefined;
   return background
-    ? { property: "background-color", value: rgba(TEXT_HEX[hue], 0.25) }
-    : { property: "color", value: TEXT_HEX[hue] };
+    ? { property: "background-color", value: notionBackground(hue) }
+    : { property: "color", value: NOTION_TEXT_HEX[hue] };
 }
 
-// The fixed toolbar's eleven hues, by the Notion name nearest each.
+// The closed palette's eleven hues, by the Notion name nearest each: what
+// the fixed toolbar offered before the Notion palette, still in documents.
 const TOOLBAR_HUES: Record<string, NotionColor> = {
   Gray: "gray",
   Red: "red",
@@ -111,7 +85,7 @@ const normalize = (value: string) => value.toLowerCase().replaceAll(/\s+/g, "");
 
 const TEXT_NAMES = new Map<string, NotionColor>([
   ...NOTION_COLOR_NAMES.map(
-    (name) => [normalize(TEXT_HEX[name]), name] as const,
+    (name) => [normalize(NOTION_TEXT_HEX[name]), name] as const,
   ),
   ...EDITOR_TEXT_COLORS.map(
     ({ name, value }) => [normalize(value), TOOLBAR_HUES[name]!] as const,
@@ -120,7 +94,7 @@ const TEXT_NAMES = new Map<string, NotionColor>([
 
 const BACKGROUND_NAMES = new Map<string, NotionColor>([
   ...NOTION_COLOR_NAMES.map(
-    (name) => [normalize(rgba(TEXT_HEX[name], 0.25)), name] as const,
+    (name) => [normalize(notionBackground(name)), name] as const,
   ),
   ...EDITOR_HIGHLIGHT_COLORS.map(
     ({ name, value }) => [normalize(value), TOOLBAR_HUES[name]!] as const,

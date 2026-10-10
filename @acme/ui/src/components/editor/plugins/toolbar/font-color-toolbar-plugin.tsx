@@ -4,18 +4,24 @@ import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
 } from "@lexical/selection";
-import { $getSelection, $isRangeSelection, $setSelection } from "lexical";
+import {
+  $getSelection,
+  $isRangeSelection,
+  $setSelection,
+  SKIP_DOM_SELECTION_TAG,
+} from "lexical";
 import { BaselineIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/components/button";
 
+import { useEditorColorPalette } from "../../context/color-palette-context";
 import { useToolbarContext } from "../../context/toolbar-context";
 import { useUpdateToolbarHandler } from "../../editor-hooks/use-update-toolbar";
-import { ColorSwatchPicker } from "./color-swatch-picker";
-import { EDITOR_TEXT_COLORS } from "./editor-color-palette";
+import { EditorColorChooser } from "./editor-color-chooser";
 
 export function FontColorToolbarPlugin() {
   const { activeEditor } = useToolbarContext();
+  const palette = useEditorColorPalette();
   const selectionReference = useRef<RangeSelection | null>(null);
 
   // Empty means "inherit the page color" rather than any particular color, so
@@ -43,10 +49,18 @@ export function FontColorToolbarPlugin() {
             $patchStyleText(selection, styles);
           }
         },
-        skipHistoryStack ? { tag: "historic" } : {},
+        {
+          tag: [
+            ...(skipHistoryStack ? ["historic"] : []),
+            // The free picker keeps the focus while a color is typed or
+            // dragged: putting the editor's selection back in the DOM took
+            // it, and the rest of a hex code was typed over the text.
+            ...(palette === "free" ? [SKIP_DOM_SELECTION_TAG] : []),
+          ],
+        },
       );
     },
-    [activeEditor],
+    [activeEditor, palette],
   );
 
   const onFontColorSelect = useCallback(
@@ -72,13 +86,11 @@ export function FontColorToolbarPlugin() {
   );
 
   return (
-    <ColorSwatchPicker
-      swatches={EDITOR_TEXT_COLORS}
-      value={fontColor || undefined}
+    <EditorColorChooser
+      kind="text"
+      value={fontColor}
       onSelect={onFontColorSelect}
       onOpenChange={onOpenChange}
-      defaultLabel="Default"
-      renderSwatch={(swatch) => <span style={{ color: swatch.value }}>A</span>}
     >
       <Button
         variant="ghost"
@@ -92,6 +104,6 @@ export function FontColorToolbarPlugin() {
           style={{ backgroundColor: fontColor || "transparent" }}
         />
       </Button>
-    </ColorSwatchPicker>
+    </EditorColorChooser>
   );
 }

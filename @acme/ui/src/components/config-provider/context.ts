@@ -280,6 +280,14 @@ export interface WaveConfig {
   showEffect?: ShowWaveEffect;
 }
 
+export interface EditorConfig {
+  /**
+   * The colors the rich-text editor offers: any ("free", the default) or
+   * Notion's ("notion"), which markdown and Notion sync keep.
+   */
+  colorPalette?: "free" | "notion";
+}
+
 export interface ConfigComponentProps {
   avatar?: ComponentStyleConfig;
   checkbox?: ComponentStyleConfig;
@@ -346,6 +354,7 @@ export interface ConfigComponentProps {
   // dropdown?: ComponentStyleConfig;
   // flex?: FlexConfig;
   wave?: WaveConfig;
+  editor?: EditorConfig;
 }
 
 export interface ConfigConsumerProps extends ConfigComponentProps {

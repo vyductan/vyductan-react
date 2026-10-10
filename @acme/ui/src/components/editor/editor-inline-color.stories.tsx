@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
+import { ConfigProvider } from "../config-provider";
 import { Editor } from "./editor";
 import InlineColorDemo from "./examples/inline-color";
 
@@ -55,12 +56,17 @@ export const Parity: Story = {
 };
 
 /**
- * Locks the design decision behind the palette: the picker offers a fixed set
- * and no free-form entry. A hex field would let `#000000` into stored content,
- * and that is the one value that disappears when the page is read in dark mode.
+ * Locks the design decision behind the Notion palette: the picker offers a
+ * fixed set and no free-form entry — the colors a markdown file can carry, and
+ * no `#000000`, the one value that disappears when the page is read in dark
+ * mode. (Left unset, the palette is free: see color-palette.browser.test.tsx.)
  */
 export const PaletteIsClosed: Story = {
-  render: () => <InlineColorDemo />,
+  render: () => (
+    <ConfigProvider editor={{ colorPalette: "notion" }}>
+      <InlineColorDemo />
+    </ConfigProvider>
+  ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 

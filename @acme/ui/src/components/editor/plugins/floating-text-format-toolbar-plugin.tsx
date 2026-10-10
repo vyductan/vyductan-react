@@ -73,8 +73,10 @@ import {
 } from "@acme/ui/components/tooltip";
 import { cn } from "@acme/ui/lib/utils";
 
+import type { NotionColor } from "./toolbar/editor-color-palette";
 import { ToggleGroup, ToggleGroupItem } from "../../../shadcn/toggle-group";
 import { message } from "../../message";
+import { useEditorColorPalette } from "../context/color-palette-context";
 import { useFloatingLinkContext } from "../context/floating-link-context";
 import { $turnSelectedBlocksIntoList } from "../utils/block-selection";
 import { BLOCK_TYPE_ICONS } from "../utils/block-type-icons";
@@ -84,6 +86,13 @@ import { positionFormatToolbar } from "../utils/position-format-toolbar";
 import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-children";
 import { INSERT_COLLAPSIBLE_COMMAND } from "./collapsible-plugin";
 import { INSERT_EQUATION_COMMAND } from "./equations-plugin";
+import {
+  NOTION_COLOR_NAMES,
+  notionBackground,
+} from "./toolbar/editor-color-palette";
+
+const isNotionColor = (value: string): value is NotionColor =>
+  (NOTION_COLOR_NAMES as readonly string[]).includes(value);
 
 type BlockType = keyof typeof BLOCK_TYPE_ICONS;
 
@@ -418,20 +427,29 @@ function TextFormatFloatingToolbar({
     [],
   );
 
+  const palette = useEditorColorPalette();
+  // In Notion's palette a background is its hue at 25% alpha, readable on a
+  // dark page too, where these light tints were a white box behind light
+  // text; and the one Notion sync and markdown name.
   const backgroundColors = useMemo(
-    () => [
-      { label: "Default background", value: "default", hex: "#ffffff" },
-      { label: "Gray background", value: "gray", hex: "#F3F4F6" },
-      { label: "Brown background", value: "brown", hex: "#FEF3C7" },
-      { label: "Orange background", value: "orange", hex: "#FFEDD5" },
-      { label: "Yellow background", value: "yellow", hex: "#FEF9C3" },
-      { label: "Green background", value: "green", hex: "#DCFCE7" },
-      { label: "Blue background", value: "blue", hex: "#DBEAFE" },
-      { label: "Purple background", value: "purple", hex: "#EDE9FE" },
-      { label: "Pink background", value: "pink", hex: "#FCE7F3" },
-      { label: "Red background", value: "red", hex: "#FEE2E2" },
-    ],
-    [],
+    () =>
+      [
+        { label: "Default background", value: "default", hex: "#ffffff" },
+        { label: "Gray background", value: "gray", hex: "#F3F4F6" },
+        { label: "Brown background", value: "brown", hex: "#FEF3C7" },
+        { label: "Orange background", value: "orange", hex: "#FFEDD5" },
+        { label: "Yellow background", value: "yellow", hex: "#FEF9C3" },
+        { label: "Green background", value: "green", hex: "#DCFCE7" },
+        { label: "Blue background", value: "blue", hex: "#DBEAFE" },
+        { label: "Purple background", value: "purple", hex: "#EDE9FE" },
+        { label: "Pink background", value: "pink", hex: "#FCE7F3" },
+        { label: "Red background", value: "red", hex: "#FEE2E2" },
+      ].map((color) =>
+        palette === "notion" && isNotionColor(color.value)
+          ? { ...color, hex: notionBackground(color.value) }
+          : color,
+      ),
+    [palette],
   );
   const handleTextColorChange = useCallback(
     (colorValue: string) => {

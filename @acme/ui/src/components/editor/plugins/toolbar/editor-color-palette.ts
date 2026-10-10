@@ -68,3 +68,57 @@ export const EDITOR_HIGHLIGHT_COLORS: EditorColorSwatch[] = COLOR_HUES.map(
     value: `rgba(${toRgbaChannels(hex)}, ${HIGHLIGHT_ALPHA})`,
   }),
 );
+
+/**
+ * Which colors the editor offers. An app sets it once, on its ConfigProvider
+ * (`editor.colorPalette`), or an Editor on its own (`colorPalette`):
+ *
+ * - "free", the default: any color, from a picker with a hex field. What the
+ *   nlabs apps had before the palette was closed, and want.
+ * - "notion": Notion's colors, the ones a markdown file can carry
+ *   (Notion-flavored `<span color="blue">`) — so VD Markdown and Notion sync
+ *   keep them. Also no `#000000`, which vanishes on a dark page.
+ */
+export type EditorColorPalette = "free" | "notion";
+
+export const NOTION_COLOR_NAMES = [
+  "gray",
+  "brown",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "purple",
+  "pink",
+  "red",
+] as const;
+export type NotionColor = (typeof NOTION_COLOR_NAMES)[number];
+
+/** A Notion color's text: the floating toolbar's own text colors. */
+export const NOTION_TEXT_HEX: Record<NotionColor, string> = {
+  gray: "#6B7280",
+  brown: "#B45309",
+  orange: "#EA580C",
+  yellow: "#CA8A04",
+  green: "#16A34A",
+  blue: "#2563EB",
+  purple: "#9333EA",
+  pink: "#DB2777",
+  red: "#DC2626",
+};
+
+/** A Notion color's background: its hue at the highlights' alpha. */
+export const notionBackground = (name: NotionColor) =>
+  `rgba(${toRgbaChannels(NOTION_TEXT_HEX[name])}, ${HIGHLIGHT_ALPHA})`;
+
+const capitalized = (name: string) => name[0]!.toUpperCase() + name.slice(1);
+
+export const NOTION_TEXT_COLORS: EditorColorSwatch[] = NOTION_COLOR_NAMES.map(
+  (name) => ({ name: capitalized(name), value: NOTION_TEXT_HEX[name] }),
+);
+
+export const NOTION_HIGHLIGHT_COLORS: EditorColorSwatch[] =
+  NOTION_COLOR_NAMES.map((name) => ({
+    name: capitalized(name),
+    value: notionBackground(name),
+  }));

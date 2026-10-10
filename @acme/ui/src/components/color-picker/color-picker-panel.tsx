@@ -30,12 +30,16 @@ export const ColorPickerPanel: React.FC<ColorPickerPanelProperties> = ({
   };
 
   const handleInputChange = (newValue: string) => {
-    setInputState({ sourceValue: hexValue, value: newValue });
     try {
-      new AggregationColor(newValue);
+      const color = new AggregationColor(newValue);
+      // Held against the color this sends, as it comes back: `#123` comes
+      // back `#112233`, and replacing what is being typed with it made
+      // `#123456` come out `#11223345`.
+      setInputState({ sourceValue: color.toHexString(), value: newValue });
       onChange?.(newValue);
     } catch {
       // Invalid color, keep the input value but don't update the color
+      setInputState({ sourceValue: hexValue, value: newValue });
     }
   };
 
