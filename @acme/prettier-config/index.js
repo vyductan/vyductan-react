@@ -2,6 +2,8 @@
 /** @typedef {import("prettier-plugin-tailwindcss").PluginOptions} TailwindConfig */
 /** @typedef {import("@ianvs/prettier-plugin-sort-imports").PluginConfig} SortImportsConfig */
 
+import { fileURLToPath } from "node:url";
+
 /** @type { PrettierConfig | SortImportsConfig | TailwindConfig } */
 const config = {
   plugins: [
@@ -9,6 +11,12 @@ const config = {
     import.meta.resolve("prettier-plugin-packagejson"),
     import.meta.resolve("prettier-plugin-tailwindcss"),
   ],
+  // Tailwind v4 has no JS config: without the entry stylesheet the plugin
+  // can't see theme tokens (bg-background, text-muted-foreground…) and sorts
+  // them as unknown classes to the front. apps/web adds no theme of its own.
+  tailwindStylesheet: fileURLToPath(
+    new URL("../ui/src/styles/globals.css", import.meta.url),
+  ),
   tailwindFunctions: ["tv"],
   importOrder: [
     "<TYPES>",

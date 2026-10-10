@@ -74,7 +74,7 @@
     "colorjs.io": "catalog:",
     "date-fns": "catalog:",
     "dayjs": "catalog:",
-    "dompurify": "^3.4.13",
+    "dompurify": "^3.4.16",
     "embla-carousel-react": "^8.6.0",
     "iconify-icon": "^3.0.2",
     "input-otp": "^1.4.2",
