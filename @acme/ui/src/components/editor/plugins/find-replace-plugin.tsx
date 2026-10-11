@@ -50,9 +50,35 @@ interface Match {
   offset: number;
 }
 
-/** Names the stylesheet styles with `::highlight(...)`. */
+/** Names the `::highlight(...)` rules below are written against. */
 const ALL_MATCHES_HIGHLIGHT = "editor-find";
 const CURRENT_MATCH_HIGHLIGHT = "editor-find-current";
+
+/*
+ * Every match in a soft yellow, the current one stronger, as Notion marks
+ * them.
+ *
+ * Injected from here rather than written in themes/editor-theme.css: the CSS
+ * parser built into Turbopack does not know the `::highlight()` pseudo-element
+ * and warned on every compile of every app importing the editor. It kept the
+ * rule, so this was only ever log noise — but the names live in this file, and
+ * so does the API the rules style, so the rules can too.
+ */
+const HIGHLIGHT_STYLES = `
+::highlight(${ALL_MATCHES_HIGHLIGHT}) { background-color: rgb(255 212 0 / 0.35); }
+::highlight(${CURRENT_MATCH_HIGHLIGHT}) { background-color: rgb(255 150 0 / 0.6); }
+`;
+const HIGHLIGHT_STYLE_ID = "acme-editor-find-highlights";
+
+/** Add the rules once per document; any number of editors share them. */
+function ensureHighlightStyles(): void {
+  if (typeof document === "undefined") return;
+  if (document.getElementById(HIGHLIGHT_STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = HIGHLIGHT_STYLE_ID;
+  style.textContent = HIGHLIGHT_STYLES;
+  document.head.append(style);
+}
 
 /** Gap between the bar and the edges it is pinned to, in px. */
 const EDGE_GAP = 8;
@@ -294,6 +320,7 @@ export function FindReplacePlugin({
   useEffect(() => {
     const api = highlightApi();
     if (!api) return;
+    ensureHighlightStyles();
 
     if (!isOpen || matches.length === 0) {
       api.registry.delete(ALL_MATCHES_HIGHLIGHT);

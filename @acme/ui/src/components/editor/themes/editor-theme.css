@@ -378,17 +378,10 @@
   }
 
   /*
-   * Find: every match in a soft yellow, the current one stronger, as Notion
-   * marks them. Drawn with the CSS Custom Highlight API, so nothing is
-   * written into the document — see plugins/find-replace-plugin.tsx.
+   * Find's match colours are not here: plugins/find-replace-plugin.tsx injects
+   * its ::highlight() rules itself, because Turbopack's CSS parser warns on
+   * that pseudo-element.
    */
-  ::highlight(editor-find) {
-    background-color: rgb(255 212 0 / 0.35);
-  }
-
-  ::highlight(editor-find-current) {
-    background-color: rgb(255 150 0 / 0.6);
-  }
 
   /*
    * Inline code, in the red Notion marks it with. Same reasoning as the syntax
