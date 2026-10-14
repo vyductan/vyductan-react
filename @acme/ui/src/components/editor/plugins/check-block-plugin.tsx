@@ -45,8 +45,14 @@ export function CheckBlockPlugin() {
         if (!block) return false;
 
         if ($isCheckBlockNode(block)) {
-          // If hitting enter at the start of empty block, Turn into Paragraph
+          // Enter on an empty to-do: indented, it moves out a level; at the
+          // margin, it turns into a plain line — as in Notion.
           if (block.getTextContentSize() === 0 && selection.isCollapsed()) {
+            if (block.getIndent() > 0) {
+              block.setIndent(block.getIndent() - 1);
+              if (event) event.preventDefault();
+              return true;
+            }
             const p = $createParagraphNode();
             block.replace(p);
             p.select();
@@ -55,7 +61,10 @@ export function CheckBlockPlugin() {
           }
 
           if (!event?.shiftKey) {
+            // The next to-do starts at this one's indent, as in Notion; it
+            // started at the margin.
             const newBlock = $createCheckBlockNode(false);
+            newBlock.setIndent(block.getIndent());
 
             if (selection.isCollapsed()) {
               const anchor = selection.anchor;

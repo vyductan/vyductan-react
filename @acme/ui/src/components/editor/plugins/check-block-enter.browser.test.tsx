@@ -1,0 +1,140 @@
+import type { ElementNode, LexicalEditor } from "lexical";
+import * as React from "react";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { cleanup, render, waitFor } from "@testing-library/react";
+import {
+  $createTextNode,
+  $getRoot,
+  $isElementNode,
+  $isTextNode,
+} from "lexical";
+import { afterEach, expect, test } from "vitest";
+import { userEvent } from "vitest/browser";
+
+import { Editor } from "../editor";
+import {
+  $createCheckBlockNode,
+  $isCheckBlockNode,
+} from "../nodes/check-block-node";
+
+Object.assign(globalThis, { React });
+
+function EditorRefPlugin({
+  onReady,
+}: {
+  onReady: (editor: LexicalEditor) => void;
+}) {
+  const [editor] = useLexicalComposerContext();
+
+  React.useEffect(() => {
+    onReady(editor);
+  }, [editor, onReady]);
+
+  return null;
+}
+
+afterEach(() => {
+  cleanup();
+  document.body.replaceChildren();
+});
+
+/** To-dos "a", then "b" indented once; the caret at the end of `at`. */
+async function todos(at: "a" | "b", bText = "b") {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  document.querySelector<HTMLElement>('[contenteditable="true"]')!.focus();
+  live.update(
+    () => {
+      const a = $createCheckBlockNode(false).append($createTextNode("a"));
+      const b = $createCheckBlockNode(false);
+      if (bText) b.append($createTextNode(bText));
+      b.setIndent(1);
+      $getRoot().clear().append(a, b);
+      (at === "a" ? a : b).selectEnd();
+    },
+    { discrete: true },
+  );
+  return live;
+}
+
+const blocks = (live: LexicalEditor) =>
+  live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((node) => ({
+        type: $isCheckBlockNode(node) ? "todo" : node.getType(),
+        text: node.getTextContent(),
+        indent: $isElementNode(node) ? node.getIndent() : 0,
+      })),
+  );
+
+/**
+ * Like Notion: Enter at the end of an indented to-do starts the next one at
+ * the same indent. It started at the margin.
+ */
+test("Enter in an indented to-do starts the next to-do at its indent", async () => {
+  const live = await todos("b");
+
+  await userEvent.keyboard("{Enter}c");
+
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "todo", text: "b", indent: 1 },
+      { type: "todo", text: "c", indent: 1 },
+    ]),
+  );
+});
+
+test("Enter in the middle of an indented to-do splits it at its indent", async () => {
+  const live = await todos("b", "bc");
+  live.update(
+    () => {
+      const text = $getRoot()
+        .getLastChildOrThrow<ElementNode>()
+        .getFirstChild();
+      if ($isTextNode(text)) text.select(1, 1);
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("{Enter}");
+
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "todo", text: "b", indent: 1 },
+      { type: "todo", text: "c", indent: 1 },
+    ]),
+  );
+});
+
+/**
+ * Enter on an empty indented to-do moves it out a level, as in Notion — and
+ * only at the margin turns it into a plain line.
+ */
+test("Enter on an empty indented to-do moves it out a level first", async () => {
+  const live = await todos("b", "");
+
+  await userEvent.keyboard("{Enter}");
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "todo", text: "", indent: 0 },
+    ]),
+  );
+
+  await userEvent.keyboard("{Enter}");
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "paragraph", text: "", indent: 0 },
+    ]),
+  );
+});
