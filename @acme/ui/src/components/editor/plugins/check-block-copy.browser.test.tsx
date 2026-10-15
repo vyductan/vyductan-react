@@ -154,3 +154,73 @@ test("a heading copied by its line pastes back as a heading", async () => {
     ).toStrictEqual(["heading", "heading"]),
   );
 });
+
+/**
+ * Pasting a plain line onto an empty to-do — Enter, then Cmd+V — lost the
+ * checkbox: the copied paragraph took the to-do's place. In Notion a plain
+ * line pasted into a block joins it; the to-do stays a to-do.
+ */
+for (const how of ["by its line", "by all of its text"] as const) {
+  test(`a plain line copied ${how} pastes into an empty to-do as its text`, async () => {
+    let editor: LexicalEditor | null = null;
+    render(
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>,
+    );
+    await waitFor(() => expect(editor).not.toBeNull());
+    const live = editor as unknown as LexicalEditor;
+    const root = document.querySelector<HTMLElement>(
+      '[contenteditable="true"]',
+    )!;
+    root.focus();
+    live.update(
+      () => {
+        const code = $createTextNode("fn_sweep_intake_retention");
+        code.toggleFormat("code");
+        const line = $createParagraphNode().append(code);
+        $getRoot()
+          .clear()
+          .append(
+            line,
+            $createCheckBlockNode(false).append($createTextNode("a")),
+            $createCheckBlockNode(false),
+          );
+        if (how === "by its line") code.selectEnd();
+        else code.select(0, code.getTextContentSize());
+      },
+      { discrete: true },
+    );
+
+    const clipboardData = new DataTransfer();
+    root.dispatchEvent(
+      new ClipboardEvent("copy", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      }),
+    );
+    live.update(() => $getRoot().getLastChildOrThrow().selectStart(), {
+      discrete: true,
+    });
+    root.dispatchEvent(
+      new ClipboardEvent("paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      }),
+    );
+
+    await waitFor(() =>
+      expect(blocks(live).slice(1)).toStrictEqual([
+        { type: "todo", text: "a", indent: 0, checked: false },
+        {
+          type: "todo",
+          text: "fn_sweep_intake_retention",
+          indent: 0,
+          checked: false,
+        },
+      ]),
+    );
+  });
+}

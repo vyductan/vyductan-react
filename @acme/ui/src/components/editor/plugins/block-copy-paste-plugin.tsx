@@ -22,6 +22,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import {
   $getSelection,
   $isElementNode,
+  $isParagraphNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   $isTextNode,
@@ -642,8 +643,32 @@ export function BlockCopyPastePlugin(): null {
           const document = parser.parseFromString(html, "text/html");
           const nodes = $generateNodesFromDOM(editor, document);
 
-          // Insert after current block
+          // An empty line is taken by what is pasted on it, as in Notion: a
+          // plain line's text goes into it (an empty to-do stays a to-do),
+          // any other block takes its place.
           let lastNode: LexicalNode = block;
+          const [first] = nodes;
+          if (
+            $isElementNode(block) &&
+            block.isEmpty() &&
+            !$isListItemNode(block) &&
+            first !== undefined
+          ) {
+            if ($isParagraphNode(first) && !$isParagraphNode(block)) {
+              block.append(...first.getChildren());
+              nodes.shift();
+              if (nodes.length === 0) {
+                block.selectEnd();
+                return;
+              }
+            } else {
+              block.replace(first);
+              lastNode = first;
+              nodes.shift();
+            }
+          }
+
+          // Insert after current block
           for (const node of nodes) {
             lastNode.insertAfter(node);
             lastNode = node;
