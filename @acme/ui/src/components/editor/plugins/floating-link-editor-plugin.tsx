@@ -29,7 +29,7 @@ import {
   KEY_ESCAPE_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
-import { Check, Pencil, Trash, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { Button } from "@acme/ui/components/button";
@@ -58,7 +58,7 @@ function FloatingLinkEditor({
 }): JSX.Element {
   const editorReference = useRef<HTMLDivElement | null>(null);
   const inputReference = useRef<HTMLInputElement>(null);
-  const [linkUrl, setLinkUrl] = useState("");
+  const [, setLinkUrl] = useState("");
   const [editedLinkUrl, setEditedLinkUrl] = useState("https://");
   const [lastSelection, setLastSelection] = useState<BaseSelection | null>(
     null,
@@ -410,10 +410,12 @@ function FloatingLinkEditor({
       }
     }, 100);
   };
-  // Show editor only when in edit mode or when link is selected and should show
-  const isVisible = isLinkEditMode || (isLink && shouldShow);
+  // Only for making a link (⌘K, the toolbar). An existing link is shown and
+  // edited by its hover card (LinkHoverCardPlugin), not when the caret lands
+  // in it: on a right-click that opened under the context menu.
+  const isVisible = isLinkEditMode;
 
-  if (!isLinkEditMode && !isLink) {
+  if (!isLinkEditMode) {
     return <div ref={editorReference} className="hidden" />;
   }
 
@@ -509,66 +511,6 @@ function FloatingLinkEditor({
           >
             <Check className="h-4 w-4" />
           </Button>
-        </div>
-      ) : isLink ? (
-        // Show link URL with edit/delete buttons when link is selected
-        <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-popover p-2 shadow-sm">
-          <a
-            href={sanitizeUrl(linkUrl)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 overflow-hidden text-sm text-ellipsis whitespace-nowrap text-blue-600 hover:text-blue-700 hover:underline"
-            onClick={(e) => {
-              // Prevent editor from losing focus when clicking link
-              e.stopPropagation();
-            }}
-          >
-            {linkUrl}
-          </a>
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                // Get current link URL before setting edit mode
-                editor.getEditorState().read(() => {
-                  const selection = $getSelection();
-                  if ($isRangeSelection(selection)) {
-                    const node = getSelectedNode(selection);
-                    const linkParent = $findMatchingParent(node, $isLinkNode);
-                    if (linkParent) {
-                      setEditedLinkUrl(linkParent.getURL());
-                    } else if ($isLinkNode(node)) {
-                      setEditedLinkUrl(node.getURL());
-                    } else {
-                      setEditedLinkUrl(linkUrl || "https://");
-                    }
-                  } else {
-                    setEditedLinkUrl(linkUrl || "https://");
-                  }
-                });
-                setIsLinkEditMode(true);
-              }}
-              className="h-8 w-8"
-              title="Edit link"
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-                setIsLink(false);
-              }}
-              className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
-              title="Remove link"
-            >
-              <Trash className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       ) : null}
     </div>

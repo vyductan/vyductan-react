@@ -67,6 +67,7 @@ import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugi
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
+import { LinkHoverCardPlugin } from "../plugins/link-hover-card-plugin";
 import { PageLinkHoverCardPlugin } from "../plugins/page-link-hover-card-plugin";
 import { PasteAsPlugin } from "../plugins/paste-as-plugin";
 import { PasteCleanupPlugin } from "../plugins/paste-cleanup-plugin";
@@ -324,6 +325,7 @@ export function Plugins({
       {editable && (
         <FloatingLinkEditorPlugin anchorElem={floatingAnchorElement} />
       )}
+      {editable && <LinkHoverCardPlugin />}
       {editable && formatToolbar && variant !== "simple" && (
         <FloatingTextFormatToolbarPlugin
           anchorElem={floatingAnchorElement}
