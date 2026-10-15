@@ -1,6 +1,10 @@
 import type { ElementNode, LexicalEditor } from "lexical";
 import * as React from "react";
-import { $isListItemNode, $isListNode } from "@lexical/list";
+import {
+  $createListItemNode,
+  $createListNode,
+  $isListItemNode,
+} from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import {
@@ -202,24 +206,20 @@ test("a bullet typed on an indented line keeps its indent", async () => {
       live.getEditorState().read(() => {
         const node = $getSelection()?.getNodes()[0];
         const item = node?.getParent();
-        const list = item?.getParent();
-        return $isListItemNode(item) && $isListNode(list)
-          ? {
-              text: item.getTextContent(),
-              depth: item.getIndent(),
-              indent: list.getIndent(),
-            }
+        return $isListItemNode(item)
+          ? { text: item.getTextContent(), depth: item.getIndent() }
           : null;
       }),
-    ).toStrictEqual({ text: "a", depth: 0, indent: 1 }),
+    ).toStrictEqual({ text: "a", depth: 1 }),
   );
 });
 
 /**
- * Lexical nests an item by copying its list, indent and all: under an
- * indented list, the nested one was pushed a whole indent further again.
+ * A bullet under a to-do is the first level of bullets, a filled dot as in
+ * Notion — nested only to sit under the to-do, with no item above it. One
+ * nested under a real item is the second level, a circle.
  */
-test("a list nested in an indented list is not indented twice", async () => {
+test("a bullet under a to-do is a filled dot", async () => {
   let editor: LexicalEditor | null = null;
   render(
     <Editor autoFocus={false}>
@@ -230,17 +230,59 @@ test("a list nested in an indented list is not indented twice", async () => {
   const live = editor as unknown as LexicalEditor;
   live.setEditorState(
     live.parseEditorState(
-      JSON.stringify(markdownToLexicalContent("- [ ] a\n\t- b\n\t\t- c")),
+      JSON.stringify(
+        markdownToLexicalContent("- [ ] a\n\t- b\n\t\t- c\n\n- d\n\t- e"),
+      ),
     ),
   );
 
-  await waitFor(() => {
-    const lists = [...document.querySelectorAll("ul")].filter(
-      (list) => !list.querySelector("[data-check-icon]"),
-    );
-    expect(lists.map((list) => list.style.paddingInlineStart)).toStrictEqual([
-      expect.stringContaining("1 *"),
-      "",
-    ]);
-  });
+  const marker = (text: string) =>
+    getComputedStyle(
+      [...document.querySelectorAll("li")].find(
+        (item) => !item.querySelector("ul, ol") && item.textContent === text,
+      )!,
+    ).listStyleType;
+  await waitFor(() =>
+    expect(["b", "c", "d", "e"].map(marker)).toStrictEqual([
+      "disc",
+      "circle",
+      "disc",
+      "circle",
+    ]),
+  );
+});
+
+/**
+ * With a list at the margin just below, Lexical joined the new bullet to
+ * it: out at the margin again. Typed under a to-do, it is a list of its own.
+ */
+test("a bullet typed above a list at the margin keeps its indent", async () => {
+  const live = await todos("a");
+  live.update(
+    () => {
+      const line = $createParagraphNode();
+      line.setIndent(1);
+      const below = $createListNode("bullet").append(
+        $createListItemNode().append($createTextNode("below")),
+      );
+      $getRoot().getLastChildOrThrow().replace(line);
+      line.insertAfter(below);
+      line.select();
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("- a");
+
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() =>
+        $getRoot()
+          .getAllTextNodes()
+          .map((text) => text.getParent())
+          .filter($isListItemNode)
+          .map((item) => `${item.getTextContent()}@${item.getIndent()}`),
+      ),
+    ).toStrictEqual(["a@1", "below@0"]),
+  );
 });

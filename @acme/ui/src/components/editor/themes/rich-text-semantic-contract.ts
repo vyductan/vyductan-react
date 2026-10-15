@@ -114,7 +114,8 @@ export const richTextSemanticContract = {
     ),
     listitemUnchecked: cn(CHECK_ITEM, "before:border-foreground/70"),
     nested: {
-      listitem: "list-none before:hidden after:hidden",
+      // `rich-text-list-holder` names it for the rules below.
+      listitem: "rich-text-list-holder list-none before:hidden after:hidden",
     },
     // A list's marker counts only lists of its own kind above it, not its
     // depth. A bullet under a numbered line is the first level of bullets —
@@ -125,15 +126,22 @@ export const richTextSemanticContract = {
     // published page alike, and each deeper one outranks the one above.
     //
     // A checklist is a <ul> too, so a bullet under one counts it as a level.
+    //
+    // A holder first in a top-level list has no item above it — a published
+    // page folds every other holder into the item before it — so the list in
+    // it is only indented, as one typed under a to-do is. It stays the first
+    // level, and the one nested in it the second.
     ol: cn(
       "my-1 ml-6 list-decimal [&>li]:mt-1",
       "[ol_&]:list-[lower-alpha] [ol_ol_&]:list-[lower-roman] [ol_ol_ol_&]:list-decimal",
+      "[:not(li)>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol_&]:list-[lower-alpha]",
     ),
     // The marker comes from the rules above, so depth sets only the position.
     olDepth: ["list-outside"],
     ul: cn(
       "my-1 ml-6 list-disc [&>li]:mt-1",
       "[ul_&]:list-[circle] [ul_ul_&]:list-[square] [ul_ul_ul_&]:list-disc",
+      "[:not(li)>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul_&]:list-[circle]",
     ),
     ulDepth: ["list-outside"],
   },
