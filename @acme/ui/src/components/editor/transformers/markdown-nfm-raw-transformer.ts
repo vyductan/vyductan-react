@@ -8,7 +8,13 @@ import type {
 import type { LexicalEditor, LexicalNode, NodeKey } from "lexical";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
-import { $getEditor, $isElementNode, $isParagraphNode } from "lexical";
+import { $findMatchingParent } from "@lexical/utils";
+import {
+  $getEditor,
+  $getSelection,
+  $isElementNode,
+  $isParagraphNode,
+} from "lexical";
 
 import {
   $createNfmRawBlockNode,
@@ -108,22 +114,46 @@ export const NFM_RAW_INLINE: TextMatchTransformer = {
 function withTabIndent(transformer: ElementTransformer): ElementTransformer {
   return {
     ...transformer,
-    export: (node, traverseChildren) =>
-      transformer
+    export: (node, traverseChildren) => {
+      const markdown = transformer
         .export(node, traverseChildren)
         ?.replaceAll(/^(?: {4})+/gm, (spaces) =>
           "\t".repeat(spaces.length / 4),
-        ) ?? null,
+        );
+      if (markdown == undefined) return null;
+      // A list's own indent (under a to-do) goes before each of its lines.
+      const indent = $isListNode(node) ? "\t".repeat(node.getIndent()) : "";
+      return indent ? markdown.replaceAll(/^/gm, indent) : markdown;
+    },
     replace: (parentNode, children, match, isImport) => {
       if (!isImport) {
-        return transformer.replace(parentNode, children, match, isImport);
+        // Typed ("- ") on an indented line — under a to-do, say — the list
+        // stands at that indent, as in Notion.
+        const indent = parentNode.getIndent();
+        const result = transformer.replace(
+          parentNode,
+          children,
+          match,
+          isImport,
+        );
+        // Typed on an empty line there are no children; the caret is in
+        // the new item.
+        const start = children[0] ?? $getSelection()?.getNodes()[0];
+        const item = start ? $findMatchingParent(start, $isListItemNode) : null;
+        $indentNewList(item, indent);
+        return result;
       }
       const indent = columnsOf(match[1] ?? "");
       const parents = $listContentColumns(parentNode);
-      // Nested under each item above whose text it reaches; with no list
-      // just above, Lexical's own count stands.
+      // Nested under each item above whose text it reaches; under a to-do,
+      // by the to-do's text; else Lexical's own count stands.
       let depth: number | undefined;
-      if (parents) {
+      // Under a to-do the list itself is indented, as typing it there does.
+      const todo = parents ? null : $todoAbove(parentNode);
+      const listIndent = todo ? $importedTodoIndent(todo, match[1] ?? "") : 0;
+      if (todo) {
+        depth = 0;
+      } else if (parents) {
         depth = 0;
         for (const column of parents) {
           if (indent < column) break;
@@ -139,12 +169,34 @@ function withTabIndent(transformer: ElementTransformer): ElementTransformer {
         isImport,
       );
       const item = children[0]?.getParent();
+      if (listIndent > 0) $indentNewList(item, listIndent);
       if ($isListItemNode(item)) {
         contentColumns().set(item.getKey(), columnsOf(match[0] ?? ""));
       }
       return result;
     },
   };
+}
+
+/**
+ * Indents the list `item` was just put in, when it is a list of its own —
+ * one it joined has its indent already.
+ */
+function $indentNewList(item: LexicalNode | null | undefined, indent: number) {
+  const list = item?.getParent();
+  if (indent === 0 || !$isListNode(list) || list.getChildrenSize() !== 1) {
+    return;
+  }
+  list.setIndent(indent);
+}
+
+/** The to-do just above `node`, blank lines between not counting. */
+function $todoAbove(node: LexicalNode): LexicalNode | null {
+  let above = node.getPreviousSibling();
+  while ($isParagraphNode(above) && above.getTextContentSize() === 0) {
+    above = above.getPreviousSibling();
+  }
+  return above?.getType() === "check-block" ? above : null;
 }
 
 /** Columns a run of whitespace (and marker) spans: a tab to the next stop of 4. */

@@ -158,3 +158,39 @@ describe("indented to-dos", () => {
     ]);
   });
 });
+
+/** Top-level lists, by their items' text and the list's own indent. */
+function listIndents(markdown: string): string[] {
+  const root = markdownToLexicalContent(markdown).root as JsonNode;
+  return (root.children ?? [])
+    .filter((node) => node.type === "list")
+    .map((list) => `${textOf(list)}@${list.indent ?? 0}`);
+}
+
+/**
+ * A list under a to-do, as Notion makes it ("- " typed on an indented line
+ * below one): the list itself is indented, as a paragraph or a to-do is —
+ * its bullets the first level's, filled dots — and stays so through
+ * markdown.
+ */
+describe("a list under a to-do", () => {
+  test("keeps its indent through markdown", () => {
+    const markdown = lexicalContentToMarkdown(
+      markdownToLexicalContent("- [ ] a\n\t- b\n\t- c"),
+    );
+    expect(markdown).toMatch(/\n\t- b\n\t- c$/);
+    expect(listIndents(markdown)).toStrictEqual(["bc@1"]);
+  });
+
+  test("read by the to-do's text column, as Prettier writes it", () => {
+    expect(listIndents("- [ ] a\n  - b\n  - c")).toStrictEqual(["bc@1"]);
+  });
+
+  test("an item nested in it stays nested", () => {
+    const markdown = lexicalContentToMarkdown(
+      markdownToLexicalContent("- [ ] a\n\t- b\n\t\t- c"),
+    );
+    expect(markdown).toMatch(/\n\t- b\n\t\t- c$/);
+    expect(itemDepths(markdown)).toStrictEqual(["b@0", "c@1"]);
+  });
+});

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { $isListItemNode, $isListNode } from "@lexical/list";
+import { $isListItemNode, $isListNode, ListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $dfs, $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
@@ -72,6 +72,14 @@ export function ListMarkerPlugin(): null {
   useEffect(
     () =>
       mergeRegister(
+        // Lexical nests an item by copying its list, indent and all; a list
+        // indented under a to-do pushed its nested one a whole indent
+        // further. A nested list sits by its item, with no indent of its own.
+        editor.registerNodeTransform(ListNode, (list) => {
+          if (list.getIndent() !== 0 && $isListItemNode(list.getParent())) {
+            list.setIndent(0);
+          }
+        }),
         editor.registerCommand(
           KEY_BACKSPACE_COMMAND,
           (event) => {
