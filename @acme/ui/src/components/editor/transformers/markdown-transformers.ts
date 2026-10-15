@@ -38,6 +38,8 @@ import {
   NFM_SPAN,
 } from "./markdown-nfm-colors-transformer";
 import {
+  $importedTodoIndent,
+  $rememberImportedTodo,
   NFM_RAW_BLOCK,
   NFM_RAW_INLINE,
   withTabIndentedLists,
@@ -62,15 +64,22 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
         return null;
       }
       const isChecked = node.getChecked();
-      return `- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
+      // Its indent as tabs, as nested list items are written.
+      const indent = "\t".repeat(node.getIndent());
+      return `${indent}- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
     },
-    regExp: /^-\s\[(?:\s|x)\]\s/i,
+    regExp: /^(\s*)-\s\[(?:\s|x)\]\s/i,
     replace: (parentNode, _children, match) => {
       const matchText = match[0] ?? "";
+      const leading = match[1] ?? "";
       const isChecked = matchText.toLowerCase().includes("[x]");
       const node = $createCheckBlockNode(isChecked);
+      node.setIndent(
+        $importedTodoIndent(parentNode.getPreviousSibling(), leading),
+      );
       node.append(...parentNode.getChildren());
       parentNode.replace(node);
+      $rememberImportedTodo(node, leading);
     },
     type: "element",
   },

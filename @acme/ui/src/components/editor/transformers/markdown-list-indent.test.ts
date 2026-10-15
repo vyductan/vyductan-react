@@ -8,6 +8,7 @@ import {
 interface JsonNode {
   type?: string;
   text?: string;
+  indent?: number;
   children?: JsonNode[];
 }
 
@@ -108,6 +109,52 @@ describe("nested list indentation", () => {
       "Backend objects (11–16): no COMMENT ON@1",
       "schemas/ = full explanation@0",
       "README batch@0",
+    ]);
+  });
+});
+
+/** To-dos, by text and indent. */
+function todoIndents(markdown: string): string[] {
+  const root = markdownToLexicalContent(markdown).root as JsonNode;
+  return (root.children ?? [])
+    .filter((node) => node.type === "check-block")
+    .map((node) => `${textOf(node)}@${node.indent ?? 0}`);
+}
+
+/**
+ * An indented to-do lost its indent on a save: written at the margin, and
+ * `\t- [ ] b` read back as a bullet whose text was "[ ] b". In VD Markdown,
+ * which saves on its own, a reload showed it out at the margin.
+ */
+describe("indented to-dos", () => {
+  test("keep their indent through markdown", () => {
+    const markdown = lexicalContentToMarkdown(
+      markdownToLexicalContent("- [ ] a\n\t- [ ] b\n- [ ] c"),
+    );
+    expect(todoIndents(markdown)).toStrictEqual(["a@0", "b@1", "c@0"]);
+  });
+
+  test("read by their parent's text column, as Prettier writes them", () => {
+    expect(
+      todoIndents("- [ ] a\n  - [x] b\n    - [ ] c\n- [ ] d"),
+    ).toStrictEqual(["a@0", "b@1", "c@2", "d@0"]);
+  });
+
+  test("a sibling at the same indent stays a sibling", () => {
+    expect(todoIndents("- [ ] a\n  - [ ] b\n  - [ ] c")).toStrictEqual([
+      "a@0",
+      "b@1",
+      "c@1",
+    ]);
+  });
+
+  test("checked or not, read back as it was", () => {
+    const root = markdownToLexicalContent("- [ ] a\n\t- [x] b").root as {
+      children: { checked?: boolean }[];
+    };
+    expect(root.children.map((node) => node.checked)).toStrictEqual([
+      false,
+      true,
     ]);
   });
 });

@@ -8,7 +8,7 @@ import type {
 import type { LexicalEditor, LexicalNode, NodeKey } from "lexical";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { ORDERED_LIST, UNORDERED_LIST } from "@lexical/markdown";
-import { $getEditor, $isParagraphNode } from "lexical";
+import { $getEditor, $isElementNode, $isParagraphNode } from "lexical";
 
 import {
   $createNfmRawBlockNode,
@@ -200,3 +200,55 @@ export const withTabIndentedLists = (transformer: Transformer): Transformer =>
   transformer === UNORDERED_LIST || transformer === ORDERED_LIST
     ? withTabIndent(transformer)
     : transformer;
+
+// Where each imported to-do starts and where its text starts, by node key,
+// per editor.
+const TODO_COLUMNS = new WeakMap<
+  LexicalEditor,
+  Map<NodeKey, { lead: number; text: number }>
+>();
+const todoColumns = () => {
+  const editor = $getEditor();
+  let columns = TODO_COLUMNS.get(editor);
+  if (!columns) TODO_COLUMNS.set(editor, (columns = new Map()));
+  return columns;
+};
+
+/**
+ * The indent a to-do read from markdown takes, as a nested list item's:
+ * under the to-do above whose text it reaches, beside one it lines up with.
+ * `leading` is its line's indent. With no to-do just above, a tab (or four
+ * spaces) is a level.
+ */
+export function $importedTodoIndent(
+  before: LexicalNode | null,
+  leading: string,
+): number {
+  const column = columnsOf(leading);
+  const columns = todoColumns();
+  let above = before;
+  while (above) {
+    if ($isParagraphNode(above) && above.getTextContentSize() === 0) {
+      above = above.getPreviousSibling();
+      continue;
+    }
+    if (!$isElementNode(above) || above.getType() !== "check-block") break;
+    const at = columns.get(above.getKey()) ?? {
+      lead: above.getIndent() * 4,
+      text: above.getIndent() * 4 + 2,
+    };
+    if (column >= at.text) return above.getIndent() + 1;
+    if (column >= at.lead) return above.getIndent();
+    above = above.getPreviousSibling();
+  }
+  return Math.floor(column / 4);
+}
+
+/** Remembers where an imported to-do's line and text start. */
+export function $rememberImportedTodo(node: LexicalNode, leading: string) {
+  todoColumns().set(node.getKey(), {
+    lead: columnsOf(leading),
+    // Its text is after `- `: the `[ ]` is the text's, as CommonMark has it.
+    text: columnsOf(leading) + 2,
+  });
+}
