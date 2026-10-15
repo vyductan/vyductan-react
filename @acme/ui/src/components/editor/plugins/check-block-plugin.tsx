@@ -146,16 +146,16 @@ export function CheckBlockPlugin() {
           const node = anchor.getNode();
           const block = node.getTopLevelElement();
           if (!block) return false;
-          if (
-            $isCheckBlockNode(block) && // If at start, convert to paragraph
-            // If there are other blocks before, standard backspace merges.
-            // But if we are at start of content, we prefer turning into paragraph?
-            // Notion behavior: Backspace at start of empty checkblock -> turn to paragraph
-            block.getTextContentSize() === 0
-          ) {
+          // As Notion: Backspace at the start of a to-do turns it into text
+          // where it stands — its words and its indent kept.
+          const first = block.getFirstDescendant();
+          const atStart = node.is(block) || (first !== null && node.is(first));
+          if ($isCheckBlockNode(block) && atStart) {
             const p = $createParagraphNode();
+            p.setIndent(block.getIndent());
+            p.append(...block.getChildren());
             block.replace(p);
-            p.select();
+            p.selectStart();
             event.preventDefault();
             return true;
           }

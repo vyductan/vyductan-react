@@ -138,3 +138,39 @@ test("Enter on an empty indented to-do moves it out a level first", async () => 
     ]),
   );
 });
+
+/**
+ * Like Notion: Backspace at the start of an indented to-do turns it into
+ * text where it stands. It went out to the margin as well.
+ */
+test("Backspace on an empty indented to-do keeps its indent", async () => {
+  const live = await todos("b", "");
+
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "paragraph", text: "", indent: 1 },
+    ]),
+  );
+});
+
+test("Backspace at the start of an indented to-do turns it into its text", async () => {
+  const live = await todos("b", "buy milk");
+  live.update(
+    () => {
+      $getRoot().getLastChildOrThrow<ElementNode>().selectStart();
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "paragraph", text: "buy milk", indent: 1 },
+    ]),
+  );
+});
