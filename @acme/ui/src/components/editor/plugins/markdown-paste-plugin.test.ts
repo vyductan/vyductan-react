@@ -183,3 +183,25 @@ describe("hasMarkdownPasteSyntax on Notion toggles and callouts", () => {
     expect(hasMarkdownPasteSyntax?.(text)).toBe(false);
   });
 });
+
+describe("hasMarkdownPasteSyntax inside a line", () => {
+  const { hasMarkdownPasteSyntax } = markdownPastePlugin;
+
+  test("inline code, bold, a link and strikethrough mid-sentence", () => {
+    expect(hasMarkdownPasteSyntax("RPCs stay in `api` for now")).toBe(true);
+    expect(hasMarkdownPasteSyntax("this is **important** here")).toBe(true);
+    expect(hasMarkdownPasteSyntax("see [the docs](https://a.dev) first")).toBe(
+      true,
+    );
+    expect(hasMarkdownPasteSyntax("not ~~this~~ but that")).toBe(true);
+  });
+
+  /** Prose that only looks like it stays prose. */
+  test("a lone backtick, snake_case and a * in prose are not", () => {
+    expect(hasMarkdownPasteSyntax("it's 5` long")).toBe(false);
+    expect(hasMarkdownPasteSyntax("fn_sweep_intake_retention runs")).toBe(
+      false,
+    );
+    expect(hasMarkdownPasteSyntax("2 * 3 = 6")).toBe(false);
+  });
+});

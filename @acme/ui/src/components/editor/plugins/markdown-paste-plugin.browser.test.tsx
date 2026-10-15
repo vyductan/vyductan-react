@@ -222,3 +222,65 @@ test("keeps the parent item's number when pasting a nested list", async () => {
 
   expect(getComputedStyle(parent).listStyleType).toBe("decimal");
 });
+
+/**
+ * Plain text with inline code in it — a chat reply's source, a commit
+ * message — pasted into a list item: in Notion each `name` becomes inline
+ * code and the words join the item. Only markdown that starts a line was
+ * read, so the backticks stayed as they were.
+ */
+test("inline code in pasted text is code, joined to the line", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  root.focus();
+  live.update(
+    () => {
+      const scope = $createTextNode("Scope: ");
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("bullet").append($createListItemNode().append(scope)),
+        );
+      scope.selectEnd();
+    },
+    { discrete: true },
+  );
+
+  const clipboardData = new DataTransfer();
+  clipboardData.setData(
+    "text/plain",
+    "RPCs stay in `api`. Rule: `direct` = browser, `api` = server",
+  );
+  root.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() =>
+        $getRoot()
+          .getAllTextNodes()
+          .map((text) =>
+            text.hasFormat("code")
+              ? `[${text.getTextContent()}]`
+              : text.getTextContent(),
+          )
+          .join(""),
+      ),
+    ).toBe(
+      "Scope: RPCs stay in [api]. Rule: [direct] = browser, [api] = server",
+    ),
+  );
+  expect(blockTexts(live)).toHaveLength(1);
+});

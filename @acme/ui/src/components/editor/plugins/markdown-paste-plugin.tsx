@@ -19,6 +19,15 @@ const MARKDOWN_PASTE_SYNTAX_REGEXP =
   /^#{1,6}\s|^\s*\*\s|^\s*-\s|^\s*\d+\.\s|^>\s|^`|^\[.*\]\(|^!\[.*\]\(/m;
 
 /**
+ * Markdown inside a line, as Notion reads it on paste: `code`, **bold**,
+ * ~~struck~~ and [a link](url) — each a whole, closed pair on one line, so a
+ * lone backtick or a `*` in arithmetic stays prose. Single `*`/`_` emphasis is
+ * left out: snake_case names would read as italics.
+ */
+const MARKDOWN_INLINE_SYNTAX_REGEXP =
+  /`[^`\n]+`|\*\*[^*\n]+\*\*|~~[^~\n]+~~|\[[^\]\n]+\]\([^)\s]+\)/;
+
+/**
  * A table's delimiter row: nothing but pipes, dashes, colons and spaces, with
  * at least one pipe and one dash — `| --- | :---: |`, or `--- | ---` without the
  * outer pipes. A table has none of the line starts the pattern above looks
@@ -49,6 +58,7 @@ const NFM_MENTION_REGEXP = /<(mention-[\w-]+)\s[^>\n]*(?:\/>|>[^<\n]*<\/\1>)/;
 export function hasMarkdownPasteSyntax(text: string): boolean {
   return (
     MARKDOWN_PASTE_SYNTAX_REGEXP.test(text) ||
+    MARKDOWN_INLINE_SYNTAX_REGEXP.test(text) ||
     MARKDOWN_TABLE_DELIMITER_REGEXP.test(text) ||
     NFM_BLOCK_REGEXP.test(text) ||
     NFM_LINE_BLOCK_REGEXP.test(text) ||
