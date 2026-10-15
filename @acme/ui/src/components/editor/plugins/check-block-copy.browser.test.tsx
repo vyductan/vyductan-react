@@ -1,5 +1,6 @@
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
+import { $createListItemNode, $createListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $createHeadingNode } from "@lexical/rich-text";
 import { cleanup, render, waitFor } from "@testing-library/react";
@@ -224,3 +225,65 @@ for (const how of ["by its line", "by all of its text"] as const) {
     );
   });
 }
+
+/**
+ * The whole of one line copied (dragged over), pasted after words on
+ * another: in Notion its words join that line. Here a new list item came
+ * in below it.
+ */
+test("a whole line pasted after words joins their line", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  root.focus();
+  live.update(
+    () => {
+      const words = $createTextNode("đồng nhất các cụm");
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("bullet").append(
+            $createListItemNode().append($createTextNode("Giúp ")),
+            $createListItemNode().append(words),
+          ),
+        );
+      words.select(0, words.getTextContentSize());
+    },
+    { discrete: true },
+  );
+
+  const clipboardData = new DataTransfer();
+  root.dispatchEvent(
+    new ClipboardEvent("copy", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+  live.update(() => $getRoot().getAllTextNodes()[0]!.selectEnd(), {
+    discrete: true,
+  });
+  root.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() =>
+        $getRoot()
+          .getAllTextNodes()
+          .map((text) => text.getParent()?.getTextContent()),
+      ),
+    ).toStrictEqual(["Giúp đồng nhất các cụm", "đồng nhất các cụm"]),
+  );
+});

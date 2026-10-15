@@ -22,13 +22,11 @@ import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import type { ReadClipboardText } from "../plugins/paste-cleanup-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
+import { BlockColorPlugin } from "../plugins/block-color-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
 import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
 import { BlockSelectionPlugin } from "../plugins/block-selection-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
-import { BlockColorPlugin } from "../plugins/block-color-plugin";
-import { SelectLineFirstPlugin } from "../plugins/select-line-first-plugin";
-import { InlineCodeExitPlugin } from "../plugins/inline-code-exit-plugin";
 import { CalloutPickerPlugin } from "../plugins/callout-picker-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
 import { CodeActionMenuPlugin } from "../plugins/code-action-menu-plugin";
@@ -57,9 +55,12 @@ import { FormatShortcutsPlugin } from "../plugins/format-shortcuts-plugin";
 import { HistoryFlashPlugin } from "../plugins/history-flash-plugin";
 import { ImageLineClickPlugin } from "../plugins/image-line-click-plugin";
 import { ImagesPlugin } from "../plugins/images-plugin";
+import { InlineBlockPastePlugin } from "../plugins/inline-block-paste-plugin";
+import { InlineCodeExitPlugin } from "../plugins/inline-code-exit-plugin";
 import { KeyboardShortcutsHelpPlugin } from "../plugins/keyboard-shortcuts-help-plugin";
 import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { LayoutPlugin } from "../plugins/layout-plugin";
+import { LinkHoverCardPlugin } from "../plugins/link-hover-card-plugin";
 import { LinkPlugin } from "../plugins/link-plugin";
 import { ListMarkerPlugin } from "../plugins/list-marker-plugin";
 import { ListMarkerShortcutPlugin } from "../plugins/list-marker-shortcut-plugin";
@@ -67,13 +68,13 @@ import { ListMaxIndentLevelPlugin } from "../plugins/list-max-indent-level-plugi
 import { MarkdownPastePlugin } from "../plugins/markdown-paste-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
 import { PageBreakPlugin } from "../plugins/page-break-plugin";
-import { LinkHoverCardPlugin } from "../plugins/link-hover-card-plugin";
 import { PageLinkHoverCardPlugin } from "../plugins/page-link-hover-card-plugin";
 import { PasteAsPlugin } from "../plugins/paste-as-plugin";
 import { PasteCleanupPlugin } from "../plugins/paste-cleanup-plugin";
 import { PlainTextLinebreakPastePlugin } from "../plugins/plain-text-linebreak-paste-plugin";
 import { PollPlugin } from "../plugins/poll-plugin";
 import { ResetFormatOnEnterPlugin } from "../plugins/reset-format-on-enter-plugin";
+import { SelectLineFirstPlugin } from "../plugins/select-line-first-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
 import { TableColumnResizePlugin } from "../plugins/table-column-resize-plugin";
@@ -308,6 +309,7 @@ export function Plugins({
       )}
       <CopyHtmlCleanupPlugin />
       {editable && <PasteCleanupPlugin readClipboardText={readClipboardText} />}
+      {editable && <InlineBlockPastePlugin />}
       {editable && <MarkdownPastePlugin />}
       {editable && <PlainTextLinebreakPastePlugin />}
       {editable && resolvePasteLink && (
