@@ -124,6 +124,15 @@ export class CheckBlockNode extends ElementNode {
     return { element };
   }
 
+  /**
+   * Copied with its text, the to-do comes too, as a heading does: copied by
+   * its line (Cmd+C, nothing selected), it pasted back as plain text, its
+   * checkbox gone.
+   */
+  extractWithChild(): boolean {
+    return true;
+  }
+
   getChecked(): boolean {
     return this.__checked;
   }

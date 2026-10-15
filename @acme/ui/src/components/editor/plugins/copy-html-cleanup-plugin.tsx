@@ -64,13 +64,21 @@ const BLOCK_TAGS = new Set([
   "UL",
 ]);
 
+// Classes a node is read back by (importDOM): without them a to-do copied
+// by its line pasted back as plain text, its checkbox gone.
+const READ_BACK_CLASSES = new Set(["check-block", "check-block-checked"]);
+
 /** The copied HTML, without what only made sense inside the editor. */
 export function cleanCopiedHtml(html: string): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const { body } = doc;
 
   for (const element of body.querySelectorAll<HTMLElement>("*")) {
-    element.removeAttribute("class");
+    const kept = [...element.classList].filter((name) =>
+      READ_BACK_CLASSES.has(name),
+    );
+    if (kept.length > 0) element.className = kept.join(" ");
+    else element.removeAttribute("class");
     const style = element.getAttribute("style");
     if (style !== null) {
       element.style.removeProperty("white-space");

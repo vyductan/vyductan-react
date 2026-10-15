@@ -94,3 +94,18 @@ describe("cleanCopiedHtml", () => {
     );
   });
 });
+
+describe("cleanCopiedHtml, what the editor reads back", () => {
+  /** The class a to-do is read back by; the theme's go. */
+  test("keeps a to-do's class", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        '<div class="check-block check-block-checked flex gap-2" data-checked="true"><span class="font-semibold">Create MR</span></div>',
+      ),
+    );
+
+    expect(body.innerHTML).toBe(
+      '<div class="check-block check-block-checked" data-checked="true">Create MR</div>',
+    );
+  });
+});
