@@ -2,7 +2,13 @@ import type { LexicalEditor } from "lexical";
 import * as React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { render, waitFor } from "@testing-library/react";
-import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $getSelection,
+  $isTextNode,
+} from "lexical";
 import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -424,4 +430,50 @@ test("stays inside the area that actually scrolls, below a header beside it", as
   expect(contentEditable.getBoundingClientRect().top).toBeLessThan(mainTop);
   expect(bar.getBoundingClientRect().top).toBeGreaterThanOrEqual(mainTop);
   expect(bar.getBoundingClientRect().top).toBeLessThan(mainTop + 24);
+});
+
+/**
+ * With the bar open, scrolled away from the match to type somewhere else:
+ * every keystroke searched again and scrolled back to the match. Only a new
+ * query, or stepping, brings a match into view.
+ */
+test("editing elsewhere does not scroll back to the match", async () => {
+  const { live, input } = await openFind();
+  live.update(
+    () => {
+      const root = $getRoot();
+      for (let line = 0; line < 120; line++) {
+        root.append($createParagraphNode().append($createTextNode("filler")));
+      }
+      root.append($createParagraphNode().append($createTextNode("the end")));
+    },
+    { discrete: true },
+  );
+
+  await userEvent.fill(input, "Cơ hội");
+  await waitFor(() => expect(counter()).toBe("1 of 1"));
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  globalThis.scrollTo({
+    top: document.documentElement.scrollHeight,
+    behavior: "instant",
+  });
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+  const scrolled = globalThis.scrollY;
+  expect(scrolled).toBeGreaterThan(1000);
+
+  // Type at the end, where the page now is: the caret there, text in.
+  live.update(
+    () => {
+      const last = $getRoot().getLastDescendant();
+      if (!$isTextNode(last)) return;
+      last.select(last.getTextContentSize(), last.getTextContentSize());
+      $getSelection()?.insertText(" and more");
+    },
+    { discrete: true },
+  );
+  expect(document.querySelector('[data-slot="find-bar"]')).not.toBeNull();
+  await new Promise((resolve) => setTimeout(resolve, 600));
+
+  expect(globalThis.scrollY).toBe(scrolled);
 });

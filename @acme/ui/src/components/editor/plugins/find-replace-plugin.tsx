@@ -211,17 +211,25 @@ export function FindReplacePlugin({
   const findInputReference = useRef<HTMLInputElement>(null);
   const barReference = useRef<HTMLDivElement>(null);
   const queryReference = useRef(query);
+  // Whether the next drawing brings the current match into view: asked for
+  // by a new query, a step or a replace — not by an edit elsewhere, which
+  // searched again and threw the page back to the match on every keystroke.
+  const revealReference = useRef(false);
   useEffect(() => {
     queryReference.current = query;
   }, [query]);
 
-  const refresh = useCallback(() => {
-    const next = editor
-      .getEditorState()
-      .read(() => $findMatches(queryReference.current));
-    setMatches(next);
-    setCurrent((index) => Math.min(index, Math.max(0, next.length - 1)));
-  }, [editor]);
+  const refresh = useCallback(
+    (reveal: boolean) => {
+      if (reveal) revealReference.current = true;
+      const next = editor
+        .getEditorState()
+        .read(() => $findMatches(queryReference.current));
+      setMatches(next);
+      setCurrent((index) => Math.min(index, Math.max(0, next.length - 1)));
+    },
+    [editor],
+  );
 
   // Open: from Cmd/Ctrl+F, pre-filled with a one-line selection.
   const open = useCallback(
@@ -267,13 +275,13 @@ export function FindReplacePlugin({
   // Search as the query changes, and again whenever the document does.
   useEffect(() => {
     if (!isOpen) return;
-    refresh();
+    refresh(true);
   }, [isOpen, query, refresh]);
 
   useEffect(() => {
     if (!isOpen) return;
     return editor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
-      if (dirtyElements.size > 0 || dirtyLeaves.size > 0) refresh();
+      if (dirtyElements.size > 0 || dirtyLeaves.size > 0) refresh(false);
     });
   }, [editor, isOpen, refresh]);
 
@@ -352,8 +360,11 @@ export function FindReplacePlugin({
     const active = ranges[current];
     if (active) {
       api.registry.set(CURRENT_MATCH_HIGHLIGHT, new api.Highlight(active));
-      const element = editor.getElementByKey(matches[current]!.key);
-      element?.scrollIntoView({ block: "center", behavior: "smooth" });
+      if (revealReference.current) {
+        revealReference.current = false;
+        const element = editor.getElementByKey(matches[current]!.key);
+        element?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
     } else {
       api.registry.delete(CURRENT_MATCH_HIGHLIGHT);
     }
@@ -366,6 +377,7 @@ export function FindReplacePlugin({
 
   const step = (direction: 1 | -1) => {
     if (matches.length === 0) return;
+    revealReference.current = true;
     setCurrent(
       (index) => (index + direction + matches.length) % matches.length,
     );
@@ -389,6 +401,7 @@ export function FindReplacePlugin({
   const replaceCurrent = () => {
     const match = matches[current];
     if (!match) return;
+    revealReference.current = true;
     editor.update(() => {
       const node = $getNodeByKey(match.key);
       if ($isTextNode(node))
