@@ -8,6 +8,11 @@
  * The threshold is relative to the room, not fixed: the first readings are
  * taken as the noise floor, and speech is anything clearly above it. A fixed
  * level either fires on a noisy café or never on a quiet laptop mic.
+ *
+ * The floor keeps being tracked after that (down at once, up slowly), and
+ * "quiet" is measured against it too: a fresh mic reads ~0 while it warms up,
+ * so the first readings can miss a fan entirely, and the turn would then
+ * never end over it.
  */
 export type SilenceDetectorOptions = {
   /** Readings used to measure the room before listening. */
@@ -44,6 +49,8 @@ export function createSilenceDetector({
   let heardSpeech = false;
   let loudFrames = 0;
   let quietSince: number | null = null;
+  /** The room as heard since: the quietest level lately, rising slowly. */
+  let floor: number | null = null;
 
   return {
     /** Whether the learner has started speaking in this take. */
@@ -78,7 +85,21 @@ export function createSilenceDetector({
         if (loudDuringCalibration >= 2) heardSpeech = true;
       }
 
-      if (rms >= threshold) {
+      // Down at once, up ~1% per reading: the dips between words keep it at
+      // the room, and a long turn cannot drag it up to the voice.
+      floor =
+        floor === null || rms < floor ? rms : floor + (rms - floor) * 0.01;
+      // Both bars follow the room, within the same limits as the first one.
+      const speechBar = Math.min(
+        maxThreshold,
+        Math.max(threshold, floor * ratio),
+      );
+      const quietBar = Math.min(
+        maxThreshold * 0.8,
+        Math.max(threshold * 0.8, floor * 1.5),
+      );
+
+      if (rms >= speechBar) {
         // Two frames in a row: one click or bump is not the learner speaking.
         loudFrames += 1;
         if (loudFrames >= 2) heardSpeech = true;
@@ -93,7 +114,7 @@ export function createSilenceDetector({
 
       // Below a slightly lower bar counts as quiet, so a voice trailing off at
       // the threshold does not flicker between speaking and silent.
-      if (rms < threshold * 0.8) {
+      if (rms < quietBar) {
         quietSince ??= now;
         if (now - quietSince >= silenceMs) return "stop";
       }

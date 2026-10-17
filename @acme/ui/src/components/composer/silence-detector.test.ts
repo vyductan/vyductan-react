@@ -68,4 +68,27 @@ describe("createSilenceDetector", () => {
     const result = run([...speech(12), ...quiet(20)]);
     expect(result.decision).toBe("stop");
   });
+
+  // A fresh mic reads ~0 for its first frames, so the room measures as
+  // silent and the bar drops to minThreshold — below a fan or air
+  // conditioner. The turn then never ended ("nói xong mà không chịu gửi").
+  it("ends the turn over steady room noise the warm-up missed", () => {
+    const warmUp = quiet(3, 0);
+    const fan = (n: number) => quiet(n, 0.025);
+    const result = run([...warmUp, ...fan(10), ...speech(10), ...fan(30)]);
+    expect(result.decision).toBe("stop");
+  });
+
+  it("does not take that room noise for the learner speaking", () => {
+    const result = run([...quiet(3, 0), ...quiet(100, 0.025)], {
+      silenceMs: 800,
+      noSpeechMs: 4000,
+    });
+    expect(result.decision).toBe("no-speech");
+  });
+
+  it("keeps listening to a long turn that gets softer", () => {
+    const result = run([...quiet(3), ...speech(60, 0.1), ...speech(20, 0.07)]);
+    expect(result.decision).toBe("listening");
+  });
 });
