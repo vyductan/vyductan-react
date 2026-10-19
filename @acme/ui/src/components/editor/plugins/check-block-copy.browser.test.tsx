@@ -8,7 +8,9 @@ import {
   $createParagraphNode,
   $createTextNode,
   $getRoot,
+  $getSelection,
   $isElementNode,
+  $isRangeSelection,
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
@@ -285,5 +287,89 @@ test("a whole line pasted after words joins their line", async () => {
           .map((text) => text.getParent()?.getTextContent()),
       ),
     ).toStrictEqual(["Giúp đồng nhất các cụm", "đồng nhất các cụm"]),
+  );
+});
+
+/**
+ * Cmd+C with the caret on a line of several runs — words, then inline code:
+ * only the last run went on the clipboard ("minor_unit" pasted alone), and
+ * the caret jumped to the end of the line. The line goes whole; the caret
+ * stays.
+ */
+test("a line copied by the caret goes whole, and the caret stays", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  root.focus();
+  live.update(
+    () => {
+      const words = $createTextNode("Round USD Price ->use ");
+      const code = $createTextNode("minor_unit");
+      code.toggleFormat("code");
+      $getRoot()
+        .clear()
+        .append(
+          $createCheckBlockNode(true).append(words, code),
+          $createParagraphNode(),
+        );
+      words.select(5, 5);
+    },
+    { discrete: true },
+  );
+
+  const clipboardData = new DataTransfer();
+  root.dispatchEvent(
+    new ClipboardEvent("copy", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+
+  expect(clipboardData.getData("text/plain")).toBe(
+    "Round USD Price ->use minor_unit",
+  );
+  expect(clipboardData.getData("text/html")).toContain("Round USD Price");
+  expect(clipboardData.getData("text/html")).toContain("minor_unit");
+  expect(
+    live.getEditorState().read(() => {
+      const selection = $getSelection();
+      return $isRangeSelection(selection)
+        ? `${selection.anchor.getNode().getTextContent()}@${selection.anchor.offset}`
+        : null;
+    }),
+  ).toBe("Round USD Price ->use @5");
+
+  live.update(() => $getRoot().getLastChildOrThrow().selectStart(), {
+    discrete: true,
+  });
+  root.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      {
+        type: "todo",
+        text: "Round USD Price ->use minor_unit",
+        indent: 0,
+        checked: true,
+      },
+      {
+        type: "todo",
+        text: "Round USD Price ->use minor_unit",
+        indent: 0,
+        checked: true,
+      },
+    ]),
   );
 });

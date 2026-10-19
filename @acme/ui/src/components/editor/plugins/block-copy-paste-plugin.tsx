@@ -20,6 +20,7 @@ import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
+  $createRangeSelection,
   $getSelection,
   $isElementNode,
   $isParagraphNode,
@@ -160,6 +161,24 @@ function $blockOf(point: PointType): LexicalNode | null {
     node = parent;
   }
   return null;
+}
+
+/**
+ * A selection over the whole of `block`, for serializing it, the editor's
+ * own selection untouched. `select()` on an element puts a collapsed caret at
+ * its end: only the last run of a line was copied ("minor_unit" alone, not
+ * the words before it), and the caret was left at the end of the line.
+ */
+function $wholeBlockSelection(block: LexicalNode): RangeSelection {
+  const range = $createRangeSelection();
+  if ($isElementNode(block)) {
+    range.anchor.set(block.getKey(), 0, "element");
+    range.focus.set(block.getKey(), block.getChildrenSize(), "element");
+  } else if ($isTextNode(block)) {
+    range.anchor.set(block.getKey(), 0, "text");
+    range.focus.set(block.getKey(), block.getTextContentSize(), "text");
+  }
+  return range;
 }
 
 /** Whether a point is at the very start of its block, before any of its text. */
@@ -401,13 +420,8 @@ export function BlockCopyPastePlugin(): null {
 
         event.preventDefault();
         editor.update(() => {
-          // Select the block to generate HTML for it
-          if ($isElementNode(block) || $isTextNode(block)) {
-            // We know it is ElementNode or TextNode which have select()
-            (block as ElementNode).select();
-          }
-
-          const selectionToSerialize = $getSelection();
+          // The whole block, the caret left where it is.
+          const selectionToSerialize = $wholeBlockSelection(block);
           let text = block.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
@@ -426,23 +440,6 @@ export function BlockCopyPastePlugin(): null {
             const wrappedHtml = `<div ${BLOCK_COPY_ATTRIBUTE}="true">${html}</div>`;
             event.clipboardData.setData("text/html", wrappedHtml);
             event.clipboardData.setData("text/plain", text);
-          }
-
-          // Restore cursor position if possible
-          if ($isRangeSelection(selection)) {
-            const originalAnchor = selection.anchor;
-            const originalFocus = selection.focus;
-
-            selection.anchor.set(
-              originalAnchor.key,
-              originalAnchor.offset,
-              originalAnchor.type,
-            );
-            selection.focus.set(
-              originalFocus.key,
-              originalFocus.offset,
-              originalFocus.type,
-            );
           }
         });
         return true;
@@ -547,11 +544,7 @@ export function BlockCopyPastePlugin(): null {
 
         event.preventDefault();
         editor.update(() => {
-          if ($isElementNode(block) || $isTextNode(block)) {
-            (block as ElementNode).select();
-          }
-
-          const selectionToSerialize = $getSelection();
+          const selectionToSerialize = $wholeBlockSelection(block);
           let text = block.getTextContent();
           let html = $generateHtmlFromNodes(editor, selectionToSerialize);
 
