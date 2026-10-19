@@ -13,6 +13,7 @@ import {
   $getRoot,
   $getSelection,
   $isElementNode,
+  $isRangeSelection,
   $isTextNode,
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
@@ -287,12 +288,8 @@ test("a bullet typed above a list at the margin keeps its indent", async () => {
   );
 });
 
-/**
- * A triple-click selects the line, and Chrome ends the selection at the
- * start of the next one: Backspace then took the to-do below into the
- * cleared line — its text joined the bullet, its checkbox gone.
- */
-test("Backspace after a triple-click clears the line, the to-do below stays", async () => {
+/** To-do, bullet "minor_unit", to-do; the bullet's line, on screen. */
+async function threeLines() {
   let editor: LexicalEditor | null = null;
   render(
     <Editor autoFocus={false}>
@@ -315,7 +312,6 @@ test("Backspace after a triple-click clears the line, the to-do below stays", as
     },
     { discrete: true },
   );
-
   const line = await waitFor(() => {
     const node = [...document.querySelectorAll("li")].find(
       (item) => item.textContent === "minor_unit",
@@ -323,7 +319,62 @@ test("Backspace after a triple-click clears the line, the to-do below stays", as
     expect(node).toBeDefined();
     return node!;
   });
+  return { live, line };
+}
+
+const caretAt = (live: LexicalEditor) =>
+  live.getEditorState().read(() => {
+    const selection = $getSelection();
+    return $isRangeSelection(selection) && selection.isCollapsed()
+      ? `${selection.anchor.getNode().getTextContent()}@${selection.anchor.offset}`
+      : null;
+  });
+
+/**
+ * A triple-click selects the line; Backspace takes the line away, not just
+ * its words. Chrome ended the selection at the start of the next line, so it
+ * took the to-do below into the cleared bullet, its checkbox gone.
+ */
+test("Backspace after a triple-click removes the line, the to-do below stays", async () => {
+  const { live, line } = await threeLines();
+
   await userEvent.tripleClick(line);
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(
+      blocks(live).map((block) => `${block.type}:${block.text}`),
+    ).toStrictEqual(["todo:Round USD", "todo:Remove it"]),
+  );
+  expect(caretAt(live)).toBe("Round USD@9");
+});
+
+test("Delete after a triple-click removes the line, the caret below", async () => {
+  const { live, line } = await threeLines();
+
+  await userEvent.tripleClick(line);
+  await userEvent.keyboard("{Delete}");
+
+  await waitFor(() =>
+    expect(
+      blocks(live).map((block) => `${block.type}:${block.text}`),
+    ).toStrictEqual(["todo:Round USD", "todo:Remove it"]),
+  );
+  expect(caretAt(live)).toBe("Remove it@0");
+});
+
+/** Selected by hand, the words go and the line stays, as before. */
+test("Backspace on a line's words selected by hand keeps the line", async () => {
+  const { live } = await threeLines();
+  live.update(
+    () => {
+      const code = $getRoot().getAllTextNodes()[1]!;
+      code.select(0, code.getTextContentSize());
+    },
+    { discrete: true },
+  );
+  document.querySelector<HTMLElement>('[contenteditable="true"]')!.focus();
+
   await userEvent.keyboard("{Backspace}");
 
   await waitFor(() =>

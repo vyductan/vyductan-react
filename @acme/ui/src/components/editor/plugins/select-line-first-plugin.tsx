@@ -1,4 +1,10 @@
-import type { ElementNode, LexicalNode } from "lexical";
+import type {
+  ElementNode,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  RangeSelection,
+} from "lexical";
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $isTableCellNode } from "@lexical/table";
@@ -7,8 +13,12 @@ import {
   $getSelection,
   $isElementNode,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_NORMAL,
+  KEY_BACKSPACE_COMMAND,
+  KEY_DELETE_COMMAND,
   SELECT_ALL_COMMAND,
 } from "lexical";
 
@@ -29,6 +39,54 @@ const $blockOf = (node: LexicalNode) =>
  * is all selected — by the first press or by hand — goes straight to the
  * page, as does an empty line or a selection across blocks.
  */
+// The line a triple-click selected last, per editor: Backspace or Delete
+// while it is still all selected takes the line away. Written by the click,
+// read by the keys — both outside React.
+const tripleClicked = new WeakMap<LexicalEditor, NodeKey>();
+
+/** Whether `selection` covers all of `line` and nothing else. */
+function $coversLine(selection: RangeSelection, line: ElementNode): boolean {
+  const inLine = (node: LexicalNode) => {
+    const block = $blockOf(node);
+    return block !== null && block.is(line);
+  };
+  return (
+    inLine(selection.anchor.getNode()) &&
+    inLine(selection.focus.getNode()) &&
+    selection.getTextContent() === line.getTextContent()
+  );
+}
+
+/**
+ * Takes `line` away, the caret to the end of the line above (or, `forward`,
+ * the start of the one below). The only line left is emptied instead.
+ */
+function $removeLine(line: ElementNode, forward: boolean) {
+  let node: LexicalNode = line;
+  let beside: LexicalNode | null = null;
+  while (!$isRootOrShadowRoot(node)) {
+    beside = forward ? node.getNextSibling() : node.getPreviousSibling();
+    if (beside) break;
+    const parent = node.getParent();
+    if (!parent) break;
+    node = parent;
+  }
+  if (!beside) {
+    line.clear();
+    line.select(0, 0);
+    return;
+  }
+  line.remove();
+  if ($isElementNode(beside)) {
+    if (forward) beside.selectStart();
+    else beside.selectEnd();
+  } else if (forward) {
+    beside.selectPrevious();
+  } else {
+    beside.selectNext();
+  }
+}
+
 export function SelectLineFirstPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
@@ -42,6 +100,7 @@ export function SelectLineFirstPlugin(): null {
         editor.registerCommand(
           CLICK_COMMAND,
           (event) => {
+            tripleClicked.delete(editor);
             if (event.detail !== 3) return false;
             const selection = $getSelection();
             if (!$isRangeSelection(selection) || selection.isCollapsed()) {
@@ -52,18 +111,42 @@ export function SelectLineFirstPlugin(): null {
               : [selection.anchor, selection.focus];
             const line = $blockOf(start.getNode());
             const next = $blockOf(end.getNode());
-            if (!line || !next || line.is(next) || end.offset !== 0) {
-              return false;
+            if (!line || !next) return false;
+            if (!line.is(next)) {
+              const first = next.getFirstDescendant();
+              const endNode = end.getNode();
+              const atNextStart =
+                end.offset === 0 &&
+                (endNode.is(next) || (first !== null && endNode.is(first)));
+              if (!atNextStart) return false;
+              line.select(0, line.getChildrenSize());
             }
-            const first = next.getFirstDescendant();
-            const endNode = end.getNode();
-            if (!endNode.is(next) && !(first !== null && endNode.is(first))) {
-              return false;
-            }
-            line.select(0, line.getChildrenSize());
+            tripleClicked.set(editor, line.getKey());
             return false;
           },
           COMMAND_PRIORITY_LOW,
+        ),
+        // A line a triple-click selected goes whole with Backspace or Delete,
+        // not just its words; selected by hand, its words go as before.
+        ...[KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND].map((command) =>
+          editor.registerCommand(
+            command,
+            (event) => {
+              const key = tripleClicked.get(editor);
+              tripleClicked.delete(editor);
+              const selection = $getSelection();
+              if (key === undefined || !$isRangeSelection(selection)) {
+                return false;
+              }
+              const line = $blockOf(selection.anchor.getNode());
+              if (!line || line.getKey() !== key) return false;
+              if (!$coversLine(selection, line)) return false;
+              event.preventDefault();
+              $removeLine(line, command === KEY_DELETE_COMMAND);
+              return true;
+            },
+            COMMAND_PRIORITY_NORMAL,
+          ),
         ),
         editor.registerCommand(
           SELECT_ALL_COMMAND,
