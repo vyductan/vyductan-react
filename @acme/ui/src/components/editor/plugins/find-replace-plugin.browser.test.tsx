@@ -477,3 +477,28 @@ test("editing elsewhere does not scroll back to the match", async () => {
 
   expect(globalThis.scrollY).toBe(scrolled);
 });
+
+/**
+ * Cmd+Shift+F and Cmd+Shift+H are the host's search across files (VS Code)
+ * or the browser's: the note's own bar opened under them too.
+ */
+test.each([["f"], ["h"]])(
+  "Shift with Cmd/Ctrl+%s is left to the host",
+  async (key) => {
+    let editor: LexicalEditor | null = null;
+    render(
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>,
+    );
+    await waitFor(() => expect(editor).not.toBeNull());
+    await userEvent.click(
+      document.querySelector<HTMLElement>('[contenteditable="true"]')!,
+    );
+
+    await userEvent.keyboard(`{Control>}{Shift>}${key}{/Shift}{/Control}`);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    expect(document.querySelector('[data-slot="find-bar"]')).toBeNull();
+  },
+);

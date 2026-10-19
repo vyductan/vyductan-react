@@ -260,7 +260,10 @@ export function FindReplacePlugin({
           KEY_MODIFIER_COMMAND,
           (event) => {
             const key = event.key.toLowerCase();
+            // With Shift it is the host's search across files (VS Code's
+            // Cmd+Shift+F / H), not the note's.
             if (!(event.metaKey || event.ctrlKey) || event.altKey) return false;
+            if (event.shiftKey) return false;
             if (key !== "f" && key !== "h") return false;
             event.preventDefault();
             open(key === "h");
