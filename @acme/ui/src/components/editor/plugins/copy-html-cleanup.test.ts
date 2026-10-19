@@ -96,8 +96,12 @@ describe("cleanCopiedHtml", () => {
 });
 
 describe("cleanCopiedHtml, what the editor reads back", () => {
-  /** The class a to-do is read back by; the theme's go. */
-  test("keeps a to-do's class", () => {
+  /**
+   * A to-do goes out as a task list item, the form Notion (and GitHub) read
+   * as a to-do — the editor's own <div class="check-block"> pasted into
+   * Notion as plain text. Its class stays, for the editor to read it back.
+   */
+  test("a to-do is a task list item, its checkbox an input", () => {
     const body = parse(
       cleanCopiedHtml(
         '<div class="check-block check-block-checked flex gap-2" data-checked="true"><span class="font-semibold">Create MR</span></div>',
@@ -105,7 +109,19 @@ describe("cleanCopiedHtml, what the editor reads back", () => {
     );
 
     expect(body.innerHTML).toBe(
-      '<div class="check-block check-block-checked" data-checked="true">Create MR</div>',
+      '<ul><li class="check-block check-block-checked" data-checked="true"><input type="checkbox" checked="">Create MR</li></ul>',
+    );
+  });
+
+  test("to-dos one after another share a list", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        '<div class="check-block">a</div><div class="check-block check-block-checked" data-checked="true">b</div><p>c</p>',
+      ),
+    );
+
+    expect(body.innerHTML).toBe(
+      '<ul><li class="check-block"><input type="checkbox">a</li><li class="check-block check-block-checked" data-checked="true"><input type="checkbox" checked="">b</li></ul><p>c</p>',
     );
   });
 });

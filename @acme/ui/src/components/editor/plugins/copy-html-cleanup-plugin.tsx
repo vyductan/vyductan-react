@@ -120,6 +120,8 @@ export function cleanCopiedHtml(html: string): string {
   }
   body.normalize();
 
+  toTaskLists(doc);
+
   // A quote's text in a paragraph, as markdown renders it.
   for (const quote of body.querySelectorAll("blockquote")) {
     const inline = [...quote.childNodes].every(
@@ -134,6 +136,41 @@ export function cleanCopiedHtml(html: string): string {
   }
 
   return body.innerHTML;
+}
+
+/**
+ * To-dos as task list items — `<ul><li><input type="checkbox">` — the form
+ * Notion and GitHub read as to-dos; the editor's own `<div class="check-block">`
+ * pasted into Notion as plain text. One after another, they share a list. The
+ * class stays: the editor reads its to-dos back by it.
+ */
+function toTaskLists(doc: Document) {
+  for (const todo of [...doc.body.querySelectorAll("div.check-block")]) {
+    const item = doc.createElement("li");
+    for (const { name, value } of todo.attributes) {
+      item.setAttribute(name, value);
+    }
+    const box = doc.createElement("input");
+    box.type = "checkbox";
+    if (todo.classList.contains("check-block-checked")) {
+      box.setAttribute("checked", "");
+    }
+    item.append(box, ...todo.childNodes);
+
+    const before = todo.previousElementSibling;
+    if (before?.tagName === "UL" && before.hasAttribute("data-task-list")) {
+      before.append(item);
+      todo.remove();
+    } else {
+      const list = doc.createElement("ul");
+      list.dataset.taskList = "true";
+      list.append(item);
+      todo.replaceWith(list);
+    }
+  }
+  for (const list of doc.body.querySelectorAll("ul[data-task-list]")) {
+    list.removeAttribute("data-task-list");
+  }
 }
 
 /**

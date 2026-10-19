@@ -93,7 +93,21 @@ export class CheckBlockNode extends ElementNode {
           priority: 1,
         };
       },
-      // Handle legacy or Notion-style checklist imports if needed here
+      // A copied to-do goes out as a task list item (see
+      // copy-html-cleanup-plugin), the form Notion reads as a to-do; the
+      // class says it is one of these, not a list item.
+      li: (node: HTMLElement) =>
+        node.classList.contains("check-block")
+          ? { conversion: convertCheckBlockElement, priority: 2 }
+          : null,
+      // Its list is only a wrapper: the to-dos go in where it stood.
+      ul: (node: HTMLElement) =>
+        node.children.length > 0 &&
+        [...node.children].every((child) =>
+          child.classList.contains("check-block"),
+        )
+          ? { conversion: () => ({ node: null }), priority: 2 }
+          : null,
     };
   }
 
