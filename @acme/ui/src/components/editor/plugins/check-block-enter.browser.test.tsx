@@ -286,3 +286,49 @@ test("a bullet typed above a list at the margin keeps its indent", async () => {
     ).toStrictEqual(["a@1", "below@0"]),
   );
 });
+
+/**
+ * A triple-click selects the line, and Chrome ends the selection at the
+ * start of the next one: Backspace then took the to-do below into the
+ * cleared line — its text joined the bullet, its checkbox gone.
+ */
+test("Backspace after a triple-click clears the line, the to-do below stays", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.update(
+    () => {
+      const code = $createTextNode("minor_unit");
+      code.toggleFormat("code");
+      $getRoot()
+        .clear()
+        .append(
+          $createCheckBlockNode(true).append($createTextNode("Round USD")),
+          $createListNode("bullet").append($createListItemNode().append(code)),
+          $createCheckBlockNode(true).append($createTextNode("Remove it")),
+        );
+    },
+    { discrete: true },
+  );
+
+  const line = await waitFor(() => {
+    const node = [...document.querySelectorAll("li")].find(
+      (item) => item.textContent === "minor_unit",
+    );
+    expect(node).toBeDefined();
+    return node!;
+  });
+  await userEvent.tripleClick(line);
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(
+      blocks(live).map((block) => `${block.type}:${block.text}`),
+    ).toStrictEqual(["todo:Round USD", "list:", "todo:Remove it"]),
+  );
+});
