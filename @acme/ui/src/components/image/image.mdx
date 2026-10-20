@@ -133,22 +133,23 @@ thumbnail would leave an empty card until it landed.
 
 ### PreviewGroupType
 
-| Property        | Type                                                                     | Default | Description                                           |
-| --------------- | ------------------------------------------------------------------------ | ------- | ----------------------------------------------------- |
-| `open`          | `boolean`                                                                | -       | Controlled open state.                                |
-| `current`       | `number`                                                                 | -       | Controlled index of the previewed item.               |
-| `onOpenChange`  | `(open: boolean, info: { current: number }) => void`                     | -       | Fired when the overlay opens or closes.               |
-| `onChange`      | `(current: number, previousCurrent: number) => void`                     | -       | Fired when the previewed item changes.                |
-| `minScale`      | `number`                                                                 | `1`     | Minimum zoom scale.                                   |
-| `maxScale`      | `number`                                                                 | `50`    | Maximum zoom scale.                                   |
-| `scaleStep`     | `number`                                                                 | `0.5`   | Amount added or removed per zoom step.                |
-| `movable`       | `boolean`                                                                | `true`  | Whether a zoomed image can be dragged to pan.         |
-| `countRender`   | `(current: number, total: number) => React.ReactNode`                    | -       | Replaces the counter.                                 |
-| `closeIcon`     | `React.ReactNode`                                                        | -       | Replaces the close icon.                              |
-| `imageRender`   | `(originalNode, info: { transform, image, current }) => React.ReactNode` | -       | Replaces the previewed content.                       |
-| `actionsRender` | `(originalNode, info: ToolbarRenderInfo) => React.ReactNode`             | -       | Replaces the toolbar; `info` carries icons + actions. |
-| `mask`          | `boolean \| { enabled?, blur?, closable? }`                              | `true`  | Backdrop behind the preview.                          |
-| `onTransform`   | `(info: { transform, action }) => void`                                  | -       | Fired on every zoom, rotate, flip, or pan.            |
+| Property        | Type                                                                     | Default | Description                                                                                            |
+| --------------- | ------------------------------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------ |
+| `open`          | `boolean`                                                                | -       | Controlled open state.                                                                                 |
+| `current`       | `number`                                                                 | -       | Controlled index of the previewed item.                                                                |
+| `onOpenChange`  | `(open: boolean, info: { current: number }) => void`                     | -       | Fired when the overlay opens or closes.                                                                |
+| `onChange`      | `(current: number, previousCurrent: number) => void`                     | -       | Fired when the previewed item changes.                                                                 |
+| `minScale`      | `number`                                                                 | `1`     | Minimum zoom scale.                                                                                    |
+| `maxScale`      | `number`                                                                 | `50`    | Maximum zoom scale.                                                                                    |
+| `scaleStep`     | `number`                                                                 | `0.5`   | Amount added or removed per zoom step.                                                                 |
+| `movable`       | `boolean`                                                                | `true`  | Whether a zoomed image can be dragged to pan.                                                          |
+| `countRender`   | `(current: number, total: number) => React.ReactNode`                    | -       | Replaces the counter.                                                                                  |
+| `closeIcon`     | `React.ReactNode`                                                        | -       | Replaces the close icon.                                                                               |
+| `imageRender`   | `(originalNode, info: { transform, image, current }) => React.ReactNode` | -       | Replaces the previewed content.                                                                        |
+| `actionsRender` | `(originalNode, info: ToolbarRenderInfo) => React.ReactNode`             | -       | Replaces the toolbar; `info` carries icons + actions.                                                  |
+| `mask`          | `boolean \| { enabled?, blur?, closable? }`                              | `true`  | Backdrop behind the preview.                                                                           |
+| `neighbors`     | `boolean`                                                                | `true`  | Shows the previous and next images, dimmed, at the edges; clicking one moves to it. Not in Ant Design. |
+| `onTransform`   | `(info: { transform, action }) => void`                                  | -       | Fired on every zoom, rotate, flip, or pan.                                                             |
 
 Not implemented from Ant Design's surface: `getContainer` (the overlay always
 portals to the body), `focusTrap` (always on, via `Dialog`), and the
@@ -164,19 +165,20 @@ portals to the body), `focusTrap` (always on, via `Dialog`), and the
 
 ### GalleryLightbox
 
-| Property        | Type                      | Default | Description                                                                       |
-| --------------- | ------------------------- | ------- | --------------------------------------------------------------------------------- |
-| `open`          | `boolean`                 | -       | Controlled open state.                                                            |
-| `onOpenChange`  | `(open: boolean) => void` | -       | Called when the lightbox opens or closes.                                         |
-| `media`         | `GalleryMedia[]`          | -       | Slides to render, in order.                                                       |
-| `initialIndex`  | `number`                  | `0`     | Slide to show when opening.                                                       |
-| `onDownloadAll` | `() => void`              | -       | When provided, renders a "Download All" action.                                   |
-| `minScale`      | `number`                  | `0.2`   | Lower bound for the zoom-out button.                                              |
-| `maxScale`      | `number`                  | `8`     | Upper bound for the zoom-in button.                                               |
-| `scaleStep`     | `number`                  | `0.5`   | Amount added or removed per zoom step.                                            |
-| `movable`       | `boolean`                 | `true`  | Whether a zoomed image can be dragged to pan.                                     |
-| `seekableVideo` | `boolean`                 | `false` | Buffer videos to a blob: URL so scrubbing works on origins without Range support. |
-| `videoSync`     | `GalleryVideoSync`        | -       | Carries a video's position in from a copy playing elsewhere.                      |
+| Property        | Type                      | Default | Description                                                                                       |
+| --------------- | ------------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `open`          | `boolean`                 | -       | Controlled open state.                                                                            |
+| `onOpenChange`  | `(open: boolean) => void` | -       | Called when the lightbox opens or closes.                                                         |
+| `media`         | `GalleryMedia[]`          | -       | Slides to render, in order.                                                                       |
+| `initialIndex`  | `number`                  | `0`     | Slide to show when opening.                                                                       |
+| `onDownloadAll` | `() => void`              | -       | When provided, renders a "Download All" action.                                                   |
+| `minScale`      | `number`                  | `0.2`   | Lower bound for the zoom-out button.                                                              |
+| `maxScale`      | `number`                  | `8`     | Upper bound for the zoom-in button.                                                               |
+| `scaleStep`     | `number`                  | `0.5`   | Amount added or removed per zoom step.                                                            |
+| `movable`       | `boolean`                 | `true`  | Whether a zoomed image can be dragged to pan.                                                     |
+| `seekableVideo` | `boolean`                 | `false` | Buffer videos to a blob: URL so scrubbing works on origins without Range support.                 |
+| `videoSync`     | `GalleryVideoSync`        | -       | Carries a video's position in from a copy playing elsewhere.                                      |
+| `neighbors`     | `boolean`                 | `true`  | Narrows each slide so the previous and next show, dimmed, at the edges; clicking one moves to it. |
 
 `GalleryVideoSync` is `{ index, startTime, onTimeUpdate? }` — `startTime` seeks
 and resumes the video at `index` once it is ready, and `onTimeUpdate` mirrors

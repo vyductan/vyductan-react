@@ -1,3 +1,4 @@
+import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Download,
@@ -53,6 +54,11 @@ export interface GalleryLightboxProps {
   seekableVideo?: boolean;
   /** Carries a video's playback position in from a copy playing elsewhere. */
   videoSync?: GalleryVideoSync;
+  /**
+   * Narrow each slide so the previous and next items show, dimmed, at the
+   * edges. Clicking one moves to it.
+   */
+  neighbors?: boolean;
 }
 
 export type GalleryVideoSync = {
@@ -76,6 +82,7 @@ export function GalleryLightbox({
   movable = true,
   seekableVideo = false,
   videoSync,
+  neighbors = true,
 }: GalleryLightboxProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(initialIndex);
 
@@ -97,17 +104,38 @@ export function GalleryLightbox({
 
   const [previousOpen, setPreviousOpen] = useState(open);
 
+  // Slides whose video has reported its size. Until then a video is the
+  // 300x150 default box, so its slide keeps a set width instead of hugging it.
+  const [sizedVideos, setSizedVideos] = useState<ReadonlySet<number>>(
+    () => new Set(),
+  );
+
   // Sync internal state with initialIndex during render when Lightbox opens
   // (React 18+ recommended pattern to avoid cascading renders)
   if (open && !previousOpen) {
     setPreviousOpen(true);
     setCurrentImageIndex(initialIndex);
     resetTransform();
+    // Radix builds fresh video elements on every open; none has metadata yet.
+    setSizedVideos(new Set());
   } else if (!open && previousOpen) {
     setPreviousOpen(false);
   }
 
   const [lightboxCarouselApi, setLightboxCarouselApi] = useState<CarouselApi>();
+
+  // A drag that ends over something other than where it started still fires a
+  // click — on the nearest common ancestor, which the close-on-backdrop checks
+  // read as a backdrop click. Remembering where the pointer went down lets
+  // every click handler tell a click from the end of a swipe or pan.
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const isDragRelease = (event: React.MouseEvent) => {
+    const start = pointerStart.current;
+    if (!start) return false;
+    return Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6;
+  };
+
+  const hasNeighbors = neighbors && media.length > 1;
 
   const videoReferences = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -173,14 +201,25 @@ export function GalleryLightbox({
       <DialogContent
         className="pointer-events-none m-0 flex h-screen w-screen max-w-none flex-col items-center justify-center overflow-hidden border-none bg-black/50 p-0 shadow-none backdrop-blur-sm sm:max-w-none [&>button]:hidden"
         showCloseButton={false}
+        onPointerDownCapture={(e) => {
+          pointerStart.current = { x: e.clientX, y: e.clientY };
+        }}
         onClick={(e) => {
-          if (e.target === e.currentTarget) onOpenChange(false);
+          if (e.target === e.currentTarget && !isDragRelease(e)) {
+            onOpenChange(false);
+          }
         }}
       >
         <DialogTitle className="sr-only">Image Gallery</DialogTitle>
 
         {/* Carousel Background */}
-        <div className="pointer-events-auto absolute top-16 right-0 bottom-[180px] left-0 z-10 sm:bottom-[190px] md:px-16">
+        <div
+          className={cn(
+            "pointer-events-auto absolute top-16 right-0 bottom-[180px] left-0 z-10 sm:bottom-[190px]",
+            // Neighbors run to the screen edge; inset would clip them early.
+            !neighbors && "md:px-16",
+          )}
+        >
           {media.length > 0 && (
             <Carousel
               opts={{
@@ -191,6 +230,7 @@ export function GalleryLightbox({
               className="h-full w-full **:data-[slot=carousel-content]:h-full"
               onClick={(e) => {
                 if (
+                  isDragRelease(e) ||
                   (e.target as HTMLElement).closest("button") ||
                   (e.target as HTMLElement).tagName === "IMG" ||
                   (e.target as HTMLElement).tagName === "VIDEO"
@@ -212,12 +252,45 @@ export function GalleryLightbox({
                 {media.map((item, index) => (
                   <CarouselItem
                     key={index}
-                    className="flex h-full w-full items-center justify-center pl-0"
+                    className={cn(
+                      "flex h-full items-center justify-center pl-0",
+                      !hasNeighbors && "w-full",
+                      // A slide hugs its media so the neighbors sit a fixed
+                      // gap away whatever its size; a video has no size until
+                      // metadata loads, so until then it keeps a set width.
+                      hasNeighbors &&
+                        (item.type === "video" && !sizedVideos.has(index)
+                          ? "basis-[80%] sm:basis-[76%]"
+                          : "basis-auto"),
+                      hasNeighbors &&
+                        "px-2 transition-opacity duration-300 sm:px-4",
+                      hasNeighbors &&
+                        index !== currentImageIndex &&
+                        "cursor-pointer opacity-30 hover:opacity-50",
+                      // A zoomed image grows past its slide; keep it above the
+                      // neighbors rather than under the next one.
+                      index === currentImageIndex && "relative z-10",
+                    )}
                   >
                     <div
-                      className="pointer-events-auto relative flex h-full w-full items-center justify-center"
+                      className={cn(
+                        "pointer-events-auto relative flex h-full w-full items-center justify-center",
+                        // A neighbor's media can't take the click (play a
+                        // video, start a pan); the slide brings it in instead.
+                        hasNeighbors &&
+                          index !== currentImageIndex &&
+                          "*:pointer-events-none",
+                      )}
                       onClick={(e) => {
-                        if (e.target === e.currentTarget) onOpenChange(false);
+                        // A swipe released over a neighbor must not also jump
+                        // to it, nor close the lightbox.
+                        if (isDragRelease(e)) return;
+                        if (hasNeighbors && index !== currentImageIndex) {
+                          e.stopPropagation();
+                          lightboxCarouselApi?.scrollTo(index);
+                        } else if (e.target === e.currentTarget) {
+                          onOpenChange(false);
+                        }
                       }}
                     >
                       {item.type === "video" ? (
@@ -226,13 +299,25 @@ export function GalleryLightbox({
                           data-index={index}
                           src={item.url}
                           seekable={seekableVideo}
-                          controls
+                          // Chrome lays its native controls out once and misses
+                          // the resize when a slide that is off screen grows to
+                          // its video's size — the bar stays 300px-wide until
+                          // the window resizes. Adding the controls only after
+                          // sizing builds them at the final width.
+                          controls={!hasNeighbors || sizedVideos.has(index)}
                           playsInline
                           onClick={(e) => e.stopPropagation()}
                           // Keep drags on the scrub bar from reaching the
                           // carousel, which would swipe to the next slide.
                           onPointerDown={(e) => e.stopPropagation()}
                           onPointerMove={(e) => e.stopPropagation()}
+                          onLoadedMetadata={() => {
+                            setSizedVideos((previous) =>
+                              previous.has(index)
+                                ? previous
+                                : new Set(previous).add(index),
+                            );
+                          }}
                           onTimeUpdate={(e) => {
                             if (index === videoSync?.index) {
                               videoSync.onTimeUpdate?.(
@@ -240,9 +325,16 @@ export function GalleryLightbox({
                               );
                             }
                           }}
-                          // Without an explicit box the element starts at the
-                          // 300x150 default and jumps once metadata arrives.
-                          className="h-full max-h-full w-full max-w-full cursor-auto object-contain transition-transform duration-200"
+                          className={cn(
+                            "max-h-full max-w-full cursor-auto object-contain transition-transform duration-200",
+                            // Once sized, a hugging slide lets the video take
+                            // its own size, capped like an image. Before that
+                            // (or without neighbors) an explicit box stops the
+                            // 300x150 default jumping when metadata arrives.
+                            hasNeighbors && sizedVideos.has(index)
+                              ? "max-w-[76vw]"
+                              : "h-full w-full",
+                          )}
                           style={
                             index === currentImageIndex
                               ? { transform: activeTransform }
@@ -256,6 +348,9 @@ export function GalleryLightbox({
                             alt={`Gallery Image ${index + 1}`}
                             className={cn(
                               "max-h-full max-w-full object-contain select-none",
+                              // The slide sizes itself from the image, so the
+                              // cap has to come from the screen instead.
+                              hasNeighbors && "max-w-[76vw]",
                               // Transitioning every pointermove makes the drag
                               // trail the cursor, so only animate zoom/rotate.
                               isDragging

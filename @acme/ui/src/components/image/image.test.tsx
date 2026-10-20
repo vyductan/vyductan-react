@@ -3,7 +3,7 @@ import React from "react";
 import "@testing-library/jest-dom/vitest";
 
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 
 import { Image } from "./image";
 
@@ -105,5 +105,60 @@ describe("Image previewing", () => {
     render(<Image src={SOURCE} alt="Harbour" preview={{ cover: "Xem ảnh" }} />);
 
     expect(previewMask()).toHaveTextContent("Xem ảnh");
+  });
+});
+
+describe("Preview group neighbors", () => {
+  // The viewer measures the current image to park its neighbors; jsdom has no
+  // layout, so the observer only needs to exist.
+  const originalResizeObserver = globalThis.ResizeObserver;
+  beforeAll(() => {
+    globalThis.ResizeObserver ??= class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+  });
+  afterAll(() => {
+    globalThis.ResizeObserver = originalResizeObserver;
+  });
+
+  const items = ["a", "b", "c"].map(
+    (name) => `https://example.test/${name}.jpg`,
+  );
+
+  /** Neighbors are decorative (`alt=""`); the current image has real alt. */
+  function neighborSources() {
+    return [...document.querySelectorAll<HTMLImageElement>('img[alt=""]')].map(
+      (image) => image.getAttribute("src"),
+    );
+  }
+
+  test("show the previous and next image, wrapping at the ends", () => {
+    render(<Image.PreviewGroup items={items} preview={{ open: true }} />);
+
+    expect(neighborSources()).toEqual([items[2], items[1]]);
+  });
+
+  test("with two images, show only the side that doesn't wrap", () => {
+    render(
+      <Image.PreviewGroup
+        items={items.slice(0, 2)}
+        preview={{ open: true, current: 1 }}
+      />,
+    );
+
+    expect(neighborSources()).toEqual([items[0]]);
+  });
+
+  test("are off when `preview.neighbors` is false", () => {
+    render(
+      <Image.PreviewGroup
+        items={items}
+        preview={{ open: true, neighbors: false }}
+      />,
+    );
+
+    expect(neighborSources()).toEqual([]);
   });
 });

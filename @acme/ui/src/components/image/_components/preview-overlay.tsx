@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -79,6 +79,8 @@ export type PreviewOverlayProps = {
     info: ToolbarRenderInfo,
   ) => React.ReactNode;
   mask?: PreviewMask;
+  /** Show the previous and next images, dimmed, at the viewer's edges. */
+  neighbors?: boolean;
   onTransform?: (info: {
     transform: ImageTransform;
     action: TransformAction;
@@ -120,6 +122,7 @@ export function PreviewOverlay({
   imageRender,
   actionsRender,
   mask,
+  neighbors = true,
   onTransform,
 }: PreviewOverlayProps) {
   const transformState = useImageTransform({
@@ -142,9 +145,43 @@ export function PreviewOverlay({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, open]);
 
+  const resolvedMask = resolveMask(mask);
+
+  // Neighbors hug the current image's edges, so they need its laid-out width.
+  // `offsetWidth` ignores the zoom transform, so zooming leaves them put.
+  const [imageWidth, setImageWidth] = useState<number>();
+  const measureImage = useCallback((element: HTMLImageElement) => {
+    const observer = new ResizeObserver(() => {
+      setImageWidth(element.offsetWidth);
+    });
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      setImageWidth(undefined);
+    };
+  }, []);
+
+  // A drag that ends somewhere other than where it started still fires a
+  // click — on the nearest common ancestor, which the backdrop checks read as
+  // a backdrop click. So a pan released off the image would close the viewer.
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const isDragRelease = (event: React.MouseEvent) => {
+    const start = pointerStart.current;
+    if (!start) return false;
+    return Math.hypot(event.clientX - start.x, event.clientY - start.y) > 6;
+  };
+  const closeOnBackdrop = (event: React.MouseEvent) => {
+    if (
+      resolvedMask.closable &&
+      event.target === event.currentTarget &&
+      !isDragRelease(event)
+    ) {
+      onOpenChange(false);
+    }
+  };
+
   const total = items.length;
   const item = items[current];
-  const resolvedMask = resolveMask(mask);
 
   const goto = (offset: number) => {
     if (total < 2) return;
@@ -153,6 +190,61 @@ export function PreviewOverlay({
   };
 
   if (!item) return null;
+
+  // With two images both sides would show the same one, so each side only
+  // appears when it has somewhere to go without wrapping — or when there are
+  // enough images that wrapping reads as a loop.
+  const showNeighbors = neighbors && total > 1;
+  const previousIndex =
+    showNeighbors && (current > 0 || total > 2)
+      ? (current - 1 + total) % total
+      : undefined;
+  const nextIndex =
+    showNeighbors && (current < total - 1 || total > 2)
+      ? (current + 1) % total
+      : undefined;
+
+  const renderNeighbor = (
+    index: number | undefined,
+    side: "left" | "right",
+  ) => {
+    const neighbor = index === undefined ? undefined : items[index];
+    if (index === undefined || !neighbor) return null;
+    const neighborSource =
+      failedSources[neighbor.src] && fallback ? fallback : neighbor.src;
+    // Until the current image has a width, assume it fills its slot.
+    const halfImage = imageWidth === undefined ? "38%" : `${imageWidth / 2}px`;
+    return (
+      <button
+        type="button"
+        // The arrow buttons already carry this for keyboard and screen
+        // readers; the neighbor is a pointer shortcut only.
+        tabIndex={-1}
+        aria-hidden
+        onClick={() => goto(side === "left" ? -1 : 1)}
+        className={cn(
+          // Same width as the current slot, parked a fixed gap past the
+          // current image's edge; the viewport clips whatever runs off.
+          "absolute inset-y-20 flex w-[80%] cursor-pointer items-center opacity-30 transition-opacity hover:opacity-50 sm:w-[76%]",
+          side === "left" ? "justify-end" : "justify-start",
+        )}
+        style={{
+          [side === "left" ? "right" : "left"]:
+            `calc(50% + ${halfImage} + 1rem)`,
+        }}
+      >
+        <img
+          src={neighborSource}
+          alt=""
+          draggable={false}
+          onError={() =>
+            setFailedSources((prev) => ({ ...prev, [neighbor.src]: true }))
+          }
+          className="max-h-full max-w-full object-contain select-none"
+        />
+      </button>
+    );
+  };
 
   const {
     src,
@@ -168,6 +260,7 @@ export function PreviewOverlay({
     <picture className="contents">
       <img
         {...imgRest}
+        ref={showNeighbors ? measureImage : undefined}
         src={source}
         alt={alt ?? `Preview ${current + 1}`}
         onError={() => setFailedSources((prev) => ({ ...prev, [src]: true }))}
@@ -288,11 +381,10 @@ export function PreviewOverlay({
           if (event.key === "ArrowLeft") goto(-1);
           if (event.key === "ArrowRight") goto(1);
         }}
-        onClick={(event) => {
-          if (resolvedMask.closable && event.target === event.currentTarget) {
-            onOpenChange(false);
-          }
+        onPointerDownCapture={(event) => {
+          pointerStart.current = { x: event.clientX, y: event.clientY };
         }}
+        onClick={closeOnBackdrop}
         className={cn(
           "m-0 flex h-screen w-screen max-w-none flex-col items-center justify-center overflow-hidden border-none p-0 shadow-none sm:max-w-none",
           resolvedMask.enabled ? "bg-black/70" : "bg-transparent",
@@ -301,13 +393,15 @@ export function PreviewOverlay({
       >
         <DialogTitle className="sr-only">Image preview</DialogTitle>
 
+        {renderNeighbor(previousIndex, "left")}
+        {renderNeighbor(nextIndex, "right")}
+
         <div
-          className="flex h-full w-full items-center justify-center px-4 py-20 md:px-20"
-          onClick={(event) => {
-            if (resolvedMask.closable && event.target === event.currentTarget) {
-              onOpenChange(false);
-            }
-          }}
+          className={cn(
+            "flex h-full items-center justify-center py-20",
+            showNeighbors ? "w-[80%] sm:w-[76%]" : "w-full px-4 md:px-20",
+          )}
+          onClick={closeOnBackdrop}
         >
           {imageRender
             ? imageRender(originalImage, {

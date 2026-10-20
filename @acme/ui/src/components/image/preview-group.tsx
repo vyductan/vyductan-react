@@ -47,6 +47,11 @@ export type PreviewGroupType = {
     info: ToolbarRenderInfo,
   ) => React.ReactNode;
   mask?: PreviewMask;
+  /**
+   * Show the previous and next images, dimmed, at the edges of the viewer.
+   * Clicking one moves to it. On by default.
+   */
+  neighbors?: boolean;
   onTransform?: (info: {
     transform: ImageTransform;
     action: TransformAction;
@@ -186,6 +191,7 @@ export function ImagePreviewGroup({
           imageRender={config.imageRender}
           actionsRender={config.actionsRender}
           mask={config.mask}
+          neighbors={config.neighbors}
           onTransform={config.onTransform}
         />
       )}
