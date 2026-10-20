@@ -383,3 +383,34 @@ test("Backspace on a line's words selected by hand keeps the line", async () => 
     ).toStrictEqual(["todo:Round USD", "list:", "todo:Remove it"]),
   );
 });
+
+/** As typed: Enter after a to-do, Tab, then Backspace on the empty one. */
+test("Backspace on a to-do made by Enter and Tab keeps its indent", async () => {
+  const live = await todos("a");
+  live.update(() => $getRoot().getLastChildOrThrow().remove(), {
+    discrete: true,
+  });
+  live.update(
+    () => $getRoot().getFirstChildOrThrow<ElementNode>().selectEnd(),
+    {
+      discrete: true,
+    },
+  );
+
+  await userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Tab}");
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "todo", text: "", indent: 1 },
+    ]),
+  );
+
+  await userEvent.keyboard("{Backspace}");
+  await waitFor(() =>
+    expect(blocks(live)).toStrictEqual([
+      { type: "todo", text: "a", indent: 0 },
+      { type: "paragraph", text: "", indent: 1 },
+    ]),
+  );
+});

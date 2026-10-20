@@ -192,3 +192,28 @@ describe("a list under a to-do", () => {
     expect(itemDepths(markdown)).toStrictEqual(["b@1", "c@0"]);
   });
 });
+
+/**
+ * An empty to-do is written `- [ ] `, and format on save (Prettier) trims
+ * the space: `- [ ]` read back as a bullet with "[ ]" for its text.
+ */
+describe("an empty to-do", () => {
+  test("reads back as a to-do with its trailing space trimmed", () => {
+    expect(todoIndents("- [ ] a\n- [ ]")).toStrictEqual(["a@0", "@0"]);
+  });
+
+  test("indented, too", () => {
+    expect(todoIndents("- [ ] a\n\t- [ ]\n  - [x]")).toStrictEqual([
+      "a@0",
+      "@1",
+      "@1",
+    ]);
+  });
+
+  test("survives a save", () => {
+    const markdown = lexicalContentToMarkdown(
+      markdownToLexicalContent("- [ ] a\n\t- [ ] \n- [ ] c"),
+    ).replaceAll(/[ \t]+$/gm, "");
+    expect(todoIndents(markdown)).toStrictEqual(["a@0", "@1", "c@0"]);
+  });
+});

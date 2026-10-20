@@ -68,7 +68,9 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
       const indent = "\t".repeat(node.getIndent());
       return `${indent}- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
     },
-    regExp: /^(\s*)-\s\[(?:\s|x)\]\s/i,
+    // A space, or the line's end: an empty to-do's trailing space is trimmed
+  // by format on save, and `- [ ]` read back as a bullet.
+  regExp: /^(\s*)-\s\[(?:\s|x)\](?:\s|$)/i,
     replace: (parentNode, _children, match) => {
       const matchText = match[0] ?? "";
       const leading = match[1] ?? "";
