@@ -51,6 +51,25 @@ import { cn } from "@acme/ui/lib/utils";
 export const OPEN_FIND_COMMAND: LexicalCommand<string> =
   createCommand("OPEN_FIND_COMMAND");
 
+/**
+ * Opens the find bar on `words` once mounted (and again if they change), for
+ * a page that holds no editor of its own: put it inside the <Editor>. Null or
+ * blank opens nothing.
+ */
+export function OpenFind({ words }: { words: string | null }): null {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    if (!words?.trim()) return;
+    // A frame later: the find plugin registers its command in an effect of
+    // its own, which may run after this one.
+    const frame = requestAnimationFrame(() => {
+      editor.dispatchCommand(OPEN_FIND_COMMAND, words);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [editor, words]);
+  return null;
+}
+
 interface FindReplacePluginProperties {
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;

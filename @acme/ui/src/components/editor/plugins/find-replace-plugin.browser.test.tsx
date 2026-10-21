@@ -13,7 +13,7 @@ import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
-import { OPEN_FIND_COMMAND } from "./find-replace-plugin";
+import { OPEN_FIND_COMMAND, OpenFind } from "./find-replace-plugin";
 
 // Real keys and real layout: the bar opens on a shortcut, is placed by
 // measuring the editor, and steps through matches on Enter.
@@ -577,4 +577,28 @@ test("finds and shows words that arrive after it opened", async () => {
 
   await waitFor(() => expect(counter()).toBe("1 of 1"));
   await waitFor(() => expect(globalThis.scrollY).toBeGreaterThan(1000));
+});
+
+/**
+ * What a page puts inside its <Editor> to open the bar on given words — it
+ * holds no editor of its own to dispatch OPEN_FIND_COMMAND with.
+ */
+test("OpenFind opens the bar on its words when mounted", async () => {
+  render(
+    <div style={{ width: 380, marginLeft: 16 }}>
+      <Editor autoFocus={false} format="markdown" value={LINES.join("\n\n")}>
+        <OpenFind words="cơ hội" />
+      </Editor>
+    </div>,
+  );
+
+  const input = await waitFor(() => {
+    const node = document.querySelector<HTMLInputElement>(
+      'input[aria-label="Find in note"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(input.value).toBe("cơ hội");
+  await waitFor(() => expect(counter()).toBe("1 of 1"));
 });
