@@ -13,6 +13,7 @@ import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
+import { OPEN_FIND_COMMAND } from "./find-replace-plugin";
 
 // Real keys and real layout: the bar opens on a shortcut, is placed by
 // measuring the editor, and steps through matches on Enter.
@@ -502,3 +503,78 @@ test.each([["f"], ["h"]])(
     expect(document.querySelector('[data-slot="find-bar"]')).toBeNull();
   },
 );
+
+/**
+ * A note opened from a search result arrives with the words that found it:
+ * the page dispatches OPEN_FIND_COMMAND and the bar opens on them, counted,
+ * the first one current.
+ */
+test("opens on OPEN_FIND_COMMAND with the words it is given", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <div style={{ width: 380, marginLeft: 16 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.update(
+    () => {
+      const root = $getRoot();
+      root.clear();
+      for (const line of LINES) {
+        root.append($createParagraphNode().append($createTextNode(line)));
+      }
+    },
+    { discrete: true },
+  );
+
+  live.dispatchCommand(OPEN_FIND_COMMAND, "cơ");
+
+  const input = await waitFor(() => {
+    const node = document.querySelector<HTMLInputElement>(
+      'input[aria-label="Find in note"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(input.value).toBe("cơ");
+  await waitFor(() => expect(counter()).toBe("1 of 3"));
+});
+
+/**
+ * The note's text loads after the page asks for the bar. The match that then
+ * appears — far down — is still the one brought into view.
+ */
+test("finds and shows words that arrive after it opened", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <div style={{ width: 380, marginLeft: 16 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.dispatchCommand(OPEN_FIND_COMMAND, "the end");
+  await waitFor(() => expect(counter()).toBe("0 of 0"));
+
+  live.update(
+    () => {
+      const root = $getRoot();
+      root.clear();
+      for (let line = 0; line < 120; line++) {
+        root.append($createParagraphNode().append($createTextNode("filler")));
+      }
+      root.append($createParagraphNode().append($createTextNode("the end")));
+    },
+    { discrete: true },
+  );
+
+  await waitFor(() => expect(counter()).toBe("1 of 1"));
+  await waitFor(() => expect(globalThis.scrollY).toBeGreaterThan(1000));
+});

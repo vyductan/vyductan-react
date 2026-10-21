@@ -14,6 +14,7 @@
  * - Every match is highlighted, the current one more strongly, with the CSS
  *   Custom Highlight API — nothing is written into the document.
  */
+import type { LexicalCommand } from "lexical";
 import type { JSX } from "react";
 import {
   useCallback,
@@ -32,6 +33,7 @@ import {
   $isRangeSelection,
   $isTextNode,
   COMMAND_PRIORITY_LOW,
+  createCommand,
   KEY_MODIFIER_COMMAND,
 } from "lexical";
 import { ArrowDown, ArrowUp, Replace, X } from "lucide-react";
@@ -39,6 +41,15 @@ import { createPortal } from "react-dom";
 
 import { Button } from "@acme/ui/components/button";
 import { cn } from "@acme/ui/lib/utils";
+
+/**
+ * Opens the find bar on the given words, the first match current and in
+ * view — for a note opened from a search result. The note's text may still be
+ * loading: the first match that appears afterwards is the one brought into
+ * view.
+ */
+export const OPEN_FIND_COMMAND: LexicalCommand<string> =
+  createCommand("OPEN_FIND_COMMAND");
 
 interface FindReplacePluginProperties {
   isOpen?: boolean;
@@ -215,16 +226,23 @@ export function FindReplacePlugin({
   // by a new query, a step or a replace — not by an edit elsewhere, which
   // searched again and threw the page back to the match on every keystroke.
   const revealReference = useRef(false);
+  // Opened by OPEN_FIND_COMMAND before the text it looks for has arrived:
+  // reveal the first match whenever it does, even from an edit's refresh.
+  const revealWhenFoundReference = useRef(false);
   useEffect(() => {
     queryReference.current = query;
   }, [query]);
 
   const refresh = useCallback(
     (reveal: boolean) => {
-      if (reveal) revealReference.current = true;
       const next = editor
         .getEditorState()
         .read(() => $findMatches(queryReference.current));
+      if (revealWhenFoundReference.current && next.length > 0) {
+        revealWhenFoundReference.current = false;
+        reveal = true;
+      }
+      if (reveal) revealReference.current = true;
       setMatches(next);
       setCurrent((index) => Math.min(index, Math.max(0, next.length - 1)));
     },
@@ -271,8 +289,20 @@ export function FindReplacePlugin({
           },
           COMMAND_PRIORITY_LOW,
         ),
+        editor.registerCommand(
+          OPEN_FIND_COMMAND,
+          (words) => {
+            queryReference.current = words;
+            setQuery(words);
+            setCurrent(0);
+            revealWhenFoundReference.current = true;
+            setOpen(true);
+            return true;
+          },
+          COMMAND_PRIORITY_LOW,
+        ),
       ),
-    [editor, open],
+    [editor, open, setOpen],
   );
 
   // Search as the query changes, and again whenever the document does.
