@@ -162,3 +162,56 @@ describe("Preview group neighbors", () => {
     expect(neighborSources()).toEqual([]);
   });
 });
+
+describe("Image loading", () => {
+  /** Make every <img> report the given load state, for the test's duration. */
+  function stubImageState(state: { complete: boolean; naturalWidth: number }) {
+    const keys = ["complete", "naturalWidth"] as const;
+    const saved = keys.map((key) => [
+      key,
+      Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, key),
+    ]);
+    for (const key of keys) {
+      Object.defineProperty(HTMLImageElement.prototype, key, {
+        configurable: true,
+        get: () => state[key],
+      });
+    }
+    return () => {
+      for (const [key, descriptor] of saved) {
+        if (descriptor) {
+          Object.defineProperty(
+            HTMLImageElement.prototype,
+            key as string,
+            descriptor as PropertyDescriptor,
+          );
+        }
+      }
+    };
+  }
+
+  // An image the browser already has (a reload, a back navigation) finishes
+  // before React attaches `onLoad` to server-rendered markup, so no load event
+  // ever reaches it. jsdom never loads images, so the state is stubbed.
+  test("shows an image that finished loading before it was hydrated", () => {
+    const restore = stubImageState({ complete: true, naturalWidth: 512 });
+    try {
+      render(<Image src={SOURCE} alt="Harbour" />);
+
+      expect(screen.getByAltText("Harbour")).toHaveClass("opacity-100");
+    } finally {
+      restore();
+    }
+  });
+
+  test("keeps the placeholder for an image still loading", () => {
+    const restore = stubImageState({ complete: false, naturalWidth: 0 });
+    try {
+      render(<Image src={SOURCE} alt="Harbour" />);
+
+      expect(screen.getByAltText("Harbour")).toHaveClass("opacity-0");
+    } finally {
+      restore();
+    }
+  });
+});

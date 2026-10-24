@@ -142,6 +142,18 @@ const InternalImage = memo(function Image({
     setLoaded(true);
   };
 
+  // An image the browser already holds (a reload, a back navigation) can
+  // finish before React attaches `onLoad` to server-rendered markup: no load
+  // event ever arrives, and the image stayed invisible behind its placeholder.
+  // Read the element's own state once it is mounted instead.
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = wrapperRef.current?.querySelector("img");
+    if (!element?.complete) return;
+    if (element.naturalWidth > 0) setLoaded(true);
+    else if (element.currentSrc) setError(true);
+  }, [src]);
+
   const handleImageError = () => {
     setError(true);
   };
@@ -178,6 +190,7 @@ const InternalImage = memo(function Image({
 
   const thumbnail = (
     <div
+      ref={wrapperRef}
       style={{ width, height }}
       className={cn("group/image relative inline-block", rootClassName)}
       onPointerEnter={hoverPreview ? preloadPeek : undefined}
