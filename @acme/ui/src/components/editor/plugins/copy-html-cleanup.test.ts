@@ -125,3 +125,50 @@ describe("cleanCopiedHtml, what the editor reads back", () => {
     );
   });
 });
+
+/**
+ * A simple table in Notion holds no lists: a <ul> in a cell went in as text
+ * Notion indented one way or another, cell by cell. A cell's list goes out
+ * as lines of text, the way Notion (and this editor's markdown) writes one.
+ */
+describe("cleanCopiedHtml, lists in table cells", () => {
+  test("a bullet list in a cell is lines of text", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        '<table><tbody><tr><td><ul class="ml-6"><li value="1"><span>Keep only</span></li><li value="2">Bỏ qua</li></ul></td></tr></tbody></table>',
+      ),
+    );
+
+    expect(body.querySelector("td")!.innerHTML).toBe("• Keep only<br>• Bỏ qua");
+  });
+
+  test("a numbered list counts, and words before it stay", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        "<table><tbody><tr><td><p>Steps</p><ol><li>one</li><li>two</li></ol></td></tr></tbody></table>",
+      ),
+    );
+
+    expect(body.querySelector("td")!.innerHTML).toBe(
+      "<p>Steps</p>1. one<br>2. two",
+    );
+  });
+
+  /** As Lexical nests one: in an item of its own after its parent. */
+  test("a nested item is indented under its item", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        "<table><tbody><tr><td><ul><li>a</li><li><ul><li>b</li></ul></li></ul></td></tr></tbody></table>",
+      ),
+    );
+
+    expect(body.querySelector("td")!.innerHTML).toBe(
+      "• a<br>&nbsp;&nbsp;&nbsp;&nbsp;• b",
+    );
+  });
+
+  test("a list outside a table stays a list", () => {
+    const body = parse(cleanCopiedHtml("<ul><li>a</li></ul>"));
+    expect(body.innerHTML).toBe("<ul><li>a</li></ul>");
+  });
+});
