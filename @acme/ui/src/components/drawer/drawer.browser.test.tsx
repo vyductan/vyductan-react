@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Button } from "../button";
 import { Popover } from "../popover";
@@ -77,5 +77,41 @@ describe("Escape from a real keypress", () => {
 
     await waitFor(() => expect(drawerPanel()).toBeNull());
     expect(openPopovers()).toHaveLength(1);
+  });
+});
+
+describe("on a phone-width screen", () => {
+  // A right drawer is anchored to the right edge; a size wider than the
+  // screen pushed its left part — the title and every field label — off
+  // screen on an iPhone (the todo drawer asks for 960px).
+  test("a wide drawer stays inside the viewport", async () => {
+    await page.viewport(390, 844);
+    try {
+      render(
+        <Drawer open title="Wide" size={960}>
+          <Button>Body control</Button>
+        </Drawer>,
+      );
+      await waitFor(() => expect(drawerPanel()).not.toBeNull());
+      await waitFor(() => {
+        const rect = drawerPanel()!.getBoundingClientRect();
+        expect(rect.left).toBeGreaterThanOrEqual(0);
+        expect(rect.width).toBeLessThanOrEqual(390);
+      });
+    } finally {
+      await page.viewport(1280, 800);
+    }
+  });
+
+  test("keeps its size on a screen wide enough for it", async () => {
+    render(
+      <Drawer open title="Wide" size={960}>
+        <Button>Body control</Button>
+      </Drawer>,
+    );
+    await waitFor(() => expect(drawerPanel()).not.toBeNull());
+    await waitFor(() =>
+      expect(drawerPanel()!.getBoundingClientRect().width).toBe(960),
+    );
   });
 });

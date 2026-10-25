@@ -236,7 +236,14 @@ const Drawer = ({
           } as React.CSSProperties
         }
         className={cn(
-          isHorizontal ? "w-(--drawer-size)" : "h-(--drawer-size)",
+          /*
+           * Capped at the screen: the panel is anchored to its edge, so a
+           * size wider than the viewport pushed the far side (title, labels)
+           * off screen on a phone instead of shrinking.
+           */
+          isHorizontal
+            ? "w-(--drawer-size) max-w-full"
+            : "h-(--drawer-size) max-h-full",
           className,
         )}
       >
