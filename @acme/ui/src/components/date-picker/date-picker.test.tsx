@@ -377,7 +377,7 @@ describe("DatePicker disabled time validation", () => {
     const input = screen.getByRole("textbox");
 
     fireEvent.change(input, { target: { value: "2024-05-15 10:30" } });
-    fireEvent.keyUp(input, { key: "Enter" });
+    fireEvent.keyDown(input, { key: "Enter" });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -397,7 +397,7 @@ describe("DatePicker disabled time validation", () => {
     const input = screen.getByRole("textbox");
 
     fireEvent.change(input, { target: { value: "2024-05-15 10:30" } });
-    fireEvent.keyUp(input, { key: "Enter" });
+    fireEvent.keyDown(input, { key: "Enter" });
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledWith(
@@ -472,7 +472,7 @@ describe("DatePicker disabled time validation", () => {
     }
 
     fireEvent.change(startInput, { target: { value: "2024-05-15" } });
-    fireEvent.keyUp(startInput, { key: "Enter" });
+    fireEvent.keyDown(startInput, { key: "Enter" });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -505,7 +505,7 @@ describe("DatePicker disabled time validation", () => {
     fireEvent.change(endInput, {
       target: { value: "2024-05-15 22:30:00" },
     });
-    fireEvent.keyUp(endInput, { key: "Enter" });
+    fireEvent.keyDown(endInput, { key: "Enter" });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -537,7 +537,7 @@ describe("DatePicker disabled time validation", () => {
     fireEvent.change(startInput, {
       target: { value: "2024-05-17 22:30:00" },
     });
-    fireEvent.keyUp(startInput, { key: "Enter" });
+    fireEvent.keyDown(startInput, { key: "Enter" });
 
     expect(onChange).not.toHaveBeenCalled();
   });

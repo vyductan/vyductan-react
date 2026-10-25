@@ -135,6 +135,10 @@ type DatePickerProperties = DatePickerBaseProperties & {
    * caller can tell a confirmation from any other close (Escape, click-away).
    */
   onOk?: (date: Dayjs | null | undefined) => void;
+  /** Runs after the picker's own blur commit (Field injects this to mark touched). */
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  /** Runs after the picker's own Enter commit. */
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 
   picker?: PickerMode;
 
@@ -162,6 +166,8 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
     open: openProperty,
     onOpenChange,
     onOk,
+    onBlur,
+    onKeyDown,
     minDate,
     maxDate,
 
@@ -818,6 +824,56 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
     [month],
   );
 
+  // Commit typed text when focus leaves the picker. A separate function so
+  // the caller's onBlur (Field marks touched) still runs on every blur,
+  // including the early returns below.
+  const commitInputOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (skipBlurCommitReference.current) {
+      skipBlurCommitReference.current = false;
+      return;
+    }
+
+    if (interactingInsidePanelReference.current) {
+      interactingInsidePanelReference.current = false;
+      return;
+    }
+
+    // Check if the focus is moving to an element within the calendar/popover
+    const relatedTarget = e.relatedTarget as HTMLElement | undefined;
+    const calendarContainer = document.querySelector('[data-slot="calendar"]');
+    const popoverContainer = document.querySelector(
+      '[data-slot="popover-content"]',
+    );
+
+    // If focus is moving to calendar or popover, don't close
+    if (
+      relatedTarget &&
+      (calendarContainer?.contains(relatedTarget) ||
+        popoverContainer?.contains(relatedTarget) ||
+        relatedTarget.closest('[data-slot="calendar"]') ||
+        relatedTarget.closest('[data-slot="popover-content"]'))
+    ) {
+      return;
+    }
+
+    // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
+    if (inputValue.trim()) {
+      const parsed = parseInputDate(inputValue, format);
+      if (parsed && isSelectableValue(parsed)) {
+        setValue(parsed);
+        setInputValue(formatValue(parsed));
+      } else {
+        // Invalid input - revert to previous value
+        setInputValue(value ? formatValue(value) : "");
+      }
+    } else {
+      // Empty input - trigger onChange with undefined
+      setValue(undefined);
+      setInputValue("");
+    }
+    setOpen(false);
+  };
+
   return (
     <>
       <Popover
@@ -1054,13 +1110,22 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
                 e.preventDefault();
               }
             }}
+            onKeyDown={(event) => {
+              // Enter commits on keydown, not keyup: inside a <form> the native
+              // implicit submit is the keydown's default action, so a keyup
+              // commit lands after the form already read the old value. Like
+              // AntD (rc-picker onSharedKeyDown), no preventDefault — the form
+              // still submits, now with the typed date.
+              if (!loading && event.key === "Enter") {
+                handleChangeInput(event.currentTarget.value);
+                setOpen(false);
+              }
+              onKeyDown?.(event);
+            }}
             onKeyUp={(event) => {
               event.stopPropagation();
               if (loading) return;
-              if (event.key === "Enter") {
-                handleChangeInput(event.currentTarget.value);
-                setOpen(false);
-              } else if (event.key === "Escape") {
+              if (event.key === "Escape") {
                 // Only trigger onChange if input is valid, otherwise just close
                 if (inputValue.trim()) {
                   const parsed = parseInputDate(inputValue, format);
@@ -1088,52 +1153,8 @@ const SingleDatePicker = (properties: DatePickerProperties) => {
               }
             }}
             onBlur={(e) => {
-              if (skipBlurCommitReference.current) {
-                skipBlurCommitReference.current = false;
-                return;
-              }
-
-              if (interactingInsidePanelReference.current) {
-                interactingInsidePanelReference.current = false;
-                return;
-              }
-
-              // Check if the focus is moving to an element within the calendar/popover
-              const relatedTarget = e.relatedTarget as HTMLElement | undefined;
-              const calendarContainer = document.querySelector(
-                '[data-slot="calendar"]',
-              );
-              const popoverContainer = document.querySelector(
-                '[data-slot="popover-content"]',
-              );
-
-              // If focus is moving to calendar or popover, don't close
-              if (
-                relatedTarget &&
-                (calendarContainer?.contains(relatedTarget) ||
-                  popoverContainer?.contains(relatedTarget) ||
-                  relatedTarget.closest('[data-slot="calendar"]') ||
-                  relatedTarget.closest('[data-slot="popover-content"]'))
-              ) {
-                return;
-              }
-
-              // Validate input on blur - if valid trigger onChange, otherwise revert to previous value
-              if (inputValue.trim()) {
-                const parsed = parseInputDate(inputValue, format);
-                if (parsed && isSelectableValue(parsed)) {
-                  setValue(parsed);
-                  setInputValue(formatValue(parsed));
-                } else {
-                  // Invalid input - revert to previous value
-                  setInputValue(value ? formatValue(value) : "");
-                }
-              } else {
-                // Empty input - trigger onChange with undefined
-                setValue(undefined);
-                setInputValue("");
-              }
-              setOpen(false);
+              commitInputOnBlur(e);
+              onBlur?.(e);
             }}
             {...rest}
           />

@@ -68,6 +68,14 @@ type DateRangePickerProperties = Omit<
   open?: boolean;
   /** Callback when the panel open state changes. */
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Runs after the picker's own blur commit, once focus leaves the picker (not
+   * when it hops between the start and end inputs). Field injects this to mark
+   * the field touched.
+   */
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  /** Runs after the picker's own Enter commit, on either input. */
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 
   placeholder?: [string, string];
 
@@ -99,6 +107,8 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
     showTime,
     open: openProperty,
     onOpenChange,
+    onBlur,
+    onKeyDown,
 
     style,
     classNames,
@@ -738,8 +748,12 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   setMonth(value[0].toDate());
                 }
               }}
-              onKeyUp={(event) => {
-                event.stopPropagation();
+              onKeyDown={(event) => {
+                // Enter commits on keydown, not keyup: inside a <form> the
+                // native implicit submit is the keydown's default action, so a
+                // keyup commit lands after the form already read the old range.
+                // Like AntD (rc-picker onSharedKeyDown), no preventDefault —
+                // the form still submits, now with the typed range.
                 if (event.key === "Enter") {
                   handleStartInputChange(event.currentTarget.value);
                   setActiveInput("end");
@@ -754,20 +768,31 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                     setMonth(previousMonth);
                   }
                   endInputReference.current?.focus();
-                } else if (event.key === "Escape") {
+                }
+                onKeyDown?.(event);
+              }}
+              onKeyUp={(event) => {
+                event.stopPropagation();
+                if (event.key === "Escape") {
                   setOpen(false);
                 }
               }}
               onChange={(event) => {
                 const newValue = event.currentTarget.value;
                 setStartInputValue(newValue);
-                if (parseInputDate(newValue, format)) {
-                  handleStartInputChange(newValue);
+                // Navigate the calendar to preview what's being typed, but do
+                // NOT commit yet — committing per keystroke re-formats the
+                // field and clobbers partial input (a relaxed parse turns "0"
+                // into a date). The value commits on blur / Enter.
+                const parsed = parseInputDate(newValue, format);
+                if (parsed && isSelectableValue(parsed, "start")) {
+                  setMonth(parsed.toDate());
                 }
               }}
               onBlur={(e) => {
-                const relatedTarget = e.relatedTarget as
-                  HTMLElement | undefined;
+                const relatedTarget = e.relatedTarget as HTMLElement | null;
+                const toEndInput =
+                  relatedTarget === endInputReference.current?.input;
                 const calendarContainer = document.querySelector(
                   '[data-slot="calendar"]',
                 );
@@ -780,12 +805,14 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   (calendarContainer?.contains(relatedTarget) ||
                     popoverContainer?.contains(relatedTarget) ||
                     relatedTarget.closest('[data-slot="calendar"]') ||
-                    relatedTarget.closest('[data-slot="popover-content"]') ||
-                    relatedTarget === endInputReference.current?.input)
+                    relatedTarget.closest('[data-slot="popover-content"]'))
                 ) {
                   return;
                 }
 
+                // Commit typed text even when hopping to the end input — with
+                // no per-keystroke commit, this is where it lands (AntD commits
+                // the part on blur too).
                 if (startInputValue.trim()) {
                   const parsed = parseInputDate(startInputValue, format);
                   if (parsed && isSelectableValue(parsed, "start")) {
@@ -798,6 +825,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                 } else {
                   setValue([null, value?.[1] ?? null]);
                 }
+                if (!toEndInput) onBlur?.(e);
               }}
             />
             {activeInput === "start" && (
@@ -879,25 +907,28 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   setMonth(previousMonth);
                 }
               }}
-              onKeyUp={(event) => {
-                event.stopPropagation();
+              onKeyDown={(event) => {
+                // Enter commits on keydown — see the start input.
                 if (event.key === "Enter") {
                   handleEndInputChange(event.currentTarget.value);
                   setOpen(false);
-                } else if (event.key === "Escape") {
+                }
+                onKeyDown?.(event);
+              }}
+              onKeyUp={(event) => {
+                event.stopPropagation();
+                if (event.key === "Escape") {
                   setOpen(false);
                 }
               }}
               onChange={(event) => {
-                const newValue = event.currentTarget.value;
-                setEndInputValue(newValue);
-                if (parseInputDate(newValue, format)) {
-                  handleEndInputChange(newValue);
-                }
+                // Preview only; commits on blur / Enter — see the start input.
+                setEndInputValue(event.currentTarget.value);
               }}
               onBlur={(e) => {
-                const relatedTarget = e.relatedTarget as
-                  HTMLElement | undefined;
+                const relatedTarget = e.relatedTarget as HTMLElement | null;
+                const toStartInput =
+                  relatedTarget === startInputReference.current?.input;
                 const calendarContainer = document.querySelector(
                   '[data-slot="calendar"]',
                 );
@@ -910,8 +941,7 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                   (calendarContainer?.contains(relatedTarget) ||
                     popoverContainer?.contains(relatedTarget) ||
                     relatedTarget.closest('[data-slot="calendar"]') ||
-                    relatedTarget.closest('[data-slot="popover-content"]') ||
-                    relatedTarget === startInputReference.current?.input)
+                    relatedTarget.closest('[data-slot="popover-content"]'))
                 ) {
                   return;
                 }
@@ -926,7 +956,10 @@ const DateRangePicker = (properties: DateRangePickerProperties) => {
                 } else {
                   setValue([value?.[0] ?? null, null]);
                 }
+                // Hopping back to the start input keeps the panel open.
+                if (toStartInput) return;
                 setOpen(false);
+                onBlur?.(e);
               }}
             />
             {activeInput === "end" && (
