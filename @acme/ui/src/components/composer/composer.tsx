@@ -160,6 +160,18 @@ export function Composer({
   const showMic = Boolean(dictation) && speech.supported;
   const isSmall = size === "small";
   const buttonSize = isSmall ? "icon-xs" : "icon-sm";
+  // The side controls sit in a box exactly as tall as the editor's last line
+  // plus its padding, and centre in it — so any control, whatever its size,
+  // lines up with the text. A bottom padding worked out for one size did not:
+  // the 24px "+" sat 4px under the line its 32px send button was tuned for,
+  // and on touch the text grows to 16px (24px lines) and both drifted.
+  // On touch the box also gets taller padding: a 41px field read as cramped
+  // on a phone, and a thumb wants more than that to aim at.
+  //   middle: py-2.5 → 20 + 21px line = 41px; touch py-3 → 24 + 24 = 48px
+  //   small:  py-1.5 → 12 + 21px line = 33px; touch py-2 → 16 + 24 = 40px
+  const lastLineBox = isSmall
+    ? "h-[33px] any-pointer-coarse:h-[40px]"
+    : "h-[41px] any-pointer-coarse:h-[48px]";
 
   // Sending ends the take: a mic left open would start filling the next
   // message with whatever is said while reading the reply.
@@ -202,8 +214,7 @@ export function Composer({
               data-slot="composer-leading"
               className={cn(
                 "flex shrink-0 items-center",
-                // Same last-line centring as the send button, see below.
-                "pb-[4.5px]",
+                lastLineBox,
                 isSmall ? "pl-1.5" : "pl-2",
               )}
             >
@@ -227,7 +238,9 @@ export function Composer({
               className={cn("max-h-64 min-h-0 sm:min-h-0", classNames?.editor)}
               classNames={{
                 content: cn(
-                  isSmall ? "px-2.5 py-1.5" : "px-3 py-2.5",
+                  isSmall
+                    ? "px-2.5 py-1.5 any-pointer-coarse:py-2"
+                    : "px-3 py-2.5 any-pointer-coarse:py-3",
                   // The editor spaces blocks like a document (0.375em above
                   // and below). Inside a box that pushed a one-line message
                   // up off the buttons' line; keep the spacing between blocks,
@@ -270,10 +283,8 @@ export function Composer({
           <div
             className={cn(
               "flex shrink-0 items-center gap-0.5",
-              // Centred on the last line of text: its middle sits the content
-              // padding plus half a 21px line above the bottom (16.5px small,
-              // 20.5px middle), minus half the 24px / 32px button.
-              isSmall ? "pr-1.5 pb-[4.5px]" : "pr-2 pb-[4.5px]",
+              lastLineBox,
+              isSmall ? "pr-1.5" : "pr-2",
             )}
           >
             {showMic && (
