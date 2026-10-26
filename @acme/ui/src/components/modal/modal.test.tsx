@@ -27,6 +27,25 @@ globalThis.ResizeObserver ??= class ResizeObserver {
 };
 
 describe("Modal", () => {
+  test("footer={null} renders no footer row, not an empty one", () => {
+    const { baseElement, rerender } = render(
+      <Modal open title="No footer" footer={null}>
+        Body
+      </Modal>,
+    );
+    expect(baseElement.querySelector('[data-slot="dialog-footer"]')).toBeNull();
+
+    // Without the prop, the default Cancel / Ok footer stays.
+    rerender(
+      <Modal open title="Default footer">
+        Body
+      </Modal>,
+    );
+    expect(
+      baseElement.querySelector('[data-slot="dialog-footer"]'),
+    ).not.toBeNull();
+  });
+
   test("applies a responsive max-width override when width is provided", () => {
     render(
       React.createElement(

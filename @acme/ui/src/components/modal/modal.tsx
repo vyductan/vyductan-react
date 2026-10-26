@@ -352,9 +352,14 @@ const Modal = ({
           />
         </div>
 
-        <DialogFooter className={cn("px-6", classNames?.footer)}>
-          {footerToRender}
-        </DialogFooter>
+        {/* `footer={null}` means no footer, as in AntD: not an empty one.
+            DialogContent is a gap-4 grid, so an empty DialogFooter is still
+            a row and left a blank band under the body. */}
+        {footerToRender === null || footerToRender === false ? null : (
+          <DialogFooter className={cn("px-6", classNames?.footer)}>
+            {footerToRender}
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
