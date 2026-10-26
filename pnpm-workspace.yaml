@@ -26,7 +26,7 @@ catalog:
   typescript: ^6.0.3
   usehooks-ts: ^3.1.1
   uuid: ^14.0.1
-  zod: 4.4.3
+  zod: 4.6.7
   "zustand": ^5.0.15
   "@excalidraw/excalidraw": ^0.18.1
   "lodash": ^4.18.1
@@ -45,17 +45,35 @@ catalogs:
   vite:
     "@tailwindcss/vite": ^4.3.3
     "@vitejs/plugin-react": ^6.0.5
-    vite: 8.2.1
+    vite: 8.2.4
   vitest:
-    "@vitest/browser-playwright": ^4.1.10
-    "@vitest/coverage-v8": ^4.1.10
-    "@vitest/ui": ^4.1.10
-    vitest: ^4.1.10
+    "@vitest/browser-playwright": ^4.1.12
+    "@vitest/coverage-v8": ^4.1.12
+    "@vitest/ui": ^4.1.12
+    vitest: ^4.1.12
 
 linkWorkspacePackages: true
 
 overrides:
   date-fns: ^4.4.0
+  # ONE copy of the focus trap, or nested modals fight each other.
+  #
+  # `focusScopesStack` in @radix-ui/react-focus-scope is MODULE-level state: a
+  # FocusScope pauses the one below it only when both live in the same module
+  # instance. Our Dialog comes from `radix-ui` (-> react-dialog 1.1.23 ->
+  # focus-scope 1.1.16) and our Drawer from `vaul` (-> react-dialog 1.1.15 ->
+  # focus-scope 1.1.7), so a Drawer opened from inside a Dialog registered in a
+  # DIFFERENT stack and never paused the Dialog's trap. The Dialog's `focusin`
+  # handler then yanked focus back out of the Drawer on every click, which made
+  # every text input in the Drawer impossible to focus -- the Assign Guide
+  # drawer opened from the Stock board's Tour Details modal, where the "Pick a
+  # guide" dropdown (a focus-triggered popover) therefore never opened.
+  #
+  # Pinning one version puts both dialogs back in a single stack, which is what
+  # Radix's nesting support assumes. Keep this in step with the version
+  # `radix-ui` resolves to; a split is silent and only shows up as a modal
+  # inside a modal losing focus.
+  "@radix-ui/react-focus-scope": 1.1.16
 
   # Security overrides. Everything below is a transitive dependency that its
   # parent pins to an exact vulnerable version, so `pnpm update` cannot reach
@@ -84,6 +102,42 @@ overrides:
   # GHSA-5qjj-4xww-7phc.
   valibot@<1.4.2: ">=1.4.2 <2"
 
+  # serve@14.2.6 (latest) pins `compression: 1.8.1` exactly. GHSA for the
+  # memory leak on premature response close; fixed in 1.8.2.
+  compression@<1.8.2: ">=1.8.2 <2"
+
+  # micromark-extension-math@3.1.0 (latest, under remark-math) asks katex
+  # ^0.16, and @excalidraw/mermaid-to-excalidraw pins mermaid 11.17.2, which
+  # asks ^0.16.47. No 0.16 patch exists; mermaid 12 already moved to ^0.18.
+  # Prototype-pollution read gadget, fixed in 0.18.2.
+  katex@<0.18.2: ">=0.18.2 <0.19"
+
+  # @tailwindcss/typography@0.5.20 (latest) pins `postcss-selector-parser:
+  # 6.0.10` exactly; the 6.x line has no fix. Quadratic flat-selector parsing,
+  # fixed in 7.1.6 (7 changed no API the plugin uses).
+  postcss-selector-parser@<7.1.6: ">=7.1.6 <8"
+
+  # kokoro-js@1.2.1 (latest) caps @huggingface/transformers at 3.x, which
+  # asks sharp ^0.34. Kokoro runs in the browser and never loads sharp.
+  # libvips/libheif/librsvg CVEs, fixed in 0.35.5.
+  sharp@<0.35.5: ">=0.35.5 <0.36"
+
+  # Same chain: transformers depends on onnxruntime-node, whose global-agent
+  # brings roarr -> sprintf-js (unbounded-precision DoS, no fix released).
+  # Kokoro only uses onnxruntime-web in a Web Worker, and the Node binary was
+  # never built (allowBuilds below), so the package is removed outright.
+  onnxruntime-node: "-"
+
+  # @vercel/oidc (under @vercel/blob and the AI SDK) depends on
+  # @vercel/cli-config, which pins `zod: 4.1.11` exactly, up to 0.3.3 (latest).
+  # Memory exhaustion on oversized constrained collections. GHSA-mrhx-c7xc-m3w5.
+  zod@<4.6.6: ">=4.6.6 <5"
+
+  # @lexical/headless@0.49.0 asks happy-dom ^20.9.0 (0.52.0, latest, still
+  # does); the 20.x line has no fix. Import-alias code execution, fixed in
+  # 21.0.4. GHSA-834v-8h66-3h79.
+  happy-dom@>=17.0.0 <21.0.4: ">=21.0.4 <22"
+
 allowBuilds:
   "@swc/core": true
   "@tailwindcss/oxide": true
@@ -91,6 +145,9 @@ allowBuilds:
   core-js: true
   core-js-pure: true
   esbuild: true
+  # kokoro-js pulls it in via @huggingface/transformers; the app only runs
+  # Kokoro in the browser (onnxruntime-web), so the Node binary is not needed.
+  onnxruntime-node: false
   protobufjs: true
   sharp: true
   supabase: true
