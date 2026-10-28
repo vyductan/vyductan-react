@@ -414,3 +414,42 @@ test("Backspace on a to-do made by Enter and Tab keeps its indent", async () => 
     ]),
   );
 });
+
+/**
+ * Under an indented to-do a bullet is nested two levels, in holders only —
+ * no item above it at either: still the first level of bullets, a filled
+ * dot, as in Notion. It came out a circle.
+ */
+test("a bullet under an indented to-do is a filled dot too", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent(
+          "- [ ] a\n\t- [ ] b\n\t\t- c\n\t\t\t- d\n\t\t- [ ] e\n\t\t\t- f",
+        ),
+      ),
+    ),
+  );
+
+  const marker = (text: string) =>
+    getComputedStyle(
+      [...document.querySelectorAll("li")].find(
+        (item) => !item.querySelector("ul, ol") && item.textContent === text,
+      )!,
+    ).listStyleType;
+  await waitFor(() =>
+    expect(["c", "d", "f"].map(marker)).toStrictEqual([
+      "disc",
+      "circle",
+      "disc",
+    ]),
+  );
+});

@@ -130,11 +130,13 @@ export const richTextSemanticContract = {
     // A holder first in a top-level list has no item above it — a published
     // page folds every other holder into the item before it — so the list in
     // it is only indented, as one typed under a to-do is. It stays the first
-    // level, and the one nested in it the second.
+    // level, and the one nested in it the second. So too two or three holders
+    // deep, as under an indented to-do.
     ol: cn(
       "my-1 ml-6 list-decimal [&>li]:mt-1",
       "[ol_&]:list-[lower-alpha] [ol_ol_&]:list-[lower-roman] [ol_ol_ol_&]:list-decimal",
       "[:not(li)>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol_&]:list-[lower-alpha]",
+      "[:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal",
     ),
     // The marker comes from the rules above, so depth sets only the position.
     olDepth: ["list-outside"],
@@ -142,6 +144,7 @@ export const richTextSemanticContract = {
       "my-1 ml-6 list-disc [&>li]:mt-1",
       "[ul_&]:list-[circle] [ul_ul_&]:list-[square] [ul_ul_ul_&]:list-disc",
       "[:not(li)>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul_&]:list-[circle]",
+      "[:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc",
     ),
     ulDepth: ["list-outside"],
   },
