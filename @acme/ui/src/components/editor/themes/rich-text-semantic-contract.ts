@@ -131,12 +131,15 @@ export const richTextSemanticContract = {
     // page folds every other holder into the item before it — so the list in
     // it is only indented, as one typed under a to-do is. It stays the first
     // level, and the one nested in it the second. So too two or three holders
-    // deep, as under an indented to-do.
+    // deep, as under an indented to-do. Such a list steps in as a to-do does
+    // (40px a level, not a nested list's 24), so its text lines up with a
+    // to-do's at the same level.
     ol: cn(
       "my-1 ml-6 list-decimal [&>li]:mt-1",
       "[ol_&]:list-[lower-alpha] [ol_ol_&]:list-[lower-roman] [ol_ol_ol_&]:list-decimal",
       "[:not(li)>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol_&]:list-[lower-alpha]",
       "[:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal",
+      "[:not(li)>ol>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10",
     ),
     // The marker comes from the rules above, so depth sets only the position.
     olDepth: ["list-outside"],
@@ -145,6 +148,7 @@ export const richTextSemanticContract = {
       "[ul_&]:list-[circle] [ul_ul_&]:list-[square] [ul_ul_ul_&]:list-disc",
       "[:not(li)>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul_&]:list-[circle]",
       "[:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc",
+      "[:not(li)>ul>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10",
     ),
     ulDepth: ["list-outside"],
   },

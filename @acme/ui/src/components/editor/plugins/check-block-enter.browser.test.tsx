@@ -453,3 +453,42 @@ test("a bullet under an indented to-do is a filled dot too", async () => {
     ]),
   );
 });
+
+/**
+ * A bullet under a to-do sits where a to-do at its level would: its text
+ * lined up with that to-do's text, as in Notion. Nested only by holders, it
+ * stepped in 24px a level where to-dos step 40, and fell further out the
+ * deeper it went.
+ */
+test("a bullet under a to-do lines up with a to-do at its level", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent(
+          "- [ ] a\n\t- one\n\t- [ ] two\n\t\t- three\n\t\t- [ ] four",
+        ),
+      ),
+    ),
+  );
+
+  const left = (text: string) => {
+    const range = document.createRange();
+    const node = [...document.querySelectorAll("[contenteditable] *")]
+      .flatMap((element) => [...element.childNodes])
+      .find((child) => child.nodeType === 3 && child.textContent === text)!;
+    range.selectNodeContents(node);
+    return Math.round(range.getBoundingClientRect().left);
+  };
+  await waitFor(() => {
+    expect(left("one")).toBe(left("two"));
+    expect(left("three")).toBe(left("four"));
+  });
+});
