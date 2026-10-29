@@ -120,6 +120,7 @@ export function cleanCopiedHtml(html: string): string {
   }
   body.normalize();
 
+  foldNestedLists(doc);
   toTaskLists(doc);
   cellListsAsText(doc);
 
@@ -137,6 +138,27 @@ export function cleanCopiedHtml(html: string): string {
   }
 
   return body.innerHTML;
+}
+
+/**
+ * Nested lists inside their parent item, as HTML nests them. Lexical keeps a
+ * nested list in an item of its own after its parent; Notion took that item
+ * for an empty one, and each nested list came in under an extra empty item,
+ * a level off. One with no item before it (a list under a to-do) stays.
+ */
+function foldNestedLists(doc: Document) {
+  const isList = (node: Node) =>
+    node instanceof Element && (node.tagName === "UL" || node.tagName === "OL");
+  for (const holder of doc.body.querySelectorAll("li")) {
+    const children = [...holder.childNodes].filter(
+      (child) => !(child.nodeType === 3 && child.textContent?.trim() === ""),
+    );
+    if (children.length === 0 || !children.every(isList)) continue;
+    const parent = holder.previousElementSibling;
+    if (parent?.tagName !== "LI") continue;
+    parent.append(...children);
+    holder.remove();
+  }
 }
 
 /**

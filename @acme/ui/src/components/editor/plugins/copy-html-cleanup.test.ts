@@ -172,3 +172,34 @@ describe("cleanCopiedHtml, lists in table cells", () => {
     expect(body.innerHTML).toBe("<ul><li>a</li></ul>");
   });
 });
+
+/**
+ * Lexical keeps a nested list in an item of its own after its parent item.
+ * Notion (and HTML) take that item for an empty one: pasted, each nested
+ * list came in under an extra empty "List" item, a level off. Nested lists
+ * go out inside their parent item, as HTML nests them.
+ */
+describe("cleanCopiedHtml, nested lists", () => {
+  test("a nested list goes into the item before it", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        "<ol><li>Khách</li><li><ul><li>Nguy cơ</li><li>Giải pháp</li><li><ul><li></li><li>Nếu không</li></ul></li><li>Dùng Cron</li></ul></li></ol>",
+      ),
+    );
+
+    expect(body.innerHTML).toBe(
+      "<ol><li>Khách<ul><li>Nguy cơ</li><li>Giải pháp<ul><li></li><li>Nếu không</li></ul></li><li>Dùng Cron</li></ul></li></ol>",
+    );
+  });
+
+  /** With no item before it — a list under a to-do — it stays as it is. */
+  test("a nested list first in its list stays", () => {
+    const body = parse(
+      cleanCopiedHtml("<ul><li><ul><li>a</li></ul></li><li>b</li></ul>"),
+    );
+
+    expect(body.innerHTML).toBe(
+      "<ul><li><ul><li>a</li></ul></li><li>b</li></ul>",
+    );
+  });
+});
