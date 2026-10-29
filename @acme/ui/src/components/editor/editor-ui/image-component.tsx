@@ -562,9 +562,9 @@ export default function ImageComponent({
                     className={`h-auto w-full max-w-full cursor-default object-contain ${
                       loading ? "opacity-90" : ""
                     } ${
-                      isFocused
-                        ? `${$isNodeSelection(selection) ? "draggable cursor-grab active:cursor-grabbing" : ""} focused ring-2 ring-primary ring-offset-2`
-                        : null
+                      isFocused && $isNodeSelection(selection)
+                        ? "draggable cursor-grab active:cursor-grabbing"
+                        : ""
                     }`}
                     src={src}
                     altText={altText}
@@ -577,6 +577,14 @@ export default function ImageComponent({
                     onDoubleClick={() => setIsPreviewOpen(true)}
                   />
                 </ImageErrorBoundary>
+                {/* Selected, the image takes the blue of a selected block, as
+                    in Notion. A ring around it was clipped by the frame. */}
+                {isFocused && !loading && (
+                  <div
+                    data-slot="image-selected"
+                    className="pointer-events-none absolute inset-0 rounded-sm bg-[rgb(35_131_226/0.14)]"
+                  />
+                )}
               </div>
             )}
           </div>
