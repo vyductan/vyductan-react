@@ -6,6 +6,7 @@ import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 
 import type { SizeType } from "../config-provider/size-context";
+import type { ImageDownloadFn as ImageDownloadFunction } from "./context/image-download-context";
 import type { ImageResolverFn as ImageResolverFunction } from "./context/image-resolver-context";
 import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "./plugins/page-link-hover-card-plugin";
@@ -47,6 +48,8 @@ type EditorPropertiesBase = {
   editable?: boolean;
   resolveImage?: ImageResolverFunction;
   onImageUpload?: (file: File) => Promise<string>;
+  /** Saves an image for the image toolbar's Download; the page's own download otherwise. */
+  onImageDownload?: ImageDownloadFunction;
   onStatsChange?: (stats: {
     wordCount: number;
     characterCount: number;
@@ -166,6 +169,7 @@ export function Editor({
   editable = true,
   resolveImage,
   onImageUpload,
+  onImageDownload,
   onStatsChange,
   format = "json",
   variant = "default",
@@ -209,7 +213,10 @@ export function Editor({
         editable,
       }}
     >
-      <EditorProviders resolveImage={resolveImage}>
+      <EditorProviders
+        resolveImage={resolveImage}
+        downloadImage={onImageDownload}
+      >
         <EditorColorPaletteContext.Provider
           value={colorPalette ?? configuredPalette ?? "free"}
         >

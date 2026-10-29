@@ -45,6 +45,7 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 
+import { useImageDownload } from "../context/image-download-context";
 import {
   clearImageCache,
   useSuspenseImage,
@@ -467,16 +468,23 @@ export default function ImageComponent({
     }
   }, [src]);
 
+  const downloadImage = useImageDownload();
   const handleDownload = useCallback(() => {
+    if (downloadImage) {
+      downloadImage(src, altText);
+      return;
+    }
     const link = document.createElement("a");
     link.href = src;
     link.download = altText || "image";
     link.click();
-  }, [src, altText]);
+  }, [downloadImage, src, altText]);
 
+  // Shows the caption, or goes to it when it is there already.
   const handleCaptionToggle = useCallback(() => {
     setShowCaption();
-  }, [setShowCaption]);
+    setTimeout(() => caption.focus(), 0);
+  }, [setShowCaption, caption]);
 
   const handleDelete = useCallback(() => {
     editor.update(() => {
@@ -591,7 +599,12 @@ export default function ImageComponent({
           </div>
 
           {showCaption && (
-            <div className="image-caption-container absolute right-0 bottom-1 left-0 m-0 block min-w-[100px] overflow-hidden border-t bg-popover/90 p-0 text-popover-foreground">
+            // Under the image, as in Notion: laid over it, it hid the
+            // picture's bottom.
+            <div
+              data-slot="image-caption"
+              className="image-caption-container block min-w-[100px] text-muted-foreground"
+            >
               <LexicalNestedComposer initialEditor={caption}>
                 <AutoFocusPlugin />
                 <MentionsPlugin />
@@ -603,9 +616,9 @@ export default function ImageComponent({
                 <RichTextPlugin
                   contentEditable={
                     <ContentEditable
-                      className="ImageNode__contentEditable user-select-text word-break-break-word relative block min-h-5 w-[calc(100%-20px)] cursor-text resize-none border-0 p-2.5 text-sm whitespace-pre-wrap caret-primary outline-none"
-                      placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground overflow-hidden absolute top-2.5 left-2.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
-                      placeholder="Enter a caption..."
+                      className="ImageNode__contentEditable user-select-text word-break-break-word relative block min-h-5 w-full cursor-text resize-none border-0 px-0.5 pt-1.5 pb-1 text-sm whitespace-pre-wrap caret-primary outline-none"
+                      placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground/60 overflow-hidden absolute top-1.5 left-0.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
+                      placeholder="Write a caption..."
                     />
                   }
                   ErrorBoundary={LexicalErrorBoundary}
@@ -619,11 +632,7 @@ export default function ImageComponent({
             !loading &&
             !isLoadError && (
               <ImageToolbar
-                onCaption={
-                  captionsEnabled && !showCaption
-                    ? handleCaptionToggle
-                    : undefined
-                }
+                onCaption={captionsEnabled ? handleCaptionToggle : undefined}
                 onZoom={() => setIsPreviewOpen(true)}
                 onDownload={handleDownload}
                 onMore={(position) =>
@@ -641,7 +650,8 @@ export default function ImageComponent({
               maxWidth={maxWidth}
               onResizeStart={onResizeStart}
               onResizeEnd={onResizeEnd}
-              captionsEnabled={!isLoadError && captionsEnabled}
+              // The toolbar's Caption takes its place.
+              captionsEnabled={false}
             />
           )}
         </div>

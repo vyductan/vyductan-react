@@ -24,6 +24,7 @@ import { HashtagNode } from "@lexical/hashtag";
 import { LinkNode } from "@lexical/link";
 import {
   $applyNodeReplacement,
+  $getRoot,
   createEditor,
   DecoratorNode,
   LineBreakNode,
@@ -202,7 +203,9 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
           KeywordNode,
         ],
       });
-    this.__captionsEnabled = !!captionsEnabled;
+    // Captions are kept in markdown as the image's title, so every image
+    // can take one, as in Notion.
+    this.__captionsEnabled = captionsEnabled ?? true;
   }
 
   exportJSON(): SerializedImageNode {
@@ -237,6 +240,53 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   setSrc(source: string): void {
     const writable = this.getWritable();
     writable.__src = source;
+  }
+
+  /** The caption's words, its formatting aside. */
+  getCaptionText(): string {
+    return this.__caption
+      .getEditorState()
+      .read(() => $getRoot().getTextContent());
+  }
+
+  /** Shows the caption with these words, as read back from a file. */
+  setCaptionText(text: string): void {
+    const writable = this.getWritable();
+    writable.__showCaption = true;
+    const caption = writable.__caption;
+    caption.setEditorState(
+      caption.parseEditorState({
+        root: {
+          type: "root",
+          version: 1,
+          direction: null,
+          format: "",
+          indent: 0,
+          children: [
+            {
+              type: "paragraph",
+              version: 1,
+              direction: null,
+              format: "",
+              indent: 0,
+              textFormat: 0,
+              textStyle: "",
+              children: [
+                {
+                  type: "text",
+                  version: 1,
+                  text,
+                  detail: 0,
+                  format: 0,
+                  mode: "normal",
+                  style: "",
+                },
+              ],
+            },
+          ],
+        },
+      } as unknown as Parameters<LexicalEditor["parseEditorState"]>[0]),
+    );
   }
 
   setLoading(loading: boolean): void {

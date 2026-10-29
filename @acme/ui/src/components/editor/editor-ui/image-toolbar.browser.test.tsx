@@ -3,7 +3,7 @@ import * as React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor, within } from "@testing-library/react";
 import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
-import { afterEach, expect, test } from "vitest";
+import { afterEach, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
@@ -37,11 +37,17 @@ afterEach(() => {
 const PIXEL =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
 
-async function renderWithImage({ captionsEnabled = false } = {}) {
+async function renderWithImage({
+  captionsEnabled,
+  onImageDownload,
+}: {
+  captionsEnabled?: boolean;
+  onImageDownload?: (source: string, name: string) => void;
+} = {}) {
   let editor: LexicalEditor | null = null;
   render(
     <div style={{ width: 720, padding: 40 }}>
-      <Editor autoFocus={false}>
+      <Editor autoFocus={false} onImageDownload={onImageDownload}>
         <EditorRefPlugin onReady={(next) => (editor = next)} />
       </Editor>
     </div>,
@@ -99,7 +105,7 @@ test("hovering an image shows its toolbar at the top right", async () => {
 
   const bar = await openToolbar(image);
 
-  for (const name of ["Zoom", "Download", "More"]) {
+  for (const name of ["Caption", "Zoom", "Download", "More"]) {
     expect(within(bar).getByRole("button", { name })).toBeTruthy();
   }
   const box = bar.getBoundingClientRect();
@@ -122,12 +128,8 @@ test("the toolbar goes when the pointer leaves the image", async () => {
   await waitFor(() => expect(toolbar()).toBeNull());
 });
 
-/**
- * Markdown has no place for a caption (`![alt](src)`), so an image whose
- * captions are off offers none: typed, it would be lost on save.
- */
-test("an image without captions offers no Caption", async () => {
-  const { image } = await renderWithImage();
+test("an image whose captions are off offers no Caption", async () => {
+  const { image } = await renderWithImage({ captionsEnabled: false });
 
   const bar = await openToolbar(image);
 
@@ -178,4 +180,19 @@ test("More opens the image menu under the button", async () => {
   expect(menu.getBoundingClientRect().top).toBeGreaterThan(
     more.getBoundingClientRect().bottom - 1,
   );
+});
+
+/**
+ * A VS Code webview shows the save dialog for a page's download and writes
+ * nothing; the host is handed the image to save instead.
+ */
+test("Download hands the image to the host when it saves images", async () => {
+  const onImageDownload = vi.fn();
+  const { image } = await renderWithImage({ onImageDownload });
+
+  await userEvent.click(
+    within(await openToolbar(image)).getByRole("button", { name: "Download" }),
+  );
+
+  expect(onImageDownload).toHaveBeenCalledWith(PIXEL, "pic");
 });
