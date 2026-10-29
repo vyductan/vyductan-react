@@ -192,6 +192,24 @@ describe("cleanCopiedHtml, nested lists", () => {
     );
   });
 
+  /**
+   * Bullets under a numbered item are a list of their own after it, opening
+   * with a holder: as copied from the editor. They go into the numbered
+   * item, as Notion nests them; pasted as they were, Notion made an empty
+   * bullet of the holder.
+   */
+  test("a nested list opening the next list goes into the item before", () => {
+    const body = parse(
+      cleanCopiedHtml(
+        '<ol><li value="1">Khách</li></ol><ul><li value="1"><ul><li value="1">Nguy cơ</li><li value="2">Giải pháp<ul><li value="1">Nếu giữ</li></ul></li><li value="3">Dùng Cron</li></ul></li></ul>',
+      ),
+    );
+
+    expect(body.innerHTML).toBe(
+      '<ol><li value="1">Khách<ul><li value="1">Nguy cơ</li><li value="2">Giải pháp<ul><li value="1">Nếu giữ</li></ul></li><li value="3">Dùng Cron</li></ul></li></ol>',
+    );
+  });
+
   /** With no item before it — a list under a to-do — it stays as it is. */
   test("a nested list first in its list stays", () => {
     const body = parse(

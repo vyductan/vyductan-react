@@ -142,7 +142,8 @@ export function cleanCopiedHtml(html: string): string {
 
 /**
  * Nested lists inside their parent item, as HTML nests them. Lexical keeps a
- * nested list in an item of its own after its parent; Notion took that item
+ * nested list in an item of its own after its parent (bullets under a
+ * numbered item: in a list of their own after it); Notion took that item
  * for an empty one, and each nested list came in under an extra empty item,
  * a level off. One with no item before it (a list under a to-do) stays.
  */
@@ -154,11 +155,29 @@ function foldNestedLists(doc: Document) {
       (child) => !(child.nodeType === 3 && child.textContent?.trim() === ""),
     );
     if (children.length === 0 || !children.every(isList)) continue;
-    const parent = holder.previousElementSibling;
-    if (parent?.tagName !== "LI") continue;
+    const parent = itemBefore(holder);
+    if (!parent) continue;
+    const list = holder.parentElement;
     parent.append(...children);
     holder.remove();
+    if (list && list.children.length === 0) list.remove();
   }
+}
+
+/**
+ * The item a holder's list belongs under: the item before it, or — when it
+ * opens its list, as bullets under a numbered item do (a list of their own,
+ * of another kind) — the last item of the list just before. None for a list
+ * under a to-do or a paragraph.
+ */
+function itemBefore(holder: Element): Element | null {
+  const before = holder.previousElementSibling;
+  if (before) return before.tagName === "LI" ? before : null;
+  const list = holder.parentElement;
+  const listBefore = list?.previousElementSibling;
+  if (!listBefore || !/^(UL|OL)$/.test(listBefore.tagName)) return null;
+  const last = listBefore.lastElementChild;
+  return last?.tagName === "LI" ? last : null;
 }
 
 /**
