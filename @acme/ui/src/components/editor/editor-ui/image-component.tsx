@@ -52,6 +52,7 @@ import {
 import { ContentEditable } from "../editor-ui/content-editable";
 import { ImageContextMenu } from "../editor-ui/image-context-menu";
 import { ImageResizer } from "../editor-ui/image-resizer";
+import { ImageToolbar } from "../editor-ui/image-toolbar";
 import { $isImageNode } from "../nodes/image-node";
 // import brokenImage from '../images/image-broken.svg';
 import { EmojisPlugin } from "../plugins/emojis-plugin";
@@ -612,6 +613,24 @@ export default function ImageComponent({
               </LexicalNestedComposer>
             </div>
           )}
+          {isEditable &&
+            (isFocused || isHovering) &&
+            !isResizing &&
+            !loading &&
+            !isLoadError && (
+              <ImageToolbar
+                onCaption={
+                  captionsEnabled && !showCaption
+                    ? handleCaptionToggle
+                    : undefined
+                }
+                onZoom={() => setIsPreviewOpen(true)}
+                onDownload={handleDownload}
+                onMore={(position) =>
+                  setContextMenu({ isOpen: true, position })
+                }
+              />
+            )}
           {resizable && isEditable && (isFocused || isHovering) && (
             <ImageResizer
               showCaption={showCaption}
