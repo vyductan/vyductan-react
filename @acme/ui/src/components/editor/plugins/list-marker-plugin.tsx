@@ -9,6 +9,7 @@ import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
   $setState,
   COMMAND_PRIORITY_LOW,
   KEY_BACKSPACE_COMMAND,
@@ -102,14 +103,27 @@ export function ListMarkerPlugin(): null {
             if (!$isListItemNode(item) || $isNestedListHolder(item))
               return false;
             if ($isUnmarkedItem(item)) {
-              // An empty one goes, as in Notion: Enter then Backspace twice
-              // is back where it was. Taken out of the list instead, it cut
-              // the list in two and put the items after it a level off.
+              // Its words join the line above, as in Notion — an empty one
+              // simply goes: Enter then Backspace twice is back where it was.
+              // Taken out of the list instead, it cut the list in two and
+              // put the items after it a level off.
               const above = $lineAbove(item);
-              if (item.getTextContentSize() > 0 || !above) return false;
+              if (!above) return false;
+              const first = item.getFirstDescendant();
+              const atStart =
+                anchorNode.is(item) || (first !== null && anchorNode.is(first));
+              if (!atStart) return false;
               event?.preventDefault();
+              const end = above.getLastDescendant();
+              const endOffset = $isTextNode(end) ? end.getTextContentSize() : 0;
+              const childrenBefore = above.getChildrenSize();
+              above.append(...item.getChildren());
               item.remove();
-              above.selectEnd();
+              if ($isTextNode(end) && end.isAttached()) {
+                end.select(endOffset, endOffset);
+              } else {
+                above.select(childrenBefore, childrenBefore);
+              }
               return true;
             }
             const list = item.getParent();

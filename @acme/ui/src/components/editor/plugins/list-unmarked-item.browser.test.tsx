@@ -149,7 +149,12 @@ test("Backspace in the middle of an item still deletes a character", async () =>
   );
 });
 
-test("Backspace again on an unmarked line takes it out of the list", async () => {
+/**
+ * As in Notion: Backspace again at the start of an unmarked line joins its
+ * words to the line above. It took the line out of the list, cutting the
+ * list in two.
+ */
+test("Backspace again on an unmarked line joins it to the line above", async () => {
   const editor = await renderList();
   await caretIn(editor, "bb", 0);
   await userEvent.keyboard("{Backspace}");
@@ -158,16 +163,19 @@ test("Backspace again on an unmarked line takes it out of the list", async () =>
   await userEvent.keyboard("{Backspace}");
 
   await waitFor(() =>
-    expect(
-      editor.getEditorState().read(() =>
-        $getRoot()
-          .getAllTextNodes()
-          .find((node) => node.getTextContent().includes("bb"))
-          ?.getParent()
-          ?.getType(),
-      ),
-    ).not.toBe("listitem"),
+    expect(markers()).toEqual([
+      { text: "aabb", marker: "1" },
+      { text: "cc", marker: "2" },
+    ]),
   );
+  expect(
+    editor.getEditorState().read(() => {
+      const selection = $getSelection();
+      return $isRangeSelection(selection)
+        ? `${selection.anchor.getNode().getTextContent()}@${selection.anchor.offset}`
+        : null;
+    }),
+  ).toBe("aabb@2");
 });
 
 test("the published view hides the marker and numbers the same way", async () => {
@@ -345,4 +353,39 @@ test("Backspace on an empty unmarked line removes it, the list as it was", async
         : null;
     }),
   ).toBe(`Nếu giữ chỗ:@${"Nếu giữ chỗ:".length}`);
+});
+
+/** Nested: the words go up to the nested line above, the list as it was. */
+test("an unmarked nested line joins the nested line above", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent(
+          ["- Giải pháp", "\t- Nếu giữ chỗ:", "\t- c", "\t- Nếu không"].join(
+            "\n",
+          ),
+        ),
+      ),
+    ),
+  );
+
+  await caretIn(live, "c", 0);
+  await userEvent.keyboard("{Backspace}");
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(
+      live
+        .getEditorState()
+        .read(() => $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS)),
+    ).toBe(["- Giải pháp", "\t- Nếu giữ chỗ:c", "\t- Nếu không"].join("\n")),
+  );
 });
