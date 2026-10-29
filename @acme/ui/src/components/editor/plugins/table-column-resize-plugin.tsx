@@ -265,9 +265,22 @@ function TableColumnResizeInner({
     document.addEventListener("mousemove", handleMouseMove, { passive: true });
     editorRoot?.addEventListener("mouseleave", handleMouseLeave);
 
+    // The handle is placed where the boundary was when the pointer came to
+    // it. Typing in a cell moves the boundary, and the handle stayed behind —
+    // a line through the words. As in Notion, an edit puts it away; the next
+    // mousemove brings it back where the boundary now is.
+    const removeUpdateListener = editor.registerUpdateListener(
+      ({ dirtyElements, dirtyLeaves }) => {
+        if (dragReference.current) return;
+        if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+        setGrabber(null);
+      },
+    );
+
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       editorRoot?.removeEventListener("mouseleave", handleMouseLeave);
+      removeUpdateListener();
     };
   }, [editor]);
 
