@@ -122,7 +122,6 @@ export function cleanCopiedHtml(html: string): string {
 
   foldNestedLists(doc);
   toTaskLists(doc);
-  cellListsAsText(doc);
 
   // A quote's text in a paragraph, as markdown renders it.
   for (const quote of body.querySelectorAll("blockquote")) {
@@ -212,51 +211,6 @@ function toTaskLists(doc: Document) {
   }
   for (const list of doc.body.querySelectorAll("ul[data-task-list]")) {
     list.removeAttribute("data-task-list");
-  }
-}
-
-/**
- * Lists in table cells as lines of text — `• a<br>• b`, `1. a<br>2. b` — the
- * way Notion writes a list in a cell (and this editor's markdown does): a
- * simple table in Notion holds no lists, and a <ul> in a cell went in as
- * text indented one way or another, cell by cell. A nested item is indented
- * by non-breaking spaces under its item.
- */
-function cellListsAsText(doc: Document) {
-  const lists = [...doc.body.querySelectorAll("td, th")].flatMap((cell) =>
-    [...cell.querySelectorAll(":scope ul, :scope ol")].filter(
-      (list) => list.parentElement?.closest("ul, ol, td, th") === cell,
-    ),
-  );
-  for (const list of lists) {
-    const lines: Node[][] = [];
-    const walk = (current: Element, depth: number) => {
-      let number = Number(current.getAttribute("start") ?? 1);
-      for (const item of current.children) {
-        if (item.tagName !== "LI") continue;
-        const own = [...item.childNodes].filter(
-          (child) =>
-            !(child instanceof Element && /^(UL|OL)$/.test(child.tagName)),
-        );
-        if (own.some((child) => child.textContent?.trim())) {
-          const marker = current.tagName === "OL" ? `${number++}. ` : "• ";
-          lines.push([
-            doc.createTextNode("\u00A0".repeat(depth * 4) + marker),
-            ...own,
-          ]);
-        }
-        for (const nested of item.querySelectorAll(
-          ":scope > ul, :scope > ol",
-        )) {
-          walk(nested, depth + 1);
-        }
-      }
-    };
-    walk(list, 0);
-    const replacement = lines.flatMap((line, index) =>
-      index === 0 ? line : [doc.createElement("br"), ...line],
-    );
-    list.replaceWith(...replacement);
   }
 }
 
