@@ -1,9 +1,11 @@
 "use client";
 
 import type { ListItemNode } from "@lexical/list";
+import type { LexicalEditor } from "lexical";
 import { useEffect } from "react";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode } from "@lexical/table";
 import { $dfs, $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
   $getRoot,
@@ -12,7 +14,9 @@ import {
   $isTextNode,
   $setState,
   COMMAND_PRIORITY_LOW,
+  INDENT_CONTENT_COMMAND,
   KEY_BACKSPACE_COMMAND,
+  OUTDENT_CONTENT_COMMAND,
 } from "lexical";
 
 import {
@@ -81,104 +85,131 @@ function $lineAbove(item: ListItemNode): ListItemNode | null {
   return $isListItemNode(above) ? above : null;
 }
 
+function tabInCellList(editor: LexicalEditor, event: KeyboardEvent) {
+  if (event.key !== "Tab" || event.metaKey || event.ctrlKey || event.altKey)
+    return;
+  const inCellList = editor.read(() => {
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return false;
+    const node = selection.anchor.getNode();
+    const item = $isListItemNode(node)
+      ? node
+      : $findMatchingParent(node, $isListItemNode);
+    return (
+      $isListItemNode(item) &&
+      $findMatchingParent(item, $isTableCellNode) !== null
+    );
+  });
+  if (!inCellList) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  editor.dispatchCommand(
+    event.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND,
+    undefined,
+  );
+}
+
 export function ListMarkerPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(
-    () =>
-      mergeRegister(
-        editor.registerCommand(
-          KEY_BACKSPACE_COMMAND,
-          (event) => {
-            const selection = $getSelection();
-            if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-              return false;
-            }
-            const { anchor } = selection;
-            if (anchor.offset !== 0) return false;
-            const anchorNode = anchor.getNode();
-            const item = $isListItemNode(anchorNode)
-              ? anchorNode
-              : $findMatchingParent(anchorNode, $isListItemNode);
-            if (!$isListItemNode(item) || $isNestedListHolder(item))
-              return false;
-            if ($isUnmarkedItem(item)) {
-              // Its words join the line above, as in Notion — an empty one
-              // simply goes: Enter then Backspace twice is back where it was.
-              // Taken out of the list instead, it cut the list in two and
-              // put the items after it a level off.
-              const above = $lineAbove(item);
-              if (!above) return false;
-              const first = item.getFirstDescendant();
-              const atStart =
-                anchorNode.is(item) || (first !== null && anchorNode.is(first));
-              if (!atStart) return false;
-              event?.preventDefault();
-              const end = above.getLastDescendant();
-              const endOffset = $isTextNode(end) ? end.getTextContentSize() : 0;
-              const childrenBefore = above.getChildrenSize();
-              above.append(...item.getChildren());
-              item.remove();
-              if ($isTextNode(end) && end.isAttached()) {
-                end.select(endOffset, endOffset);
-              } else {
-                above.select(childrenBefore, childrenBefore);
-              }
-              return true;
-            }
-            const list = item.getParent();
-            if (!$isListNode(list) || list.getListType() === "check") {
-              return false;
-            }
-            // Only at the very start of the item's text.
+  useEffect(() => {
+    const onTabInCellList = (event: KeyboardEvent) =>
+      tabInCellList(editor, event);
+    return mergeRegister(
+      // As in Notion: in a list in a table cell, Tab nests the item and
+      // Shift+Tab takes it back out. The table's own Tab (to the next
+      // cell) runs first in Lexical, so this listens ahead of it, on the
+      // root in the capture phase; anywhere else Tab is left to it.
+      editor.registerRootListener((root, previous) => {
+        previous?.removeEventListener("keydown", onTabInCellList, true);
+        root?.addEventListener("keydown", onTabInCellList, true);
+      }),
+      editor.registerCommand(
+        KEY_BACKSPACE_COMMAND,
+        (event) => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+            return false;
+          }
+          const { anchor } = selection;
+          if (anchor.offset !== 0) return false;
+          const anchorNode = anchor.getNode();
+          const item = $isListItemNode(anchorNode)
+            ? anchorNode
+            : $findMatchingParent(anchorNode, $isListItemNode);
+          if (!$isListItemNode(item) || $isNestedListHolder(item)) return false;
+          if ($isUnmarkedItem(item)) {
+            // Its words join the line above, as in Notion — an empty one
+            // simply goes: Enter then Backspace twice is back where it was.
+            // Taken out of the list instead, it cut the list in two and
+            // put the items after it a level off.
+            const above = $lineAbove(item);
+            if (!above) return false;
             const first = item.getFirstDescendant();
             const atStart =
               anchorNode.is(item) || (first !== null && anchorNode.is(first));
             if (!atStart) return false;
-
             event?.preventDefault();
-            $setState(item, unmarkedState, true);
+            const end = above.getLastDescendant();
+            const endOffset = $isTextNode(end) ? end.getTextContentSize() : 0;
+            const childrenBefore = above.getChildrenSize();
+            above.append(...item.getChildren());
+            item.remove();
+            if ($isTextNode(end) && end.isAttached()) {
+              end.select(endOffset, endOffset);
+            } else {
+              above.select(childrenBefore, childrenBefore);
+            }
             return true;
-          },
-          COMMAND_PRIORITY_LOW,
-        ),
-        editor.registerUpdateListener(({ editorState }) => {
-          editorState.read(() => {
-            for (const { node } of $dfs($getRoot())) {
-              if (!$isListNode(node)) continue;
-              const values = $displayedListValues(node);
-              const numbered = node.getListType() === "number";
-              // The label an unmarked line continues: the nearest labelled
-              // item above it, or the list's first label when there is none.
-              let referenceValue = node.getStart();
-              for (const child of node.getChildren()) {
-                if (!$isListItemNode(child) || $isNestedListHolder(child)) {
-                  continue;
-                }
-                const element = editor.getElementByKey(child.getKey());
-                if (!(element instanceof HTMLLIElement)) continue;
-                const unmarked = $isUnmarkedItem(child);
-                if (unmarked) alignUnmarked(element, referenceValue);
-                else {
-                  element.style.listStyleType = "";
-                  element.style.marginInlineStart = "";
-                }
-                const value = values.get(child.getKey());
-                if (value !== undefined) referenceValue = value;
-                if (
-                  numbered &&
-                  value !== undefined &&
-                  element.value !== value
-                ) {
-                  element.value = value;
-                }
+          }
+          const list = item.getParent();
+          if (!$isListNode(list) || list.getListType() === "check") {
+            return false;
+          }
+          // Only at the very start of the item's text.
+          const first = item.getFirstDescendant();
+          const atStart =
+            anchorNode.is(item) || (first !== null && anchorNode.is(first));
+          if (!atStart) return false;
+
+          event?.preventDefault();
+          $setState(item, unmarkedState, true);
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+      editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          for (const { node } of $dfs($getRoot())) {
+            if (!$isListNode(node)) continue;
+            const values = $displayedListValues(node);
+            const numbered = node.getListType() === "number";
+            // The label an unmarked line continues: the nearest labelled
+            // item above it, or the list's first label when there is none.
+            let referenceValue = node.getStart();
+            for (const child of node.getChildren()) {
+              if (!$isListItemNode(child) || $isNestedListHolder(child)) {
+                continue;
+              }
+              const element = editor.getElementByKey(child.getKey());
+              if (!(element instanceof HTMLLIElement)) continue;
+              const unmarked = $isUnmarkedItem(child);
+              if (unmarked) alignUnmarked(element, referenceValue);
+              else {
+                element.style.listStyleType = "";
+                element.style.marginInlineStart = "";
+              }
+              const value = values.get(child.getKey());
+              if (value !== undefined) referenceValue = value;
+              if (numbered && value !== undefined && element.value !== value) {
+                element.value = value;
               }
             }
-          });
-        }),
-      ),
-    [editor],
-  );
+          }
+        });
+      }),
+    );
+  }, [editor]);
 
   return null;
 }
