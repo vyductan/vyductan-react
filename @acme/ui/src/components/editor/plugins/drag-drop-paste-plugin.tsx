@@ -16,6 +16,7 @@ import {
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
   COMMAND_PRIORITY_LOW,
+  HISTORY_MERGE_TAG,
   PASTE_COMMAND,
 } from "lexical";
 
@@ -114,33 +115,41 @@ export function DragDropPastePlugin({
                       // 4. Preload the image to prevent flash/layout shift
                       await preloadImage(uploadedUrl, resolveImage);
 
-                      // 5. Update image with remote URL and turn off loading
-                      editor.update(() => {
-                        const node = $getNodeByKey(key);
-                        if ($isImageNode(node) && uploadedUrl) {
-                          node.setSrc(uploadedUrl);
-                          node.setLoading(false);
-                        }
-                      });
+                      // 5. Update image with remote URL and turn off loading.
+                      // Merged into the paste's undo step: on its own, one
+                      // Cmd+Z went back to the image still "Uploading...".
+                      editor.update(
+                        () => {
+                          const node = $getNodeByKey(key);
+                          if ($isImageNode(node) && uploadedUrl) {
+                            node.setSrc(uploadedUrl);
+                            node.setLoading(false);
+                          }
+                        },
+                        { tag: HISTORY_MERGE_TAG },
+                      );
                     } catch (error) {
                       console.error("Failed to upload image:", error);
 
                       // Handle error: Replace with file link
-                      editor.update(() => {
-                        const node = $getNodeByKey(key);
-                        if ($isImageNode(node)) {
-                          if (uploadedUrl) {
-                            // Upload succeeded, but preload failed (likely not an image). Replace with link.
-                            const linkNode = $createLinkNode(uploadedUrl);
-                            linkNode.append($createTextNode(file.name));
-                            node.replace(linkNode);
-                          } else {
-                            // Upload failed. Remove the loading image.
-                            node.remove();
-                            message.error(`Failed to upload ${file.name}`);
+                      editor.update(
+                        () => {
+                          const node = $getNodeByKey(key);
+                          if ($isImageNode(node)) {
+                            if (uploadedUrl) {
+                              // Upload succeeded, but preload failed (likely not an image). Replace with link.
+                              const linkNode = $createLinkNode(uploadedUrl);
+                              linkNode.append($createTextNode(file.name));
+                              node.replace(linkNode);
+                            } else {
+                              // Upload failed. Remove the loading image.
+                              node.remove();
+                              message.error(`Failed to upload ${file.name}`);
+                            }
                           }
-                        }
-                      });
+                        },
+                        { tag: HISTORY_MERGE_TAG },
+                      );
                     }
                   })();
                 }
