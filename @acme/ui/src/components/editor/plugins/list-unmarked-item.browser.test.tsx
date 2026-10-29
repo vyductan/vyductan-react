@@ -5,14 +5,24 @@ import {
   $createListNode,
   $isListItemNode,
 } from "@lexical/list";
+import { $convertToMarkdownString } from "@lexical/markdown";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
-import { $createTextNode, $getRoot, $isTextNode, $setState } from "lexical";
+import {
+  $createTextNode,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $isTextNode,
+  $setState,
+} from "lexical";
 import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 import { EditorRender } from "../editor-render";
+import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
+import { markdownToLexicalContent } from "../utils/lexical-converter";
 import { unmarkedState } from "../utils/list-marker";
 
 // Runs in the `browser` project: Backspace has to be a real key press so it
@@ -283,4 +293,56 @@ test("unmarked lines with no labelled item above still line up", async () => {
     .map((li) => textLeft(li));
   expect(lefts).toHaveLength(3);
   expect(Math.max(...lefts) - Math.min(...lefts)).toBeLessThan(1);
+});
+
+/**
+ * As in Notion: Enter at the end of an item, then Backspace twice, and the
+ * new line is gone — the caret back where it was. The second Backspace took
+ * the empty line out of the list instead: a paragraph at the margin that cut
+ * the list in two, the items after it nested a level off.
+ */
+test("Backspace on an empty unmarked line removes it, the list as it was", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const markdown = [
+    "1. Khách điền form",
+    "\t- Nguy cơ",
+    "\t- Giải pháp: ???",
+    "\t\t- Nếu giữ chỗ:",
+    "\t\t- Nếu không giữ chỗ",
+    "\t- Dùng Cron Job",
+  ].join("\n");
+  live.setEditorState(
+    live.parseEditorState(JSON.stringify(markdownToLexicalContent(markdown))),
+  );
+  const before = live
+    .getEditorState()
+    .read(() => $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS));
+
+  await caretIn(live, "Nếu giữ chỗ:", "Nếu giữ chỗ:".length);
+  await userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Backspace}");
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() =>
+    expect(
+      live
+        .getEditorState()
+        .read(() => $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS)),
+    ).toBe(before),
+  );
+  expect(
+    live.getEditorState().read(() => {
+      const selection = $getSelection();
+      return $isRangeSelection(selection)
+        ? `${selection.anchor.getNode().getTextContent()}@${selection.anchor.offset}`
+        : null;
+    }),
+  ).toBe(`Nếu giữ chỗ:@${"Nếu giữ chỗ:".length}`);
 });

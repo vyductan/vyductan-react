@@ -1,5 +1,6 @@
 "use client";
 
+import type { ListItemNode } from "@lexical/list";
 import { useEffect } from "react";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -66,6 +67,19 @@ function alignUnmarked(element: HTMLLIElement, referenceValue: number) {
  * after each update the DOM is corrected: unmarked items lose their marker and
  * the numbers of the rest skip them.
  */
+/**
+ * The item on the line above `item` in its list: the one before it, or the
+ * last line nested in it. None for the first item.
+ */
+function $lineAbove(item: ListItemNode): ListItemNode | null {
+  let above = item.getPreviousSibling();
+  while ($isListItemNode(above) && $isNestedListHolder(above)) {
+    const nested = above.getLastChild();
+    above = $isListNode(nested) ? nested.getLastChild() : null;
+  }
+  return $isListItemNode(above) ? above : null;
+}
+
 export function ListMarkerPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
@@ -87,7 +101,17 @@ export function ListMarkerPlugin(): null {
               : $findMatchingParent(anchorNode, $isListItemNode);
             if (!$isListItemNode(item) || $isNestedListHolder(item))
               return false;
-            if ($isUnmarkedItem(item)) return false;
+            if ($isUnmarkedItem(item)) {
+              // An empty one goes, as in Notion: Enter then Backspace twice
+              // is back where it was. Taken out of the list instead, it cut
+              // the list in two and put the items after it a level off.
+              const above = $lineAbove(item);
+              if (item.getTextContentSize() > 0 || !above) return false;
+              event?.preventDefault();
+              item.remove();
+              above.selectEnd();
+              return true;
+            }
             const list = item.getParent();
             if (!$isListNode(list) || list.getListType() === "check") {
               return false;
