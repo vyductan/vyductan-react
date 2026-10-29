@@ -182,6 +182,14 @@ const UNESCAPED_PIPE = /(?<!\\)\|/g;
 // `- [ ] x` is a check item, not a bullet: keep its `-`.
 const CELL_BULLET_EXPORT = /^(\s*)[-*+] (?!\[[ x]\] )/i;
 const CELL_BULLET_IMPORT = /^(\s*)• ?/;
+/*
+ * A nested item's indent is written as `&nbsp;&nbsp;` a level. A tab or
+ * spaces there did not last: Prettier, formatting on save, folds the
+ * whitespace inside a cell to one space, and the list came back flat.
+ */
+const CELL_INDENT_EXPORT = /^\t+/;
+const CELL_INDENT_IMPORT = /^(?:&nbsp;|\u00A0)+/;
+const NBSP_LEVEL = "&nbsp;&nbsp;";
 
 export const $exportTableCell = (cell: TableCellNode): string =>
   $convertToMarkdownString(getMarkdownTransformers(), cell)
@@ -191,6 +199,7 @@ export const $exportTableCell = (cell: TableCellNode): string =>
       line
         .trimEnd()
         .replace(CELL_BULLET_EXPORT, "$1• ")
+        .replace(CELL_INDENT_EXPORT, (tabs) => NBSP_LEVEL.repeat(tabs.length))
         .replaceAll(UNESCAPED_PIPE, String.raw`\|`),
     )
     .join("<br>");
@@ -200,7 +209,14 @@ export const $createTableCell = (textContent: string): TableCellNode => {
     .trim()
     .replaceAll(String.raw`\|`, "|")
     .split(CELL_LINE_BREAK)
-    .map((line) => line.trimEnd().replace(CELL_BULLET_IMPORT, "$1- "))
+    .map((line) =>
+      line
+        .trimEnd()
+        .replace(CELL_INDENT_IMPORT, (indent) =>
+          "\t".repeat(Math.ceil(indent.replaceAll("&nbsp;", " ").length / 2)),
+        )
+        .replace(CELL_BULLET_IMPORT, "$1- "),
+    )
     .join("\n");
   const cell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
   $convertFromMarkdownString(markdown, getMarkdownTransformers(), cell);

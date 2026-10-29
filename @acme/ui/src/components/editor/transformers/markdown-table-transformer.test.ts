@@ -110,4 +110,28 @@ describe("TABLE markdown transformer: lists in cells", () => {
     ]);
     expect(lexicalContentToMarkdown(markdownToLexicalContent(once))).toBe(once);
   });
+
+  /**
+   * Items nested by Tab in a cell came back flat after a reload: the nesting
+   * went out as a tab, which Prettier, formatting on save, folds to a space.
+   */
+  test("writes a nested list's indent as &nbsp; and reads it back", () => {
+    const once = lexicalContentToMarkdown(
+      markdownToLexicalContent(table("• a<br>  • b<br>• c")),
+    );
+    expect(once).toContain("| x | • a<br>&nbsp;&nbsp;• b<br>• c |");
+
+    const root = markdownToLexicalContent(once).root as JsonNode;
+    const cell = root.children?.find((node) => node.type === "table")
+      ?.children?.[1]?.children?.[1];
+    const [list] = cell?.children ?? [];
+    expect(list?.children?.map((item) => textOf(item))).toStrictEqual([
+      "a",
+      "b",
+      "c",
+    ]);
+    // b sits in a list of its own, nested under a.
+    expect(list?.children?.[1]?.children?.[0]?.type).toBe("list");
+    expect(lexicalContentToMarkdown(markdownToLexicalContent(once))).toBe(once);
+  });
 });
