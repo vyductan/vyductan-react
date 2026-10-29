@@ -2,6 +2,7 @@ import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode } from "@lexical/table";
 import { $findMatchingParent } from "@lexical/utils";
 import {
   $isElementNode,
@@ -16,7 +17,9 @@ import {
  * back a heading on an empty line), so pasted after "Giúp " a list item came
  * in as a new item below rather than joining the text.
  *
- * An empty line is left to the paste as it is: there the block takes it.
+ * An empty line is left to the paste as it is: there the block takes it —
+ * but not in a table cell, which holds words, as Notion's does: a to-do or a
+ * heading pasted there came in checkbox and all. A list keeps its bullets.
  */
 export function InlineBlockPastePlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -34,7 +37,11 @@ export function InlineBlockPastePlugin(): null {
           const line =
             $findMatchingParent(anchor, $isListItemNode) ??
             anchor.getTopLevelElement();
-          if (!line || line.getTextContentSize() === 0) return false;
+          if (!line) return false;
+          const inCell =
+            $findMatchingParent(anchor, $isTableCellNode) !== null &&
+            !$isListNode(nodes[0]);
+          if (!inCell && line.getTextContentSize() === 0) return false;
 
           selection.insertNodes(words);
           return true;
