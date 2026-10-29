@@ -14,8 +14,6 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import {
   $deleteTableColumnAtSelection,
   $deleteTableRowAtSelection,
-  $insertTableColumnAtSelection,
-  $insertTableRowAtSelection,
   $isTableCellNode,
   $isTableSelection,
   $mergeCells,
@@ -31,6 +29,7 @@ import {
 
 import { Icon } from "@acme/ui/icons";
 
+import { $insertTableColumn, $insertTableRow } from "../utils/table-insert";
 import {
   NodeContextMenuOption,
   NodeContextMenuPlugin,
@@ -191,7 +190,7 @@ export function ContextMenuPlugin(): JSX.Element {
       icon: <Icon className="size-4" icon="icon-[lucide--arrow-up]" />,
       $onSelect: () => {
         if (selectContextMenuTableCell()) {
-          $insertTableRowAtSelection(false);
+          $insertTableRow(false);
         }
       },
       $showOn: isInTableContext,
@@ -200,7 +199,7 @@ export function ContextMenuPlugin(): JSX.Element {
       icon: <Icon className="size-4" icon="icon-[lucide--arrow-down]" />,
       $onSelect: () => {
         if (selectContextMenuTableCell()) {
-          $insertTableRowAtSelection(true);
+          $insertTableRow(true);
         }
       },
       $showOn: isInTableContext,
@@ -209,7 +208,7 @@ export function ContextMenuPlugin(): JSX.Element {
       icon: <Icon className="size-4" icon="icon-[lucide--arrow-left]" />,
       $onSelect: () => {
         if (selectContextMenuTableCell()) {
-          $insertTableColumnAtSelection(false);
+          $insertTableColumn(false);
         }
       },
       $showOn: isInTableContext,
@@ -218,7 +217,7 @@ export function ContextMenuPlugin(): JSX.Element {
       icon: <Icon className="size-4" icon="icon-[lucide--arrow-right]" />,
       $onSelect: () => {
         if (selectContextMenuTableCell()) {
-          $insertTableColumnAtSelection(true);
+          $insertTableColumn(true);
         }
       },
       $showOn: isInTableContext,

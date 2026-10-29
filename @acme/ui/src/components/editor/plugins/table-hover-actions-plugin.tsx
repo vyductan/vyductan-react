@@ -9,15 +9,12 @@
 import type { JSX } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $insertTableColumnAtSelection,
-  $insertTableRowAtSelection,
-  $isTableCellNode,
-} from "@lexical/table";
+import { $isTableCellNode } from "@lexical/table";
 import { $getNearestNodeFromDOMNode, COMMAND_PRIORITY_LOW } from "lexical";
 import { PlusIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 
+import { $insertTableColumn, $insertTableRow } from "../utils/table-insert";
 import { TABLE_COLUMN_RESIZE_DRAG_COMMAND } from "./table-column-resize-plugin";
 
 // How many px outside the table boundary we still consider "hovering the table"
@@ -301,7 +298,7 @@ function TableHoverActionsInner({
       const cellNode = $getNearestNodeFromDOMNode(cell);
       if ($isTableCellNode(cellNode)) {
         cellNode.selectEnd();
-        $insertTableColumnAtSelection(true);
+        $insertTableColumn(true);
       }
     });
     setButtonState(null);
@@ -313,7 +310,7 @@ function TableHoverActionsInner({
       const cellNode = $getNearestNodeFromDOMNode(cell);
       if ($isTableCellNode(cellNode)) {
         cellNode.selectEnd();
-        $insertTableRowAtSelection(true);
+        $insertTableRow(true);
       }
     });
     setButtonState(null);

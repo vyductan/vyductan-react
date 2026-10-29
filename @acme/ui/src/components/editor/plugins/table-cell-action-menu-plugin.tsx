@@ -9,8 +9,6 @@ import {
   $getTableColumnIndexFromTableCellNode,
   $getTableNodeFromLexicalNodeOrThrow,
   $getTableRowNodeFromTableCellNodeOrThrow,
-  $insertTableColumnAtSelection,
-  $insertTableRowAtSelection,
   $isTableCellNode,
   $isTableRowNode,
   $isTableSelection,
@@ -34,6 +32,8 @@ import { Dropdown } from "@acme/ui/components/dropdown";
 import { Switch } from "@acme/ui/components/switch";
 import { Icon } from "@acme/ui/icons";
 import { cn } from "@acme/ui/lib/utils";
+
+import { $insertTableColumn, $insertTableRow } from "../utils/table-insert";
 
 /** Where the pointer is during a handle drag: all a drag needs of an event. */
 type DragPoint = Pick<PointerEvent, "clientX" | "clientY">;
@@ -295,7 +295,7 @@ function TableCellActionMenuInner({
       const sourceCells = rowNode.getChildren().filter($isTableCellNode);
 
       node.selectEnd();
-      $insertTableRowAtSelection(insertAfter);
+      $insertTableRow(insertAfter);
 
       const insertedRow = insertAfter
         ? rowNode.getNextSibling()
@@ -464,7 +464,7 @@ function TableCellActionMenuInner({
         });
 
       node.selectEnd();
-      $insertTableColumnAtSelection(insertAfter);
+      $insertTableColumn(insertAfter);
 
       const insertedColumnIndex = insertAfter
         ? targetColumnIndex + 1
@@ -639,7 +639,7 @@ function TableCellActionMenuInner({
       const sourceCells = rowNode.getChildren().filter($isTableCellNode);
 
       node.selectEnd();
-      $insertTableRowAtSelection(true);
+      $insertTableRow(true);
 
       const duplicateRow = rowNode.getNextSibling();
       if (!$isTableRowNode(duplicateRow)) {
@@ -677,7 +677,7 @@ function TableCellActionMenuInner({
         });
 
       node.selectEnd();
-      $insertTableColumnAtSelection(true);
+      $insertTableColumn(true);
 
       const duplicateColumnIndex = targetColumnIndex + 1;
       for (const [rowIndex, row] of tableNode
