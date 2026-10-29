@@ -492,3 +492,50 @@ test("a bullet under a to-do lines up with a to-do at its level", async () => {
     expect(left("three")).toBe(left("four"));
   });
 });
+
+/**
+ * Bullets under a numbered item are a list of their own after it (read from
+ * markdown) or nested in it (pasted from Notion): the same lines, and they
+ * sit the same. The first stepped in as under a to-do, 40px a level, and
+ * stood further in than the second.
+ */
+test("bullets under a numbered item sit the same, however they are nested", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(markdownToLexicalContent("1. a\n\t- read\n\nbetween")),
+    ),
+  );
+  live.update(
+    () => {
+      $getRoot().append(
+        $createListNode("number").append(
+          $createListItemNode().append($createTextNode("b")),
+          $createListItemNode().append(
+            $createListNode("bullet").append(
+              $createListItemNode().append($createTextNode("pasted")),
+            ),
+          ),
+        ),
+      );
+    },
+    { discrete: true },
+  );
+
+  const left = (text: string) => {
+    const range = document.createRange();
+    const node = [...document.querySelectorAll("[contenteditable] *")]
+      .flatMap((element) => [...element.childNodes])
+      .find((child) => child.nodeType === 3 && child.textContent === text)!;
+    range.selectNodeContents(node);
+    return Math.round(range.getBoundingClientRect().left);
+  };
+  await waitFor(() => expect(left("read")).toBe(left("pasted")));
+});
