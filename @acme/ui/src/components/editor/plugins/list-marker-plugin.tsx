@@ -163,6 +163,15 @@ export function ListMarkerPlugin(): null {
           }
           const list = item.getParent();
           if (!$isListNode(list)) return false;
+          // In a table cell, as in Notion, an item of the outer list
+          // becomes words at the cell's margin: Lexical's own Backspace
+          // takes it out of the list.
+          if (
+            !$isListItemNode(list.getParent()) &&
+            $findMatchingParent(list, $isTableCellNode) !== null
+          ) {
+            return false;
+          }
           // Only at the very start of the item's text.
           const first = item.getFirstDescendant();
           const atStart =

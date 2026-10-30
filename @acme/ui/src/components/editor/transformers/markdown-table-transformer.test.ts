@@ -199,3 +199,23 @@ test("a list item's bullet taken off in a cell stays off across a save", () => {
   expect(lines).toStrictEqual(["Làm gì:", "• Duyệt", "Nơi gọi:", "• api"]);
   expect(lexicalContentToMarkdown(markdownToLexicalContent(once))).toBe(once);
 });
+
+/**
+ * As in Notion: in a cell, a line without a bullet below a list is words at
+ * the cell's margin, lined up with the line above the list. It was read into
+ * the list, indented under the item above.
+ */
+test("a line with no bullet below a list in a cell is text at the margin", () => {
+  const blocks = cellBlocks(
+    table("Nơi gọi:<br>• Operator confirm booking<br>Nên gọi<br>→ Direct"),
+    1,
+    1,
+  ).map(({ type, text }) => `${type}:${text}`);
+  // The two lines below the list are one paragraph, a line break between
+  // them, as any two lines of words in a cell.
+  expect(blocks).toStrictEqual([
+    "paragraph:Nơi gọi:",
+    "list:Operator confirm booking",
+    "paragraph:Nên gọi→ Direct",
+  ]);
+});

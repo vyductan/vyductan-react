@@ -232,6 +232,7 @@ export const $createTableCell = (textContent: string): TableCellNode => {
         )
         .replace(CELL_BULLET_IMPORT, "$1- "),
     )
+    .flatMap(atMarginBelowList())
     .join("\n");
   const cell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
   $convertFromMarkdownString(markdown, getMarkdownTransformers(), cell);
@@ -239,8 +240,29 @@ export const $createTableCell = (textContent: string): TableCellNode => {
   return cell;
 };
 
+const CELL_LIST_LINE = /^\s*(?:[-*+] |\d+[.)] )/;
+
 /**
- * A line with no bullet under an item in a cell is an item whose bullet
+ * As in Notion: in a cell, a line with no bullet at the margin below a list
+ * is words at the margin, not part of the list. Markdown reads such a line
+ * into the item above; a blank line before it keeps it out (Lexical drops
+ * the blank line itself).
+ */
+const atMarginBelowList = () => {
+  let inList = false;
+  return (line: string): string[] => {
+    if (CELL_LIST_LINE.test(line)) {
+      inList = true;
+      return [line];
+    }
+    if (!inList || /^\s/.test(line) || line === "") return [line];
+    inList = false;
+    return ["", line];
+  };
+};
+
+/**
+ * An indented line with no bullet under an item in a cell is an item whose bullet
  * was taken off, as it was written. Markdown reads it into the item above,
  * after a line break: it comes out again as a line of its own, unmarked.
  */
