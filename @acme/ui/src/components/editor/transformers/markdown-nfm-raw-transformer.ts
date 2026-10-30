@@ -18,6 +18,7 @@ import {
   NfmRawBlockNode,
   NfmRawInlineNode,
 } from "../nodes/nfm-raw-node";
+import { $exportListWithUnmarked } from "./markdown-continuation-transformer";
 import { findClosingLine } from "./markdown-nfm-blocks-transformer";
 
 /*
@@ -109,11 +110,15 @@ function withTabIndent(transformer: ElementTransformer): ElementTransformer {
   return {
     ...transformer,
     export: (node, traverseChildren) =>
+      ($isListNode(node)
+        ? $exportListWithUnmarked(node, traverseChildren)
+        : null) ??
       transformer
         .export(node, traverseChildren)
         ?.replaceAll(/^(?: {4})+/gm, (spaces) =>
           "\t".repeat(spaces.length / 4),
-        ) ?? null,
+        ) ??
+      null,
     replace: (parentNode, children, match, isImport) => {
       if (!isImport) {
         // Typed ("- ") on an indented line — under a to-do, say — the item
@@ -244,7 +249,11 @@ export function $importedTodoIndent(
   const columns = todoColumns();
   let above = before;
   while (above) {
-    if ($isParagraphNode(above) && above.getTextContentSize() === 0) {
+    // Past blank lines, and words under a to-do (an indented paragraph).
+    if (
+      $isParagraphNode(above) &&
+      (above.getTextContentSize() === 0 || above.getIndent() > 0)
+    ) {
       above = above.getPreviousSibling();
       continue;
     }

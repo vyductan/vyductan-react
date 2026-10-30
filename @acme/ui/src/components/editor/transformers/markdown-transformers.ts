@@ -1,4 +1,4 @@
-import type { Transformer } from "@lexical/markdown";
+import type { ElementTransformer, Transformer } from "@lexical/markdown";
 import {
   $createListNode,
   $isListItemNode,
@@ -27,6 +27,7 @@ import {
   IMAGE_ELEMENT,
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
+import { CONTINUATION } from "./markdown-continuation-transformer";
 import {
   CALLOUT,
   DETAILS,
@@ -47,6 +48,36 @@ import {
 import { NFM_TABLE } from "./markdown-nfm-table-transformer";
 import { registerMarkdownTransformers } from "./markdown-transformer-registry";
 
+/** `- [ ] text` / `- [x] text` ⇄ CheckBlockNode. */
+export const CHECK_BLOCK: ElementTransformer = {
+  dependencies: [CheckBlockNode],
+  export: (node, traverseChildren) => {
+    if (!$isCheckBlockNode(node)) {
+      return null;
+    }
+    const isChecked = node.getChecked();
+    // Its indent as tabs, as nested list items are written.
+    const indent = "\t".repeat(node.getIndent());
+    return `${indent}- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
+  },
+  // A space, or the line's end: an empty to-do's trailing space is trimmed
+  // by format on save, and `- [ ]` read back as a bullet.
+  regExp: /^(\s*)-\s\[(?:\s|x)\](?:\s|$)/i,
+  replace: (parentNode, _children, match) => {
+    const matchText = match[0] ?? "";
+    const leading = match[1] ?? "";
+    const isChecked = matchText.toLowerCase().includes("[x]");
+    const node = $createCheckBlockNode(isChecked);
+    node.setIndent(
+      $importedTodoIndent(parentNode.getPreviousSibling(), leading),
+    );
+    node.append(...parentNode.getChildren());
+    parentNode.replace(node);
+    $rememberImportedTodo(node, leading);
+  },
+  type: "element",
+};
+
 export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   TABLE,
   HR,
@@ -57,34 +88,7 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   EQUATION,
   // CHECK_LIST removed to avoid conflict with custom [] transformer
   // CHECK_LIST,
-  {
-    dependencies: [CheckBlockNode],
-    export: (node, traverseChildren) => {
-      if (!$isCheckBlockNode(node)) {
-        return null;
-      }
-      const isChecked = node.getChecked();
-      // Its indent as tabs, as nested list items are written.
-      const indent = "\t".repeat(node.getIndent());
-      return `${indent}- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
-    },
-    // A space, or the line's end: an empty to-do's trailing space is trimmed
-  // by format on save, and `- [ ]` read back as a bullet.
-  regExp: /^(\s*)-\s\[(?:\s|x)\](?:\s|$)/i,
-    replace: (parentNode, _children, match) => {
-      const matchText = match[0] ?? "";
-      const leading = match[1] ?? "";
-      const isChecked = matchText.toLowerCase().includes("[x]");
-      const node = $createCheckBlockNode(isChecked);
-      node.setIndent(
-        $importedTodoIndent(parentNode.getPreviousSibling(), leading),
-      );
-      node.append(...parentNode.getChildren());
-      parentNode.replace(node);
-      $rememberImportedTodo(node, leading);
-    },
-    type: "element",
-  },
+  CHECK_BLOCK,
   // ELEMENT_TRANSFORMERS bao gồm transformers cho lists (unordered và ordered)
   // Cần có để Lexical có thể convert list nodes thành markdown đúng format
   ...ELEMENT_TRANSFORMERS.map(withTabIndentedLists),
@@ -182,6 +186,8 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   NFM_BLOCK_COLOR_IMPORT,
   NFM_RAW_INLINE,
   ...MULTILINE_ELEMENT_TRANSFORMERS,
+  // Last: it reads any line below a to-do that nothing before it took.
+  CONTINUATION,
 ];
 
 // Hand the lists to the transformers that convert their own contents with
