@@ -64,9 +64,8 @@ function alignUnmarked(element: HTMLLIElement, referenceValue: number) {
 /**
  * Notion-style Backspace at the start of a list item: the marker goes, the
  * line stays in the list at the same depth as a continuation of the item
- * above. Backspace again on that line falls through to Lexical, which takes it
- * out of the list. Checklists keep Lexical's behaviour — their marker is the
- * checkbox.
+ * above. Backspace again on that line joins it to the line above. In a
+ * checklist the marker is the checkbox: it goes the same way.
  *
  * Lexical renders every item with a marker and numbers them by position, so
  * after each update the DOM is corrected: unmarked items lose their marker and
@@ -163,9 +162,7 @@ export function ListMarkerPlugin(): null {
             return true;
           }
           const list = item.getParent();
-          if (!$isListNode(list) || list.getListType() === "check") {
-            return false;
-          }
+          if (!$isListNode(list)) return false;
           // Only at the very start of the item's text.
           const first = item.getFirstDescendant();
           const atStart =
@@ -174,6 +171,8 @@ export function ListMarkerPlugin(): null {
 
           event?.preventDefault();
           $setState(item, unmarkedState, true);
+          // A to-do's checkbox is its marker: it goes, tick and all.
+          if (list.getListType() === "check") item.setChecked(undefined);
           return true;
         },
         COMMAND_PRIORITY_LOW,
@@ -194,8 +193,15 @@ export function ListMarkerPlugin(): null {
               const element = editor.getElementByKey(child.getKey());
               if (!(element instanceof HTMLLIElement)) continue;
               const unmarked = $isUnmarkedItem(child);
-              if (unmarked) alignUnmarked(element, referenceValue);
+              if (unmarked && node.getListType() === "check") {
+                // A to-do's box is drawn by its own CSS, keyed on this; it
+                // is no checkbox any more for assistive tech either.
+                element.dataset.unmarked = "true";
+                element.removeAttribute("role");
+                element.removeAttribute("aria-checked");
+              } else if (unmarked) alignUnmarked(element, referenceValue);
               else {
+                delete element.dataset.unmarked;
                 element.style.listStyleType = "";
                 element.style.marginInlineStart = "";
               }

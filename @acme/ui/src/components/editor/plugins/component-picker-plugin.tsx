@@ -723,7 +723,7 @@ export function ComponentPickerMenuPlugin(): JSX.Element {
         ) => {
           return anchorElementReference.current && flatOptions.length > 0
             ? createPortal(
-                <div className="absolute z-50 mt-1 -ml-2 w-full max-w-[min(calc(100vw-2rem),680px)] sm:w-[680px]">
+                <div className="absolute z-50 mt-1 -ml-2 w-[min(calc(100vw-2rem),680px)]">
                   {/* Menu */}
                   <div className="overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-lg">
                     <CommandRoot

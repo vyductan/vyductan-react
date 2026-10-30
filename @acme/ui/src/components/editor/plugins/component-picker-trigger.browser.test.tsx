@@ -3,7 +3,7 @@ import * as React from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, expect, test } from "vitest";
-import { userEvent } from "vitest/browser";
+import { page, userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 
@@ -95,4 +95,27 @@ test("'/' at the start of a soft line break opens the menu", async () => {
   await userEvent.keyboard("first line{Shift>}{Enter}{/Shift}/");
 
   await waitFor(() => expect(menuIsOpen()).toBe(true));
+});
+
+/**
+ * In a narrow panel (VS Code's side editor) the menu was the width of the
+ * "/todo" typed — a sliver its items could not fit in. It takes its own
+ * width, whatever the text it opened from.
+ */
+test("in a narrow window the menu keeps its own width", async () => {
+  await page.viewport(560, 800);
+  try {
+    await renderEditor();
+
+    await userEvent.keyboard("/todo");
+
+    const menu = await waitFor(() => {
+      const option = document.querySelector('[role="option"]');
+      expect(option).not.toBeNull();
+      return option!.closest<HTMLElement>(".bg-popover")!;
+    });
+    expect(menu.getBoundingClientRect().width).toBeGreaterThan(300);
+  } finally {
+    await page.viewport(1280, 800);
+  }
 });

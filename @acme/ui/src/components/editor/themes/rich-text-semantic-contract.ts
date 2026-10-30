@@ -8,6 +8,8 @@ const CHECK_ITEM = cn(
   'before:absolute before:block before:content-[""]',
   "before:top-[calc((1lh_-_1rem)/2)] before:left-[3px] before:size-4",
   "before:rounded-[3px] before:border-[1.5px] before:border-solid",
+  // Backspace at its start makes it plain text in place: no box, no tick.
+  "data-unmarked:before:hidden data-unmarked:after:hidden",
 );
 
 export const richTextSemanticContractKeys = [
