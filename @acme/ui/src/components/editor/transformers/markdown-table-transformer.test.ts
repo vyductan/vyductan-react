@@ -1,9 +1,17 @@
+import type { ElementNode, LexicalNode } from "lexical";
+import { createHeadlessEditor } from "@lexical/headless";
+import { $createListItemNode, $createListNode } from "@lexical/list";
+import { $createTableNodeWithDimensions } from "@lexical/table";
+import { $createTextNode, $getRoot, $setState } from "lexical";
 import { describe, expect, test } from "vitest";
 
+import type { LexicalEditorContent } from "../types";
+import { nodes } from "../nodes/nodes";
 import {
   lexicalContentToMarkdown,
   markdownToLexicalContent,
 } from "../utils/lexical-converter";
+import { unmarkedState } from "../utils/list-marker";
 
 interface JsonNode {
   type?: string;
@@ -134,4 +142,60 @@ describe("TABLE markdown transformer: lists in cells", () => {
     expect(list?.children?.[1]?.children?.[0]?.type).toBe("list");
     expect(lexicalContentToMarkdown(markdownToLexicalContent(once))).toBe(once);
   });
+});
+
+/** A one-row table whose second cell holds `build()`, as the editor saves it. */
+function tableWith(build: () => LexicalNode[]): LexicalEditorContent {
+  const editor = createHeadlessEditor({ nodes: nodes as never });
+  editor.update(
+    () => {
+      const grid = $createTableNodeWithDimensions(1, 2, false);
+      const cell = grid
+        .getFirstChildOrThrow<ElementNode>()
+        .getLastChildOrThrow<ElementNode>();
+      cell.clear().append(...build());
+      $getRoot().clear().append(grid);
+    },
+    { discrete: true },
+  );
+  return editor.getEditorState().toJSON() as LexicalEditorContent;
+}
+
+/**
+ * Backspace at the start of a list item in a cell takes its bullet off.
+ * Saved and reloaded, the bullet was back.
+ */
+test("a list item's bullet taken off in a cell stays off across a save", () => {
+  const item = (words: string, unmarked = false) => {
+    const node = $createListItemNode().append($createTextNode(words));
+    if (unmarked) $setState(node, unmarkedState, true);
+    return node;
+  };
+  const once = lexicalContentToMarkdown(
+    tableWith(() => [
+      $createListNode("bullet").append(
+        item("Làm gì:", true),
+        item("Duyệt"),
+        item("Nơi gọi:", true),
+        item("api"),
+      ),
+    ]),
+  );
+  expect(once).toContain("| Làm gì:<br>• Duyệt<br>Nơi gọi:<br>• api |");
+
+  const root = markdownToLexicalContent(once).root as JsonNode & {
+    children?: (JsonNode & { $?: { unmarked?: boolean } })[];
+  };
+  const cell = root.children?.find((node) => node.type === "table")
+    ?.children?.[0]?.children?.[1] as JsonNode;
+  const lines = (cell.children ?? []).flatMap((block) =>
+    block.type === "list"
+      ? (block.children ?? []).map(
+          (child) =>
+            `${(child as { $?: { unmarked?: boolean } }).$?.unmarked ? "" : "• "}${textOf(child)}`,
+        )
+      : [textOf(block)],
+  );
+  expect(lines).toStrictEqual(["Làm gì:", "• Duyệt", "Nơi gọi:", "• api"]);
+  expect(lexicalContentToMarkdown(markdownToLexicalContent(once))).toBe(once);
 });

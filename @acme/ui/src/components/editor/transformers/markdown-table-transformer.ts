@@ -1,5 +1,7 @@
+import type { ListItemNode } from "@lexical/list";
 import type { ElementTransformer } from "@lexical/markdown";
 import type { LexicalNode } from "lexical";
+import { $createListItemNode, $isListItemNode } from "@lexical/list";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
@@ -16,8 +18,17 @@ import {
   TableNode,
   TableRowNode,
 } from "@lexical/table";
-import { $getState, $isParagraphNode, $isTextNode } from "lexical";
+import { $dfs } from "@lexical/utils";
+import {
+  $getState,
+  $isLineBreakNode,
+  $isParagraphNode,
+  $isTabNode,
+  $isTextNode,
+  $setState,
+} from "lexical";
 
+import { unmarkedState } from "../utils/list-marker";
 import {
   $exportNfmTable,
   nfmTableState,
@@ -190,6 +201,7 @@ const CELL_BULLET_IMPORT = /^(\s*)• ?/;
 const CELL_INDENT_EXPORT = /^\t+/;
 const CELL_INDENT_IMPORT = /^(?:&nbsp;|\u00A0)+/;
 const NBSP_LEVEL = "&nbsp;&nbsp;";
+const CELL_ALIGN_EXPORT = /^(\t*) +/;
 
 export const $exportTableCell = (cell: TableCellNode): string =>
   $convertToMarkdownString(getMarkdownTransformers(), cell)
@@ -198,6 +210,9 @@ export const $exportTableCell = (cell: TableCellNode): string =>
     .map((line) =>
       line
         .trimEnd()
+        // An unmarked item is lined up with the words above by spaces;
+        // in a cell its line starts at its depth, as any other.
+        .replace(CELL_ALIGN_EXPORT, "$1")
         .replace(CELL_BULLET_EXPORT, "$1• ")
         .replace(CELL_INDENT_EXPORT, (tabs) => NBSP_LEVEL.repeat(tabs.length))
         .replaceAll(UNESCAPED_PIPE, String.raw`\|`),
@@ -220,8 +235,41 @@ export const $createTableCell = (textContent: string): TableCellNode => {
     .join("\n");
   const cell = $createTableCellNode(TableCellHeaderStates.NO_STATUS);
   $convertFromMarkdownString(markdown, getMarkdownTransformers(), cell);
+  $unmarkLinesUnderItems(cell);
   return cell;
 };
+
+/**
+ * A line with no bullet under an item in a cell is an item whose bullet
+ * was taken off, as it was written. Markdown reads it into the item above,
+ * after a line break: it comes out again as a line of its own, unmarked.
+ */
+function $unmarkLinesUnderItems(cell: TableCellNode) {
+  for (const { node } of $dfs(cell)) {
+    if (!$isListItemNode(node)) continue;
+    let item: ListItemNode = node;
+    for (const child of node.getChildren()) {
+      if (!$isLineBreakNode(child)) {
+        if (!item.is(node)) item.append(child);
+        continue;
+      }
+      child.remove();
+      const line = $createListItemNode();
+      $setState(line, unmarkedState, true);
+      item.insertAfter(line);
+      item = line;
+    }
+    if (item.is(node)) continue;
+    // Its depth was written before it as tabs; the item above holds it.
+    for (const lead of item.getChildren()) {
+      if ($isTabNode(lead)) lead.remove();
+      else if ($isTextNode(lead)) {
+        lead.setTextContent(lead.getTextContent().trimStart());
+        break;
+      } else break;
+    }
+  }
+}
 
 const mapToTableCells = (textContent: string): Array<TableCellNode> | null => {
   const match = TABLE_ROW_REG_EXP.exec(textContent);
