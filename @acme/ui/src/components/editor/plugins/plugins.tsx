@@ -77,6 +77,7 @@ import { ResetFormatOnEnterPlugin } from "../plugins/reset-format-on-enter-plugi
 import { SelectLineFirstPlugin } from "../plugins/select-line-first-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
+import { TableCellEnterPlugin } from "../plugins/table-cell-enter-plugin";
 import { TableColumnResizePlugin } from "../plugins/table-column-resize-plugin";
 import { TableHoverActionsPlugin } from "../plugins/table-hover-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
@@ -228,6 +229,7 @@ export function Plugins({
       <CheckBlockPlugin />
       <HorizontalRulePlugin />
       <TablePlugin />
+      <TableCellEnterPlugin />
       {editable && <ContextMenuPlugin />}
       {editable && (
         <TableCellActionMenuPlugin anchorElem={floatingAnchorElement} />
