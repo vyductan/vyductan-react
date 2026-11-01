@@ -8,6 +8,7 @@ import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
+import { TABLE_COLUMN_RESIZE_DRAG_COMMAND } from "./table-column-resize-plugin";
 
 Object.assign(globalThis, { React });
 
@@ -335,4 +336,66 @@ test("while dragging a column, a copy of it follows the pointer", async () => {
   document.dispatchEvent(pointer("pointerup", c3.left + 5, from.y));
   await frame();
   expect(preview()).toBeNull();
+});
+
+/**
+ * Let go of a drag outside VS Code's webview — over the sidebar, a tab —
+ * and the page never hears the pointerup. The handles took the drag as still
+ * going and stopped following the pointer, and the add-column button stayed
+ * away, until the window was reloaded. A pointer moving with no button down
+ * has let go.
+ */
+test("a drag whose release was never heard ends at the next plain move", async () => {
+  const handle = await tableWithRows();
+  const rect = handle.getBoundingClientRect();
+  const at = { clientX: rect.left + 5, clientY: rect.top + 5 };
+  const pointer = {
+    bubbles: true,
+    cancelable: true,
+    pointerType: "mouse",
+    isPrimary: true,
+  };
+  handle.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      ...pointer,
+      ...at,
+      button: 0,
+      buttons: 1,
+    }),
+  );
+  document.dispatchEvent(
+    new PointerEvent("pointermove", {
+      ...pointer,
+      clientX: at.clientX,
+      clientY: at.clientY + 40,
+      buttons: 1,
+    }),
+  );
+  // No pointerup: it happened outside the page.
+
+  await userEvent.hover(cellOf("R3"));
+
+  await waitFor(() => {
+    const row = cellOf("R3").getBoundingClientRect();
+    const now = document
+      .querySelector<HTMLElement>('button[aria-label="Row actions"]')!
+      .getBoundingClientRect();
+    const middle = now.top + now.height / 2;
+    expect(middle).toBeGreaterThanOrEqual(row.top);
+    expect(middle).toBeLessThanOrEqual(row.bottom);
+  });
+});
+
+test("a column resize whose release was never heard gives the add button back", async () => {
+  await tableWithRows();
+  const editor = document.querySelector<
+    HTMLElement & { __lexicalEditor: LexicalEditor }
+  >('[contenteditable="true"]')!.__lexicalEditor;
+  editor.dispatchCommand(TABLE_COLUMN_RESIZE_DRAG_COMMAND, { active: true });
+
+  await userEvent.hover(cellOf("R2"));
+
+  await waitFor(() =>
+    expect(document.querySelector("[data-table-hover-btn]")).not.toBeNull(),
+  );
 });

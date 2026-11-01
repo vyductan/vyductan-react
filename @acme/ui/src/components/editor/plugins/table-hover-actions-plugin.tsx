@@ -187,7 +187,13 @@ function TableHoverActionsInner({
       // the drag story stay green, even dragging across other cells and off the
       // table. Kept because that retargeting is the one thing here we rely on a
       // browser to get right, and the check is a boolean read.
-      if (columnDragActiveReference.current) return;
+      if (columnDragActiveReference.current) {
+        if (e.buttons !== 0) return;
+        // No button down: the drag ended where its release was never heard —
+        // outside VS Code's webview, say. Left set, the button stayed away
+        // until a reload.
+        columnDragActiveReference.current = false;
+      }
 
       const { clientX, clientY } = e;
 

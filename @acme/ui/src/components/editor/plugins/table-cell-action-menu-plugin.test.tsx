@@ -1070,7 +1070,14 @@ test("reorders rows when dragging the row handle below the next row", async () =
   ]) {
     fireEvent(
       document,
-      new MouseEvent("pointermove", { bubbles: true, clientX, clientY }),
+      new MouseEvent("pointermove", {
+        bubbles: true,
+        clientX,
+        clientY,
+        // The button is down, as in a real drag: a move without it is a
+        // drag let go where the page did not hear it.
+        buttons: 1,
+      }),
     );
   }
 
@@ -1137,7 +1144,14 @@ test("reorders columns when dragging the column handle to the right", async () =
   ]) {
     fireEvent(
       document,
-      new MouseEvent("pointermove", { bubbles: true, clientX, clientY }),
+      new MouseEvent("pointermove", {
+        bubbles: true,
+        clientX,
+        clientY,
+        // The button is down, as in a real drag: a move without it is a
+        // drag let go where the page did not hear it.
+        buttons: 1,
+      }),
     );
   }
 

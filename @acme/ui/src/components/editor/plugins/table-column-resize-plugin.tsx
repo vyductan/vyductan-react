@@ -349,6 +349,12 @@ function TableColumnResizeInner({
     if (!drag || !grabber) {
       return;
     }
+    // No button down: it was let go where the page did not hear it. The
+    // widths it showed last are the ones it was let go at.
+    if (event.buttons === 0) {
+      commitDrag(event);
+      return;
+    }
 
     dragPointReference.current = { x: event.clientX, y: event.clientY };
 

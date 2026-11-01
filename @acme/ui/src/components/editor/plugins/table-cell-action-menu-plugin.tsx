@@ -1006,6 +1006,13 @@ function TableCellActionMenuInner({
     let faded: HTMLTableCellElement[] = [];
 
     const onMove = (move: PointerEvent) => {
+      // No button down: it was let go where the page did not hear it —
+      // outside VS Code's webview, say. Left running, the handles stopped
+      // following the pointer until a reload.
+      if (move.buttons === 0) {
+        finish(move, false);
+        return;
+      }
       if (!dragging) {
         const travel = Math.hypot(
           move.clientX - origin.x,
