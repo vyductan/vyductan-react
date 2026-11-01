@@ -28,6 +28,7 @@ import {
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
 import { CONTINUATION } from "./markdown-continuation-transformer";
+import { INTRAWORD_UNDERSCORE } from "./markdown-intraword-underscore";
 import {
   CALLOUT,
   DETAILS,
@@ -159,6 +160,8 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   // Whole-document conversion adds them — see MARKDOWN_DOCUMENT_TRANSFORMERS.
   ...TEXT_FORMAT_TRANSFORMERS,
   ...TEXT_MATCH_TRANSFORMERS,
+  // Last: other text-match exports (links, mentions…) go first.
+  INTRAWORD_UNDERSCORE,
 ];
 
 /**
