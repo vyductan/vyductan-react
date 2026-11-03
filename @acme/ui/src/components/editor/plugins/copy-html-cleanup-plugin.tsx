@@ -19,25 +19,27 @@ export function CopyHtmlCleanupPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    // On the document, bubbling: after the editor's own listener on its root
-    // has written the clipboard.
+    // On the window, bubbling: after whatever filled the clipboard — the
+    // editor's listener on its root, or @lexical/table's on the document.
+    // Cells selected, the page has no selection of its own and a copy (VS
+    // Code's, for one) is aimed at <body>; the table fills it from the
+    // document. Taken only when aimed inside the editor, that HTML went out
+    // as it was. So the focus being in the editor counts too.
     const onCopy = (event: ClipboardEvent) => {
       const root = editor.getRootElement();
-      if (
-        !root ||
-        !(event.target instanceof Node) ||
-        !root.contains(event.target)
-      )
-        return;
+      if (!root) return;
+      const aimedHere =
+        event.target instanceof Node && root.contains(event.target);
+      if (!aimedHere && !root.contains(document.activeElement)) return;
       const html = event.clipboardData?.getData("text/html");
       if (!html) return;
       event.clipboardData?.setData("text/html", cleanCopiedHtml(html));
     };
-    document.addEventListener("copy", onCopy);
-    document.addEventListener("cut", onCopy);
+    window.addEventListener("copy", onCopy);
+    window.addEventListener("cut", onCopy);
     return () => {
-      document.removeEventListener("copy", onCopy);
-      document.removeEventListener("cut", onCopy);
+      window.removeEventListener("copy", onCopy);
+      window.removeEventListener("cut", onCopy);
     };
   }, [editor]);
 
