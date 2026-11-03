@@ -1,5 +1,8 @@
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode } from "@lexical/table";
+import { $findMatchingParent } from "@lexical/utils";
+import { $getSelection, $isRangeSelection } from "lexical";
 
 /**
  * Puts plain semantic HTML on the clipboard for a copy or cut, the kind a
@@ -33,7 +36,19 @@ export function CopyHtmlCleanupPlugin(): null {
       if (!aimedHere && !root.contains(document.activeElement)) return;
       const html = event.clipboardData?.getData("text/html");
       if (!html) return;
-      event.clipboardData?.setData("text/html", cleanCopiedHtml(html));
+      const fromCell = editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+        const cell = $findMatchingParent(
+          selection.anchor.getNode(),
+          $isTableCellNode,
+        );
+        return cell !== null && cell.isParentOf(selection.focus.getNode());
+      });
+      event.clipboardData?.setData(
+        "text/html",
+        cleanCopiedHtml(html, { fromCell }),
+      );
     };
     window.addEventListener("copy", onCopy);
     window.addEventListener("cut", onCopy);
@@ -70,8 +85,15 @@ const BLOCK_TAGS = new Set([
 // by its line pasted back as plain text, its checkbox gone.
 const READ_BACK_CLASSES = new Set(["check-block", "check-block-checked"]);
 
-/** The copied HTML, without what only made sense inside the editor. */
-export function cleanCopiedHtml(html: string): string {
+/**
+ * The copied HTML, without what only made sense inside the editor.
+ * `fromCell`: the copy was made inside one table cell (Cmd+A there), its
+ * content with no table around it — its lists go out as a cell's are.
+ */
+export function cleanCopiedHtml(
+  html: string,
+  { fromCell = false }: { fromCell?: boolean } = {},
+): string {
   const doc = new DOMParser().parseFromString(html, "text/html");
   const { body } = doc;
 
@@ -124,7 +146,7 @@ export function cleanCopiedHtml(html: string): string {
 
   foldNestedLists(doc);
   toTaskLists(doc);
-  cellListsAsLines(doc);
+  cellListsAsLines(doc, fromCell);
 
   // A quote's text in a paragraph, as markdown renders it.
   for (const quote of body.querySelectorAll("blockquote")) {
@@ -227,7 +249,7 @@ const CELL_BULLETS = ["•", "◦", "▪"];
  * a list. A <ul> in a cell pasted as "• a" with no indent, plain text. The
  * spaces stay plain: Notion reads them as the indent, `&nbsp;` it does not.
  */
-function cellListsAsLines(doc: Document) {
+function cellListsAsLines(doc: Document, fromCell: boolean) {
   const isList = (node: Element) =>
     node.tagName === "UL" || node.tagName === "OL";
   const lines = (list: Element, depth: number): HTMLElement[] => {
@@ -255,7 +277,11 @@ function cellListsAsLines(doc: Document) {
     return out;
   };
   for (const list of [
-    ...doc.body.querySelectorAll(":is(td, th) > :is(ul, ol)"),
+    ...doc.body.querySelectorAll(
+      fromCell
+        ? ":is(body, td, th) > :is(ul, ol)"
+        : ":is(td, th) > :is(ul, ol)",
+    ),
   ]) {
     const items = lines(list, 0);
     // Notion trims the spaces opening a pasted cell, `&nbsp;` too: a cell

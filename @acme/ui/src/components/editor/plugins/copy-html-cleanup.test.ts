@@ -179,6 +179,22 @@ describe("cleanCopiedHtml, lists in table cells", () => {
     expect(td.innerHTML).toBe("<p>\u200b  3. c</p><p>  4. d</p>");
   });
 
+  /**
+   * Cmd+A in a cell and copy: what is on the clipboard is the cell's
+   * content, no table around it, and it is pasted into a Notion cell. Its
+   * lists go out as the cell lines too.
+   */
+  test("a copy from inside one cell sends its lists as the cell lines", () => {
+    expect(
+      cleanCopiedHtml("<p>top</p><ul><li>a</li><li>b</li></ul>", {
+        fromCell: true,
+      }),
+    ).toBe("<p>top</p><p>  • a</p><p>  • b</p>");
+    expect(cleanCopiedHtml("<ul><li>a</li></ul>", { fromCell: true })).toBe(
+      "<p>\u200b  • a</p>",
+    );
+  });
+
   test("a list outside a table stays a list", () => {
     expect(cleanCopiedHtml("<ul><li>a</li></ul>")).toBe("<ul><li>a</li></ul>");
   });

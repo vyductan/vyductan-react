@@ -10,6 +10,7 @@ import {
 import { cleanup, render, waitFor } from "@testing-library/react";
 import { $getRoot, $setSelection } from "lexical";
 import { afterEach, expect, test } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Editor } from "../editor";
 import { MARKDOWN_DOCUMENT_TRANSFORMERS } from "../transformers/markdown-transformers";
@@ -195,4 +196,48 @@ test("cells copied by a copy aimed outside the editor are cleaned too", async ()
   expect(html).toContain("<table");
   expect(html).toContain("<p>\u200b  • Email confirmed</p>");
   expect(html).not.toContain("class=");
+});
+
+/**
+ * Cmd+A in a cell selects the cell's content, and a copy of it has no table
+ * around it. Pasted into a Notion cell, its list came in as plain "• " text.
+ */
+test("a cell's content copied by Cmd+A sends its list as Notion's lines", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  live.update(
+    () =>
+      $convertFromMarkdownString(
+        TABLE_WITH_LIST,
+        MARKDOWN_DOCUMENT_TRANSFORMERS,
+      ),
+    { discrete: true },
+  );
+  const item = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>("td li");
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  await userEvent.click(item);
+  await userEvent.keyboard("{ControlOrMeta>}a{/ControlOrMeta}");
+
+  const clipboardData = new DataTransfer();
+  root.dispatchEvent(
+    new ClipboardEvent("copy", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+
+  const html = clipboardData.getData("text/html");
+  expect(html).not.toContain("<table");
+  expect(html).toContain("<p>​  • Email confirmed</p><p>  • Leader change</p>");
 });

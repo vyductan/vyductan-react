@@ -169,8 +169,10 @@ export function SelectLineFirstPlugin(): null {
             block.select(0, block.getChildrenSize());
             return true;
           },
-          // Ahead of the rich-text plugin's own select-all, which takes the page.
-          COMMAND_PRIORITY_LOW,
+          // Ahead of the rich-text plugin's own select-all, which takes the
+          // page, and of @lexical/table's, which took the whole table from a
+          // cell at the first press — at the same priority, it ran first.
+          COMMAND_PRIORITY_NORMAL,
         ),
       ),
     [editor],
