@@ -45,10 +45,12 @@ export function CopyHtmlCleanupPlugin(): null {
         );
         return cell !== null && cell.isParentOf(selection.focus.getNode());
       });
-      event.clipboardData?.setData(
-        "text/html",
-        cleanCopiedHtml(html, { fromCell }),
-      );
+      const cleaned = cleanCopiedHtml(html, { fromCell });
+      event.clipboardData?.setData("text/html", cleaned);
+      // Pasted into a Notion cell, the plain text is what Notion takes.
+      if (fromCell) {
+        event.clipboardData?.setData("text/plain", cellPlainText(cleaned));
+      }
     };
     window.addEventListener("copy", onCopy);
     window.addEventListener("cut", onCopy);
@@ -237,6 +239,26 @@ function toTaskLists(doc: Document) {
   for (const list of doc.body.querySelectorAll("ul[data-task-list]")) {
     list.removeAttribute("data-task-list");
   }
+}
+
+/**
+ * The plain text of a copy from a table cell, as a Notion cell takes it —
+ * pasted into one, Notion reads the plain text, not the HTML: a line per
+ * block and line break, its lists as cleanCopiedHtml wrote them. Notion
+ * trims every pasted line's opening spaces; a zero-width space ahead keeps
+ * a list line's indent, and Notion drops it.
+ */
+export function cellPlainText(cleanHtml: string): string {
+  const { body } = new DOMParser().parseFromString(cleanHtml, "text/html");
+  for (const lineBreak of body.querySelectorAll("br")) {
+    lineBreak.replaceWith("\n");
+  }
+  return [...body.childNodes]
+    .map((node) => (node.textContent ?? "").replaceAll("\u200b", ""))
+    .join("\n")
+    .split("\n")
+    .map((line) => (/^\s/.test(line) ? `\u200b${line}` : line))
+    .join("\n");
 }
 
 /** A cell's list levels, as Notion marks them. */

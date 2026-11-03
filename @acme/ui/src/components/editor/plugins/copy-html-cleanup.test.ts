@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { cleanCopiedHtml } from "./copy-html-cleanup-plugin";
+import { cellPlainText, cleanCopiedHtml } from "./copy-html-cleanup-plugin";
 
 const parse = (html: string) =>
   new DOMParser().parseFromString(html, "text/html").body;
@@ -193,6 +193,20 @@ describe("cleanCopiedHtml, lists in table cells", () => {
     expect(cleanCopiedHtml("<ul><li>a</li></ul>", { fromCell: true })).toBe(
       "<p>\u200b  • a</p>",
     );
+  });
+
+  /**
+   * Pasted into a Notion cell, it is the plain text Notion takes, not the
+   * HTML: the lines came in joined by spaces. Notion trims each pasted
+   * line's opening spaces too; a zero-width space ahead keeps them.
+   */
+  test("the plain text of a copy from a cell is Notion's cell lines", () => {
+    const html = cleanCopiedHtml(
+      "<p>top</p><ul><li>a <code>x</code></li><li><ul><li>d</li></ul></li></ul>",
+      { fromCell: true },
+    );
+
+    expect(cellPlainText(html)).toBe("top\n\u200b  • a x\n\u200b      ◦ d");
   });
 
   test("a list outside a table stays a list", () => {
