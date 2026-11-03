@@ -26,6 +26,7 @@ import { BlockColorPlugin } from "../plugins/block-color-plugin";
 import { BlockCopyPastePlugin } from "../plugins/block-copy-paste-plugin";
 import { BlockPlaceholderPlugin } from "../plugins/block-placeholder-plugin";
 import { BlockSelectionPlugin } from "../plugins/block-selection-plugin";
+import { ShiftClickSelectPlugin } from "../plugins/shift-click-select-plugin";
 import { BlockTypeNormalizationPlugin } from "../plugins/blocktype-normalization-plugin";
 import { CalloutPickerPlugin } from "../plugins/callout-picker-plugin";
 import { CheckBlockPlugin } from "../plugins/check-block-plugin";
@@ -256,6 +257,7 @@ export function Plugins({
         <BlockPlaceholderPlugin placeholder={placeholder} />
       )}
       {editable && <BlockSelectionPlugin />}
+      {editable && <ShiftClickSelectPlugin />}
 
       <MentionsPlugin
         mentionsData={mentionsData}

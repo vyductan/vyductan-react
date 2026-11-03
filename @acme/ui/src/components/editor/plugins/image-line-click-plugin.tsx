@@ -46,7 +46,8 @@ export function ImageLineClickPlugin(): null {
 
   useEffect(() => {
     const onMouseDown = (event: MouseEvent) => {
-      if (event.button !== 0 || !editor.isEditable()) return;
+      // A shift+click extends the selection (ShiftClickSelectPlugin).
+      if (event.button !== 0 || event.shiftKey || !editor.isEditable()) return;
       const target = event.target;
       if (!(target instanceof Element) || target.closest("img")) return;
 
