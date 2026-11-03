@@ -240,6 +240,9 @@ test("a cell's content copied by Cmd+A sends its list as Notion's lines", async 
   const html = clipboardData.getData("text/html");
   expect(html).not.toContain("<table");
   expect(html).toContain("<p>​  • Email confirmed</p><p>  • Leader change</p>");
+  expect(
+    JSON.parse(clipboardData.getData("text/_notion-text-production")).editing,
+  ).toStrictEqual([["  • Email confirmed\n  • Leader change"]]);
   expect(clipboardData.getData("text/plain")).toBe(
     "\u200b  • Email confirmed\n\u200b  • Leader change",
   );

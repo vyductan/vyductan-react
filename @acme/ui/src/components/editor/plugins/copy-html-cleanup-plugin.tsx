@@ -50,6 +50,10 @@ export function CopyHtmlCleanupPlugin(): null {
       // Pasted into a Notion cell, the plain text is what Notion takes.
       if (fromCell) {
         event.clipboardData?.setData("text/plain", cellPlainText(cleaned));
+        event.clipboardData?.setData(
+          "text/_notion-text-production",
+          notionCellText(cleaned),
+        );
       }
     };
     window.addEventListener("copy", onCopy);
@@ -259,6 +263,70 @@ export function cellPlainText(cleanHtml: string): string {
     .split("\n")
     .map((line) => (/^\s/.test(line) ? `\u200b${line}` : line))
     .join("\n");
+}
+
+/** Notion's rich-text marks, by the element that carries them. */
+const NOTION_MARKS: Record<string, (element: Element) => string[]> = {
+  STRONG: () => ["b"],
+  B: () => ["b"],
+  EM: () => ["i"],
+  I: () => ["i"],
+  S: () => ["s"],
+  DEL: () => ["s"],
+  U: () => ["_"],
+  CODE: () => ["c"],
+  A: (element) => ["a", element.getAttribute("href") ?? ""],
+};
+
+/**
+ * A copy from a table cell as Notion copies a cell's text itself, its
+ * `text/_notion-text-production`: the rich text — runs of text with their
+ * marks — and how much of it is meant. Pasted into a Notion cell, HTML with
+ * any formatting in it had its lines joined by spaces; this, Notion pastes
+ * line for line, formatting kept.
+ */
+export function notionCellText(cleanHtml: string): string {
+  const { body } = new DOMParser().parseFromString(cleanHtml, "text/html");
+  const runs: [string, string[][]][] = [];
+  const add = (text: string, marks: string[][]) => {
+    if (!text) return;
+    const last = runs.at(-1);
+    if (last && JSON.stringify(last[1]) === JSON.stringify(marks)) {
+      last[0] += text;
+    } else {
+      runs.push([text, marks]);
+    }
+  };
+  const walk = (node: Node, marks: string[][]) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      add((node.textContent ?? "").replaceAll("\u200b", ""), marks);
+      return;
+    }
+    if (!(node instanceof Element)) return;
+    if (node.tagName === "BR") {
+      add("\n", marks);
+      return;
+    }
+    const mark = NOTION_MARKS[node.tagName]?.(node);
+    // Italic exports as <i><em>: one mark, not two.
+    const inner =
+      mark && !marks.some((other) => other[0] === mark[0])
+        ? [...marks, mark]
+        : marks;
+    for (const child of node.childNodes) walk(child, inner);
+  };
+  for (const [index, block] of [...body.childNodes].entries()) {
+    if (index > 0) add("\n", []);
+    walk(block, []);
+  }
+  const text = runs.map(([run]) => run).join("");
+  return JSON.stringify({
+    editing: runs.map(([run, marks]) =>
+      marks.length > 0 ? [run, marks] : [run],
+    ),
+    selection: { startIndex: 0, endIndex: text.length },
+    action: "copy",
+  });
 }
 
 /** A cell's list levels, as Notion marks them. */

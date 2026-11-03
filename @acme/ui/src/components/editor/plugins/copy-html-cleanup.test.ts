@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
 
-import { cellPlainText, cleanCopiedHtml } from "./copy-html-cleanup-plugin";
+import {
+  cellPlainText,
+  cleanCopiedHtml,
+  notionCellText,
+} from "./copy-html-cleanup-plugin";
 
 const parse = (html: string) =>
   new DOMParser().parseFromString(html, "text/html").body;
@@ -207,6 +211,41 @@ describe("cleanCopiedHtml, lists in table cells", () => {
     );
 
     expect(cellPlainText(html)).toBe("top\n\u200b  • a x\n\u200b      ◦ d");
+  });
+
+  /**
+   * With any formatting in it, Notion pastes the HTML into a cell, and joins
+   * its lines with spaces — <p> or <br> alike. Notion's own copy of a cell's
+   * text goes as `text/_notion-text-production`: the cell's rich text, which
+   * it pastes line for line, formatting kept.
+   */
+  test("a copy from a cell as Notion's own cell text, formatting kept", () => {
+    const html = cleanCopiedHtml(
+      '<p>top</p><ul><li><b><strong>Bold:</strong></b> see <code>fn_x</code></li><li><a href="https://a.b">link</a> <i><em>it</em></i></li></ul>',
+      { fromCell: true },
+    );
+
+    const text = "top\n  • Bold: see fn_x\n  • link it";
+    expect(JSON.parse(notionCellText(html))).toStrictEqual({
+      editing: [
+        ["top\n  • "],
+        ["Bold:", [["b"]]],
+        [" see "],
+        ["fn_x", [["c"]]],
+        ["\n  • "],
+        ["link", [["a", "https://a.b"]]],
+        [" "],
+        ["it", [["i"]]],
+      ],
+      selection: { startIndex: 0, endIndex: text.length },
+      action: "copy",
+    });
+  });
+
+  test("a list opening the cell starts the text, no zero-width space", () => {
+    const html = cleanCopiedHtml("<ul><li>a</li></ul>", { fromCell: true });
+
+    expect(JSON.parse(notionCellText(html)).editing).toStrictEqual([["  • a"]]);
   });
 
   test("a list outside a table stays a list", () => {
