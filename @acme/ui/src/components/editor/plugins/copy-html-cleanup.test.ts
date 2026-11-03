@@ -127,21 +127,48 @@ describe("cleanCopiedHtml, what the editor reads back", () => {
 });
 
 /**
- * A list in a table cell goes out as a list: Notion holds lists in its
- * table cells, where Enter starts the next item and Tab nests one. Sent as
- * lines of "• " text, it pasted as text, neither working.
+ * Notion keeps no list blocks in a table cell: a list there is lines of
+ * text — two spaces and "• " a level, four more spaces a level deeper,
+ * "◦ " — which it lays out as a list. A <ul> sent in a cell pasted as
+ * "• a" with no indent, plain text to Notion. Each item goes out as such a
+ * line, a paragraph of its own, its spaces plain.
  */
 describe("cleanCopiedHtml, lists in table cells", () => {
-  test("a list in a cell stays a list, nested items inside their item", () => {
-    const body = parse(
+  const cell = (html: string) =>
+    parse(
       cleanCopiedHtml(
-        "<table><tbody><tr><td><p>base url</p><ul><li>a</li><li><ul><li>d</li></ul></li></ul></td></tr></tbody></table>",
+        `<table><tbody><tr><td>${html}</td></tr></tbody></table>`,
       ),
+    ).querySelector("td")!;
+
+  test("a bulleted list is Notion's lines of text, nested items indented", () => {
+    const td = cell(
+      "<p>base url</p><ul><li>a</li><li><ul><li>d</li></ul></li></ul><p>after</p>",
     );
 
-    expect(body.querySelector("td")!.innerHTML).toBe(
-      "<p>base url</p><ul><li>a<ul><li>d</li></ul></li></ul>",
+    expect(td.innerHTML).toBe(
+      "<p>base url</p><p>  • a</p><p>      ◦ d</p><p>after</p>",
     );
+  });
+
+  test("an item keeps its formatting", () => {
+    const td = cell(
+      "<ul><li><b><strong>Bold:</strong></b> see <code>fn_x</code></li></ul>",
+    );
+
+    expect(td.innerHTML).toBe(
+      "<p>  • <strong>Bold:</strong> see <code>fn_x</code></p>",
+    );
+  });
+
+  test("a numbered list counts from its start", () => {
+    const td = cell('<ol start="3"><li>c</li><li>d</li></ol>');
+
+    expect(td.innerHTML).toBe("<p>  3. c</p><p>  4. d</p>");
+  });
+
+  test("a list outside a table stays a list", () => {
+    expect(cleanCopiedHtml("<ul><li>a</li></ul>")).toBe("<ul><li>a</li></ul>");
   });
 });
 

@@ -122,6 +122,7 @@ export function cleanCopiedHtml(html: string): string {
 
   foldNestedLists(doc);
   toTaskLists(doc);
+  cellListsAsLines(doc);
 
   // A quote's text in a paragraph, as markdown renders it.
   for (const quote of body.querySelectorAll("blockquote")) {
@@ -211,6 +212,50 @@ function toTaskLists(doc: Document) {
   }
   for (const list of doc.body.querySelectorAll("ul[data-task-list]")) {
     list.removeAttribute("data-task-list");
+  }
+}
+
+/** A cell's list levels, as Notion marks them. */
+const CELL_BULLETS = ["•", "◦", "▪"];
+
+/**
+ * Lists in table cells as Notion keeps them there: no list blocks — a
+ * Notion cell holds text only — but lines of it, two spaces and "• " for an
+ * item, four spaces more and "◦ " a level deeper, which Notion lays out as
+ * a list. A <ul> in a cell pasted as "• a" with no indent, plain text. The
+ * spaces stay plain: Notion reads them as the indent, `&nbsp;` it does not.
+ */
+function cellListsAsLines(doc: Document) {
+  const isList = (node: Element) =>
+    node.tagName === "UL" || node.tagName === "OL";
+  const lines = (list: Element, depth: number): HTMLElement[] => {
+    const out: HTMLElement[] = [];
+    let number = Number(list.getAttribute("start") ?? 1);
+    for (const item of list.children) {
+      if (item.tagName !== "LI") continue;
+      const nested = [...item.children].filter(isList);
+      const marker =
+        list.tagName === "OL"
+          ? `${number++}. `
+          : `${CELL_BULLETS[depth % CELL_BULLETS.length]} `;
+      const line = doc.createElement("p");
+      line.append(
+        `${" ".repeat(2 + 4 * depth)}${marker}`,
+        ...[...item.childNodes].filter(
+          (child) =>
+            !(child instanceof Element) ||
+            !(isList(child) || child.tagName === "INPUT"),
+        ),
+      );
+      out.push(line);
+      for (const list of nested) out.push(...lines(list, depth + 1));
+    }
+    return out;
+  };
+  for (const list of [
+    ...doc.body.querySelectorAll(":is(td, th) > :is(ul, ol)"),
+  ]) {
+    list.replaceWith(...lines(list, 0));
   }
 }
 
