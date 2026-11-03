@@ -160,3 +160,20 @@ test("Enter with the slash menu open in a cell picks from the menu", async () =>
 
   await waitFor(() => expect(document.querySelector("td ol")).not.toBeNull());
 });
+
+/**
+ * A new line in a cell takes the markdown shortcuts a line of its own does:
+ * "- " after Shift+Enter starts a list there. It stayed "- " — the new line
+ * was a line break inside the same paragraph, and a shortcut only fires at
+ * a paragraph's start.
+ */
+test("“- ” on a new line in a cell starts a list", async () => {
+  await table("top");
+
+  await userEvent.keyboard("{Shift>}{Enter}{/Shift}- x");
+
+  await waitFor(() =>
+    expect(document.querySelector("td li")?.textContent).toBe("x"),
+  );
+  expect(cells()).toStrictEqual([["top", "x"], ["bottom"]]);
+});

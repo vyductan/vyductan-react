@@ -79,6 +79,7 @@ import { SelectLineFirstPlugin } from "../plugins/select-line-first-plugin";
 import { TabFocusPlugin } from "../plugins/tab-focus-plugin";
 import { TableCellActionMenuPlugin } from "../plugins/table-cell-action-menu-plugin";
 import { TableCellEnterPlugin } from "../plugins/table-cell-enter-plugin";
+import { TableCellLineShortcutPlugin } from "../plugins/table-cell-line-shortcut-plugin";
 import { TableColumnResizePlugin } from "../plugins/table-column-resize-plugin";
 import { TableHoverActionsPlugin } from "../plugins/table-hover-actions-plugin";
 import { TOCPlugin } from "../plugins/toc-plugin";
@@ -231,6 +232,7 @@ export function Plugins({
       <HorizontalRulePlugin />
       <TablePlugin />
       <TableCellEnterPlugin />
+      <TableCellLineShortcutPlugin />
       {editable && <ContextMenuPlugin />}
       {editable && (
         <TableCellActionMenuPlugin anchorElem={floatingAnchorElement} />
