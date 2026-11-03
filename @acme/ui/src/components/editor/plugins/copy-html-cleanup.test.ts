@@ -157,14 +157,26 @@ describe("cleanCopiedHtml, lists in table cells", () => {
     );
 
     expect(td.innerHTML).toBe(
-      "<p>  • <strong>Bold:</strong> see <code>fn_x</code></p>",
+      "<p>\u200b  • <strong>Bold:</strong> see <code>fn_x</code></p>",
     );
+  });
+
+  /**
+   * Notion trims the spaces at the start of a pasted cell — `&nbsp;` too —
+   * so a cell opening with a list lost its first item's indent, the rest
+   * kept theirs. A zero-width space ahead of them keeps them; Notion drops
+   * it, leaving the line as its own.
+   */
+  test("a list opening a cell keeps its first item's indent", () => {
+    const td = cell("<ul><li>a</li><li>b</li></ul>");
+
+    expect(td.innerHTML).toBe("<p>\u200b  • a</p><p>  • b</p>");
   });
 
   test("a numbered list counts from its start", () => {
     const td = cell('<ol start="3"><li>c</li><li>d</li></ol>');
 
-    expect(td.innerHTML).toBe("<p>  3. c</p><p>  4. d</p>");
+    expect(td.innerHTML).toBe("<p>\u200b  3. c</p><p>  4. d</p>");
   });
 
   test("a list outside a table stays a list", () => {

@@ -257,7 +257,12 @@ function cellListsAsLines(doc: Document) {
   for (const list of [
     ...doc.body.querySelectorAll(":is(td, th) > :is(ul, ol)"),
   ]) {
-    list.replaceWith(...lines(list, 0));
+    const items = lines(list, 0);
+    // Notion trims the spaces opening a pasted cell, `&nbsp;` too: a cell
+    // that opened with a list lost its first item's indent. A zero-width
+    // space ahead keeps them, and Notion drops it.
+    if (!list.previousElementSibling) items[0]?.prepend("\u200b");
+    list.replaceWith(...items);
   }
 }
 

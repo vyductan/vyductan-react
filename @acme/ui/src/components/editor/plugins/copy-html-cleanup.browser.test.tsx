@@ -123,7 +123,7 @@ test("a table copied whole sends its cell lists as Notion's lines", async () => 
     $getRoot().select(0, $getRoot().getChildrenSize()),
   );
 
-  expect(html).toContain("<p>  • Email confirmed</p>");
+  expect(html).toContain("<p>\u200b  • Email confirmed</p>");
   expect(html).not.toContain("<ul");
 });
 
@@ -136,7 +136,7 @@ test("a table copied by its cells sends its cell lists as Notion's lines", async
     $setSelection($createTableSelectionFrom(table, first, last));
   });
 
-  expect(html).toContain("<p>  • Email confirmed</p>");
+  expect(html).toContain("<p>\u200b  • Email confirmed</p>");
   expect(html).not.toContain("<ul");
 });
 
@@ -193,6 +193,6 @@ test("cells copied by a copy aimed outside the editor are cleaned too", async ()
 
   const html = clipboardData.getData("text/html");
   expect(html).toContain("<table");
-  expect(html).toContain("<p>  • Email confirmed</p>");
+  expect(html).toContain("<p>\u200b  • Email confirmed</p>");
   expect(html).not.toContain("class=");
 });
