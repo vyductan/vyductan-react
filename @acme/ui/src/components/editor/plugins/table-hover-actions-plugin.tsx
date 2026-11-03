@@ -287,11 +287,22 @@ function TableHoverActionsInner({
       if (isTextKey || isEditKey) setButtonState(null);
     };
 
+    // Not keys alone: a paste (Cmd+V), an undo or a cut changes the text
+    // too, and a long paste grew the cell under the button, left across its
+    // words. Any change to the text puts it away. A column resize writes the
+    // table's widths only — no text — and keeps the button it brings back.
+    const removeUpdateListener = editor.registerUpdateListener(
+      ({ dirtyLeaves }) => {
+        if (dirtyLeaves.size > 0) setButtonState(null);
+      },
+    );
+
     document.addEventListener("mousemove", handleMouseMove, { passive: true });
     editorRoot.addEventListener("mouseleave", handleMouseLeave);
     editorRoot.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      removeUpdateListener();
       document.removeEventListener("mousemove", handleMouseMove);
       editorRoot.removeEventListener("mouseleave", handleMouseLeave);
       editorRoot.removeEventListener("keydown", handleKeyDown);

@@ -1,7 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 
+import type { LexicalEditor } from "lexical";
 import * as React from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -13,6 +15,7 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
+import { $createTextNode, $getRoot } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
 import { nodes } from "../nodes/nodes";
@@ -21,7 +24,23 @@ import { TableHoverActionsPlugin } from "./table-hover-actions-plugin";
 
 Object.assign(globalThis, { React });
 
-function TableHoverActionsHarness() {
+function EditorRefPlugin({
+  onReady,
+}: {
+  onReady: (editor: LexicalEditor) => void;
+}) {
+  const [editor] = useLexicalComposerContext();
+  React.useEffect(() => {
+    onReady(editor);
+  }, [editor, onReady]);
+  return null;
+}
+
+function TableHoverActionsHarness({
+  onReady,
+}: {
+  onReady?: (editor: LexicalEditor) => void;
+}) {
   return (
     <LexicalComposer
       initialConfig={{
@@ -41,6 +60,7 @@ function TableHoverActionsHarness() {
       />
       <TablePlugin />
       <TableHoverActionsPlugin anchorElem={document.body} />
+      {onReady ? <EditorRefPlugin onReady={onReady} /> : null}
     </LexicalComposer>
   );
 }
@@ -173,4 +193,54 @@ test("adds a new row from the bottom hover action", async () => {
 
     expect(newRowCells).toEqual(["", ""]);
   });
+});
+
+/**
+ * Pasting a long text into a cell grew the table under the add-row button,
+ * which stayed where the old bottom edge was — a bar across the words. Only
+ * keys typed with no modifier put it away, and a paste is Cmd+V. Any change
+ * to the text does now; the next pointer move brings it back in place.
+ */
+test("a change to the text, a paste too, puts the hover action away", async () => {
+  let editor: LexicalEditor | null = null;
+  const { container } = render(
+    <TableHoverActionsHarness onReady={(next) => (editor = next)} />,
+  );
+  const table = await waitFor(() => {
+    const element = container.querySelector("table");
+    expect(element).not.toBeNull();
+    return element as HTMLTableElement;
+  });
+  Object.defineProperty(table, "getBoundingClientRect", {
+    configurable: true,
+    value: () => ({
+      x: 20,
+      y: 10,
+      top: 10,
+      right: 200,
+      bottom: 110,
+      left: 20,
+      width: 180,
+      height: 100,
+      toJSON: () => ({}),
+    }),
+  });
+  fireEvent.mouseMove(table.querySelector("tr:last-of-type > *:last-child")!, {
+    clientX: 120,
+    clientY: 108,
+  });
+  await screen.findByTitle(/click to add a new row/i);
+
+  (editor as unknown as LexicalEditor).update(
+    () => {
+      $getRoot()
+        .getAllTextNodes()[0]!
+        .insertAfter($createTextNode(" a long pasted text"));
+    },
+    { discrete: true },
+  );
+
+  await waitFor(() =>
+    expect(screen.queryByTitle(/click to add a new row/i)).toBeNull(),
+  );
 });
