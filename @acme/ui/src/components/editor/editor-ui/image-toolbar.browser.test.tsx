@@ -40,14 +40,22 @@ const PIXEL =
 async function renderWithImage({
   captionsEnabled,
   onImageDownload,
+  src = PIXEL,
+  resolveImage,
 }: {
   captionsEnabled?: boolean;
   onImageDownload?: (source: string, name: string) => void;
+  src?: string;
+  resolveImage?: (source: string) => Promise<string>;
 } = {}) {
   let editor: LexicalEditor | null = null;
   render(
     <div style={{ width: 720, padding: 40 }}>
-      <Editor autoFocus={false} onImageDownload={onImageDownload}>
+      <Editor
+        autoFocus={false}
+        onImageDownload={onImageDownload}
+        resolveImage={resolveImage}
+      >
         <EditorRefPlugin onReady={(next) => (editor = next)} />
       </Editor>
     </div>,
@@ -61,7 +69,7 @@ async function renderWithImage({
         .append(
           $createParagraphNode().append(
             $createImageNode({
-              src: PIXEL,
+              src,
               altText: "pic",
               width: 160,
               height: 120,
@@ -195,4 +203,68 @@ test("Download hands the image to the host when it saves images", async () => {
   );
 
   expect(onImageDownload).toHaveBeenCalledWith(PIXEL, "pic");
+});
+
+/** The menu's Copy image, its clipboard write caught. */
+async function copyImage(image: HTMLElement) {
+  const written: ClipboardItem[] = [];
+  vi.spyOn(navigator.clipboard, "write").mockImplementation(async (items) => {
+    written.push(...items);
+  });
+  await userEvent.click(
+    within(await openToolbar(image)).getByRole("button", { name: "More" }),
+  );
+  const copy = await waitFor(() => {
+    const node = [...document.querySelectorAll<HTMLElement>("button")].find(
+      (button) => button.textContent?.includes("Copy image"),
+    );
+    expect(node).toBeTruthy();
+    return node!;
+  });
+  await userEvent.click(copy);
+  await waitFor(() => expect(written).toHaveLength(1));
+  const [item] = written;
+  return { types: item!.types, png: await item!.getType("image/png") };
+}
+
+const JPEG = await (async () => {
+  const canvas = new OffscreenCanvas(4, 3);
+  canvas.getContext("2d")!.fillRect(0, 0, 4, 3);
+  const blob = await canvas.convertToBlob({ type: "image/jpeg" });
+  return await new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.readAsDataURL(blob);
+  });
+})();
+
+/**
+ * The clipboard takes a picture as PNG only: a JPEG was handed over as
+ * image/jpeg, refused, and nothing was copied.
+ */
+test("Copy image puts a JPEG on the clipboard as a PNG", async () => {
+  const { image } = await renderWithImage({ src: JPEG });
+
+  const { types, png } = await copyImage(image);
+
+  expect(types).toStrictEqual(["image/png"]);
+  expect(png.type).toBe("image/png");
+  const bitmap = await createImageBitmap(png);
+  expect([bitmap.width, bitmap.height]).toStrictEqual([4, 3]);
+});
+
+/**
+ * In VS Code an image's src is the file's own path (`assets/pic.png`), shown
+ * through a resolved URL. Copy fetched the path as written, which pointed
+ * nowhere, and nothing was copied.
+ */
+test("Copy image copies the picture as shown, its src resolved", async () => {
+  const { image } = await renderWithImage({
+    src: "assets/pic.png",
+    resolveImage: async () => PIXEL,
+  });
+
+  const { png } = await copyImage(image);
+
+  expect(png.size).toBeGreaterThan(0);
 });

@@ -456,16 +456,24 @@ export default function ImageComponent({
     input.click();
   }, [editor, nodeKey]);
 
-  const handleCopy = useCallback(async () => {
-    try {
-      const response = await fetch(src);
-      const blob = await response.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({ [blob.type]: blob }),
-      ]);
-    } catch (error) {
-      console.error("Failed to copy image:", error);
-    }
+  // The picture as shown (its src may be a path only a resolver can reach),
+  // as a PNG — the one image type the clipboard takes. The write starts at
+  // once with the PNG still coming, so the click's activation still holds.
+  const handleCopy = useCallback(() => {
+    const source = imageReference.current?.currentSrc || src;
+    const png = (async () => {
+      const blob = await (await fetch(source)).blob();
+      if (blob.type === "image/png") return blob;
+      const bitmap = await createImageBitmap(blob);
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      canvas.getContext("2d")?.drawImage(bitmap, 0, 0);
+      return canvas.convertToBlob({ type: "image/png" });
+    })();
+    navigator.clipboard
+      .write([new ClipboardItem({ "image/png": png })])
+      .catch((error: unknown) => {
+        console.error("Failed to copy image:", error);
+      });
   }, [src]);
 
   const downloadImage = useImageDownload();
