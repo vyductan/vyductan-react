@@ -137,15 +137,66 @@ test("Enter on a list item in a cell starts the next item", async () => {
   );
 });
 
-/** In the last row there is no cell below: Enter adds no line. */
-test("Enter in the last row adds no line", async () => {
+/**
+ * In the last row there is no cell below: Enter goes on down, to the line
+ * under the table. It put the caret back at the start of its cell.
+ */
+test("Enter in the last row goes to the line under the table", async () => {
   const live = await table("bottom");
 
   await userEvent.keyboard("{Enter}");
-  await new Promise((resolve) => setTimeout(resolve, 100));
 
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() => {
+        const selection = $getSelection();
+        return $isRangeSelection(selection)
+          ? selection.anchor.getNode().getKey()
+          : null;
+      }),
+    ).toBe(
+      live
+        .getEditorState()
+        .read(() => $getRoot().getLastChildOrThrow().getKey()),
+    ),
+  );
   expect(cells()).toStrictEqual([["top"], ["bottom"]]);
-  expect(caret(live)).toBe("bottom@0");
+  expect(live.getEditorState().read(() => $getRoot().getChildrenSize())).toBe(
+    2,
+  );
+});
+
+/** A table that ends the document: Enter there makes the line under it. */
+test("Enter in the last row of a table that ends the document adds a line", async () => {
+  const live = await table("bottom");
+  live.update(
+    () => {
+      $getRoot().getLastChildOrThrow().remove();
+      $getRoot()
+        .getAllTextNodes()
+        .find((node) => node.getTextContent() === "bottom")!
+        .selectEnd();
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("{Enter}x");
+
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() =>
+        $getRoot()
+          .getChildren()
+          .map((node) => node.getType()),
+      ),
+    ).toStrictEqual(["table", "paragraph"]),
+  );
+  expect(
+    live
+      .getEditorState()
+      .read(() => $getRoot().getLastChildOrThrow().getTextContent()),
+  ).toBe("x");
+  expect(cells()).toStrictEqual([["top"], ["bottom"]]);
 });
 
 /** With the "/" menu open in a cell, Enter picks from the menu. */
