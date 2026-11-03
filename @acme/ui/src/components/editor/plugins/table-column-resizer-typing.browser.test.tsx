@@ -173,3 +173,153 @@ test("a column resize whose release was never heard ends at the next plain move"
 
   expect(announced).toStrictEqual([true, false]);
 });
+
+/**
+ * Pressing the handle sizes a never-sized table's columns, an edit; the
+ * handle took it for typing and put itself away under the pointer. The
+ * pointer it held went with it, the release was never heard, and the drag
+ * stayed on — every hover after ignored, no mark at any boundary.
+ */
+test("pressing the column resize handle keeps it, with its ruler", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <div style={{ width: 700 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent("| Issue | B |\n| --- | --- |\n| Party | x |"),
+      ),
+    ),
+  );
+  const cell = await waitFor(() => {
+    const node = [...document.querySelectorAll<HTMLElement>("td")].find(
+      (td) => td.textContent === "Party",
+    );
+    expect(node).toBeDefined();
+    return node!;
+  });
+  const box = cell.getBoundingClientRect();
+  cell.dispatchEvent(
+    new MouseEvent("mousemove", {
+      bubbles: true,
+      clientX: box.right - 1,
+      clientY: box.top + box.height / 2,
+    }),
+  );
+  const grabber = await waitFor(() => {
+    expect(resizer()).not.toBeNull();
+    return resizer()!;
+  });
+  grabber.setPointerCapture = () => undefined;
+
+  grabber.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: box.right - 1,
+      clientY: box.top + box.height / 2,
+    }),
+  );
+
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  expect(resizer()).not.toBeNull();
+  expect(
+    document.querySelector("[data-table-column-resize-ruler]"),
+  ).not.toBeNull();
+});
+
+/**
+ * Let go outside the webview, the grabber loses the pointer too, so the next
+ * move is a plain mousemove over the table, not the grabber's. The drag
+ * stayed on: the boundary's mark, hidden while dragging, never came back on
+ * hover. That move ends the drag too, and the mark is there again.
+ */
+test("a lost release with the pointer captured elsewhere still brings the mark back", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <div style={{ width: 700 }}>
+      <Editor autoFocus={false}>
+        <EditorRefPlugin onReady={(next) => (editor = next)} />
+      </Editor>
+    </div>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent("| Issue | B |\n| --- | --- |\n| Party | x |"),
+      ),
+    ),
+  );
+  const cell = await waitFor(() => {
+    const node = [...document.querySelectorAll<HTMLElement>("td")].find(
+      (td) => td.textContent === "Party",
+    );
+    expect(node).toBeDefined();
+    return node!;
+  });
+  const box = cell.getBoundingClientRect();
+  const atEdge = {
+    bubbles: true,
+    clientX: box.right - 1,
+    clientY: box.top + box.height / 2,
+  };
+  cell.dispatchEvent(new MouseEvent("mousemove", atEdge));
+  const grabber = await waitFor(() => {
+    expect(resizer()).not.toBeNull();
+    return resizer()!;
+  });
+  // No capture to lose and no event saying so: the pointer simply stops
+  // reaching the grabber, as when it is let go outside the webview.
+  grabber.setPointerCapture = () => undefined;
+  grabber.dispatchEvent(
+    new PointerEvent("pointerdown", {
+      ...atEdge,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    }),
+  );
+  await waitFor(() =>
+    expect(
+      document.querySelector("[data-table-column-resize-ruler]"),
+    ).not.toBeNull(),
+  );
+
+  // Released outside; back on the table, the moves are the page's own.
+  cell.dispatchEvent(new MouseEvent("mousemove", { ...atEdge, buttons: 0 }));
+  await waitFor(() =>
+    expect(
+      document.querySelector("[data-table-column-resize-ruler]"),
+    ).toBeNull(),
+  );
+  // The widths it was let go at are saved, and the handle put away until the
+  // pointer comes back to where the boundary now is.
+  await waitFor(() => expect(resizer()).toBeNull());
+  const edge = cell.getBoundingClientRect().right - 1;
+  cell.dispatchEvent(
+    new MouseEvent("mousemove", { ...atEdge, clientX: edge, buttons: 0 }),
+  );
+
+  await waitFor(() =>
+    expect(
+      document.querySelector("[data-table-column-resize-mark]"),
+    ).not.toBeNull(),
+  );
+});

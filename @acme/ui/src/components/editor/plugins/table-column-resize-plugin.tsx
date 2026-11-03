@@ -149,9 +149,21 @@ function TableColumnResizeInner({
     [],
   );
 
+  /** The latest finishDrag, for the document listener set up once. */
+  const finishDragReference = useRef<(point: { x: number; y: number }) => void>(
+    () => undefined,
+  );
+
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       if (dragReference.current) {
+        // No button down: let go where the page did not hear it, and the
+        // grabber lost the pointer too, so its own moves stopped (see
+        // handlePointerMove). Left on, the drag kept the boundary's mark
+        // hidden and every hover ignored.
+        if (event.buttons === 0) {
+          finishDragReference.current({ x: event.clientX, y: event.clientY });
+        }
         return;
       }
 
@@ -305,6 +317,18 @@ function TableColumnResizeInner({
       [...firstRow.cells].map((cell) => cell.getBoundingClientRect().right),
     );
 
+    // The drag is on before the widths are written below: that write is an
+    // edit, and the update listener puts the handle away on an edit unless a
+    // drag is on. Put away, it took the pointer it held with it — the release
+    // never came, the drag never ended, and every hover after was ignored.
+    const drag: Drag = {
+      tableKey,
+      columnIndex,
+      startX: event.clientX,
+      startWidths: measured,
+      currentWidths: measured,
+    };
+    dragReference.current = drag;
     let startWidths = measured;
 
     // Materialise the widths the browser is already using, so the table does not
@@ -327,13 +351,8 @@ function TableColumnResizeInner({
       { discrete: true },
     );
 
-    dragReference.current = {
-      tableKey,
-      columnIndex,
-      startX: event.clientX,
-      startWidths,
-      currentWidths: startWidths,
-    };
+    drag.startWidths = startWidths;
+    drag.currentWidths = startWidths;
     const startRect = table.getBoundingClientRect();
     setRuler({
       x: grabber.boundaryX,
@@ -381,19 +400,22 @@ function TableColumnResizeInner({
   };
 
   const commitDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const drag = dragReference.current;
-    dragReference.current = null;
-    setRuler(null);
-    dragPointReference.current = { x: event.clientX, y: event.clientY };
-    announceDragEnd();
-
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
+    finishDrag({ x: event.clientX, y: event.clientY });
+  };
 
+  /** End the drag at `point`, keeping the widths it showed last. */
+  const finishDrag = (point: { x: number; y: number }) => {
+    const drag = dragReference.current;
     if (!drag) {
       return;
     }
+    dragReference.current = null;
+    setRuler(null);
+    dragPointReference.current = point;
+    announceDragEnd();
 
     // Re-anchor to where the boundary now is. `grabber.boundaryX` was captured
     // on hover, so reusing it after a resize snapped the resting mark back to
@@ -425,6 +447,10 @@ function TableColumnResizeInner({
       }
     });
   };
+
+  useEffect(() => {
+    finishDragReference.current = finishDrag;
+  });
 
   // Escape abandons the drag and puts the starting widths back.
   useEffect(() => {
@@ -479,6 +505,9 @@ function TableColumnResizeInner({
         // The theme's `tableCellResizer` key positions against a cell; these
         // overlays are anchor-relative, so the geometry is inline here.
         className="absolute z-[46] flex cursor-col-resize justify-center"
+        onLostPointerCapture={(event) =>
+          finishDrag({ x: event.clientX, y: event.clientY })
+        }
         onPointerCancel={commitDrag}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
