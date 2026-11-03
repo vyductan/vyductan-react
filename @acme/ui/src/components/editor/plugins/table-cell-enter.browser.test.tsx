@@ -5,6 +5,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $createTableNodeWithDimensions } from "@lexical/table";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import {
+  $createLineBreakNode,
   $createParagraphNode,
   $createTextNode,
   $getRoot,
@@ -227,4 +228,52 @@ test("“- ” on a new line in a cell starts a list", async () => {
     expect(document.querySelector("td li")?.textContent).toBe("x"),
   );
   expect(cells()).toStrictEqual([["top", "x"], ["bottom"]]);
+});
+
+/**
+ * As in Notion, a list marker makes a list of its own line only: the lines
+ * under it in the cell (after a Shift+Enter) stay as they are. The whole
+ * paragraph went into the list item, those lines indented under its bullet.
+ */
+test("“- ” on a cell's first line leaves the lines under it alone", async () => {
+  const live = await table("", () => [
+    $createParagraphNode().append(
+      $createLineBreakNode(),
+      $createTextNode("→ abc"),
+    ),
+  ]);
+  live.update(
+    () => {
+      $getRoot()
+        .getAllTextNodes()
+        .find((node) => node.getTextContent() === "→ abc")!
+        .getParentOrThrow<ElementNode>()
+        .select(0, 0);
+    },
+    { discrete: true },
+  );
+
+  await userEvent.keyboard("- x");
+
+  await waitFor(() =>
+    expect(document.querySelector("td li")?.textContent).toBe("x"),
+  );
+  expect(cells()).toStrictEqual([["x", "→ abc"], ["bottom"]]);
+});
+
+test("“- ” on a middle line of a cell lists that line only", async () => {
+  await table("top", () => [
+    $createParagraphNode().append(
+      $createTextNode("top"),
+      $createLineBreakNode(),
+      $createTextNode("more"),
+    ),
+  ]);
+
+  await userEvent.keyboard("{Shift>}{Enter}{/Shift}- x");
+
+  await waitFor(() =>
+    expect(document.querySelector("td li")?.textContent).toBe("x"),
+  );
+  expect(cells()).toStrictEqual([["top", "x", "more"], ["bottom"]]);
 });

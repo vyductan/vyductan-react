@@ -1,4 +1,5 @@
 import type { ListType } from "@lexical/list";
+import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import {
   $createListItemNode,
@@ -9,6 +10,7 @@ import {
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $isTableCellNode } from "@lexical/table";
 import {
+  $createParagraphNode,
   $getSelection,
   $isLineBreakNode,
   $isParagraphNode,
@@ -25,11 +27,13 @@ const MARKERS: [RegExp, ListType][] = [
 
 /**
  * In a table cell a new line (Shift+Enter) is a line break inside the cell's
- * paragraph, and the markdown shortcuts only fire at a paragraph's start, so
- * "- " typed there stayed "- ". Now a marker typed right after a line break
- * in a cell — the caret just past it — makes the rest of that paragraph a
- * list of its own in the cell. A marker already in the text, the caret
- * elsewhere (a file opened, a paste), is left alone.
+ * paragraph, and the markdown shortcuts work on whole paragraphs: "- " typed
+ * after a line break stayed "- ", and typed on the first line it took every
+ * line under it into the list item too. As in Notion, a marker typed at the
+ * start of a line in a cell — the caret just past it — makes that line, and
+ * only it, a list in the cell; the lines above and below stay as they were.
+ * A marker already in the text, the caret elsewhere (a file opened, a
+ * paste), is left alone.
  */
 export function TableCellLineShortcutPlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -38,15 +42,24 @@ export function TableCellLineShortcutPlugin(): null {
     if (!editor.hasNodes([ListNode, ListItemNode])) return;
 
     return editor.registerNodeTransform(TextNode, (node) => {
-      const lineBreak = node.getPreviousSibling();
+      const before = node.getPreviousSibling();
       const paragraph = node.getParent();
       if (
-        !$isLineBreakNode(lineBreak) ||
+        (before !== null && !$isLineBreakNode(before)) ||
         !$isParagraphNode(paragraph) ||
         !$isTableCellNode(paragraph.getParent())
       ) {
         return;
       }
+      // The line: from here to the next line break.
+      const line: LexicalNode[] = [node];
+      let after = node.getNextSibling();
+      while (after && !$isLineBreakNode(after)) {
+        line.push(after);
+        after = after.getNextSibling();
+      }
+      // A paragraph of one line is the markdown shortcuts' own case.
+      if (before === null && after === null) return;
       const text = node.getTextContent();
       const found = MARKERS.map(
         ([pattern, type]) => [pattern.exec(text)?.[0], type] as const,
@@ -64,18 +77,22 @@ export function TableCellLineShortcutPlugin(): null {
         return;
       }
 
-      // The line and what follows it leave the paragraph for a list item.
+      // The line leaves the paragraph for a list item; the lines under it
+      // go on in a paragraph of their own under the list.
       const item = $createListItemNode(
         type === "check" ? /^\[[xX]\]/.test(marker) : undefined,
       );
-      const rest = [node, ...node.getNextSiblings()];
-      lineBreak.remove();
-      item.append(...rest);
+      const below = after ? after.getNextSiblings() : [];
+      before?.remove();
+      after?.remove();
+      item.append(...line);
       const list = $createListNode(
         type,
         type === "number" ? Number.parseInt(marker, 10) : undefined,
       ).append(item);
       paragraph.insertAfter(list);
+      if (after) list.insertAfter($createParagraphNode().append(...below));
+      if (paragraph.isEmpty()) paragraph.remove();
 
       const remaining = text.slice(marker.length);
       if (remaining) {
