@@ -2,7 +2,13 @@ import type { ListNode } from "@lexical/list";
 import type { ElementTransformer } from "@lexical/markdown";
 import type { ElementNode, LexicalNode } from "lexical";
 import { $isListItemNode, $isListNode } from "@lexical/list";
-import { $createParagraphNode, $isParagraphNode, $isTextNode } from "lexical";
+import {
+  $createLineBreakNode,
+  $createParagraphNode,
+  $isElementNode,
+  $isParagraphNode,
+  $isTextNode,
+} from "lexical";
 
 import { $isUnmarkedItem } from "../utils/list-marker";
 import { $importedTodoIndent } from "./markdown-nfm-raw-transformer";
@@ -135,6 +141,21 @@ export const CONTINUATION: ElementTransformer = {
   // words under a to-do. A list marker is a list item's, not words.
   regExp: /^(?=([ \t]*)(?![-*+] |\d+[.)] )\S)/,
   replace: (parentNode, children, match) => {
+    // The line after a to-do's line that ends in a backslash — markdown's
+    // line break — is that to-do's own next line (Shift+Enter).
+    const above = parentNode.getPreviousSibling();
+    const end = $isElementNode(above) ? above.getLastDescendant() : null;
+    if (
+      above?.getType() === "check-block" &&
+      $isTextNode(end) &&
+      end.getTextContent().endsWith("\\")
+    ) {
+      end.setTextContent(end.getTextContent().slice(0, -1));
+      if (end.getTextContentSize() === 0) end.remove();
+      (above as ElementNode).append($createLineBreakNode(), ...children);
+      parentNode.remove();
+      return;
+    }
     if (!$todoContext(parentNode)) return false;
     const leading = match[1] ?? "";
     const first = children[0];

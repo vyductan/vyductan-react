@@ -29,6 +29,7 @@ import {
 import { TABLE } from "../transformers/markdown-table-transformer";
 import { CONTINUATION } from "./markdown-continuation-transformer";
 import { INTRAWORD_UNDERSCORE } from "./markdown-intraword-underscore";
+import { LINE_START_ESCAPE } from "./markdown-line-start-escape";
 import {
   CALLOUT,
   DETAILS,
@@ -59,7 +60,11 @@ export const CHECK_BLOCK: ElementTransformer = {
     const isChecked = node.getChecked();
     // Its indent as tabs, as nested list items are written.
     const indent = "\t".repeat(node.getIndent());
-    return `${indent}- [${isChecked ? "x" : " "}] ${traverseChildren(node)}`;
+    // Its own next lines (Shift+Enter) end in a backslash, markdown's line
+    // break: a line at the margin under a to-do is a line of its own, and
+    // a new line alone read back out of the to-do. See CONTINUATION.
+    const words = traverseChildren(node).replaceAll("\n", "\\\n");
+    return `${indent}- [${isChecked ? "x" : " "}] ${words}`;
   },
   // A space, or the line's end: an empty to-do's trailing space is trimmed
   // by format on save, and `- [ ]` read back as a bullet.
@@ -177,6 +182,9 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
 export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   // First: a colored block is written by it, before HEADING/QUOTE/paragraph.
   NFM_BLOCK_COLOR_EXPORT,
+  // Ahead of INTRAWORD_UNDERSCORE, whose text it writes too. Documents
+  // only: a table cell's lines are its own.
+  LINE_START_ESCAPE,
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
