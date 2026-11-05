@@ -27,7 +27,10 @@ import {
   IMAGE_ELEMENT,
 } from "../transformers/markdown-image-transformer";
 import { TABLE } from "../transformers/markdown-table-transformer";
-import { CONTINUATION } from "./markdown-continuation-transformer";
+import {
+  CONTINUATION,
+  TODO_NEXT_LINE,
+} from "./markdown-continuation-transformer";
 import { INTRAWORD_UNDERSCORE } from "./markdown-intraword-underscore";
 import { LINE_START_ESCAPE } from "./markdown-line-start-escape";
 import {
@@ -182,6 +185,8 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
 export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   // First: a colored block is written by it, before HEADING/QUOTE/paragraph.
   NFM_BLOCK_COLOR_EXPORT,
+  // Before the lists: a to-do's next line may start like an item.
+  TODO_NEXT_LINE,
   // Ahead of INTRAWORD_UNDERSCORE, whose text it writes too. Documents
   // only: a table cell's lines are its own.
   LINE_START_ESCAPE,

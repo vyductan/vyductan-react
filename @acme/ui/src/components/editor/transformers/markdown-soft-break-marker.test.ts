@@ -110,3 +110,25 @@ test("a to-do's own lines end in markdown's line break, escaped if need be", () 
     "- [ ] Guest Manage Booking\\\n\\- Plan: visualize\\\nthen more",
   );
 });
+
+/**
+ * Format on save (Prettier) rewrites the line under a to-do's line break:
+ * indented past where a list could start, the escape dropped — markdown
+ * reads it as words all the same. Read here, its spaces stayed, pushing
+ * the line in.
+ */
+test("a to-do's next line as format on save rewrites it reads back the same", () => {
+  for (const markdown of [
+    "- [ ] Guest Manage Booking\\\n       - abc\n",
+    "- [ ] Guest Manage Booking\\\n  \\- abc\n",
+    "- [ ] Guest Manage Booking\\\n      then more\n",
+  ]) {
+    const [block] = blocks(markdownToLexicalContent(markdown));
+    expect(block).toStrictEqual([
+      "check-block",
+      markdown.includes("then more")
+        ? "Guest Manage Booking\nthen more"
+        : "Guest Manage Booking\n- abc",
+    ]);
+  }
+});

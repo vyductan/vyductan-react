@@ -141,21 +141,6 @@ export const CONTINUATION: ElementTransformer = {
   // words under a to-do. A list marker is a list item's, not words.
   regExp: /^(?=([ \t]*)(?![-*+] |\d+[.)] )\S)/,
   replace: (parentNode, children, match) => {
-    // The line after a to-do's line that ends in a backslash — markdown's
-    // line break — is that to-do's own next line (Shift+Enter).
-    const above = parentNode.getPreviousSibling();
-    const end = $isElementNode(above) ? above.getLastDescendant() : null;
-    if (
-      above?.getType() === "check-block" &&
-      $isTextNode(end) &&
-      end.getTextContent().endsWith("\\")
-    ) {
-      end.setTextContent(end.getTextContent().slice(0, -1));
-      if (end.getTextContentSize() === 0) end.remove();
-      (above as ElementNode).append($createLineBreakNode(), ...children);
-      parentNode.remove();
-      return;
-    }
     if (!$todoContext(parentNode)) return false;
     const leading = match[1] ?? "";
     const first = children[0];
@@ -171,6 +156,38 @@ export const CONTINUATION: ElementTransformer = {
     );
     line.append(...children);
     parentNode.replace(line);
+  },
+  type: "element",
+};
+
+/**
+ * The line after a to-do's line that ends in a backslash — markdown's line
+ * break — is that to-do's own next line (Shift+Enter), whatever it starts
+ * with: format on save indents it past where a list could start and drops
+ * its escape, and markdown reads it as words all the same. Its indent is
+ * not its words.
+ *
+ * Ahead of the list transformers, which would take "- abc" for an item.
+ */
+export const TODO_NEXT_LINE: ElementTransformer = {
+  dependencies: [],
+  export: () => null,
+  regExp: /^([ \t]*)(?=\S)/,
+  // The indent is the match, so Lexical leaves it out of the words.
+  replace: (parentNode, children) => {
+    const above = parentNode.getPreviousSibling();
+    const end = $isElementNode(above) ? above.getLastDescendant() : null;
+    if (
+      above?.getType() !== "check-block" ||
+      !$isTextNode(end) ||
+      !end.getTextContent().endsWith("\\")
+    ) {
+      return false;
+    }
+    end.setTextContent(end.getTextContent().slice(0, -1));
+    if (end.getTextContentSize() === 0) end.remove();
+    (above as ElementNode).append($createLineBreakNode(), ...children);
+    parentNode.remove();
   },
   type: "element",
 };
