@@ -253,3 +253,58 @@ test("keeps the menu in place once the pointer leaves the editor", async () => {
   expect(after.width).toBeGreaterThan(0);
   expect(Math.abs(after.top - handle.top)).toBeLessThan(40);
 });
+
+/**
+ * Typing hides the handle and its "+", as Notion does; moving the pointer
+ * brings them back. Keys go straight to the editor's root: what is typed is
+ * not the point, only that a key that writes was pressed.
+ */
+test("hides the handle while typing until the pointer moves", async () => {
+  let editor: LexicalEditor | null = null;
+  render(<Harness onReady={(next) => (editor = next)} />);
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    const paragraph = $createParagraphNode();
+    paragraph.append($createTextNode("Some words"));
+    root.append(paragraph);
+  });
+  await waitFor(() => expect(paragraphs()).toHaveLength(1));
+
+  await userEvent.hover(paragraphs()[0]!);
+  const menu = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[data-slot="draggable-block-menu"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(menu.dataset.typing).toBeUndefined();
+
+  const press = (key: string, init: KeyboardEventInit = {}) =>
+    live
+      .getRootElement()!
+      .dispatchEvent(
+        new KeyboardEvent("keydown", { key, bubbles: true, ...init }),
+      );
+
+  press("x");
+  expect(menu.dataset.typing).toBe("");
+  expect(getComputedStyle(menu).visibility).toBe("hidden");
+
+  await userEvent.hover(document.querySelector('[data-testid="anchor"]')!, {
+    position: { x: 200, y: 150 },
+  });
+  await waitFor(() => expect(menu.dataset.typing).toBeUndefined());
+
+  // A shortcut, or moving the caret, is not typing.
+  press("b", { metaKey: true });
+  press("ArrowLeft");
+  expect(menu.dataset.typing).toBeUndefined();
+
+  press("Backspace");
+  expect(menu.dataset.typing).toBe("");
+});

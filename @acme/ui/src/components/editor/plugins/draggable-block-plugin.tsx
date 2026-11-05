@@ -278,6 +278,41 @@ export function DraggableBlockPlugin({
     };
   }, [anchorElem, editor]);
 
+  // Typing hides the handle and its "+", as Notion does: they sit beside the
+  // line being written and draw the eye. The pointer moving brings them back.
+  useEffect(() => {
+    if (!anchorElem) return;
+    const setTyping = (typing: boolean) => {
+      const menu = menuReference.current;
+      if (!menu || "typing" in menu.dataset === typing) return;
+      if (typing) menu.dataset.typing = "";
+      else delete menu.dataset.typing;
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      if (
+        event.key.length === 1 ||
+        event.key === "Backspace" ||
+        event.key === "Delete" ||
+        event.key === "Enter" ||
+        event.key === "Tab"
+      ) {
+        setTyping(true);
+      }
+    };
+    const onMouseMove = () => setTyping(false);
+    const offRoot = editor.registerRootListener((root, previous) => {
+      previous?.removeEventListener("keydown", onKeyDown);
+      root?.addEventListener("keydown", onKeyDown);
+    });
+    anchorElem.addEventListener("mousemove", onMouseMove);
+    return () => {
+      offRoot();
+      editor.getRootElement()?.removeEventListener("keydown", onKeyDown);
+      anchorElem.removeEventListener("mousemove", onMouseMove);
+    };
+  }, [anchorElem, editor]);
+
   // Insert a new paragraph below the current block and trigger component picker
   const handleAddBlockBelow = useCallback(() => {
     const key = currentNodeKeyReference.current;
@@ -488,7 +523,7 @@ export function DraggableBlockPlugin({
       <div
         ref={menuReference}
         data-slot="draggable-block-menu"
-        className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute top-0 left-0 -ml-1 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100`}
+        className={`${DRAGGABLE_BLOCK_MENU_CLASSNAME} absolute top-0 left-0 -ml-1 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100 data-typing:invisible`}
       >
         {/* Plus Button */}
         <div
