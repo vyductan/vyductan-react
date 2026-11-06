@@ -6,10 +6,16 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { render, waitFor } from "@testing-library/react";
-import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $isElementNode,
+} from "lexical";
 import { afterEach, expect, test } from "vitest";
 import { userEvent } from "vitest/browser";
 
+import { $isLayoutContainerNode } from "../nodes/layout-container-node";
 import { nodes } from "../nodes/nodes";
 import { DraggableBlockPlugin } from "./draggable-block-plugin";
 
@@ -307,4 +313,108 @@ test("hides the handle while typing until the pointer moves", async () => {
 
   press("Backspace");
   expect(menu.dataset.typing).toBe("");
+});
+
+/** The document as text, columns as arrays of their blocks' text. */
+const docShape = (editor: LexicalEditor) =>
+  editor.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((child) =>
+        $isLayoutContainerNode(child)
+          ? child
+              .getChildren()
+              .map((column) =>
+                $isElementNode(column)
+                  ? column.getChildren().map((block) => block.getTextContent())
+                  : [],
+              )
+          : child.getTextContent(),
+      ),
+  );
+
+/**
+ * Drag `from`'s handle and drop at (x, y): real drag events, one
+ * DataTransfer through them, as the browser sends.
+ */
+async function dragBlock(from: HTMLElement, x: number, y: number) {
+  await userEvent.hover(from);
+  const handle = await waitFor(() => {
+    const menu = document.querySelector<HTMLElement>(
+      '[data-slot="draggable-block-menu"]',
+    );
+    const wrapper = menu?.closest<HTMLElement>("[draggable]");
+    expect(wrapper).toBeTruthy();
+    return wrapper!;
+  });
+  const dataTransfer = new DataTransfer();
+  handle.dispatchEvent(
+    new DragEvent("dragstart", {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer,
+    }),
+  );
+  const over = document.elementFromPoint(x, y)!;
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    clientX: x,
+    clientY: y,
+    dataTransfer,
+  };
+  over.dispatchEvent(new DragEvent("dragover", init));
+  const line = document.querySelector<HTMLElement>(
+    '[data-slot="draggable-block-target-line"]',
+  );
+  const lineHeight = line?.getBoundingClientRect().height ?? 0;
+  over.dispatchEvent(new DragEvent("drop", init));
+  handle.dispatchEvent(
+    new DragEvent("dragend", { bubbles: true, dataTransfer }),
+  );
+  return { lineHeight };
+}
+
+/**
+ * Notion's columns: a block dropped on another's right edge goes beside it,
+ * and dragged back out, the columns undo themselves.
+ */
+test("drops a block beside another as columns, and back out", async () => {
+  let editor: LexicalEditor | null = null;
+  render(<Harness onReady={(next) => (editor = next)} />);
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    for (const text of ["Alpha", "Beta", "Gamma"]) {
+      root.append($createParagraphNode().append($createTextNode(text)));
+    }
+  });
+  await waitFor(() => expect(paragraphs()).toHaveLength(3));
+
+  const [alpha, , gamma] = paragraphs();
+  const target = alpha!.getBoundingClientRect();
+  const { lineHeight } = await dragBlock(
+    gamma!,
+    target.right - 4,
+    target.top + target.height / 2,
+  );
+  // Upright, the height of the block, not a 4px line across.
+  expect(lineHeight).toBeGreaterThan(10);
+  await waitFor(() =>
+    expect(docShape(live)).toEqual([[["Alpha"], ["Gamma"]], "Beta"]),
+  );
+
+  // Gamma's handle is in its column; dropped under Beta, the columns go.
+  const inColumn = [
+    ...document.querySelectorAll<HTMLElement>('[contenteditable="true"] p'),
+  ].find((element) => element.textContent === "Gamma")!;
+  const beta = paragraphs().find((element) => element.textContent === "Beta")!;
+  const under = beta.getBoundingClientRect();
+  await dragBlock(inColumn, under.left + under.width / 2, under.bottom - 2);
+  await waitFor(() =>
+    expect(docShape(live)).toEqual(["Alpha", "Beta", "Gamma"]),
+  );
 });

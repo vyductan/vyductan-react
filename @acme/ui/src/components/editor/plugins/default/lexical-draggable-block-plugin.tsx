@@ -16,6 +16,9 @@
  *   an item dropped among non-list blocks in a new list of its own type, and
  *   removes the lists it leaves empty.
  * - Drops use the target's upper/lower half, and the moved block flashes.
+ * - Columns, as Notion has them: blocks inside a column have handles of their
+ *   own, and a drop on a block's right edge puts the dragged block in a
+ *   column beside it (see column-drop.ts).
  */
 import type { ListItemNode } from "@lexical/list";
 import type { LexicalEditor, LexicalNode } from "lexical";
@@ -46,8 +49,17 @@ import {
 } from "lexical";
 import { createPortal } from "react-dom";
 
+import type { Side } from "./column-drop";
+import { $isLayoutContainerNode } from "../../nodes/layout-container-node";
 import { $selectedTopLevelBlocks } from "../../utils/block-selection";
 import { flashNodeKeys } from "../../utils/flash-block";
+import {
+  $blockAnchor,
+  $canDropBeside,
+  $columnOf,
+  $dropBeside,
+  $pruneColumn,
+} from "./column-drop";
 
 const SPACE = 4;
 const TARGET_LINE_HALF_HEIGHT = 2;
@@ -140,7 +152,20 @@ function getBlockElement(
   // Read the committed state rather than editor.read(): this runs inside the
   // DROP_COMMAND update, and editor.read() would commit that update early —
   // the move that follows then hit "Cannot call set() on a frozen node map".
-  const keys = editor.getEditorState().read(() => $getRoot().getChildrenKeys());
+  const [keys, columnKeys] = editor.getEditorState().read(() => {
+    const children = $getRoot().getChildren();
+    return [
+      children.map((child) => child.getKey()),
+      new Set(
+        children
+          .filter((child) => $isLayoutContainerNode(child))
+          .map((child) => child.getKey()),
+      ),
+    ];
+  });
+  const columnElements = new Set(
+    [...columnKeys].map((key) => editor.getElementByKey(key)),
+  );
   const elements = keys
     .map((key) => editor.getElementByKey(key))
     .filter((element): element is HTMLElement => element !== null);
@@ -183,10 +208,81 @@ function getBlockElement(
     }
   }
 
+  if (topLevel && columnElements.has(topLevel)) {
+    topLevel = blockInColumns(topLevel, event.x, event.y);
+  }
   if (topLevel && isListElement(topLevel)) {
     return listItemAt(topLevel, event.y);
   }
   return topLevel;
+}
+
+/** The blocks whose handles stand inside a column, not in the gutter. */
+const inColumn = new WeakSet<HTMLElement>();
+
+/** Nearest of `elements` to `value` along one axis: in it, or closest. */
+function nearest(
+  elements: HTMLElement[],
+  value: number,
+  span: (rect: DOMRect) => [number, number],
+): HTMLElement | null {
+  let best: HTMLElement | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (const element of elements) {
+    const [start, end] = span(element.getBoundingClientRect());
+    const distance =
+      value < start ? start - value : value > end ? value - end : 0;
+    if (distance < bestDistance) {
+      best = element;
+      bestDistance = distance;
+    }
+  }
+  return best;
+}
+
+/**
+ * The block under the pointer in a row of columns: the column across from
+ * it, then the block in that column level with it — the first or last for a
+ * pointer above or below them all.
+ */
+function blockInColumns(
+  container: HTMLElement,
+  x: number,
+  y: number,
+): HTMLElement | null {
+  const columns = [...container.children].filter(isHTMLElement);
+  // Nearest in both directions: side by side as a rule, but columns stack
+  // when there is no room for them across.
+  let column: HTMLElement | null = null;
+  let best = Number.POSITIVE_INFINITY;
+  for (const candidate of columns) {
+    const rect = candidate.getBoundingClientRect();
+    const dx = x < rect.left ? rect.left - x : Math.max(0, x - rect.right);
+    const dy = y < rect.top ? rect.top - y : Math.max(0, y - rect.bottom);
+    if (dx + dy < best) {
+      column = candidate;
+      best = dx + dy;
+    }
+  }
+  if (!column) return null;
+  const block = nearest(
+    [...column.children].filter(isHTMLElement),
+    y,
+    (rect) => [rect.top, rect.bottom],
+  );
+  if (block) inColumn.add(block);
+  return block;
+}
+
+/**
+ * Whether the pointer is on `targetBlockElem`'s right edge: a band a quarter
+ * of the block wide, at most 96px. Only the right — a drag comes from the
+ * handle on the left and passes close by the start of the text on its way
+ * up or down, and a band there turned those drags into columns.
+ */
+function sideFor(targetBlockElem: HTMLElement, mouseX: number): Side | null {
+  const rect = targetBlockElem.getBoundingClientRect();
+  return mouseX >= rect.right - Math.min(96, rect.width / 4) ? "right" : null;
 }
 
 /**
@@ -216,6 +312,8 @@ function setMenuPosition(
   const targetRect = targetElem.getBoundingClientRect();
   const targetStyle =
     targetElem.ownerDocument.defaultView?.getComputedStyle(targetElem);
+  // Shown before it is measured: hidden, it has no width to stand aside by.
+  floatingElem.style.display = "flex";
   const floatingRect = floatingElem.getBoundingClientRect();
   const anchorRect = anchorElem.getBoundingClientRect();
 
@@ -233,9 +331,13 @@ function setMenuPosition(
       anchorRect.top +
       anchorElem.scrollTop) /
     zoomLevel;
+  // In a column the handle goes beside the block, not out in the gutter.
+  const left = inColumn.has(targetElem)
+    ? (targetRect.left - anchorRect.left - floatingRect.width) / zoomLevel
+    : SPACE;
   floatingElem.style.display = "flex";
   floatingElem.style.opacity = "1";
-  floatingElem.style.transform = `translate(${SPACE}px, ${top}px)`;
+  floatingElem.style.transform = `translate(${left}px, ${top}px)`;
 }
 
 function setDragImage(dataTransfer: DataTransfer, blockElem: HTMLElement) {
@@ -253,9 +355,24 @@ function setTargetLine(
   targetBlockElem: HTMLElement,
   mouseY: number,
   anchorElem: HTMLElement,
+  side: Side | null = null,
 ) {
   const blockRect = targetBlockElem.getBoundingClientRect();
   const anchorRect = anchorElem.getBoundingClientRect();
+  if (side) {
+    // Upright, down the edge the dragged block will stand beside.
+    const x =
+      (side === "right" ? blockRect.right + SPACE : blockRect.left - SPACE) -
+      TARGET_LINE_HALF_HEIGHT;
+    targetLineElem.style.transform = `translate(${x - anchorRect.left}px, ${
+      blockRect.top - anchorRect.top + anchorElem.scrollTop
+    }px)`;
+    targetLineElem.style.width = `${TARGET_LINE_HALF_HEIGHT * 2}px`;
+    targetLineElem.style.height = `${blockRect.height}px`;
+    targetLineElem.style.opacity = ".4";
+    return;
+  }
+  targetLineElem.style.height = "";
   const { marginTop, marginBottom } = getCollapsedMargins(targetBlockElem);
   const lineTop =
     placementFor(targetBlockElem, mouseY) === "after"
@@ -341,7 +458,7 @@ function $moveBlock(
 
   let anchor = target;
   if ($isListItemNode(target)) {
-    anchor = target.getTopLevelElementOrThrow();
+    anchor = $blockAnchor(target);
   }
   if (placement === "before") anchor.insertBefore(dragged);
   else anchor.insertAfter(dragged);
@@ -357,8 +474,10 @@ function $moveBlocks(
   target: LexicalNode,
   placement: "before" | "after",
 ): boolean {
-  const anchor = target.getTopLevelElement() ?? target;
-  if (blocks.some((block) => block.is(anchor))) return false;
+  const anchor = $blockAnchor(target);
+  if (blocks.some((block) => block.is(anchor) || block.isParentOf(anchor))) {
+    return false;
+  }
   if (placement === "before") {
     for (const block of blocks) anchor.insertBefore(block);
   } else {
@@ -384,6 +503,8 @@ function useDraggableBlockMenu(
 ): JSX.Element {
   const scrollerElem = anchorElem.parentElement;
   const isDraggingBlockRef = useRef(false);
+  // What is being dragged: a drag's data cannot be read until it is dropped.
+  const draggedKeysRef = useRef<string[]>([]);
   const [draggableBlockElem, setDraggableBlockElemState] =
     useState<HTMLElement | null>(null);
 
@@ -433,6 +554,29 @@ function useDraggableBlockMenu(
   }, [editor, anchorElem, draggableBlockElem, menuRef]);
 
   useEffect(() => {
+    /** The edge a drop would go beside, if the pointer is on one it may. */
+    function sideIfAllowed(
+      targetBlockElem: HTMLElement,
+      mouseX: number,
+    ): Side | null {
+      const side = sideFor(targetBlockElem, mouseX);
+      if (!side) return null;
+      return editor.getEditorState().read(
+        () => {
+          const targetNode = $getNearestNodeFromDOMNode(targetBlockElem);
+          const dragged = draggedKeysRef.current
+            .map((key) => $getNodeByKey(key))
+            .filter((node): node is LexicalNode => node !== null);
+          return targetNode &&
+            dragged.length > 0 &&
+            $canDropBeside(dragged, targetNode)
+            ? side
+            : null;
+        },
+        { editor },
+      );
+    }
+
     function onDragover(event: DragEvent): boolean {
       if (!isDraggingBlockRef.current) return false;
       const [isFileTransfer] = eventFiles(event);
@@ -442,11 +586,13 @@ function useDraggableBlockMenu(
       const targetBlockElem = getBlockElement(anchorElem, editor, event, true);
       const targetLineElem = targetLineRef.current;
       if (targetBlockElem === null || targetLineElem === null) return false;
+      const zoom = calculateZoomLevel(target);
       setTargetLine(
         targetLineElem,
         targetBlockElem,
-        event.clientY / calculateZoomLevel(target),
+        event.clientY / zoom,
         anchorElem,
+        sideIfAllowed(targetBlockElem, event.clientX / zoom),
       );
       // Prevent default so the drop event fires.
       event.preventDefault();
@@ -470,6 +616,25 @@ function useDraggableBlockMenu(
       if (!targetBlockElem) return false;
       const targetNode = $getNearestNodeFromDOMNode(targetBlockElem);
       if (!targetNode) return false;
+      const zoom = calculateZoomLevel(target);
+
+      const side = sideFor(targetBlockElem, event.clientX / zoom);
+      if (side && $canDropBeside(draggedNodes, targetNode)) {
+        $dropBeside(draggedNodes, targetNode, side);
+        setDraggableBlockElem(null);
+        const movedKeys = draggedNodes.map((node) => node.getKey());
+        $onUpdate(() => {
+          flashNodeKeys(editor, movedKeys);
+          if (IS_FIREFOX) editor.focus();
+        });
+        return true;
+      }
+
+      // The columns the dragged blocks leave, tidied once they have gone.
+      const fromColumns = draggedNodes.map((node) => $columnOf(node));
+      const tidy = () => {
+        for (const column of fromColumns) $pruneColumn(column);
+      };
 
       if (draggedNodes.length > 1) {
         const moved = $moveBlocks(
@@ -481,6 +646,7 @@ function useDraggableBlockMenu(
           ),
         );
         setDraggableBlockElem(null);
+        if (moved) tidy();
         if (moved) {
           const movedKeys = draggedNodes.map((node) => node.getKey());
           $onUpdate(() => {
@@ -500,11 +666,9 @@ function useDraggableBlockMenu(
       $moveBlock(
         draggedNode,
         targetNode,
-        placementFor(
-          targetBlockElem,
-          event.clientY / calculateZoomLevel(target),
-        ),
+        placementFor(targetBlockElem, event.clientY / zoom),
       );
+      tidy();
       setDraggableBlockElem(null);
       // Highlight what moved once it is in its new place, as Notion does.
       const movedKey = draggedNode.getKey();
@@ -594,6 +758,7 @@ function useDraggableBlockMenu(
       }
     });
     isDraggingBlockRef.current = true;
+    draggedKeysRef.current = nodeKeys.split(",").filter(Boolean);
     dataTransfer.setData(DRAG_DATA_FORMAT, nodeKeys);
     if (IS_FIREFOX) {
       const rootElement = editor.getRootElement();
