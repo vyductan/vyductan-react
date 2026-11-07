@@ -1,7 +1,11 @@
-import type { ListNode } from "@lexical/list";
+import type { ListItemNode, ListNode } from "@lexical/list";
 import type { LexicalNode } from "lexical";
-import { $isListItemNode, $isListNode } from "@lexical/list";
-import { $getState, createState } from "lexical";
+import {
+  $createListItemNode,
+  $isListItemNode,
+  $isListNode,
+} from "@lexical/list";
+import { $getState, $setState, createState } from "lexical";
 
 /**
  * A list item shown without its marker: Notion's "continuation" line, made by
@@ -43,4 +47,38 @@ export function $displayedListValues(list: ListNode): Map<string, number> {
     next += 1;
   }
   return values;
+}
+
+/**
+ * Put `item`'s nested lists in items of their own, as Lexical keeps them:
+ * `<li>words<ul>…</ul></li>` is the item's words, then an item holding the
+ * nested list. Read any other way the item's marker went (it took the
+ * nested list's place in Chrome's layout) and its children hung off it.
+ *
+ * Lexical splits them so when it reads a whole `<ul>`; a copy taken from
+ * the middle of a list starts with bare `<li>`s, which it reads as they are.
+ * Words after a nested list go on a line of their own, unmarked — still
+ * the item's, as they were.
+ */
+export function $splitNestedLists(item: ListItemNode): void {
+  const children = item.getChildren();
+  if (!children.some($isListNode) || children.every($isListNode)) return;
+  let last: ListItemNode = item;
+  let line: ListItemNode | null = item;
+  for (const child of children) {
+    if ($isListNode(child)) {
+      const holder = $createListItemNode().append(child);
+      last.insertAfter(holder);
+      last = holder;
+      line = null;
+    } else if (line === null) {
+      line = $createListItemNode();
+      $setState(line, unmarkedState, true);
+      last.insertAfter(line);
+      last = line;
+      line.append(child);
+    } else if (!line.is(item)) {
+      line.append(child);
+    }
+  }
 }

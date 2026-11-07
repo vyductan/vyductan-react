@@ -1,9 +1,8 @@
 "use client";
 
-import type { ListItemNode } from "@lexical/list";
 import type { LexicalEditor } from "lexical";
 import { useEffect } from "react";
-import { $isListItemNode, $isListNode } from "@lexical/list";
+import { $isListItemNode, $isListNode, ListItemNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $isTableCellNode } from "@lexical/table";
 import { $dfs, $findMatchingParent, mergeRegister } from "@lexical/utils";
@@ -23,6 +22,7 @@ import {
   $displayedListValues,
   $isNestedListHolder,
   $isUnmarkedItem,
+  $splitNestedLists,
   unmarkedState,
 } from "../utils/list-marker";
 
@@ -115,6 +115,9 @@ export function ListMarkerPlugin(): null {
     const onTabInCellList = (event: KeyboardEvent) =>
       tabInCellList(editor, event);
     return mergeRegister(
+      // An item holding words and a nested list side by side (a copy from
+      // the middle of a list) is split as Lexical keeps items.
+      editor.registerNodeTransform(ListItemNode, $splitNestedLists),
       // As in Notion: in a list in a table cell, Tab nests the item and
       // Shift+Tab takes it back out. The table's own Tab (to the next
       // cell) runs first in Lexical, so this listens ahead of it, on the
