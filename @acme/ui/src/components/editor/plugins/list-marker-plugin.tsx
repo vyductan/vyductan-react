@@ -7,6 +7,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $isTableCellNode } from "@lexical/table";
 import { $dfs, $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
+  $createParagraphNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
@@ -141,6 +142,41 @@ export function ListMarkerPlugin(): null {
             : $findMatchingParent(anchorNode, $isListItemNode);
           if (!$isListItemNode(item) || $isNestedListHolder(item)) return false;
           if ($isUnmarkedItem(item)) {
+            // As in Notion, the last line of a nested list goes out a level
+            // instead: nothing after it to cut off, and the way to write on
+            // below the list. Out of the list altogether it is a paragraph.
+            const parentList = item.getParent();
+            const holder = parentList?.getParent();
+            const outer = holder?.getParent();
+            const lead = item.getFirstDescendant();
+            const atItemStart =
+              anchorNode.is(item) || (lead !== null && anchorNode.is(lead));
+            if (
+              atItemStart &&
+              item.getNextSibling() === null &&
+              $isListNode(parentList) &&
+              $isListItemNode(holder) &&
+              $isListNode(outer)
+            ) {
+              event?.preventDefault();
+              // Out of the nested list, after the item holding it; the
+              // holder goes once its list is empty.
+              holder.insertAfter(item);
+              if (parentList.getChildrenSize() === 0) holder.remove();
+              if (
+                !$isListItemNode(outer.getParent()) &&
+                item.getNextSibling() === null
+              ) {
+                const paragraph = $createParagraphNode();
+                paragraph.append(...item.getChildren());
+                outer.insertAfter(paragraph);
+                item.remove();
+                paragraph.selectStart();
+              } else {
+                item.selectStart();
+              }
+              return true;
+            }
             // Its words join the line above, as in Notion — an empty one
             // simply goes: Enter then Backspace twice is back where it was.
             // Taken out of the list instead, it cut the list in two and

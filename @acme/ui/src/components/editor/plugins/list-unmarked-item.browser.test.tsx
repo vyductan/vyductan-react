@@ -12,6 +12,7 @@ import {
   $createTextNode,
   $getRoot,
   $getSelection,
+  $getState,
   $isRangeSelection,
   $isTextNode,
   $setState,
@@ -387,5 +388,111 @@ test("an unmarked nested line joins the nested line above", async () => {
         .getEditorState()
         .read(() => $convertToMarkdownString(MARKDOWN_DOCUMENT_TRANSFORMERS)),
     ).toBe(["- Giải pháp", "\t- Nếu giữ chỗ:c", "\t- Nếu không"].join("\n")),
+  );
+});
+
+/**
+ * As in Notion: on the last line of a nested list, Backspace twice on a new,
+ * empty line takes it out a level — here out of the list, a paragraph at the
+ * margin — rather than removing it. Once more and it goes, the caret back at
+ * the end of the line above. Removing it at the second press left no way to
+ * write on below the list.
+ */
+test("Backspace on an empty last nested line takes it out a level", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.update(
+    () => {
+      $getRoot()
+        .clear()
+        .append(
+          $createListNode("number").append(
+            item("Chiến lược thương mại"),
+            $createListItemNode().append(
+              $createListNode("bullet").append(
+                item("Push sản phẩm"),
+                item("Theo mùa"),
+              ),
+            ),
+          ),
+        );
+    },
+    { discrete: true },
+  );
+  const blocks = () =>
+    live.getEditorState().read(() =>
+      $getRoot()
+        .getChildren()
+        .map((child) => `${child.getType()}:${child.getTextContent()}`),
+    );
+  const caret = () =>
+    live.getEditorState().read(() => {
+      const selection = $getSelection();
+      return $isRangeSelection(selection)
+        ? `${selection.anchor.getNode().getType()}:${selection.anchor.getNode().getTextContent()}@${selection.anchor.offset}`
+        : null;
+    });
+
+  const [list] = blocks();
+  await caretIn(live, "Theo mùa", "Theo mùa".length);
+  await userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Backspace}");
+  await userEvent.keyboard("{Backspace}");
+
+  await waitFor(() => expect(blocks()).toEqual([list, "paragraph:"]));
+  expect(caret()).toBe("paragraph:@0");
+
+  await userEvent.keyboard("{Backspace}");
+  await waitFor(() => expect(blocks()).toEqual([list]));
+  expect(caret()).toBe(`text:Theo mùa@${"Theo mùa".length}`);
+});
+
+/** Two levels in, the first time out it goes up one, still in the list. */
+test("an empty last line two levels in goes up one level", async () => {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  live.setEditorState(
+    live.parseEditorState(
+      JSON.stringify(
+        markdownToLexicalContent(
+          ["- Giải pháp", "\t- Nếu giữ chỗ", "\t\t- a"].join("\n"),
+        ),
+      ),
+    ),
+  );
+
+  await caretIn(live, "a", 1);
+  await userEvent.keyboard("{Enter}");
+  await userEvent.keyboard("{Backspace}");
+  await userEvent.keyboard("{Backspace}");
+  await userEvent.keyboard("x");
+
+  await waitFor(() =>
+    expect(
+      live.getEditorState().read(() => {
+        const node = $getRoot()
+          .getAllTextNodes()
+          .find((text) => text.getTextContent() === "x");
+        const item = node?.getParent();
+        return item && $isListItemNode(item)
+          ? {
+              indent: item.getIndent(),
+              unmarked: $getState(item, unmarkedState),
+            }
+          : null;
+      }),
+    ).toEqual({ indent: 1, unmarked: true }),
   );
 });
