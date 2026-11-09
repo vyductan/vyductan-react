@@ -1,11 +1,12 @@
-import type { ListItemNode, ListNode } from "@lexical/list";
+import type { ListItemNode, ListNode, ListType } from "@lexical/list";
 import type { LexicalNode } from "lexical";
 import {
   $createListItemNode,
+  $createListNode,
   $isListItemNode,
   $isListNode,
 } from "@lexical/list";
-import { $getState, $setState, createState } from "lexical";
+import { $getState, $isElementNode, $setState, createState } from "lexical";
 
 /**
  * A list item shown without its marker: Notion's "continuation" line, made by
@@ -81,4 +82,28 @@ export function $splitNestedLists(item: ListItemNode): void {
       line.append(child);
     }
   }
+}
+
+/**
+ * A list item's words followed by its nested list, as a paste brings them
+ * when the copy began inside the item: Chrome leaves out the list around the
+ * selection's start, so the item comes as bare inline words, then a `<ul>`.
+ * Pasted on a list item, those words join the item, but the list went in as
+ * a block of its own — out at the edge instead of under them.
+ *
+ * Rewritten in place so the nested list comes in as a holder item in a list
+ * of the pasted-on item's type: the words still join the item at the caret,
+ * and the holder goes in right after it — under the words.
+ */
+export function $nestListAfterWords(
+  nodes: LexicalNode[],
+  listType: ListType,
+): void {
+  const at = nodes.findIndex($isListNode);
+  if (at <= 0) return;
+  const words = nodes.slice(0, at);
+  if (words.some((node) => $isElementNode(node) && !node.isInline())) return;
+  if (words.every((node) => node.getTextContent().trim() === "")) return;
+  const holder = $createListItemNode().append(nodes[at]!);
+  nodes[at] = $createListNode(listType).append(holder);
 }

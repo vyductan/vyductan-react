@@ -13,16 +13,19 @@ import {
   $isRangeSelection,
   $isTextNode,
   $setState,
+  COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   INDENT_CONTENT_COMMAND,
   KEY_BACKSPACE_COMMAND,
   OUTDENT_CONTENT_COMMAND,
+  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
 } from "lexical";
 
 import {
   $displayedListValues,
   $isNestedListHolder,
   $isUnmarkedItem,
+  $nestListAfterWords,
   $splitNestedLists,
   unmarkedState,
 } from "../utils/list-marker";
@@ -119,6 +122,23 @@ export function ListMarkerPlugin(): null {
       // An item holding words and a nested list side by side (a copy from
       // the middle of a list) is split as Lexical keeps items.
       editor.registerNodeTransform(ListItemNode, $splitNestedLists),
+      // An item's words and its nested list, pasted on a list item, come in
+      // as that item — the nested list under its words, not out at the edge.
+      editor.registerCommand(
+        SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
+        ({ nodes, selection }) => {
+          if (!$isRangeSelection(selection)) return false;
+          const item = $findMatchingParent(
+            selection.anchor.getNode(),
+            $isListItemNode,
+          );
+          const list = item?.getParent();
+          if ($isListNode(list)) $nestListAfterWords(nodes, list.getListType());
+          // Only reshaped: the paste goes on as usual.
+          return false;
+        },
+        COMMAND_PRIORITY_HIGH,
+      ),
       // As in Notion: in a list in a table cell, Tab nests the item and
       // Shift+Tab takes it back out. The table's own Tab (to the next
       // cell) runs first in Lexical, so this listens ahead of it, on the
