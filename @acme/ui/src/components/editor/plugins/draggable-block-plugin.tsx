@@ -1,7 +1,7 @@
 import type { LexicalNode, NodeKey } from "lexical";
 import type { JSX } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { $createCodeNode } from "@lexical/code";
+import { $createCodeNode, $isCodeNode } from "@lexical/code";
 import { $generateNodesFromDOM } from "@lexical/html";
 import { $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -24,7 +24,7 @@ import {
   $setState,
   COPY_COMMAND,
 } from "lexical";
-import { GripVerticalIcon, PlusIcon } from "lucide-react";
+import { CheckIcon, GripVerticalIcon, PlusIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import {
@@ -43,7 +43,10 @@ import {
 import { cn } from "@acme/ui/lib/utils";
 
 import type { SizeType } from "../../config-provider/size-context";
-import { $createCheckBlockNode } from "../nodes/check-block-node";
+import {
+  $createCheckBlockNode,
+  $isCheckBlockNode,
+} from "../nodes/check-block-node";
 import {
   blockColorState,
   cssForNotionColor,
@@ -146,6 +149,32 @@ const TURN_INTO_CHOICES: ReadonlyArray<{
   { type: "quote", label: "Quote" },
 ];
 
+type TurnIntoType = (typeof TURN_INTO_CHOICES)[number]["type"];
+
+/** Which of the "Turn into" choices `node` is now, if one of them. */
+export function $turnIntoTypeOf(
+  node: LexicalNode | null | undefined,
+): TurnIntoType | null {
+  if (!node) return null;
+  if ($isListItemNode(node)) {
+    const list = node.getParent();
+    return $isListNode(list) ? list.getListType() : null;
+  }
+  if ($isCheckBlockNode(node)) return "check";
+  if ($isHeadingNode(node)) {
+    const tag = node.getTag();
+    return tag === "h1" || tag === "h2" || tag === "h3" ? tag : null;
+  }
+  if ($isCodeNode(node)) return "code";
+  if ($isQuoteNode(node)) return "quote";
+  if ($isParagraphNode(node)) return "paragraph";
+  return null;
+}
+
+/** The menu's width (w-64) and the gap it keeps from the handle. */
+const MENU_WIDTH = 256;
+const MENU_GAP = 5;
+
 export function DraggableBlockPlugin({
   anchorElem,
   size = "middle",
@@ -164,6 +193,14 @@ export function DraggableBlockPlugin({
   const [isColorOpen, setIsColorOpen] = useState(false);
   // The block the menu is open on can take a color (see BLOCK_COLORS).
   const [canColor, setCanColor] = useState(false);
+  // What the block is now, shown on "Turn into" and ticked in its list.
+  const [currentType, setCurrentType] = useState<TurnIntoType | null>(null);
+  /*
+   * Into the left margin, as Notion opens it, when there is room there;
+   * below the handle when there is not. Left to itself the popover flipped
+   * to the right, over the very line the menu was opened on.
+   */
+  const [menuSide, setMenuSide] = useState<"left" | "bottom">("left");
   /**
    * Mirrors the two above for the mousemove listener, which is bound once and
    * would otherwise close over their first values. Synced in an effect rather
@@ -199,17 +236,39 @@ export function DraggableBlockPlugin({
     (next: boolean) => {
       if (next) {
         const rect = menuReference.current?.getBoundingClientRect();
+        const key = currentNodeKeyReference.current;
         if (rect) {
+          const side =
+            rect.left - MENU_GAP - MENU_WIDTH >= 8 ? "left" : "bottom";
+          setMenuSide(side);
+          // Below, the menu clears the block's first line, not just the
+          // handle: a heading's line is taller than the handle centred on it.
+          let height = rect.height;
+          const block = key === null ? null : editor.getElementByKey(key);
+          if (side === "bottom" && block) {
+            const blockRect = block.getBoundingClientRect();
+            const lineHeight = Number.parseFloat(
+              getComputedStyle(block).lineHeight,
+            );
+            const lineBottom = Number.isNaN(lineHeight)
+              ? blockRect.bottom
+              : Math.min(blockRect.bottom, blockRect.top + lineHeight);
+            height = Math.max(height, lineBottom - rect.top);
+          }
           setAnchorBox({
             top: rect.top,
             left: rect.left,
             width: rect.width,
-            height: rect.height,
+            height,
           });
         }
-        const key = currentNodeKeyReference.current;
         setCanColor(
           key !== null && editor.read(() => $isColorable($getNodeByKey(key))),
+        );
+        setCurrentType(
+          key === null
+            ? null
+            : editor.read(() => $turnIntoTypeOf($getNodeByKey(key))),
         );
       } else {
         setIsColorOpen(false);
@@ -564,8 +623,8 @@ export function DraggableBlockPlugin({
           </PopoverTrigger>
           <PopoverContent
             align="start"
-            side="left"
-            sideOffset={5}
+            side={menuSide}
+            sideOffset={MENU_GAP}
             collisionPadding={8}
             className="w-64 p-0"
           >
@@ -593,7 +652,14 @@ export function DraggableBlockPlugin({
                         }}
                       >
                         <span>Turn into</span>
-                        <span className="ml-auto">›</span>
+                        <span className="ml-auto text-muted-foreground">
+                          {
+                            TURN_INTO_CHOICES.find(
+                              ({ type }) => type === currentType,
+                            )?.label
+                          }
+                        </span>
+                        <span>›</span>
                       </CommandItem>
                     </PopoverTrigger>
                     <PopoverContent
@@ -615,10 +681,19 @@ export function DraggableBlockPlugin({
                               return (
                                 <CommandItem
                                   key={type}
+                                  data-current={
+                                    type === currentType ? "" : undefined
+                                  }
                                   onSelect={() => handleTurnInto(type)}
                                 >
                                   <Icon className="size-4" />
                                   {label}
+                                  {type === currentType && (
+                                    <CheckIcon
+                                      aria-label="Current"
+                                      className="ml-auto size-4"
+                                    />
+                                  )}
                                 </CommandItem>
                               );
                             })}
@@ -708,6 +783,8 @@ export function DraggableBlockPlugin({
     isTurnIntoOpen,
     isColorOpen,
     canColor,
+    currentType,
+    menuSide,
     size,
   ]);
 

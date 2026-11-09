@@ -5,7 +5,8 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { render, waitFor } from "@testing-library/react";
+import { $createHeadingNode } from "@lexical/rich-text";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import {
   $createParagraphNode,
   $createTextNode,
@@ -83,7 +84,12 @@ function Harness({ onReady }: { onReady: (editor: LexicalEditor) => void }) {
   );
 }
 
-afterEach(() => document.body.replaceChildren());
+// Unmounted first: a test can end with a menu open, and clearing the page
+// under its portals left the old tree to fail the next test as it went.
+afterEach(() => {
+  cleanup();
+  document.body.replaceChildren();
+});
 
 const paragraphs = () => [
   ...document.querySelectorAll<HTMLElement>('[contenteditable="true"] > p'),
@@ -417,4 +423,82 @@ test("drops a block beside another as columns, and back out", async () => {
   await waitFor(() =>
     expect(docShape(live)).toEqual(["Alpha", "Beta", "Gamma"]),
   );
+});
+
+/**
+ * As Notion: the menu says what the block is now — on "Turn into", and ticked
+ * in its list. With no room in the margin it opens below the handle; it
+ * flipped to the right, over the line it was opened on.
+ */
+test("the block menu shows the block's type and keeps clear of its line", async () => {
+  let editor: LexicalEditor | null = null;
+  const { unmount } = render(<Harness onReady={(next) => (editor = next)} />);
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+
+  live.update(() => {
+    const root = $getRoot();
+    root.clear();
+    root.append(
+      $createHeadingNode("h2").append($createTextNode("Why")),
+      $createParagraphNode().append($createTextNode("What")),
+    );
+  });
+  const heading = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[contenteditable="true"] h2',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+
+  await userEvent.hover(heading);
+  const trigger = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      '[data-slot="draggable-block-menu"] [data-slot="popover-trigger"]',
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  await userEvent.click(trigger);
+
+  const menu = await waitFor(() => {
+    const node = [
+      ...document.querySelectorAll<HTMLElement>(
+        '[data-slot="popover-content"]',
+      ),
+    ].find((content) => content.textContent?.includes("Turn into"));
+    expect(node).toBeTruthy();
+    return node!;
+  });
+  // Measured where it comes to rest: it slides in from above as it opens.
+  await Promise.all(
+    menu
+      .getAnimations({ subtree: true })
+      .map((animation) => animation.finished),
+  );
+  // The harness leaves 120px of margin, short of the menu's 256.
+  const line = heading.getBoundingClientRect();
+  const box = menu.getBoundingClientRect();
+  const overlaps =
+    box.left < line.right &&
+    box.right > line.left &&
+    box.top < line.bottom &&
+    box.bottom > line.top;
+  expect(overlaps).toBe(false);
+
+  const turnInto = [...menu.querySelectorAll<HTMLElement>("[cmdk-item]")].find(
+    (item) => item.textContent?.startsWith("Turn into"),
+  )!;
+  expect(turnInto.textContent).toContain("Heading 2");
+
+  await userEvent.hover(turnInto);
+  const current = await waitFor(() => {
+    const node = document.querySelector<HTMLElement>(
+      "[cmdk-item][data-current]",
+    );
+    expect(node).not.toBeNull();
+    return node!;
+  });
+  expect(current.textContent).toBe("Heading 2");
 });
