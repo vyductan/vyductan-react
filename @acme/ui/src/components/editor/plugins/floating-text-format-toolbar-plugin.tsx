@@ -167,6 +167,14 @@ function Hint({
 const BUTTON_CLASS =
   "h-7 min-w-7 shrink-0 touch-manipulation rounded-md px-0 text-foreground active:bg-accent";
 
+/**
+ * A mark the selection has, as Notion's menu shows it: its icon in blue.
+ * Keyed on aria-pressed — the tooltip around each button overwrites the
+ * toggle's data-state="on" with its own "closed", and the toggle's accent
+ * is the panel's own color in dark mode.
+ */
+const PRESSED_CLASS = "aria-pressed:text-blue-500";
+
 function ToolbarButton({ className, ...props }: ComponentProps<typeof Button>) {
   return (
     <Button
@@ -843,7 +851,7 @@ function TextFormatFloatingToolbar({
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
         }}
-        className={cn(BUTTON_CLASS, "w-7 p-0")}
+        className={cn(BUTTON_CLASS, PRESSED_CLASS, "w-7 p-0")}
       >
         <Icon className="h-4 w-4" />
       </ToggleGroupItem>
@@ -928,7 +936,7 @@ function TextFormatFloatingToolbar({
                 value="link"
                 aria-label="Toggle link"
                 onClick={insertLink}
-                className={cn(BUTTON_CLASS, "w-7 p-0")}
+                className={cn(BUTTON_CLASS, PRESSED_CLASS, "w-7 p-0")}
               >
                 <LinkIcon className="h-4 w-4" />
               </ToggleGroupItem>

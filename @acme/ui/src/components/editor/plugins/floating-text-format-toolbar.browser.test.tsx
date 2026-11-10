@@ -242,3 +242,36 @@ test("opens below a selection made by touch, clear of the handles", async () => 
     range.getBoundingClientRect().bottom + 20,
   );
 });
+
+/**
+ * A mark the selection has shows on its button, as Notion's menu shows it: in
+ * blue. The button was pressed all along (aria-pressed), but its look keyed
+ * on data-state="on", which the tooltip around it overwrote with "closed" —
+ * and the accent it would have used is the panel's own color in dark mode.
+ */
+test("the marks the selection has are shown in blue", async () => {
+  await page.viewport(1280, 800);
+  const { bar, line, root } = await selectLine({
+    top: 200,
+    left: 40,
+    width: 720,
+  });
+  const button = (label: string) =>
+    bar.querySelector<HTMLElement>(`[aria-label="${label}"]`)!;
+  // Italic and code on the line, by the shortcuts.
+  root.focus();
+  const range = document.createRange();
+  range.selectNodeContents(line);
+  globalThis.getSelection()!.removeAllRanges();
+  globalThis.getSelection()!.addRange(range);
+  await userEvent.keyboard("{Meta>}i{/Meta}");
+  await waitFor(() =>
+    expect(button("Toggle italic").getAttribute("aria-pressed")).toBe("true"),
+  );
+  const color = (label: string) => getComputedStyle(button(label)).color;
+  await waitFor(() =>
+    expect(color("Toggle italic")).not.toBe(color("Toggle bold")),
+  );
+  expect(button("Toggle bold").getAttribute("aria-pressed")).toBe("false");
+  expect(color("Toggle bold")).toBe(color("Clear formatting"));
+});
