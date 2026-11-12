@@ -134,8 +134,9 @@ export const richTextSemanticContract = {
     // it is only indented, as one typed under a to-do is. It stays the first
     // level, and the one nested in it the second. So too two or three holders
     // deep, as under an indented to-do. Such a list steps in as a to-do does
-    // (40px a level, not a nested list's 24), so its text lines up with a
-    // to-do's at the same level — unless a list stands just before it:
+    // (40px a level, not a nested list's 24; the first step 46, as a to-do's
+    // words start 30px in, past its box, where a list's start 24), so its
+    // text lines up with a to-do's at the same level — unless a list stands just before it:
     // bullets under a numbered item are a list of their own after it, and
     // sit as nested in it, as pasted from Notion they are.
     ol: cn(
@@ -143,7 +144,7 @@ export const richTextSemanticContract = {
       "[ol_&]:list-[lower-alpha] [ol_ol_&]:list-[lower-roman] [ol_ol_ol_&]:list-decimal",
       "[:not(li)>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol_&]:list-[lower-alpha]",
       "[:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal [:not(li)>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:list-decimal",
-      "[:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10",
+      "[:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>&]:ml-[46px] [:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ol:not(:is(ol,ul)+ol)>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>ol>li.rich-text-list-holder:first-child>&]:ml-10",
     ),
     // The marker comes from the rules above, so depth sets only the position.
     olDepth: ["list-outside"],
@@ -152,7 +153,7 @@ export const richTextSemanticContract = {
       "[ul_&]:list-[circle] [ul_ul_&]:list-[square] [ul_ul_ul_&]:list-disc",
       "[:not(li)>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul_&]:list-[circle]",
       "[:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc [:not(li)>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:list-disc",
-      "[:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10",
+      "[:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>&]:ml-[46px] [:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10 [:not(li)>ul:not(:is(ol,ul)+ul)>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>ul>li.rich-text-list-holder:first-child>&]:ml-10",
     ),
     ulDepth: ["list-outside"],
   },
@@ -221,8 +222,11 @@ export const richTextSemanticContract = {
   // A real border: Chrome makes no ::after for an <hr>, a void element.
   hr: "my-2 mx-0 h-0 border-0 border-t border-border",
   checkBlock:
-    'flex items-start gap-2 my-1 *:data-[lexical-text="true"]:flex-1 *:data-[lexical-text="true"]:min-w-0',
-  checkBlockIcon: "mt-0.5 size-4 shrink-0 rounded border border-primary",
+    'flex items-start my-1 *:data-[lexical-text="true"]:flex-1 *:data-[lexical-text="true"]:min-w-0',
+  // The same box as a checklist item's (CHECK_ITEM): a to-do made here is
+  // one, and the same to-do read back from markdown is a check block.
+  checkBlockIcon:
+    "mt-[calc((1lh_-_1rem)/2)] mr-[11px] ml-[3px] size-4 shrink-0 rounded-[3px] border-[1.5px] border-solid border-foreground/70",
   checkBlockChecked:
-    '*:data-[lexical-text="true"]:line-through *:data-[lexical-text="true"]:text-muted-foreground *:data-check-icon:bg-primary *:data-check-icon:relative *:data-check-icon:after:content-[""] *:data-check-icon:after:absolute *:data-check-icon:after:top-[3px] *:data-check-icon:after:left-[5.5px] *:data-check-icon:after:w-[3px] *:data-check-icon:after:h-[6px] *:data-check-icon:after:rotate-45 *:data-check-icon:after:border-r-2 *:data-check-icon:after:border-b-2 *:data-check-icon:after:border-white',
+    '*:data-[lexical-text="true"]:line-through *:data-[lexical-text="true"]:text-muted-foreground *:data-check-icon:border-primary *:data-check-icon:bg-primary *:data-check-icon:relative *:data-check-icon:after:content-[""] *:data-check-icon:after:absolute *:data-check-icon:after:top-[3px] *:data-check-icon:after:left-[5.5px] *:data-check-icon:after:w-[3px] *:data-check-icon:after:h-[6px] *:data-check-icon:after:rotate-45 *:data-check-icon:after:border-r-2 *:data-check-icon:after:border-b-2 *:data-check-icon:after:border-white',
 } satisfies RichTextSemanticContract;
