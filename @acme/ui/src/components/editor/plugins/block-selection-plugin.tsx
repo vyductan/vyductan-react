@@ -28,7 +28,10 @@ export function BlockSelectionPlugin(): null {
 
     const unmark = () => {
       for (const element of marked) {
-        element.removeAttribute(BLOCK_SELECTED_ATTRIBUTE);
+        // A block that is gone keeps its mark: touching a removed table
+        // set Lexical's table observer looking for a table no longer there.
+        if (element.isConnected)
+          element.removeAttribute(BLOCK_SELECTED_ATTRIBUTE);
       }
       marked = [];
     };

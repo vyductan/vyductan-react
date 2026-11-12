@@ -55,6 +55,7 @@ import { FloatingTextFormatToolbarPlugin } from "../plugins/floating-text-format
 import { FormatShortcutsPlugin } from "../plugins/format-shortcuts-plugin";
 import { HistoryFlashPlugin } from "../plugins/history-flash-plugin";
 import { ClickBelowPlugin } from "../plugins/click-below-plugin";
+import { WholeBlocksDeletePlugin } from "../plugins/whole-blocks-delete-plugin";
 import { ImageLineClickPlugin } from "../plugins/image-line-click-plugin";
 import { ImagesPlugin } from "../plugins/images-plugin";
 import { InlineBlockPastePlugin } from "../plugins/inline-block-paste-plugin";
@@ -254,6 +255,7 @@ export function Plugins({
       <FormatShortcutsPlugin />
       <ImageLineClickPlugin />
       {editable && <ClickBelowPlugin />}
+      {editable && <WholeBlocksDeletePlugin />}
       <HistoryFlashPlugin />
       <ListMarkerPlugin />
       <ListMarkerShortcutPlugin />

@@ -64,7 +64,7 @@ export function $lineOf(node: LexicalNode): LexicalNode | null {
 }
 
 /** Every line of the document, in order. */
-function $lines(): LexicalNode[] {
+export function $lines(): LexicalNode[] {
   const lines: LexicalNode[] = [];
   const visitList = (list: LexicalNode) => {
     if (!$isElementNode(list)) return;
