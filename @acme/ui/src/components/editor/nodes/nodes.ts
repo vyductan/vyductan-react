@@ -32,6 +32,7 @@ import { MentionNode } from "../nodes/mention-node";
 import { NfmRawBlockNode, NfmRawInlineNode } from "../nodes/nfm-raw-node";
 import { PageBreakNode } from "../nodes/page-break-node";
 import { PollNode } from "../nodes/poll-node";
+import { QuoteContainerNode } from "../nodes/quote-container-node";
 import { TOCNode } from "../nodes/toc-node";
 import { VideoNode } from "../nodes/video-node";
 
@@ -41,6 +42,7 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     ParagraphNode,
     TextNode,
     QuoteNode,
+    QuoteContainerNode,
     ListNode,
     ListItemNode,
     LinkNode,

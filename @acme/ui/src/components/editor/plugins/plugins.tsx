@@ -56,6 +56,7 @@ import { FormatShortcutsPlugin } from "../plugins/format-shortcuts-plugin";
 import { HistoryFlashPlugin } from "../plugins/history-flash-plugin";
 import { ClickBelowPlugin } from "../plugins/click-below-plugin";
 import { WholeBlocksDeletePlugin } from "../plugins/whole-blocks-delete-plugin";
+import { QuoteContainerPlugin } from "../plugins/quote-container-plugin";
 import { ImageLineClickPlugin } from "../plugins/image-line-click-plugin";
 import { ImagesPlugin } from "../plugins/images-plugin";
 import { InlineBlockPastePlugin } from "../plugins/inline-block-paste-plugin";
@@ -256,6 +257,7 @@ export function Plugins({
       <ImageLineClickPlugin />
       {editable && <ClickBelowPlugin />}
       {editable && <WholeBlocksDeletePlugin />}
+      {editable && <QuoteContainerPlugin />}
       <HistoryFlashPlugin />
       <ListMarkerPlugin />
       <ListMarkerShortcutPlugin />

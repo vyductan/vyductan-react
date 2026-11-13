@@ -37,6 +37,8 @@ import {
   CALLOUT,
   DETAILS,
   NFM_COLUMNS,
+  QUOTE_BLOCKS,
+  withQuoteLists,
 } from "./markdown-nfm-blocks-transformer";
 import {
   NFM_BLOCK_COLOR_EXPORT,
@@ -100,7 +102,10 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   CHECK_BLOCK,
   // ELEMENT_TRANSFORMERS bao gồm transformers cho lists (unordered và ordered)
   // Cần có để Lexical có thể convert list nodes thành markdown đúng format
-  ...ELEMENT_TRANSFORMERS.map(withTabIndentedLists),
+  // In a quote, a list's shortcut makes a list inside it (withQuoteLists).
+  ...ELEMENT_TRANSFORMERS.map((transformer) =>
+    withQuoteLists(transformer, withTabIndentedLists(transformer)),
+  ),
   // Transformer custom: Convert current list item to checklist when typing "[] "
   {
     dependencies: [CheckBlockNode, ListNode, ListItemNode],
@@ -193,6 +198,7 @@ export const MARKDOWN_DOCUMENT_TRANSFORMERS: Array<Transformer> = [
   ...MARKDOWN_TRANSFORMERS,
   DETAILS,
   CALLOUT,
+  QUOTE_BLOCKS,
   // Before NFM_RAW_BLOCK, which keeps the <table>s and <columns> these decline.
   NFM_TABLE,
   NFM_COLUMNS,

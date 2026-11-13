@@ -1,9 +1,17 @@
-import type { MultilineElementTransformer } from "@lexical/markdown";
+import type {
+  ElementTransformer,
+  MultilineElementTransformer,
+  Transformer,
+} from "@lexical/markdown";
 import type { ElementNode } from "lexical";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
+  ORDERED_LIST,
+  UNORDERED_LIST,
 } from "@lexical/markdown";
+import { $isQuoteNode } from "@lexical/rich-text";
+import { $createParagraphNode } from "lexical";
 
 import {
   $createCalloutNode,
@@ -35,6 +43,11 @@ import {
   $isLayoutItemNode,
   LayoutItemNode,
 } from "../nodes/layout-item-node";
+import {
+  $createQuoteContainerNode,
+  $isQuoteContainerNode,
+  QuoteContainerNode,
+} from "../nodes/quote-container-node";
 import { getMarkdownDocumentTransformers } from "./markdown-transformer-registry";
 
 /*
@@ -185,6 +198,80 @@ export const CALLOUT: MultilineElementTransformer = {
   replace: () => false,
   type: "multiline-element",
 };
+
+/*
+ * A quote holding a list, as markdown writes one and GitHub shows it:
+ *
+ *   > - first
+ *   > - second
+ *
+ * A run of `>` lines with a list item among them reads as a quote that holds
+ * blocks (QuoteContainerNode). One of words alone is left to QUOTE, and
+ * stays a quote of words. Read as words, the items lost their bullets, and
+ * on saving the second came back escaped (`> \- second`).
+ */
+const QUOTE_LINE = /^>/;
+const LIST_LINE = /^\s*(?:[-*+]|\d{1,9}[.)])\s/;
+
+export const QUOTE_BLOCKS: MultilineElementTransformer = {
+  dependencies: [QuoteContainerNode],
+  export: (node) => {
+    if (!$isQuoteContainerNode(node)) return null;
+    return $exportBlocks(node)
+      .split("\n")
+      .map((line) => (line === "" ? ">" : `> ${line}`))
+      .join("\n");
+  },
+  handleImportAfterStartMatch: ({ lines, rootNode, startLineIndex }) => {
+    let end = startLineIndex;
+    while (end + 1 < lines.length && QUOTE_LINE.test(lines[end + 1] ?? "")) {
+      end++;
+    }
+    const body = lines
+      .slice(startLineIndex, end + 1)
+      .map((line) => line.replace(/^> ?/, ""));
+    if (!body.some((line) => LIST_LINE.test(line))) return null;
+
+    const quote = $createQuoteContainerNode();
+    $importBlocks(body.join("\n"), quote);
+    rootNode.append(quote);
+    return [true, end];
+  },
+  regExpStart: QUOTE_LINE,
+  replace: () => false,
+  type: "multiline-element",
+};
+
+/**
+ * `transformer` (a list's) with its typing shortcut made in a quote, as in
+ * Notion: "- " or "1. " at the start of a quote makes a list inside it —
+ * the quote's words its first item — instead of turning the quote into a
+ * list. Reading markdown goes through QUOTE_BLOCKS instead.
+ */
+export function withQuoteLists(
+  original: Transformer,
+  transformer: Transformer,
+): Transformer {
+  if (original !== UNORDERED_LIST && original !== ORDERED_LIST) {
+    return transformer;
+  }
+  const list = transformer as ElementTransformer;
+  const replace: ElementTransformer["replace"] = (
+    parentNode,
+    children,
+    match,
+    isImport,
+  ) => {
+    if (isImport || !$isQuoteNode(parentNode)) {
+      return list.replace(parentNode, children, match, isImport);
+    }
+    const line = $createParagraphNode();
+    const quote = $createQuoteContainerNode().append(line);
+    parentNode.replace(quote);
+    return list.replace(line, children, match, isImport);
+  };
+  return { ...list, replace };
+}
 
 /*
  * Columns, read into the editor's column layout:
