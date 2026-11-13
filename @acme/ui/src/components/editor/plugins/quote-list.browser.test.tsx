@@ -136,3 +136,72 @@ test("Enter on the empty last item takes it out of the quote, still an item", as
     ]),
   );
 });
+
+/*
+ * Lines of words in a quote stay in it, as in Notion: Backspace on an
+ * empty item there takes its bullet, Enter goes on to a new line in the
+ * quote, and Enter on an empty line too — only an empty item steps out.
+ */
+test("lines of words in a quote stay in it, empty or not", async () => {
+  const live = await quoteWith("");
+  await userEvent.keyboard("- C{Enter}{Backspace}T{Enter}U{Enter}{Enter}V");
+  await waitFor(() => {
+    const top = shape(live);
+    expect(top).toHaveLength(1);
+    expect(Object.keys(top[0] as object)).toStrictEqual(["quote-container"]);
+    const words = live
+      .getEditorState()
+      .read(() => $getRoot().getTextContent().replaceAll("\n", " ").trim());
+    expect(words.split(/\s+/)).toStrictEqual(["C", "T", "U", "V"]);
+  });
+});
+
+/** Paste `html` on an empty line. */
+async function paste(html: string) {
+  let editor: LexicalEditor | null = null;
+  render(
+    <Editor autoFocus={false}>
+      <EditorRefPlugin onReady={(next) => (editor = next)} />
+    </Editor>,
+  );
+  await waitFor(() => expect(editor).not.toBeNull());
+  const live = editor as unknown as LexicalEditor;
+  const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
+  root.focus();
+  live.update(() => $getRoot().clear().selectStart(), { discrete: true });
+  const clipboardData = new DataTransfer();
+  clipboardData.setData("text/html", html);
+  clipboardData.setData("text/plain", "a");
+  root.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
+  );
+  return live;
+}
+
+test("a pasted quote holding a list keeps the list inside it", async () => {
+  const live = await paste(
+    "<meta charset='utf-8'><blockquote><ul><li>a</li><li>b</li></ul></blockquote>",
+  );
+  await waitFor(() =>
+    expect(shape(live)).toStrictEqual([
+      { "quote-container": [{ list: ["listitem:a", "listitem:b"] }] },
+    ]),
+  );
+});
+
+test("a pasted quote of words stays a quote of words", async () => {
+  const live = await paste(
+    "<meta charset='utf-8'><blockquote><p>words</p></blockquote>",
+  );
+  await waitFor(() =>
+    expect(
+      live
+        .getEditorState()
+        .read(() => $getRoot().getChildren().map((node) => node.getType())),
+    ).toStrictEqual(["quote"]),
+  );
+});

@@ -12,11 +12,15 @@ import {
 } from "lexical";
 
 import { $isQuoteContainerNode } from "../nodes/quote-container-node";
+import { $isUnmarkedItem } from "../utils/list-marker";
 
 /**
  * Enter on the empty last item of a list that ends a quote takes the item
  * out, right after the quote and still an item, as Notion does: the way out
  * of a list in a quote. It became an empty line inside the quote.
+ *
+ * Only an item: a line of words in the quote — an item whose bullet
+ * Backspace took — goes on in it on Enter, empty or not, as in Notion.
  */
 export function QuoteContainerPlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -41,6 +45,9 @@ export function QuoteContainerPlugin(): null {
             !$isListNode(list) ||
             !$isQuoteContainerNode(quote) ||
             item.getChildrenSize() > 0 ||
+            // A line of words (its bullet taken by Backspace) goes on in
+            // the quote, empty or not, as in Notion.
+            $isUnmarkedItem(item) ||
             item.getNextSibling() !== null ||
             list.getNextSibling() !== null
           ) {
