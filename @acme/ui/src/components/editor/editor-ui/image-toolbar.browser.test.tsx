@@ -268,3 +268,40 @@ test("Copy image copies the picture as shown, its src resolved", async () => {
 
   expect(png.size).toBeGreaterThan(0);
 });
+
+/*
+ * The caption's prompt sits where its caret does, as on the page. A new
+ * caption had no line at all — the caret sat at the editable's edge, above
+ * a prompt drawn with a line's margin — and the prompt was offset by the
+ * caption's padding twice (inset like the editable, then by its own
+ * top/left): it stood below and right of the caret.
+ */
+test("the caption's prompt starts where its caret does", async () => {
+  const { image } = await renderWithImage({ captionsEnabled: true });
+  await userEvent.click(
+    within(await openToolbar(image)).getByRole("button", { name: "Caption" }),
+  );
+
+  const { line, prompt } = await waitFor(() => {
+    const caption = document.querySelector<HTMLElement>(
+      '[data-slot="image-caption"]',
+    );
+    // The editable's first line — not the prompt, which shares its class.
+    const line = caption?.querySelector<HTMLElement>("[contenteditable] > *");
+    const prompt = caption?.querySelector<HTMLElement>(
+      '[data-slot="editor-placeholder"] > div',
+    );
+    expect(line).toBeTruthy();
+    expect(prompt?.textContent).toBe("Write a caption...");
+    return { line: line!, prompt: prompt! };
+  });
+
+  const at = (element: HTMLElement) => {
+    const box = element.getBoundingClientRect();
+    return { left: Math.round(box.left), top: Math.round(box.top) };
+  };
+  expect(at(prompt)).toStrictEqual(at(line));
+  expect(getComputedStyle(prompt).fontSize).toBe(
+    getComputedStyle(line).fontSize,
+  );
+});

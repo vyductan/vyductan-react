@@ -30,7 +30,9 @@ import { useLexicalEditable } from "@lexical/react/useLexicalEditable";
 import { useLexicalNodeSelection } from "@lexical/react/useLexicalNodeSelection";
 import { mergeRegister } from "@lexical/utils";
 import {
+  $createParagraphNode,
   $getNodeByKey,
+  $getRoot,
   $getSelection,
   $isNodeSelection,
   $setSelection,
@@ -491,6 +493,12 @@ export default function ImageComponent({
   // Shows the caption, or goes to it when it is there already.
   const handleCaptionToggle = useCallback(() => {
     setShowCaption();
+    // A new caption has no line: the caret sat at the editable's edge, above
+    // a prompt drawn where a line's words start. It gets one to sit in.
+    caption.update(() => {
+      const root = $getRoot();
+      if (root.getChildrenSize() === 0) root.append($createParagraphNode());
+    });
     setTimeout(() => caption.focus(), 0);
   }, [setShowCaption, caption]);
 
@@ -625,7 +633,10 @@ export default function ImageComponent({
                   contentEditable={
                     <ContentEditable
                       className="ImageNode__contentEditable user-select-text word-break-break-word relative block min-h-5 w-full cursor-text resize-none border-0 px-0.5 pt-1.5 pb-1 text-sm whitespace-pre-wrap caret-primary outline-none"
-                      placeholderClassName="ImageNode__placeholder text-sm text-muted-foreground/60 overflow-hidden absolute top-1.5 left-0.5 pointer-events-none text-ellipsis user-select-none whitespace-nowrap inline-block"
+                      // Laid over the editable as ContentEditable places it — inset,
+                      // padded alike. `absolute` again over the editable's
+                      // `relative`; no top/left of its own, which offset it twice.
+                      placeholderClassName="ImageNode__placeholder absolute text-sm text-muted-foreground/60 overflow-hidden pointer-events-none text-ellipsis user-select-none whitespace-nowrap"
                       placeholder="Write a caption..."
                     />
                   }
