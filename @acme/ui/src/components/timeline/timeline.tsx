@@ -1,6 +1,19 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { cn } from "@acme/ui/lib/utils";
+
+/**
+ * Semantic parts, named as AntD's Timeline names them (v6 `classNames` /
+ * `styles`). AntD has no `size` prop: spacing between items is the item's
+ * bottom padding (its `itemPaddingBottom` token, 20px here as `pb-5`), so a
+ * denser timeline passes e.g. `classNames={{ item: "pb-3" }}`.
+ */
+type TimelineSemanticPart =
+  | "root"
+  | "item"
+  | "itemRail"
+  | "itemIcon"
+  | "itemContent";
 
 type TimelineProperties = {
   items: {
@@ -9,26 +22,32 @@ type TimelineProperties = {
     color?: string;
     dot?: ReactNode;
   }[];
+  className?: string;
+  classNames?: Partial<Record<TimelineSemanticPart, string>>;
+  styles?: Partial<Record<TimelineSemanticPart, CSSProperties>>;
 };
-export const Timeline = ({ items }: TimelineProperties) => {
+export const Timeline = ({
+  items,
+  className,
+  classNames,
+  styles,
+}: TimelineProperties) => {
   return (
-    <ul>
+    <ul className={cn(className, classNames?.root)} style={styles?.root}>
       {items.map((x, index) => {
         return (
           <li
             key={index}
-            className={cn(
-              "relative",
-              "pb-5",
-              // "relative grid gap-10 pl-6 after:absolute after:inset-y-0 after:left-0 after:w-px after:bg-muted-foreground/20",
-            )}
+            className={cn("relative", "pb-5", classNames?.item)}
+            style={styles?.item}
           >
             <div
-              className="absolute border-s-2"
+              className={cn("absolute border-s-2", classNames?.itemRail)}
               style={{
                 insetBlockStart: 10,
                 insetInlineStart: "calc((10px - 2px) / 2)",
                 height: "calc(100% - 10px)",
+                ...styles?.itemRail,
               }}
             />
 
@@ -36,19 +55,22 @@ export const Timeline = ({ items }: TimelineProperties) => {
               className={cn(
                 "absolute",
                 "flex -translate-x-1/2 -translate-y-1/2 bg-background py-1",
-                // x.dot ? "bg-white py-1" : "size-2.5 rounded-full bg-gray-800",
+                classNames?.itemIcon,
               )}
               style={{
                 insetBlockStart: "calc(10px / 2)",
                 insetInlineStart: "calc(10px / 2)",
-                // height: "calc(100% - 10px)",
+                ...styles?.itemIcon,
               }}
             >
               {x.dot ?? (
                 <span className="size-2.5 rounded-full bg-foreground" />
               )}
             </div>
-            <div className="relative ml-6" style={{ insetBlockStart: -6 }}>
+            <div
+              className={cn("relative ml-6", classNames?.itemContent)}
+              style={{ insetBlockStart: -6, ...styles?.itemContent }}
+            >
               {x.children}
             </div>
           </li>
