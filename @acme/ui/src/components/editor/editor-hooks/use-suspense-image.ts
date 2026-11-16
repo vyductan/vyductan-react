@@ -58,56 +58,91 @@ function loadImage(source: string): Promise<void> {
   return pending;
 }
 
-export function useSuspenseImage(source: string) {
-  const resolveImage = useImageResolver();
+/*
+ * One promise per source for "resolved URL, and that URL loaded", handed to
+ * use() on EVERY render.
+ *
+ * React 19 requires use() to be called the same way on the render that
+ * resumes after a suspension as on the one that suspended. The old hook
+ * called use() only while the resolver's answer was missing from the cache,
+ * so the resumed render — answer now cached — skipped it, and React reported
+ * "called use() to suspend in a previous render but did not call use() when
+ * it finished" on every pasted image.
+ *
+ * The promise is cached so every render hands use() the same object; React
+ * reads its settled state off the object instead of suspending again.
+ */
+const imagePromiseCache = new Map<string, Promise<string>>();
 
-  // If no resolver, we just use the src as is (default behavior)
-  const effectiveSource = resolveImage
-    ? (resolvedUrlCache.get(source) ?? source)
-    : source;
+function imagePromise(
+  source: string,
+  resolveImage: ((source_: string) => Promise<string>) | null | undefined,
+): Promise<string> {
+  const cached = imagePromiseCache.get(source);
+  if (cached) return cached;
 
-  // If we have a resolver and haven't resolved yet
-  if (resolveImage && !resolvedUrlCache.has(source)) {
-    // Check if resolution is pending
-    const pendingResolution = pendingResolutionCache.get(source);
-    if (pendingResolution) {
-      use(pendingResolution);
-    }
+  const resolvedUrl = resolveImage ? resolvedUrlCache.get(source) : source;
 
-    // Start resolving
-    const promise = resolveImage(source).then((resolvedUrl) => {
+  let promise: Promise<string>;
+  if (resolvedUrl !== undefined && loadedImageCache.has(resolvedUrl)) {
+    /*
+     * Already resolved and loaded (preloadImage on paste, or an earlier
+     * mount). Handed over pre-settled — the fields React itself writes on a
+     * thenable — so a remount draws the image at once instead of suspending
+     * for a microtask and flashing the fallback.
+     */
+    promise = Object.assign(Promise.resolve(resolvedUrl), {
+      status: "fulfilled" as const,
+      value: resolvedUrl,
+    });
+  } else {
+    promise = (
+      resolveImage
+        ? resolvedUrl === undefined
+          ? resolveUrl(source, resolveImage)
+          : Promise.resolve(resolvedUrl)
+        : Promise.resolve(source)
+    ).then(async (url) => {
+      await loadImage(url);
+      return url;
+    });
+  }
+
+  imagePromiseCache.set(source, promise);
+  return promise;
+}
+
+function resolveUrl(
+  source: string,
+  resolveImage: (source_: string) => Promise<string>,
+): Promise<string> {
+  let pending = pendingResolutionCache.get(source);
+  if (!pending) {
+    pending = resolveImage(source).then((resolvedUrl) => {
       resolvedUrlCache.set(source, resolvedUrl);
       pendingResolutionCache.delete(source);
       return resolvedUrl;
     });
-
-    pendingResolutionCache.set(source, promise);
-
-    use(promise);
+    pendingResolutionCache.set(source, pending);
   }
+  return pending;
+}
 
-  // Now effectiveSrc is the resolved URL (or original if no resolver)
-  const promise = loadImage(effectiveSource);
-  if (
-    !loadedImageCache.has(effectiveSource) &&
-    !failedImageCache.has(effectiveSource)
-  ) {
-    throw promise;
-  } else if (failedImageCache.has(effectiveSource)) {
-    throw (
-      failedImageCache.get(effectiveSource) ??
-      new Error(`Image failed to load: ${effectiveSource}`)
-    );
-  }
-
-  // Return effectiveSrc to ensure we return string even if use returns void (fulfilled)
-  return effectiveSource;
+/**
+ * The URL to draw for `source`, suspending until it is resolved (when an
+ * ImageResolver is provided) and loaded. A failed load throws its error to
+ * the nearest error boundary, as before.
+ */
+export function useSuspenseImage(source: string): string {
+  const resolveImage = useImageResolver();
+  return use(imagePromise(source, resolveImage));
 }
 
 export function clearImageCache(source: string) {
   const effectiveSource = resolvedUrlCache.get(source) ?? source;
 
   // Clear the mapping from src to signed URL
+  imagePromiseCache.delete(source);
   resolvedUrlCache.delete(source);
   pendingResolutionCache.delete(source);
 
@@ -123,17 +158,7 @@ export async function preloadImage(
 ): Promise<void> {
   // 1. Resolve URL if resolver provided and not already resolved
   if (resolver && !resolvedUrlCache.has(source)) {
-    // Check pending resolution
-    let resolutionPromise = pendingResolutionCache.get(source);
-    if (!resolutionPromise) {
-      resolutionPromise = resolver(source).then((resolvedUrl) => {
-        resolvedUrlCache.set(source, resolvedUrl);
-        pendingResolutionCache.delete(source);
-        return resolvedUrl;
-      });
-      pendingResolutionCache.set(source, resolutionPromise);
-    }
-    await resolutionPromise;
+    await resolveUrl(source, resolver);
   }
 
   // 2. Load the image (using resolved URL from cache if available)
