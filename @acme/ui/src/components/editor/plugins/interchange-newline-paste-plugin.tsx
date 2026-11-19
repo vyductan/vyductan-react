@@ -4,6 +4,7 @@ import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $createListNode, $isListItemNode, $isListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $isTableCellNode } from "@lexical/table";
 import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
   $createParagraphNode,
@@ -26,7 +27,8 @@ const INTERCHANGE_START =
 /**
  * A copy Chrome starts with `<br class="Apple-interchange-newline">` — the
  * selection began at the end of the line above — pastes as Notion takes it:
- * that break is a new block. Pasted on an empty line the words fill it;
+ * that break is a new block. Pasted on an empty line the words fill it, as
+ * they fill an empty bullet in a table cell;
  * anywhere else they go on a line of their own after the block the caret is
  * in, which keeps its words — after a list item, out of the list, the items
  * after it a list of their own below.
@@ -75,9 +77,15 @@ export function InterchangeNewlinePastePlugin(): null {
               $isElementNode(node) && !node.isInline(),
           );
           if (!block) return false;
-          // An empty line takes the words itself.
+          // An empty line takes the words itself. So does an empty bullet in
+          // a table cell: there a bullet marks a line of the cell, it is no
+          // block the words could go after.
+          const emptyLine =
+            $isParagraphNode(block) ||
+            ($isListItemNode(block) &&
+              $findMatchingParent(block, $isTableCellNode) !== null);
           if (
-            $isParagraphNode(block) &&
+            emptyLine &&
             block.getTextContentSize() === 0 &&
             selection.isCollapsed()
           ) {

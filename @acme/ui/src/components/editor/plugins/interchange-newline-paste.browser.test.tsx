@@ -2,6 +2,11 @@ import type { LexicalEditor, LexicalNode } from "lexical";
 import * as React from "react";
 import { $createListItemNode, $createListNode } from "@lexical/list";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import {
+  $createTableCellNode,
+  $createTableNode,
+  $createTableRowNode,
+} from "@lexical/table";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import {
   $createParagraphNode,
@@ -152,5 +157,42 @@ test("pasted on an empty line, the words take that line", async () => {
       "paragraph:Top",
       "paragraph:Lauren Tan Reveals",
     ]),
+  );
+});
+
+/** The second cell of the table's first row, as `type[children]`. */
+function $cell(): string {
+  const table = $getRoot().getChildren().find((n) => n.getType() === "table");
+  const row = $isElementNode(table) ? table.getFirstChild() : null;
+  const cell = $isElementNode(row) ? row.getChildAtIndex(1) : null;
+  const shape = (node: LexicalNode): string =>
+    $isElementNode(node)
+      ? `${node.getType()}[${node.getChildren().map(shape).join(",")}]`
+      : `${node.getType()}:${node.getTextContent()}`;
+  return cell ? shape(cell) : "no cell";
+}
+
+/*
+ * A cell keeps its lines in itself, and its bullet is a line's mark, not a
+ * block of its own: the words fill the empty bullet, as they fill an empty
+ * line. They had gone on a line under the list, the bullet left empty.
+ */
+test("pasted on an empty bullet in a table cell, the words fill the bullet", async () => {
+  const live = await pasteInto(() => {
+    const item = $createListItemNode();
+    $getRoot().append(
+      $createTableNode().append(
+        $createTableRowNode().append(
+          $createTableCellNode().append($createParagraphNode()),
+          $createTableCellNode().append($createListNode("bullet").append(item)),
+        ),
+      ),
+    );
+    item.select();
+  });
+  await waitFor(() =>
+    expect(live.getEditorState().read($cell)).toBe(
+      "tablecell[list[listitem[text:Lauren Tan Reveals]]]",
+    ),
   );
 });
