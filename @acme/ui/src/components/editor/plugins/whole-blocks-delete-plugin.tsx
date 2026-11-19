@@ -29,19 +29,28 @@ function $caretTo(line: LexicalNode, atEnd: boolean) {
   }
 }
 
-/** Remove `node`, then any list or holder item it leaves empty. */
+/**
+ * Remove `node`, then any list or holder item it leaves empty.
+ *
+ * Its ancestors are taken first: removing the last item of a list, Lexical
+ * removes the list too, and walking up from there found no parent — the
+ * holder above stayed, a bare bullet.
+ */
 function $removeLine(node: LexicalNode) {
-  let parent: LexicalNode | null = node.getParent();
-  node.remove();
-  while (
-    parent &&
-    !$isRootOrShadowRoot(parent) &&
-    ($isListNode(parent) || $isListItemNode(parent)) &&
-    parent.getChildrenSize() === 0
+  const ancestors: LexicalNode[] = [];
+  for (
+    let parent = node.getParent();
+    parent && !$isRootOrShadowRoot(parent);
+    parent = parent.getParent()
   ) {
-    const next: LexicalNode | null = parent.getParent();
-    parent.remove();
-    parent = next;
+    ancestors.push(parent);
+  }
+  node.remove();
+  for (const ancestor of ancestors) {
+    if (!$isListNode(ancestor) && !$isListItemNode(ancestor)) break;
+    if (!ancestor.isAttached()) continue;
+    if (ancestor.getChildrenSize() > 0) break;
+    ancestor.remove();
   }
 }
 

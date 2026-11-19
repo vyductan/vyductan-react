@@ -15,10 +15,12 @@ import {
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
 import { Editor } from "../editor";
+import { markdownToLexicalContent } from "../utils/lexical-converter";
 
 Object.assign(globalThis, { React });
 
@@ -201,6 +203,44 @@ test("everything selected leaves an empty line", async () => {
       $getRoot().clear().append(first, last);
       const selection = first.getFirstChildOrThrow<TextNode>().select(0, 0);
       selection.focus.set(last.getFirstChildOrThrow().getKey(), 3, "text");
+    },
+    { discrete: true },
+  );
+  press(root, "Backspace");
+  await waitFor(() => expect(blocks(live)).toStrictEqual(["paragraph:"]));
+});
+
+/*
+ * Cmd+A twice, then Backspace, on notes with lists inside lists: an item
+ * between two nested lists, as "B" here is. Removing it, Lexical merges the
+ * nested lists on either side — the page changed under the removal, and
+ * the items that only held nested lists were left behind empty: a column
+ * of bare bullets (2026-11-19).
+ */
+test("everything selected in nested lists leaves an empty line, no bare bullets", async () => {
+  const { live, root } = await setup();
+  const markdown = [
+    "Bài toán",
+    "",
+    "1. A",
+    "\t- skills:",
+    "\t\t- grilling",
+    "\t\t- to-spec",
+    "\t- B",
+    "\t\t- C",
+    "2. D",
+    "\t- E",
+  ].join("\n");
+  live.setEditorState(
+    live.parseEditorState(JSON.stringify(markdownToLexicalContent(markdown))),
+  );
+  live.update(
+    () => {
+      const first = $getRoot().getFirstDescendant();
+      const last = $getRoot().getLastDescendant();
+      if (!$isTextNode(first) || !$isTextNode(last)) throw new Error("no text");
+      const selection = first.select(0, 0);
+      selection.focus.set(last.getKey(), last.getTextContentSize(), "text");
     },
     { discrete: true },
   );
