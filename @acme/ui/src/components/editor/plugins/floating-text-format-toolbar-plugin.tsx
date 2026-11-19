@@ -6,7 +6,13 @@
  *
  */
 import type { LexicalEditor, TextFormatType } from "lexical";
-import type { ComponentProps, Dispatch, JSX, ReactNode } from "react";
+import type {
+  ComponentProps,
+  Dispatch,
+  JSX,
+  KeyboardEvent as ReactKeyboardEvent,
+  ReactNode,
+} from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   $createCodeNode,
@@ -134,6 +140,13 @@ const SECOND_ROW_MARKS: ReadonlyArray<{
   { format: "strikethrough", label: "Strikethrough", Icon: StrikethroughIcon },
   { format: "code", label: "Inline code", Icon: CodeIcon },
 ];
+
+/** The formatting chords, as the editor binds them under ⌘ / Ctrl. */
+const TOOLBAR_FORMAT_KEYS: Record<string, TextFormatType> = {
+  b: "bold",
+  i: "italic",
+  u: "underline",
+};
 
 /** Lets the pointer through a tooltip's positioning wrapper. */
 const passPointerThrough = (content: HTMLElement | null) => {
@@ -877,12 +890,27 @@ function TextFormatFloatingToolbar({
    * formatting; link, strikethrough, code, more. Narrow enough that it never
    * has to fold marks away to fit an editor.
    */
+  // ⌘B / ⌘I / ⌘U with the focus on the toolbar — a button on it was just
+  // clicked — format the selection as they do in the editor. They never
+  // reached it, and went on to the page: in VS Code ⌘B closed the sidebar.
+  const onToolbarKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) {
+      return;
+    }
+    const format = TOOLBAR_FORMAT_KEYS[event.key.toLowerCase()];
+    if (!format) return;
+    event.preventDefault();
+    event.stopPropagation();
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
+  };
+
   return (
     <div
       ref={popupCharStylesEditorReference}
       data-slot="format-toolbar"
       role="toolbar"
       aria-label="Text formatting"
+      onKeyDown={onToolbarKeyDown}
       className="absolute top-0 left-0 z-50 flex w-max flex-col gap-1 rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-lg transition-opacity duration-200 will-change-transform"
       style={{
         opacity: 0,

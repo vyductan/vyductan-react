@@ -305,3 +305,69 @@ test("a tooltip over the first row does not keep the pointer off its buttons", a
   );
   expect(color.contains(hit)).toBe(true);
 });
+
+/*
+ * ⌘B with the toolbar holding the focus — a button on it was just clicked:
+ * the key never reached the editor, so nothing went bold, and it went on to
+ * the page (in VS Code, ⌘B closed the sidebar). The toolbar formats with it,
+ * as the editor does, and keeps it from the page.
+ */
+test("⌘B on the toolbar bolds the selection and stays off the page", async () => {
+  await page.viewport(1280, 800);
+  const { bar, line } = await selectLine(
+    { top: 200, left: 40, width: 720 },
+    { linesBefore: 8 },
+  );
+  let leaked = 0;
+  const onWindowKey = (event: KeyboardEvent) => {
+    if (event.key === "b" && event.metaKey) leaked++;
+  };
+  globalThis.addEventListener("keydown", onWindowKey);
+  try {
+    bar.querySelector<HTMLElement>('[aria-label="Text color"]')!.focus();
+    expect(bar.contains(document.activeElement)).toBe(true);
+
+    await userEvent.keyboard("{Meta>}b{/Meta}");
+
+    await waitFor(() => expect(line.querySelector("strong, b")).not.toBeNull());
+    expect(leaked).toBe(0);
+  } finally {
+    globalThis.removeEventListener("keydown", onWindowKey);
+  }
+});
+
+/*
+ * The way it was met: a color picked from the toolbar's menu, then ⌘B at
+ * once, while the toolbar was still fading back in. The menu hands the
+ * focus back to its button, on the toolbar.
+ */
+test("⌘B right after picking a color bolds the words and stays off the page", async () => {
+  await page.viewport(1280, 800);
+  const { bar, line } = await selectLine(
+    { top: 200, left: 40, width: 720 },
+    { linesBefore: 8 },
+  );
+  let leaked = 0;
+  const onWindowKey = (event: KeyboardEvent) => {
+    if (event.key === "b" && event.metaKey) leaked++;
+  };
+  globalThis.addEventListener("keydown", onWindowKey);
+  try {
+    await userEvent.click(bar.querySelector('[aria-label="Text color"]')!);
+    const red = await waitFor(() => {
+      const item = [
+        ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+      ].find((candidate) => candidate.textContent?.trim() === "Red");
+      expect(item).toBeTruthy();
+      return item!;
+    });
+    await userEvent.click(red);
+    await userEvent.keyboard("{Meta>}b{/Meta}");
+
+    await waitFor(() => expect(line.querySelector("strong, b")).not.toBeNull());
+    expect(line.querySelector<HTMLElement>("[style*=color]")).not.toBeNull();
+    expect(leaked).toBe(0);
+  } finally {
+    globalThis.removeEventListener("keydown", onWindowKey);
+  }
+});
