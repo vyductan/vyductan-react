@@ -135,6 +135,12 @@ const SECOND_ROW_MARKS: ReadonlyArray<{
   { format: "code", label: "Inline code", Icon: CodeIcon },
 ];
 
+/** Lets the pointer through a tooltip's positioning wrapper. */
+const passPointerThrough = (content: HTMLElement | null) => {
+  if (content?.parentElement)
+    content.parentElement.style.pointerEvents = "none";
+};
+
 /** A tooltip of a name and, when it has one, a shortcut — Notion's. */
 function Hint({
   title,
@@ -147,14 +153,21 @@ function Hint({
   children: ReactNode;
 }) {
   return (
-    <TooltipRoot>
+    // The second row's tooltips open over the first row's buttons: one the
+    // pointer could rest on stayed open and kept it off the button under
+    // it (Link's over Text color). It goes as the pointer leaves, and lets
+    // the pointer through.
+    <TooltipRoot disableHoverableContent>
       {/* A Dropdown's trigger props come in here and go on to the button. */}
       <TooltipTrigger asChild {...triggerProps}>
         {children}
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="flex items-center gap-1.5 px-2 py-1"
+        className="pointer-events-none flex items-center gap-1.5 px-2 py-1"
+        // Radix places it in a wrapper of its own, which takes the pointer
+        // too.
+        ref={passPointerThrough}
       >
         <span>{title}</span>
         {shortcut && <span className="opacity-60">{shortcut}</span>}

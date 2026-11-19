@@ -275,3 +275,33 @@ test("the marks the selection has are shown in blue", async () => {
   expect(button("Toggle bold").getAttribute("aria-pressed")).toBe("false");
   expect(color("Toggle bold")).toBe(color("Clear formatting"));
 });
+
+/*
+ * The second row's tooltips open over the first row: Link's lay on Text
+ * color, and moving up to it, the pointer stayed on the tooltip — which,
+ * hoverable, stayed open, so Text color could not be reached. Tooltips here
+ * let the pointer through to the button under them.
+ */
+test("a tooltip over the first row does not keep the pointer off its buttons", async () => {
+  await page.viewport(1280, 800);
+  const { bar } = await selectLine(
+    { top: 200, left: 40, width: 720 },
+    { linesBefore: 8 },
+  );
+  const link = bar.querySelector<HTMLElement>('[aria-label="Toggle link"]')!;
+  const color = bar.querySelector<HTMLElement>('[aria-label="Text color"]')!;
+
+  await userEvent.hover(link);
+  await waitFor(() =>
+    expect(
+      document.querySelector('[data-slot="tooltip-content"]'),
+    ).not.toBeNull(),
+  );
+
+  const box = color.getBoundingClientRect();
+  const hit = document.elementFromPoint(
+    box.left + box.width / 2,
+    box.top + box.height / 2,
+  );
+  expect(color.contains(hit)).toBe(true);
+});
