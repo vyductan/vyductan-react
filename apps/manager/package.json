@@ -24,6 +24,7 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@tauri-apps/cli": "^2.11.4",
+    "@types/node": "catalog:",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "@vitejs/plugin-react": "catalog:vite",
