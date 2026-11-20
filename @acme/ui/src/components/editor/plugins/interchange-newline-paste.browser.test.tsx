@@ -162,7 +162,9 @@ test("pasted on an empty line, the words take that line", async () => {
 
 /** The second cell of the table's first row, as `type[children]`. */
 function $cell(): string {
-  const table = $getRoot().getChildren().find((n) => n.getType() === "table");
+  const table = $getRoot()
+    .getChildren()
+    .find((n) => n.getType() === "table");
   const row = $isElementNode(table) ? table.getFirstChild() : null;
   const cell = $isElementNode(row) ? row.getChildAtIndex(1) : null;
   const shape = (node: LexicalNode): string =>

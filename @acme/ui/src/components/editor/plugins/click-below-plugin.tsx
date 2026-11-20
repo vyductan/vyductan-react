@@ -2,11 +2,7 @@
 
 import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $createParagraphNode,
-  $getRoot,
-  $isParagraphNode,
-} from "lexical";
+import { $createParagraphNode, $getRoot, $isParagraphNode } from "lexical";
 
 /**
  * A click below the last block gives a line to type on, as in Notion: the

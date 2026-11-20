@@ -72,9 +72,7 @@ function DefaultErrorFallback({
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
-      <h3 className="mb-2 text-lg font-semibold text-red-800">
-        Editor error
-      </h3>
+      <h3 className="mb-2 text-lg font-semibold text-red-800">Editor error</h3>
       <p className="mb-4 text-sm text-red-600">
         {error.message || "An unknown error occurred"}
       </p>

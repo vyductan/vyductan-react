@@ -9,11 +9,7 @@ import { cn } from "@acme/ui/lib/utils";
  * denser timeline passes e.g. `classNames={{ item: "pb-3" }}`.
  */
 type TimelineSemanticPart =
-  | "root"
-  | "item"
-  | "itemRail"
-  | "itemIcon"
-  | "itemContent";
+  "root" | "item" | "itemRail" | "itemIcon" | "itemContent";
 
 type TimelineProperties = {
   items: {

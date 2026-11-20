@@ -29,7 +29,14 @@ describe("notionPlainTables", () => {
       [["Dọn dẹp AGENTS/CLAUDE.md<br>MEMORY.md", "", ""], 2],
       [["Tái cấu trúc các thư mục<br>• source code<br>• assets", "", ""], 3],
       [["Chỉ AI agent nơi lấy ngữ cảnh", "", ""], 1],
-      [["Viết những thứ còn thiếu xót", "business<br>hiệu năng<br>bảo mật", ""], 3],
+      [
+        [
+          "Viết những thứ còn thiếu xót",
+          "business<br>hiệu năng<br>bảo mật",
+          "",
+        ],
+        3,
+      ],
     ]);
   });
 

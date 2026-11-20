@@ -45,7 +45,13 @@ async function setup(build: () => LexicalNode[]) {
   const root = document.querySelector<HTMLElement>('[contenteditable="true"]')!;
   // Room below the last block, as a page gives it.
   root.style.paddingBottom = "200px";
-  live.update(() => $getRoot().clear().append(...build()), { discrete: true });
+  live.update(
+    () =>
+      $getRoot()
+        .clear()
+        .append(...build()),
+    { discrete: true },
+  );
   return { live, root };
 }
 
@@ -63,13 +69,11 @@ function mouseDown(root: HTMLElement, clientY: number) {
 }
 
 const blocks = (live: LexicalEditor) =>
-  live
-    .getEditorState()
-    .read(() =>
-      $getRoot()
-        .getChildren()
-        .map((node) => `${node.getType()}:${node.getTextContent()}`),
-    );
+  live.getEditorState().read(() =>
+    $getRoot()
+      .getChildren()
+      .map((node) => `${node.getType()}:${node.getTextContent()}`),
+  );
 
 const caretBlock = (live: LexicalEditor) =>
   live.getEditorState().read(() => {
@@ -92,7 +96,11 @@ test("a click below the last block adds a line there and puts the caret on it", 
   ]);
   mouseDown(root, root.getBoundingClientRect().bottom - 40);
   await waitFor(() =>
-    expect(blocks(live)).toStrictEqual(["paragraph:Một", "list:Hai", "paragraph:"]),
+    expect(blocks(live)).toStrictEqual([
+      "paragraph:Một",
+      "list:Hai",
+      "paragraph:",
+    ]),
   );
   expect(caretBlock(live)).toBe(2);
 });
@@ -108,7 +116,10 @@ test("below an empty last line, the click goes to it — no second one", async (
 });
 
 test("a click on the editable above the last block's foot adds nothing", async () => {
-  const { live, root } = await setup(() => [paragraph("Một"), paragraph("Hai")]);
+  const { live, root } = await setup(() => [
+    paragraph("Một"),
+    paragraph("Hai"),
+  ]);
   mouseDown(root, root.getBoundingClientRect().top + 2);
   await new Promise((resolve) => setTimeout(resolve, 50));
   expect(blocks(live)).toStrictEqual(["paragraph:Một", "paragraph:Hai"]);

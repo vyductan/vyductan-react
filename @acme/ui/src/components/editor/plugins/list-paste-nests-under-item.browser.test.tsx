@@ -96,7 +96,11 @@ async function paste(onWords: boolean) {
   clipboardData.setData("text/html", ITEM_WITH_NESTED);
   clipboardData.setData("text/plain", "Showcase");
   root.dispatchEvent(
-    new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData }),
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
   );
   return live;
 }

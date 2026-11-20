@@ -35,8 +35,10 @@ afterEach(() => {
  * of a cell — the bullets of a cell's list rows of their own — and links on
  * file names Notion took for sites. The plain text keeps the cells whole.
  */
-const NOTION_HTML = "<meta charset='utf-8'><p><strong>Các việc cần làm</strong></p>\n<table>\n<thead>\n<tr>\n<th></th>\n<th></th>\n<th></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Dọn dẹp AGENTS/CLAUDE.md</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td><a href=\"http://MEMORY.md\">MEMORY.md</a></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Tái cấu trúc các thư mục</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• source code</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• configuration files</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• testing (test suites)</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• assets</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• documents</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• adr, scratch,...</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Chỉ AI agent nơi lấy ngữ cảnh</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Tìm hiểu claude agent team</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Viết những thứ còn thiếu xót</td>\n<td>business</td>\n<td></td>\n</tr>\n<tr>\n<td>hiệu năng</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>bảo mật</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>bugs do người dùng báo về</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>verify agents</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>test, fuzz test (kiểu click lung tung, cố dùng thử như người thật), tìm bugs trong implementation code, cố tìm ra các vấn đề rồi tự sửa luôn, lặp lại quy trình đó cho đến khi PR sẵn sàng để merge</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Recall lại quá trình làm trước đây để tìm những thiếu xót</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Xây dựng một quy trình để làm 1 new feature</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Chẳng hạn phân bổ thời gian 70% for spec, 10% for execute code, 20% for testing, document</td>\n<td></td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>Mattpocock không xem lại <a href=\"http://spec.md\">spec.md</a> mà AI tạo ra</li>\n</ul>\n<!-- notionvc: 2bc80f1c-a032-4a1b-8213-8fbc37ce6fc3 -->";
-const NOTION_TEXT = "**Các việc cần làm**\n\n|  |  |  |\n| --- | --- | --- |\n| Dọn dẹp AGENTS/CLAUDE.md\nMEMORY.md |  |  |\n| Tái cấu trúc các thư mục\n  • source code\n  • configuration files\n  • testing (test suites)\n  • assets\n  • documents\n  • adr, scratch,... |  |  |\n| Chỉ AI agent nơi lấy ngữ cảnh |  |  |\n| Tìm hiểu claude agent team |  |  |\n| Viết những thứ còn thiếu xót | business\nhiệu năng\nbảo mật\nbugs do người dùng báo về\nverify agents\ntest, fuzz test (kiểu click lung tung, cố dùng thử như người thật), tìm bugs trong implementation code, cố tìm ra các vấn đề rồi tự sửa luôn, lặp lại quy trình đó cho đến khi PR sẵn sàng để merge |  |\n| Recall lại quá trình làm trước đây để tìm những thiếu xót |  |  |\n| Xây dựng một quy trình để làm 1 new feature\nChẳng hạn phân bổ thời gian 70% for spec, 10% for execute code, 20% for testing, document |  |  |\n\n- Mattpocock không xem lại spec.md mà AI tạo ra";
+const NOTION_HTML =
+  '<meta charset=\'utf-8\'><p><strong>Các việc cần làm</strong></p>\n<table>\n<thead>\n<tr>\n<th></th>\n<th></th>\n<th></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Dọn dẹp AGENTS/CLAUDE.md</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td><a href="http://MEMORY.md">MEMORY.md</a></td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Tái cấu trúc các thư mục</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• source code</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• configuration files</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• testing (test suites)</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• assets</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• documents</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>• adr, scratch,...</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Chỉ AI agent nơi lấy ngữ cảnh</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Tìm hiểu claude agent team</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Viết những thứ còn thiếu xót</td>\n<td>business</td>\n<td></td>\n</tr>\n<tr>\n<td>hiệu năng</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>bảo mật</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>bugs do người dùng báo về</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>verify agents</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>test, fuzz test (kiểu click lung tung, cố dùng thử như người thật), tìm bugs trong implementation code, cố tìm ra các vấn đề rồi tự sửa luôn, lặp lại quy trình đó cho đến khi PR sẵn sàng để merge</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Recall lại quá trình làm trước đây để tìm những thiếu xót</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Xây dựng một quy trình để làm 1 new feature</td>\n<td></td>\n<td></td>\n</tr>\n<tr>\n<td>Chẳng hạn phân bổ thời gian 70% for spec, 10% for execute code, 20% for testing, document</td>\n<td></td>\n<td></td>\n</tr>\n</tbody>\n</table>\n<ul>\n<li>Mattpocock không xem lại <a href="http://spec.md">spec.md</a> mà AI tạo ra</li>\n</ul>\n<!-- notionvc: 2bc80f1c-a032-4a1b-8213-8fbc37ce6fc3 -->';
+const NOTION_TEXT =
+  "**Các việc cần làm**\n\n|  |  |  |\n| --- | --- | --- |\n| Dọn dẹp AGENTS/CLAUDE.md\nMEMORY.md |  |  |\n| Tái cấu trúc các thư mục\n  • source code\n  • configuration files\n  • testing (test suites)\n  • assets\n  • documents\n  • adr, scratch,... |  |  |\n| Chỉ AI agent nơi lấy ngữ cảnh |  |  |\n| Tìm hiểu claude agent team |  |  |\n| Viết những thứ còn thiếu xót | business\nhiệu năng\nbảo mật\nbugs do người dùng báo về\nverify agents\ntest, fuzz test (kiểu click lung tung, cố dùng thử như người thật), tìm bugs trong implementation code, cố tìm ra các vấn đề rồi tự sửa luôn, lặp lại quy trình đó cho đến khi PR sẵn sàng để merge |  |\n| Recall lại quá trình làm trước đây để tìm những thiếu xót |  |  |\n| Xây dựng một quy trình để làm 1 new feature\nChẳng hạn phân bổ thời gian 70% for spec, 10% for execute code, 20% for testing, document |  |  |\n\n- Mattpocock không xem lại spec.md mà AI tạo ra";
 
 async function paste() {
   let editor: LexicalEditor | null = null;
@@ -54,7 +56,11 @@ async function paste() {
   clipboardData.setData("text/html", NOTION_HTML);
   clipboardData.setData("text/plain", NOTION_TEXT);
   root.dispatchEvent(
-    new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData }),
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }),
   );
   return live;
 }
@@ -64,20 +70,30 @@ function $rows(): string[][] {
   const table = $getRoot().getChildren().find($isTableNode);
   if (!table) return [];
   const lines = (node: LexicalNode): string[] =>
-    $isElementNode(node) && !node.isInline() && node.getChildren().some(
-      (child) => $isElementNode(child) && !child.isInline(),
-    )
+    $isElementNode(node) &&
+    !node.isInline() &&
+    node
+      .getChildren()
+      .some((child) => $isElementNode(child) && !child.isInline())
       ? node.getChildren().flatMap(lines)
       : [node.getTextContent()];
-  return table.getChildren().map((row) =>
-    $isElementNode(row)
-      ? row.getChildren().map((cell) =>
-          $isElementNode(cell)
-            ? cell.getChildren().flatMap(lines).join("\n").replaceAll("\n", " / ")
-            : "",
-        )
-      : [],
-  );
+  return table
+    .getChildren()
+    .map((row) =>
+      $isElementNode(row)
+        ? row
+            .getChildren()
+            .map((cell) =>
+              $isElementNode(cell)
+                ? cell
+                    .getChildren()
+                    .flatMap(lines)
+                    .join("\n")
+                    .replaceAll("\n", " / ")
+                : "",
+            )
+        : [],
+    );
 }
 
 test("a table from Notion keeps its cells of several lines as one row each", async () => {
@@ -114,7 +130,11 @@ test("a cell's bullets from Notion are a list in the cell", async () => {
     expect(
       live.getEditorState().read(() => {
         const table = $getRoot().getChildren().find($isTableNode);
-        const list = table ? $dfs(table).map(({ node }) => node).find($isListNode) : undefined;
+        const list = table
+          ? $dfs(table)
+              .map(({ node }) => node)
+              .find($isListNode)
+          : undefined;
         return list?.getChildren().map((item) => item.getTextContent());
       }),
     ).toStrictEqual([

@@ -199,9 +199,11 @@ test("a pasted quote of words stays a quote of words", async () => {
   );
   await waitFor(() =>
     expect(
-      live
-        .getEditorState()
-        .read(() => $getRoot().getChildren().map((node) => node.getType())),
+      live.getEditorState().read(() =>
+        $getRoot()
+          .getChildren()
+          .map((node) => node.getType()),
+      ),
     ).toStrictEqual(["quote"]),
   );
 });

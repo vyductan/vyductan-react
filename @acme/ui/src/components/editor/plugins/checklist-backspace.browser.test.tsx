@@ -63,7 +63,9 @@ async function renderChecklist() {
         .append(
           $createListNode("check").append(
             item("a"),
-            $createListItemNode().append($createListNode("check").append(empty)),
+            $createListItemNode().append(
+              $createListNode("check").append(empty),
+            ),
             item("b"),
           ),
         );

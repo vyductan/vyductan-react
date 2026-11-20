@@ -1,7 +1,7 @@
 "use client";
 
-import type { LexicalNode } from "lexical";
 import type { TableNode } from "@lexical/table";
+import type { LexicalNode } from "lexical";
 import { useEffect } from "react";
 import { $isLinkNode } from "@lexical/link";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -13,10 +13,10 @@ import {
 } from "@lexical/table";
 import { $dfs, mergeRegister } from "@lexical/utils";
 import {
-  COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_HIGH,
   $isRangeSelection,
   $setSelection,
+  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_HIGH,
   PASTE_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,
 } from "lexical";
@@ -76,8 +76,16 @@ export function NotionTablePastePlugin(): null {
           // selection, the one the paste then goes in at. Put it back.
           const at = $isRangeSelection(selection)
             ? {
-                anchor: [selection.anchor.key, selection.anchor.offset, selection.anchor.type] as const,
-                focus: [selection.focus.key, selection.focus.offset, selection.focus.type] as const,
+                anchor: [
+                  selection.anchor.key,
+                  selection.anchor.offset,
+                  selection.anchor.type,
+                ] as const,
+                focus: [
+                  selection.focus.key,
+                  selection.focus.offset,
+                  selection.focus.type,
+                ] as const,
               }
             : undefined;
           $mendTables(nodes, notionPlainTables(plain));
