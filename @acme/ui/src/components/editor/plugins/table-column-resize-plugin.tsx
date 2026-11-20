@@ -58,6 +58,16 @@ export const TABLE_COLUMN_RESIZE_DRAG_COMMAND: LexicalCommand<TableColumnResizeD
 /** Width of the invisible grab strip, centred on the boundary. */
 const GRABBER_WIDTH = 8;
 
+/**
+ * Tags the width write that ends a drag released on the handle. It is an edit
+ * made by the resize itself, not typing, so the update listener must not put
+ * the handle away for it: that took the resting mark with it, though the
+ * pointer was still on the new boundary. A release the page never heard
+ * leaves the write untagged: the pointer may be anywhere, so the handle goes
+ * away until it comes back to the boundary.
+ */
+const COLUMN_RESIZE_TAG = "table-column-resize";
+
 type Grabber = {
   table: HTMLTableElement;
   tableKey: string;
@@ -282,8 +292,9 @@ function TableColumnResizeInner({
     // a line through the words. As in Notion, an edit puts it away; the next
     // mousemove brings it back where the boundary now is.
     const removeUpdateListener = editor.registerUpdateListener(
-      ({ dirtyElements, dirtyLeaves }) => {
+      ({ dirtyElements, dirtyLeaves, tags }) => {
         if (dragReference.current) return;
+        if (tags.has(COLUMN_RESIZE_TAG)) return;
         if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
         setGrabber(null);
       },
@@ -403,11 +414,14 @@ function TableColumnResizeInner({
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-    finishDrag({ x: event.clientX, y: event.clientY });
+    finishDrag({ x: event.clientX, y: event.clientY }, true);
   };
 
-  /** End the drag at `point`, keeping the widths it showed last. */
-  const finishDrag = (point: { x: number; y: number }) => {
+  /**
+   * End the drag at `point`, keeping the widths it showed last. `onHandle`:
+   * released on the handle itself, so the handle and its mark stay.
+   */
+  const finishDrag = (point: { x: number; y: number }, onHandle = false) => {
     const drag = dragReference.current;
     if (!drag) {
       return;
@@ -435,17 +449,20 @@ function TableColumnResizeInner({
       });
     }
 
-    // Deliberately untagged. HISTORY_MERGE_TAG would fold this into the
+    // Not HISTORY_MERGE_TAG: that would fold this into the
     // pointerdown entry — one undo instead of two — but OnChangePlugin drops
     // history-merge updates by default, so the new widths would never reach the
     // consumer's onChange and the resize would be lost on save. Correct data
     // beats saving an undo step; a drag costs two undos.
-    editor.update(() => {
-      const tableNode = $getNodeByKey(drag.tableKey);
-      if ($isTableNode(tableNode) && $isSimpleTable(tableNode)) {
-        tableNode.setColWidths(drag.currentWidths);
-      }
-    });
+    editor.update(
+      () => {
+        const tableNode = $getNodeByKey(drag.tableKey);
+        if ($isTableNode(tableNode) && $isSimpleTable(tableNode)) {
+          tableNode.setColWidths(drag.currentWidths);
+        }
+      },
+      onHandle ? { tag: COLUMN_RESIZE_TAG } : undefined,
+    );
   };
 
   useEffect(() => {
