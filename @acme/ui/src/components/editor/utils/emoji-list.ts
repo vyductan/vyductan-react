@@ -14659,8 +14659,7 @@ export default [
   },
   {
     emoji: "🇨🇮",
-    // vi-allowed until 2027-05-20 by vyductan: Unicode emoji name (French), not Vietnamese
-    description: "flag: Côte d’Ivoire",
+    description: "flag: C\u00f4te d’Ivoire",
     category: "Flags",
     aliases: ["cote_divoire"],
     tags: ["ivory"],
