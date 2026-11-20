@@ -27,8 +27,15 @@ const segmentedVariants = cva(
 
 // size sizes the inner item (button), not the outer track — the track height
 // is then intrinsic: item height + p-1 padding. h-5/h-7/h-9 = 20/28/36px.
+// Selection is keyed off `aria-selected`, NOT `data-[state=active]`. Both are
+// set by Radix's Tabs trigger and mean the same thing here, but an option with
+// a `tooltip` is wrapped in a `TooltipTrigger asChild`, whose own
+// `data-state` (open/closed/delayed-open) is spread onto the trigger AFTER the
+// Tabs one and silently wins -- so a tooltipped Segmented showed no selected
+// item at all. `aria-selected` is untouched by the tooltip and survives both
+// controlled and uncontrolled use.
 const segmentedItemVariants = cva(
-  "ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm",
+  "ring-offset-background focus-visible:ring-ring aria-selected:bg-background aria-selected:text-foreground inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 aria-selected:shadow-sm",
   {
     variants: {
       size: {
