@@ -247,7 +247,15 @@ export const OpenedFromInsideAModalStillCloses: Story = {
     const body = within(document.body);
 
     await step("open the drawer from inside the modal", async () => {
-      await userEvent.click(body.getByRole("button", { name: /open drawer/i }));
+      // The modal mounts open, and while it opens the page is pointer-events:
+      // none until its layer takes the pointer back. A click in that window
+      // throws; Chromatic's slower runners land in it, a laptop does not.
+      const openDrawer = await waitFor(() => {
+        const button = body.getByRole("button", { name: /open drawer/i });
+        expect(getComputedStyle(button).pointerEvents).not.toBe("none");
+        return button;
+      });
+      await userEvent.click(openDrawer);
       await waitFor(() =>
         expect(body.getByText("Drawer from a modal")).toBeVisible(),
       );
