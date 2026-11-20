@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 
-import type React from "react";
+import { useEffect } from "react";
 import {
   act,
   cleanup,
@@ -199,7 +199,10 @@ describe("getValueFromEvent multi-arg", () => {
   // Captures the onChange that the binding injects, so the test can fire it
   // with several arguments like a real multi-arg control would.
   function Capture(props: { onChange?: (...args: unknown[]) => void }) {
-    (globalThis as any).__injectedOnChange = props.onChange;
+    // In an effect, not during render: render must not mutate globals.
+    useEffect(() => {
+      (globalThis as any).__injectedOnChange = props.onChange;
+    });
     return <div data-testid="pick-value">{JSON.stringify(props)}</div>;
   }
 
@@ -239,7 +242,9 @@ describe("getValueFromEvent multi-arg", () => {
 // so normalize sees a value, non-events pass through — matching AntD.
 describe("default value extraction", () => {
   function Capture3(props: { onChange?: (...args: unknown[]) => void }) {
-    (globalThis as any).__onChange = props.onChange;
+    useEffect(() => {
+      (globalThis as any).__onChange = props.onChange;
+    });
     return <div />;
   }
 
@@ -255,7 +260,9 @@ describe("default value extraction", () => {
       defaultValues: { f: "" },
       onSubmit: () => {},
     });
-    (globalThis as any).__form = form;
+    useEffect(() => {
+      (globalThis as any).__form = form;
+    });
     return (
       <Form form={form} name="def">
         <Field

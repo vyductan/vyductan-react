@@ -432,7 +432,7 @@ test("drops a block beside another as columns, and back out", async () => {
  */
 test("the block menu shows the block's type and keeps clear of its line", async () => {
   let editor: LexicalEditor | null = null;
-  const { unmount } = render(<Harness onReady={(next) => (editor = next)} />);
+  render(<Harness onReady={(next) => (editor = next)} />);
   await waitFor(() => expect(editor).not.toBeNull());
   const live = editor as unknown as LexicalEditor;
 
