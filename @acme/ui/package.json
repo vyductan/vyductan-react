@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "chromatic": "chromatic --project-token=chpt_c9c2d477ce70b1e --exit-zero-on-changes",
+    "chromatic": "dotenv -e ../../.env -- chromatic --exit-zero-on-changes",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore --ignore-path ../.gitignore --ignore-path ./.prettierignore",
     "lint": "eslint --flag unstable_native_nodejs_ts_config",
@@ -139,6 +139,7 @@
     "@vitest/ui": "catalog:vitest",
     "baseline-browser-mapping": "^2.11.14",
     "chromatic": "^18.2.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "catalog:",
     "eslint-plugin-storybook": "^10.6.3",
     "next": "16.4.3",

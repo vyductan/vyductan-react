@@ -538,6 +538,9 @@ importers:
       chromatic:
         specifier: ^18.2.0
         version: 18.2.0
+      dotenv-cli:
+        specifier: ^11.0.0
+        version: 11.0.0
       eslint:
         specifier: 'catalog:'
         version: 10.8.1(jiti@2.7.0)
