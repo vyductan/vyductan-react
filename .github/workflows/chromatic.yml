@@ -25,7 +25,7 @@ jobs:
         uses: ./@acme/github/setup
 
       - name: Run Chromatic
-        uses: chromaui/action@v11
+        uses: chromaui/action@v18
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           workingDir: "@acme/ui"
