@@ -380,10 +380,14 @@ const AutoComplete = <
 
 export { AutoComplete };
 
+/**
+ * Strips diacritics. d with stroke (U+0111/U+0110) is a letter of its own,
+ * not d plus a mark, so NFD leaves it and it is mapped by hand.
+ */
 export function removeTones(string_: string): string {
   return string_
     .normalize("NFD")
     .replaceAll(/[\u0300-\u036F]/g, "")
-    .replaceAll("đ", "d")
-    .replaceAll("Đ", "D");
+    .replaceAll("\u0111", "d")
+    .replaceAll("\u0110", "D");
 }

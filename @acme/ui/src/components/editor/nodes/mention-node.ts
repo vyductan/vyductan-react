@@ -113,7 +113,7 @@ export class MentionNode extends TextNode {
 
 /**
  * `text` is what the node shows and exports (defaults to the name) — e.g.
- * "@Thuận", so a chat message exported to markdown still reads as a mention.
+ * "@José", so a chat message exported to markdown still reads as a mention.
  */
 export function $createMentionNode(
   mentionName: string,

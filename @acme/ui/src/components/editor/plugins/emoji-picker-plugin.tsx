@@ -64,7 +64,7 @@ export function EmojiPickerPlugin() {
    * As in Notion and Slack: a colon at the start of a line, or after a space
    * or "(", with at least two letters of a name after it. The basic matcher
    * looks only at the caret's text node, so a colon typed after bold text —
-   * "lãnh đạo:" — began a node of its own, looked like a line start, and
+   * "**Note**:" — began a node of its own, looked like a line start, and
    * opened the menu on ordinary punctuation. And with no minimum, a colon
    * alone opened it.
    */

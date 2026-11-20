@@ -3,9 +3,9 @@ import * as React from "react";
 import { AutoComplete, removeTones } from "@acme/ui/components/auto-complete";
 
 const searchOptions = [
-  { label: "Cà phê sữa", value: "cafe-sua" },
-  { label: "Bánh mì", value: "banh-mi" },
-  { label: "Phở bò", value: "pho-bo" },
+  { label: "Café au lait", value: "cafe-au-lait" },
+  { label: "Crème brûlée", value: "creme-brulee" },
+  { label: "Jalapeño poppers", value: "jalapeno-poppers" },
 ] as const;
 
 const SearchFilterDemo = () => {

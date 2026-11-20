@@ -128,15 +128,15 @@ export type SearchPageLinks = (
 ) => Promise<PageLinkOption[]> | PageLinkOption[];
 
 /**
- * Case- and diacritic-insensitive: "thuan" finds "Thuận". đ is its own letter,
- * not d plus a mark, so NFD leaves it and it is mapped by hand.
+ * Case- and diacritic-insensitive: "jose" finds "José". d with stroke is its
+ * own letter, not d plus a mark, so NFD leaves it and it is mapped by hand.
  */
 export function foldMentionName(value: string): string {
   return value
     .normalize("NFD")
     .replaceAll(/[\u0300-\u036F]/g, "")
-    .replaceAll("đ", "d")
-    .replaceAll("Đ", "D")
+    .replaceAll("\u0111", "d")
+    .replaceAll("\u0110", "D")
     .toLowerCase()
     .trim();
 }
@@ -340,7 +340,7 @@ export function MentionsPlugin({
 
   // Only for a single word that no known name already equals. Multi-word
   // text is the one case left out on purpose: in a chat box the menu stays
-  // open while "@Thuận cho mượn 1m" is typed, and Enter picks the highlighted
+  // open while "@Anna paid me 1m back" is typed, and Enter picks the highlighted
   // option — a create option there would swallow the message as a name.
   const createOption = useMemo(() => {
     const name = queryString?.trim() ?? "";
