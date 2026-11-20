@@ -114,6 +114,25 @@
     max-width: 100%;
     height: auto;
     border-radius: 3px;
+    /*
+     * Content icons are inserted inline, mid-sentence, at a fixed small height.
+     *
+     * `display` is the load-bearing one: Tailwind's preflight makes every
+     * replaced element `display: block`, so two icons typed side by side in the
+     * editor come out stacked one per line everywhere this markup is published.
+     * Restoring the inline flow an `<img>` has outside preflight is what makes
+     * a row of them a row. This wins over preflight on layer order alone -- the
+     * `components` layer sits after `base` -- so the `:where()` here stays at
+     * specificity 0 and a call site's utility can still override it.
+     *
+     * The other two follow from being inline: on the baseline the icon sits
+     * visibly low against the text it qualifies, and an inline replaced element
+     * does take vertical margins. Neither has any effect on an image that
+     * stands alone in its own paragraph, which is why this is one rule for both.
+     */
+    display: inline-block;
+    vertical-align: middle;
+    margin-block: 0;
   }
 
   .rich-text-content :where(table) {

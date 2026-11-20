@@ -12,8 +12,10 @@
  */
 import { Separator } from "@acme/ui/components/divider";
 
+import type { EditorContentIcon } from "./toolbar/content-icon-toolbar-plugin";
 import { FullscreenPlugin } from "./fullscreen-plugin";
 import { BlockFormatToolbarPlugin } from "./toolbar/block-format-toolbar-plugin";
+import { ContentIconToolbarPlugin } from "./toolbar/content-icon-toolbar-plugin";
 import { ElementFormatToolbarPlugin } from "./toolbar/element-format-toolbar-plugin";
 import { FontBackgroundToolbarPlugin } from "./toolbar/font-background-toolbar-plugin";
 import { FontColorToolbarPlugin } from "./toolbar/font-color-toolbar-plugin";
@@ -28,10 +30,13 @@ import { ToolbarPlugin } from "./toolbar/toolbar-plugin";
 
 interface FixedToolbarPluginProperties {
   containerRef?: React.RefObject<HTMLDivElement | null>;
+  /** Host-supplied icon set; the button is absent when there is none. */
+  contentIcons?: EditorContentIcon[];
 }
 
 export function FixedToolbarPlugin({
   containerRef,
+  contentIcons,
 }: FixedToolbarPluginProperties) {
   return (
     <div className="sticky top-0 z-10 border-b border-border bg-card p-2 shadow-sm">
@@ -77,6 +82,11 @@ export function FixedToolbarPlugin({
 
               {/* Image */}
               <ImageToolbarPlugin />
+
+              {/* Icon set */}
+              {contentIcons && (
+                <ContentIconToolbarPlugin icons={contentIcons} />
+              )}
 
               {/* Table */}
               <TableToolbarPlugin />

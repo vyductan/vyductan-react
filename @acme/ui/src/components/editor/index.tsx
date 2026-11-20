@@ -18,3 +18,4 @@ export type {
 export * from "./utils/blocktype-normalization";
 export * from "./utils/lexical-converter";
 export { EditorErrorBoundary } from "./components/editor-error-boundary";
+export type { EditorContentIcon } from "./plugins/toolbar/content-icon-toolbar-plugin";

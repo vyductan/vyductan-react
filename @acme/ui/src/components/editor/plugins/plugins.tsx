@@ -20,6 +20,7 @@ import type { MentionData, SearchPageLinks } from "../plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "../plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "../plugins/paste-as-plugin";
 import type { ReadClipboardText } from "../plugins/paste-cleanup-plugin";
+import type { EditorContentIcon } from "../plugins/toolbar/content-icon-toolbar-plugin";
 import { ContentEditable } from "../editor-ui/content-editable";
 import { AutoLinkPlugin } from "../plugins/auto-link-plugin";
 import { BlockColorPlugin } from "../plugins/block-color-plugin";
@@ -115,6 +116,7 @@ export function Plugins({
   variant = "default",
   formatToolbar = true,
   mentionsData,
+  contentIcons,
   searchPageLinks,
   createMentionLabel,
   resolvePageLinkPreview,
@@ -132,6 +134,7 @@ export function Plugins({
   /** See Editor's `formatToolbar`. */
   formatToolbar?: boolean;
   mentionsData?: MentionData[];
+  contentIcons?: EditorContentIcon[];
   searchPageLinks?: SearchPageLinks;
   /** Offer "create" for an unknown @name, labelled by this. See MentionsPlugin. */
   createMentionLabel?: (name: string) => string;
@@ -211,7 +214,10 @@ export function Plugins({
         }}
       />
       {variant === "simple" && (
-        <FixedToolbarPlugin containerRef={containerReference} />
+        <FixedToolbarPlugin
+          containerRef={containerReference}
+          contentIcons={contentIcons}
+        />
       )}
 
       {autoFocus && editable && <AutoFocusPlugin />}

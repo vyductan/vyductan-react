@@ -12,6 +12,7 @@ import type { MentionData, SearchPageLinks } from "./plugins/mentions-plugin";
 import type { ResolvePageLinkPreview } from "./plugins/page-link-hover-card-plugin";
 import type { ResolvePasteLink } from "./plugins/paste-as-plugin";
 import type { ReadClipboardText } from "./plugins/paste-cleanup-plugin";
+import type { EditorContentIcon } from "./plugins/toolbar/content-icon-toolbar-plugin";
 import type { EditorColorPalette } from "./plugins/toolbar/editor-color-palette";
 import { ConfigContext } from "../config-provider/context";
 import { EditorColorPaletteContext } from "./context/color-palette-context";
@@ -64,6 +65,14 @@ type EditorPropertiesBase = {
    */
   formatToolbar?: boolean;
   mentionsData?: MentionData[];
+  /**
+   * A named icon set offered as a toolbar picker, inserted as images at a fixed
+   * height. Supplying it is what makes the button appear — the editor has no
+   * set of its own, because which icons exist is the host's vocabulary.
+   *
+   * Only the `simple` variant renders a fixed toolbar to put it in.
+   */
+  contentIcons?: EditorContentIcon[];
   /**
    * Find pages for the "@" menu's "Link to page" section. Picking one inserts
    * the same pill "Paste as → Mention" does. Leaving it out keeps "@" to
@@ -175,6 +184,7 @@ export function Editor({
   variant = "default",
   formatToolbar = true,
   mentionsData,
+  contentIcons,
   searchPageLinks,
   createMentionLabel,
   resolvePageLinkPreview,
@@ -228,6 +238,7 @@ export function Editor({
               variant={variant}
               formatToolbar={formatToolbar}
               mentionsData={mentionsData}
+              contentIcons={contentIcons}
               searchPageLinks={searchPageLinks}
               createMentionLabel={createMentionLabel}
               resolvePageLinkPreview={resolvePageLinkPreview}
