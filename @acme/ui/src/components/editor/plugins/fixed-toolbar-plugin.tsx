@@ -3,7 +3,7 @@
 /**
  * Fixed Toolbar Plugin
  *
- * Toolbar cố định ở trên editor với các tính năng formatting đầy đủ:
+ * Toolbar pinned above the editor with the full set of formatting features:
  * - Font formatting (size, color, family, background)
  * - Text alignment
  * - Subscript/Superscript

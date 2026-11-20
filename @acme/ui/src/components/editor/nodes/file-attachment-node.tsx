@@ -1,8 +1,8 @@
 /**
  * File Attachment Node
  *
- * Node để render file attachment trong Lexical editor
- * Hỗ trợ các loại file: PDF, DOCX, XLSX, PPTX, ZIP, etc.
+ * Node that renders a file attachment in the Lexical editor
+ * Supported file types: PDF, DOCX, XLSX, PPTX, ZIP, etc.
  */
 
 import type {

@@ -327,7 +327,7 @@ class AutocompleteServer {
           return reject(new Error("Dismissed"));
         }
         const searchTextLength = searchText.length;
-        // Tắt autocomplete bằng cách yêu cầu từ phải dài hơn 100 ký tự (thực tế không bao giờ xảy ra)
+        // Autocomplete is disabled by requiring words longer than 100 characters (never happens in practice)
         if (searchText === "" || searchTextLength < 100) {
           return resolve(null);
         }
@@ -372,5 +372,5 @@ class AutocompleteServer {
 }
 
 // https://raw.githubusercontent.com/first20hours/google-10000-english/master/google-10000-english-usa-no-swears-long.txt
-// DICTIONARY đã bị xóa để tắt tính năng autocomplete tự động thay thế text
+// DICTIONARY was emptied to turn off autocomplete's automatic text replacement
 const DICTIONARY: string[] = [];

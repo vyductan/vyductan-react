@@ -1,7 +1,7 @@
 /**
  * Instagram Plugin
  *
- * Plugin để embed Instagram posts vào Lexical editor
+ * Plugin to embed Instagram posts in the Lexical editor
  */
 
 import type { LexicalCommand } from "lexical";

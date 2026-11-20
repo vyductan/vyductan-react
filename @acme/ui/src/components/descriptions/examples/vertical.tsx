@@ -26,7 +26,7 @@ const items: DescriptionsProps["items"] = [
     label: (
       <div className="flex items-center gap-2">
         <Building2 className="h-4 w-4" />
-        <span>Phòng ban</span>
+        <span>Department</span>
       </div>
     ),
     span: 2,

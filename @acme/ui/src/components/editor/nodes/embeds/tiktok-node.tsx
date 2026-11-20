@@ -1,8 +1,8 @@
 /**
  * TikTok Embed Node
  *
- * Node để embed TikTok videos vào Lexical editor
- * Hỗ trợ TikTok URL: https://www.tiktok.com/@username/video/1234567890
+ * Node that embeds TikTok videos in the Lexical editor
+ * Supported TikTok URL: https://www.tiktok.com/@username/video/1234567890
  */
 
 import type { SerializedDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";

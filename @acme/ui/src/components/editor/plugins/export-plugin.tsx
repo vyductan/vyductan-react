@@ -1,8 +1,8 @@
 /**
  * Export Plugin
  *
- * Plugin để export editor content ra PDF và Word
- * Hỗ trợ:
+ * Plugin to export editor content to PDF and Word
+ * Supports:
  * - Export to PDF
  * - Export to Word (DOCX)
  */

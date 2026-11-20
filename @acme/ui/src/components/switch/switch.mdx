@@ -12,7 +12,7 @@ import SwitchSizeDemo from "./examples/size";
 
 # Switch
 
-Switch component với API tương tự Ant Design, hỗ trợ hiển thị trạng thái bật/tắt. Built on top of Radix UI primitives and follows Ant Design API patterns.
+Switch component with an Ant Design-like API for showing an on/off state. Built on top of Radix UI primitives and follows Ant Design API patterns.
 
 ## Examples
 
@@ -42,13 +42,13 @@ Switch unavailable state.
 
 ### Size
 
-Switch có hai kích thước: `small` và `default`.
+Switch comes in two sizes: `small` and `default`.
 
 <ComponentSource src="switch/examples/size.tsx" __comp__={SwitchSizeDemo} />
 
 ### Loading
 
-Switch có thể hiển thị trạng thái loading.
+Switch can show a loading state.
 
 <ComponentSource
   src="switch/examples/loading.tsx"
@@ -72,5 +72,5 @@ Switch có thể hiển thị trạng thái loading.
 
 ### Notes
 
-- Component hỗ trợ cả API của Ant Design (sử dụng `onChange`, `checked`, `value`) và Shadcn Switch (sử dụng `onCheckedChange`)
-- `value` prop có độ ưu tiên cao hơn `checked` nếu cả hai đều được cung cấp
+- The component supports both the Ant Design API (`onChange`, `checked`, `value`) and the Shadcn Switch API (`onCheckedChange`)
+- The `value` prop takes precedence over `checked` when both are set

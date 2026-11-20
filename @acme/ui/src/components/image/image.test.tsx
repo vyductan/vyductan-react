@@ -102,9 +102,11 @@ describe("Image previewing", () => {
   });
 
   test("`preview.cover` fills the mask", () => {
-    render(<Image src={SOURCE} alt="Harbour" preview={{ cover: "Xem ảnh" }} />);
+    render(
+      <Image src={SOURCE} alt="Harbour" preview={{ cover: "View image" }} />,
+    );
 
-    expect(previewMask()).toHaveTextContent("Xem ảnh");
+    expect(previewMask()).toHaveTextContent("View image");
   });
 });
 

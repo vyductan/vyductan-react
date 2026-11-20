@@ -75,8 +75,8 @@ const Radio = <T extends FormValueType = FormValueType>({
   };
 
   if (optionType === "tag") {
-    // Chip rời: chưa chọn = chữ màu nền trong suốt (text variant),
-    // chọn = pill nền đặc (solid variant).
+    // Separate chips: unselected = colored text on a transparent background (text variant),
+    // selected = solid-filled pill (solid variant).
     const tagColor = color === "default" ? "primary" : color;
     return (
       <label
@@ -105,8 +105,8 @@ const Radio = <T extends FormValueType = FormValueType>({
   }
 
   if (variant === "pill") {
-    // Pill giữ nút radio circle: chưa chọn = chữ màu nền trong (text),
-    // chọn = chip nền soft màu (filled). Circle ăn theo currentColor.
+    // Pill that keeps the radio circle: unselected = colored text, clear background (text),
+    // selected = soft-colored chip (filled). The circle follows currentColor.
     const pillColor = color === "default" ? "primary" : color;
     return (
       <label

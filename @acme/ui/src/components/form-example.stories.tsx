@@ -1,8 +1,8 @@
 /**
  * COMPLEX INTERACTION TESTING EXAMPLES
  *
- * Đây là các ví dụ về interaction tests phức tạp chạy trong browser mode.
- * Tests này sẽ được chạy với Playwright Chromium để đảm bảo behavior giống production.
+ * Examples of complex interaction tests that run in browser mode.
+ * They run in Playwright Chromium so behavior matches production.
  */
 
 import type { Meta, StoryObj } from "@storybook/react-vite";

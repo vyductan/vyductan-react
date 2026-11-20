@@ -1,7 +1,7 @@
 /**
  * TikTok Plugin
  *
- * Plugin để embed TikTok videos vào Lexical editor
+ * Plugin to embed TikTok videos in the Lexical editor
  */
 
 import type { LexicalCommand } from "lexical";

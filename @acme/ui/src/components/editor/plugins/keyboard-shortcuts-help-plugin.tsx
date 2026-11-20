@@ -3,7 +3,7 @@
 /**
  * Keyboard Shortcuts Help Plugin
  *
- * Hiển thị modal với danh sách keyboard shortcuts khi nhấn Ctrl+/ hoặc Cmd+/
+ * Shows a modal listing keyboard shortcuts when Ctrl+/ or Cmd+/ is pressed
  */
 import type { ReactElement } from "react";
 import { useEffect, useState } from "react";

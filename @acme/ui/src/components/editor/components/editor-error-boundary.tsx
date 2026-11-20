@@ -37,7 +37,7 @@ export class EditorErrorBoundary extends React.Component<
 
     // Show user-friendly message
     message.error(
-      "Đã xảy ra lỗi với trình soạn thảo. Vui lòng thử tải lại trang.",
+      "Something went wrong in the editor. Please try reloading the page.",
     );
   }
 
@@ -73,16 +73,16 @@ function DefaultErrorFallback({
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8">
       <h3 className="mb-2 text-lg font-semibold text-red-800">
-        Lỗi trình soạn thảo
+        Editor error
       </h3>
       <p className="mb-4 text-sm text-red-600">
-        {error.message || "Đã xảy ra lỗi không xác định"}
+        {error.message || "An unknown error occurred"}
       </p>
       <button
         onClick={resetError}
         className="rounded bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
       >
-        Thử lại
+        Try again
       </button>
     </div>
   );

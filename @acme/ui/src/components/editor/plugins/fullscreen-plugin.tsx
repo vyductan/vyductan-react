@@ -1,9 +1,9 @@
 /**
  * Fullscreen Plugin
  *
- * Plugin để toggle fullscreen mode cho editor
+ * Plugin to toggle fullscreen mode for the editor
  * - Toggle fullscreen on/off
- * - Keyboard shortcut: F11 hoặc Cmd/Ctrl+Shift+F
+ * - Keyboard shortcut: F11 or Cmd/Ctrl+Shift+F
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";

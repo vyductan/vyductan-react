@@ -552,9 +552,7 @@ function TextFormatFloatingToolbar({
           ($isListNode(node) ? node : null);
 
         if (!$isListNode(listNode)) {
-          message.info(
-            "Vui lòng đặt con trỏ trong danh sách để đổi định dạng.",
-          );
+          message.info("Place the cursor inside a list to change its style.");
           return;
         }
 
@@ -584,10 +582,10 @@ function TextFormatFloatingToolbar({
     navigator.clipboard
       .writeText(url)
       .then(() => {
-        message.success("Đã sao chép liên kết khối (giả lập).");
+        message.success("Copied link to block (placeholder).");
       })
       .catch(() => {
-        message.info("Không thể sao chép liên kết, vui lòng thử lại.");
+        message.info("Could not copy the link. Please try again.");
       });
   }, []);
 
@@ -595,12 +593,12 @@ function TextFormatFloatingToolbar({
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) {
-        message.info("Chọn nội dung để nhân đôi.");
+        message.info("Select content to duplicate.");
         return;
       }
       const text = selection.getTextContent();
       if (!text) {
-        message.info("Chọn nội dung để nhân đôi.");
+        message.info("Select content to duplicate.");
         return;
       }
       selection.insertText(`${text}${text}`);
@@ -608,7 +606,7 @@ function TextFormatFloatingToolbar({
   }, [editor]);
 
   const handleMoveToBlock = useCallback(() => {
-    message.info("Move to đang được phát triển cho module này.");
+    message.info("Move to is not available yet.");
   }, []);
 
   const handleDeleteSelection = useCallback(() => {
@@ -618,7 +616,7 @@ function TextFormatFloatingToolbar({
         selection.insertText("");
       }
     });
-    message.success("Đã xóa khối đã chọn.");
+    message.success("Deleted the selected block.");
   }, [editor]);
 
   /** Notion's "Text ▾": every type the selection can be turned into. */
@@ -1085,7 +1083,7 @@ function useFloatingTextFormatToolbar(
         if (text) {
           message.info(`${label}: “${snippet}”`);
         } else {
-          message.info(`${label}: hãy chọn nội dung để thao tác.`);
+          message.info(`${label}: select some content first.`);
         }
       });
     },
@@ -1093,19 +1091,19 @@ function useFloatingTextFormatToolbar(
   );
 
   const handleExplain = useCallback(() => {
-    selectionToast("Explain (đang phát triển)");
+    selectionToast("Explain (coming soon)");
   }, [selectionToast]);
 
   const handleAskAI = useCallback(() => {
-    selectionToast("Ask AI (đang phát triển)");
+    selectionToast("Ask AI (coming soon)");
   }, [selectionToast]);
 
   const handleComment = useCallback(() => {
-    selectionToast("Comment (đang phát triển)");
+    selectionToast("Comment (coming soon)");
   }, [selectionToast]);
 
   const handleMath = useCallback(() => {
-    selectionToast("Inline math (đang phát triển)");
+    selectionToast("Inline math (coming soon)");
   }, [selectionToast]);
 
   const updatePopup = useCallback(() => {

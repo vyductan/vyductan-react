@@ -1,8 +1,8 @@
 /**
  * Table of Contents Node
  *
- * Node để render Table of Contents trong Lexical editor
- * Tự động extract headings và tạo TOC với links
+ * Node that renders a Table of Contents in the Lexical editor
+ * Extracts headings automatically and builds a TOC with links
  */
 
 import type {

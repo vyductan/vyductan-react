@@ -1,7 +1,7 @@
 /**
  * Twitter Plugin
  *
- * Plugin để embed Twitter tweets vào Lexical editor
+ * Plugin to embed Twitter tweets in the Lexical editor
  */
 
 import type { LexicalCommand } from "lexical";

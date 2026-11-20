@@ -1,8 +1,8 @@
 /**
  * Video Node
  *
- * Node để render video element trong Lexical editor
- * Hỗ trợ video files (upload) và video URLs
+ * Node that renders a video element in the Lexical editor
+ * Supports video files (upload) and video URLs
  */
 
 import type {

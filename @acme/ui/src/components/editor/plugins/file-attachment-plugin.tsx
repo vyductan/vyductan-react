@@ -1,10 +1,10 @@
 /**
  * File Attachment Plugin
  *
- * Plugin để upload và attach files (PDF, DOCX, XLSX, etc.) vào Lexical editor
- * Hỗ trợ:
- * - Upload file từ máy tính
- * - Insert file từ URL
+ * Plugin to upload and attach files (PDF, DOCX, XLSX, etc.) in the Lexical editor
+ * Supports:
+ * - Upload a file from the computer
+ * - Insert a file from URL
  */
 
 import type { LexicalCommand, LexicalEditor } from "lexical";

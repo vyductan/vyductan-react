@@ -1,8 +1,8 @@
 /**
  * Twitter Embed Node
  *
- * Node để embed Twitter tweets vào Lexical editor
- * Hỗ trợ Twitter URL: https://twitter.com/username/status/1234567890
+ * Node that embeds Twitter tweets in the Lexical editor
+ * Supported Twitter URL: https://twitter.com/username/status/1234567890
  */
 
 import type { SerializedDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";

@@ -18,7 +18,7 @@ const months = [
 ];
 
 const App: React.FC = () => (
-  // chiều rộng giới hạn để item tràn → scroll ngang + fade 2 mép
+  // limited width so items overflow → horizontal scroll + fade on both edges
   <div className="max-w-sm">
     <Segmented
       defaultValue="June"

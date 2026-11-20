@@ -26,7 +26,7 @@ function LabelWithCount({
     <span className="inline-flex items-center gap-2">
       {label}
       {loading ? (
-        // skeleton cùng kích thước badge → không layout shift khi số về
+        // skeleton the same size as the badge → no layout shift when the count arrives
         <Skeleton className="h-4 w-6 rounded-full" />
       ) : (
         <Badge
@@ -44,7 +44,7 @@ const App: React.FC = () => {
   const [counts, setCounts] = useState<Counts>();
 
   useEffect(() => {
-    // giả lập gọi API (thực tế thay bằng useQuery(trpc.x.queryOptions()))
+    // simulated API call (in real code use useQuery(trpc.x.queryOptions()))
     const timer = setTimeout(() => {
       setCounts({ all: 42, active: 8, done: 34 });
     }, 1500);

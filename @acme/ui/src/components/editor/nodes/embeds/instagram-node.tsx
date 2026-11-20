@@ -1,8 +1,8 @@
 /**
  * Instagram Embed Node
  *
- * Node để embed Instagram posts vào Lexical editor
- * Hỗ trợ Instagram URL: https://www.instagram.com/p/ABC123/
+ * Node that embeds Instagram posts in the Lexical editor
+ * Supported Instagram URL: https://www.instagram.com/p/ABC123/
  */
 
 import type { SerializedDecoratorBlockNode } from "@lexical/react/LexicalDecoratorBlockNode";

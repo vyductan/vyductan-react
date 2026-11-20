@@ -1,7 +1,7 @@
 /**
  * Table of Contents Component
  *
- * Component để render TOC với links đến headings
+ * Component that renders the TOC with links to headings
  */
 
 import type { LexicalEditor, LexicalNode, NodeKey } from "lexical";

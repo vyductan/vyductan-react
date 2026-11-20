@@ -1,8 +1,8 @@
 /**
  * Table of Contents Plugin
  *
- * Plugin để insert Table of Contents vào Lexical editor
- * Tự động extract headings và tạo TOC
+ * Plugin to insert a Table of Contents in the Lexical editor
+ * Extracts headings automatically and builds the TOC
  */
 
 import type { LexicalCommand } from "lexical";

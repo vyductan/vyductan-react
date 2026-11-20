@@ -1,7 +1,7 @@
 /**
  * Video Component
  *
- * Component để render video element trong editor
+ * Component that renders a video element in the editor
  */
 
 import type { NodeKey } from "lexical";

@@ -202,7 +202,7 @@ export function BlockFormatDropDown() {
 
 /**
  * Block Format Toolbar Plugin
- * Wrapper component để sử dụng BlockFormatDropDown với tất cả format options
+ * Wrapper component that uses BlockFormatDropDown with every format option
  */
 export function BlockFormatToolbarPlugin({
   blockType: _blockType,

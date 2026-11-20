@@ -79,7 +79,7 @@ export const Busy: Story = {
 export const SmallWithLeading: Story = {
   args: {
     size: "small",
-    placeholder: "Nhập việc cá nhân…",
+    placeholder: "Add a personal task…",
     onSubmit: fn(),
     leading: (
       <InputGroupButton aria-label="Add image" size="icon-xs" variant="ghost">

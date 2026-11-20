@@ -100,8 +100,8 @@ export const MARKDOWN_TRANSFORMERS: Array<Transformer> = [
   // CHECK_LIST removed to avoid conflict with custom [] transformer
   // CHECK_LIST,
   CHECK_BLOCK,
-  // ELEMENT_TRANSFORMERS bao gồm transformers cho lists (unordered và ordered)
-  // Cần có để Lexical có thể convert list nodes thành markdown đúng format
+  // ELEMENT_TRANSFORMERS includes the transformers for lists (unordered and ordered)
+  // Needed so Lexical converts list nodes to correctly formatted markdown
   // In a quote, a list's shortcut makes a list inside it (withQuoteLists).
   ...ELEMENT_TRANSFORMERS.map((transformer) =>
     withQuoteLists(transformer, withTabIndentedLists(transformer)),

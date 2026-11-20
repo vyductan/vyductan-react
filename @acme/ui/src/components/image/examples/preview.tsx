@@ -23,7 +23,9 @@ const App: React.FC = () => (
         width={180}
         height={120}
         className="rounded-lg"
-        preview={{ cover: <span className="text-sm text-white">Xem ảnh</span> }}
+        preview={{
+          cover: <span className="text-sm text-white">View image</span>,
+        }}
       />
     </div>
 

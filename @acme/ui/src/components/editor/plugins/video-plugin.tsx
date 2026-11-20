@@ -1,10 +1,10 @@
 /**
  * Video Plugin
  *
- * Plugin để upload và insert video files vào Lexical editor
- * Hỗ trợ:
+ * Plugin to upload and insert video files in the Lexical editor
+ * Supports:
  * - Upload video file (MP4, WebM, etc.)
- * - Insert video từ URL
+ * - Insert video from URL
  */
 
 import type { LexicalCommand, LexicalEditor } from "lexical";

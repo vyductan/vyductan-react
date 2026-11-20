@@ -1,7 +1,7 @@
 /**
  * File Attachment Component
  *
- * Component để render file attachment card trong editor
+ * Component that renders a file attachment card in the editor
  */
 
 import type { NodeKey } from "lexical";

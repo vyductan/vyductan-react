@@ -41,8 +41,8 @@ const ComponentSource = ({ src, __comp__ }: ComponentSourceProperties) => {
   const content =
     typeof src === "string" ? (exampleSourceFiles[`../${src}`] ?? src) : "";
 
-  // Dynamic import không thể dùng với biến - cần static string literal
-  // Giải pháp: Dùng __comp__ prop đã được pass vào (đơn giản nhất)
+  // Dynamic import cannot take a variable - it needs a static string literal
+  // Solution: use the __comp__ prop that is passed in (simplest)
 
   return (
     <Card className="sb-unstyled mt-6 inline-flex w-full flex-col sm:max-w-3xl">
@@ -55,16 +55,16 @@ const ComponentSource = ({ src, __comp__ }: ComponentSourceProperties) => {
   );
 };
 
-// Nếu muốn dùng dynamic import với variable paths, bạn cần tạo mapping như sau:
+// To use dynamic import with variable paths, build a mapping like this:
 // function getComponentLoader(componentPath: string) {
 //   const componentMap: Record<string, () => Promise<{ default: React.FC }>> = {
 //     "@acme/ui/components/alert-modal/examples/basic": () =>
 //       import("@acme/ui/components/alert-modal/examples/basic"),
-//     // Thêm các component khác vào đây với static imports
+//     // Add other components here with static imports
 //   };
 //   return componentMap[componentPath];
 // }
-// Sau đó sử dụng: const ComponentLoader = getComponentLoader(componentPath);
+// Then use: const ComponentLoader = getComponentLoader(componentPath);
 //                  const Comp = ComponentLoader ? dynamic(() => ComponentLoader) : null;
 
 export { ComponentSource };
