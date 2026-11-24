@@ -62,6 +62,7 @@ import { EmojisPlugin } from "../plugins/emojis-plugin";
 import { KeywordsPlugin } from "../plugins/keywords-plugin";
 import { LinkPlugin } from "../plugins/link-plugin";
 import { MentionsPlugin } from "../plugins/mentions-plugin";
+import { $insertLineAfterImage } from "../utils/insert-line-after-image";
 import { ImagePreview } from "./image-preview";
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
@@ -489,6 +490,34 @@ export default function ImageComponent({
     link.download = altText || "image";
     link.click();
   }, [downloadImage, src, altText]);
+
+  /**
+   * Enter in the caption is done with it, as in Notion: the caret goes to a
+   * new line under the image. It made a second caption line instead, where
+   * the next thing typed or pasted went astray. Shift+Enter still breaks a
+   * line in the caption.
+   */
+  useEffect(
+    () =>
+      caption.registerCommand(
+        KEY_ENTER_COMMAND,
+        (event: KeyboardEvent | null) => {
+          if (event?.shiftKey) return false;
+          event?.preventDefault();
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (!node) return;
+            const line = $createParagraphNode();
+            $insertLineAfterImage(node, line);
+            line.select();
+          });
+          editor.focus();
+          return true;
+        },
+        COMMAND_PRIORITY_LOW,
+      ),
+    [caption, editor, nodeKey],
+  );
 
   // Shows the caption, or goes to it when it is there already.
   const handleCaptionToggle = useCallback(() => {

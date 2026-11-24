@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+import type { LexicalEditor } from "lexical";
 import type { JSX } from "react";
 import { useEffect, useRef } from "react";
 import { $createLinkNode } from "@lexical/link";
@@ -12,9 +13,11 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { DRAG_DROP_PASTE } from "@lexical/rich-text";
 import { isMimeType, mediaFileReader, mergeRegister } from "@lexical/utils";
 import {
+  $createParagraphNode,
   $createTextNode,
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
+  $getSelection,
   COMMAND_PRIORITY_LOW,
   HISTORY_MERGE_TAG,
   PASTE_COMMAND,
@@ -28,6 +31,7 @@ import {
   $insertImageNode,
   INSERT_IMAGE_COMMAND,
 } from "../plugins/images-plugin";
+import { $insertLineAfterImage } from "../utils/insert-line-after-image";
 
 const ACCEPTABLE_IMAGE_TYPES = [
   "image/",
@@ -39,6 +43,19 @@ const ACCEPTABLE_IMAGE_TYPES = [
 
 interface DragDropPastePluginProperties {
   onImageUpload?: (file: File) => Promise<string>;
+}
+
+/**
+ * The image whose caption has the focus, when the page itself has no
+ * selection: a caption is an editor of its own, nested in the image.
+ */
+function $captionedImage(editor: LexicalEditor) {
+  if ($getSelection() !== null) return null;
+  const active = document.activeElement;
+  const root = editor.getRootElement();
+  if (!active || !root?.contains(active)) return null;
+  const node = $getNearestNodeFromDOMNode(active);
+  return $isImageNode(node) ? node : null;
 }
 
 export function DragDropPastePlugin({
@@ -87,6 +104,23 @@ export function DragDropPastePlugin({
                       nodeReference.current = imageNode.getKey();
                       return;
                     }
+                  }
+
+                  // Pasted in a caption: the page has no caret then, and
+                  // the image went to the very end of it. It goes right
+                  // after the image whose caption it was.
+                  const captioned = $captionedImage(editor);
+                  if (captioned) {
+                    const imageNode = $createImageNode({
+                      altText: file.name,
+                      src: source,
+                      loading: true,
+                    });
+                    const line = $createParagraphNode().append(imageNode);
+                    $insertLineAfterImage(captioned, line);
+                    line.selectEnd();
+                    nodeReference.current = imageNode.getKey();
+                    return;
                   }
 
                   // Fallback to default insertion
