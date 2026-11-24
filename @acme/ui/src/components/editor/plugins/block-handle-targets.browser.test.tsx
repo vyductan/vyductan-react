@@ -456,3 +456,42 @@ test("the menu deletes the sub-item the handle stands beside, not its list", asy
     ]),
   );
 });
+
+/** Left edge of the handle, once it has settled beside `line`. */
+async function handleLeftBeside(line: HTMLElement) {
+  await userEvent.hover(line);
+  await waitFor(() =>
+    expect(Math.abs(centreY(handle()) - centreY(line))).toBeLessThan(8),
+  );
+  return handle().getBoundingClientRect().left;
+}
+
+/**
+ * Notion's handle stands beside a nested item, indented with it; ours stayed
+ * out in the page's gutter, far from the line it acts on (2026-11-24).
+ */
+test.each(["bullet", "check"] as const)(
+  "a nested %s item's handle is indented with it",
+  async (kind) => {
+    await renderEditor(() => {
+      buildNestedList();
+      const list = $getRoot().getChildAtIndex(1);
+      if (!$isListNode(list)) return;
+      list.setListType(kind);
+      const holder = list.getChildAtIndex(1);
+      const nested = $isListItemNode(holder) ? holder.getFirstChild() : null;
+      if ($isListNode(nested)) nested.setListType(kind);
+    });
+
+    const top = lineOf("Khung framework");
+    const sub = lineOf("B behavior");
+    const topLeft = await handleLeftBeside(top);
+    const subLeft = await handleLeftBeside(sub);
+    const indent =
+      sub.closest("li")!.getBoundingClientRect().left -
+      top.closest("li")!.getBoundingClientRect().left;
+
+    expect(indent).toBeGreaterThan(0);
+    expect(subLeft - topLeft).toBeCloseTo(indent, 0);
+  },
+);

@@ -331,13 +331,31 @@ function setMenuPosition(
       anchorRect.top +
       anchorElem.scrollTop) /
     zoomLevel;
-  // In a column the handle goes beside the block, not out in the gutter.
+  // In a column the handle goes beside the block, not out in the gutter. A
+  // nested list item's goes in by the item's indent, as Notion's does: out in
+  // the gutter it stood far from the line it acts on.
   const left = inColumn.has(targetElem)
     ? (targetRect.left - anchorRect.left - floatingRect.width) / zoomLevel
-    : SPACE;
+    : SPACE + listIndent(targetElem, targetRect) / zoomLevel;
   floatingElem.style.display = "flex";
   floatingElem.style.opacity = "1";
   floatingElem.style.transform = `translate(${left}px, ${top}px)`;
+}
+
+/** How far a list item stands in from the items of its outermost list. */
+function listIndent(item: HTMLElement, itemRect: DOMRect): number {
+  if (item.tagName !== "LI") return 0;
+  let outermost: HTMLElement | null = null;
+  for (
+    let parent = item.parentElement;
+    parent && parent.isContentEditable;
+    parent = parent.parentElement
+  ) {
+    if (parent.tagName === "UL" || parent.tagName === "OL") outermost = parent;
+  }
+  const first = outermost?.firstElementChild;
+  if (!(first instanceof HTMLElement)) return 0;
+  return Math.max(0, itemRect.left - first.getBoundingClientRect().left);
 }
 
 function setDragImage(dataTransfer: DataTransfer, blockElem: HTMLElement) {
