@@ -23,15 +23,25 @@ const toMarkdown = (node: ImageNodeType): string | null => {
   return `![${node.getAltText()}](${source}${title})`;
 };
 
+/**
+ * `![alt](src title)`, the title in any of markdown's three forms: `"…"`,
+ * `'…'` or `(…)`. Prettier writes `'…'` — format on save turned every
+ * caption into one — and read with only `"…"` in mind, the title became
+ * part of the path: the image broke and its caption was gone. Written back
+ * always as `"…"`.
+ */
+const IMAGE_PATTERN = String.raw`!\[([^[]*)\]\(([^(]+?)(?:\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|\(((?:[^()\\]|\\.)*)\)))?\)`;
+
 export const IMAGE: TextMatchTransformer = {
   dependencies: [ImageNode],
   export: (node) => {
     return $isImageNode(node) ? toMarkdown(node) : null;
   },
-  importRegExp: /!\[([^[]*)\]\(([^(]+?)(?:\s+"((?:[^"\\]|\\.)*)")?\)/,
-  regExp: /!\[([^[]*)\]\(([^(]+?)(?:\s+"((?:[^"\\]|\\.)*)")?\)$/,
+  importRegExp: new RegExp(IMAGE_PATTERN),
+  regExp: new RegExp(`${IMAGE_PATTERN}$`),
   replace: (textNode, match) => {
-    const [, altText, source, title] = match;
+    const [, altText, source, double, single, parenthesized] = match;
+    const title = double ?? single ?? parenthesized;
     const imageNode = $createImageNode({
       altText: altText ?? "",
       maxWidth: 800,

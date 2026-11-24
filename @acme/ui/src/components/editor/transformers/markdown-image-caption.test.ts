@@ -73,4 +73,29 @@ describe("IMAGE markdown transformer: captions", () => {
   test("writes an image without a caption as it was", () => {
     expect(roundTrip("![pic](assets/a.png)")).toBe("![pic](assets/a.png)");
   });
+
+  // Prettier writes a title in single quotes when it holds none; markdown
+  // also takes one in parentheses. Read with only "…" in mind, the title
+  // became part of the path: the image broke and its caption was gone
+  // (2026-11-24, after a save that format-on-save rewrote).
+  test.each([
+    ["single quotes", "![pic](assets/a.png 'Nice shot')"],
+    ["parentheses", "![pic](assets/a.png (Nice shot))"],
+  ])("reads a title in %s as the caption", (_, markdown) => {
+    expect(imageOf(markdown)).toStrictEqual({
+      src: "assets/a.png",
+      altText: "pic",
+      showCaption: true,
+      caption: "Nice shot",
+    });
+    expect(roundTrip(markdown)).toBe('![pic](assets/a.png "Nice shot")');
+  });
+
+  test("an image with a quoted title next to another keeps both apart", () => {
+    const markdown =
+      "![a](assets/a.png 'Edit booking')![b](assets/b.png)";
+    expect(roundTrip(markdown)).toBe(
+      '![a](assets/a.png "Edit booking")![b](assets/b.png)',
+    );
+  });
 });
