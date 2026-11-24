@@ -19,7 +19,6 @@ import {
   $isElementNode,
   $isParagraphNode,
   $isRangeSelection,
-  $isRootNode,
   $isTextNode,
   $setState,
   COPY_COMMAND,
@@ -62,50 +61,6 @@ import { $setBlocksTypeLiftingChildren } from "../utils/set-blocks-type-lifting-
 import { DraggableBlockPlugin_EXPERIMENTAL } from "./default/lexical-draggable-block-plugin";
 
 const DRAGGABLE_BLOCK_MENU_CLASSNAME = "draggable-block-menu";
-
-/**
- * The block the drag handle belongs to for a hovered node, or null when there
- * is no block to drag.
- *
- * Null is a real answer, not a defensive one: the pointer resting on the
- * editor's own padding resolves to the ROOT node, and a root has no top-level
- * element by definition. Asking it for one used to throw
- * "root nodes are not top level elements" out of a mousemove listener, which
- * surfaced as a runtime error overlay the moment a page with the editor was
- * opened.
- *
- * The block is the root's own child, not `getTopLevelElement()`: that stops at
- * a shadow root, and a table cell, a callout and a toggle's body are shadow
- * roots. The handle stands beside the root's children (getBlockElement), so
- * inside a table it acted on the paragraph in a cell — "+" put its new line,
- * and the "/", into the cell.
- */
-export function $draggableBlockForNode(node: LexicalNode): LexicalNode | null {
-  let topLevel: LexicalNode | null = node;
-  while (topLevel && !$isRootNode(topLevel.getParent())) {
-    topLevel = topLevel.getParent();
-  }
-
-  if (!topLevel) {
-    return null;
-  }
-
-  if (!$isListNode(topLevel)) {
-    return topLevel;
-  }
-
-  // Inside a list it is the item that gets dragged, not the whole list.
-  let current: LexicalNode | null = node;
-
-  while (current && current !== topLevel) {
-    if ($isListItemNode(current)) {
-      return current;
-    }
-    current = current.getParent();
-  }
-
-  return topLevel;
-}
 
 /**
  * The block colors "Color" offers, as Notion names them (see
@@ -302,40 +257,31 @@ export function DraggableBlockPlugin({
     [isMenuOpen, isTurnIntoOpen, isColorOpen],
   );
 
-  // Update currentNodeKey when hovering blocks
-  useEffect(() => {
-    if (!anchorElem) return;
-
-    const handleMouseMove = (event: MouseEvent) => {
+  /**
+   * The block the menu acts on is the one the handle stands beside — the
+   * element the drag plugin placed it by — never a second guess from the
+   * node under the pointer. That guess, over a nested list's indent on the
+   * way to the handle, was the list's wrapper item: the handle stayed on one
+   * line and Delete took every item under it (2026-11-24).
+   */
+  const handleElementChanged = useCallback(
+    (element: HTMLElement | null) => {
       // Reaching for a menu item drags the pointer across the blocks in
-      // between, and each crossing used to retarget the handle — so "Turn into"
-      // landed on whatever the pointer last passed over rather than the block
-      // the menu was opened on. While the menu is showing, the block it was
-      // opened on is the answer, whatever the pointer is over now.
-      if (isMenuShowingReference.current) return;
-
-      const target = event.target as Node | null;
-      if (!target) return;
-
-      editor.read(() => {
-        const node = $getNearestNodeFromDOMNode(target);
-        if (!node) return;
-
-        const block = $draggableBlockForNode(node);
-
-        // Keep the last block rather than clearing it: the pointer crossing the
-        // padding between two blocks should not drop the handle.
-        if (block) {
-          currentNodeKeyReference.current = block.getKey();
-        }
-      });
-    };
-
-    anchorElem.addEventListener("mousemove", handleMouseMove);
-    return () => {
-      anchorElem.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, [anchorElem, editor]);
+      // between; while the menu shows, the block it was opened on stays.
+      // Keep the last block on null too: the pointer crossing the padding
+      // between two blocks should not drop it.
+      if (isMenuShowingReference.current || !element) return;
+      // The committed state, not editor.read(): a drop's update must not be
+      // committed early from here (see getBlockElement).
+      const key = editor
+        .getEditorState()
+        .read(() => $getNearestNodeFromDOMNode(element)?.getKey() ?? null, {
+          editor,
+        });
+      if (key) currentNodeKeyReference.current = key;
+    },
+    [editor],
+  );
 
   // Typing hides the handle and its "+", as Notion does: they sit beside the
   // line being written and draw the eye. The pointer moving brings them back.
@@ -839,6 +785,7 @@ export function DraggableBlockPlugin({
         />
       }
       isOnMenu={isOnMenu}
+      onElementChanged={handleElementChanged}
     />
   );
 }

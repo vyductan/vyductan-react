@@ -397,3 +397,62 @@ test("undo highlights the block it brings back", async () => {
   );
   await waitFor(() => expect(isFlashing(lineOf("After"))).toBe(true));
 });
+
+/**
+ * The shape of the 2026-11-24 report: a to-do with to-dos under it. The
+ * handle stood beside one sub-item while Delete took them all.
+ */
+function buildNestedTodos() {
+  buildNestedList();
+  const list = $getRoot().getChildAtIndex(1);
+  if (!$isListNode(list)) return;
+  list.setListType("check");
+  const holder = list.getChildAtIndex(1);
+  const nested = $isListItemNode(holder) ? holder.getFirstChild() : null;
+  if ($isListNode(nested)) nested.setListType("check");
+}
+
+test("the menu deletes the sub-item the handle stands beside, not its list", async () => {
+  const editor = await renderEditor(buildNestedTodos);
+
+  const target = lineOf("B behavior");
+  await userEvent.hover(target);
+  await waitFor(() =>
+    expect(Math.abs(centreY(handle()) - centreY(target))).toBeLessThan(8),
+  );
+
+  // Then to the handle, as a hand goes: left along the line, across the
+  // sub-list's indent — where the node under the pointer is the list, not
+  // the item.
+  const editable = document.querySelector<HTMLElement>(
+    '[contenteditable="true"]',
+  )!;
+  const box = editable.getBoundingClientRect();
+  const from = target.getBoundingClientRect().left - 4;
+  const to = Math.max(box.left + 1, handle().getBoundingClientRect().right);
+  const y = centreY(target) - box.top;
+  for (let step = 0; step <= 10; step++) {
+    const x = from - ((from - to) * step) / 10;
+    await userEvent.hover(editable, {
+      position: { x: x - box.left, y },
+      force: true,
+    });
+  }
+
+  await userEvent.click(grip());
+  const remove = await waitFor(() => {
+    const item = [
+      ...document.querySelectorAll<HTMLElement>("[cmdk-item]"),
+    ].find((node) => node.textContent === "Delete");
+    expect(item).toBeDefined();
+    return item!;
+  });
+  await userEvent.click(remove);
+
+  await waitFor(() =>
+    expect(shape(editor)).toEqual([
+      "Intro",
+      ["Khung framework", ["S situation", "Ví dụ example"], "After"],
+    ]),
+  );
+});

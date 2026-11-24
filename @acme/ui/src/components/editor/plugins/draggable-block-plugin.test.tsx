@@ -2,13 +2,11 @@ import "@testing-library/jest-dom/vitest";
 
 import type { LexicalEditor } from "lexical";
 import * as React from "react";
-import { $createListItemNode, $createListNode } from "@lexical/list";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { $createTableNodeWithDimensions } from "@lexical/table";
 import {
   act,
   cleanup,
@@ -19,17 +17,12 @@ import {
 import {
   $createParagraphNode,
   $createTextNode,
-  $getNodeByKey,
   $getRoot,
 } from "lexical";
 import { afterEach, expect, test } from "vitest";
 
-import { $createCalloutNode } from "../nodes/callout-node";
 import { nodes } from "../nodes/nodes";
-import {
-  $draggableBlockForNode,
-  DraggableBlockPlugin,
-} from "./draggable-block-plugin";
+import { DraggableBlockPlugin } from "./draggable-block-plugin";
 
 Object.assign(globalThis, { React });
 
@@ -131,115 +124,4 @@ test("hovering the editor's own padding does not throw", async () => {
   window.removeEventListener("error", onError);
 
   expect(errors).toEqual([]);
-});
-
-/**
- * Which block the drag handle should attach to. The root is the case that
- * crashed: a pointer over the editor's padding resolves to it, and a root has
- * no top-level element by definition.
- */
-test("resolves the block a hovered node belongs to, and nothing for the root", async () => {
-  const { editor } = await mountHarness();
-
-  const keys = {
-    paragraph: "",
-    paragraphText: "",
-    list: "",
-    item: "",
-    itemText: "",
-  };
-
-  act(() => {
-    editor.update(
-      () => {
-        const root = $getRoot();
-        // The initial state already holds an empty paragraph; clearing keeps the
-        // keys below unambiguous.
-        root.clear();
-
-        const paragraphText = $createTextNode("A paragraph");
-        const paragraph = $createParagraphNode();
-        paragraph.append(paragraphText);
-
-        const itemText = $createTextNode("An item");
-        const item = $createListItemNode();
-        item.append(itemText);
-        const list = $createListNode("bullet");
-        list.append(item);
-
-        root.append(paragraph, list);
-
-        keys.paragraph = paragraph.getKey();
-        keys.paragraphText = paragraphText.getKey();
-        keys.list = list.getKey();
-        keys.item = item.getKey();
-        keys.itemText = itemText.getKey();
-      },
-      // Committed synchronously: Lexical otherwise commits on a microtask, and
-      // the read below would run against the state before any of this existed.
-      { discrete: true },
-    );
-  });
-
-  editor.getEditorState().read(() => {
-    const blockKeyFor = (key: string) => {
-      const node = $getNodeByKey(key);
-      if (!node) throw new Error(`fixture lost node ${key}`);
-      return $draggableBlockForNode(node)?.getKey() ?? null;
-    };
-
-    expect($draggableBlockForNode($getRoot())).toBeNull();
-    expect(blockKeyFor(keys.paragraphText)).toBe(keys.paragraph);
-
-    // Inside a list it is the item that gets dragged, not the whole list.
-    expect(blockKeyFor(keys.itemText)).toBe(keys.item);
-
-    // Hovering the list itself has no item to pick, so the list stands.
-    expect(blockKeyFor(keys.list)).toBe(keys.list);
-  });
-});
-
-/**
- * The handle stands beside the blocks at the top of the page (see
- * getBlockElement), so the block it acts on must be that one too. A table
- * cell and a callout are shadow roots, where getTopLevelElement stops: the
- * handle beside a table acted on the paragraph inside a cell, and "+" put
- * its new line — and the "/" — into the cell.
- */
-test("a node inside a table or a callout belongs to the table or the callout", async () => {
-  const { editor } = await mountHarness();
-  const keys = { table: "", cellText: "", callout: "", calloutText: "" };
-
-  act(() => {
-    editor.update(
-      () => {
-        const root = $getRoot();
-        root.clear();
-
-        const table = $createTableNodeWithDimensions(2, 2, false);
-        const cellText = $createTextNode("In a cell");
-        table.getFirstDescendant()?.getParent()?.append(cellText);
-
-        const calloutText = $createTextNode("In a callout");
-        const callout = $createCalloutNode("💡").append(
-          $createParagraphNode().append(calloutText),
-        );
-
-        root.append(table, callout);
-        keys.table = table.getKey();
-        keys.cellText = cellText.getKey();
-        keys.callout = callout.getKey();
-        keys.calloutText = calloutText.getKey();
-      },
-      { discrete: true },
-    );
-  });
-
-  editor.getEditorState().read(() => {
-    const blockKeyFor = (key: string) =>
-      $draggableBlockForNode($getNodeByKey(key)!)?.getKey() ?? null;
-
-    expect(blockKeyFor(keys.cellText)).toBe(keys.table);
-    expect(blockKeyFor(keys.calloutText)).toBe(keys.callout);
-  });
 });
