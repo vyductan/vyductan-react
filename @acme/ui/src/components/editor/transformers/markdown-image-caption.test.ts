@@ -92,8 +92,7 @@ describe("IMAGE markdown transformer: captions", () => {
   });
 
   test("an image with a quoted title next to another keeps both apart", () => {
-    const markdown =
-      "![a](assets/a.png 'Edit booking')![b](assets/b.png)";
+    const markdown = "![a](assets/a.png 'Edit booking')![b](assets/b.png)";
     expect(roundTrip(markdown)).toBe(
       '![a](assets/a.png "Edit booking")![b](assets/b.png)',
     );
